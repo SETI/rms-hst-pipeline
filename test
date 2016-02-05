@@ -1,0 +1,8 @@
+#!/bin/bash
+echo Running unit tests:
+echo '-- FileArchive'
+python FileArchive.py
+echo '-- HstFilename'
+python HstFilename.py
+python ValidateArchive.py
+
