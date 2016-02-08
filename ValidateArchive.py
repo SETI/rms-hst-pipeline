@@ -45,7 +45,7 @@ def validateArchive(arch):
         print(traceback.format_exc())
         sys.exit(1)
 
-if False:
+if True:
     print 'Now validating the archive: will take about two hours.'
     a = FileArchive.FileArchive('/Volumes/PDART-3TB')
 else:
