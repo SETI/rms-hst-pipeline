@@ -9,7 +9,11 @@ class FileArchive:
         assert os.path.exists(root)
         self.root = root
 
-    # TODO Define __str__ and __repr__
+    def __str__(self):
+        return repr(self.root)
+
+    def __repr__(self):
+        return 'FileArchive(%s)' % repr(self.root)
 
     #### Verifying parts
 
@@ -122,6 +126,16 @@ class TestFileArchive(unittest.TestCase):
             FileArchive(tempdir)
         finally:
             shutil.rmtree(tempdir)
+
+    def testStr(self):
+        tempdir = tempfile.mkdtemp()
+        a = FileArchive(tempdir)
+        self.assertEqual(repr(tempdir), str(a))
+
+    def testRepr(self):
+        tempdir = tempfile.mkdtemp()
+        a = FileArchive(tempdir)
+        self.assertEqual('FileArchive(%s)' % repr(tempdir), repr(a))
 
     def testIsValidInstrument(self):
         self.assertTrue(FileArchive.isValidInstrument('wfc3'))

@@ -9,7 +9,7 @@ import FileArchives
 import HstFilename
 
 def validateArchive(arch):
-    print 'Now validating the archive at %s' % arch.root
+    print 'Now validating %s' % repr(arch)
     proposalDict = {}
     fileCount = 0
 
