@@ -4,5 +4,7 @@ echo '-- FileArchive'
 python FileArchive.py
 echo '-- HstFilename'
 python HstFilename.py
+echo '-- Label'
+python Label.py
 python ValidateArchive.py
 

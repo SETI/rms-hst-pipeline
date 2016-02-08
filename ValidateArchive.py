@@ -5,9 +5,11 @@ import traceback
 import pyfits
 
 import FileArchive
+import FileArchives
 import HstFilename
 
 def validateArchive(arch):
+    print 'Now validating the archive at %s' % arch.root
     proposalDict = {}
     fileCount = 0
 
@@ -45,11 +47,4 @@ def validateArchive(arch):
         print(traceback.format_exc())
         sys.exit(1)
 
-if True:
-    print 'Now validating the archive: will take about two hours.'
-    a = FileArchive.FileArchive('/Volumes/PDART-3TB')
-else:
-    print 'Now validating the mini-archive: will take about two minutes.'
-    a = FileArchive.FileArchive('/Users/spaceman/Desktop/Archive')
-
-validateArchive(a)
+validateArchive(FileArchives.getAnyArchive())

@@ -9,6 +9,8 @@ class FileArchive:
         assert os.path.exists(root)
         self.root = root
 
+    # TODO Define __str__ and __repr__
+
     #### Verifying parts
 
     @staticmethod
