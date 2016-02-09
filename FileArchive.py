@@ -80,6 +80,28 @@ class FileArchive:
                     and f[0] != '.'):
                     yield (inst, prop, vis, f)
 
+    #### Creating LIDs
+
+    @staticmethod
+    def quadrupleToLID(inst, prop, vis, f):
+        bundlePart = 'hst_%d' % prop
+
+        noExt = os.path.splitext(f)[0]
+        parts = noExt.split('_')
+        suffix = '_'.join(parts[1:])
+        collectionPart = 'data_%s_%s' % (inst, suffix)
+
+        productPart = parts[0]
+
+        return 'urn:nasa:pds:%s' % ':'.join([bundlePart,
+                                             collectionPart,
+                                             productPart])
+    def listLIDs(self):
+        res = set()
+        for (inst, prop, vis, f) in self.walkFiles():
+            res.add(FileArchive.quadrupleToLID(inst, prop, vis, f))
+        return sorted(res)
+
     #### Listing parts of the archive
 
     def listInstruments(self):
