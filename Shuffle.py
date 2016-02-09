@@ -1,10 +1,11 @@
+import os
 import os.path
 
 import FileArchive
 import FileArchives
 
 def quadrupleToNewFilepath(inst, prop, vis, f):
-    bundlePart = 'hst_%d' % prop
+    bundlePart = 'hst_%05d' % prop
 
     noExt = os.path.splitext(f)[0]
     parts = noExt.split('_')
@@ -15,9 +16,16 @@ def quadrupleToNewFilepath(inst, prop, vis, f):
     return '/'.join([bundlePart, collectionPart, visitPart, f])
 
 def shuffle(arch):
+    dstDirs = set()
     for (inst, prop, vis, f) in arch.walkFiles():
         src = '/'.join([arch.visitFilepath(inst, prop, vis), f])
         dst = '/'.join([arch.root, quadrupleToNewFilepath(inst, prop, vis, f)])
-        print 'mv %s %s' % (src, dst)
+
+        # TODO This is not tested
+        dstDir = os.path.dirname(dst)
+        if dstDir not in dstDirs:
+            os.makedirs(dstDir)
+            dstDirs.add(dstDir)
+        os.rename(src, dst)
 
 shuffle(FileArchives.getAnyArchive())
