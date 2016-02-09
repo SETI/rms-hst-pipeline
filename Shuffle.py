@@ -21,7 +21,6 @@ def shuffle(arch):
         src = '/'.join([arch.visitFilepath(inst, prop, vis), f])
         dst = '/'.join([arch.root, quadrupleToNewFilepath(inst, prop, vis, f)])
 
-        # TODO This is not tested
         dstDir = os.path.dirname(dst)
         if dstDir not in dstDirs:
             os.makedirs(dstDir)
