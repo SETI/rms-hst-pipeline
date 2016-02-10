@@ -106,7 +106,7 @@ class TestLID(unittest.TestCase):
                         != LID('urn:nasa:pds:bundle:collection:produit'))
 
     def testStr(self):
-        self.assertEquals(str('urn:nasa:pds:bundle:collection:product'),
+        self.assertEquals('urn:nasa:pds:bundle:collection:product',
                           str(LID('urn:nasa:pds:bundle:collection:product')))
 
     def testRepr(self):
@@ -115,4 +115,3 @@ class TestLID(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-                

@@ -6,5 +6,11 @@ echo '-- HstFilename'
 python HstFilename.py
 echo '-- Label'
 python Label.py
+echo '-- LID'
+python LID.py
+echo '-- LIDVID'
+python LIDVID.py
+echo '-- VID'
+python VID.py
 python ValidateArchive.py
 
