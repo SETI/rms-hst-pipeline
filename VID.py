@@ -14,11 +14,11 @@ class VID:
 	self.major = int(vs[0])
 	self.minor = int(vs[1])
 
-    def __eq__(self, other):
-	return self.VID == other.VID
-
-    def __ne__(self, other):
-	return self.VID != other.VID
+    def __cmp__(self, other):
+        res = self.major - other.major
+        if res == 0:
+            res = self.minor - other.minor
+        return res
 
     def __str__(self):
 	return self.VID
@@ -55,11 +55,11 @@ class TestVID(unittest.TestCase):
         self.assertEqual(3, v.major)
         self.assertEqual(14159265, v.minor)
 
-    def testEq(self):
+    def testCmp(self):
         self.assertTrue(VID('2.3') == VID('2.3'))
         self.assertTrue(VID('2.3') != VID('2.4'))
-        self.assertFalse(VID('2.3') == VID('3.2'))
-        self.assertFalse(VID('2.3') != VID('2.3'))
+        self.assertTrue(VID('2.3') < VID('3.2'))
+        self.assertTrue(VID('2.3') > VID('2.2'))
 
     def testStr(self):
         self.assertEquals('2.3', str(VID('2.3')))
