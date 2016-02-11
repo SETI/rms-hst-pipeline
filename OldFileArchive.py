@@ -4,7 +4,7 @@ import re
 
 import HstFilename
 
-class FileArchive:
+class OldFileArchive:
     def __init__(self, root):
         assert os.path.exists(root)
         self.root = root
@@ -13,7 +13,7 @@ class FileArchive:
         return repr(self.root)
 
     def __repr__(self):
-        return 'FileArchive(%s)' % repr(self.root)
+        return 'OldFileArchive(%s)' % repr(self.root)
 
     #### Verifying parts
 
@@ -36,16 +36,16 @@ class FileArchive:
 
     def instrumentFilepath(self, inst):
         inst = inst.lower()
-        assert FileArchive.isValidInstrument(inst)
+        assert OldFileArchive.isValidInstrument(inst)
         return os.path.join(self.root, inst)
 
     def proposalFilepath(self, inst, prop):
-        assert FileArchive.isValidProposal(prop), prop
+        assert OldFileArchive.isValidProposal(prop), prop
         return os.path.join(self.instrumentFilepath(inst), "hst_%05d" % prop)
 
     def visitFilepath(self, inst, prop, vis):
         vis = vis.lower()
-        assert FileArchive.isValidVisit(vis)
+        assert OldFileArchive.isValidVisit(vis)
         return os.path.join(self.proposalFilepath(inst, prop),
                             "visit_%s" % vis)
 
@@ -54,7 +54,7 @@ class FileArchive:
     def walkInstruments(self):
         for d in os.listdir(self.root):
             if (os.path.isdir(os.path.join(self.root, d))
-                and FileArchive.isValidInstrument(d)):
+                and OldFileArchive.isValidInstrument(d)):
                 yield d
 
     def walkProposals(self):
@@ -69,7 +69,7 @@ class FileArchive:
             propFilepath = self.proposalFilepath(inst, prop)
             for d in os.listdir(propFilepath):
                 if (os.path.isdir(os.path.join(propFilepath, d))
-                    and FileArchive.isValidVisit(d[6:])):
+                    and OldFileArchive.isValidVisit(d[6:])):
                     yield (inst, prop, d[6:])
 
     def walkFiles(self):
@@ -99,7 +99,7 @@ class FileArchive:
     def listLIDs(self):
         res = set()
         for (inst, prop, vis, f) in self.walkFiles():
-            res.add(FileArchive.quadrupleToLID(inst, prop, vis, f))
+            res.add(OldFileArchive.quadrupleToLID(inst, prop, vis, f))
         return sorted(res)
 
     #### Listing parts of the archive
@@ -107,7 +107,7 @@ class FileArchive:
     def listInstruments(self):
         return sorted([d for d in os.listdir(self.root)
                        if (os.path.isdir(os.path.join(self.root, d))
-                           and FileArchive.isValidInstrument(d))])
+                           and OldFileArchive.isValidInstrument(d))])
 
     def listProposals(self, inst):
         inst = inst.lower()
@@ -119,7 +119,7 @@ class FileArchive:
         propFilepath = self.proposalFilepath(inst, prop)
         return sorted([v[6:] for v in os.listdir(propFilepath)
                        if (os.path.isdir(os.path.join(propFilepath, v))
-                           and FileArchive.isValidVisit(v[6:]))])
+                           and OldFileArchive.isValidVisit(v[6:]))])
 
     def listFiles(self, inst, prop, vis):
         visFilepath = self.visitFilepath(inst, prop, vis)
@@ -133,60 +133,60 @@ import shutil
 import tempfile
 import unittest
 
-class TestFileArchive(unittest.TestCase):
+class TestOldFileArchive(unittest.TestCase):
     def testInit(self):
         with self.assertRaises(Exception):
-            FileArchive(None)
+            OldFileArchive(None)
         with self.assertRaises(Exception):
-            FileArchive("I'm/betting/this/directory/doesn't/exist")
+            OldFileArchive("I'm/betting/this/directory/doesn't/exist")
 
-        FileArchive('/')	# guaranteed to exist
+        OldFileArchive('/')	# guaranteed to exist
 
         # but try with another directory
         tempdir = tempfile.mkdtemp()
         try:
-            FileArchive(tempdir)
+            OldFileArchive(tempdir)
         finally:
             shutil.rmtree(tempdir)
 
     def testStr(self):
         tempdir = tempfile.mkdtemp()
-        a = FileArchive(tempdir)
+        a = OldFileArchive(tempdir)
         self.assertEqual(repr(tempdir), str(a))
 
     def testRepr(self):
         tempdir = tempfile.mkdtemp()
-        a = FileArchive(tempdir)
-        self.assertEqual('FileArchive(%s)' % repr(tempdir), repr(a))
+        a = OldFileArchive(tempdir)
+        self.assertEqual('OldFileArchive(%s)' % repr(tempdir), repr(a))
 
     def testIsValidInstrument(self):
-        self.assertTrue(FileArchive.isValidInstrument('wfc3'))
-        self.assertTrue(FileArchive.isValidInstrument('wfpc2'))
-        self.assertTrue(FileArchive.isValidInstrument('acs'))
-        self.assertFalse(FileArchive.isValidInstrument('Acs'))
-        self.assertFalse(FileArchive.isValidInstrument('ACS'))
-        self.assertFalse(FileArchive.isValidInstrument('ABC'))
-        self.assertFalse(FileArchive.isValidInstrument(None))
+        self.assertTrue(OldFileArchive.isValidInstrument('wfc3'))
+        self.assertTrue(OldFileArchive.isValidInstrument('wfpc2'))
+        self.assertTrue(OldFileArchive.isValidInstrument('acs'))
+        self.assertFalse(OldFileArchive.isValidInstrument('Acs'))
+        self.assertFalse(OldFileArchive.isValidInstrument('ACS'))
+        self.assertFalse(OldFileArchive.isValidInstrument('ABC'))
+        self.assertFalse(OldFileArchive.isValidInstrument(None))
 
     def testIsValidProposal(self):
-        self.assertFalse(FileArchive.isValidProposal(-1))
-        self.assertTrue(FileArchive.isValidProposal(0))
-        self.assertTrue(FileArchive.isValidProposal(1))
-        self.assertFalse(FileArchive.isValidProposal(100000))
-        self.assertFalse(FileArchive.isValidProposal(3.14159265))
-        self.assertFalse(FileArchive.isValidProposal('xxx'))
-        self.assertFalse(FileArchive.isValidProposal(None))
+        self.assertFalse(OldFileArchive.isValidProposal(-1))
+        self.assertTrue(OldFileArchive.isValidProposal(0))
+        self.assertTrue(OldFileArchive.isValidProposal(1))
+        self.assertFalse(OldFileArchive.isValidProposal(100000))
+        self.assertFalse(OldFileArchive.isValidProposal(3.14159265))
+        self.assertFalse(OldFileArchive.isValidProposal('xxx'))
+        self.assertFalse(OldFileArchive.isValidProposal(None))
 
     def testIsValidVisit(self):
-        self.assertTrue(FileArchive.isValidVisit('01'))
-        self.assertFalse(FileArchive.isValidVisit('xxx'))
-        self.assertFalse(FileArchive.isValidVisit(01))
-        self.assertFalse(FileArchive.isValidVisit(None))
+        self.assertTrue(OldFileArchive.isValidVisit('01'))
+        self.assertFalse(OldFileArchive.isValidVisit('xxx'))
+        self.assertFalse(OldFileArchive.isValidVisit(01))
+        self.assertFalse(OldFileArchive.isValidVisit(None))
 
     def testInstrumentFilepath(self):
         tempdir = tempfile.mkdtemp()
         try:
-            fa = FileArchive(tempdir)
+            fa = OldFileArchive(tempdir)
             self.assertEqual(os.path.join(tempdir, 'acs'),
                              fa.instrumentFilepath('acs'))
             self.assertEqual(os.path.join(tempdir, 'wfpc2'),
@@ -199,7 +199,7 @@ class TestFileArchive(unittest.TestCase):
     def testProposalFilepath(self):
         tempdir = tempfile.mkdtemp()
         try:
-            fa = FileArchive(tempdir)
+            fa = OldFileArchive(tempdir)
             self.assertEqual(os.path.join(tempdir, 'acs/hst_12345'),
                              fa.proposalFilepath('acs', 12345))
             self.assertEqual(os.path.join(tempdir, 'wfpc2/hst_00000'),
@@ -213,7 +213,7 @@ class TestFileArchive(unittest.TestCase):
     def testVisitFilepath(self):
         tempdir = tempfile.mkdtemp()
         try:
-            fa = FileArchive(tempdir)
+            fa = OldFileArchive(tempdir)
             self.assertEqual(os.path.join(tempdir, 'acs/hst_12345/visit_xx'),
                              fa.visitFilepath('acs', 12345, 'xx'))
             self.assertEqual(os.path.join(tempdir, 'wfpc2/hst_00000/visit_01'),

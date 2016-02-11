@@ -1,7 +1,6 @@
 import os
 import os.path
 
-import FileArchive
 import FileArchives
 
 def quadrupleToNewFilepath(inst, prop, vis, f):
@@ -27,4 +26,4 @@ def shuffle(arch):
             dstDirs.add(dstDir)
         os.rename(src, dst)
 
-shuffle(FileArchives.getAnyArchive())
+# shuffle(FileArchives.getAnyArchive())

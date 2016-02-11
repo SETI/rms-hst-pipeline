@@ -1,12 +1,12 @@
 import os.path
 
-import FileArchive
+import OldFileArchive
 
 def getFullArchive():
-    return FileArchive.FileArchive('/Volumes/PDART-3TB')
+    return OldFileArchive.OldFileArchive('/Volumes/PDART-3TB')
 
 def getMiniArchive():
-    return FileArchive.FileArchive('/Users/spaceman/Desktop/Archive')
+    return OldFileArchive.OldFileArchive('/Users/spaceman/Desktop/Archive')
 
 def getAnyArchive():
     try:

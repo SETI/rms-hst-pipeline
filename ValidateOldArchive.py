@@ -4,11 +4,11 @@ import traceback
 
 import pyfits
 
-import FileArchive
+import OldFileArchive
 import FileArchives
 import HstFilename
 
-def validateArchive(arch):
+def validateOldArchive(arch):
     print 'Now validating %s' % repr(arch)
     proposalDict = {}
     fileCount = 0
@@ -41,10 +41,10 @@ def validateArchive(arch):
                 if fileCount % 10000 == 0:
                     print ("Seen %dK files." % (fileCount / 1000))
 
-        print "Archive tests okay (%d files)." % fileCount
+        print "OldArchive tests okay (%d files)." % fileCount
     except:
-        print "Archive test failed:"
+        print "OldArchive test failed:"
         print(traceback.format_exc())
         sys.exit(1)
 
-validateArchive(FileArchives.getAnyArchive())
+# validateOldArchive(FileArchives.getAnyOldArchive())
