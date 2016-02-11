@@ -5,7 +5,7 @@ import traceback
 import pyfits
 
 import OldFileArchive
-import FileArchives
+import OldFileArchives
 import HstFilename
 
 def validateOldArchive(arch):
@@ -47,4 +47,4 @@ def validateOldArchive(arch):
         print(traceback.format_exc())
         sys.exit(1)
 
-# validateOldArchive(FileArchives.getAnyOldArchive())
+validateOldArchive(OldFileArchives.getAnyOldArchive())

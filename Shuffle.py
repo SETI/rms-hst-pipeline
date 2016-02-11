@@ -1,7 +1,7 @@
 import os
 import os.path
 
-import FileArchives
+import OldFileArchives
 
 def quadrupleToNewFilepath(inst, prop, vis, f):
     bundlePart = 'hst_%05d' % prop
@@ -26,4 +26,4 @@ def shuffle(arch):
             dstDirs.add(dstDir)
         os.rename(src, dst)
 
-# shuffle(FileArchives.getAnyArchive())
+shuffle(OldFileArchives.getAnyArchive())
