@@ -6,7 +6,9 @@ class HstFilename:
     def __init__(self, filename):
         self.filename = filename
         assert len(os.path.basename(filename)) > 6, 'Filename must be at least six characters long'
-        assert os.path.basename(filename)[0].lower() in 'iju', 'First char of filename must be i, j, or u.'
+        basename = os.path.basename(filename)
+        assert basename[0].lower() in 'iju', ('First char of filename %s must be i, j, or u.'
+                                              % str(basename))
 
     def __str__(self):
         return self.filename.__str__()
@@ -18,8 +20,10 @@ class HstFilename:
         return os.path.basename(self.filename)
 
     def instrumentName(self):
-        i = self.__basename()[0].lower()
-        assert i in 'iju', 'First char of filename must be i, j, or u.'
+        filename = self.__basename()
+        i = filename[0].lower()
+        assert i in 'iju', ('First char of filename %s must be i, j, or u.'
+                            % str(filename))
         if i == 'i':
             return 'wfc3'
         elif i == 'j':
