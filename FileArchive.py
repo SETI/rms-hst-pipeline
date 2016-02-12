@@ -115,6 +115,16 @@ class FileArchive:
                 bundleLID = LID.LID('urn:nasa:pds:%s' % subdir)
                 yield Bundle.Bundle(self, bundleLID)
         
+    def collections(self):
+        for b in self.bundles():
+            for c in b.collections():
+                yield c
+
+    def products(self):
+        for b in self.bundles():
+            for c in b.collections():
+                for p in c.products():
+                    yield p
 
 ############################################################
 

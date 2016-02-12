@@ -14,17 +14,17 @@ class LID:
         for id in ids:
             assert re.match(allowedCharsRE, id)
 
-        # Assign the ID fields
+        # Assign the Id fields
         self.LID = str
-        self.bundleID = ids[3]
+        self.bundleId = ids[3]
 
-        # Now we modify ids to include possibly missing IDs...
+        # Now we modify ids to include possibly missing Ids...
         while len(ids) < 6:
             ids.append(None)
           
         # ...so this indexing of ids is safe
-        self.collectionID = ids[4]
-        self.productID = ids[5]
+        self.collectionId = ids[4]
+        self.productId = ids[5]
 
     def __eq__(self, other):
         return self.LID == other.LID
@@ -37,6 +37,15 @@ class LID:
 
     def __repr__(self):
         return 'LID(%s)' % repr(self.LID)
+
+    def isProductLID(self):
+        return self.productId is not None
+
+    def isCollectionLID(self):
+        return self.collectionId is not None and self.productId is None
+
+    def isBundleLID(self):
+        return self.bundleId is not None and self.collectionId is None
 
 ############################################################
 
@@ -78,21 +87,21 @@ class TestLID(unittest.TestCase):
 
         # test fields
         lid = LID('urn:nasa:pds:bundle')
-        self.assertEquals('bundle', lid.bundleID)
-        self.assertIsNone(lid.collectionID)
-        self.assertIsNone(lid.productID)
+        self.assertEquals('bundle', lid.bundleId)
+        self.assertIsNone(lid.collectionId)
+        self.assertIsNone(lid.productId)
         self.assertEquals('urn:nasa:pds:bundle', lid.LID)
 
         lid = LID('urn:nasa:pds:bundle:collection')
-        self.assertEquals('bundle', lid.bundleID)
-        self.assertEquals('collection', lid.collectionID)
-        self.assertIsNone(lid.productID)
+        self.assertEquals('bundle', lid.bundleId)
+        self.assertEquals('collection', lid.collectionId)
+        self.assertIsNone(lid.productId)
         self.assertEquals('urn:nasa:pds:bundle:collection', lid.LID)
 
         lid = LID('urn:nasa:pds:bundle:collection:product')
-        self.assertEquals('bundle', lid.bundleID)
-        self.assertEquals('collection', lid.collectionID)
-        self.assertEquals('product', lid.productID)
+        self.assertEquals('bundle', lid.bundleId)
+        self.assertEquals('collection', lid.collectionId)
+        self.assertEquals('product', lid.productId)
         self.assertEquals('urn:nasa:pds:bundle:collection:product', lid.LID)
 
     def testEq(self):
@@ -112,6 +121,8 @@ class TestLID(unittest.TestCase):
     def testRepr(self):
         self.assertEquals("LID('urn:nasa:pds:bundle:collection:product')",
                           repr(LID('urn:nasa:pds:bundle:collection:product')))
+
+    # TODO Write tests for isBundleId, etc.
 
 if __name__ == '__main__':
     unittest.main()

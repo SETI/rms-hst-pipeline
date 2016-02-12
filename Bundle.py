@@ -9,13 +9,14 @@ class Bundle(ArchiveComponent.ArchiveComponent):
     DIRECTORY_PATTERN = '\Ahst_([0-9]{5})\Z'
 
     def __init__(self, arch, lid):
+        assert lid.isBundleLID()
         ArchiveComponent.ArchiveComponent.__init__(self, arch, lid)
 
     def __repr__(self):
         return 'Bundle(%s, %s)' % (repr(self.archive), repr(self.lid))
 
     def directoryFilepath(self):
-        return os.path.join(self.archive.root, self.lid.bundleID)
+        return os.path.join(self.archive.root, self.lid.bundleId)
 
     def collections(self):
         dirFP = self.directoryFilepath()

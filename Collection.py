@@ -9,6 +9,7 @@ class Collection(ArchiveComponent.ArchiveComponent):
     DIRECTORY_PATTERN = '\Adata_([a-z0-9]+)_([a-z0-9_]+)\Z'
 
     def __init__(self, arch, lid):
+        assert lid.isCollectionLID()
         ArchiveComponent.ArchiveComponent.__init__(self, arch, lid)
 
     def __repr__(self):
@@ -16,7 +17,7 @@ class Collection(ArchiveComponent.ArchiveComponent):
                                                    
     def directoryFilepath(self):
         return os.path.join(self.archive.root, 
-                            self.lid.bundleID, self.lid.collectionID)
+                            self.lid.bundleId, self.lid.collectionId)
 
     def products(self):
         dirFP = self.directoryFilepath()
