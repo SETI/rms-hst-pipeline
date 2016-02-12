@@ -114,14 +114,14 @@ def __validateFileOop(file, ctxt):
     # Extract many properties from the filename using
     # the HstFilename class and validate them.
     hstFile = HstFilename.HstFilename(file)
-    assert hstFile.instrumentName() == ctxt['collectionInstrument']
-    assert hstFile.visit() == ctxt['productVisit']
+    assert hstFile.instrumentName() == ctxt['collectionInstrument'], hstFile
+    assert hstFile.visit() == ctxt['productVisit'], hstFile
     ctxt['hstInternalProposalIds'].add(hstFile.hstInternalProposalId())
     try:
 	proposId = pyfits.getval(file, 'PROPOSID')
 	# if it exists, ensure it matches the bundleProposalId
 	assert int(re.match('\A[0-9]+\Z',
-			    proposId)) == ctxt['bundleProposalId']
+			    proposId)) == ctxt['bundleProposalId'], hstFile
     except:
 	# if it doesn't exist; that's okay
 	pass
@@ -129,7 +129,7 @@ def __validateFileOop(file, ctxt):
     fileBasename = os.path.basename(file)
     fileSuffix = re.match('\A[^_]+_([^\.]+)\..*\Z',
 			  fileBasename).group(1)
-    assert ctxt['collectionSuffix'] == fileSuffix
+    assert ctxt['collectionSuffix'] == fileSuffix, file
 
     if True:
 	if ctxt['fileCount'] % 10000 == 0:
@@ -178,7 +178,7 @@ def __validateBundleOop(bundle, ctxt):
 
     # Assert that for any bundle (equivalently, for any
     # proposal), all its collections use the same instrument
-    assert len(ctxt['collectionInstruments']) == 1, ctxt['collectionInstruments']
+    assert len(ctxt['collectionInstruments']) == 1, (collection, ctxt['collectionInstruments'])
 
     del ctxt['collectionInstruments']
     del ctxt['bundleProposalId']
