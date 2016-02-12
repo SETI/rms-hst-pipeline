@@ -106,4 +106,97 @@ def validateArchive(arch):
 	print(traceback.format_exc())
 	sys.exit(1)
 
-validateArchive(FileArchives.getAnyArchive())
+############################################################
+
+def __validateFileOop(file, ctxt):
+    ctxt['fileCount'] += 1
+
+    # Extract many properties from the filename using
+    # the HstFilename class and validate them.
+    hstFile = HstFilename.HstFilename(file)
+    assert hstFile.instrumentName() == ctxt['collectionInstrument']
+    assert hstFile.visit() == ctxt['productVisit']
+    ctxt['hstInternalProposalIds'].add(hstFile.hstInternalProposalId())
+    try:
+	proposId = pyfits.getval(file, 'PROPOSID')
+	# if it exists, ensure it matches the bundleProposalId
+	assert int(re.match('\A[0-9]+\Z',
+			    proposId)) == ctxt['bundleProposalId']
+    except:
+	# if it doesn't exist; that's okay
+	pass
+
+    fileBasename = os.path.basename(file)
+    fileSuffix = re.match('\A[^_]+_([^\.]+)\..*\Z',
+			  fileBasename).group(1)
+    assert ctxt['collectionSuffix'] == fileSuffix
+
+    if True:
+	if ctxt['fileCount'] % 10000 == 0:
+	    print 'Seen %dK files.' % (ctxt['fileCount'] / 1000)
+
+def __validateProductOop(product, ctxt):
+    ctxt['productVisit'] = product.visit()
+    ctxt['hstInternalProposalIds'] = set()
+
+    for file in product.fileFilepaths():
+        __validateFileOop(file, ctxt)
+
+    # TODO It seems that hst_00000 is a grab bag of
+    # lost files.  This needs to be fixed.
+    # Otherwise...
+    if ctxt['bundleProposalId'] != 0:
+
+	# Assert that for any product, all of its
+	# files belong to the same project, using the
+	# HST internal proposal ID codes.
+	assert len(ctxt['hstInternalProposalIds']) == 1, (product,
+                                                          ctxt['bundleProposalId'],
+							  ctxt['hstInternalProposalIds'])
+
+    del ctxt['hstInternalProposalIds']
+    del ctxt['productVisit']
+
+def __validateCollectionOop(collection, ctxt):
+    ctxt['collectionInstrument'] = inst = collection.instrument()
+    ctxt['collectionSuffix'] = collection.suffix()
+
+    ctxt['collectionInstruments'].add(inst)
+
+    for product in collection.products():
+        __validateProductOop(product, ctxt)
+
+    del ctxt['collectionInstrument']
+    del ctxt['collectionSuffix']
+
+def __validateBundleOop(bundle, ctxt):
+    ctxt['bundleProposalId'] = bundle.proposalId()
+    ctxt['collectionInstruments'] = set()
+
+    for collection in bundle.collections():
+        __validateCollectionOop(collection, ctxt)
+
+    # Assert that for any bundle (equivalently, for any
+    # proposal), all its collections use the same instrument
+    assert len(ctxt['collectionInstruments']) == 1, ctxt['collectionInstruments']
+
+    del ctxt['collectionInstruments']
+    del ctxt['bundleProposalId']
+
+def validateArchiveOop(arch):
+    print 'Now validating %s' % repr(arch)
+    ctxt = {'fileCount': 0}
+    try:
+        for bundle in arch.bundles():
+            __validateBundleOop(bundle, ctxt)
+
+	print ('Test of %s PASSED (after %d files).'
+               % (repr(arch), ctxt['fileCount']))
+    except:
+	print ('Test of %s FAILED (after %d files).'
+               % (repr(arch), ctxt['fileCount']))
+	print(traceback.format_exc())
+	sys.exit(1)
+
+
+validateArchiveOop(FileArchives.getAnyArchive())

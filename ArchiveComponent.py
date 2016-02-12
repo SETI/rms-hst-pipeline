@@ -24,7 +24,8 @@ class ArchiveComponent:
     def fileFilepaths(self):
         dir = self.directoryFilepath()
         for f in os.listdir(dir):
-            file = os.path.join(dir, f)
-            if (os.path.isfile(file)):
-                yield file
+            if f[0] != '.':
+                file = os.path.join(dir, f)
+                if (os.path.isfile(file)):
+                    yield file
 
