@@ -1,10 +1,16 @@
 import os.path
 import re
 
+import Bundle
+import LID
+
 class FileArchive:
     def __init__(self, root):
 	assert os.path.exists(root)
 	self.root = root
+
+    def __eq__(self, other):
+        return self.root == other.root
 
     def __str__(self):
 	return repr(self.root)
@@ -102,6 +108,14 @@ class FileArchive:
                     and os.path.isdir(productDir)):
                     yield productDir
 
+    # Walking the hierarchy with objects
+    def bundles(self):
+        for subdir in os.listdir(self.root):
+            if re.match(Bundle.Bundle.DIRECTORY_PATTERN, subdir):
+                bundleLID = LID.LID('urn:nasa:pds:%s' % subdir)
+                yield Bundle.Bundle(self, bundleLID)
+        
+
 ############################################################
 
 import shutil
@@ -128,6 +142,12 @@ class TestFileArchive(unittest.TestCase):
 	tempdir = tempfile.mkdtemp()
 	a = FileArchive(tempdir)
 	self.assertEqual(repr(tempdir), str(a))
+
+    def testEq(self):
+        tempdir = tempfile.mkdtemp()
+        tempdir2 = tempfile.mkdtemp()
+        self.assertEquals(FileArchive(tempdir), FileArchive(tempdir))
+        self.assertNotEquals(FileArchive(tempdir), FileArchive(tempdir2))
 
     def testRepr(self):
 	tempdir = tempfile.mkdtemp()
