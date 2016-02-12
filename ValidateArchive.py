@@ -139,7 +139,7 @@ def __validateProductOop(product, ctxt):
     ctxt['productVisit'] = product.visit()
     ctxt['hstInternalProposalIds'] = set()
 
-    for file in product.fileFilepaths():
+    for file in product.files():
         __validateFileOop(file, ctxt)
 
     # TODO It seems that hst_00000 is a grab bag of

@@ -21,7 +21,7 @@ class ArchiveComponent:
     def directoryFilepath(self):
         pass
 
-    def fileFilepaths(self):
+    def files(self):
         dir = self.directoryFilepath()
         for f in os.listdir(dir):
             if f[0] != '.':
