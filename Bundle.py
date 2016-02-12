@@ -30,3 +30,6 @@ class Bundle(ArchiveComponent.ArchiveComponent):
             for product in collection.products():
                 yield product
 
+    def proposalId(self):
+        return int(re.match(Bundle.DIRECTORY_PATTERN,
+                            self.lid.bundleId).group(1))

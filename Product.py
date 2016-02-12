@@ -1,4 +1,5 @@
 import os.path
+import re
 
 import ArchiveComponent
 
@@ -16,3 +17,6 @@ class Product(ArchiveComponent.ArchiveComponent):
         return os.path.join(self.archive.root, self.lid.bundleId,
                             self.lid.collectionId, self.lid.productId)
 
+    def visit(self):
+        return re.match(Product.DIRECTORY_PATTERN,
+                        self.lid.productId).group(1)

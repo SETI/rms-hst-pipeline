@@ -26,4 +26,10 @@ class Collection(ArchiveComponent.ArchiveComponent):
                 productLID = LID.LID('%s:%s' % (self.lid.LID, subdir))
                 yield Product.Product(self.archive, productLID)
         
+    def instrument(self):
+        return re.match(Collection.DIRECTORY_PATTERN,
+                        self.lid.collectionId).group(1)
 
+    def suffix(self):
+        return re.match(Collection.DIRECTORY_PATTERN,
+                        self.lid.collectionId).group(2)
