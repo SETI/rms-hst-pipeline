@@ -1,5 +1,7 @@
 import LID
 import VID
+import unittest
+
 
 class LIDVID:
     def __init__(self, str):
@@ -23,36 +25,36 @@ class LIDVID:
 
 ############################################################
 
-import unittest
 
 class TestLIDVID(unittest.TestCase):
     def testInit(self):
-	# sanity-check
-	with self.assertRaises(Exception):
-	    LIDVID(null)
+        # sanity-check
+        with self.assertRaises(Exception):
+            LIDVID(null)
 
-	with self.assertRaises(Exception):
+        with self.assertRaises(Exception):
             LIDVID('::2.0')
-	with self.assertRaises(Exception):
+        with self.assertRaises(Exception):
             LIDVID('urn:nasa:pds:ssc01.hirespc.cruise:browse::')
-	with self.assertRaises(Exception):
+        with self.assertRaises(Exception):
             LIDVID('urn:nasa:pds:ssc01.hirespc.cruise:browse::2.0::3.5')
-	with self.assertRaises(Exception):
+        with self.assertRaises(Exception):
             LIDVID('urn:nasa:pds:ssc01.hirespc.cruise:browse::2.0.0')
 
     def testEq(self):
-        self.assertTrue(LIDVID('urn:nasa:pds:b:c:p::1.0')
-                        == LIDVID('urn:nasa:pds:b:c:p::1.0'))
-        self.assertFalse(LIDVID('urn:nasa:pds:b:c:p::1.1')
-                         == LIDVID('urn:nasa:pds:b:c:p::1.0'))
-        self.assertTrue(LIDVID('urn:nasa:pds:b:c:p::1.1')
-                        != LIDVID('urn:nasa:pds:b:c:p::1.0'))
-        self.assertFalse(LIDVID('urn:nasa:pds:b:c:p::1.0')
-                         != LIDVID('urn:nasa:pds:b:c:p::1.0'))
+        self.assertTrue(LIDVID('urn:nasa:pds:b:c:p::1.0') ==
+                        LIDVID('urn:nasa:pds:b:c:p::1.0'))
+        self.assertFalse(LIDVID('urn:nasa:pds:b:c:p::1.1') ==
+                         LIDVID('urn:nasa:pds:b:c:p::1.0'))
+        self.assertTrue(LIDVID('urn:nasa:pds:b:c:p::1.1') !=
+                        LIDVID('urn:nasa:pds:b:c:p::1.0'))
+        self.assertFalse(LIDVID('urn:nasa:pds:b:c:p::1.0') !=
+                         LIDVID('urn:nasa:pds:b:c:p::1.0'))
 
     def testStr(self):
-        self.assertEquals('urn:nasa:pds:b:c:p::1.0', 
+        self.assertEquals('urn:nasa:pds:b:c:p::1.0',
                           str(LIDVID('urn:nasa:pds:b:c:p::1.0')))
+
     def testStr(self):
         self.assertEquals("LIDVID('urn:nasa:pds:b:c:p::1.0')",
                           repr(LIDVID('urn:nasa:pds:b:c:p::1.0')))

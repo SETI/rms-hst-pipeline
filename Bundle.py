@@ -5,6 +5,7 @@ import ArchiveComponent
 import Collection
 import LID
 
+
 class Bundle(ArchiveComponent.ArchiveComponent):
     DIRECTORY_PATTERN = '\Ahst_([0-9]{5})\Z'
 

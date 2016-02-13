@@ -3,6 +3,7 @@ import re
 
 import ArchiveComponent
 
+
 class Product(ArchiveComponent.ArchiveComponent):
     DIRECTORY_PATTERN = '\Avisit_([a-z0-9]{2})\Z'
 

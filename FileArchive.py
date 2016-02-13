@@ -1,39 +1,43 @@
 import os.path
 import re
+import shutil
+import tempfile
+import unittest
 
 import Bundle
 import LID
 
+
 class FileArchive:
     def __init__(self, root):
-	assert os.path.exists(root)
-	self.root = root
+        assert os.path.exists(root)
+        self.root = root
 
     def __eq__(self, other):
         return self.root == other.root
 
     def __str__(self):
-	return repr(self.root)
+        return repr(self.root)
 
     def __repr__(self):
-	return 'FileArchive(%s)' % repr(self.root)
+        return 'FileArchive(%s)' % repr(self.root)
 
-    #### Verifying parts
+    # Verifying parts
 
     @staticmethod
     def isValidInstrument(inst):
-	return inst in ['acs', 'wfc3', 'wfpc2']
+        return inst in ['acs', 'wfc3', 'wfpc2']
 
     @staticmethod
     def isValidProposal(prop):
-	return isinstance(prop, int) and 0 <= prop and prop <= 99999
+        return isinstance(prop, int) and 0 <= prop and prop <= 99999
 
     @staticmethod
     def isValidVisit(vis):
-	try:
-	    return re.match('\A[a-z0-9][a-z0-9]\Z', vis) is not None
-	except:
-	    return False
+        try:
+            return re.match('\A[a-z0-9][a-z0-9]\Z', vis) is not None
+        except:
+            return False
 
     @staticmethod
     def isValidBundleDirBasename(dirname):
@@ -51,10 +55,10 @@ class FileArchive:
     def isHiddenFileBasename(basename):
         return basename[0] == '.'
 
-    #### Walking the hierarchy
+    # Walking the hierarchy
 
     def walkComp(self, start=None):
-        if start == None:
+        if start is None:
             start = self.root
         rootSegs = self.root.split('/')
         startSegs = start.split('/')
@@ -63,29 +67,29 @@ class FileArchive:
             # start is the root; walk bundles
             for subdir in os.listdir(start):
                 bundleDir = os.path.join(self.root, subdir)
-                if (FileArchive.isValidBundleDirBasename(subdir) 
-                    and os.path.isdir(bundleDir)):
+                if FileArchive.isValidBundleDirBasename(subdir) and \
+                        os.path.isdir(bundleDir):
                     yield bundleDir
         elif level == 1:
             # start is a bundle; walk collections
             for subdir in os.listdir(start):
                 collectionDir = os.path.join(start, subdir)
-                if (FileArchive.isValidCollectionDirBasename(subdir)
-                    and os.path.isdir(collectionDir)):
+                if FileArchive.isValidCollectionDirBasename(subdir) and \
+                        os.path.isdir(collectionDir):
                     yield collectionDir
         elif level == 2:
             # start is a collection; walk products
             for subdir in os.listdir(start):
                 productDir = os.path.join(start, subdir)
-                if (FileArchive.isValidProductDirBasename(subdir)
-                    and os.path.isdir(productDir)):
+                if FileArchive.isValidProductDirBasename(subdir) and \
+                        os.path.isdir(productDir):
                     yield productDir
         elif level == 3:
             # start is a product; walk files
             for f in os.listdir(start):
                 file = os.path.join(start, f)
-                if (not FileArchive.isHiddenFileBasename(f)
-                    and os.path.isfile(file)):
+                if not FileArchive.isHiddenFileBasename(f) and \
+                        os.path.isfile(file):
                     yield file
         else:
             # it's a bug
@@ -104,8 +108,8 @@ class FileArchive:
         for collectionDir in self.walkCollectionDirectories():
             for subdir in os.listdir(collectionDir):
                 productDir = os.path.join(collectionDir, subdir)
-                if (FileArchive.isValidProductDirBasename(subdir)
-                    and os.path.isdir(productDir)):
+                if FileArchive.isValidProductDirBasename(subdir) and \
+                        os.path.isdir(productDir):
                     yield productDir
 
     # Walking the hierarchy with objects
@@ -114,7 +118,7 @@ class FileArchive:
             if re.match(Bundle.Bundle.DIRECTORY_PATTERN, subdir):
                 bundleLID = LID.LID('urn:nasa:pds:%s' % subdir)
                 yield Bundle.Bundle(self, bundleLID)
-        
+
     def collections(self):
         for b in self.bundles():
             for c in b.collections():
@@ -128,30 +132,27 @@ class FileArchive:
 
 ############################################################
 
-import shutil
-import tempfile
-import unittest
 
 class TestFileArchive(unittest.TestCase):
     def testInit(self):
-	with self.assertRaises(Exception):
-	    FileArchive(None)
-	with self.assertRaises(Exception):
-	    FileArchive("I'm/betting/this/directory/doesn't/exist")
+        with self.assertRaises(Exception):
+            FileArchive(None)
+        with self.assertRaises(Exception):
+            FileArchive("I'm/betting/this/directory/doesn't/exist")
 
-	FileArchive('/')	# guaranteed to exist
+        FileArchive('/')        # guaranteed to exist
 
-	# but try with another directory
-	tempdir = tempfile.mkdtemp()
-	try:
-	    FileArchive(tempdir)
-	finally:
-	    shutil.rmtree(tempdir)
+        # but try with another directory
+        tempdir = tempfile.mkdtemp()
+        try:
+            FileArchive(tempdir)
+        finally:
+            shutil.rmtree(tempdir)
 
     def testStr(self):
-	tempdir = tempfile.mkdtemp()
-	a = FileArchive(tempdir)
-	self.assertEqual(repr(tempdir), str(a))
+        tempdir = tempfile.mkdtemp()
+        a = FileArchive(tempdir)
+        self.assertEqual(repr(tempdir), str(a))
 
     def testEq(self):
         tempdir = tempfile.mkdtemp()
@@ -160,33 +161,33 @@ class TestFileArchive(unittest.TestCase):
         self.assertNotEquals(FileArchive(tempdir), FileArchive(tempdir2))
 
     def testRepr(self):
-	tempdir = tempfile.mkdtemp()
-	a = FileArchive(tempdir)
-	self.assertEqual('FileArchive(%s)' % repr(tempdir), repr(a))
+        tempdir = tempfile.mkdtemp()
+        a = FileArchive(tempdir)
+        self.assertEqual('FileArchive(%s)' % repr(tempdir), repr(a))
 
     def testIsValidInstrument(self):
-	self.assertTrue(FileArchive.isValidInstrument('wfc3'))
-	self.assertTrue(FileArchive.isValidInstrument('wfpc2'))
-	self.assertTrue(FileArchive.isValidInstrument('acs'))
-	self.assertFalse(FileArchive.isValidInstrument('Acs'))
-	self.assertFalse(FileArchive.isValidInstrument('ACS'))
-	self.assertFalse(FileArchive.isValidInstrument('ABC'))
-	self.assertFalse(FileArchive.isValidInstrument(None))
+        self.assertTrue(FileArchive.isValidInstrument('wfc3'))
+        self.assertTrue(FileArchive.isValidInstrument('wfpc2'))
+        self.assertTrue(FileArchive.isValidInstrument('acs'))
+        self.assertFalse(FileArchive.isValidInstrument('Acs'))
+        self.assertFalse(FileArchive.isValidInstrument('ACS'))
+        self.assertFalse(FileArchive.isValidInstrument('ABC'))
+        self.assertFalse(FileArchive.isValidInstrument(None))
 
     def testIsValidProposal(self):
-	self.assertFalse(FileArchive.isValidProposal(-1))
-	self.assertTrue(FileArchive.isValidProposal(0))
-	self.assertTrue(FileArchive.isValidProposal(1))
-	self.assertFalse(FileArchive.isValidProposal(100000))
-	self.assertFalse(FileArchive.isValidProposal(3.14159265))
-	self.assertFalse(FileArchive.isValidProposal('xxx'))
-	self.assertFalse(FileArchive.isValidProposal(None))
+        self.assertFalse(FileArchive.isValidProposal(-1))
+        self.assertTrue(FileArchive.isValidProposal(0))
+        self.assertTrue(FileArchive.isValidProposal(1))
+        self.assertFalse(FileArchive.isValidProposal(100000))
+        self.assertFalse(FileArchive.isValidProposal(3.14159265))
+        self.assertFalse(FileArchive.isValidProposal('xxx'))
+        self.assertFalse(FileArchive.isValidProposal(None))
 
     def testIsValidVisit(self):
-	self.assertTrue(FileArchive.isValidVisit('01'))
-	self.assertFalse(FileArchive.isValidVisit('xxx'))
-	self.assertFalse(FileArchive.isValidVisit(01))
-	self.assertFalse(FileArchive.isValidVisit(None))
+        self.assertTrue(FileArchive.isValidVisit('01'))
+        self.assertFalse(FileArchive.isValidVisit('xxx'))
+        self.assertFalse(FileArchive.isValidVisit(01))
+        self.assertFalse(FileArchive.isValidVisit(None))
 
 if __name__ == '__main__':
     unittest.main()

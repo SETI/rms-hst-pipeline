@@ -1,18 +1,20 @@
 import re
+import unittest
+
 
 class VID:
     def __init__(self, str):
-	vs = str.split('.')
+        vs = str.split('.')
 
-	# Check requirements
-	assert len(str) <= 255
-	assert len(vs) == 2
-	for v in vs:
-	    assert re.match('\\A(0|[1-9][0-9]*)\\Z', v)
+        # Check requirements
+        assert len(str) <= 255
+        assert len(vs) == 2
+        for v in vs:
+            assert re.match('\\A(0|[1-9][0-9]*)\\Z', v)
 
-	self.VID = str
-	self.major = int(vs[0])
-	self.minor = int(vs[1])
+        self.VID = str
+        self.major = int(vs[0])
+        self.minor = int(vs[1])
 
     def __cmp__(self, other):
         res = self.major - other.major
@@ -21,34 +23,32 @@ class VID:
         return res
 
     def __str__(self):
-	return self.VID
+        return self.VID
 
     def __repr__(self):
-	return 'VID(%s)' % repr(self.VID)
+        return 'VID(%s)' % repr(self.VID)
 
 ############################################################
 
-import unittest
 
 class TestVID(unittest.TestCase):
     def testInit(self):
-	# sanity-check
-	with self.assertRaises(Exception):
-	    VID(null)
+        # sanity-check
+        with self.assertRaises(Exception):
+            VID(null)
 
-	with self.assertRaises(Exception):
-	    VID('foo')
+        with self.assertRaises(Exception):
+            VID('foo')
 
         VID('0.0')
-	with self.assertRaises(Exception):
+        with self.assertRaises(Exception):
             VID('0.0.0')
-	with self.assertRaises(Exception):
+        with self.assertRaises(Exception):
             VID('5.')
-	with self.assertRaises(Exception):
+        with self.assertRaises(Exception):
             VID('.5')
-	with self.assertRaises(Exception):
+        with self.assertRaises(Exception):
             VID('0.01')
-
 
         # test fields
         v = VID('3.14159265')

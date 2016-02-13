@@ -3,6 +3,7 @@ import os.path
 
 import OldFileArchives
 
+
 def quadrupleToNewFilepath(inst, prop, vis, f):
     bundlePart = 'hst_%05d' % prop
 
@@ -13,6 +14,7 @@ def quadrupleToNewFilepath(inst, prop, vis, f):
 
     visitPart = 'visit_%s' % vis
     return '/'.join([bundlePart, collectionPart, visitPart, f])
+
 
 def shuffle(arch):
     dstDirs = set()

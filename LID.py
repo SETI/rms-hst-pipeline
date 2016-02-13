@@ -1,4 +1,6 @@
 import re
+import unittest
+
 
 class LID:
     def __init__(self, str):
@@ -6,7 +8,7 @@ class LID:
 
         # Check requirements
         assert len(str) <= 255
-        assert len(ids) in [4,5,6]
+        assert len(ids) in [4, 5, 6]
         assert ids[0] == 'urn'
         assert ids[1] == 'nasa'
         assert ids[2] == 'pds'
@@ -21,7 +23,7 @@ class LID:
         # Now we modify ids to include possibly missing Ids...
         while len(ids) < 6:
             ids.append(None)
-          
+
         # ...so this indexing of ids is safe
         self.collectionId = ids[4]
         self.productId = ids[5]
@@ -49,7 +51,6 @@ class LID:
 
 ############################################################
 
-import unittest
 
 class TestLID(unittest.TestCase):
     def testInit(self):
@@ -105,14 +106,14 @@ class TestLID(unittest.TestCase):
         self.assertEquals('urn:nasa:pds:bundle:collection:product', lid.LID)
 
     def testEq(self):
-        self.assertTrue(LID('urn:nasa:pds:bundle:collection:product')
-                        == LID('urn:nasa:pds:bundle:collection:product'))
-        self.assertFalse(LID('urn:nasa:pds:bundle:collection:product')
-                         != LID('urn:nasa:pds:bundle:collection:product'))
-        self.assertFalse(LID('urn:nasa:pds:bundle:collection:product')
-                         == LID('urn:nasa:pds:bundle:collection:produit'))
-        self.assertTrue(LID('urn:nasa:pds:bundle:collection:product')
-                        != LID('urn:nasa:pds:bundle:collection:produit'))
+        self.assertTrue(LID('urn:nasa:pds:bundle:collection:product') ==
+                        LID('urn:nasa:pds:bundle:collection:product'))
+        self.assertFalse(LID('urn:nasa:pds:bundle:collection:product') !=
+                         LID('urn:nasa:pds:bundle:collection:product'))
+        self.assertFalse(LID('urn:nasa:pds:bundle:collection:product') ==
+                         LID('urn:nasa:pds:bundle:collection:produit'))
+        self.assertTrue(LID('urn:nasa:pds:bundle:collection:product') !=
+                        LID('urn:nasa:pds:bundle:collection:produit'))
 
     def testStr(self):
         self.assertEquals('urn:nasa:pds:bundle:collection:product',

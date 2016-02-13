@@ -5,6 +5,7 @@ import ArchiveComponent
 import LID
 import Product
 
+
 class Collection(ArchiveComponent.ArchiveComponent):
     DIRECTORY_PATTERN = '\Adata_([a-z0-9]+)_([a-z0-9_]+)\Z'
 
@@ -14,9 +15,9 @@ class Collection(ArchiveComponent.ArchiveComponent):
 
     def __repr__(self):
         return 'Collection(%s, %s)' % (repr(self.archive), repr(self.lid))
-                                                   
+
     def directoryFilepath(self):
-        return os.path.join(self.archive.root, 
+        return os.path.join(self.archive.root,
                             self.lid.bundleId, self.lid.collectionId)
 
     def products(self):
@@ -25,7 +26,7 @@ class Collection(ArchiveComponent.ArchiveComponent):
             if re.match(Product.Product.DIRECTORY_PATTERN, subdir):
                 productLID = LID.LID('%s:%s' % (self.lid.LID, subdir))
                 yield Product.Product(self.archive, productLID)
-        
+
     def instrument(self):
         return re.match(Collection.DIRECTORY_PATTERN,
                         self.lid.collectionId).group(1)

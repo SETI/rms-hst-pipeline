@@ -8,6 +8,7 @@ import OldFileArchive
 import OldFileArchives
 import HstFilename
 
+
 def validateOldArchive(arch):
     print 'Now validating %s' % repr(arch)
     proposalDict = {}
@@ -19,22 +20,23 @@ def validateOldArchive(arch):
             hfn = HstFilename.HstFilename(filepath)
 
             # Get the proposal from the file, using caching
-            hstProposId = hfn.hstInternalProposalId();
+            hstProposId = hfn.hstInternalProposalId()
             try:
                 proposId = pyfits.getval(filepath, 'PROPOSID')
             except:
-                proposId = 0;
+                proposId = 0
             if proposId == 0:
                 # TODO We do have a problem with wfpc2/hst_00000/visit_01/...
                 # If I put -1 instead of 0 here, assertion fails.  What
                 # does this mean?
-                proposId = proposalDict.get(hstProposId, 0);
+                proposId = proposalDict.get(hstProposId, 0)
             else:
-                proposalDict[hstProposId] = proposId;
+                proposalDict[hstProposId] = proposId
 
             assert hfn.instrumentName() == inst
             assert hfn.visit() == vis
-            assert proposId == prop, 'On %s: proposId %d != prop %d' % (filepath, proposId, prop)
+            assert proposId == prop, \
+                'On %s: proposId %d != prop %d' % (filepath, proposId, prop)
 
             if True:
                 fileCount = fileCount + 1

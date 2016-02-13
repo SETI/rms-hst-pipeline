@@ -1,14 +1,17 @@
 import os.path
+import unittest
+
 
 class HstFilename:
     s = '/some/random/folder/j6gp01mmq_trl.fits'
 
     def __init__(self, filename):
         self.filename = filename
-        assert len(os.path.basename(filename)) > 6, 'Filename must be at least six characters long'
+        assert len(os.path.basename(filename)) > 6, \
+            'Filename must be at least six characters long'
         basename = os.path.basename(filename)
-        assert basename[0].lower() in 'iju', ('First char of filename %s must be i, j, or u.'
-                                              % str(basename))
+        assert basename[0].lower() in 'iju', \
+            ('First char of filename %s must be i, j, or u.' % str(basename))
 
     def __str__(self):
         return self.filename.__str__()
@@ -31,7 +34,7 @@ class HstFilename:
         elif i == 'u':
             return 'wfpc2'
         else:
-            raise Exception, 'First char of filename must be i, j, or u.'
+            raise Exception('First char of filename must be i, j, or u.')
 
     def hstInternalProposalId(self):
         return self.__basename()[1:4].lower()
@@ -41,7 +44,6 @@ class HstFilename:
 
 ############################################################
 
-import unittest
 
 class TestHstFilename(unittest.TestCase):
     def testInit(self):
@@ -58,7 +60,7 @@ class TestHstFilename(unittest.TestCase):
         # test instrument name
         with self.assertRaises(Exception):
             HstFilename('x123456')
-        HstFilename('I123456')	# case-less
+        HstFilename('I123456')  # case-less
 
     def testStr(self):
         s = HstFilename.s

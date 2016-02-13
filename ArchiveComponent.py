@@ -2,6 +2,7 @@ import abc
 import os
 import os.path
 
+
 class ArchiveComponent:
     __metaclass__ = abc.ABCMeta
 
@@ -28,4 +29,3 @@ class ArchiveComponent:
                 file = os.path.join(dir, f)
                 if (os.path.isfile(file)):
                     yield file
-

@@ -1,8 +1,12 @@
 import os
 import os.path
 import re
+import shutil
+import tempfile
+import unittest
 
 import HstFilename
+
 
 class OldFileArchive:
     def __init__(self, root):
@@ -15,7 +19,7 @@ class OldFileArchive:
     def __repr__(self):
         return 'OldFileArchive(%s)' % repr(self.root)
 
-    #### Verifying parts
+    # Verifying parts
 
     @staticmethod
     def isValidInstrument(inst):
@@ -32,7 +36,7 @@ class OldFileArchive:
         except:
             return False
 
-    #### Creating filepaths from parts
+    # Creating filepaths from parts
 
     def instrumentFilepath(self, inst):
         inst = inst.lower()
@@ -49,12 +53,12 @@ class OldFileArchive:
         return os.path.join(self.proposalFilepath(inst, prop),
                             "visit_%s" % vis)
 
-    #### Walking parts of the archive
+    # Walking parts of the archive
 
     def walkInstruments(self):
         for d in os.listdir(self.root):
-            if (os.path.isdir(os.path.join(self.root, d))
-                and OldFileArchive.isValidInstrument(d)):
+            if os.path.isdir(os.path.join(self.root, d)) and \
+                    OldFileArchive.isValidInstrument(d):
                 yield d
 
     def walkProposals(self):
@@ -68,19 +72,19 @@ class OldFileArchive:
         for (inst, prop) in self.walkProposals():
             propFilepath = self.proposalFilepath(inst, prop)
             for d in os.listdir(propFilepath):
-                if (os.path.isdir(os.path.join(propFilepath, d))
-                    and OldFileArchive.isValidVisit(d[6:])):
+                if os.path.isdir(os.path.join(propFilepath, d)) and \
+                        OldFileArchive.isValidVisit(d[6:]):
                     yield (inst, prop, d[6:])
 
     def walkFiles(self):
         for (inst, prop, vis) in self.walkVisits():
             visFilepath = self.visitFilepath(inst, prop, vis)
             for f in os.listdir(visFilepath):
-                if (os.path.isfile(os.path.join(visFilepath, f))
-                    and f[0] != '.'):
+                if os.path.isfile(os.path.join(visFilepath, f)) and \
+                        f[0] != '.':
                     yield (inst, prop, vis, f)
 
-    #### Creating LIDs
+    # Creating LIDs
 
     @staticmethod
     def quadrupleToLID(inst, prop, vis, f):
@@ -96,18 +100,19 @@ class OldFileArchive:
         return 'urn:nasa:pds:%s' % ':'.join([bundlePart,
                                              collectionPart,
                                              productPart])
+
     def listLIDs(self):
         res = set()
         for (inst, prop, vis, f) in self.walkFiles():
             res.add(OldFileArchive.quadrupleToLID(inst, prop, vis, f))
         return sorted(res)
 
-    #### Listing parts of the archive
+    # Listing parts of the archive
 
     def listInstruments(self):
         return sorted([d for d in os.listdir(self.root)
-                       if (os.path.isdir(os.path.join(self.root, d))
-                           and OldFileArchive.isValidInstrument(d))])
+                       if (os.path.isdir(os.path.join(self.root, d)) and
+                           OldFileArchive.isValidInstrument(d))])
 
     def listProposals(self, inst):
         inst = inst.lower()
@@ -118,20 +123,17 @@ class OldFileArchive:
     def listVisits(self, inst, prop):
         propFilepath = self.proposalFilepath(inst, prop)
         return sorted([v[6:] for v in os.listdir(propFilepath)
-                       if (os.path.isdir(os.path.join(propFilepath, v))
-                           and OldFileArchive.isValidVisit(v[6:]))])
+                       if (os.path.isdir(os.path.join(propFilepath, v)) and
+                           OldFileArchive.isValidVisit(v[6:]))])
 
     def listFiles(self, inst, prop, vis):
         visFilepath = self.visitFilepath(inst, prop, vis)
         return sorted(f for f in os.listdir(visFilepath)
-                      if (os.path.isfile(os.path.join(visFilepath, f))
-                          and f[0] != '.'))
+                      if (os.path.isfile(os.path.join(visFilepath, f)) and
+                          f[0] != '.'))
 
 ############################################################
 
-import shutil
-import tempfile
-import unittest
 
 class TestOldFileArchive(unittest.TestCase):
     def testInit(self):
@@ -140,7 +142,7 @@ class TestOldFileArchive(unittest.TestCase):
         with self.assertRaises(Exception):
             OldFileArchive("I'm/betting/this/directory/doesn't/exist")
 
-        OldFileArchive('/')	# guaranteed to exist
+        OldFileArchive('/')  # guaranteed to exist
 
         # but try with another directory
         tempdir = tempfile.mkdtemp()
