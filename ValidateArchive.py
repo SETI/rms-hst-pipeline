@@ -8,6 +8,8 @@ import pyfits
 import FileArchive
 import FileArchives
 import HstFilename
+import Validation
+import Validations
 
 
 def __validateFile(file, ctxt):
@@ -212,4 +214,6 @@ def validateArchiveOop(arch):
         sys.exit(1)
 
 
-validateArchiveOop(FileArchives.getAnyArchive())
+# validateArchiveOop(FileArchives.getAnyArchive())
+Validation.runArchiveValidation(FileArchives.getAnyArchive(),
+                                Validations.stdValidation)
