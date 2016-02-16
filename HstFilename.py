@@ -19,11 +19,11 @@ class HstFilename:
     def __repr__(self):
         return 'HstFilename(%s)' % self.filename.__repr__()
 
-    def __basename(self):
+    def _basename(self):
         return os.path.basename(self.filename)
 
     def instrumentName(self):
-        filename = self.__basename()
+        filename = self._basename()
         i = filename[0].lower()
         assert i in 'iju', ('First char of filename %s must be i, j, or u.'
                             % str(filename))
@@ -37,10 +37,10 @@ class HstFilename:
             raise Exception('First char of filename must be i, j, or u.')
 
     def hstInternalProposalId(self):
-        return self.__basename()[1:4].lower()
+        return self._basename()[1:4].lower()
 
     def visit(self):
-        return self.__basename()[4:6].lower()
+        return self._basename()[4:6].lower()
 
 ############################################################
 

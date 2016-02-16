@@ -24,27 +24,6 @@ class CountFilesValidation(Validation.NullValidation):
             print 'Saw %d files.' % self.fileCount
 
 
-class CollectionUsesOneSingleInstrument(Validation.NullValidation):
-    def __init__(self):
-        Validation.NullValidation.__init__(self)
-        self.collectionInstruments = None
-
-    def doBundle(self, bundle, before):
-        if before:
-            self.collectionInstruments = set()
-        else:
-            # Assert that for any bundle (equivalently, for any
-            # proposal), all its collections use the same instrument
-            if len(self.collectionInstruments) > 1:
-                print 'UNEXPECTED: collections used %s' % \
-                    str(self.collectionInstruments)
-            self.collectionInstruments = None
-
-    def doCollection(self, collection, before):
-        if before:
-            self.collectionInstruments.add(collection.instrument())
-
-
 class ProductFilesHaveCollectionSuffix(Validation.NullValidation):
     def __init__(self):
         Validation.NullValidation.__init__(self)
@@ -61,8 +40,9 @@ class ProductFilesHaveCollectionSuffix(Validation.NullValidation):
         fileBasename = os.path.basename(file)
         fileSuffix = re.match('\A[^_]+_([^\.]+)\..*\Z',
                               fileBasename).group(1)
-        assert self.collectionSuffix == fileSuffix, \
-            (product, file, self.collectionSuffix, fileSuffix)
+        self.assertEquals(self.collectionSuffix, fileSuffix,
+                          'Unexpected suffix for file %s in product %s' %
+                          (repr(file), product))
 
 
 class ProductFilesHaveBundleProposalId(Validation.NullValidation):
@@ -79,15 +59,20 @@ class ProductFilesHaveBundleProposalId(Validation.NullValidation):
     def doProductFile(self, product, file):
         try:
             proposId = pyfits.getval(file, 'PROPOSID')
-        except IOError:
-            # TODO Put a good message here
+        except IOError as e:
+            # We know that much (all?) of the contents of hst_00000
+            # are there due to IOErrors, so let's not report them.
+            # Report others, though.
+            if self.bundleProposalId != 0:
+                self.report('IOError %s reading file %s of product %s' %
+                            (e, file, product))
             proposId = None
         except KeyError:
             proposId = None
 
         # if it exists, ensure it matches the bundleProposalId
         if proposId is not None:
-            assert proposId == self.bundleProposalId
+            self.assertEquals(self.bundleProposalId, proposId)
 
 
 class ProductFilesHaveProductVisit(Validation.NullValidation):
@@ -103,7 +88,9 @@ class ProductFilesHaveProductVisit(Validation.NullValidation):
 
     def doProductFile(self, product, file):
         hstFile = HstFilename.HstFilename(file)
-        assert hstFile.visit() == self.productVisit
+        self.assertEquals(self.productVisit, hstFile.visit(),
+                          'Unexpected visit value for file %s in product %s' %
+                          (file, product))
 
 
 class BundleContainsOneSingleHstInternalProposalId(Validation.NullValidation):
@@ -128,8 +115,9 @@ class BundleContainsOneSingleHstInternalProposalId(Validation.NullValidation):
                 # Assert that for any bundle, all of its
                 # files belong to the same project, using the
                 # HST internal proposal ID codes.
-                assert len(self.hstInternalProposalIds) == 1, \
-                    (bundle, self.hstInternalProposalIds)
+                self.assertEquals(1, len(self.hstInternalProposalIds),
+                                  'In bundle %s, saw HST proposal ids %s.' %
+                                  (bundle, list(self.hstInternalProposalIds)))
 
             self.hstInternalProposalIds = None
             self.bundleProposalId = None
@@ -140,9 +128,5 @@ stdValidation = Validation.CompositeValidation([
         ProductFilesHaveCollectionSuffix(),
         ProductFilesHaveProductVisit(),
         BundleContainsOneSingleHstInternalProposalId(),
-
-        # This one doesn't seem to be true
-        CollectionUsesOneSingleInstrument()
-
         # More to do?
         ])

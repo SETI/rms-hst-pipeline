@@ -1,4 +1,4 @@
-class NullValidation:
+class NullValidation(object):
     def __init__(self):
         pass
 
@@ -16,6 +16,18 @@ class NullValidation:
 
     def doProductFile(self, product, file):
         pass
+
+    def assertEquals(self, expected, actual, tag=None):
+        if expected != actual:
+            msg = 'expected %s; got %s.' % (repr(expected), repr(actual))
+            self.report(msg, tag)
+
+    def report(self, msg, tag=None):
+        print self.__class__.__name__ + ':',
+        if tag is not None:
+            print msg, tag
+        else:
+            print msg
 
 
 class CompositeValidation(NullValidation):
