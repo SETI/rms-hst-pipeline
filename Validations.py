@@ -1,6 +1,8 @@
 import os.path
-import pyfits
 import re
+import sys
+
+import pyfits
 
 import HstFilename
 import Validation
@@ -15,13 +17,13 @@ class CountFilesValidation(Validation.NullValidation):
         if before:
             self.fileCount = 0
         else:
-            print 'Saw %d files.' % self.fileCount
+            print >> sys.stderr, 'Saw %d files.' % self.fileCount
             self.fileCount = None
 
     def doProductFile(self, product, file):
         self.fileCount += 1
         if self.fileCount % 200 == 0:
-            print 'Saw %d files.' % self.fileCount
+            print >> sys.stderr, 'Saw %d files.' % self.fileCount
 
 
 class ProductFilesHaveCollectionSuffix(Validation.NullValidation):
