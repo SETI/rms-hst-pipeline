@@ -2,7 +2,7 @@ import re
 import unittest
 
 
-class VID:
+class VID(object):
     def __init__(self, str):
         vs = str.split('.')
 

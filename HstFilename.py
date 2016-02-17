@@ -3,7 +3,7 @@ import re
 import unittest
 
 
-class HstFilename:
+class HstFilename(object):
     s = '/some/random/folder/j6gp01mmq_trl.fits'
 
     def __init__(self, filename):

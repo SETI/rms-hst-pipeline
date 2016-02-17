@@ -6,7 +6,7 @@ import unittest
 import xml.dom
 
 
-class Label:
+class Label(object):
     def __init__(self):
         self.impl = xml.dom.getDOMImplementation()
         d = self.document = self.impl.createDocument(None, None, None)

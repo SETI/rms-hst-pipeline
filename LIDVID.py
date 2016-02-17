@@ -3,7 +3,7 @@ import VID
 import unittest
 
 
-class LIDVID:
+class LIDVID(object):
     def __init__(self, str):
         segs = str.split('::')
         assert len(segs) == 2

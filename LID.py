@@ -2,7 +2,7 @@ import re
 import unittest
 
 
-class LID:
+class LID(object):
     def __init__(self, str):
         ids = str.split(':')
 

@@ -5,7 +5,7 @@ import os.path
 import ArchiveFile
 
 
-class ArchiveComponent:
+class ArchiveComponent(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, arch, lid):

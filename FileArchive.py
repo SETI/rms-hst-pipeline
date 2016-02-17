@@ -8,7 +8,7 @@ import Bundle
 import LID
 
 
-class FileArchive:
+class FileArchive(object):
     def __init__(self, root):
         assert os.path.exists(root)
         self.root = root
