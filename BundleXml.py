@@ -65,7 +65,8 @@ def schemaCheck(filepath):
                          ('./PDS4_PDS_1500.xsd.xml', filepath))
     return exitCode == 0
 
-if False:
+
+def testSynthesis():
     # Create sample bundle.xml files for the non-hst_00000 bundles and
     # test them against the XML schema.
     a = FileArchives.getAnyArchive()
