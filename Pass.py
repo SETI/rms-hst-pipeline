@@ -1,6 +1,9 @@
 class NullPass(object):
     def __init__(self):
-        pass
+        self.contextHolder = None
+
+    def setContextHolder(self, ctxtHolder):
+        self.contextHolder = ctxtHolder
 
     def doArchive(self, archive, before):
         pass
@@ -30,6 +33,7 @@ class NullPass(object):
 
     def report(self, msg, tag=None):
         print self.__class__.__name__ + ':',
+        print self.contextHolder.context + ':',
         if tag is not None:
             print msg, tag
         else:
@@ -40,6 +44,11 @@ class CompositePass(NullPass):
     def __init__(self, passes):
         NullPass.__init__(self)
         self.passes = passes
+
+    def setContextHolder(self, ctxtHolder):
+        NullPass.setContextHolder(self, ctxtHolder)
+        for p in self.passes:
+            p.setContextHolder(ctxtHolder)
 
     def doArchive(self, archive, before):
         if before:
@@ -86,21 +95,40 @@ class CompositePass(NullPass):
             p.doProductFile(file)
 
 
+class _ContextHolder(object):
+    def __init__(self):
+        self.context = None
+
+
 def runArchivePasses(archive, p):
+    ctxtHolder = _ContextHolder()
+    p.setContextHolder(ctxtHolder)
+
+    ctxtHolder.context = archive
     p.doArchive(archive, True)
     for bundle in archive.bundles():
+        ctxtHolder.context = bundle
         p.doBundle(bundle, True)
         for file in bundle.files():
+            ctxtHolder.context = file
             p.doBundleFile(file)
         for collection in bundle.collections():
+            ctxtHolder.context = collection
             p.doCollection(collection, True)
             for file in collection.files():
+                ctxtHolder.context = file
                 p.doCollectionFile(file)
             for product in collection.products():
+                ctxtHolder.context = product
                 p.doProduct(product, True)
                 for file in product.files():
+                    ctxtHolder.context = file
                     p.doProductFile(file)
+                ctxtHolder.context = product
                 p.doProduct(product, False)
+            ctxtHolder.context = collection
             p.doCollection(collection, False)
+        ctxtHolder.context = bundle
         p.doBundle(bundle, False)
+    ctxtHolder.context = archive
     p.doArchive(archive, False)
