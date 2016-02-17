@@ -8,7 +8,13 @@ class NullValidation(object):
     def doBundle(self, bundle, before):
         pass
 
+    def doBundleFile(self, file):
+        pass
+
     def doCollection(self, collection, before):
+        pass
+
+    def doCollectionFile(self, file):
         pass
 
     def doProduct(self, product, before):
@@ -51,6 +57,10 @@ class CompositeValidation(NullValidation):
             for v in reversed(self.validations):
                 v.doBundle(bundle, before)
 
+    def doBundleFile(self, file):
+        for v in self.validations:
+            v.doBundleFile(file)
+
     def doCollection(self, collection, before):
         if before:
             for v in self.validations:
@@ -58,6 +68,10 @@ class CompositeValidation(NullValidation):
         else:
             for v in reversed(self.validations):
                 v.doCollection(collection, before)
+
+    def doCollectionFile(self, file):
+        for v in self.validations:
+            v.doCollectionFile(file)
 
     def doProduct(self, product, before):
         if before:
@@ -76,8 +90,12 @@ def runArchiveValidation(archive, v):
     v.doArchive(archive, True)
     for bundle in archive.bundles():
         v.doBundle(bundle, True)
+        for file in bundle.files():
+            v.doBundleFile(file)
         for collection in bundle.collections():
             v.doCollection(collection, True)
+            for file in collection.files():
+                v.doCollectionFile(file)
             for product in collection.products():
                 v.doProduct(product, True)
                 for file in product.files():
