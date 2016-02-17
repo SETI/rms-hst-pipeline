@@ -120,11 +120,34 @@ class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
             self.hstInternalProposalIds = None
             self.bundleProposalId = None
 
+
+class BundleContainsBundleXml(Pass.LimitedReportingPass):
+    def __init__(self):
+        Pass.LimitedReportingPass.__init__(self)
+        self.sawBundleXml = None
+        self.count = 0
+
+    def doArchive(self, archive, before):
+        if not before:
+            print self.count
+
+    def doBundle(self, bundle, before):
+        if before:
+            self.sawBundleXml = False
+        else:
+            if not self.sawBundleXml:
+                self.count += 1
+                self.report('Bundle missing bundle.xml file.')
+
+    def doBundleFile(self, file):
+        if file.basename() == 'bundle.xml':
+            self.sawBundleXml = True
+
 stdValidation = Pass.CompositePass([
         CountFilesPass(),
         ProductFilesHaveBundleProposalId(),
         ProductFilesHaveCollectionSuffix(),
         ProductFilesHaveProductVisit(),
         BundleContainsOneSingleHstInternalProposalId(),
-        # More to do?
+        BundleContainsBundleXml(),
         ])

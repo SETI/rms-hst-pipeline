@@ -33,11 +33,30 @@ class NullPass(object):
 
     def report(self, msg, tag=None):
         print self.__class__.__name__ + ':',
-        print self.contextHolder.context + ':',
+        print repr(self.contextHolder.context) + ':',
         if tag is not None:
             print msg, tag
         else:
             print msg
+
+
+class LimitedReportingPass(NullPass):
+    def __init__(self, reportLimit=8):
+        NullPass.__init__(self)
+        self.reportCount = 0
+        self.reportLimit = reportLimit
+
+    def report(self, msg, tag=None):
+        self.reportCount += 1
+        if self.reportCount < self.reportLimit:
+            NullPass.report(self, msg, tag)
+        elif self.reportCount == self.reportLimit:
+            NullPass.report(self, msg, tag)
+            NullPass.report(self,
+                            'Reached reporting limit (=%s).' %
+                            self.reportLimit)
+        else:
+            pass
 
 
 class CompositePass(NullPass):
