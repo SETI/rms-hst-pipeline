@@ -1,3 +1,4 @@
+import os
 import xml.dom
 
 import FileArchives
@@ -28,11 +29,11 @@ def createDefaultBundleXml(bundle):
     id_area, b = createChildren(root, ['Identification_Area', 'Bundle'])
 
     log_id, vers_id, title, info_ver, prod_cls = createChildren(id_area, [
-            'logical_identifier',
-            'version_id',
-            'title',
-            'information_model_version',
-            'product_class'])
+            'pds:logical_identifier',
+            'pds:version_id',
+            'pds:title',
+            'pds:information_model_version',
+            'pds:product_class'])
 
     setText(log_id, str(bundle.lid))
     setText(vers_id, '1.0')
@@ -45,22 +46,36 @@ def createDefaultBundleXml(bundle):
 
     for collection in bundle.collections():
         mem_entry = createChild(root, 'Bundle_Member_Entry')
-    lid, stat, ref_ty = createChildren(mem_entry, [
-            'lid_reference',
-            'member_status',
-            'reference_type'])
-    setText(lid, str(collection.lid))
-    setText(stat, 'Primary')
-    setText(ref_ty, 'bundle_has_data_collection')
+        lid, stat, ref_ty = createChildren(mem_entry, [
+                'pds:lid_reference',
+                'pds:member_status',
+                'pds:reference_type'])
+        setText(lid, str(collection.lid))
+        setText(stat, 'Primary')
+        setText(ref_ty, 'bundle_has_data_collection')
 
     if True:
         return d.toprettyxml(indent='  ', newl='\n', encoding='utf-8')
     else:
         return d.toxml(encoding='utf-8')
 
-# Print a sample bundle.xml for the first non-hst_00000 bundle.
-a = FileArchives.getAnyArchive()
-for b in a.bundles():
-    if b.proposalId() != 0:
-        print createDefaultBundleXml(b)
-        break
+
+def schemaCheck(filepath):
+    exitCode = os.system('xmllint --noout --schema "%s" %s' %
+                         ('./PDS4_PDS_1500.xsd.xml', filepath))
+    return exitCode == 0
+
+if False:
+    # Create sample bundle.xml files for the non-hst_00000 bundles and
+    # test them against the XML schema.
+    a = FileArchives.getAnyArchive()
+    for b in a.bundles():
+        if b.proposalId() != 0:
+            xmlSrc = createDefaultBundleXml(b)
+            with open('bundle.xml', 'w') as f:
+                f.write(xmlSrc)
+            if schemaCheck('bundle.xml'):
+                print 'Yay: bundle.xml for %s conforms to the schema.' % str(b)
+            else:
+                print ('Boo: bundle.xml for %s ' +
+                       'does not conform to the schema.') % str(b)
