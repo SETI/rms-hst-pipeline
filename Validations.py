@@ -10,8 +10,8 @@ import Pass
 
 class CountFilesPass(Pass.NullPass):
     def __init__(self):
-        Pass.NullPass.__init__(self)
         self.fileCount = None
+        Pass.NullPass.__init__(self)
 
     def doArchive(self, archive, before):
         if before:
@@ -28,8 +28,8 @@ class CountFilesPass(Pass.NullPass):
 
 class ProductFilesHaveCollectionSuffix(Pass.NullPass):
     def __init__(self):
-        Pass.NullPass.__init__(self)
         self.collectionSuffix = None
+        Pass.NullPass.__init__(self)
 
     def doCollection(self, collection, before):
         if before:
@@ -39,17 +39,15 @@ class ProductFilesHaveCollectionSuffix(Pass.NullPass):
 
     def doProductFile(self, file):
         # get file suffix
-        fileBasename = file.basename
-        fileSuffix = re.match('\A[^_]+_([^\.]+)\..*\Z',
-                              fileBasename).group(1)
+        fileSuffix = HstFilename.HstFilename(file.basename).suffix()
         self.assertEquals(self.collectionSuffix, fileSuffix,
                           'Unexpected suffix for file %s' % repr(file))
 
 
 class ProductFilesHaveBundleProposalId(Pass.NullPass):
     def __init__(self):
-        Pass.NullPass.__init__(self)
         self.bundleProposalId = None
+        Pass.NullPass.__init__(self)
 
     def doBundle(self, bundle, before):
         if before:
@@ -78,8 +76,8 @@ class ProductFilesHaveBundleProposalId(Pass.NullPass):
 
 class ProductFilesHaveProductVisit(Pass.NullPass):
     def __init__(self):
-        Pass.NullPass.__init__(self)
         self.productVisit = None
+        Pass.NullPass.__init__(self)
 
     def doProduct(self, product, before):
         if before:
@@ -95,9 +93,9 @@ class ProductFilesHaveProductVisit(Pass.NullPass):
 
 class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
     def __init__(self):
-        Pass.NullPass.__init__(self)
         self.hstInternalProposalIds = None
         self.bundleProposalId = None
+        Pass.NullPass.__init__(self)
 
     def doProductFile(self, file):
         hstFile = HstFilename.HstFilename(file.fullFilepath())
