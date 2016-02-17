@@ -125,7 +125,6 @@ def testSynthesis():
                 inventorySrc = createDefaultCollectionInventory(c)
                 with io.open(invName, 'w', newline='\r\n') as f:
                     f.write(inventorySrc)
-                # print inventorySrc
 
                 if schemaCheck(xmlName):
                     print 'Yay: %s for %s conforms to the schema.' % \
@@ -134,6 +133,3 @@ def testSynthesis():
                     print ('Boo: %s for %s ' +
                            'does not conform to the schema.') % \
                            (xmlName, str(b))
-
-
-testSynthesis()

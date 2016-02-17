@@ -125,23 +125,40 @@ class BundleContainsBundleXml(Pass.LimitedReportingPass):
     def __init__(self):
         Pass.LimitedReportingPass.__init__(self)
         self.sawBundleXml = None
-        self.count = 0
-
-    def doArchive(self, archive, before):
-        if not before:
-            print self.count
 
     def doBundle(self, bundle, before):
         if before:
             self.sawBundleXml = False
         else:
             if not self.sawBundleXml:
-                self.count += 1
                 self.report('Bundle missing bundle.xml file.')
 
     def doBundleFile(self, file):
         if file.basename() == 'bundle.xml':
             self.sawBundleXml = True
+
+
+class CollectionContainsCollectionXml(Pass.LimitedReportingPass):
+    def __init__(self):
+        Pass.LimitedReportingPass.__init__(self)
+        self.sawCollectionXml = None
+
+    def doCollection(self, collection, before):
+        if before:
+            self.sawCollectionXml = False
+            self.collectionInvName = 'collection_%s_inventory.tab' % \
+                collection.suffix()
+            self.collectionXmlName = 'collection_%s.xml' % collection.suffix()
+        else:
+            if not self.sawCollectionXml:
+                self.report('Collection missing %s file.' %
+                            self.collectionXmlName)
+
+    def doCollectionFile(self, file):
+        if file.basename() == self.collectionXmlName:
+            self.sawCollectionXml = True
+        elif file.basename() == self.collectionInventoryName:
+            self.sawCollectionInv = True
 
 stdValidation = Pass.CompositePass([
         CountFilesPass(),
@@ -150,4 +167,5 @@ stdValidation = Pass.CompositePass([
         ProductFilesHaveProductVisit(),
         BundleContainsOneSingleHstInternalProposalId(),
         BundleContainsBundleXml(),
+        CollectionContainsCollectionXml(),
         ])
