@@ -1,7 +1,7 @@
 import FileArchives
-import Validation
+import Pass
 import Validations
 
 
-Validation.runArchiveValidation(FileArchives.getAnyArchive(),
-                                Validations.stdValidation)
+Pass.runArchivePasses(FileArchives.getAnyArchive(),
+                      Validations.stdValidation)

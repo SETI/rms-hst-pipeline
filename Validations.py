@@ -5,12 +5,12 @@ import sys
 import pyfits
 
 import HstFilename
-import Validation
+import Pass
 
 
-class CountFilesValidation(Validation.NullValidation):
+class CountFilesPass(Pass.NullPass):
     def __init__(self):
-        Validation.NullValidation.__init__(self)
+        Pass.NullPass.__init__(self)
         self.fileCount = None
 
     def doArchive(self, archive, before):
@@ -26,9 +26,9 @@ class CountFilesValidation(Validation.NullValidation):
             print >> sys.stderr, 'Saw %d files.' % self.fileCount
 
 
-class ProductFilesHaveCollectionSuffix(Validation.NullValidation):
+class ProductFilesHaveCollectionSuffix(Pass.NullPass):
     def __init__(self):
-        Validation.NullValidation.__init__(self)
+        Pass.NullPass.__init__(self)
         self.collectionSuffix = None
 
     def doCollection(self, collection, before):
@@ -46,9 +46,9 @@ class ProductFilesHaveCollectionSuffix(Validation.NullValidation):
                           'Unexpected suffix for file %s' % repr(file))
 
 
-class ProductFilesHaveBundleProposalId(Validation.NullValidation):
+class ProductFilesHaveBundleProposalId(Pass.NullPass):
     def __init__(self):
-        Validation.NullValidation.__init__(self)
+        Pass.NullPass.__init__(self)
         self.bundleProposalId = None
 
     def doBundle(self, bundle, before):
@@ -76,9 +76,9 @@ class ProductFilesHaveBundleProposalId(Validation.NullValidation):
             self.assertEquals(self.bundleProposalId, proposId)
 
 
-class ProductFilesHaveProductVisit(Validation.NullValidation):
+class ProductFilesHaveProductVisit(Pass.NullPass):
     def __init__(self):
-        Validation.NullValidation.__init__(self)
+        Pass.NullPass.__init__(self)
         self.productVisit = None
 
     def doProduct(self, product, before):
@@ -93,9 +93,9 @@ class ProductFilesHaveProductVisit(Validation.NullValidation):
                           'Unexpected visit value for file %s' % repr(file))
 
 
-class BundleContainsOneSingleHstInternalProposalId(Validation.NullValidation):
+class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
     def __init__(self):
-        Validation.NullValidation.__init__(self)
+        Pass.NullPass.__init__(self)
         self.hstInternalProposalIds = None
         self.bundleProposalId = None
 
@@ -122,8 +122,8 @@ class BundleContainsOneSingleHstInternalProposalId(Validation.NullValidation):
             self.hstInternalProposalIds = None
             self.bundleProposalId = None
 
-stdValidation = Validation.CompositeValidation([
-        CountFilesValidation(),  # not really a validation
+stdValidation = Pass.CompositePass([
+        CountFilesPass(),
         ProductFilesHaveBundleProposalId(),
         ProductFilesHaveCollectionSuffix(),
         ProductFilesHaveProductVisit(),
