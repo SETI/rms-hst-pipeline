@@ -14,7 +14,7 @@ class NullValidation(object):
     def doProduct(self, product, before):
         pass
 
-    def doProductFile(self, product, file):
+    def doProductFile(self, file):
         pass
 
     def assertEquals(self, expected, actual, tag=None):
@@ -67,9 +67,9 @@ class CompositeValidation(NullValidation):
             for v in reversed(self.validations):
                 v.doProduct(product, before)
 
-    def doProductFile(self, product, file):
+    def doProductFile(self, file):
         for v in self.validations:
-            v.doProductFile(product, file)
+            v.doProductFile(file)
 
 
 def runArchiveValidation(archive, v):
@@ -81,7 +81,7 @@ def runArchiveValidation(archive, v):
             for product in collection.products():
                 v.doProduct(product, True)
                 for file in product.files():
-                    v.doProductFile(product, file)
+                    v.doProductFile(file)
                 v.doProduct(product, False)
             v.doCollection(collection, False)
         v.doBundle(bundle, False)

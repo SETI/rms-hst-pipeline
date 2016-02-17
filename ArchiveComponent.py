@@ -2,6 +2,8 @@ import abc
 import os
 import os.path
 
+import ArchiveFile
+
 
 class ArchiveComponent:
     __metaclass__ = abc.ABCMeta
@@ -24,8 +26,8 @@ class ArchiveComponent:
 
     def files(self):
         dir = self.directoryFilepath()
-        for f in os.listdir(dir):
-            if f[0] != '.':
-                file = os.path.join(dir, f)
+        for basename in os.listdir(dir):
+            if basename[0] != '.':
+                file = os.path.join(dir, basename)
                 if (os.path.isfile(file)):
-                    yield file
+                    yield ArchiveFile.ArchiveFile(self, basename)
