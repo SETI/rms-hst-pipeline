@@ -3,6 +3,7 @@ import os
 import xml.dom
 
 import FileArchives
+import LabelMaker
 
 
 def createDefaultCollectionInventory(c):
@@ -106,12 +107,6 @@ def createDefaultCollectionXml(collection):
         return d.toxml(encoding='utf-8')
 
 
-def schemaCheck(filepath):
-    exitCode = os.system('xmllint --noout --schema "%s" %s' %
-                         ('./PDS4_PDS_1500.xsd.xml', filepath))
-    return exitCode == 0
-
-
 def testSynthesis():
     a = FileArchives.getAnyArchive()
     for b in a.bundles():
@@ -126,7 +121,7 @@ def testSynthesis():
                 with io.open(invName, 'w', newline='\r\n') as f:
                     f.write(inventorySrc)
 
-                if schemaCheck(xmlName):
+                if LabelMaker.xmlSchemaCheck(xmlName):
                     print 'Yay: %s for %s conforms to the schema.' % \
                         (xmlName, str(b))
                 else:
