@@ -8,4 +8,4 @@ class BundleInfo(Info.Info):
         self.bundle = bundle
 
     def title(self):
-        return 'TBD'
+        return self.PLACEHOLDER('title')

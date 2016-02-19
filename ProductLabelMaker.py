@@ -29,7 +29,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         self._setText(log_id, str(product.lid))
         self._setText(vers_id, self.info.versionID())
-        self._setText(title, 'TBD')
+        self._setText(title, self.info.title())
         self._setText(info_ver, self.info.informationModelVersion())
         self._setText(prod_cls, 'Product_Observational')
 
@@ -39,16 +39,26 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
                                             'Observing_System',
                                             'Target_Identification'])
 
-        self._createChildren(time_coords, ['start_date_time',
-                                           'stop_date_time'])
+        start_dt, stop_dt = \
+            self._createChildren(time_coords, ['start_date_time',
+                                               'stop_date_time'])
+        self._setText(start_dt, self.info.startDateTime())
+        self._setText(stop_dt, self.info.stopDateTime())
 
-        self._createChildren(invest_area, ['name', 'type',
-                                           'Internal_Reference'])
+        nm, ty, i_refs = \
+            self._createChildren(invest_area, ['name', 'type',
+                                               'Internal_Reference'])
+        self._setText(nm, self.info.investigationAreaName())
+        self._setText(ty, self.info.investigationAreaType())
 
         obs_sys_comp = self._createChild(obs_sys, 'Observing_System_Component')
-        self._createChildren(obs_sys_comp, ['name', 'type'])
+        nm, ty = self._createChildren(obs_sys_comp, ['name', 'type'])
+        self._setText(nm, self.info.observingSystemComponentName())
+        self._setText(ty, self.info.observingSystemComponentType())
 
-        self._createChildren(targ_id, ['name', 'type'])
+        nm, ty = self._createChildren(targ_id, ['name', 'type'])
+        self._setText(nm, self.info.targetIdentificationName())
+        self._setText(ty, self.info.targetIdentificationType())
 
         for file in product.files():
             self.createFileInfo(file_area, file)

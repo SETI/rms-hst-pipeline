@@ -8,4 +8,4 @@ class CollectionInfo(Info.Info):
         self.collection = collection
 
     def title(self):
-        return 'TBD'
+        return self.PLACEHOLDER('title')
