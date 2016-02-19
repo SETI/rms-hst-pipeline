@@ -120,7 +120,8 @@ def testSynthesis():
             for c in b.collections():
                 lm = CollectionLabelMaker(c)
                 lm.createDefaultXmlFile('collection.xml')
-                lm.createDefaultInventoryFile('collection_suffix.xml')
+                lm.createDefaultInventoryFile(
+                    'collection_suffix_inventory.tab')
                 if LabelMaker.xmlSchemaCheck('collection.xml'):
                     print ('Yay: collection.xml for %s ' +
                            'conforms to the schema.') % str(c)

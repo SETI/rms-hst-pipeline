@@ -2,6 +2,7 @@ import os.path
 import re
 
 import ArchiveComponent
+import Bundle
 import LID
 import Product
 
@@ -36,4 +37,4 @@ class Collection(ArchiveComponent.ArchiveComponent):
                         self.lid.collectionId).group(2)
 
     def bundle(self):
-        return Bundle(self.archive, self.lid.parentLID())
+        return Bundle.Bundle(self.archive, self.lid.parentLID())

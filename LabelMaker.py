@@ -40,8 +40,9 @@ class LabelMaker(object):
         return [self._createChild(parent, name) for name in names]
 
     def _setText(self, parent, txt):
-        d = self.document
-        return parent.appendChild(d.createTextNode(txt))
+        if txt is not None:
+            d = self.document
+            return parent.appendChild(d.createTextNode(txt))
 
     def printDefaultXml(self):
         print self.document.toprettyxml(indent='  ',

@@ -1,6 +1,7 @@
 import os
 import xml.dom
 
+import Bundle
 import BundleInfo
 import FileArchives
 import LabelMaker
@@ -8,6 +9,7 @@ import LabelMaker
 
 class BundleLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, bundle):
+        assert isinstance(bundle, Bundle.Bundle)
         LabelMaker.LabelMaker.__init__(self, bundle,
                                        BundleInfo.BundleInfo(bundle))
 

@@ -8,4 +8,7 @@ class CollectionInfo(Info.Info):
         self.collection = collection
 
     def title(self):
-        return self.PLACEHOLDER('title')
+        imageTag = self.collection.suffix().upper() + ' images'
+        prodId = str(self.collection.bundle().proposalId())
+        return ('This collection contains the raw %s ' +
+                'obtained from HST Observing Program %s.') % (imageTag, prodId)

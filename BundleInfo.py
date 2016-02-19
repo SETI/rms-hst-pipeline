@@ -8,4 +8,6 @@ class BundleInfo(Info.Info):
         self.bundle = bundle
 
     def title(self):
-        return self.PLACEHOLDER('title')
+        prodId = str(self.bundle.proposalId())
+        return ('This collection contains raw images ' +
+                'obtained from HST Observing Program %s.') % prodId
