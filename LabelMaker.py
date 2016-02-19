@@ -65,5 +65,5 @@ class LabelMaker(object):
 
 def xmlSchemaCheck(filepath):
     exitCode = os.system('xmllint --noout --schema "%s" %s' %
-                         ('./PDS4_PDS_1500.xsd.xml', filepath))
+                         ('./xml/PDS4_PDS_1500.xsd.xml', filepath))
     return exitCode == 0

@@ -1,7 +1,9 @@
 import FileArchives
 import Pass
+import Reporter
 import Validations
 
 
-Pass.PassRunner().run(FileArchives.getAnyArchive(),
-                      Validations.stdValidation)
+reporter = CsvReporter('archive-validation.csv')
+Pass.PassRunner(reporter).run(FileArchives.getAnyArchive(),
+                              Validations.stdValidation)
