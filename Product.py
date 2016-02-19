@@ -21,3 +21,9 @@ class Product(ArchiveComponent.ArchiveComponent):
     def visit(self):
         return re.match(Product.DIRECTORY_PATTERN,
                         self.lid.productId).group(1)
+
+    def collection(self):
+        return Collection(self.archive, self.lid.parentLID())
+
+    def bundle(self):
+        return Bundle(self.archive, self.lid.parentLID().parentLID())

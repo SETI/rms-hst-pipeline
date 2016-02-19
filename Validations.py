@@ -166,6 +166,6 @@ stdValidation = Pass.CompositePass([
         ProductFilesHaveCollectionSuffix(),
         ProductFilesHaveProductVisit(),
         BundleContainsOneSingleHstInternalProposalId(),
-        BundleContainsBundleXml(),
-        CollectionContainsCollectionXml(),
+        # BundleContainsBundleXml(),
+        # CollectionContainsCollectionXml(),
         ])
