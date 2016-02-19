@@ -12,5 +12,7 @@ echo '-- LIDVID'
 python LIDVID.py
 echo '-- VID'
 python VID.py
-python ValidateArchive.py
+today=`date +%Y-%m-%d`
+filename=archive-validation-$today.txt
+python ValidateArchive.py | tee $filename
 
