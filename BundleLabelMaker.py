@@ -9,6 +9,9 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, bundle):
         LabelMaker.LabelMaker.__init__(self, bundle)
 
+    def defaultXmlName(self):
+        return 'bundle.xml'
+
     def createDefaultXml(self):
         bundle = self.component
         root = self._createChild(self.document, 'Product_Bundle')
@@ -46,9 +49,6 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
             self._setText(lid, str(collection.lid))
             self._setText(stat, 'Primary')
             self._setText(ref_ty, 'bundle_has_data_collection')
-
-    def defaultXmlName(self):
-        return 'bundle.xml'
 
 
 def testSynthesis():

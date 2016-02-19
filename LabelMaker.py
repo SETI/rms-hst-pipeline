@@ -40,6 +40,11 @@ class LabelMaker(object):
         d = self.document
         return parent.appendChild(d.createTextNode(txt))
 
+    def printDefaultXml(self):
+        print self.document.toprettyxml(indent='  ',
+                                        newl='\n',
+                                        encoding='utf-8')
+
     def createDefaultXmlFile(self, xmlFilepath=None):
         if xmlFilepath is None:
             xmlName = self.defaultXmlName()
