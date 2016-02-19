@@ -123,11 +123,13 @@ class PassRunner(object):
         self.reporter = reporter
 
     def report(self, pass_, msg, tag):
+        # TODO I should ensure that these are all strings (or None).
         self.reporter.report(pass_, repr(self.context), msg, tag)
 
     def run(self, archive, p):
         p.setPassRunner(self)
 
+        self.reporter.beginReporting()
         self.context = archive
         p.doArchive(archive, True)
         for bundle in archive.bundles():
@@ -156,3 +158,4 @@ class PassRunner(object):
             p.doBundle(bundle, False)
         self.context = archive
         p.doArchive(archive, False)
+        self.reporter.endReporting()
