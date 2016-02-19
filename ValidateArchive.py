@@ -1,7 +1,8 @@
 import FileArchives
 import Pass
+import Reporter
 import Validations
 
 
-Pass.runArchivePasses(FileArchives.getAnyArchive(),
+Pass.PassRunner().run(FileArchives.getAnyArchive(),
                       Validations.stdValidation)

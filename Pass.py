@@ -1,9 +1,14 @@
+import abc
+
+import Reporter
+
+
 class NullPass(object):
     def __init__(self):
-        self.contextHolder = None
+        self.passRunner = None
 
-    def setContextHolder(self, ctxtHolder):
-        self.contextHolder = ctxtHolder
+    def setPassRunner(self, passRunner):
+        self.passRunner = passRunner
 
     def doArchive(self, archive, before):
         pass
@@ -32,12 +37,7 @@ class NullPass(object):
             self.report(msg, tag)
 
     def report(self, msg, tag=None):
-        print self.__class__.__name__ + ':',
-        print repr(self.contextHolder.context) + ':',
-        if tag is not None:
-            print msg, tag
-        else:
-            print msg
+        self.passRunner.report(self.__class__.__name__, msg, tag)
 
 
 class LimitedReportingPass(NullPass):
@@ -64,10 +64,10 @@ class CompositePass(NullPass):
         NullPass.__init__(self)
         self.passes = passes
 
-    def setContextHolder(self, ctxtHolder):
-        NullPass.setContextHolder(self, ctxtHolder)
+    def setPassRunner(self, passRunner):
+        NullPass.setPassRunner(self, passRunner)
         for p in self.passes:
-            p.setContextHolder(ctxtHolder)
+            p.setPassRunner(passRunner)
 
     def doArchive(self, archive, before):
         if before:
@@ -114,40 +114,45 @@ class CompositePass(NullPass):
             p.doProductFile(file)
 
 
-class _ContextHolder(object):
-    def __init__(self):
+class PassRunner(object):
+    def __init__(self, reporter=None):
         self.context = None
+        if reporter is None:
+            reporter = Reporter.StdoutReporter()
+        assert isinstance(reporter, Reporter.Reporter)
+        self.reporter = reporter
 
+    def report(self, pass_, msg, tag):
+        self.reporter.report(pass_, repr(self.context), msg, tag)
 
-def runArchivePasses(archive, p):
-    ctxtHolder = _ContextHolder()
-    p.setContextHolder(ctxtHolder)
+    def run(self, archive, p):
+        p.setPassRunner(self)
 
-    ctxtHolder.context = archive
-    p.doArchive(archive, True)
-    for bundle in archive.bundles():
-        ctxtHolder.context = bundle
-        p.doBundle(bundle, True)
-        for file in bundle.files():
-            ctxtHolder.context = file
-            p.doBundleFile(file)
-        for collection in bundle.collections():
-            ctxtHolder.context = collection
-            p.doCollection(collection, True)
-            for file in collection.files():
-                ctxtHolder.context = file
-                p.doCollectionFile(file)
-            for product in collection.products():
-                ctxtHolder.context = product
-                p.doProduct(product, True)
-                for file in product.files():
-                    ctxtHolder.context = file
-                    p.doProductFile(file)
-                ctxtHolder.context = product
-                p.doProduct(product, False)
-            ctxtHolder.context = collection
-            p.doCollection(collection, False)
-        ctxtHolder.context = bundle
-        p.doBundle(bundle, False)
-    ctxtHolder.context = archive
-    p.doArchive(archive, False)
+        self.context = archive
+        p.doArchive(archive, True)
+        for bundle in archive.bundles():
+            self.context = bundle
+            p.doBundle(bundle, True)
+            for file in bundle.files():
+                self.context = file
+                p.doBundleFile(file)
+            for collection in bundle.collections():
+                self.context = collection
+                p.doCollection(collection, True)
+                for file in collection.files():
+                    self.context = file
+                    p.doCollectionFile(file)
+                for product in collection.products():
+                    self.context = product
+                    p.doProduct(product, True)
+                    for file in product.files():
+                        self.context = file
+                        p.doProductFile(file)
+                    self.context = product
+                    p.doProduct(product, False)
+                self.context = collection
+                p.doCollection(collection, False)
+            self.context = bundle
+            p.doBundle(bundle, False)
+        self.context = archive
+        p.doArchive(archive, False)
