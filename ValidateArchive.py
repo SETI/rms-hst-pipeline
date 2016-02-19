@@ -3,5 +3,5 @@ import Pass
 import Validations
 
 
-Pass.runArchivePasses(FileArchives.getAnyArchive(),
+Pass.PassRunner().run(FileArchives.getAnyArchive(),
                       Validations.stdValidation)

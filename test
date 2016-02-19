@@ -12,7 +12,9 @@ echo '-- LIDVID'
 python LIDVID.py
 echo '-- VID'
 python VID.py
+echo starting archive validation at `date "+%Y-%m-%d %H:%M"`
 today=`date +%Y-%m-%d`
 filename=archive-validation-$today.txt
 python ValidateArchive.py | tee $filename
+echo finished archive validation at `date "+%Y-%m-%d %H:%M"`
 

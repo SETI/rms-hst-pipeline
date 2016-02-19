@@ -34,3 +34,6 @@ class Collection(ArchiveComponent.ArchiveComponent):
     def suffix(self):
         return re.match(Collection.DIRECTORY_PATTERN,
                         self.lid.collectionId).group(2)
+
+    def bundle(self):
+        return Bundle(self.archive, self.lid.parentLID())

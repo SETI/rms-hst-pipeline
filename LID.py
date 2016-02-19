@@ -49,6 +49,14 @@ class LID(object):
     def isBundleLID(self):
         return self.bundleId is not None and self.collectionId is None
 
+    def parentLID(self):
+        if self.isBundleLID():
+            raise ValueError('bundle LID %s has no parent LID' %
+                             repr(self.LID))
+        else:
+            parts = self.LID.split(':')
+            return LID(':'.join(parts[:-1]))
+
 ############################################################
 
 
