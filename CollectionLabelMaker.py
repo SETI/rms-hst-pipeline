@@ -54,19 +54,25 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
                                         'Collection',
                                         'File_Area_Inventory'])
 
-        log_id, vers_id, title, info_ver, prod_cls = \
+        log_id, vers_id, title, info_ver, prod_cls, cit_info = \
             self._createChildren(id_area, [
-                'pds:logical_identifier',
-                'pds:version_id',
-                'pds:title',
-                'pds:information_model_version',
-                'pds:product_class'])
+                'logical_identifier',
+                'version_id',
+                'title',
+                'information_model_version',
+                'product_class',
+                'Citation_Information'])
 
         self._setText(log_id, str(collection.lid))
         self._setText(vers_id, self.info.versionID())
         self._setText(title, self.info.title())
         self._setText(info_ver, self.info.informationModelVersion())
-        self._setText(prod_cls, 'Product_Observational')
+        self._setText(prod_cls, 'Product_Collection')
+
+        pub_yr = self._createChild(cit_info, 'publication_year')
+        self._setText(pub_yr, self.info.citationInformationPublicationYear())
+        desc = self._createChild(cit_info, 'description')
+        self._setText(desc, self.info.citationInformationDescription())
 
         self._setText(self._createChild(coll, 'collection_type'), 'Data')
 
@@ -89,19 +95,22 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
             productCount += 1
         self._setText(records, str(productCount))
 
-        self._setText(r_delim, 'carriage-return line-feed')
-        self._setText(f_delim, 'comma')
+        self._setText(r_delim, 'Carriage-Return Line-Feed')
+        self._setText(f_delim, 'Comma')
 
         fs, gs, f1, f2 = self._createChildren(rec_delim, [
                 'fields', 'groups', 'Field_Delimited', 'Field_Delimited'])
         self._setText(fs, '2')
         self._setText(gs, '0')
 
-        nm, fn, dt = \
-            self._createChildren(f1, ['name', 'field_number', 'data_type'])
+        nm, fn, dt, mfl = \
+            self._createChildren(f1, ['name', 'field_number',
+                                      'data_type', 'maximum_field_length'])
         self._setText(nm, 'Member_Status')
         self._setText(fn, '1')
         self._setText(dt, 'ASCII_String')
+        mfl.setAttribute('unit', 'byte')
+        self._setText(mfl, '1')
 
         nm, fn, dt = \
             self._createChildren(f2, ['name', 'field_number', 'data_type'])
@@ -124,10 +133,17 @@ def testSynthesis():
                     'collection_suffix_inventory.tab')
                 if LabelMaker.xmlSchemaCheck('collection.xml'):
                     print ('Yay: collection.xml for %s ' +
-                           'conforms to the schema.') % str(c)
+                           'conforms to the XML schema.') % str(b)
                 else:
                     print ('Boo: collection.xml for %s ' +
-                           'does not conform to the schema.') % str(c)
-
+                           'does not conform to the XML schema.') % str(b)
+                    return
+                if LabelMaker.schematronCheck('collection.xml'):
+                    print ('Yay: collection.xml for %s ' +
+                           'conforms to the Schematron schema.') % str(b)
+                else:
+                    print ('Boo: collection.xml for %s ' +
+                           'does not conform to the Schematron schema.') % \
+                           str(b)
 
 testSynthesis()

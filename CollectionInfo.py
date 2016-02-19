@@ -12,3 +12,10 @@ class CollectionInfo(Info.Info):
         prodId = str(self.collection.bundle().proposalId())
         return ('This collection contains the raw %s ' +
                 'obtained from HST Observing Program %s.') % (imageTag, prodId)
+
+    def citationInformationDescription(self):
+        return self.PLACEHOLDER('citationInformationDescription')
+
+    def citationInformationPublicationYear(self):
+        # TODO This is wrong.
+        return '2000'

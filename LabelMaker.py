@@ -65,6 +65,16 @@ class LabelMaker(object):
 
 
 def xmlSchemaCheck(filepath):
-    exitCode = os.system('xmllint --noout --schema "%s" %s' %
+    cmdTemplate = 'xmllint --noout --schema %s %s'
+    exitCode = os.system(cmdTemplate %
                          ('./xml/PDS4_PDS_1500.xsd.xml', filepath))
+    return exitCode == 0
+
+
+def schematronCheck(filepath):
+    cmdTemplate = 'java -jar probatron.jar %s %s' + \
+        ' | xmllint -format -' + \
+        ' | python Schematron.py'
+    exitCode = os.system(cmdTemplate %
+                         (filepath, './xml/PDS4_PDS_1500.sch.xml'))
     return exitCode == 0
