@@ -4,14 +4,17 @@ import os.path
 import xml.dom
 
 import ArchiveComponent
+import Info
 
 
 class LabelMaker(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, component):
+    def __init__(self, component, info):
         assert isinstance(component, ArchiveComponent.ArchiveComponent)
         self.component = component
+        assert isinstance(info, Info.Info)
+        self.info = info
         self.domImpl = xml.dom.getDOMImplementation()
         self.document = self.domImpl.createDocument(None, None, None)
         self.createDefaultXml()

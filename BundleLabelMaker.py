@@ -1,13 +1,15 @@
 import os
 import xml.dom
 
+import BundleInfo
 import FileArchives
 import LabelMaker
 
 
 class BundleLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, bundle):
-        LabelMaker.LabelMaker.__init__(self, bundle)
+        LabelMaker.LabelMaker.__init__(self, bundle,
+                                       BundleInfo.BundleInfo(bundle))
 
     def defaultXmlName(self):
         return 'bundle.xml'
@@ -16,7 +18,7 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
         bundle = self.component
         root = self._createChild(self.document, 'Product_Bundle')
 
-        PDS = 'http://pds.nasa.gov/pds4/pds/v1'
+        PDS = self.info.pdsNamespaceUrl()
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
 
@@ -32,9 +34,9 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
                 'pds:product_class'])
 
         self._setText(log_id, str(bundle.lid))
-        self._setText(vers_id, '1.0')
-        self._setText(title, 'TBD')
-        self._setText(info_ver, '1.5.0.0')
+        self._setText(vers_id, self.info.versionID())
+        self._setText(title, self.info.title())
+        self._setText(info_ver, self.info.informationModelVersion())
         self._setText(prod_cls, 'Product_Observational')
 
         b_ty = self._createChild(b, 'bundle_type')
@@ -65,4 +67,4 @@ def testSynthesis():
                 print ('Boo: bundle.xml for %s ' +
                        'does not conform to the schema.') % str(b)
 
-# testSynthesis()
+testSynthesis()

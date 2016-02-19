@@ -1,10 +1,12 @@
 import FileArchives
 import LabelMaker
+import ProductInfo
 
 
 class ProductLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, product):
-        LabelMaker.LabelMaker.__init__(self, product)
+        LabelMaker.LabelMaker.__init__(
+            self, product, ProductInfo.ProductInfo(product))
 
     def defaultXmlName(self):
         assert False, 'ProductLabelMaker.defaultXmlName unimplemented'
@@ -26,9 +28,9 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
                 'pds:product_class'])
 
         self._setText(log_id, str(product.lid))
-        self._setText(vers_id, '1.0')
+        self._setText(vers_id, self.info.versionID())
         self._setText(title, 'TBD')
-        self._setText(info_ver, '1.5.0.0')
+        self._setText(info_ver, self.info.informationModelVersion())
         self._setText(prod_cls, 'Product_Observational')
 
         time_coords, invest_area, obs_sys, targ_id = \
@@ -68,4 +70,4 @@ def testSynthesis():
                     lm.printDefaultXml()
                     return
 
-# testSynthesis()
+testSynthesis()

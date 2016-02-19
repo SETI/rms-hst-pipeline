@@ -2,13 +2,15 @@ import io
 import os
 import xml.dom
 
+import CollectionInfo
 import FileArchives
 import LabelMaker
 
 
 class CollectionLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, collection):
-        LabelMaker.LabelMaker.__init__(self, collection)
+        LabelMaker.LabelMaker.__init__(
+            self, collection, CollectionInfo.CollectionInfo(collection))
         self.inventoryDocument = None
         self.createDefaultCollectionInventory()
 
@@ -43,7 +45,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         collection = self.component
         root = self._createChild(self.document, 'Product_Collection')
 
-        PDS = 'http://pds.nasa.gov/pds4/pds/v1'
+        PDS = self.info.pdsNamespaceUrl()
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
 
@@ -61,9 +63,9 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
                 'pds:product_class'])
 
         self._setText(log_id, str(collection.lid))
-        self._setText(vers_id, '1.0')
-        self._setText(title, 'TBD')
-        self._setText(info_ver, '1.5.0.0')
+        self._setText(vers_id, self.info.versionID())
+        self._setText(title, self.info.title())
+        self._setText(info_ver, self.info.informationModelVersion())
         self._setText(prod_cls, 'Product_Observational')
 
         self._setText(self._createChild(coll, 'collection_type'), 'Data')
@@ -121,10 +123,10 @@ def testSynthesis():
                 lm.createDefaultInventoryFile('collection_suffix.xml')
                 if LabelMaker.xmlSchemaCheck('collection.xml'):
                     print ('Yay: collection.xml for %s ' +
-                           'conforms to the schema.') % str(b)
+                           'conforms to the schema.') % str(c)
                 else:
                     print ('Boo: collection.xml for %s ' +
-                           'does not conform to the schema.') % str(b)
+                           'does not conform to the schema.') % str(c)
 
 
-# testSynthesis()
+testSynthesis()
