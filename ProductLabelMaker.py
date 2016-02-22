@@ -106,6 +106,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         self._setText(elmts, '1')  # TODO Wrong
         self._setText(seq_num, '1')  # TODO Wrong
 
+
 def testSynthesis():
     a = FileArchives.getAnyArchive()
     for b in a.bundles():
