@@ -8,19 +8,19 @@ class XmlUtils(object):
     def __init__(self, document):
         self.document = document
 
-    def _addProcessingInstruction(self, lhs, rhs):
+    def addProcessingInstruction(self, lhs, rhs):
         d = self.document
         return d.appendChild(d.createProcessingInstruction(lhs, rhs))
 
-    def _createChild(self, parent, name):
+    def createChild(self, parent, name):
         d = self.document
         return parent.appendChild(d.createElement(name))
 
-    def _createChildren(self, parent, names):
+    def createChildren(self, parent, names):
         d = self.document
-        return [self._createChild(parent, name) for name in names]
+        return [self.createChild(parent, name) for name in names]
 
-    def _setText(self, parent, txt):
+    def setText(self, parent, txt):
         if txt is not None:
             d = self.document
             return parent.appendChild(d.createTextNode(txt))

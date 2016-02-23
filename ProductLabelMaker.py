@@ -18,93 +18,93 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
     def createDefaultXml(self):
         product = self.component
 
-        root = self._createChild(self.document, 'Product_Observational')
+        root = self.createChild(self.document, 'Product_Observational')
 
         PDS = self.info.pdsNamespaceUrl()
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
 
         id_area, obs_area = \
-            self._createChildren(root, ['Identification_Area',
+            self.createChildren(root, ['Identification_Area',
                                         'Observation_Area'])
 
         log_id, vers_id, title, info_ver, prod_cls = \
-            self._createChildren(id_area, [
+            self.createChildren(id_area, [
                 'logical_identifier',
                 'version_id',
                 'title',
                 'information_model_version',
                 'product_class'])
 
-        self._setText(log_id, str(product.lid))
-        self._setText(vers_id, self.info.versionID())
-        self._setText(title, self.info.title())
-        self._setText(info_ver, self.info.informationModelVersion())
-        self._setText(prod_cls, 'Product_Observational')
+        self.setText(log_id, str(product.lid))
+        self.setText(vers_id, self.info.versionID())
+        self.setText(title, self.info.title())
+        self.setText(info_ver, self.info.informationModelVersion())
+        self.setText(prod_cls, 'Product_Observational')
 
         time_coords, invest_area, obs_sys, targ_id = \
-            self._createChildren(obs_area, ['Time_Coordinates',
+            self.createChildren(obs_area, ['Time_Coordinates',
                                             'Investigation_Area',
                                             'Observing_System',
                                             'Target_Identification'])
 
         start_dt, stop_dt = \
-            self._createChildren(time_coords, ['start_date_time',
+            self.createChildren(time_coords, ['start_date_time',
                                                'stop_date_time'])
-        self._setText(start_dt, self.info.startDateTime())
-        self._setText(stop_dt, self.info.stopDateTime())
+        self.setText(start_dt, self.info.startDateTime())
+        self.setText(stop_dt, self.info.stopDateTime())
 
         nm, ty, i_ref = \
-            self._createChildren(invest_area, ['name', 'type',
+            self.createChildren(invest_area, ['name', 'type',
                                                'Internal_Reference'])
-        self._setText(nm, self.info.investigationAreaName())
-        self._setText(ty, self.info.investigationAreaType())
+        self.setText(nm, self.info.investigationAreaName())
+        self.setText(ty, self.info.investigationAreaType())
 
-        ref_ty, = self._createChildren(i_ref, ['reference_type'])
-        self._setText(ref_ty, self.info.internalReferenceType())
+        ref_ty, = self.createChildren(i_ref, ['reference_type'])
+        self.setText(ref_ty, self.info.internalReferenceType())
 
-        obs_sys_comp = self._createChild(obs_sys, 'Observing_System_Component')
-        nm, ty = self._createChildren(obs_sys_comp, ['name', 'type'])
-        self._setText(nm, self.info.observingSystemComponentName())
-        self._setText(ty, self.info.observingSystemComponentType())
+        obs_sys_comp = self.createChild(obs_sys, 'Observing_System_Component')
+        nm, ty = self.createChildren(obs_sys_comp, ['name', 'type'])
+        self.setText(nm, self.info.observingSystemComponentName())
+        self.setText(ty, self.info.observingSystemComponentType())
 
-        nm, ty = self._createChildren(targ_id, ['name', 'type'])
-        self._setText(nm, self.info.targetIdentificationName())
-        self._setText(ty, self.info.targetIdentificationType())
+        nm, ty = self.createChildren(targ_id, ['name', 'type'])
+        self.setText(nm, self.info.targetIdentificationName())
+        self.setText(ty, self.info.targetIdentificationType())
 
         for file in product.files():
             self.createFileInfo(root, file)
 
     def createFileInfo(self, root, f):
         assert isinstance(f, ArchiveFile.ArchiveFile)
-        file_area = self._createChild(root, 'File_Area_Observational')
+        file_area = self.createChild(root, 'File_Area_Observational')
 
         fileInfo = ProductFileInfo.ProductFileInfo(file_area, f)
-        file = self._createChild(file_area, 'File')
-        file_name = self._createChild(file, 'file_name')
-        self._setText(file_name, fileInfo.fileName())
+        file = self.createChild(file_area, 'File')
+        file_name = self.createChild(file, 'file_name')
+        self.setText(file_name, fileInfo.fileName())
 
         # TODO These are the wrong contents; it's a placeholder.
-        arr = self._createChild(file_area, 'Array')
+        arr = self.createChild(file_area, 'Array')
         offset, axes, ax_ind_order, elmt_arr, axis_arr = \
-            self._createChildren(arr, ['offset', 'axes', 'axis_index_order',
+            self.createChildren(arr, ['offset', 'axes', 'axis_index_order',
                                        'Element_Array', 'Axis_Array'])
 
         offset.setAttribute('unit', 'byte')
-        self._setText(offset, '0')
-        self._setText(axes, '1')
-        self._setText(ax_ind_order, 'Last Index Fastest')  # TODO Abstract?
+        self.setText(offset, '0')
+        self.setText(axes, '1')
+        self.setText(ax_ind_order, 'Last Index Fastest')  # TODO Abstract?
 
-        d_ty = self._createChild(elmt_arr, 'data_type')
-        self._setText(d_ty, 'UnsignedByte')
+        d_ty = self.createChild(elmt_arr, 'data_type')
+        self.setText(d_ty, 'UnsignedByte')
 
         ax_nm, elmts, seq_num = \
-            self._createChildren(axis_arr, ['axis_name', 'elements',
+            self.createChildren(axis_arr, ['axis_name', 'elements',
                                             'sequence_number'])
 
-        self._setText(ax_nm, 'kurt')  # TODO Wrong
-        self._setText(elmts, '1')  # TODO Wrong
-        self._setText(seq_num, '1')  # TODO Wrong
+        self.setText(ax_nm, 'kurt')  # TODO Wrong
+        self.setText(elmts, '1')  # TODO Wrong
+        self.setText(seq_num, '1')  # TODO Wrong
 
 
 def testSynthesis():
