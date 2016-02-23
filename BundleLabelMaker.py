@@ -18,17 +18,18 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
 
     def createDefaultXml(self):
         bundle = self.component
-        root = self._createChild(self.document, 'Product_Bundle')
+        root = self.createChild(self.document, 'Product_Bundle')
 
         PDS = self.info.pdsNamespaceUrl()
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
 
-        id_area, b = \
-            self._createChildren(root, ['Identification_Area', 'Bundle'])
+        identificationArea, bundle_ = \
+            self.createChildren(root, ['Identification_Area', 'Bundle'])
 
-        log_id, vers_id, title, info_ver, prod_cls, cit_info = \
-            self._createChildren(id_area, [
+        logicalIdentifier, versionId, title, informationModelVersion, \
+            productClass, citationInformation = \
+            self.createChildren(identificationArea, [
                 'logical_identifier',
                 'version_id',
                 'title',
@@ -36,29 +37,34 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
                 'product_class',
                 'Citation_Information'])
 
-        self._setText(log_id, str(bundle.lid))
-        self._setText(vers_id, self.info.versionID())
-        self._setText(title, self.info.title())
-        self._setText(info_ver, self.info.informationModelVersion())
-        self._setText(prod_cls, 'Product_Bundle')
+        self.setText(logicalIdentifier, str(bundle.lid))
+        self.setText(versionId, self.info.versionID())
+        self.setText(title, self.info.title())
+        self.setText(informationModelVersion,
+                     self.info.informationModelVersion())
+        self.setText(productClass, 'Product_Bundle')
 
-        pub_yr = self._createChild(cit_info, 'publication_year')
-        self._setText(pub_yr, self.info.citationInformationPublicationYear())
-        desc = self._createChild(cit_info, 'description')
-        self._setText(desc, self.info.citationInformationDescription())
+        publicationYear = self.createChild(citationInformation,
+                                           'publication_year')
+        self.setText(publicationYear,
+                     self.info.citationInformationPublicationYear())
 
-        b_ty = self._createChild(b, 'bundle_type')
-        self._setText(b_ty, 'Archive')
+        description = self.createChild(citationInformation, 'description')
+        self.setText(description, self.info.citationInformationDescription())
+
+        bundleType = self.createChild(bundle_, 'bundle_type')
+        self.setText(bundleType, 'Archive')
 
         for collection in bundle.collections():
-            mem_entry = self._createChild(root, 'Bundle_Member_Entry')
-            lid, stat, ref_ty = self._createChildren(mem_entry, [
+            bundleMemberEntry = self.createChild(root, 'Bundle_Member_Entry')
+            lidReference, memberStatus, referenceType = \
+                self.createChildren(bundleMemberEntry, [
                     'lid_reference',
                     'member_status',
                     'reference_type'])
-            self._setText(lid, str(collection.lid))
-            self._setText(stat, 'Primary')
-            self._setText(ref_ty, 'bundle_has_data_collection')
+            self.setText(lidReference, str(collection.lid))
+            self.setText(memberStatus, 'Primary')
+            self.setText(referenceType, 'bundle_has_data_collection')
 
 
 def testSynthesis():
