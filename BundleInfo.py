@@ -15,7 +15,7 @@ class BundleInfo(Info.Info):
 
     def title(self):
         """
-        The text appearing at XPath
+        Return the text appearing at XPath
         '/Product_Bundle/Identification/Area/title'.
         """
         prodId = str(self.bundle.proposalId())
@@ -24,14 +24,14 @@ class BundleInfo(Info.Info):
 
     def citationInformationDescription(self):
         """
-        The text appearing at XPath
+        Return the text appearing at XPath
         '/Product_Bundle/Identification_Area/CitationInformation/description'.
         """
         return self.PLACEHOLDER('citationInformationDescription')
 
     def citationInformationPublicationYear(self):
         """
-        The text appearing at XPath
+        Return the text appearing at XPath
         '/Product_Bundle/Identification_Area/CitationInformation/publication_year'.
         """
         return self.CHEATING_PLACEHOLDER('2000',

@@ -15,7 +15,7 @@ class CollectionInfo(Info.Info):
 
     def title(self):
         """
-        The text appearing at XPath
+        Return the text appearing at XPath
         '/Product_Collection/Identification_Area/title'.
         """
         imageTag = self.collection.suffix().upper() + ' images'
@@ -25,14 +25,14 @@ class CollectionInfo(Info.Info):
 
     def citationInformationDescription(self):
         """
-        The text appearing at XPath
+        Return the text appearing at XPath
         '/Product_Collection/Identification_Area/CitationInformation/description'.
         """
         return self.PLACEHOLDER('citationInformationDescription')
 
     def citationInformationPublicationYear(self):
         """
-        The text appearing at XPath
+        Return the text appearing at XPath
         '/Product_Collection/Identification_Area/CitationInformation/publication_year'.
         """
         return self.CHEATING_PLACEHOLDER('2000',
