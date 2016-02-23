@@ -1,6 +1,3 @@
-import os
-import xml.dom
-
 import Bundle
 import BundleInfo
 import FileArchives

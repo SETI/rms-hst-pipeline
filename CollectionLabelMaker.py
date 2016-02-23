@@ -1,6 +1,5 @@
 import io
 import os
-import xml.dom
 
 import CollectionInfo
 import FileArchives
