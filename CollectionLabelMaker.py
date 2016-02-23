@@ -42,6 +42,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
 
     def createDefaultXml(self):
         collection = self.component
+        # At XPath '/Product_Collection'
         root = self.createChild(self.document, 'Product_Collection')
 
         PDS = self.info.pdsNamespaceUrl()
@@ -53,6 +54,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
                                        'Collection',
                                        'File_Area_Inventory'])
 
+        # At XPath '/Product_Collection/Identification_Area'
         logicalIdentifier, versionId, title, informationModelVersion, \
             productClass, citationInformation = \
             self.createChildren(identificationArea, [
@@ -70,6 +72,8 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
                      self.info.informationModelVersion())
         self.setText(productClass, 'Product_Collection')
 
+        # At XPath
+        # '/Product_Collection/Identification_Area/Citation_Information'
         publicationYear, description = \
             self.createChildren(citationInformation,
                                 ['publication_year', 'description'])
@@ -79,13 +83,17 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
 
         self.setText(description, self.info.citationInformationDescription())
 
+        # At XPath '/Product_Collection/Collection'
         self.setText(self.createChild(collection_, 'collection_type'), 'Data')
 
+        # At XPath '/Product_Collection/File_Area_Inventory'
         file, inventory = self.createChildren(fileAreaInventory,
                                               ['File', 'Inventory'])
+        # At XPath '/Product_Collection/File_Area_Inventory/File'
         fileName = self.createChild(file, 'file_name')
         self.setText(fileName, self.defaultInventoryName())
 
+        # At XPath '/Product_Collection/File_Area_Inventory/Inventory'
         offset, parsingStandardId, records, recordDelimiter, \
             fieldDelimiter, recordDelimited, referenceType = \
             self.createChildren(inventory, [
@@ -105,12 +113,16 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         self.setText(recordDelimiter, 'Carriage-Return Line-Feed')
         self.setText(fieldDelimiter, 'Comma')
 
+        # At XPath
+        # '/Product_Collection/File_Area_Inventory/Inventory/Record_Delimited'
         fields, groups, fieldDelimited1, fieldDelimited2 = \
             self.createChildren(recordDelimited, [
                 'fields', 'groups', 'Field_Delimited', 'Field_Delimited'])
         self.setText(fields, '2')
         self.setText(groups, '0')
 
+        # At XPath
+        # '/Product_Collection/File_Area_Inventory/Inventory/Record_Delimited/Field_Delimited[1]'
         name, fieldNumber, dataType, maximumFieldLength = \
             self.createChildren(fieldDelimited1,
                                 ['name', 'field_number',
@@ -121,6 +133,8 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         maximumFieldLength.setAttribute('unit', 'byte')
         self.setText(maximumFieldLength, '1')
 
+        # At XPath
+        # '/Product_Collection/File_Area_Inventory/Inventory/Record_Delimited/Field_Delimited[2]'
         name, fieldNumber, dataType = \
             self.createChildren(fieldDelimited2,
                                 ['name', 'field_number', 'data_type'])

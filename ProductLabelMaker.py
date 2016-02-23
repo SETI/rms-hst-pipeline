@@ -19,6 +19,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
     def createDefaultXml(self):
         product = self.component
 
+        # At XPath '/Product_Observational'
         root = self.createChild(self.document, 'Product_Observational')
 
         PDS = self.info.pdsNamespaceUrl()
@@ -29,6 +30,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
             self.createChildren(root, ['Identification_Area',
                                        'Observation_Area'])
 
+        # At XPath '/Product_Observational/Identification_Area'
         logicalIdentifier, versionId, title, \
             informationModelVersion, productClass = \
             self.createChildren(identificationArea, [
@@ -45,6 +47,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
                      self.info.informationModelVersion())
         self.setText(productClass, 'Product_Observational')
 
+        # At XPath '/Product_Observational/Observation_Area'
         timeCoordinates, investigationArea, \
             observingSystem, targetIdentification = \
             self.createChildren(observationArea, ['Time_Coordinates',
@@ -52,33 +55,44 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
                                                   'Observing_System',
                                                   'Target_Identification'])
 
+        # At XPath '/Product_Observational/Observation_Area/Time_Coordinates'
         startDateTime, stopDateTime = \
             self.createChildren(timeCoordinates, ['start_date_time',
                                                   'stop_date_time'])
         self.setText(startDateTime, self.info.startDateTime())
         self.setText(stopDateTime, self.info.stopDateTime())
 
+        # At XPath '/Product_Observational/Observation_Area/Investigation_Area'
         name, type, internalReference = \
             self.createChildren(investigationArea, ['name', 'type',
                                                     'Internal_Reference'])
         self.setText(name, self.info.investigationAreaName())
         self.setText(type, self.info.investigationAreaType())
 
+        # At XPath
+        # '/Product_Observational/Observation_Area/Investigation_Area/Internal_Reference'
         referenceType = self.createChild(internalReference, 'reference_type')
         self.setText(referenceType, self.info.internalReferenceType())
 
+        # At XPath '/Product_Observational/Observation_Area/Observing_System'
         observingSystemComponent = \
             self.createChild(observingSystem, 'Observing_System_Component')
+
+        # At XPath
+        # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component'
         name, type = self.createChildren(observingSystemComponent,
                                          ['name', 'type'])
         self.setText(name, self.info.observingSystemComponentName())
         self.setText(type, self.info.observingSystemComponentType())
 
+        # At XPath
+        # '/Product_Observational/Observation_Area/Target_Identification'
         name, type = self.createChildren(targetIdentification,
                                          ['name', 'type'])
         self.setText(name, self.info.targetIdentificationName())
         self.setText(type, self.info.targetIdentificationType())
 
+        # At XPath '/Product_Observational'
         for archiveFile in product.files():
             DummyProductFileLabelMaker.DummyProductFileLabelMaker(
                 self.document, root, archiveFile)

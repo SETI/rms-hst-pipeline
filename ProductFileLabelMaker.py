@@ -30,12 +30,17 @@ class ProductFileLabelMaker(XmlUtils.XmlUtils):
 
     def createDefaultXml(self):
         """Create the XML nodes for the product file."""
+
+        # At XPath '/Product_Observational/File_Area_Observational'
         fileAreaObservational = self.createChild(self.root,
                                                  'File_Area_Observational')
 
+        # At XPath '/Product_Observational/File_Area_Observational/File'
         file = self.createChild(fileAreaObservational, 'File')
         fileName = self.createChild(file, 'file_name')
         self.setText(fileName, self.archiveFile.basename)
+
+        # At XPath '/Product_Observational/File_Area_Observational'
         self.createFileDataXml(fileAreaObservational)
 
     @abc.abstractmethod

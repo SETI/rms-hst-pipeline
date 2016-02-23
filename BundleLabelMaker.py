@@ -17,6 +17,7 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
         bundle = self.component
         root = self.createChild(self.document, 'Product_Bundle')
 
+        # At XPath '/Product_Bundle'
         PDS = self.info.pdsNamespaceUrl()
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
@@ -24,6 +25,7 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
         identificationArea, bundle_ = \
             self.createChildren(root, ['Identification_Area', 'Bundle'])
 
+        # At XPath '/Product_Bundle/Identification_Area'
         logicalIdentifier, versionId, title, informationModelVersion, \
             productClass, citationInformation = \
             self.createChildren(identificationArea, [
@@ -41,6 +43,7 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
                      self.info.informationModelVersion())
         self.setText(productClass, 'Product_Bundle')
 
+        # At XPath '/Product_Bundle/Identification_Area/Citation_Information'
         publicationYear, description = \
             self.createChildren(citationInformation,
                                 ['publication_year', 'description'])
@@ -49,10 +52,12 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
                      self.info.citationInformationPublicationYear())
         self.setText(description, self.info.citationInformationDescription())
 
+        # At XPath '/Product_Bundle/Bundle'
         bundleType = self.createChild(bundle_, 'bundle_type')
         self.setText(bundleType, 'Archive')
 
         for collection in bundle.collections():
+            # At XPath '/Product_Bundle/Bundle_Member_Entry'
             bundleMemberEntry = self.createChild(root, 'Bundle_Member_Entry')
             lidReference, memberStatus, referenceType = \
                 self.createChildren(bundleMemberEntry, [
