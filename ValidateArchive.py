@@ -1,9 +1,13 @@
+import datetime
+
 import FileArchives
 import Pass
 import Reporter
 import Validations
 
 
-reporter = Reporter.CsvReporter('archive-validation.csv')
+now = datetime.datetime.now()
+today = now.strftime('%Y-%m-%d')
+reporter = Reporter.CsvReporter('archive-validation-%s.csv' % today)
 Pass.PassRunner(reporter).run(FileArchives.getAnyArchive(),
                               Validations.stdValidation)

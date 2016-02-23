@@ -46,7 +46,15 @@ def xmlSchemaCheck(filepath):
     Test the XML label at the filepath against the PDS4 v1.5 XML
     schema, returning true iff it passes.
     """
-    cmdTemplate = 'xmllint --noout --schema %s %s'
+
+    # xmllint breaks the Unix Rule of Silence and says 'foo.xml
+    # verifies' when the command succeeds instead of remaining silent.
+    # To suppress (possible hundreds of thousands of) these messages
+    # without suppressing real error messages, we perform the
+    # following incantation in Old Enochian to the tentacled horrific
+    # Elder Ones to suppress only lines including '.xml verifies' only
+    # in stderr. Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn.
+    cmdTemplate = "xmllint --noout --schema %s %s 3>&1 1>&2 2>&3 3>&- | sed '/\\.xml validates/d'"
     exitCode = os.system(cmdTemplate %
                          ('./xml/PDS4_PDS_1500.xsd.xml', filepath))
     return exitCode == 0
