@@ -6,9 +6,18 @@ import ArchiveFile
 
 
 class ArchiveComponent(object):
+    """
+    A bundle, component, or product within an archive.  This is an
+    abstract class.
+    """
+
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, arch, lid):
+        """
+        Create an ArchiveComponent given the archive it lives in and
+        its LID.
+        """
         assert arch
         self.archive = arch
         assert lid
@@ -22,9 +31,14 @@ class ArchiveComponent(object):
 
     @abc.abstractmethod
     def directoryFilepath(self):
+        """Return the absolute filepath to the component's directory."""
         pass
 
     def files(self):
+        """
+        Generate all the files belonging to this component as ArchiveFile
+        objects.
+        """
         dir = self.directoryFilepath()
         for basename in os.listdir(dir):
             if basename[0] != '.':

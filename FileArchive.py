@@ -9,8 +9,11 @@ import LID
 
 
 class FileArchive(object):
+    """An archive containing PDS4 Bundles."""
+
     def __init__(self, root):
-        assert os.path.exists(root)
+        """Create an archive given a filepath to an existing directory."""
+        assert os.path.exists(root) and os.path.isdir(root)
         self.root = root
 
     def __eq__(self, other):
@@ -55,76 +58,22 @@ class FileArchive(object):
     def isHiddenFileBasename(basename):
         return basename[0] == '.'
 
-    # Walking the hierarchy
-
-    def walkComp(self, start=None):
-        if start is None:
-            start = self.root
-        rootSegs = self.root.split('/')
-        startSegs = start.split('/')
-        level = len(startSegs) - len(rootSegs)
-        if level == 0:
-            # start is the root; walk bundles
-            for subdir in os.listdir(start):
-                bundleDir = os.path.join(self.root, subdir)
-                if FileArchive.isValidBundleDirBasename(subdir) and \
-                        os.path.isdir(bundleDir):
-                    yield bundleDir
-        elif level == 1:
-            # start is a bundle; walk collections
-            for subdir in os.listdir(start):
-                collectionDir = os.path.join(start, subdir)
-                if FileArchive.isValidCollectionDirBasename(subdir) and \
-                        os.path.isdir(collectionDir):
-                    yield collectionDir
-        elif level == 2:
-            # start is a collection; walk products
-            for subdir in os.listdir(start):
-                productDir = os.path.join(start, subdir)
-                if FileArchive.isValidProductDirBasename(subdir) and \
-                        os.path.isdir(productDir):
-                    yield productDir
-        elif level == 3:
-            # start is a product; walk files
-            for f in os.listdir(start):
-                file = os.path.join(start, f)
-                if not FileArchive.isHiddenFileBasename(f) and \
-                        os.path.isfile(file):
-                    yield file
-        else:
-            # it's a bug
-            assert false
-
-    def walkBundleDirectories(self):
-        for bundleDir in self.walkComp():
-            yield bundleDir
-
-    def walkCollectionDirectories(self):
-        for bundleDir in self.walkBundleDirectories():
-            for collectionDir in self.walkComp(bundleDir):
-                yield collectionDir
-
-    def walkProductDirectories(self):
-        for collectionDir in self.walkCollectionDirectories():
-            for subdir in os.listdir(collectionDir):
-                productDir = os.path.join(collectionDir, subdir)
-                if FileArchive.isValidProductDirBasename(subdir) and \
-                        os.path.isdir(productDir):
-                    yield productDir
-
     # Walking the hierarchy with objects
     def bundles(self):
+        """Generate the bundles stored in this archive."""
         for subdir in os.listdir(self.root):
             if re.match(Bundle.Bundle.DIRECTORY_PATTERN, subdir):
                 bundleLID = LID.LID('urn:nasa:pds:%s' % subdir)
                 yield Bundle.Bundle(self, bundleLID)
 
     def collections(self):
+        """Generate the collections stored in this archive."""
         for b in self.bundles():
             for c in b.collections():
                 yield c
 
     def products(self):
+        """Generate the products stored in this archive."""
         for b in self.bundles():
             for c in b.collections():
                 for p in c.products():
