@@ -3,7 +3,7 @@ import tempfile
 import ArchiveFile
 import FileArchives
 import LabelMaker
-import ProductFileInfo
+import ProductFileLabelMaker
 import ProductInfo
 
 
@@ -78,54 +78,54 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         self.setText(name, self.info.targetIdentificationName())
         self.setText(type, self.info.targetIdentificationType())
 
-        for file in product.files():
-            self.createFileInfo(root, file)
+        for archiveFile in product.files():
+            ProductFileLabelMaker.ProductFileLabelMaker(self.document,
+                                                        archiveFile)
+            fileAreaObservational = self.createChild(root,
+                                                     'File_Area_Observational')
 
-    def createFileInfo(self, root, archiveFile):
-        assert isinstance(archiveFile, ArchiveFile.ArchiveFile)
-        fileAreaObservational = self.createChild(root,
-                                                 'File_Area_Observational')
+            file = self.createChild(fileAreaObservational, 'File')
+            fileName = self.createChild(file, 'file_name')
+            self.setText(fileName, archiveFile.basename)
 
-        fileInfo = ProductFileInfo.ProductFileInfo(fileAreaObservational,
-                                                   archiveFile)
-        file = self.createChild(fileAreaObservational, 'File')
-        file_name = self.createChild(file, 'file_name')
-        self.setText(file_name, fileInfo.fileName())
+            # TODO These are the wrong contents; it's a placeholder.
+            array = self.createChild(fileAreaObservational, 'Array')
+            offset, axes, axisIndexOrder, elementArray, axisArray = \
+                self.createChildren(array, ['offset', 'axes', 'axis_index_order',
+                                            'Element_Array', 'Axis_Array'])
 
-        # TODO These are the wrong contents; it's a placeholder.
-        array = self.createChild(fileAreaObservational, 'Array')
-        offset, axes, axisIndexOrder, elementArray, axisArray = \
-            self.createChildren(array, ['offset', 'axes', 'axis_index_order',
-                                        'Element_Array', 'Axis_Array'])
+            offset.setAttribute('unit', 'byte')
+            self.setText(offset, '0')
+            self.setText(axes, '1')
+            self.setText(axisIndexOrder, 'Last Index Fastest')  # TODO Abstract?
 
-        offset.setAttribute('unit', 'byte')
-        self.setText(offset, '0')
-        self.setText(axes, '1')
-        self.setText(axisIndexOrder, 'Last Index Fastest')  # TODO Abstract?
+            dataType = self.createChild(elementArray, 'data_type')
+            self.setText(dataType, 'UnsignedByte')
 
-        dataType = self.createChild(elementArray, 'data_type')
-        self.setText(dataType, 'UnsignedByte')
+            axisName, elements, sequenceNumber = \
+                self.createChildren(axisArray, ['axis_name', 'elements',
+                                                'sequence_number'])
 
-        axisName, elements, sequenceNumber = \
-            self.createChildren(axisArray, ['axis_name', 'elements',
-                                            'sequence_number'])
-
-        self.setText(axisName, 'Axis Joe')  # TODO Wrong
-        self.setText(elements, '1')  # TODO Wrong
-        self.setText(sequenceNumber, '1')  # TODO Wrong
+            self.setText(axisName, 'Axis Joe')  # TODO Wrong
+            self.setText(elements, '1')  # TODO Wrong
+            self.setText(sequenceNumber, '1')  # TODO Wrong
 
 
 def testSynthesis():
     a = FileArchives.getAnyArchive()
+    productCount = 0
     for b in a.bundles():
         if b.proposalId() != 0:
             for c in b.collections():
                 for p in c.products():
+                    productCount += 1
                     fp = '/tmp/foo.xml'
                     lm = ProductLabelMaker(p)
                     lm.createDefaultXmlFile(fp)
                     if not (LabelMaker.xmlSchemaCheck(fp) and
                             LabelMaker.schematronCheck(fp)):
+                        return
+                    if productCount > 8:
                         return
 
 testSynthesis()
