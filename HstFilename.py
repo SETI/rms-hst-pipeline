@@ -18,7 +18,7 @@ class HstFilename(object):
         return self.filename.__str__()
 
     def __repr__(self):
-        return 'HstFilename(%s)' % self.filename.__repr__()
+        return 'HstFilename(%r)' % self.filename
 
     def _basename(self):
         return os.path.basename(self.filename)
@@ -73,8 +73,7 @@ class TestHstFilename(unittest.TestCase):
 
     def testRepr(self):
         s = HstFilename.s
-        self.assertEqual('HstFilename(\'' + s + '\')',
-                         HstFilename(s).__repr__())
+        self.assertEqual('HstFilename(\'' + s + '\')', repr(HstFilename(s)))
 
     def testInstrumentName(self):
         s = HstFilename.s

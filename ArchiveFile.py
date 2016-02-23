@@ -24,11 +24,10 @@ class ArchiveFile(object):
             self.basename == other.basename
 
     def __str__(self):
-        return '%s in %s' % (self.basename, repr(self.component))
+        return '%s in %r' % (self.basename, self.component)
 
     def __repr__(self):
-        return 'ArchiveFile(%s, %s)' % (repr(self.basename),
-                                        repr(self.component))
+        return 'ArchiveFile(%r, %r)' % (self.basename, self.component)
 
     def fullFilepath(self):
         """Return the full, absolute filepath to the file."""

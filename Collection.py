@@ -20,7 +20,7 @@ class Collection(ArchiveComponent.ArchiveComponent):
         super(Collection, self).__init__(arch, lid)
 
     def __repr__(self):
-        return 'Collection(%s, %s)' % (repr(self.archive), repr(self.lid))
+        return 'Collection(%r, %r)' % (self.archive, self.lid)
 
     def directoryFilepath(self):
         """Return the absolute filepath to the component's directory."""

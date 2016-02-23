@@ -94,7 +94,7 @@ class Pass(object):
         it will be added to the report.
         """
         if expected != actual:
-            msg = 'expected %s; got %s.' % (repr(expected), repr(actual))
+            msg = 'expected %r; got %r.' % (expected, actual)
             self.report(msg, tag)
 
     def report(self, msg, tag=None):

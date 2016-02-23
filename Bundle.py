@@ -19,7 +19,7 @@ class Bundle(ArchiveComponent.ArchiveComponent):
         super(Bundle, self).__init__(arch, lid)
 
     def __repr__(self):
-        return 'Bundle(%s, %s)' % (repr(self.archive), repr(self.lid))
+        return 'Bundle(%r, %r)' % (self.archive, self.lid)
 
     def directoryFilepath(self):
         """Return the absolute filepath to the component's directory."""

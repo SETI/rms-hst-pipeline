@@ -41,7 +41,7 @@ class ProductFilesHaveCollectionSuffix(Pass.NullPass):
         # get file suffix
         fileSuffix = HstFilename.HstFilename(file.basename).suffix()
         self.assertEquals(self.collectionSuffix, fileSuffix,
-                          'Unexpected suffix for file %s' % repr(file))
+                          'Unexpected suffix for file %r' % file)
 
 
 class ProductFilesHaveBundleProposalId(Pass.NullPass):
@@ -88,7 +88,7 @@ class ProductFilesHaveProductVisit(Pass.NullPass):
     def doProductFile(self, file):
         hstFile = HstFilename.HstFilename(file.fullFilepath())
         self.assertEquals(self.productVisit, hstFile.visit(),
-                          'Unexpected visit value for file %s' % repr(file))
+                          'Unexpected visit value for file %r' % file)
 
 
 class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):

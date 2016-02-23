@@ -45,7 +45,7 @@ class LID(object):
         return self.LID
 
     def __repr__(self):
-        return 'LID(%s)' % repr(self.LID)
+        return 'LID(%r)' % self.LID
 
     def isProductLID(self):
         """Return True iff the LID is a product LID."""
@@ -65,8 +65,8 @@ class LID(object):
         iff the object is a bundle LID.
         """
         if self.isBundleLID():
-            raise ValueError('bundle LID %s has no parent LID' %
-                             repr(self.LID))
+            raise ValueError('bundle LID %r has no parent LID' %
+                             self.LID)
         else:
             parts = self.LID.split(':')
             return LID(':'.join(parts[:-1]))

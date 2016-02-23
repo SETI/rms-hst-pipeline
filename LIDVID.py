@@ -27,7 +27,7 @@ class LIDVID(object):
         return self.str
 
     def __repr__(self):
-        return 'LIDVID(%s)' % repr(self.LIDVID)
+        return 'LIDVID(%r)' % self.LIDVID
 
 ############################################################
 

@@ -32,7 +32,7 @@ class VID(object):
         return self.VID
 
     def __repr__(self):
-        return 'VID(%s)' % repr(self.VID)
+        return 'VID(%r)' % self.VID
 
 ############################################################
 

@@ -23,7 +23,7 @@ class FileArchive(object):
         return repr(self.root)
 
     def __repr__(self):
-        return 'FileArchive(%s)' % repr(self.root)
+        return 'FileArchive(%r)' % self.root
 
     # Verifying parts
 
@@ -112,7 +112,7 @@ class TestFileArchive(unittest.TestCase):
     def testRepr(self):
         tempdir = tempfile.mkdtemp()
         a = FileArchive(tempdir)
-        self.assertEqual('FileArchive(%s)' % repr(tempdir), repr(a))
+        self.assertEqual('FileArchive(%r)' % tempdir, repr(a))
 
     def testIsValidInstrument(self):
         self.assertTrue(FileArchive.isValidInstrument('wfc3'))
