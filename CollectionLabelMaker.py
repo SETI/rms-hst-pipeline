@@ -154,4 +154,5 @@ def testSynthesis():
                            'does not conform to the Schematron schema.') % \
                            str(c)
 
-testSynthesis()
+if __name__ == '__main__':
+    testSynthesis()

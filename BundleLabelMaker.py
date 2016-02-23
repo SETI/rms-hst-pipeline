@@ -87,4 +87,5 @@ def testSynthesis():
                        'does not conform to the Schematron schema.') % str(b)
                 return
 
-testSynthesis()
+if __name__ == '__main__':
+    testSynthesis()

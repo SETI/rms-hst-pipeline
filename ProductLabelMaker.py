@@ -99,4 +99,5 @@ def testSynthesis():
                             LabelMaker.schematronCheck(fp)):
                         sys.exit(1)
 
-testSynthesis()
+if __name__ == '__main__':
+    testSynthesis()
