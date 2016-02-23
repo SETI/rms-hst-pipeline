@@ -1,9 +1,10 @@
+import sys
 import tempfile
 
 import ArchiveFile
+import DummyProductFileLabelMaker
 import FileArchives
 import LabelMaker
-import ProductFileLabelMaker
 import ProductInfo
 
 
@@ -79,36 +80,8 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         self.setText(type, self.info.targetIdentificationType())
 
         for archiveFile in product.files():
-            ProductFileLabelMaker.ProductFileLabelMaker(self.document,
-                                                        archiveFile)
-            fileAreaObservational = self.createChild(root,
-                                                     'File_Area_Observational')
-
-            file = self.createChild(fileAreaObservational, 'File')
-            fileName = self.createChild(file, 'file_name')
-            self.setText(fileName, archiveFile.basename)
-
-            # TODO These are the wrong contents; it's a placeholder.
-            array = self.createChild(fileAreaObservational, 'Array')
-            offset, axes, axisIndexOrder, elementArray, axisArray = \
-                self.createChildren(array, ['offset', 'axes', 'axis_index_order',
-                                            'Element_Array', 'Axis_Array'])
-
-            offset.setAttribute('unit', 'byte')
-            self.setText(offset, '0')
-            self.setText(axes, '1')
-            self.setText(axisIndexOrder, 'Last Index Fastest')  # TODO Abstract?
-
-            dataType = self.createChild(elementArray, 'data_type')
-            self.setText(dataType, 'UnsignedByte')
-
-            axisName, elements, sequenceNumber = \
-                self.createChildren(axisArray, ['axis_name', 'elements',
-                                                'sequence_number'])
-
-            self.setText(axisName, 'Axis Joe')  # TODO Wrong
-            self.setText(elements, '1')  # TODO Wrong
-            self.setText(sequenceNumber, '1')  # TODO Wrong
+            DummyProductFileLabelMaker.DummyProductFileLabelMaker(
+                self.document, root, archiveFile)
 
 
 def testSynthesis():
@@ -124,8 +97,6 @@ def testSynthesis():
                     lm.createDefaultXmlFile(fp)
                     if not (LabelMaker.xmlSchemaCheck(fp) and
                             LabelMaker.schematronCheck(fp)):
-                        return
-                    if productCount > 8:
-                        return
+                        sys.exit(1)
 
 testSynthesis()
