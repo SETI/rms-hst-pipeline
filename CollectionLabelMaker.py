@@ -43,19 +43,20 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
 
     def createDefaultXml(self):
         collection = self.component
-        root = self._createChild(self.document, 'Product_Collection')
+        root = self.createChild(self.document, 'Product_Collection')
 
         PDS = self.info.pdsNamespaceUrl()
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
 
-        id_area, coll, fa_inv = \
-            self._createChildren(root, ['Identification_Area',
-                                        'Collection',
-                                        'File_Area_Inventory'])
+        identificationArea, collection_, fileAreaInventory = \
+            self.createChildren(root, ['Identification_Area',
+                                       'Collection',
+                                       'File_Area_Inventory'])
 
-        log_id, vers_id, title, info_ver, prod_cls, cit_info = \
-            self._createChildren(id_area, [
+        logicalIdentifier, versionId, title, informationModelVersion, \
+            productClass, citationInformation = \
+            self.createChildren(identificationArea, [
                 'logical_identifier',
                 'version_id',
                 'title',
@@ -63,63 +64,71 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
                 'product_class',
                 'Citation_Information'])
 
-        self._setText(log_id, str(collection.lid))
-        self._setText(vers_id, self.info.versionID())
-        self._setText(title, self.info.title())
-        self._setText(info_ver, self.info.informationModelVersion())
-        self._setText(prod_cls, 'Product_Collection')
+        self.setText(logicalIdentifier, str(collection.lid))
+        self.setText(versionId, self.info.versionID())
+        self.setText(title, self.info.title())
+        self.setText(informationModelVersion,
+                     self.info.informationModelVersion())
+        self.setText(productClass, 'Product_Collection')
 
-        pub_yr = self._createChild(cit_info, 'publication_year')
-        self._setText(pub_yr, self.info.citationInformationPublicationYear())
-        desc = self._createChild(cit_info, 'description')
-        self._setText(desc, self.info.citationInformationDescription())
+        publicationYear = self.createChild(citationInformation,
+                                           'publication_year')
+        self.setText(publicationYear,
+                     self.info.citationInformationPublicationYear())
+        description = self.createChild(citationInformation, 'description')
+        self.setText(description, self.info.citationInformationDescription())
 
-        self._setText(self._createChild(coll, 'collection_type'), 'Data')
+        self.setText(self.createChild(collection_, 'collection_type'), 'Data')
 
-        f, inv = self._createChildren(fa_inv, ['File', 'Inventory'])
-        fn = self._createChild(f, 'file_name')
-        self._setText(fn, self.defaultInventoryName())
+        file, inventory = self.createChildren(fileAreaInventory,
+                                              ['File', 'Inventory'])
+        fileName = self.createChild(file, 'file_name')
+        self.setText(fileName, self.defaultInventoryName())
 
-        off, pars, records, r_delim, f_delim, rec_delim, ref_ty = \
-            self._createChildren(inv, [
+        offset, parsingStandardId, records, recordDelimiter, \
+            fieldDelimiter, recordDelimited, referenceType = \
+            self.createChildren(inventory, [
                 'offset', 'parsing_standard_id',
                 'records', 'record_delimiter', 'field_delimiter',
                 'Record_Delimited', 'reference_type'])
 
-        self._setText(off, '0')
-        off.setAttribute('unit', 'byte')
-        self._setText(pars, 'PDS DSV 1')
+        self.setText(offset, '0')
+        offset.setAttribute('unit', 'byte')
+        self.setText(parsingStandardId, 'PDS DSV 1')
 
         productCount = 0
         for p in collection.products():
             productCount += 1
-        self._setText(records, str(productCount))
+        self.setText(records, str(productCount))
 
-        self._setText(r_delim, 'Carriage-Return Line-Feed')
-        self._setText(f_delim, 'Comma')
+        self.setText(recordDelimiter, 'Carriage-Return Line-Feed')
+        self.setText(fieldDelimiter, 'Comma')
 
-        fs, gs, f1, f2 = self._createChildren(rec_delim, [
+        fields, groups, fieldDelimited1, fieldDelimited2 = \
+            self.createChildren(recordDelimited, [
                 'fields', 'groups', 'Field_Delimited', 'Field_Delimited'])
-        self._setText(fs, '2')
-        self._setText(gs, '0')
+        self.setText(fields, '2')
+        self.setText(groups, '0')
 
-        nm, fn, dt, mfl = \
-            self._createChildren(f1, ['name', 'field_number',
-                                      'data_type', 'maximum_field_length'])
-        self._setText(nm, 'Member_Status')
-        self._setText(fn, '1')
-        self._setText(dt, 'ASCII_String')
-        mfl.setAttribute('unit', 'byte')
-        self._setText(mfl, '1')
+        name, fieldNumber, dataType, maximumFieldLength = \
+            self.createChildren(fieldDelimited1,
+                                ['name', 'field_number',
+                                 'data_type', 'maximum_field_length'])
+        self.setText(name, 'Member_Status')
+        self.setText(fieldNumber, '1')
+        self.setText(dataType, 'ASCII_String')
+        maximumFieldLength.setAttribute('unit', 'byte')
+        self.setText(maximumFieldLength, '1')
 
-        nm, fn, dt = \
-            self._createChildren(f2, ['name', 'field_number', 'data_type'])
+        name, fieldNumber, dataType = \
+            self.createChildren(fieldDelimited2,
+                                ['name', 'field_number', 'data_type'])
 
-        self._setText(nm, 'LIDVID_LID')
-        self._setText(fn, '2')
-        self._setText(dt, 'ASCII_LIDVID_LID')
+        self.setText(name, 'LIDVID_LID')
+        self.setText(fieldNumber, '2')
+        self.setText(dataType, 'ASCII_LIDVID_LID')
 
-        self._setText(ref_ty, 'inventory_has_member_product')
+        self.setText(referenceType, 'inventory_has_member_product')
 
 
 def testSynthesis():
