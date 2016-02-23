@@ -23,6 +23,5 @@ class CollectionInfo(Info.Info):
         return self.PLACEHOLDER('citationInformationDescription')
 
     def citationInformationPublicationYear(self):
-        # TODO This is wrong.
-        return '2000'
-        return self.PLACEHOLDER('citationInformationPublicationYear')
+        return self.CHEATING_PLACEHOLDER('2000',
+                                         'citationInformationPublicationYear')

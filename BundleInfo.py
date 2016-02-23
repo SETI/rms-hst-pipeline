@@ -34,8 +34,5 @@ class BundleInfo(Info.Info):
         The text appearing at XPath
         '/Product_Bundle/Identification_Area/CitationInformation/publication_year'.
         """
-        # This won't pass the XML Schema.
-        # return self.PLACEHOLDER('citationInformationPublicationYear')
-
-        # TODO But this is wrong.
-        return '2000'
+        return self.CHEATING_PLACEHOLDER('2000',
+                                         'citationInformationPublicationYear')
