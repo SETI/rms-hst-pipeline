@@ -14,14 +14,26 @@ class CollectionInfo(Info.Info):
         self.collection = collection
 
     def title(self):
+        """
+        The text appearing at XPath
+        '/Product_Collection/Identification_Area/title'.
+        """
         imageTag = self.collection.suffix().upper() + ' images'
         prodId = str(self.collection.bundle().proposalId())
         return ('This collection contains the raw %s ' +
                 'obtained from HST Observing Program %s.') % (imageTag, prodId)
 
     def citationInformationDescription(self):
+        """
+        The text appearing at XPath
+        '/Product_Collection/Identification_Area/CitationInformation/description'.
+        """
         return self.PLACEHOLDER('citationInformationDescription')
 
     def citationInformationPublicationYear(self):
+        """
+        The text appearing at XPath
+        '/Product_Collection/Identification_Area/CitationInformation/publication_year'.
+        """
         return self.CHEATING_PLACEHOLDER('2000',
                                          'citationInformationPublicationYear')

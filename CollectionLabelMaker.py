@@ -70,11 +70,13 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
                      self.info.informationModelVersion())
         self.setText(productClass, 'Product_Collection')
 
-        publicationYear = self.createChild(citationInformation,
-                                           'publication_year')
+        publicationYear, description = \
+            self.createChildren(citationInformation,
+                                ['publication_year', 'description'])
+
         self.setText(publicationYear,
                      self.info.citationInformationPublicationYear())
-        description = self.createChild(citationInformation, 'description')
+
         self.setText(description, self.info.citationInformationDescription())
 
         self.setText(self.createChild(collection_, 'collection_type'), 'Data')
