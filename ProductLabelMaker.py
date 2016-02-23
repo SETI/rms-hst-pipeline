@@ -10,8 +10,8 @@ import ProductInfo
 
 class ProductLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, product):
-        LabelMaker.LabelMaker.__init__(
-            self, product, ProductInfo.ProductInfo(product))
+        super(ProductLabelMaker,
+              self).__init__(product, ProductInfo.ProductInfo(product))
 
     def defaultXmlName(self):
         assert False, 'ProductLabelMaker.defaultXmlName unimplemented'

@@ -7,8 +7,8 @@ import LabelMaker
 class BundleLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, bundle):
         assert isinstance(bundle, Bundle.Bundle)
-        LabelMaker.LabelMaker.__init__(self, bundle,
-                                       BundleInfo.BundleInfo(bundle))
+        super(BundleLabelMaker, self).__init__(bundle,
+                                               BundleInfo.BundleInfo(bundle))
 
     def defaultXmlName(self):
         return 'bundle.xml'

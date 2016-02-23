@@ -25,7 +25,7 @@ class ProductFileLabelMaker(XmlUtils.XmlUtils):
         assert isinstance(archiveFile, ArchiveFile.ArchiveFile)
         self.archiveFile = archiveFile
 
-        XmlUtils.XmlUtils.__init__(self, document)
+        super(ProductFileLabelMaker, self).__init__(document)
         self.createDefaultXml()
 
     def createDefaultXml(self):

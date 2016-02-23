@@ -10,8 +10,9 @@ class DummyProductFileLabelMaker(ProductFileLabelMaker.ProductFileLabelMaker):
     """
 
     def __init__(self, document, root, archiveFile):
-        ProductFileLabelMaker.ProductFileLabelMaker.__init__(self, document,
-                                                             root, archiveFile)
+        super(DummyProductFileLabelMaker, self).__init__(document,
+                                                         root,
+                                                         archiveFile)
 
     def createFileDataXml(self, fileAreaObservational):
         # TODO These are the wrong contents; it's a placeholder.

@@ -17,7 +17,7 @@ class Collection(ArchiveComponent.ArchiveComponent):
         Create a Collection given the archive it lives in and its LID.
         """
         assert lid.isCollectionLID()
-        ArchiveComponent.ArchiveComponent.__init__(self, arch, lid)
+        super(Collection, self).__init__(arch, lid)
 
     def __repr__(self):
         return 'Collection(%s, %s)' % (repr(self.archive), repr(self.lid))

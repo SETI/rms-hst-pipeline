@@ -8,8 +8,8 @@ import LabelMaker
 
 class CollectionLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, collection):
-        LabelMaker.LabelMaker.__init__(
-            self, collection, CollectionInfo.CollectionInfo(collection))
+        super(CollectionLabelMaker, self).__init__(
+            collection, CollectionInfo.CollectionInfo(collection))
         self.inventoryDocument = None
         self.createDefaultCollectionInventory()
 

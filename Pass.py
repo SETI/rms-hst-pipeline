@@ -106,7 +106,7 @@ class NullPass(Pass):
     """A Pass that does nothing.  Useful as a base class."""
 
     def __init__(self):
-        Pass.__init__(self)
+        super(NullPass, self).__init__()
 
     def doArchive(self, archive, before):
         pass
@@ -139,7 +139,7 @@ class LimitedReportingPass(NullPass):
 
     def __init__(self, reportLimit=8):
         """Create a pass with a given reporting limit.  Default is 8."""
-        NullPass.__init__(self)
+        super(LimitedReportingPass, self).__init__()
         self.reportCount = 0
         self.reportLimit = reportLimit
 
@@ -168,7 +168,7 @@ class CompositePass(NullPass):
     def __init__(self, passes):
         """Create a CompositePass with the given list of passes."""
         self.passes = passes
-        NullPass.__init__(self)
+        super(CompositePass, self).__init__()
 
     def setPassRunner(self, passRunner):
         NullPass.setPassRunner(self, passRunner)

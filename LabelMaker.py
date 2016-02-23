@@ -26,7 +26,7 @@ class LabelMaker(XmlUtils.XmlUtils):
         document = xml.dom.getDOMImplementation().createDocument(None,
                                                                  None,
                                                                  None)
-        XmlUtils.XmlUtils.__init__(self, document)
+        super(LabelMaker, self).__init__(document)
 
         self.createDefaultXml()
 

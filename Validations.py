@@ -11,7 +11,7 @@ import Pass
 class CountFilesPass(Pass.NullPass):
     def __init__(self):
         self.fileCount = None
-        Pass.NullPass.__init__(self)
+        super(CountFilesPass, self).__init__()
 
     def doArchive(self, archive, before):
         if before:
@@ -29,7 +29,7 @@ class CountFilesPass(Pass.NullPass):
 class ProductFilesHaveCollectionSuffix(Pass.NullPass):
     def __init__(self):
         self.collectionSuffix = None
-        Pass.NullPass.__init__(self)
+        super(ProductFilesHaveCollectionSuffix, self).__init__()
 
     def doCollection(self, collection, before):
         if before:
@@ -47,7 +47,7 @@ class ProductFilesHaveCollectionSuffix(Pass.NullPass):
 class ProductFilesHaveBundleProposalId(Pass.NullPass):
     def __init__(self):
         self.bundleProposalId = None
-        Pass.NullPass.__init__(self)
+        super(ProductFilesHaveBundleProposalId, self).__init__()
 
     def doBundle(self, bundle, before):
         if before:
@@ -77,7 +77,7 @@ class ProductFilesHaveBundleProposalId(Pass.NullPass):
 class ProductFilesHaveProductVisit(Pass.NullPass):
     def __init__(self):
         self.productVisit = None
-        Pass.NullPass.__init__(self)
+        super(ProductFilesHaveProductVisit, self).__init__()
 
     def doProduct(self, product, before):
         if before:
@@ -95,7 +95,7 @@ class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
     def __init__(self):
         self.hstInternalProposalIds = None
         self.bundleProposalId = None
-        Pass.NullPass.__init__(self)
+        super(BundleContainsOneSingleHstInternalProposalId, self).__init__()
 
     def doProductFile(self, file):
         hstFile = HstFilename.HstFilename(file.fullFilepath())
@@ -123,8 +123,8 @@ class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
 
 class BundleContainsBundleXml(Pass.LimitedReportingPass):
     def __init__(self):
-        Pass.LimitedReportingPass.__init__(self)
         self.sawBundleXml = None
+        super(BundleContainsBundleXml, self).__init__()
 
     def doBundle(self, bundle, before):
         if before:
@@ -140,8 +140,8 @@ class BundleContainsBundleXml(Pass.LimitedReportingPass):
 
 class CollectionContainsCollectionXml(Pass.LimitedReportingPass):
     def __init__(self):
-        Pass.LimitedReportingPass.__init__(self)
         self.sawCollectionXml = None
+        super(CollectionContainsCollectionXml, self).__init__()
 
     def doCollection(self, collection, before):
         if before:

@@ -14,7 +14,7 @@ class Product(ArchiveComponent.ArchiveComponent):
         Create a Product given the archive it lives in and its LID.
         """
         assert lid.isProductLID()
-        ArchiveComponent.ArchiveComponent.__init__(self, arch, lid)
+        super(Product, self).__init__(arch, lid)
 
     def __repr__(self):
         return 'Product(%s, %s)' % (repr(self.archive), repr(self.lid))

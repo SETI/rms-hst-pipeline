@@ -16,7 +16,7 @@ class Bundle(ArchiveComponent.ArchiveComponent):
         Create a Bundle given the archive it lives in and its LID.
         """
         assert lid.isBundleLID()
-        ArchiveComponent.ArchiveComponent.__init__(self, arch, lid)
+        super(Bundle, self).__init__(arch, lid)
 
     def __repr__(self):
         return 'Bundle(%s, %s)' % (repr(self.archive), repr(self.lid))

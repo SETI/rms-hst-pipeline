@@ -18,7 +18,7 @@ class ProjectIdPass(Pass.NullPass):
         self.bundleProposalId = None
         self.numToCharDict = {}
         self.charToNumDict = {}
-        Pass.NullPass.__init__(self)
+        super(ProjectIdPass, self).__init__()
 
     def doBundle(self, bundle, before):
         if before:
