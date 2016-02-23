@@ -3,7 +3,13 @@ import Info
 
 
 class CollectionInfo(Info.Info):
+    """
+    A helper object associated with a PDS4 Collection providing
+    information to fill in collection label fields.
+    """
+
     def __init__(self, collection):
+        """Create an object associated with the given Collection."""
         assert isinstance(collection, Collection.Collection)
         self.collection = collection
 
@@ -19,3 +25,4 @@ class CollectionInfo(Info.Info):
     def citationInformationPublicationYear(self):
         # TODO This is wrong.
         return '2000'
+        return self.PLACEHOLDER('citationInformationPublicationYear')

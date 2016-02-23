@@ -3,7 +3,13 @@ import Info
 
 
 class ProductInfo(Info.Info):
+    """
+    A helper object associated with a PDS4 Product providing
+    information to fill in product label fields.
+    """
+
     def __init__(self, product):
+        """Create an object associated with the given Product."""
         assert isinstance(product, Product.Product)
         self.product = product
 

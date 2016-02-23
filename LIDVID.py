@@ -4,7 +4,13 @@ import unittest
 
 
 class LIDVID(object):
+    """Representation of a PDS4 LIDVID."""
+
     def __init__(self, str):
+        """
+        Create a LIDVID object from a string, throwing an exception if
+        the LIDVID string is malformed.
+        """
         segs = str.split('::')
         assert len(segs) == 2
         self.LIDVID = str

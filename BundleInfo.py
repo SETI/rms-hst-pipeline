@@ -3,7 +3,13 @@ import Info
 
 
 class BundleInfo(Info.Info):
+    """
+    A helper object associated with a PDS4 Bundle providing
+    information to fill in bundle label fields.
+    """
+
     def __init__(self, bundle):
+        """Create an object associated with the given Bundle."""
         assert isinstance(bundle, Bundle.Bundle)
         self.bundle = bundle
 

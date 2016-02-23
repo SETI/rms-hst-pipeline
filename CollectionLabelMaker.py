@@ -141,17 +141,17 @@ def testSynthesis():
                     'collection_suffix_inventory.tab')
                 if LabelMaker.xmlSchemaCheck('collection.xml'):
                     print ('Yay: collection.xml for %s ' +
-                           'conforms to the XML schema.') % str(b)
+                           'conforms to the XML schema.') % str(c)
                 else:
                     print ('Boo: collection.xml for %s ' +
-                           'does not conform to the XML schema.') % str(b)
+                           'does not conform to the XML schema.') % str(c)
                     return
                 if LabelMaker.schematronCheck('collection.xml'):
                     print ('Yay: collection.xml for %s ' +
-                           'conforms to the Schematron schema.') % str(b)
+                           'conforms to the Schematron schema.') % str(c)
                 else:
                     print ('Boo: collection.xml for %s ' +
                            'does not conform to the Schematron schema.') % \
-                           str(b)
+                           str(c)
 
 testSynthesis()

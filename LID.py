@@ -3,7 +3,14 @@ import unittest
 
 
 class LID(object):
+    """Representation of a PDS4 LID."""
+
     def __init__(self, str):
+        """
+        Create a LID object from a string, throwing an exception if
+        the LID string is malformed.
+        """
+
         ids = str.split(':')
 
         # Check requirements
@@ -41,15 +48,22 @@ class LID(object):
         return 'LID(%s)' % repr(self.LID)
 
     def isProductLID(self):
+        """Return True iff the LID is a product LID."""
         return self.productId is not None
 
     def isCollectionLID(self):
+        """Return True iff the LID is a collection LID."""
         return self.collectionId is not None and self.productId is None
 
     def isBundleLID(self):
+        """Return True iff the LID is a bundle LID."""
         return self.bundleId is not None and self.collectionId is None
 
     def parentLID(self):
+        """
+        Return a LID object for the object's parent.  Throw an error
+        iff the object is a bundle LID.
+        """
         if self.isBundleLID():
             raise ValueError('bundle LID %s has no parent LID' %
                              repr(self.LID))

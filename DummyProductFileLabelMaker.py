@@ -2,6 +2,13 @@ import ProductFileLabelMaker
 
 
 class DummyProductFileLabelMaker(ProductFileLabelMaker.ProductFileLabelMaker):
+    """
+    A dummy class that builds the part of a PDS4 product label
+    corresponding to a single file within the product.  It incorrectly
+    declares that the data consists of an array of a single byte.
+    This is meant to be used as a placeholder.
+    """
+
     def __init__(self, document, root, archiveFile):
         ProductFileLabelMaker.ProductFileLabelMaker.__init__(self, document,
                                                              root, archiveFile)
