@@ -54,7 +54,8 @@ def xmlSchemaCheck(filepath):
     # following incantation in Old Enochian to the tentacled horrific
     # Elder Ones to suppress only lines including '.xml verifies' only
     # in stderr. Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn.
-    cmdTemplate = "xmllint --noout --schema %s %s 3>&1 1>&2 2>&3 3>&- | sed '/\\.xml validates/d'"
+    cmdTemplate = "xmllint --noout --schema %s %s 3>&1 1>&2 2>&3 3>&- | " + \
+        "sed '/\\.xml validates/d'"
     exitCode = os.system(cmdTemplate %
                          ('./xml/PDS4_PDS_1500.xsd.xml', filepath))
     return exitCode == 0

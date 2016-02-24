@@ -2,6 +2,8 @@
 echo Running unit tests:
 echo '-- FileArchive'
 python FileArchive.py
+echo '-- Heuristic'
+python Heuristic.py
 echo '-- HstFilename'
 python HstFilename.py
 echo '-- Label'

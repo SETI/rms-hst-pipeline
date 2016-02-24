@@ -3,6 +3,7 @@ Module docstring goes here, with an explanation of why one needs to
 use Heuristic objects instead of just calling functions.
 """
 import abc
+import unittest
 
 
 class Result(object):
@@ -17,6 +18,9 @@ class Result(object):
         """Return True iff this is a Success instance."""
         pass
 
+    def isFailure(self):
+        return not self.isSuccess()
+
 
 class Success(Result):
     """
@@ -25,6 +29,12 @@ class Success(Result):
     """
     def __init__(self, value):
         self.value = value
+
+    def __repr__(self):
+        return 'Success(%r)' % self.value
+
+    def __str__(self):
+        return self.__repr__()
 
     def isSuccess(self):
         return True
@@ -37,6 +47,12 @@ class Failure(Result):
     """
     def __init__(self, exceptions):
         self.exceptions = exceptions
+
+    def __repr__(self):
+        return 'Failure(%r)' % self.exceptions
+
+    def __str__(self):
+        return 'Failure'
 
     def isSuccess(self):
         return False
@@ -65,6 +81,12 @@ class HFunction(Heuristic):
     def __init__(self, func):
         """Create a Heuristic from the given function."""
         self.func = func
+
+    def __repr__(self):
+        return 'HFunction(%r)' % self.func
+
+    def __str__(self):
+        return 'HFunction(%s)' % self.func
 
     def run(self, arg):
         """
@@ -96,6 +118,12 @@ class HOrElses(Heuristic):
         """
         self.label = label
         self.orElses = orElses
+
+    def __repr__(self):
+        return 'HOrElses(%r, %r)' % (self.label, self.orElses)
+
+    def __str__(self):
+        return 'HOrElses(%s, %s)' % (self.label, self.orElses)
 
     def run(self, arg):
         """
@@ -152,15 +180,17 @@ class HAndThens(Heuristic):
                     arg = res.value
                 else:
                     if self.label:
-                        return [(self.label, res.exceptions)]
+                        return Failure([(self.label, res.exceptions)])
                     else:
-                        res
+                        return res
         else:
             res = Success(arg)
 
         # if you made it here, all of them succeeded
         return res
 
+
+############################################################
 
 def _toHeuristic(arg):
     """Wrap the argument if necessary and return an instance of Heuristic."""
@@ -214,3 +244,196 @@ def hAndThens(*args):
         label = None
 
     return HAndThens(label, [_toHeuristic(arg) for arg in args])
+
+############################################################
+
+
+def _doubles(n): return n * 2
+
+
+def _triples(n): return n * 3
+
+
+def _succ(n): return n + 1
+
+
+def _fails(n): raise Exception('I failed')
+
+
+def _failsWithMessage(msg):
+    def _fails(arg):
+        raise Exception(msg)
+    return _fails
+
+
+class TestHeuristic(unittest.TestCase):
+    def testIsSuccess(self):
+        self.assertTrue(Success(None).isSuccess())
+        self.assertFalse(Failure([]).isSuccess())
+
+    def testIsFailure(self):
+        self.assertTrue(Failure([]).isFailure())
+        self.assertFalse(Success(None).isFailure())
+
+    def testHFunction(self):
+        res = HFunction(_doubles).run(3)
+        self.assertTrue(res.isSuccess())
+        self.assertEquals(6, res.value)
+
+        res = HFunction(_fails).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(1, len(res.exceptions))
+
+    def testHOrElsesSugar(self):
+        doubles = HFunction(_doubles)
+        succ = HFunction(_succ)
+
+        # Test contents
+        h = hOrElses(doubles, succ)
+        self.assertTrue(isinstance(h, HOrElses))
+        self.assertIsNone(h.label)
+        self.assertEquals([doubles, succ], h.orElses)
+
+        h = hOrElses('foo', succ, doubles)
+        self.assertTrue(isinstance(h, HOrElses))
+        self.assertEquals('foo', h.label)
+        self.assertEquals([succ, doubles], h.orElses)
+
+        # Test function wrapping
+        h = hOrElses(_doubles, _succ)
+        self.assertTrue(isinstance(h, HOrElses))
+        self.assertIsNone(h.label)
+        for o in h.orElses:
+            self.assertTrue(isinstance(o, HFunction))
+        self.assertEquals([_doubles, _succ], [h.func for h in h.orElses])
+
+    def testHOrElses(self):
+        # I use hOrElses() sugar here; the test above proves it to be
+        # equivalent to explicit HOrElses construction.
+
+        doubles = HFunction(_doubles)
+        succ = HFunction(_succ)
+        failsFoo = HFunction(_failsWithMessage('foo'))
+        failsBar = HFunction(_failsWithMessage('bar'))
+
+        # Test that the first success returns, not trying further
+        # alternatives
+        res = hOrElses(doubles, succ).run(3)
+        self.assertTrue(res.isSuccess())
+        self.assertEquals(6, res.value)
+
+        res = hOrElses(succ, doubles).run(3)
+        self.assertTrue(res.isSuccess())
+        self.assertEquals(4, res.value)
+
+        res = hOrElses(doubles, failsFoo).run(3)
+        self.assertTrue(res.isSuccess())
+        self.assertEquals(6, res.value)
+
+        res = hOrElses(failsFoo, doubles).run(3)
+        self.assertTrue(res.isSuccess())
+        self.assertEquals(6, res.value)
+
+        # Test that multiple failures return all their exceptions.
+        res = hOrElses(failsFoo, failsBar).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(['foo', 'bar'],
+                          [e.args[0] for e in res.exceptions])
+
+        res = hOrElses(failsBar, failsFoo).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(['bar', 'foo'],
+                          [e.args[0] for e in res.exceptions])
+
+        # Test that using a label wraps any exceptions.
+        res = hOrElses('wrapper', failsBar, failsFoo).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(1, len(res.exceptions))
+        (lab, es) = res.exceptions[0]
+        self.assertEquals('wrapper', lab)
+        self.assertEquals(['bar', 'foo'], [e.args[0] for e in es])
+
+        # Test empty case: no alternatives means immediate failure.
+        res = hOrElses().run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(0, len(res.exceptions))
+
+    def testHAndThensSugar(self):
+        doubles = HFunction(_doubles)
+        succ = HFunction(_succ)
+
+        # Test contents
+        h = hAndThens(doubles, succ)
+        self.assertTrue(isinstance(h, HAndThens))
+        self.assertIsNone(h.label)
+        self.assertEquals([doubles, succ], h.andThens)
+
+        h = hAndThens('foo', succ, doubles)
+        self.assertTrue(isinstance(h, HAndThens))
+        self.assertEquals('foo', h.label)
+        self.assertEquals([succ, doubles], h.andThens)
+
+        # Test function wrapping
+        h = hAndThens(_doubles, _succ)
+        self.assertTrue(isinstance(h, HAndThens))
+        self.assertIsNone(h.label)
+        for a in h.andThens:
+            self.assertTrue(isinstance(a, HFunction))
+        self.assertEquals([_doubles, _succ], [h.func for h in h.andThens])
+
+    def testHAndThens(self):
+        # I use hAndThens() sugar here; the test above proves it to be
+        # equivalent to explicit HAndThens construction.
+
+        doubles = HFunction(_doubles)
+        succ = HFunction(_succ)
+        failsFoo = HFunction(_failsWithMessage('foo'))
+        failsBar = HFunction(_failsWithMessage('bar'))
+
+        # Test that successful calculations run chained in order
+        res = hAndThens(doubles, succ).run(3)
+        self.assertTrue(res.isSuccess())
+        self.assertEquals(7, res.value)
+
+        res = hAndThens(succ, doubles).run(3)
+        self.assertTrue(res.isSuccess())
+        self.assertEquals(8, res.value)
+
+        # Test that the first failure aborts the calculation
+        res = hAndThens(doubles, failsFoo).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(1, len(res.exceptions))
+        self.assertEquals('foo', res.exceptions[0].args[0])
+
+        res = hAndThens(failsBar, doubles).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(1, len(res.exceptions))
+        self.assertEquals('bar', res.exceptions[0].args[0])
+
+        res = hAndThens(failsFoo, failsBar).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(1, len(res.exceptions))
+        self.assertEquals('foo', res.exceptions[0].args[0])
+
+        res = hAndThens(failsBar, failsFoo).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(1, len(res.exceptions))
+        self.assertEquals('bar', res.exceptions[0].args[0])
+
+        # Test that using a label wraps any exceptions.
+        res = hAndThens('wrapper', failsBar, failsFoo).run(3)
+        self.assertFalse(res.isSuccess())
+        self.assertEquals(1, len(res.exceptions))
+        (lab, es) = res.exceptions[0]
+        self.assertEquals('wrapper', lab)
+        self.assertEquals(['bar'], [e.args[0] for e in es])
+
+        # Test empty case: no actions means immediate success with no
+        # change in argument.
+        res = hAndThens().run(3)
+        self.assertTrue(res.isSuccess())
+        self.assertEquals(3, res.value)
+
+
+if __name__ == '__main__':
+    unittest.main()
