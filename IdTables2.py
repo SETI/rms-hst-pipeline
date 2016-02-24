@@ -1,6 +1,7 @@
 # Tables listing numerical and character-encoded project IDs and their
 # relations.  Errors and integer values of zero have been removed to
 # make this a one-to-one mapping.
+import unittest
 
 intToCharDict = {
     '10065': '8ta',
@@ -635,3 +636,17 @@ charToIntDict = {
     'ct9': '14064',
     'cwy': '14334',
     }
+
+############################################################
+
+
+class TestIdTables2(unittest.TestCase):
+    def testIdTables2(self):
+        # Test that the tables are one-to-one
+        intToCharDictInverse = {v: k for k, v in intToCharDict.iteritems()}
+        self.assertEqual(charToIntDict, intToCharDictInverse)
+        charToIntDictInverse = {v: k for k, v in charToIntDict.iteritems()}
+        self.assertEqual(intToCharDict, charToIntDictInverse)
+
+if __name__ == '__main__':
+    unittest.main()
