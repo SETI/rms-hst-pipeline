@@ -18,9 +18,9 @@ class BundleInfo(Info.Info):
         Return the text appearing at XPath
         '/Product_Bundle/Identification/Area/title'.
         """
-        prodId = str(self.bundle.proposalId())
+        prod_id = str(self.bundle.proposal_id())
         return ('This collection contains raw images ' +
-                'obtained from HST Observing Program %s.') % prodId
+                'obtained from HST Observing Program %s.') % prod_id
 
     def citationInformationDescription(self):
         """

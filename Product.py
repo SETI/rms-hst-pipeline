@@ -15,16 +15,16 @@ class Product(ArchiveComponent.ArchiveComponent):
         """
         Create a Product given the archive it lives in and its LID.
         """
-        assert lid.isProductLID()
+        assert lid.is_product_lid()
         super(Product, self).__init__(arch, lid)
 
     def __repr__(self):
         return 'Product(%r, %r)' % (self.archive, self.lid)
 
-    def directoryFilepath(self):
+    def directory_filepath(self):
         """Return the absolute filepath to the component's directory."""
-        return os.path.join(self.archive.root, self.lid.bundleId,
-                            self.lid.collectionId, self.lid.productId)
+        return os.path.join(self.archive.root, self.lid.bundle_id,
+                            self.lid.collection_id, self.lid.product_id)
 
     def visit(self):
         """
@@ -32,12 +32,14 @@ class Product(ArchiveComponent.ArchiveComponent):
         the product's LID.
         """
         return re.match(Product.DIRECTORY_PATTERN,
-                        self.lid.productId).group(1)
+                        self.lid.product_id).group(1)
 
     def collection(self):
         """Return the collection this product belongs to."""
-        return Collection.Collection(self.archive, self.lid.parentLID())
+        return Collection.Collection(self.archive, self.lid.parent_lid())
 
     def bundle(self):
         """Return the bundle this product belongs to."""
-        return Bundle.Bundle(self.archive, self.lid.parentLID().parentLID())
+        return Bundle.Bundle(self.archive, self.lid.parent_lid().parent_lid())
+
+# was_converted

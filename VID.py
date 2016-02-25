@@ -38,7 +38,7 @@ class VID(object):
 
 
 class TestVID(unittest.TestCase):
-    def testInit(self):
+    def test_init(self):
         # sanity-check
         with self.assertRaises(Exception):
             VID(null)
@@ -61,17 +61,19 @@ class TestVID(unittest.TestCase):
         self.assertEqual(3, v.major)
         self.assertEqual(14159265, v.minor)
 
-    def testCmp(self):
+    def test_cmp(self):
         self.assertTrue(VID('2.3') == VID('2.3'))
         self.assertTrue(VID('2.3') != VID('2.4'))
         self.assertTrue(VID('2.3') < VID('3.2'))
         self.assertTrue(VID('2.3') > VID('2.2'))
 
-    def testStr(self):
+    def test_str(self):
         self.assertEquals('2.3', str(VID('2.3')))
 
-    def testRepr(self):
+    def test_repr(self):
         self.assertEquals("VID('2.3')", repr(VID('2.3')))
 
 if __name__ == '__main__':
     unittest.main()
+
+# was_converted

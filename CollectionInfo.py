@@ -19,7 +19,7 @@ class CollectionInfo(Info.Info):
         '/Product_Collection/Identification_Area/title'.
         """
         imageTag = self.collection.suffix().upper() + ' images'
-        prodId = str(self.collection.bundle().proposalId())
+        prodId = str(self.collection.bundle().proposal_id())
         return ('This collection contains the raw %s ' +
                 'obtained from HST Observing Program %s.') % (imageTag, prodId)
 

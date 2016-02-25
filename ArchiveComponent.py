@@ -30,7 +30,7 @@ class ArchiveComponent(object):
         return str(self.lid)
 
     @abc.abstractmethod
-    def directoryFilepath(self):
+    def directory_filepath(self):
         """Return the absolute filepath to the component's directory."""
         pass
 
@@ -39,9 +39,11 @@ class ArchiveComponent(object):
         Generate all the files belonging to this component as ArchiveFile
         objects.
         """
-        dir = self.directoryFilepath()
+        dir = self.directory_filepath()
         for basename in os.listdir(dir):
             if basename[0] != '.':
                 file = os.path.join(dir, basename)
                 if (os.path.isfile(file)):
                     yield ArchiveFile.ArchiveFile(self, basename)
+
+# was_converted

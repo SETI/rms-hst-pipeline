@@ -13,27 +13,27 @@ class LIDVID(object):
         """
         segs = str.split('::')
         assert len(segs) == 2
-        self.LIDVID = str
-        self.LID = LID.LID(segs[0])
-        self.VID = VID.VID(segs[1])
+        self.lidvid = str
+        self.lid = LID.LID(segs[0])
+        self.vid = VID.VID(segs[1])
 
     def __eq__(self, other):
-        return (self.LID == other.LID) and (self.VID == other.VID)
+        return (self.lid == other.lid) and (self.vid == other.vid)
 
     def __ne__(self, other):
         return not (self == other)
 
     def __str__(self):
-        return self.str
+        return self.lidvid
 
     def __repr__(self):
-        return 'LIDVID(%r)' % self.LIDVID
+        return 'LIDVID(%r)' % self.lidvid
 
 ############################################################
 
 
 class TestLIDVID(unittest.TestCase):
-    def testInit(self):
+    def test_init(self):
         # sanity-check
         with self.assertRaises(Exception):
             LIDVID(null)
@@ -47,7 +47,7 @@ class TestLIDVID(unittest.TestCase):
         with self.assertRaises(Exception):
             LIDVID('urn:nasa:pds:ssc01.hirespc.cruise:browse::2.0.0')
 
-    def testEq(self):
+    def test_eq(self):
         self.assertTrue(LIDVID('urn:nasa:pds:b:c:p::1.0') ==
                         LIDVID('urn:nasa:pds:b:c:p::1.0'))
         self.assertFalse(LIDVID('urn:nasa:pds:b:c:p::1.1') ==
@@ -57,13 +57,15 @@ class TestLIDVID(unittest.TestCase):
         self.assertFalse(LIDVID('urn:nasa:pds:b:c:p::1.0') !=
                          LIDVID('urn:nasa:pds:b:c:p::1.0'))
 
-    def testStr(self):
+    def test_str(self):
         self.assertEquals('urn:nasa:pds:b:c:p::1.0',
                           str(LIDVID('urn:nasa:pds:b:c:p::1.0')))
 
-    def testStr(self):
+    def test_repr(self):
         self.assertEquals("LIDVID('urn:nasa:pds:b:c:p::1.0')",
                           repr(LIDVID('urn:nasa:pds:b:c:p::1.0')))
 
 if __name__ == '__main__':
     unittest.main()
+
+# was_converted

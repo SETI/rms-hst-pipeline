@@ -32,7 +32,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
     def createDefaultInventoryFile(self, invFilepath=None):
         if invFilepath is None:
             invName = self.defaultInventoryName()
-            invFilepath = os.path.join(self.component.directoryFilepath(),
+            invFilepath = os.path.join(self.component.directory_filepath(),
                                        invName)
         # Line endings in the inventoryDocument are native (i.e.,
         # possibly wrong, depending on the platform), so we must write
@@ -149,7 +149,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
 def testSynthesis():
     a = FileArchives.getAnyArchive()
     for b in a.bundles():
-        if b.proposalId() != 0:
+        if b.proposal_id() != 0:
             for c in b.collections():
                 lm = CollectionLabelMaker(c)
                 lm.createDefaultXmlFile('collection.xml')

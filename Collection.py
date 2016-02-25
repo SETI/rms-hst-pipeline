@@ -16,26 +16,26 @@ class Collection(ArchiveComponent.ArchiveComponent):
         """
         Create a Collection given the archive it lives in and its LID.
         """
-        assert lid.isCollectionLID()
+        assert lid.is_collection_lid()
         super(Collection, self).__init__(arch, lid)
 
     def __repr__(self):
         return 'Collection(%r, %r)' % (self.archive, self.lid)
 
-    def directoryFilepath(self):
+    def directory_filepath(self):
         """Return the absolute filepath to the component's directory."""
         return os.path.join(self.archive.root,
-                            self.lid.bundleId, self.lid.collectionId)
+                            self.lid.bundle_id, self.lid.collection_id)
 
     def products(self):
         """
         Generate the products of this bundle as Product objects.
         """
-        dirFP = self.directoryFilepath()
-        for subdir in os.listdir(dirFP):
+        dir_fp = self.directory_filepath()
+        for subdir in os.listdir(dir_fp):
             if re.match(Product.Product.DIRECTORY_PATTERN, subdir):
-                productLID = LID.LID('%s:%s' % (self.lid.LID, subdir))
-                yield Product.Product(self.archive, productLID)
+                product_lid = LID.LID('%s:%s' % (self.lid.lid, subdir))
+                yield Product.Product(self.archive, product_lid)
 
     def instrument(self):
         """
@@ -43,7 +43,7 @@ class Collection(ArchiveComponent.ArchiveComponent):
         from the collection's LID.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
-                        self.lid.collectionId).group(1)
+                        self.lid.collection_id).group(1)
 
     def suffix(self):
         """
@@ -51,8 +51,10 @@ class Collection(ArchiveComponent.ArchiveComponent):
         calculated from the collection's LID.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
-                        self.lid.collectionId).group(2)
+                        self.lid.collection_id).group(2)
 
     def bundle(self):
         """Return the bundle this collection belongs to."""
-        return Bundle.Bundle(self.archive, self.lid.parentLID())
+        return Bundle.Bundle(self.archive, self.lid.parent_lid())
+
+# was_converted

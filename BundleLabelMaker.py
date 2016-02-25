@@ -74,7 +74,7 @@ def testSynthesis():
     # test them against the XML schema.
     a = FileArchives.getAnyArchive()
     for b in a.bundles():
-        if b.proposalId() != 0:
+        if b.proposal_id() != 0:
             lm = BundleLabelMaker(b)
             lm.createDefaultXmlFile('bundle.xml')
             if LabelMaker.xmlSchemaCheck('bundle.xml'):

@@ -15,25 +15,25 @@ class Bundle(ArchiveComponent.ArchiveComponent):
         """
         Create a Bundle given the archive it lives in and its LID.
         """
-        assert lid.isBundleLID()
+        assert lid.is_bundle_lid()
         super(Bundle, self).__init__(arch, lid)
 
     def __repr__(self):
         return 'Bundle(%r, %r)' % (self.archive, self.lid)
 
-    def directoryFilepath(self):
+    def directory_filepath(self):
         """Return the absolute filepath to the component's directory."""
-        return os.path.join(self.archive.root, self.lid.bundleId)
+        return os.path.join(self.archive.root, self.lid.bundle_id)
 
     def collections(self):
         """
         Generate the collections of this bundle as Collection objects.
         """
-        dirFP = self.directoryFilepath()
-        for subdir in os.listdir(dirFP):
+        dir_fp = self.directory_filepath()
+        for subdir in os.listdir(dir_fp):
             if re.match(Collection.Collection.DIRECTORY_PATTERN, subdir):
-                collectionLID = LID.LID('%s:%s' % (self.lid.LID, subdir))
-                yield Collection.Collection(self.archive, collectionLID)
+                collection_lid = LID.LID('%s:%s' % (self.lid.lid, subdir))
+                yield Collection.Collection(self.archive, collection_lid)
 
     def products(self):
         """Generate the products of this bundle as Product objects."""
@@ -41,10 +41,12 @@ class Bundle(ArchiveComponent.ArchiveComponent):
             for product in collection.products():
                 yield product
 
-    def proposalId(self):
+    def proposal_id(self):
         """
         Return the proposal ID for this bundle.  It is calculated
         from the bundle's LID.
         """
         return int(re.match(Bundle.DIRECTORY_PATTERN,
-                            self.lid.bundleId).group(1))
+                            self.lid.bundle_id).group(1))
+
+# was_converted

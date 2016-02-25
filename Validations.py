@@ -51,7 +51,7 @@ class ProductFilesHaveBundleProposalId(Pass.NullPass):
 
     def doBundle(self, bundle, before):
         if before:
-            self.bundleProposalId = bundle.proposalId()
+            self.bundleProposalId = bundle.proposal_id()
         else:
             self.bundleProposalId = None
 
@@ -103,7 +103,7 @@ class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
 
     def doBundle(self, bundle, before):
         if before:
-            self.bundleProposalId = bundle.proposalId()
+            self.bundleProposalId = bundle.proposal_id()
             self.hstInternalProposalIds = set()
         else:
             # TODO It seems that hst_00000 is a grab bag of
