@@ -4,12 +4,11 @@ import ArchiveFile
 import XmlUtils
 
 
-class ProductFileLabelMaker(XmlUtils.XmlUtils):
+class ProductFileXmlMaker(XmlUtils.XmlUtils):
     """
     An abstract class to build the part of a PDS4 product label
-    corresponding to a single file within the product.  Despite the
-    name, this is not a subclass of LabelMaker; rather it provides
-    functionality to the ProductLabelMaker.
+    corresponding to a single file within the product.  This class
+    provides functionality to the ProductLabelMaker.
     """
 
     def __init__(self, document, root, archiveFile):
@@ -25,7 +24,7 @@ class ProductFileLabelMaker(XmlUtils.XmlUtils):
         assert isinstance(archiveFile, ArchiveFile.ArchiveFile)
         self.archiveFile = archiveFile
 
-        super(ProductFileLabelMaker, self).__init__(document)
+        super(ProductFileXmlMaker, self).__init__(document)
         self.createDefaultXml()
 
     def createDefaultXml(self):

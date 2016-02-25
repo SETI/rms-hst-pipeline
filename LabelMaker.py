@@ -40,6 +40,25 @@ class LabelMaker(XmlUtils.XmlUtils):
         """The default name for the XML label for this type of component."""
         pass
 
+    def createDefaultXmlFile(self, xmlFilepath=None):
+        """
+        Pretty-print the XML document to a file.  If no filepath is
+        given, it will be written to the default label filepath for
+        the component.
+        """
+        if xmlFilepath is None:
+            xmlName = self.defaultXmlName()
+            xmlFilepath = os.path.join(self.component.directoryFilepath(),
+                                       xmlName)
+        with open(xmlFilepath, 'w') as outputFile:
+            pretty = True
+            if pretty:
+                outputFile.write(self.document.toprettyxml(indent='  ',
+                                                           newl='\n',
+                                                           encoding='utf-8'))
+            else:
+                outputFile.write(self.document.toxml(encoding='utf-8'))
+
 
 def xmlSchemaCheck(filepath):
     """

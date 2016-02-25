@@ -2,7 +2,7 @@ import sys
 import tempfile
 
 import ArchiveFile
-import DummyProductFileLabelMaker
+import DummyProductFileXmlMaker
 import FileArchives
 import LabelMaker
 import ProductInfo
@@ -92,7 +92,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath '/Product_Observational'
         for archiveFile in product.files():
-            DummyProductFileLabelMaker.DummyProductFileLabelMaker(
+            DummyProductFileXmlMaker.DummyProductFileXmlMaker(
                 self.document, root, archiveFile)
 
     def createObservingSystemXml(self, observingSystem):
@@ -170,7 +170,7 @@ def testSynthesis():
                         LabelMaker.schematronCheck(fp)):
                     print '%s did not validate; aborting' % p
                     sys.exit(1)
-                return
+
 
 if __name__ == '__main__':
     testSynthesis()

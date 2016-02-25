@@ -1,18 +1,18 @@
-import ProductFileLabelMaker
+import ProductFileXmlMaker
 
 
-class DummyProductFileLabelMaker(ProductFileLabelMaker.ProductFileLabelMaker):
+class DummyProductFileXmlMaker(ProductFileXmlMaker.ProductFileXmlMaker):
     """
     A dummy class that builds the part of a PDS4 product label
     corresponding to a single file within the product.  It incorrectly
-    declares that the data consists of an array of a single byte.
-    This class is meant to be used as a placeholder.
+    declares that the data consists of a FITS header, then an array of
+    a single byte.  This class is meant to be used as a placeholder.
     """
 
     def __init__(self, document, root, archiveFile):
-        super(DummyProductFileLabelMaker, self).__init__(document,
-                                                         root,
-                                                         archiveFile)
+        super(DummyProductFileXmlMaker, self).__init__(document,
+                                                       root,
+                                                       archiveFile)
 
     def createFileDataXml(self, fileAreaObservational):
         # The following block should be true for all FITS files.
@@ -28,7 +28,7 @@ class DummyProductFileLabelMaker(ProductFileLabelMaker.ProductFileLabelMaker):
         self.setText(localIdentifier, 'header')
         offset.setAttribute('unit', 'byte')
         self.setText(offset, '0')
-        self.setText(objectLength, '1')  # TODO wrong!
+        self.setText(objectLength, '2880')  # TODO wrong; some multiple of this
         objectLength.setAttribute('unit', 'byte')
         self.setText(parsingStandardId, 'FITS 3.0')
         self.setText(description, 'Global FITS Header')
