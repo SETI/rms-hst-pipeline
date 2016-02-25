@@ -59,6 +59,6 @@ class DummyProductFileXmlMaker(ProductFileXmlMaker.ProductFileXmlMaker):
             self.create_children(axis_array, ['axis_name', 'elements',
                                               'sequence_number'])
 
-        self.set_text(axis_name, 'Axis Joe')  # TODO Wrong
+        self.set_text(axis_name, 'defaultAxisName')  # TODO Wrong
         self.set_text(elements, '1')  # TODO Wrong
         self.set_text(sequence_number, '1')  # TODO Wrong
