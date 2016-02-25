@@ -19,12 +19,18 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
     def createDefaultXml(self):
         product = self.component
 
+        # At XPath '/'
+        self.addProcessingInstruction('xml-model',
+                                      self.info.xmlModelPdsAttributes())
+
         # At XPath '/Product_Observational'
         root = self.createChild(self.document, 'Product_Observational')
 
         PDS = self.info.pdsNamespaceUrl()
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
+        root.setAttribute('xmlns:xsi', self.info.xsiNamespaceUrl())
+        root.setAttribute('xsi:schemaLocation', self.info.pds4SchemaUrl())
 
         identificationArea, observationArea = \
             self.createChildren(root, ['Identification_Area',
@@ -99,7 +105,8 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
                                     ['name',
                                      'Observing_System_Component',
                                      'Observing_System_Component'])
-            self.setText(name, 'Hubble Space Telescope Advanced Camera for Surveys')
+            self.setText(name,
+                         'Hubble Space Telescope Advanced Camera for Surveys')
 
             # At XPath
             # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[0]'
@@ -163,6 +170,7 @@ def testSynthesis():
                         LabelMaker.schematronCheck(fp)):
                     print '%s did not validate; aborting' % p
                     sys.exit(1)
+                return
 
 if __name__ == '__main__':
     testSynthesis()

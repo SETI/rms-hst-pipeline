@@ -15,6 +15,24 @@ class DummyProductFileLabelMaker(ProductFileLabelMaker.ProductFileLabelMaker):
                                                          archiveFile)
 
     def createFileDataXml(self, fileAreaObservational):
+        # The following block should be true for all FITS files.
+
+        # At XPath '/Product_Observational/File_Area_Observational/Header'
+        header = self.createChild(fileAreaObservational, 'Header')
+        localIdentifier, offset, objectLength, \
+            parsingStandardId, description = \
+            self.createChildren(header,
+                                ["local_identifier", "offset", "object_length",
+                                 "parsing_standard_id", "description"])
+
+        self.setText(localIdentifier, 'header')
+        offset.setAttribute('unit', 'byte')
+        self.setText(offset, '0')
+        self.setText(objectLength, '1')  # TODO wrong!
+        objectLength.setAttribute('unit', 'byte')
+        self.setText(parsingStandardId, 'FITS 3.0')
+        self.setText(description, 'Global FITS Header')
+
         # At XPath '/Product_Observational/File_Area_Observational/Array'
         array = self.createChild(fileAreaObservational, 'Array')
         offset, axes, axisIndexOrder, elementArray, axisArray = \

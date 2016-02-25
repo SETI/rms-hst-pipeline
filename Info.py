@@ -8,6 +8,23 @@ class Info(object):
         """Return the PDS namespace URL"""
         return 'http://pds.nasa.gov/pds4/pds/v1'
 
+    def pds4SchemaUrl(self):
+        """Return the PDS Schema location URL"""
+        return 'http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.xsd'
+
+    def xsiNamespaceUrl(self):
+        """Return the XMLSchema instance namespace URL"""
+        return 'http://www.w3.org/2001/XMLSchema-instance'
+
+    def xmlModelPdsAttributes(self):
+        """Return the attributes for PDS4_PDS_1500.sch"""
+        # TODO That docstring is not informative enough
+        return """href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.sch\"
+schematypens=\"http://purl.oclc.org/dsdl/schematron\""""
+
+    def fits(self):
+        return 'FITS 3.0'
+
     def informationModelVersion(self):
         return '1.5.0.0'
 

@@ -5,6 +5,7 @@ import ArchiveComponent
 import Bundle
 import Collection
 
+
 class Product(ArchiveComponent.ArchiveComponent):
     """A PDS4 Product."""
 
