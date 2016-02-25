@@ -160,7 +160,7 @@ class CollectionContainsCollectionXml(Pass.LimitedReportingPass):
         elif file.basename() == self.collectionInventoryName:
             self.sawCollectionInv = True
 
-stdValidation = Pass.CompositePass([
+std_validation = Pass.CompositePass([
         CountFilesPass(),
         ProductFilesHaveBundleProposalId(),
         ProductFilesHaveCollectionSuffix(),

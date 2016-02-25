@@ -44,7 +44,7 @@ class ProjectIdPass(Pass.NullPass):
 
 
 def runPass():
-    archive = FileArchives.getAnyArchive()
+    archive = FileArchives.get_any_archive()
     p = ProjectIdPass()
     Pass.PassRunner().run(archive,
                           Pass.CompositePass([Validations.CountFilesPass(),

@@ -22,13 +22,13 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
 
-        identificationArea, bundle_ = \
+        identification_area, bundle_ = \
             self.create_children(root, ['Identification_Area', 'Bundle'])
 
         # At XPath '/Product_Bundle/Identification_Area'
-        logicalIdentifier, versionId, title, information_model_version, \
-            productClass, citationInformation = \
-            self.create_children(identificationArea, [
+        logical_identifier, version_id, title, information_model_version, \
+            product_class, citation_information = \
+            self.create_children(identification_area, [
                 'logical_identifier',
                 'version_id',
                 'title',
@@ -36,43 +36,45 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
                 'product_class',
                 'Citation_Information'])
 
-        self.set_text(logicalIdentifier, str(bundle.lid))
-        self.set_text(versionId, self.info.version_id())
+        self.set_text(logical_identifier, str(bundle.lid))
+        self.set_text(version_id, self.info.version_id())
         self.set_text(title, self.info.title())
         self.set_text(information_model_version,
                       self.info.information_model_version())
-        self.set_text(productClass, 'Product_Bundle')
+        self.set_text(product_class, 'Product_Bundle')
 
         # At XPath '/Product_Bundle/Identification_Area/Citation_Information'
-        publicationYear, description = \
-            self.create_children(citationInformation,
+        publication_year, description = \
+            self.create_children(citation_information,
                                  ['publication_year', 'description'])
 
-        self.set_text(publicationYear,
+        self.set_text(publication_year,
                       self.info.citation_information_publication_year())
-        self.set_text(description, self.info.citation_information_description())
+        self.set_text(description,
+                      self.info.citation_information_description())
 
         # At XPath '/Product_Bundle/Bundle'
-        bundleType = self.create_child(bundle_, 'bundle_type')
-        self.set_text(bundleType, 'Archive')
+        bundle_type = self.create_child(bundle_, 'bundle_type')
+        self.set_text(bundle_type, 'Archive')
 
         for collection in bundle.collections():
             # At XPath '/Product_Bundle/Bundle_Member_Entry'
-            bundleMemberEntry = self.create_child(root, 'Bundle_Member_Entry')
-            lidReference, memberStatus, referenceType = \
-                self.create_children(bundleMemberEntry, [
+            bundle_member_entry = self.create_child(root,
+                                                    'Bundle_Member_Entry')
+            lid_reference, member_status, reference_type = \
+                self.create_children(bundle_member_entry, [
                     'lid_reference',
                     'member_status',
                     'reference_type'])
-            self.set_text(lidReference, str(collection.lid))
-            self.set_text(memberStatus, 'Primary')
-            self.set_text(referenceType, 'bundle_has_data_collection')
+            self.set_text(lid_reference, str(collection.lid))
+            self.set_text(member_status, 'Primary')
+            self.set_text(reference_type, 'bundle_has_data_collection')
 
 
 def test_synthesis():
     # Create sample bundle.xml files for the non-hst_00000 bundles and
     # test them against the XML schema.
-    a = FileArchives.getAnyArchive()
+    a = FileArchives.get_any_archive()
     for b in a.bundles():
         if b.proposal_id() != 0:
             lm = BundleLabelMaker(b)
@@ -94,3 +96,5 @@ def test_synthesis():
 
 if __name__ == '__main__':
     test_synthesis()
+
+# was_converted

@@ -11,17 +11,17 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         super(CollectionLabelMaker, self).__init__(
             collection, CollectionInfo.CollectionInfo(collection))
         self.inventoryDocument = None
-        self.createDefaultCollectionInventory()
+        self.create_default_collection_inventory()
 
     def default_xml_name(self):
         collection = self.component
         return 'collection_%s.xml' % collection.suffix()
 
-    def defaultInventoryName(self):
+    def default_inventory_name(self):
         collection = self.component
         return 'collection_%s_inventory.tab' % collection.suffix()
 
-    def createDefaultCollectionInventory(self):
+    def create_default_collection_inventory(self):
         collection = self.component
         lines = [u'P,%s\n' % str(p.lid) for p in collection.products()]
         # Line endings are native here (i.e., possibly wrong,
@@ -29,15 +29,15 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         # io.open() with newline='\r\n'
         self.inventoryDocument = ''.join(lines)
 
-    def createDefaultInventoryFile(self, invFilepath=None):
-        if invFilepath is None:
-            invName = self.defaultInventoryName()
-            invFilepath = os.path.join(self.component.directory_filepath(),
-                                       invName)
+    def create_default_inventory_file(self, inv_filepath=None):
+        if inv_filepath is None:
+            inv_name = self.default_inventory_name()
+            inv_filepath = os.path.join(self.component.directory_filepath(),
+                                        inv_name)
         # Line endings in the inventoryDocument are native (i.e.,
         # possibly wrong, depending on the platform), so we must write
         # using io.open() with newline='\r\n'
-        with io.open(invFilepath, 'w', newline='\r\n') as f:
+        with io.open(inv_filepath, 'w', newline='\r\n') as f:
             f.write(self.inventoryDocument)
 
     def create_default_xml(self):
@@ -49,15 +49,15 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
 
-        identificationArea, collection_, fileAreaInventory = \
+        identification_area, collection_, file_area_inventory = \
             self.create_children(root, ['Identification_Area',
                                         'Collection',
                                         'File_Area_Inventory'])
 
         # At XPath '/Product_Collection/Identification_Area'
-        logicalIdentifier, versionId, title, information_model_version, \
-            productClass, citationInformation = \
-            self.create_children(identificationArea, [
+        logical_identifier, version_id, title, information_model_version, \
+            product_class, citationInformation = \
+            self.create_children(identification_area, [
                 'logical_identifier',
                 'version_id',
                 'title',
@@ -65,37 +65,39 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
                 'product_class',
                 'Citation_Information'])
 
-        self.set_text(logicalIdentifier, str(collection.lid))
-        self.set_text(versionId, self.info.version_id())
+        self.set_text(logical_identifier, str(collection.lid))
+        self.set_text(version_id, self.info.version_id())
         self.set_text(title, self.info.title())
         self.set_text(information_model_version,
                       self.info.information_model_version())
-        self.set_text(productClass, 'Product_Collection')
+        self.set_text(product_class, 'Product_Collection')
 
         # At XPath
         # '/Product_Collection/Identification_Area/Citation_Information'
-        publicationYear, description = \
+        publication_year, description = \
             self.create_children(citationInformation,
                                  ['publication_year', 'description'])
 
-        self.set_text(publicationYear,
+        self.set_text(publication_year,
                       self.info.citation_information_publication_year())
 
-        self.set_text(description, self.info.citation_information_description())
+        self.set_text(description,
+                      self.info.citation_information_description())
 
         # At XPath '/Product_Collection/Collection'
-        self.set_text(self.create_child(collection_, 'collection_type'), 'Data')
+        self.set_text(self.create_child(collection_, 'collection_type'),
+                      'Data')
 
         # At XPath '/Product_Collection/File_Area_Inventory'
-        file, inventory = self.create_children(fileAreaInventory,
+        file, inventory = self.create_children(file_area_inventory,
                                                ['File', 'Inventory'])
         # At XPath '/Product_Collection/File_Area_Inventory/File'
-        fileName = self.create_child(file, 'file_name')
-        self.set_text(fileName, self.defaultInventoryName())
+        file_name = self.create_child(file, 'file_name')
+        self.set_text(file_name, self.default_inventory_name())
 
         # At XPath '/Product_Collection/File_Area_Inventory/Inventory'
-        offset, parsingStandardId, records, recordDelimiter, \
-            fieldDelimiter, recordDelimited, referenceType = \
+        offset, parsing_standard_id, records, record_delimiter, \
+            field_delimiter, record_delimited, reference_type = \
             self.create_children(inventory, [
                 'offset', 'parsing_standard_id',
                 'records', 'record_delimiter', 'field_delimiter',
@@ -103,57 +105,57 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
 
         self.set_text(offset, '0')
         offset.setAttribute('unit', 'byte')
-        self.set_text(parsingStandardId, 'PDS DSV 1')
+        self.set_text(parsing_standard_id, 'PDS DSV 1')
 
-        productCount = 0
+        product_count = 0
         for p in collection.products():
-            productCount += 1
-        self.set_text(records, str(productCount))
+            product_count += 1
+        self.set_text(records, str(product_count))
 
-        self.set_text(recordDelimiter, 'Carriage-Return Line-Feed')
-        self.set_text(fieldDelimiter, 'Comma')
+        self.set_text(record_delimiter, 'Carriage-Return Line-Feed')
+        self.set_text(field_delimiter, 'Comma')
 
         # At XPath
         # '/Product_Collection/File_Area_Inventory/Inventory/Record_Delimited'
-        fields, groups, fieldDelimited1, fieldDelimited2 = \
-            self.create_children(recordDelimited, [
+        fields, groups, field_delimited1, field_delimited2 = \
+            self.create_children(record_delimited, [
                 'fields', 'groups', 'Field_Delimited', 'Field_Delimited'])
         self.set_text(fields, '2')
         self.set_text(groups, '0')
 
         # At XPath
         # '/Product_Collection/File_Area_Inventory/Inventory/Record_Delimited/Field_Delimited[1]'
-        name, fieldNumber, dataType, maximumFieldLength = \
-            self.create_children(fieldDelimited1,
+        name, field_number, date_type, maximum_field_length = \
+            self.create_children(field_delimited1,
                                  ['name', 'field_number',
                                   'data_type', 'maximum_field_length'])
         self.set_text(name, 'Member_Status')
-        self.set_text(fieldNumber, '1')
-        self.set_text(dataType, 'ASCII_String')
-        maximumFieldLength.setAttribute('unit', 'byte')
-        self.set_text(maximumFieldLength, '1')
+        self.set_text(field_number, '1')
+        self.set_text(date_type, 'ASCII_String')
+        maximum_field_length.setAttribute('unit', 'byte')
+        self.set_text(maximum_field_length, '1')
 
         # At XPath
         # '/Product_Collection/File_Area_Inventory/Inventory/Record_Delimited/Field_Delimited[2]'
-        name, fieldNumber, dataType = \
-            self.create_children(fieldDelimited2,
+        name, field_number, date_type = \
+            self.create_children(field_delimited2,
                                  ['name', 'field_number', 'data_type'])
 
         self.set_text(name, 'LIDVID_LID')
-        self.set_text(fieldNumber, '2')
-        self.set_text(dataType, 'ASCII_LIDVID_LID')
+        self.set_text(field_number, '2')
+        self.set_text(date_type, 'ASCII_LIDVID_LID')
 
-        self.set_text(referenceType, 'inventory_has_member_product')
+        self.set_text(reference_type, 'inventory_has_member_product')
 
 
 def test_synthesis():
-    a = FileArchives.getAnyArchive()
+    a = FileArchives.get_any_archive()
     for b in a.bundles():
         if b.proposal_id() != 0:
             for c in b.collections():
                 lm = CollectionLabelMaker(c)
                 lm.create_default_xml_file('collection.xml')
-                lm.createDefaultInventoryFile(
+                lm.create_default_inventory_file(
                     'collection_suffix_inventory.tab')
                 if LabelMaker.xml_schema_check('collection.xml'):
                     print ('Yay: collection.xml for %s ' +
@@ -172,3 +174,5 @@ def test_synthesis():
 
 if __name__ == '__main__':
     test_synthesis()
+
+# was_converted

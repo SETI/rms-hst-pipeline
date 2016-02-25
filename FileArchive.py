@@ -28,34 +28,34 @@ class FileArchive(object):
     # Verifying parts
 
     @staticmethod
-    def isValidInstrument(inst):
+    def is_valid_instrument(inst):
         return inst in ['acs', 'wfc3', 'wfpc2']
 
     @staticmethod
-    def isValidProposal(prop):
+    def is_valid_proposal(prop):
         return isinstance(prop, int) and 0 <= prop and prop <= 99999
 
     @staticmethod
-    def isValidVisit(vis):
+    def is_valid_visit(vis):
         try:
             return re.match('\A[a-z0-9][a-z0-9]\Z', vis) is not None
         except:
             return False
 
     @staticmethod
-    def isValidBundleDirBasename(dirname):
+    def is_valid_bundle_dir_basename(dirname):
         return re.match('\Ahst_[0-9]{5}\Z', dirname) is not None
 
     @staticmethod
-    def isValidCollectionDirBasename(dirname):
+    def is_valid_collection_dir_basename(dirname):
         return re.match('\Adata_[a-z0-9]+_', dirname) is not None
 
     @staticmethod
-    def isValidProductDirBasename(dirname):
+    def is_valid_product_dir_basename(dirname):
         return re.match('\Avisit_[a-z0-9]{2}\Z', dirname) is not None
 
     @staticmethod
-    def isHiddenFileBasename(basename):
+    def is_hidden_file_basename(basename):
         return basename[0] == '.'
 
     # Walking the hierarchy with objects
@@ -63,8 +63,8 @@ class FileArchive(object):
         """Generate the bundles stored in this archive."""
         for subdir in os.listdir(self.root):
             if re.match(Bundle.Bundle.DIRECTORY_PATTERN, subdir):
-                bundleLID = LID.LID('urn:nasa:pds:%s' % subdir)
-                yield Bundle.Bundle(self, bundleLID)
+                bundle_lid = LID.LID('urn:nasa:pds:%s' % subdir)
+                yield Bundle.Bundle(self, bundle_lid)
 
     def collections(self):
         """Generate the collections stored in this archive."""
@@ -83,7 +83,7 @@ class FileArchive(object):
 
 
 class TestFileArchive(unittest.TestCase):
-    def testInit(self):
+    def test_init(self):
         with self.assertRaises(Exception):
             FileArchive(None)
         with self.assertRaises(Exception):
@@ -98,45 +98,47 @@ class TestFileArchive(unittest.TestCase):
         finally:
             shutil.rmtree(tempdir)
 
-    def testStr(self):
+    def test_str(self):
         tempdir = tempfile.mkdtemp()
         a = FileArchive(tempdir)
         self.assertEqual(repr(tempdir), str(a))
 
-    def testEq(self):
+    def test_eq(self):
         tempdir = tempfile.mkdtemp()
         tempdir2 = tempfile.mkdtemp()
         self.assertEquals(FileArchive(tempdir), FileArchive(tempdir))
         self.assertNotEquals(FileArchive(tempdir), FileArchive(tempdir2))
 
-    def testRepr(self):
+    def test_repr(self):
         tempdir = tempfile.mkdtemp()
         a = FileArchive(tempdir)
         self.assertEqual('FileArchive(%r)' % tempdir, repr(a))
 
-    def testIsValidInstrument(self):
-        self.assertTrue(FileArchive.isValidInstrument('wfc3'))
-        self.assertTrue(FileArchive.isValidInstrument('wfpc2'))
-        self.assertTrue(FileArchive.isValidInstrument('acs'))
-        self.assertFalse(FileArchive.isValidInstrument('Acs'))
-        self.assertFalse(FileArchive.isValidInstrument('ACS'))
-        self.assertFalse(FileArchive.isValidInstrument('ABC'))
-        self.assertFalse(FileArchive.isValidInstrument(None))
+    def test_is_valid_instrument(self):
+        self.assertTrue(FileArchive.is_valid_instrument('wfc3'))
+        self.assertTrue(FileArchive.is_valid_instrument('wfpc2'))
+        self.assertTrue(FileArchive.is_valid_instrument('acs'))
+        self.assertFalse(FileArchive.is_valid_instrument('Acs'))
+        self.assertFalse(FileArchive.is_valid_instrument('ACS'))
+        self.assertFalse(FileArchive.is_valid_instrument('ABC'))
+        self.assertFalse(FileArchive.is_valid_instrument(None))
 
-    def testIsValidProposal(self):
-        self.assertFalse(FileArchive.isValidProposal(-1))
-        self.assertTrue(FileArchive.isValidProposal(0))
-        self.assertTrue(FileArchive.isValidProposal(1))
-        self.assertFalse(FileArchive.isValidProposal(100000))
-        self.assertFalse(FileArchive.isValidProposal(3.14159265))
-        self.assertFalse(FileArchive.isValidProposal('xxx'))
-        self.assertFalse(FileArchive.isValidProposal(None))
+    def test_is_valid_proposal(self):
+        self.assertFalse(FileArchive.is_valid_proposal(-1))
+        self.assertTrue(FileArchive.is_valid_proposal(0))
+        self.assertTrue(FileArchive.is_valid_proposal(1))
+        self.assertFalse(FileArchive.is_valid_proposal(100000))
+        self.assertFalse(FileArchive.is_valid_proposal(3.14159265))
+        self.assertFalse(FileArchive.is_valid_proposal('xxx'))
+        self.assertFalse(FileArchive.is_valid_proposal(None))
 
-    def testIsValidVisit(self):
-        self.assertTrue(FileArchive.isValidVisit('01'))
-        self.assertFalse(FileArchive.isValidVisit('xxx'))
-        self.assertFalse(FileArchive.isValidVisit(01))
-        self.assertFalse(FileArchive.isValidVisit(None))
+    def test_is_valid_visit(self):
+        self.assertTrue(FileArchive.is_valid_visit('01'))
+        self.assertFalse(FileArchive.is_valid_visit('xxx'))
+        self.assertFalse(FileArchive.is_valid_visit(01))
+        self.assertFalse(FileArchive.is_valid_visit(None))
 
 if __name__ == '__main__':
     unittest.main()
+
+# was_converted

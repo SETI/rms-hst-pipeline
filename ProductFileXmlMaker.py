@@ -11,7 +11,7 @@ class ProductFileXmlMaker(XmlUtils.XmlUtils):
     provides functionality to the ProductLabelMaker.
     """
 
-    def __init__(self, document, root, archiveFile):
+    def __init__(self, document, root, archive_file):
         """
         Create the XML corresponding to a single file within the
         product, given the XML document, the root node to which the
@@ -21,8 +21,8 @@ class ProductFileXmlMaker(XmlUtils.XmlUtils):
         assert document
         assert root
         self.root = root
-        assert isinstance(archiveFile, ArchiveFile.ArchiveFile)
-        self.archiveFile = archiveFile
+        assert isinstance(archive_file, ArchiveFile.ArchiveFile)
+        self.archive_file = archive_file
 
         super(ProductFileXmlMaker, self).__init__(document)
         self.create_default_xml()
@@ -36,13 +36,15 @@ class ProductFileXmlMaker(XmlUtils.XmlUtils):
 
         # At XPath '/Product_Observational/File_Area_Observational/File'
         file = self.create_child(file_area_observational, 'File')
-        fileName = self.create_child(file, 'file_name')
-        self.set_text(fileName, self.archiveFile.basename)
+        file_name = self.create_child(file, 'file_name')
+        self.set_text(file_name, self.archive_file.basename)
 
         # At XPath '/Product_Observational/File_Area_Observational'
-        self.createFileDataXml(file_area_observational)
+        self.create_file_data_xml(file_area_observational)
 
     @abc.abstractmethod
-    def createFileDataXml(self, file_area_observational):
+    def create_file_data_xml(self, file_area_observational):
         """Create the XML nodes describing the product file's data."""
         pass
+
+# was_converted
