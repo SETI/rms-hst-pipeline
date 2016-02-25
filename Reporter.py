@@ -11,14 +11,14 @@ class Reporter(object):
         """Report the results."""
         pass
 
-    def beginReporting(self):
+    def begin_reporting(self):
         """
         Prepare to report.  May open a file or initialize a UI,
         depending on the Reporter implementation.
         """
         pass
 
-    def endReporting(self):
+    def end_reporting(self):
         """
         Complete reporting.  May close a file or do any other work,
         depending on the Reporter implementation.
@@ -55,17 +55,19 @@ class CsvReporter(Reporter):
         """Write a row into the CSV file."""
         if tag is None:
             tag = ''
-        self.csvWriter.writerow([pass_, context, msg, tag])
+        self.csv_writer.writerow([pass_, context, msg, tag])
 
-    def beginReporting(self):
+    def begin_reporting(self):
         """Open the CSV file and write the header row."""
         self.file = open(self.filepath, 'wb')
-        self.csvWriter = csv.writer(self.file)
+        self.csv_writer = csv.writer(self.file)
         # Write the headers.
-        self.csvWriter.writerow(['PASS', 'CONTEXT', 'MESSAGE', 'TAG'])
+        self.csv_writer.writerow(['PASS', 'CONTEXT', 'MESSAGE', 'TAG'])
 
-    def endReporting(self):
+    def end_reporting(self):
         """Close the CSV file."""
         self.file.close()
-        self.csvWriter = None
+        self.csv_writer = None
         self.file = None
+
+# was_converted

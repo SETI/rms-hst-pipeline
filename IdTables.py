@@ -1,7 +1,7 @@
 # Tables listing numerical and character-encoded project IDs and their
 # relations.
 
-intToCharDict = {
+int_to_char_dict = {
     '0': set(['9dn', 'a24', 'b29', 'brx', '8xy', '9du', '9xe', 'bz5', '9a8',
               '9uw', '8nm', '8m3', '9z0', 'a16', 'b9h', 'bsw', 'cjh', 'bh8',
               '9eq', 'b9z', '9rl', 'cih', 'cpe', '93e', 'bae', '91y', 'bcz',
@@ -374,7 +374,7 @@ intToCharDict = {
                      'cpf', 'bzx', 'c7i', '6ee', '95m', '2ge', '8ta',
                      '32z', 'cd0', '6em', '9h6', '9q3', '9gr']), }
 
-charToIntDict = {
+char_to_int_dict = {
     '264': set(['5590', 'KeyError']),
     '293': set(['5392', 'KeyError']),
     '2av': set(['5624', 'KeyError']),
@@ -690,3 +690,5 @@ charToIntDict = {
     'ct9': set(['14064', 'KeyError']),
     'cwy': set(['14334', 'KeyError']),
     }
+
+# was_converted

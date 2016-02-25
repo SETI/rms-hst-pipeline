@@ -23,7 +23,7 @@ class HstFilename(object):
     def _basename(self):
         return os.path.basename(self.filename)
 
-    def instrumentName(self):
+    def instrument_name(self):
         filename = self._basename()
         i = filename[0].lower()
         assert i in 'iju', ('First char of filename %s must be i, j, or u.'
@@ -37,7 +37,7 @@ class HstFilename(object):
         else:
             raise Exception('First char of filename must be i, j, or u.')
 
-    def hstInternalProposalId(self):
+    def hst_internal_proposal_id(self):
         return self._basename()[1:4].lower()
 
     def suffix(self):
@@ -51,7 +51,7 @@ class HstFilename(object):
 
 
 class TestHstFilename(unittest.TestCase):
-    def testInit(self):
+    def test_init(self):
         # test bad type
         with self.assertRaises(Exception):
             HstFilename(None)
@@ -67,25 +67,27 @@ class TestHstFilename(unittest.TestCase):
             HstFilename('x123456')
         HstFilename('I123456')  # case-less
 
-    def testStr(self):
+    def test_str(self):
         s = HstFilename.s
         self.assertEqual(s, HstFilename(s).__str__())
 
-    def testRepr(self):
+    def test_repr(self):
         s = HstFilename.s
         self.assertEqual('HstFilename(\'' + s + '\')', repr(HstFilename(s)))
 
-    def testInstrumentName(self):
+    def test_instrument_name(self):
         s = HstFilename.s
-        self.assertEqual('acs', HstFilename(s).instrumentName())
+        self.assertEqual('acs', HstFilename(s).instrument_name())
 
-    def testHstInternalProposalId(self):
+    def test_hst_internal_proposal_id(self):
         s = HstFilename.s
-        self.assertEqual('6gp', HstFilename(s).hstInternalProposalId())
+        self.assertEqual('6gp', HstFilename(s).hst_internal_proposal_id())
 
-    def testVisit(self):
+    def test_visit(self):
         s = HstFilename.s
         self.assertEqual('01', HstFilename(s).visit())
 
 if __name__ == '__main__':
     unittest.main()
+
+# was_converted

@@ -8,8 +8,6 @@ echo '-- HstFilename'
 python HstFilename.py
 echo '-- IdTables2'
 python IdTables2.py
-echo '-- Label'
-python Label.py
 echo '-- LID'
 python LID.py
 echo '-- LIDVID'

@@ -11,17 +11,17 @@ class Pass(object):
 
     def __init__(self):
         """Create a Pass object."""
-        self.passRunner = None
+        self.pass_runner = None
 
-    def setPassRunner(self, passRunner):
+    def set_pass_runner(self, pass_runner):
         """
         Set the PassRunner.  It provides access to the Reporter and
         the context (location in the archive) while running the pass.
         """
-        self.passRunner = passRunner
+        self.pass_runner = pass_runner
 
     @abc.abstractmethod
-    def doArchive(self, archive, before):
+    def do_archive(self, archive, before):
         """
         Perform actions before or after the contents of a FileArchive
         are processed.  This method is called twice; the Boolean
@@ -34,7 +34,7 @@ class Pass(object):
         pass
 
     @abc.abstractmethod
-    def doBundle(self, bundle, before):
+    def do_bundle(self, bundle, before):
         """
         Perform actions before or after the contents of a Bundle are
         processed.  This method is called twice; the Boolean argument
@@ -47,12 +47,12 @@ class Pass(object):
         pass
 
     @abc.abstractmethod
-    def doBundleFile(self, file):
+    def do_bundle_file(self, file):
         """Perform actions for a file in the Bundle directory."""
         pass
 
     @abc.abstractmethod
-    def doCollection(self, collection, before):
+    def do_collection(self, collection, before):
         """
         Perform actions before or after the contents of a Collection
         are processed.  This method is called twice; the Boolean
@@ -65,12 +65,12 @@ class Pass(object):
         pass
 
     @abc.abstractmethod
-    def doCollectionFile(self, file):
+    def do_collection_file(self, file):
         """Perform actions for a file in the Collection directory."""
         pass
 
     @abc.abstractmethod
-    def doProduct(self, product, before):
+    def do_product(self, product, before):
         """
         Perform actions before or after the contents of a Product are
         processed.  This method is called twice; the Boolean argument
@@ -83,11 +83,11 @@ class Pass(object):
         pass
 
     @abc.abstractmethod
-    def doProductFile(self, file):
+    def do_product_file(self, file):
         """Perform actions for a file in the Product directory."""
         pass
 
-    def assertEquals(self, expected, actual, tag=None):
+    def assert_equals(self, expected, actual, tag=None):
         """
         Do nothing if the two objects are equal; if not, report that
         through the Reporter.  An optional string tag may be provided;
@@ -99,7 +99,7 @@ class Pass(object):
 
     def report(self, msg, tag=None):
         """Report through the reporter."""
-        self.passRunner.report(self.__class__.__name__, msg, tag)
+        self.pass_runner.report(self.__class__.__name__, msg, tag)
 
 
 class NullPass(Pass):
@@ -108,25 +108,25 @@ class NullPass(Pass):
     def __init__(self):
         super(NullPass, self).__init__()
 
-    def doArchive(self, archive, before):
+    def do_archive(self, archive, before):
         pass
 
-    def doBundle(self, bundle, before):
+    def do_bundle(self, bundle, before):
         pass
 
-    def doBundleFile(self, file):
+    def do_bundle_file(self, file):
         pass
 
-    def doCollection(self, collection, before):
+    def do_collection(self, collection, before):
         pass
 
-    def doCollectionFile(self, file):
+    def do_collection_file(self, file):
         pass
 
-    def doProduct(self, product, before):
+    def do_product(self, product, before):
         pass
 
-    def doProductFile(self, file):
+    def do_product_file(self, file):
         pass
 
 
@@ -170,54 +170,54 @@ class CompositePass(NullPass):
         self.passes = passes
         super(CompositePass, self).__init__()
 
-    def setPassRunner(self, passRunner):
-        NullPass.setPassRunner(self, passRunner)
+    def set_pass_runner(self, pass_runner):
+        NullPass.set_pass_runner(self, pass_runner)
         for p in self.passes:
-            p.setPassRunner(passRunner)
+            p.set_pass_runner(pass_runner)
 
-    def doArchive(self, archive, before):
+    def do_archive(self, archive, before):
         if before:
             for p in self.passes:
-                p.doArchive(archive, before)
+                p.do_archive(archive, before)
         else:
             for p in reversed(self.passes):
-                p.doArchive(archive, before)
+                p.do_archive(archive, before)
 
-    def doBundle(self, bundle, before):
+    def do_bundle(self, bundle, before):
         if before:
             for p in self.passes:
-                p.doBundle(bundle, before)
+                p.do_bundle(bundle, before)
         else:
             for p in reversed(self.passes):
-                p.doBundle(bundle, before)
+                p.do_bundle(bundle, before)
 
-    def doBundleFile(self, file):
+    def do_bundle_file(self, file):
         for p in self.passes:
-            p.doBundleFile(file)
+            p.do_bundle_file(file)
 
-    def doCollection(self, collection, before):
+    def do_collection(self, collection, before):
         if before:
             for p in self.passes:
-                p.doCollection(collection, before)
+                p.do_collection(collection, before)
         else:
             for p in reversed(self.passes):
-                p.doCollection(collection, before)
+                p.do_collection(collection, before)
 
-    def doCollectionFile(self, file):
+    def do_collection_file(self, file):
         for p in self.passes:
-            p.doCollectionFile(file)
+            p.do_collection_file(file)
 
-    def doProduct(self, product, before):
+    def do_product(self, product, before):
         if before:
             for p in self.passes:
-                p.doProduct(product, before)
+                p.do_product(product, before)
         else:
             for p in reversed(self.passes):
-                p.doProduct(product, before)
+                p.do_product(product, before)
 
-    def doProductFile(self, file):
+    def do_product_file(self, file):
         for p in self.passes:
-            p.doProductFile(file)
+            p.do_product_file(file)
 
 
 class PassRunner(object):
@@ -246,35 +246,37 @@ class PassRunner(object):
 
     def run(self, archive, p):
         """Run the Pass on the FileArchive."""
-        p.setPassRunner(self)
+        p.set_pass_runner(self)
 
-        self.reporter.beginReporting()
+        self.reporter.begin_reporting()
         self.context = archive
-        p.doArchive(archive, True)
+        p.do_archive(archive, True)
         for bundle in archive.bundles():
             self.context = bundle
-            p.doBundle(bundle, True)
+            p.do_bundle(bundle, True)
             for file in bundle.files():
                 self.context = file
-                p.doBundleFile(file)
+                p.do_bundle_file(file)
             for collection in bundle.collections():
                 self.context = collection
-                p.doCollection(collection, True)
+                p.do_collection(collection, True)
                 for file in collection.files():
                     self.context = file
-                    p.doCollectionFile(file)
+                    p.do_collection_file(file)
                 for product in collection.products():
                     self.context = product
-                    p.doProduct(product, True)
+                    p.do_product(product, True)
                     for file in product.files():
                         self.context = file
-                        p.doProductFile(file)
+                        p.do_product_file(file)
                     self.context = product
-                    p.doProduct(product, False)
+                    p.do_product(product, False)
                 self.context = collection
-                p.doCollection(collection, False)
+                p.do_collection(collection, False)
             self.context = bundle
-            p.doBundle(bundle, False)
+            p.do_bundle(bundle, False)
         self.context = archive
-        p.doArchive(archive, False)
-        self.reporter.endReporting()
+        p.do_archive(archive, False)
+        self.reporter.end_reporting()
+
+# was_converted

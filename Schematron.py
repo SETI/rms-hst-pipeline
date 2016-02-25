@@ -5,8 +5,8 @@ import sys
 import xml.dom.minidom
 
 xml = xml.dom.minidom.parse(sys.stdin)
-failedAsserts = xml.documentElement.getElementsByTagName('svrl:failed-assert')
-if len(failedAsserts) > 0:
+failed_asserts = xml.documentElement.getElementsByTagName('svrl:failed-assert')
+if len(failed_asserts) > 0:
     print xml.toprettyxml(indent='  ', newl='\n', encoding='utf-8')
     exit(1)
 else:

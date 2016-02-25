@@ -6,7 +6,7 @@ import Pass
 import Validations
 
 
-def _addKeyPairToSetDict(dict, k, v):
+def _add_key_pair_to_set_dict(dict, k, v):
     if k not in dict:
         dict[k] = set()
     dict[k].add(v)
@@ -15,32 +15,34 @@ def _addKeyPairToSetDict(dict, k, v):
 class ProjectIdPass(Pass.NullPass):
     def __init__(self):
         # initialize your tables
-        self.bundleProposalId = None
-        self.numToCharDict = {}
-        self.charToNumDict = {}
+        self.bundle_proposal_id = None
+        self.num_to_char_dict = {}
+        self.char_to_num_dict = {}
         super(ProjectIdPass, self).__init__()
 
-    def doBundle(self, bundle, before):
+    def do_bundle(self, bundle, before):
         if before:
-            self.bundleProposalId = bundle.proposalId()
+            self.bundle_proposal_id = bundle.proposal_id()
         else:
-            self.bundleProposalId = None
+            self.bundle_proposal_id = None
 
-    def doProductFile(self, file):
-        hstFilename = HstFilename.HstFilename(file.basename)
-        hstProposalId = hstFilename.hstInternalProposalId()
+    def do_product_file(self, file):
+        hst_filename = HstFilename.HstFilename(file.basename)
+        hst_proposal_id = hst_filename.hst_internal_proposal_id()
         try:
-            proposId = str(pyfits.getval(file.full_filepath(), 'PROPOSID'))
+            proposid = str(pyfits.getval(file.full_filepath(), 'PROPOSID'))
         except IOError:
-            proposId = 'IOError'
+            proposid = 'IOError'
         except KeyError:
-            proposId = 'KeyError'
-        _addKeyPairToSetDict(self.numToCharDict, proposId, hstProposalId)
-        _addKeyPairToSetDict(self.charToNumDict, hstProposalId, proposId)
+            proposid = 'KeyError'
+        _add_key_pair_to_set_dict(self.num_to_char_dict,
+                                  proposid, hst_proposal_id)
+        _add_key_pair_to_set_dict(self.char_to_num_dict,
+                                  hst_proposal_id, proposid)
 
     def dump(self):
-        print repr(self.numToCharDict)
-        print repr(self.charToNumDict)
+        print repr(self.num_to_char_dict)
+        print repr(self.char_to_num_dict)
 
 
 def runPass():
@@ -54,3 +56,5 @@ def runPass():
 
 if __name__ == '__main__':
     runPass()
+
+# was_converted

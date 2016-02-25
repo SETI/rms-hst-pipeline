@@ -3,7 +3,7 @@
 # make this a one-to-one mapping.
 import unittest
 
-intToCharDict = {
+int_to_char_dict = {
     '10065': '8ta',
     '10095': '9gr',
     '10102': '90s',
@@ -320,7 +320,7 @@ intToCharDict = {
     '9991': '8sn',
  }
 
-charToIntDict = {
+char_to_int_dict = {
     '264': '5590',
     '293': '5392',
     '2av': '5624',
@@ -641,12 +641,16 @@ charToIntDict = {
 
 
 class TestIdTables2(unittest.TestCase):
-    def testIdTables2(self):
+    def test_IdTables2(self):
         # Test that the tables are one-to-one
-        intToCharDictInverse = {v: k for k, v in intToCharDict.iteritems()}
-        self.assertEqual(charToIntDict, intToCharDictInverse)
-        charToIntDictInverse = {v: k for k, v in charToIntDict.iteritems()}
-        self.assertEqual(intToCharDict, charToIntDictInverse)
+        int_to_char_dict_inverse = {v: k for k, v
+                                    in int_to_char_dict.iteritems()}
+        self.assertEqual(char_to_int_dict, int_to_char_dict_inverse)
+        char_to_int_dict_inverse = {v: k for k, v
+                                    in char_to_int_dict.iteritems()}
+        self.assertEqual(int_to_char_dict, char_to_int_dict_inverse)
 
 if __name__ == '__main__':
     unittest.main()
+
+# was_converted

@@ -10,155 +10,157 @@ import Pass
 
 class CountFilesPass(Pass.NullPass):
     def __init__(self):
-        self.fileCount = None
+        self.file_count = None
         super(CountFilesPass, self).__init__()
 
-    def doArchive(self, archive, before):
+    def do_archive(self, archive, before):
         if before:
-            self.fileCount = 0
+            self.file_count = 0
         else:
-            print >> sys.stderr, 'Saw %d files.' % self.fileCount
-            self.fileCount = None
+            print >> sys.stderr, 'Saw %d files.' % self.file_count
+            self.file_count = None
 
-    def doProductFile(self, file):
-        self.fileCount += 1
-        if self.fileCount % 200 == 0:
-            print >> sys.stderr, 'Saw %d files.' % self.fileCount
+    def do_product_file(self, file):
+        self.file_count += 1
+        if self.file_count % 200 == 0:
+            print >> sys.stderr, 'Saw %d files.' % self.file_count
 
 
 class ProductFilesHaveCollectionSuffix(Pass.NullPass):
     def __init__(self):
-        self.collectionSuffix = None
+        self.collection_suffix = None
         super(ProductFilesHaveCollectionSuffix, self).__init__()
 
-    def doCollection(self, collection, before):
+    def do_collection(self, collection, before):
         if before:
-            self.collectionSuffix = collection.suffix()
+            self.collection_suffix = collection.suffix()
         else:
-            self.collectionSuffix = None
+            self.collection_suffix = None
 
-    def doProductFile(self, file):
+    def do_product_file(self, file):
         # get file suffix
-        fileSuffix = HstFilename.HstFilename(file.basename).suffix()
-        self.assertEquals(self.collectionSuffix, fileSuffix,
-                          'Unexpected suffix for file %r' % file)
+        file_suffix = HstFilename.HstFilename(file.basename).suffix()
+        self.assert_equals(self.collection_suffix, file_suffix,
+                           'Unexpected suffix for file %r' % file)
 
 
 class ProductFilesHaveBundleProposalId(Pass.NullPass):
     def __init__(self):
-        self.bundleProposalId = None
+        self.bundle_proposal_id = None
         super(ProductFilesHaveBundleProposalId, self).__init__()
 
-    def doBundle(self, bundle, before):
+    def do_bundle(self, bundle, before):
         if before:
-            self.bundleProposalId = bundle.proposal_id()
+            self.bundle_proposal_id = bundle.proposal_id()
         else:
-            self.bundleProposalId = None
+            self.bundle_proposal_id = None
 
-    def doProductFile(self, file):
+    def do_product_file(self, file):
         try:
-            proposId = pyfits.getval(file.full_filepath(), 'PROPOSID')
+            proposid = pyfits.getval(file.full_filepath(), 'PROPOSID')
         except IOError as e:
             # We know that much (all?) of the contents of hst_00000
             # are there due to IOErrors, so let's not report them.
             # Report others, though.
-            if self.bundleProposalId != 0:
+            if self.bundle_proposal_id != 0:
                 self.report('IOError %s reading file %s of product %s' %
                             (e, file, file.component))
-            proposId = None
+            proposid = None
         except KeyError:
-            proposId = None
+            proposid = None
 
-        # if it exists, ensure it matches the bundleProposalId
-        if proposId is not None:
-            self.assertEquals(self.bundleProposalId, proposId)
+        # if it exists, ensure it matches the bundle_proposal_id
+        if proposid is not None:
+            self.assert_equals(self.bundle_proposal_id, proposid)
 
 
 class ProductFilesHaveProductVisit(Pass.NullPass):
     def __init__(self):
-        self.productVisit = None
+        self.product_visit = None
         super(ProductFilesHaveProductVisit, self).__init__()
 
-    def doProduct(self, product, before):
+    def do_product(self, product, before):
         if before:
-            self.productVisit = product.visit()
+            self.product_visit = product.visit()
         else:
-            self.productVisit = None
+            self.product_visit = None
 
-    def doProductFile(self, file):
+    def do_product_file(self, file):
         hstFile = HstFilename.HstFilename(file.full_filepath())
-        self.assertEquals(self.productVisit, hstFile.visit(),
-                          'Unexpected visit value for file %r' % file)
+        self.assert_equals(self.product_visit, hstFile.visit(),
+                           'Unexpected visit value for file %r' % file)
 
 
 class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
     def __init__(self):
-        self.hstInternalProposalIds = None
-        self.bundleProposalId = None
+        self.hst_internal_proposal_ids = None
+        self.bundle_proposal_id = None
         super(BundleContainsOneSingleHstInternalProposalId, self).__init__()
 
-    def doProductFile(self, file):
-        hstFile = HstFilename.HstFilename(file.full_filepath())
-        self.hstInternalProposalIds.add(hstFile.hstInternalProposalId())
+    def do_product_file(self, file):
+        hst_file = HstFilename.HstFilename(file.full_filepath())
+        self.hst_internal_proposal_ids.add(hst_file.hst_internal_proposal_id())
 
-    def doBundle(self, bundle, before):
+    def do_bundle(self, bundle, before):
         if before:
-            self.bundleProposalId = bundle.proposal_id()
-            self.hstInternalProposalIds = set()
+            self.bundle_proposal_id = bundle.proposal_id()
+            self.hst_internal_proposal_ids = set()
         else:
             # TODO It seems that hst_00000 is a grab bag of
             # lost files.  This needs to be fixed.
             # Otherwise...
-            if self.bundleProposalId != 0:
+            if self.bundle_proposal_id != 0:
                 # Assert that for any bundle, all of its
                 # files belong to the same project, using the
                 # HST internal proposal ID codes.
-                self.assertEquals(1, len(self.hstInternalProposalIds),
-                                  'In bundle %s, saw HST proposal ids %s.' %
-                                  (bundle, list(self.hstInternalProposalIds)))
+                self.assert_equals(1, len(self.hst_internal_proposal_ids),
+                                   'In bundle %s, saw HST proposal ids %s.' %
+                                   (bundle,
+                                    list(self.hst_internal_proposal_ids)))
 
-            self.hstInternalProposalIds = None
-            self.bundleProposalId = None
+            self.hst_internal_proposal_ids = None
+            self.bundle_proposal_id = None
 
 
 class BundleContainsBundleXml(Pass.LimitedReportingPass):
     def __init__(self):
-        self.sawBundleXml = None
+        self.saw_bundle_xml = None
         super(BundleContainsBundleXml, self).__init__()
 
-    def doBundle(self, bundle, before):
+    def do_bundle(self, bundle, before):
         if before:
-            self.sawBundleXml = False
+            self.saw_bundle_xml = False
         else:
-            if not self.sawBundleXml:
+            if not self.saw_bundle_xml:
                 self.report('Bundle missing bundle.xml file.')
 
-    def doBundleFile(self, file):
+    def do_bundle_file(self, file):
         if file.basename() == 'bundle.xml':
-            self.sawBundleXml = True
+            self.saw_bundle_xml = True
 
 
 class CollectionContainsCollectionXml(Pass.LimitedReportingPass):
     def __init__(self):
-        self.sawCollectionXml = None
+        self.saw_collection_xml = None
         super(CollectionContainsCollectionXml, self).__init__()
 
-    def doCollection(self, collection, before):
+    def do_collection(self, collection, before):
         if before:
-            self.sawCollectionXml = False
-            self.collectionInvName = 'collection_%s_inventory.tab' % \
+            self.saw_collection_xml = False
+            self.collection_inv_name = 'collection_%s_inventory.tab' % \
                 collection.suffix()
-            self.collectionXmlName = 'collection_%s.xml' % collection.suffix()
+            self.collection_xml_name = 'collection_%s.xml' % \
+                collection.suffix()
         else:
-            if not self.sawCollectionXml:
+            if not self.saw_collection_xml:
                 self.report('Collection missing %s file.' %
-                            self.collectionXmlName)
+                            self.collection_xml_name)
 
-    def doCollectionFile(self, file):
-        if file.basename() == self.collectionXmlName:
-            self.sawCollectionXml = True
-        elif file.basename() == self.collectionInventoryName:
-            self.sawCollectionInv = True
+    def do_collection_file(self, file):
+        if file.basename() == self.collection_xml_name:
+            self.saw_collection_xml = True
+        elif file.basename() == self.collection_inv_name:
+            self.saw_collection_inv = True
 
 std_validation = Pass.CompositePass([
         CountFilesPass(),
@@ -169,3 +171,5 @@ std_validation = Pass.CompositePass([
         # BundleContainsBundleXml(),
         # CollectionContainsCollectionXml(),
         ])
+
+# was_converted
