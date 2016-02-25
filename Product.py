@@ -2,7 +2,8 @@ import os.path
 import re
 
 import ArchiveComponent
-
+import Bundle
+import Collection
 
 class Product(ArchiveComponent.ArchiveComponent):
     """A PDS4 Product."""
@@ -34,8 +35,8 @@ class Product(ArchiveComponent.ArchiveComponent):
 
     def collection(self):
         """Return the collection this product belongs to."""
-        return Collection(self.archive, self.lid.parentLID())
+        return Collection.Collection(self.archive, self.lid.parentLID())
 
     def bundle(self):
         """Return the bundle this product belongs to."""
-        return Bundle(self.archive, self.lid.parentLID().parentLID())
+        return Bundle.Bundle(self.archive, self.lid.parentLID().parentLID())

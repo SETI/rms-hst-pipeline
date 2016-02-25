@@ -75,15 +75,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         self.setText(referenceType, self.info.internalReferenceType())
 
         # At XPath '/Product_Observational/Observation_Area/Observing_System'
-        observingSystemComponent = \
-            self.createChild(observingSystem, 'Observing_System_Component')
-
-        # At XPath
-        # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component'
-        name, type = self.createChildren(observingSystemComponent,
-                                         ['name', 'type'])
-        self.setText(name, self.info.observingSystemComponentName())
-        self.setText(type, self.info.observingSystemComponentType())
+        self.createObservingSystemXml(observingSystem)
 
         # At XPath
         # '/Product_Observational/Observation_Area/Target_Identification'
@@ -97,21 +89,80 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
             DummyProductFileLabelMaker.DummyProductFileLabelMaker(
                 self.document, root, archiveFile)
 
+    def createObservingSystemXml(self, observingSystem):
+        # At XPath
+        # '/Product_Observational/Observation_Area/Observing_System/'
+        instrument = self.component.collection().instrument()
+        if instrument == 'acs':
+            name, observingSystemComponentHST, observingSystemComponentACS = \
+                self.createChildren(observingSystem,
+                                    ['name',
+                                     'Observing_System_Component',
+                                     'Observing_System_Component'])
+            self.setText(name, 'Hubble Space Telescope Advanced Camera for Surveys')
+
+            # At XPath
+            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[0]'
+            name, type, internalReference = \
+                self.createChildren(observingSystemComponentHST,
+                                    ['name', 'type', 'Internal_Reference'])
+            self.setText(name, 'Hubble Space Telescope')
+            self.setText(type, 'Spacecraft')
+
+            # At XPath
+            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[0]/Internal_Reference'
+            lidReference, referenceType = \
+                self.createChildren(internalReference,
+                                    ['lid_reference', 'reference_type'])
+            self.setText(lidReference,
+                         'urn:nasa:pds:context:investigation:mission.hst')
+            self.setText(referenceType, 'is_instrument_host')
+
+            # At XPath
+            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[1]'
+            name, type, internalReference = \
+                self.createChildren(observingSystemComponentACS,
+                                    ['name', 'type', 'Internal_Reference'])
+            self.setText(name, 'Advanced Camera for Surveys')
+            self.setText(type, 'Instrument')
+
+            # At XPath
+            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[1]/Internal_Reference'
+            lidReference, referenceType = \
+                self.createChildren(internalReference,
+                                    ['lid_reference', 'reference_type'])
+            self.setText(lidReference,
+                         'urn:nasa:pds:context:investigation:mission.hst_acs')
+            self.setText(referenceType, 'is_instrument')
+
+        else:  # default path
+
+            # At XPath
+            # '/Product_Observational/Observation_Area/Observing_System'
+            observingSystemComponent = \
+                self.createChild(observingSystem, 'Observing_System_Component')
+
+            # At XPath
+            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component'
+            name, type = self.createChildren(observingSystemComponent,
+                                             ['name', 'type'])
+            self.setText(name, self.info.observingSystemComponentName())
+            self.setText(type, self.info.observingSystemComponentType())
+
 
 def testSynthesis():
     a = FileArchives.getAnyArchive()
-    productCount = 0
+    fp = '/tmp/foo.xml'
     for b in a.bundles():
-        if b.proposalId() != 0:
-            for c in b.collections():
-                for p in c.products():
-                    productCount += 1
-                    fp = '/tmp/foo.xml'
-                    lm = ProductLabelMaker(p)
-                    lm.createDefaultXmlFile(fp)
-                    if not (LabelMaker.xmlSchemaCheck(fp) and
-                            LabelMaker.schematronCheck(fp)):
-                        sys.exit(1)
+        for c in b.collections():
+            for p in c.products():
+                print p
+                lm = ProductLabelMaker(p)
+                lm.createDefaultXmlFile(fp)
+                if not (LabelMaker.xmlSchemaCheck(fp) and
+                        LabelMaker.schematronCheck(fp)):
+                    print '%s did not validate; aborting' % p
+                    sys.exit(1)
 
 if __name__ == '__main__':
     testSynthesis()
