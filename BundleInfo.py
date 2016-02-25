@@ -22,17 +22,19 @@ class BundleInfo(Info.Info):
         return ('This collection contains raw images ' +
                 'obtained from HST Observing Program %s.') % prod_id
 
-    def citationInformationDescription(self):
+    def citation_information_description(self):
         """
         Return the text appearing at XPath
         '/Product_Bundle/Identification_Area/CitationInformation/description'.
         """
-        return self.PLACEHOLDER('citationInformationDescription')
+        return self.PLACEHOLDER('citation_information_description')
 
-    def citationInformationPublicationYear(self):
+    def citation_information_publication_year(self):
         """
         Return the text appearing at XPath
         '/Product_Bundle/Identification_Area/CitationInformation/publication_year'.
         """
-        return self.CHEATING_PLACEHOLDER('2000',
-                                         'citationInformationPublicationYear')
+        return self.CHEATING_PLACEHOLDER(
+            '2000', 'citation_information_publication_year')
+
+# was_converted

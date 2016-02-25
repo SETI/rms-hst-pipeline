@@ -20,66 +20,69 @@ class ProductInfo(Info.Info):
         """
         return self.PLACEHOLDER('title')
 
-    def startDateTime(self):
+    def start_date_time(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Time_Coordinates/start_date_time'.
         """
-        return self.CHEATING_PLACEHOLDER('2000-01-02Z', 'startDateTime')
+        return self.CHEATING_PLACEHOLDER('2000-01-02Z', 'start_date_time')
 
-    def stopDateTime(self):
+    def stop_date_time(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Time_Coordinates/stop_date_time'.
         """
-        return self.CHEATING_PLACEHOLDER('2000-01-02Z', 'stopDateTime')
+        return self.CHEATING_PLACEHOLDER('2000-01-02Z', 'stop_date_time')
 
-    def investigationAreaName(self):
+    def investigation_area_name(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Investigation_Area/name'.
         """
-        return self.PLACEHOLDER('investigationAreaName')
+        return self.PLACEHOLDER('investigation_area_name')
 
-    def investigationAreaType(self):
+    def investigation_area_type(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Investigation_Area/type'.
         """
-        return self.CHEATING_PLACEHOLDER('Mission', 'investigationAreaType')
+        return self.CHEATING_PLACEHOLDER('Mission', 'investigation_area_type')
 
-    def internalReferenceType(self):
+    def internal_reference_type(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Investigation_Area/Internal_Reference/reference_type'.
         """
         return 'data_to_investigation'
 
-    def observingSystemComponentName(self):
+    def observing_system_component_name(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component/name'.
         """
-        return self.PLACEHOLDER('observingSystemComponentName')
+        return self.PLACEHOLDER('observing_system_component_name')
 
-    def observingSystemComponentType(self):
+    def observing_system_component_type(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component/type'.
         """
         return self.CHEATING_PLACEHOLDER('Instrument',
-                                         'observingSystemComponentType')
+                                         'observing_system_component_type')
 
-    def targetIdentificationName(self):
+    def target_identification_name(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Target_Identification/name'.
         """
-        return self.PLACEHOLDER('targetIdentificationName')
+        return self.PLACEHOLDER('target_identification_name')
 
-    def targetIdentificationType(self):
+    def target_identification_type(self):
         """
         Return the text appearing at XPath
         '/Product_Observational/Observation_Area/Target_Identification/type'.
         """
-        return self.CHEATING_PLACEHOLDER('Planet', 'targetIdentificationType')
+        return self.CHEATING_PLACEHOLDER('Planet',
+                                         'target_identification_type')
+
+# was_converted

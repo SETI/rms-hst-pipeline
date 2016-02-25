@@ -57,7 +57,7 @@ class ProductFilesHaveBundleProposalId(Pass.NullPass):
 
     def doProductFile(self, file):
         try:
-            proposId = pyfits.getval(file.fullFilepath(), 'PROPOSID')
+            proposId = pyfits.getval(file.full_filepath(), 'PROPOSID')
         except IOError as e:
             # We know that much (all?) of the contents of hst_00000
             # are there due to IOErrors, so let's not report them.
@@ -86,7 +86,7 @@ class ProductFilesHaveProductVisit(Pass.NullPass):
             self.productVisit = None
 
     def doProductFile(self, file):
-        hstFile = HstFilename.HstFilename(file.fullFilepath())
+        hstFile = HstFilename.HstFilename(file.full_filepath())
         self.assertEquals(self.productVisit, hstFile.visit(),
                           'Unexpected visit value for file %r' % file)
 
@@ -98,7 +98,7 @@ class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
         super(BundleContainsOneSingleHstInternalProposalId, self).__init__()
 
     def doProductFile(self, file):
-        hstFile = HstFilename.HstFilename(file.fullFilepath())
+        hstFile = HstFilename.HstFilename(file.full_filepath())
         self.hstInternalProposalIds.add(hstFile.hstInternalProposalId())
 
     def doBundle(self, bundle, before):

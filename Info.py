@@ -4,19 +4,19 @@ class Info(object):
     ArchiveFile, providing information to fill in label fields for it.
     """
 
-    def pdsNamespaceUrl(self):
+    def pds_namespace_url(self):
         """Return the PDS namespace URL"""
         return 'http://pds.nasa.gov/pds4/pds/v1'
 
-    def pds4SchemaUrl(self):
+    def pds4_schema_url(self):
         """Return the PDS Schema location URL"""
         return 'http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.xsd'
 
-    def xsiNamespaceUrl(self):
+    def xsi_namespace_url(self):
         """Return the XMLSchema instance namespace URL"""
         return 'http://www.w3.org/2001/XMLSchema-instance'
 
-    def xmlModelPdsAttributes(self):
+    def xml_model_pds_attributes(self):
         """Return the attributes for PDS4_PDS_1500.sch"""
         # TODO That docstring is not informative enough
         return """href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.sch\"
@@ -25,10 +25,10 @@ schematypens=\"http://purl.oclc.org/dsdl/schematron\""""
     def fits(self):
         return 'FITS 3.0'
 
-    def informationModelVersion(self):
+    def information_model_version(self):
         return '1.5.0.0'
 
-    def versionID(self):
+    def version_id(self):
         return '1.0'
 
     def PLACEHOLDER(self, tag):
@@ -62,3 +62,5 @@ schematypens=\"http://purl.oclc.org/dsdl/schematron\""""
             return cheat
         else:
             return self.PLACEHOLDER(tag)
+
+# was_converted

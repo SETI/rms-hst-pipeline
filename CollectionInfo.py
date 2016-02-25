@@ -18,22 +18,25 @@ class CollectionInfo(Info.Info):
         Return the text appearing at XPath
         '/Product_Collection/Identification_Area/title'.
         """
-        imageTag = self.collection.suffix().upper() + ' images'
-        prodId = str(self.collection.bundle().proposal_id())
-        return ('This collection contains the raw %s ' +
-                'obtained from HST Observing Program %s.') % (imageTag, prodId)
+        image_tag = self.collection.suffix().upper() + ' images'
+        prod_id = str(self.collection.bundle().proposal_id())
+        template = 'This collection contains the raw %s ' + \
+            'obtained from HST Observing Program %s.'
+        return template % (image_tag, prod_id)
 
-    def citationInformationDescription(self):
+    def citation_information_description(self):
         """
         Return the text appearing at XPath
         '/Product_Collection/Identification_Area/CitationInformation/description'.
         """
-        return self.PLACEHOLDER('citationInformationDescription')
+        return self.PLACEHOLDER('citation_information_description')
 
-    def citationInformationPublicationYear(self):
+    def citation_information_publication_year(self):
         """
         Return the text appearing at XPath
         '/Product_Collection/Identification_Area/CitationInformation/publication_year'.
         """
-        return self.CHEATING_PLACEHOLDER('2000',
-                                         'citationInformationPublicationYear')
+        return self.CHEATING_PLACEHOLDER(
+            '2000', 'citation_information_publication_year')
+
+# was_converted

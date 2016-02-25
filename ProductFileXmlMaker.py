@@ -25,24 +25,24 @@ class ProductFileXmlMaker(XmlUtils.XmlUtils):
         self.archiveFile = archiveFile
 
         super(ProductFileXmlMaker, self).__init__(document)
-        self.createDefaultXml()
+        self.create_default_xml()
 
-    def createDefaultXml(self):
+    def create_default_xml(self):
         """Create the XML nodes for the product file."""
 
         # At XPath '/Product_Observational/File_Area_Observational'
-        fileAreaObservational = self.createChild(self.root,
-                                                 'File_Area_Observational')
+        file_area_observational = self.create_child(self.root,
+                                                    'File_Area_Observational')
 
         # At XPath '/Product_Observational/File_Area_Observational/File'
-        file = self.createChild(fileAreaObservational, 'File')
-        fileName = self.createChild(file, 'file_name')
-        self.setText(fileName, self.archiveFile.basename)
+        file = self.create_child(file_area_observational, 'File')
+        fileName = self.create_child(file, 'file_name')
+        self.set_text(fileName, self.archiveFile.basename)
 
         # At XPath '/Product_Observational/File_Area_Observational'
-        self.createFileDataXml(fileAreaObservational)
+        self.createFileDataXml(file_area_observational)
 
     @abc.abstractmethod
-    def createFileDataXml(self, fileAreaObservational):
+    def createFileDataXml(self, file_area_observational):
         """Create the XML nodes describing the product file's data."""
         pass

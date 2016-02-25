@@ -10,25 +10,25 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
         super(BundleLabelMaker, self).__init__(bundle,
                                                BundleInfo.BundleInfo(bundle))
 
-    def defaultXmlName(self):
+    def default_xml_name(self):
         return 'bundle.xml'
 
-    def createDefaultXml(self):
+    def create_default_xml(self):
         bundle = self.component
-        root = self.createChild(self.document, 'Product_Bundle')
+        root = self.create_child(self.document, 'Product_Bundle')
 
         # At XPath '/Product_Bundle'
-        PDS = self.info.pdsNamespaceUrl()
+        PDS = self.info.pds_namespace_url()
         root.setAttribute('xmlns', PDS)
         root.setAttribute('xmlns:pds', PDS)
 
         identificationArea, bundle_ = \
-            self.createChildren(root, ['Identification_Area', 'Bundle'])
+            self.create_children(root, ['Identification_Area', 'Bundle'])
 
         # At XPath '/Product_Bundle/Identification_Area'
-        logicalIdentifier, versionId, title, informationModelVersion, \
+        logicalIdentifier, versionId, title, information_model_version, \
             productClass, citationInformation = \
-            self.createChildren(identificationArea, [
+            self.create_children(identificationArea, [
                 'logical_identifier',
                 'version_id',
                 'title',
@@ -36,55 +36,55 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
                 'product_class',
                 'Citation_Information'])
 
-        self.setText(logicalIdentifier, str(bundle.lid))
-        self.setText(versionId, self.info.versionID())
-        self.setText(title, self.info.title())
-        self.setText(informationModelVersion,
-                     self.info.informationModelVersion())
-        self.setText(productClass, 'Product_Bundle')
+        self.set_text(logicalIdentifier, str(bundle.lid))
+        self.set_text(versionId, self.info.version_id())
+        self.set_text(title, self.info.title())
+        self.set_text(information_model_version,
+                      self.info.information_model_version())
+        self.set_text(productClass, 'Product_Bundle')
 
         # At XPath '/Product_Bundle/Identification_Area/Citation_Information'
         publicationYear, description = \
-            self.createChildren(citationInformation,
-                                ['publication_year', 'description'])
+            self.create_children(citationInformation,
+                                 ['publication_year', 'description'])
 
-        self.setText(publicationYear,
-                     self.info.citationInformationPublicationYear())
-        self.setText(description, self.info.citationInformationDescription())
+        self.set_text(publicationYear,
+                      self.info.citation_information_publication_year())
+        self.set_text(description, self.info.citation_information_description())
 
         # At XPath '/Product_Bundle/Bundle'
-        bundleType = self.createChild(bundle_, 'bundle_type')
-        self.setText(bundleType, 'Archive')
+        bundleType = self.create_child(bundle_, 'bundle_type')
+        self.set_text(bundleType, 'Archive')
 
         for collection in bundle.collections():
             # At XPath '/Product_Bundle/Bundle_Member_Entry'
-            bundleMemberEntry = self.createChild(root, 'Bundle_Member_Entry')
+            bundleMemberEntry = self.create_child(root, 'Bundle_Member_Entry')
             lidReference, memberStatus, referenceType = \
-                self.createChildren(bundleMemberEntry, [
+                self.create_children(bundleMemberEntry, [
                     'lid_reference',
                     'member_status',
                     'reference_type'])
-            self.setText(lidReference, str(collection.lid))
-            self.setText(memberStatus, 'Primary')
-            self.setText(referenceType, 'bundle_has_data_collection')
+            self.set_text(lidReference, str(collection.lid))
+            self.set_text(memberStatus, 'Primary')
+            self.set_text(referenceType, 'bundle_has_data_collection')
 
 
-def testSynthesis():
+def test_synthesis():
     # Create sample bundle.xml files for the non-hst_00000 bundles and
     # test them against the XML schema.
     a = FileArchives.getAnyArchive()
     for b in a.bundles():
         if b.proposal_id() != 0:
             lm = BundleLabelMaker(b)
-            lm.createDefaultXmlFile('bundle.xml')
-            if LabelMaker.xmlSchemaCheck('bundle.xml'):
+            lm.create_default_xml_file('bundle.xml')
+            if LabelMaker.xml_schema_check('bundle.xml'):
                 print ('Yay: bundle.xml for %s ' +
                        'conforms to the XML schema.') % str(b)
             else:
                 print ('Boo: bundle.xml for %s ' +
                        'does not conform to the XML schema.') % str(b)
                 return
-            if LabelMaker.schematronCheck('bundle.xml'):
+            if LabelMaker.schematron_check('bundle.xml'):
                 print ('Yay: bundle.xml for %s ' +
                        'conforms to the Schematron schema.') % str(b)
             else:
@@ -93,4 +93,4 @@ def testSynthesis():
                 return
 
 if __name__ == '__main__':
-    testSynthesis()
+    test_synthesis()

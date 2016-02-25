@@ -29,7 +29,9 @@ class ArchiveFile(object):
     def __repr__(self):
         return 'ArchiveFile(%r, %r)' % (self.basename, self.component)
 
-    def fullFilepath(self):
+    def full_filepath(self):
         """Return the full, absolute filepath to the file."""
         return os.path.join(self.component.directory_filepath(),
                             self.basename)
+
+# was_converted

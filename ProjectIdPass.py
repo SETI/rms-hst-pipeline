@@ -30,7 +30,7 @@ class ProjectIdPass(Pass.NullPass):
         hstFilename = HstFilename.HstFilename(file.basename)
         hstProposalId = hstFilename.hstInternalProposalId()
         try:
-            proposId = str(pyfits.getval(file.fullFilepath(), 'PROPOSID'))
+            proposId = str(pyfits.getval(file.full_filepath(), 'PROPOSID'))
         except IOError:
             proposId = 'IOError'
         except KeyError:
@@ -51,4 +51,6 @@ def runPass():
                                               p]))
     p.dump()
 
-runPass()
+
+if __name__ == '__main__':
+    runPass()
