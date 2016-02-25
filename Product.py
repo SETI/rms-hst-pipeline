@@ -41,5 +41,3 @@ class Product(ArchiveComponent.ArchiveComponent):
     def bundle(self):
         """Return the bundle this product belongs to."""
         return Bundle.Bundle(self.archive, self.lid.parent_lid().parent_lid())
-
-# was_converted

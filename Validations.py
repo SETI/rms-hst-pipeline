@@ -171,5 +171,3 @@ std_validation = Pass.CompositePass([
         # BundleContainsBundleXml(),
         # CollectionContainsCollectionXml(),
         ])
-
-# was_converted

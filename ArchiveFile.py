@@ -33,5 +33,3 @@ class ArchiveFile(object):
         """Return the full, absolute filepath to the file."""
         return os.path.join(self.component.directory_filepath(),
                             self.basename)
-
-# was_converted

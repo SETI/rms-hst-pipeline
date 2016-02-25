@@ -45,5 +45,3 @@ class ArchiveComponent(object):
                 file = os.path.join(dir, basename)
                 if (os.path.isfile(file)):
                     yield ArchiveFile.ArchiveFile(self, basename)
-
-# was_converted

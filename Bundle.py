@@ -48,5 +48,3 @@ class Bundle(ArchiveComponent.ArchiveComponent):
         """
         return int(re.match(Bundle.DIRECTORY_PATTERN,
                             self.lid.bundle_id).group(1))
-
-# was_converted

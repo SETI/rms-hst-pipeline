@@ -278,5 +278,3 @@ class PassRunner(object):
         self.context = archive
         p.do_archive(archive, False)
         self.reporter.end_reporting()
-
-# was_converted

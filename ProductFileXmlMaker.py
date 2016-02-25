@@ -46,5 +46,3 @@ class ProductFileXmlMaker(XmlUtils.XmlUtils):
     def create_file_data_xml(self, file_area_observational):
         """Create the XML nodes describing the product file's data."""
         pass
-
-# was_converted

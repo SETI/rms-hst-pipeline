@@ -43,5 +43,3 @@ class XmlUtils(object):
         print self.document.toprettyxml(indent='  ',
                                         newl='\n',
                                         encoding='utf-8')
-
-# was_converted

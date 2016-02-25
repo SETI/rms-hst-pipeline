@@ -62,5 +62,3 @@ schematypens=\"http://purl.oclc.org/dsdl/schematron\""""
             return cheat
         else:
             return self.PLACEHOLDER(tag)
-
-# was_converted

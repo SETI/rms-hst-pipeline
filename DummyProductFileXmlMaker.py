@@ -62,5 +62,3 @@ class DummyProductFileXmlMaker(ProductFileXmlMaker.ProductFileXmlMaker):
         self.set_text(axis_name, 'Axis Joe')  # TODO Wrong
         self.set_text(elements, '1')  # TODO Wrong
         self.set_text(sequence_number, '1')  # TODO Wrong
-
-# was_converted

@@ -91,5 +91,3 @@ def schematron_check(filepath):
     exit_code = os.system(cmd_template %
                           (filepath, './xml/PDS4_PDS_1500.sch.xml'))
     return exit_code == 0
-
-# was_converted

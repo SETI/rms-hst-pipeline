@@ -690,5 +690,3 @@ char_to_int_dict = {
     'ct9': set(['14064', 'KeyError']),
     'cwy': set(['14334', 'KeyError']),
     }
-
-# was_converted

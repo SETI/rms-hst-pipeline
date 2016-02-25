@@ -28,5 +28,3 @@ def get_any_archive():
         return get_full_archive()
     except:
         return get_mini_archive()
-
-# was_converted

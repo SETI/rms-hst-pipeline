@@ -38,5 +38,3 @@ class CollectionInfo(Info.Info):
         """
         return self.CHEATING_PLACEHOLDER(
             '2000', 'citation_information_publication_year')
-
-# was_converted

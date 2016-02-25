@@ -69,5 +69,3 @@ class CsvReporter(Reporter):
         self.file.close()
         self.csv_writer = None
         self.file = None
-
-# was_converted

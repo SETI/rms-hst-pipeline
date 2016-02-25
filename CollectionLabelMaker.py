@@ -174,5 +174,3 @@ def test_synthesis():
 
 if __name__ == '__main__':
     test_synthesis()
-
-# was_converted

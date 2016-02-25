@@ -56,5 +56,3 @@ class Collection(ArchiveComponent.ArchiveComponent):
     def bundle(self):
         """Return the bundle this collection belongs to."""
         return Bundle.Bundle(self.archive, self.lid.parent_lid())
-
-# was_converted

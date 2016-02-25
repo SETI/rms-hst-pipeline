@@ -84,5 +84,3 @@ class ProductInfo(Info.Info):
         """
         return self.CHEATING_PLACEHOLDER('Planet',
                                          'target_identification_type')
-
-# was_converted

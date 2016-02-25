@@ -56,5 +56,3 @@ def runPass():
 
 if __name__ == '__main__':
     runPass()
-
-# was_converted
