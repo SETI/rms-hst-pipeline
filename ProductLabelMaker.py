@@ -3,6 +3,7 @@ import tempfile
 
 import ArchiveFile
 import DummyProductFileXmlMaker
+import FitsProductFileXmlMaker
 import FileArchives
 import LabelMaker
 import ProductInfo
@@ -93,8 +94,12 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath '/Product_Observational'
         for archiveFile in product.files():
-            DummyProductFileXmlMaker.DummyProductFileXmlMaker(
-                self.document, root, archiveFile)
+            if False:
+                DummyProductFileXmlMaker.DummyProductFileXmlMaker(
+                    self.document, root, archiveFile)
+            else:
+                FitsProductFileXmlMaker.FitsProductFileXmlMaker(
+                    self.document, root, archiveFile)
 
     def createObserving_systemXml(self, observing_system):
         # At XPath
