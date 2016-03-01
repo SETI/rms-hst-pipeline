@@ -5,6 +5,7 @@ import ArchiveFile
 import DummyProductFileXmlMaker
 import FitsProductFileXmlMaker
 import FileArchives
+import InstrumentXmlMaker
 import LabelMaker
 import ProductInfo
 import Targets
@@ -56,11 +57,9 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         self.set_text(product_class, 'Product_Observational')
 
         # At XPath '/Product_Observational/Observation_Area'
-        time_coordinates, investigation_area, \
-            observing_system = \
+        time_coordinates, investigation_area = \
             self.create_children(observation_area, ['Time_Coordinates',
-                                                    'Investigation_Area',
-                                                    'Observing_System'])
+                                                    'Investigation_Area'])
 
         # At XPath '/Product_Observational/Observation_Area/Time_Coordinates'
         start_date_time, stop_date_time = \
@@ -82,8 +81,11 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
                                            'reference_type')
         self.set_text(reference_type, self.info.internal_reference_type())
 
-        # At XPath '/Product_Observational/Observation_Area/Observing_System'
-        self.create_observing_system_xml(observing_system)
+        # At XPath '/Product_Observational/Observation_Area'
+        instrument = self.component.collection().instrument()
+        InstrumentXmlMaker.InstrumentXmlMaker(self.document,
+                                              observation_area,
+                                              instrument)
 
         # At XPath '/Product_Observational'
         def runFPFXM(archiveFile):
@@ -109,10 +111,11 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
     def create_target_identification_xml(self,
                                          targname,
                                          observation_area):
+        # Move this back up
+        target_identification = self.create_child(observation_area,
+                                                  'Target_Identification')
         nameType = Targets.targname_to_target(targname)
         if nameType:
-            target_identification = self.create_child(observation_area,
-                                                      'Target_Identification')
             name, type, internal_reference = \
                 self.create_children(target_identification,
                                      ['name', 'type', 'Internal_Reference'])
@@ -125,69 +128,12 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
                           'urn:nasa:pds:context:target:%s.%s' %
                           (nameType[1].lower(), nameType[0].lower()))
             self.set_text(reference_type, 'data_to_target')
-
-    def create_observing_system_xml(self, observing_system):
-        # At XPath
-        # '/Product_Observational/Observation_Area/Observing_System/'
-        instrument = self.component.collection().instrument()
-        if instrument == 'acs':
-            name, observing_system_component_hst, \
-                observing_system_component_acs = \
-                self.create_children(observing_system,
-                                     ['name',
-                                      'Observing_System_Component',
-                                      'Observing_System_Component'])
-            self.set_text(name,
-                          'Hubble Space Telescope Advanced Camera for Surveys')
-
-            # At XPath
-            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[0]'
-            name, type, internal_reference = \
-                self.create_children(observing_system_component_hst,
-                                     ['name', 'type', 'Internal_Reference'])
-            self.set_text(name, 'Hubble Space Telescope')
-            self.set_text(type, 'Spacecraft')
-
-            # At XPath
-            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[0]/Internal_Reference'
-            lid_reference, reference_type = \
-                self.create_children(internal_reference,
-                                     ['lid_reference', 'reference_type'])
-            self.set_text(lid_reference,
-                          'urn:nasa:pds:context:investigation:mission.hst')
-            self.set_text(reference_type, 'is_instrument_host')
-
-            # At XPath
-            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[1]'
-            name, type, internal_reference = \
-                self.create_children(observing_system_component_acs,
-                                     ['name', 'type', 'Internal_Reference'])
-            self.set_text(name, 'Advanced Camera for Surveys')
-            self.set_text(type, 'Instrument')
-
-            # At XPath
-            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component[1]/Internal_Reference'
-            lid_reference, reference_type = \
-                self.create_children(internal_reference,
-                                     ['lid_reference', 'reference_type'])
-            self.set_text(lid_reference,
-                          'urn:nasa:pds:context:investigation:mission.hst_acs')
-            self.set_text(reference_type, 'is_instrument')
-
-        else:  # default path
-
-            # At XPath
-            # '/Product_Observational/Observation_Area/Observing_System'
-            observing_system_component = \
-                self.create_child(observing_system,
-                                  'Observing_System_Component')
-
-            # At XPath
-            # '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component'
-            name, type = self.create_children(observing_system_component,
-                                              ['name', 'type'])
-            self.set_text(name, self.info.observing_system_component_name())
-            self.set_text(type, self.info.observing_system_component_type())
+        else:
+            name, type = \
+                self.create_children(target_identification, ['name', 'type'])
+            self.set_text(name, self.info.unknown_target_identification_name())
+            self.set_text(type,
+                          self.info.unknown_target_identification_type())
 
 
 def test_synthesis():

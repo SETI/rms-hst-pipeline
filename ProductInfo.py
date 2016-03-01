@@ -69,3 +69,10 @@ class ProductInfo(Info.Info):
         """
         return self.CHEATING_PLACEHOLDER('Instrument',
                                          'observing_system_component_type')
+
+    def unknown_target_identification_name(self):
+        return self.PLACEHOLDER('unknown_target_identification_name')
+
+    def unknown_target_identification_type(self):
+        return self.CHEATING_PLACEHOLDER('Galaxy',
+                                         'unknown_target_identification_type')
