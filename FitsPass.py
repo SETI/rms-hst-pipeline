@@ -9,39 +9,38 @@ import pyfits
 
 import FileArchives
 import Pass
+import Targets
 
 
 class FitsPass(Pass.NullPass):
     def __init__(self):
-        self.fits_dict = None
-        self.fits_error = False
-        self.full_dict = {}
         super(Pass.NullPass, self).__init__()
-
-    def do_product(self, product, before):
-        if before:
-            self.fits_dict = collections.defaultdict(set)
-            self.fits_error = False
-        else:
-            if not self.fits_error:
-                self.full_dict[product.lid.lid] = dict(self.fits_dict)
-                # sys.exit(0)
 
     def do_product_file(self, file):
         try:
             fits = pyfits.open(file.full_filepath())
             header = fits[0].header
-            for k, v in header.iteritems():
-                self.fits_dict[k].add(v)
+            try:
+                targname = header['targname']
+                target = Targets.targname_to_target(targname)
+                if target:
+                    print 'In %s, target %s' % (file, target)
+                else:
+                    pass
+                    # print 'In %s, unknown target %s' % (file, targname)
+            except KeyError:
+                pass
+                # print 'No key TARGNAME'
             fits.close()
-        except Exception as e:
-            self.fits_error = True
-            # print 'Exception: %s' % e
+        except IOError as e:
+            # self.fits_error = True
+            # print 'Exception on %s: %s' % (file, e)
+            pass
 
 if __name__ == '__main__':
     a = FileArchives.get_mini_archive()
     f = FitsPass()
     r = Pass.PassRunner()
     r.run(a, f)
-    pp = pprint.PrettyPrinter(indent=4, width=50)
-    pp.pprint(f.full_dict)
+    # pp = pprint.PrettyPrinter(indent=4, width=50)
+    # pp.pprint(f.targ_dict)

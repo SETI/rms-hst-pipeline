@@ -69,10 +69,15 @@ class XmlFitsPass(FitsPass):
         super(XmlFitsPass, self).__init__()
         self.xml = xml
         self.file_area_observational = file_area_observational
+        self.targname = None
 
     def do_hdu(self, hdu, n, before):
         if before:
             self.hdu = hdu
+            try:
+                self.targname = hdu.header['targname']
+            except KeyError:
+                pass
         else:
             self.hdu = None
 
@@ -159,14 +164,15 @@ class FitsProductFileXmlMaker(ProductFileXmlMaker.ProductFileXmlMaker):
     """
 
     def __init__(self, document, root, archive_file):
-        # root = Product_Observational.
+        self.targname = None
         super(FitsProductFileXmlMaker, self).__init__(document,
                                                       root,
                                                       archive_file)
 
     def create_file_data_xml(self, file_area_observational):
-        runFitsPass(self.archive_file.full_filepath(),
-                    XmlFitsPass(self, file_area_observational))
+        xfp = XmlFitsPass(self, file_area_observational)
+        runFitsPass(self.archive_file.full_filepath(), xfp)
+        self.targname = xfp.targname
 
 
 def _createLabel():
@@ -174,7 +180,8 @@ def _createLabel():
         return LabelMaker.xml_schema_check(filepath) and \
             LabelMaker.schematron_check(filepath)
 
-    product_lid = LID.LID('urn:nasa:pds:hst_09059:data_acs_raw:visit_01')
+    # product_lid = LID.LID('urn:nasa:pds:hst_09059:data_acs_raw:visit_01')
+    product_lid = LID.LID('urn:nasa:pds:hst_10534:data_wfpc2_c0m:visit_01')
     archive = FileArchives.get_any_archive()
     product = Product.Product(archive, product_lid)
     product_lm = ProductLabelMaker.ProductLabelMaker(product)

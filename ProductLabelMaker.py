@@ -7,6 +7,7 @@ import FitsProductFileXmlMaker
 import FileArchives
 import LabelMaker
 import ProductInfo
+import Targets
 
 
 class ProductLabelMaker(LabelMaker.LabelMaker):
@@ -56,11 +57,10 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath '/Product_Observational/Observation_Area'
         time_coordinates, investigation_area, \
-            observing_system, target_identification = \
+            observing_system = \
             self.create_children(observation_area, ['Time_Coordinates',
                                                     'Investigation_Area',
-                                                    'Observing_System',
-                                                    'Target_Identification'])
+                                                    'Observing_System'])
 
         # At XPath '/Product_Observational/Observation_Area/Time_Coordinates'
         start_date_time, stop_date_time = \
@@ -83,25 +83,50 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         self.set_text(reference_type, self.info.internal_reference_type())
 
         # At XPath '/Product_Observational/Observation_Area/Observing_System'
-        self.createObserving_systemXml(observing_system)
-
-        # At XPath
-        # '/Product_Observational/Observation_Area/Target_Identification'
-        name, type = self.create_children(target_identification,
-                                          ['name', 'type'])
-        self.set_text(name, self.info.target_identification_name())
-        self.set_text(type, self.info.target_identification_type())
+        self.create_observing_system_xml(observing_system)
 
         # At XPath '/Product_Observational'
-        for archiveFile in product.files():
-            if False:
-                DummyProductFileXmlMaker.DummyProductFileXmlMaker(
-                    self.document, root, archiveFile)
-            else:
-                FitsProductFileXmlMaker.FitsProductFileXmlMaker(
-                    self.document, root, archiveFile)
+        def runFPFXM(archiveFile):
+            fpfxm = FitsProductFileXmlMaker.FitsProductFileXmlMaker(
+                self.document, root, archiveFile)
+            return fpfxm.targname
 
-    def createObserving_systemXml(self, observing_system):
+        targnames = set([runFPFXM(archiveFile)
+                         for archiveFile in product.files()])
+        if len(targnames) == 1:
+            # Consistent
+            targname = targnames.pop()
+            if targname:
+                self.create_target_identification_xml(targname,
+                                                      observation_area)
+        elif len(targnames) == 0:
+            # TODO How to handle?
+            pass
+        else:
+            # Inconsistent
+            print 'Targnames == %s' % targnames
+
+    def create_target_identification_xml(self,
+                                         targname,
+                                         observation_area):
+        nameType = Targets.targname_to_target(targname)
+        if nameType:
+            target_identification = self.create_child(observation_area,
+                                                      'Target_Identification')
+            name, type, internal_reference = \
+                self.create_children(target_identification,
+                                     ['name', 'type', 'Internal_Reference'])
+            self.set_text(name, nameType[0])
+            self.set_text(type, nameType[1])
+            lid_reference, reference_type = \
+                self.create_children(internal_reference,
+                                     ['lid_reference', 'reference_type'])
+            self.set_text(lid_reference,
+                          'urn:nasa:pds:context:target:%s.%s' %
+                          (nameType[1].lower(), nameType[0].lower()))
+            self.set_text(reference_type, 'data_to_target')
+
+    def create_observing_system_xml(self, observing_system):
         # At XPath
         # '/Product_Observational/Observation_Area/Observing_System/'
         instrument = self.component.collection().instrument()

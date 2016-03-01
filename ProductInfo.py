@@ -69,18 +69,3 @@ class ProductInfo(Info.Info):
         """
         return self.CHEATING_PLACEHOLDER('Instrument',
                                          'observing_system_component_type')
-
-    def target_identification_name(self):
-        """
-        Return the text appearing at XPath
-        '/Product_Observational/Observation_Area/Target_Identification/name'.
-        """
-        return self.PLACEHOLDER('target_identification_name')
-
-    def target_identification_type(self):
-        """
-        Return the text appearing at XPath
-        '/Product_Observational/Observation_Area/Target_Identification/type'.
-        """
-        return self.CHEATING_PLACEHOLDER('Planet',
-                                         'target_identification_type')
