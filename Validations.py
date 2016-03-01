@@ -4,8 +4,12 @@ import sys
 
 import pyfits
 
+import BundleLabelMaker
+import CollectionLabelMaker
 import HstFilename
+import LabelMaker
 import Pass
+import ProductLabelMaker
 
 
 class CountFilesPass(Pass.NullPass):
@@ -162,12 +166,71 @@ class CollectionContainsCollectionXml(Pass.LimitedReportingPass):
         elif file.basename() == self.collection_inv_name:
             self.saw_collection_inv = True
 
+
+class CorrectBundleLabel(Pass.LimitedReportingPass):
+    def __init__(self):
+        super(CorrectBundleLabel, self).__init__()
+
+    def do_bundle(self, bundle, before):
+        if before:
+            lm = BundleLabelMaker.BundleLabelMaker(bundle)
+            filename = '/tmp/bundle.xml'
+            lm.create_default_xml_file(filename)
+            self.assert_boolean(LabelMaker.xml_schema_check(filename))
+            self.assert_boolean(LabelMaker.schematron_check(filename))
+
+
+class CorrectCollectionLabel(Pass.LimitedReportingPass):
+    def __init__(self):
+        super(CorrectCollectionLabel, self).__init__()
+
+    def do_collection(self, collection, before):
+        if before:
+            lm = CollectionLabelMaker.CollectionLabelMaker(collection)
+            filename = '/tmp/collection.xml'
+            lm.create_default_xml_file(filename)
+            self.assert_boolean(LabelMaker.xml_schema_check(filename))
+            self.assert_boolean(LabelMaker.schematron_check(filename))
+
+
+class CorrectProductLabel(Pass.LimitedReportingPass):
+    def __init__(self):
+        super(CorrectProductLabel, self).__init__()
+
+    def do_product(self, product, before):
+        if before:
+            try:
+                lm = ProductLabelMaker.ProductLabelMaker(product)
+            except IOError:
+                lm = None
+            self.assert_boolean(lm, 'Building xml for %s' % product)
+            if lm:
+                filename = '/tmp/product.xml'
+                lm.create_default_xml_file(filename)
+
+                checkOK = LabelMaker.xml_schema_check(filename)
+                self.assert_boolean(checkOK,
+                                    'XML schema check for %s' % product)
+                if not checkOK:
+                    print 'aborting...'
+                    sys.exit(1)
+
+                checkOK = LabelMaker.schematron_check(filename)
+                self.assert_boolean(checkOK,
+                                    'Schematron check for %s' % product)
+                if not checkOK:
+                    print 'aborting...'
+                    sys.exit(1)
+
 std_validation = Pass.CompositePass([
         CountFilesPass(),
         ProductFilesHaveBundleProposalId(),
         ProductFilesHaveCollectionSuffix(),
         ProductFilesHaveProductVisit(),
         BundleContainsOneSingleHstInternalProposalId(),
+        CorrectBundleLabel(),
+        CorrectCollectionLabel(),
+        # CorrectProductLabel(),
         # BundleContainsBundleXml(),
         # CollectionContainsCollectionXml(),
         ])

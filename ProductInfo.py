@@ -55,6 +55,13 @@ class ProductInfo(Info.Info):
         """
         return 'data_to_investigation'
 
+    def observing_system_name(self):
+        """
+        Return the text appearing at XPath
+        '/Product_Observational/Observation_Area/Observing_System/name'
+        """
+        return self.PLACEHOLDER('observing_system_name')
+
     def observing_system_component_name(self):
         """
         Return the text appearing at XPath

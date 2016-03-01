@@ -19,7 +19,7 @@ class BundleInfo(Info.Info):
         '/Product_Bundle/Identification/Area/title'.
         """
         prod_id = str(self.bundle.proposal_id())
-        return ('This collection contains raw images ' +
+        return ('This bundle contains images ' +
                 'obtained from HST Observing Program %s.') % prod_id
 
     def citation_information_description(self):

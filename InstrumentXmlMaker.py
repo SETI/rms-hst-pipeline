@@ -6,7 +6,7 @@ class InstrumentXmlMaker(XmlUtils.XmlUtils):
     A class to build an Observing_System node in a PDS4 product label.
     """
 
-    def __init__(self, document, parent, instrument):
+    def __init__(self, document, parent, info, instrument):
         """
         Create the XML corresponding to an Observing_System node,
         given the XML document, the parent node to which the new XML
@@ -15,6 +15,8 @@ class InstrumentXmlMaker(XmlUtils.XmlUtils):
         assert document
         assert parent
         self.parent = parent
+        assert info
+        self.info = info
         super(InstrumentXmlMaker, self).__init__(document)
         self.create_default_xml(instrument)
 
@@ -66,15 +68,17 @@ class InstrumentXmlMaker(XmlUtils.XmlUtils):
             self.set_text(reference_type, 'is_instrument')
 
         else:
-            # At XPath
-            # 'Observing_System'
-            observing_system_component = \
-                self.create_child(observing_system,
-                                  'Observing_System_Component')
+            # At XPath 'Observing_System/name'
+            self.set_text(name, self.info.observing_system_name())
 
             # At XPath
             # 'Observing_System/Observing_System_Component'
-            name, type = self.create_children(observing_system_component,
+            name, type = self.create_children(observing_system_component_hst,
+                                              ['name', 'type'])
+            self.set_text(name, self.info.observing_system_component_name())
+            self.set_text(type, self.info.observing_system_component_type())
+
+            name, type = self.create_children(observing_system_component_acs,
                                               ['name', 'type'])
             self.set_text(name, self.info.observing_system_component_name())
             self.set_text(type, self.info.observing_system_component_type())

@@ -15,6 +15,11 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
 
     def create_default_xml(self):
         bundle = self.component
+
+        # At XPath '/'
+        self.add_processing_instruction('xml-model',
+                                        self.info.xml_model_pds_attributes())
+
         root = self.create_child(self.document, 'Product_Bundle')
 
         # At XPath '/Product_Bundle'

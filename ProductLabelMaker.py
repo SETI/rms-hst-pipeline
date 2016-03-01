@@ -85,13 +85,17 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         instrument = self.component.collection().instrument()
         InstrumentXmlMaker.InstrumentXmlMaker(self.document,
                                               observation_area,
+                                              self.info,
                                               instrument)
 
         # At XPath '/Product_Observational'
         def runFPFXM(archiveFile):
-            fpfxm = FitsProductFileXmlMaker.FitsProductFileXmlMaker(
-                self.document, root, archiveFile)
-            return fpfxm.targname
+            try:
+                fpfxm = FitsProductFileXmlMaker.FitsProductFileXmlMaker(
+                    self.document, root, archiveFile)
+                return fpfxm.targname
+            except IOError:
+                return None
 
         targnames = set([runFPFXM(archiveFile)
                          for archiveFile in product.files()])

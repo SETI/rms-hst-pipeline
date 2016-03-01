@@ -97,6 +97,16 @@ class Pass(object):
             msg = 'expected %r; got %r.' % (expected, actual)
             self.report(msg, tag)
 
+    def assert_boolean(self, bool_value, tag=None):
+        """
+        Do nothing if the bool_value is true; if not, report that
+        through the Rporter.  An optional string tag may be provided;
+        it will be added to the report.
+        """
+        if not bool_value:
+            msg = 'assertion failed'
+            self.report(msg, tag)
+
     def report(self, msg, tag=None):
         """Report through the reporter."""
         self.pass_runner.report(self.__class__.__name__, msg, tag)
