@@ -8,8 +8,10 @@ import BundleLabelMaker
 import CollectionLabelMaker
 import HstFilename
 import LabelMaker
+import LID
 import Pass
 import ProductLabelMaker
+import XmlSchema
 
 
 class CountFilesPass(Pass.NullPass):
@@ -167,38 +169,54 @@ class CollectionContainsCollectionXml(Pass.LimitedReportingPass):
             self.saw_collection_inv = True
 
 
-class CorrectBundleLabel(Pass.LimitedReportingPass):
+class CorrectLabel(Pass.LimitedReportingPass):
+    def __init__(self):
+        super(CorrectLabel, self).__init__()
+
+    def check_label(self, lid, filename):
+        assert isinstance(lid, LID.LID)
+        if not self.past_limit():
+            failures = XmlSchema.xml_schema_failures(filename)
+            if failures:
+                self.report('Label for %s failed XML schema test' % lid,
+                            failures)
+            else:
+                failures = XmlSchema.schematron_failures(filename)
+                if failures:
+                    self.report('Label for %s failed Schematron test' % lid,
+                                failures)
+
+
+class CorrectBundleLabel(CorrectLabel):
     def __init__(self):
         super(CorrectBundleLabel, self).__init__()
 
     def do_bundle(self, bundle, before):
-        if before:
+        if before and not self.past_limit():
             lm = BundleLabelMaker.BundleLabelMaker(bundle)
             filename = '/tmp/bundle.xml'
             lm.create_default_xml_file(filename)
-            self.assert_boolean(LabelMaker.xml_schema_check(filename))
-            self.assert_boolean(LabelMaker.schematron_check(filename))
+            self.check_label(bundle.lid, filename)
 
 
-class CorrectCollectionLabel(Pass.LimitedReportingPass):
+class CorrectCollectionLabel(CorrectLabel):
     def __init__(self):
         super(CorrectCollectionLabel, self).__init__()
 
     def do_collection(self, collection, before):
-        if before:
+        if before and not self.past_limit():
             lm = CollectionLabelMaker.CollectionLabelMaker(collection)
             filename = '/tmp/collection.xml'
             lm.create_default_xml_file(filename)
-            self.assert_boolean(LabelMaker.xml_schema_check(filename))
-            self.assert_boolean(LabelMaker.schematron_check(filename))
+            self.check_label(collection.lid, filename)
 
 
-class CorrectProductLabel(Pass.LimitedReportingPass):
+class CorrectProductLabel(CorrectLabel):
     def __init__(self):
         super(CorrectProductLabel, self).__init__()
 
     def do_product(self, product, before):
-        if before:
+        if before and not self.past_limit():
             try:
                 lm = ProductLabelMaker.ProductLabelMaker(product)
             except IOError:
@@ -207,20 +225,7 @@ class CorrectProductLabel(Pass.LimitedReportingPass):
             if lm:
                 filename = '/tmp/product.xml'
                 lm.create_default_xml_file(filename)
-
-                checkOK = LabelMaker.xml_schema_check(filename)
-                self.assert_boolean(checkOK,
-                                    'XML schema check for %s' % product)
-                if not checkOK:
-                    print 'aborting...'
-                    sys.exit(1)
-
-                checkOK = LabelMaker.schematron_check(filename)
-                self.assert_boolean(checkOK,
-                                    'Schematron check for %s' % product)
-                if not checkOK:
-                    print 'aborting...'
-                    sys.exit(1)
+                self.check_label(product.lid, filename)
 
 std_validation = Pass.CompositePass([
         CountFilesPass(),
@@ -230,7 +235,7 @@ std_validation = Pass.CompositePass([
         BundleContainsOneSingleHstInternalProposalId(),
         CorrectBundleLabel(),
         CorrectCollectionLabel(),
-        # CorrectProductLabel(),
+        CorrectProductLabel(),
         # BundleContainsBundleXml(),
         # CollectionContainsCollectionXml(),
         ])

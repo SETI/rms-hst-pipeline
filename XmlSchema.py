@@ -60,7 +60,9 @@ def xml_schema_failures(filepath, schema=XML_SCHEMA, stdin=None):
     else:
         # ignore stdout
         assert stderr
-        return stderr
+        # TODO The replace probably ought to be done only in the
+        # reporting, only as necessary
+        return stderr.replace('\n', '\\n')
 
 
 def _probatron(filepath, schema=SCHEMATRON_SCHEMA):
@@ -126,7 +128,10 @@ def schematron_failures(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
     failures = _svrl_failures(svrl)
     if len(failures) > 0:
         # should I have a pretty option here for human-readability?
-        return ''.join([f.toxml() for f in failures])
+
+        # TODO The replace probably ought to be done only in the
+        # reporting, only as necessary
+        return ('\n'.join([f.toxml() for f in failures])).replace('\n', '\\n')
     else:
         return None
 
@@ -160,14 +165,15 @@ class TestXmlSchema(unittest.TestCase):
 
     def test_run_xml_schema(self):
         # Correct XML, but doesn't match the schema
-        res = xml_schema_failures('-',
-                                  stdin='<library><book/><book/></library>')
-        self.assertIsNotNone(res)
+        failures = \
+            xml_schema_failures('-',
+                                stdin='<library><book/><book/></library>')
+        self.assertIsNotNone(failures)
+        self.assertNotIn('\n', failures)
 
         # Valid XML according to the schema.
-        VALID_XML_FILEPATH = './testfiles/bundle.xml'
-        res = xml_schema_failures(VALID_XML_FILEPATH)
-        self.assertIsNone(res)
+        failures = xml_schema_failures('./testfiles/bundle.xml')
+        self.assertIsNone(failures)
 
     def test_run_schematron(self):
         exit_code, stderr, stdout = _probatron('./testfiles/bundle.xml')
@@ -189,7 +195,10 @@ class TestXmlSchema(unittest.TestCase):
         self.assertTrue(_svrl_has_failures(svrl))
 
         self.assertIsNone(schematron_failures('./testfiles/bundle.xml'))
-        self.assertIsNotNone(schematron_failures('./testfiles/bad_bundle.xml'))
+        failures = schematron_failures('./testfiles/bad_bundle.xml')
+        self.assertIsNotNone(failures)
+        self.assertNotIn('\n', failures)
+
 
 if __name__ == '__main__':
     unittest.main()
