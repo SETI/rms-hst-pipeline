@@ -14,6 +14,8 @@ echo '-- LIDVID'
 python LIDVID.py
 echo '-- VID'
 python VID.py
+echo '-- XmlSchema'
+python XmlSchema.py
 echo starting archive validation at `date "+%Y-%m-%d %H:%M"`
 python ValidateArchive.py
 echo finished archive validation at `date "+%Y-%m-%d %H:%M"`

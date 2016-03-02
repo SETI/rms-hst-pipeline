@@ -5,6 +5,7 @@ import xml.dom
 
 import ArchiveComponent
 import Info
+import XmlSchema
 import XmlUtils
 
 
@@ -65,6 +66,9 @@ def xml_schema_check(filepath):
     Test the XML label at the filepath against the PDS4 v1.5 XML
     schema, returning true iff it passes.
     """
+
+    failures = XmlSchema.xml_schema_failures(filepath)
+    return failures is None
 
     # xmllint breaks the Unix Rule of Silence and says 'foo.xml
     # verifies' when the command succeeds instead of remaining silent.
