@@ -66,22 +66,8 @@ def xml_schema_check(filepath):
     Test the XML label at the filepath against the PDS4 v1.5 XML
     schema, returning true iff it passes.
     """
-
     failures = XmlSchema.xml_schema_failures(filepath)
     return failures is None
-
-    # xmllint breaks the Unix Rule of Silence and says 'foo.xml
-    # verifies' when the command succeeds instead of remaining silent.
-    # To suppress (possible hundreds of thousands of) these messages
-    # without suppressing real error messages, we perform the
-    # following incantation in Old Enochian to the tentacled horrific
-    # Elder Ones to suppress only lines including '.xml verifies' only
-    # in stderr. Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn.
-    cmd_template = "xmllint --noout --schema %s %s 3>&1 1>&2 2>&3 3>&- | " + \
-        "sed '/\\.xml validates/d'"
-    exit_code = os.system(cmd_template %
-                          ('./xml/PDS4_PDS_1500.xsd.xml', filepath))
-    return exit_code == 0
 
 
 def schematron_check(filepath):
@@ -89,9 +75,6 @@ def schematron_check(filepath):
     Test the XML label at the filepath against the PDS4 v1.5
     Schematron schema, returning true iff it passes.
     """
-    cmd_template = 'java -jar probatron.jar %s %s' + \
-        ' | xmllint -format -' + \
-        ' | python Schematron.py'
-    exit_code = os.system(cmd_template %
-                          (filepath, './xml/PDS4_PDS_1500.sch.xml'))
-    return exit_code == 0
+
+    failures = XmlSchema.schematron_failures(filepath)
+    return failures is None

@@ -147,21 +147,24 @@ class LimitedReportingPass(NullPass):
     messages.  "Shut up; I heard you the first twenty times."
     """
 
-    def __init__(self, reportLimit=8):
+    def __init__(self, report_limit=8):
         """Create a pass with a given reporting limit.  Default is 8."""
         super(LimitedReportingPass, self).__init__()
-        self.reportCount = 0
-        self.reportLimit = reportLimit
+        self.report_count = 0
+        self.report_limit = report_limit
+
+    def past_limit(self):
+        return self.report_count >= self.report_limit
 
     def report(self, msg, tag=None):
-        self.reportCount += 1
-        if self.reportCount < self.reportLimit:
+        self.report_count += 1
+        if self.report_count < self.report_limit:
             NullPass.report(self, msg, tag)
-        elif self.reportCount == self.reportLimit:
+        elif self.report_count == self.report_limit:
             NullPass.report(self, msg, tag)
             NullPass.report(self,
                             'Reached reporting limit (=%s).' %
-                            self.reportLimit)
+                            self.report_limit)
         else:
             pass
 
