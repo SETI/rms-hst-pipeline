@@ -5,7 +5,11 @@ import unittest
 import xml.dom.minidom
 
 
-def run_subprocess(cmd, stdin=None):
+XML_SCHEMA = './xml/PDS4_PDS_1500.xsd.xml'
+SCHEMATRON_SCHEMA = './xml/PDS4_PDS_1500.sch.xml'
+
+
+def _run_subprocess(cmd, stdin=None):
     """
     Run a command in a subprocess.  Command can be either a string
     with the command name, or an array of the command name and its
@@ -29,21 +33,18 @@ def run_subprocess(cmd, stdin=None):
     return (exit_code, stderr, stdout)
 
 
-XML_SCHEMA = './xml/PDS4_PDS_1500.xsd.xml'
-
-
-def xmllint(filepath, schema=XML_SCHEMA, stdin=None):
+def _xmllint(filepath, schema=XML_SCHEMA, stdin=None):
     """
     Run xmllint on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
     triple of exit_code, stderr and stdout.
     """
     if stdin is None:
-        return run_subprocess(['xmllint', '--noout',
-                               '--schema', schema, filepath])
+        return _run_subprocess(['xmllint', '--noout',
+                                '--schema', schema, filepath])
     else:
-        return run_subprocess(['xmllint', '--noout', '--schema', schema, '-'],
-                              stdin=stdin)
+        return _run_subprocess(['xmllint', '--noout', '--schema', schema, '-'],
+                               stdin=stdin)
 
 
 def xml_schema_failures(filepath, schema=XML_SCHEMA, stdin=None):
@@ -53,7 +54,7 @@ def xml_schema_failures(filepath, schema=XML_SCHEMA, stdin=None):
     there are no failures; returns a string containing the failures if
     they exist.
     """
-    exit_code, stderr, stdout = xmllint(filepath, schema=schema, stdin=stdin)
+    exit_code, stderr, stdout = _xmllint(filepath, schema=schema, stdin=stdin)
     if exit_code == 0:
         return None
     else:
@@ -62,57 +63,56 @@ def xml_schema_failures(filepath, schema=XML_SCHEMA, stdin=None):
         return stderr
 
 
-SCHEMATRON_SCHEMA = './xml/PDS4_PDS_1500.sch.xml'
-
-
-def probatron(filepath, schema=SCHEMATRON_SCHEMA):
+def _probatron(filepath, schema=SCHEMATRON_SCHEMA):
     """
     Run probatron on the XML at the filepath validating against the
     schema.  Returns a triple of exit_code, stderr and stdout.
     """
-    return run_subprocess(['java', '-jar', 'probatron.jar',
-                           '-r0',  # output report as terse SVRL
-                           '-n1',  # emit line/col numbers in report
-                           filepath, schema])
+    return _run_subprocess(['java', '-jar', 'probatron.jar',
+                            '-r0',  # output report as terse SVRL
+                            '-n1',  # emit line/col numbers in report
+                            filepath, schema])
 
 
-def probatron_with_stdin(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
+def _probatron_with_stdin(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
     triple of exit_code, stderr and stdout.
     """
     if stdin is None:
-        return probatron(filepath, schema)
+        return _probatron(filepath, schema)
     else:
         (handle, filepath) = tempfile.mkstemp()
         try:
             f = os.fdopen(handle, 'w')
             f.write(stdin)
             f.close()
-            return probatron(filepath, schema)
+            return _probatron(filepath, schema)
         finally:
             os.remove(filepath)
 
 
-def probatron_with_svrl_result(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
+def _probatron_with_svrl_result(filepath,
+                                schema=SCHEMATRON_SCHEMA,
+                                stdin=None):
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns the
     SVRL as XML.
     """
-    exit_code, stderr, stdout = probatron_with_stdin(filepath, schema, stdin)
+    exit_code, stderr, stdout = _probatron_with_stdin(filepath, schema, stdin)
     assert exit_code == 0, 'exit_code = %r' % exit_code
     assert stderr == '', 'stderr = %r' % stderr
     return xml.dom.minidom.parseString(stdout)
 
 
-def svrl_failures(svrl):
+def _svrl_failures(svrl):
     return svrl.documentElement.getElementsByTagName('svrl:failed-assert')
 
 
-def svrl_has_failures(svrl):
-    return len(svrl_failures(svrl)) > 0
+def _svrl_has_failures(svrl):
+    return len(_svrl_failures(svrl)) > 0
 
 
 def schematron_failures(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
@@ -122,8 +122,8 @@ def schematron_failures(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
     there are no failures; returns a string containing the failures if
     they exist.
     """
-    svrl = probatron_with_svrl_result(filepath, schema, stdin)
-    failures = svrl_failures(svrl)
+    svrl = _probatron_with_svrl_result(filepath, schema, stdin)
+    failures = _svrl_failures(svrl)
     if len(failures) > 0:
         # should I have a pretty option here for human-readability?
         return ''.join([f.toxml() for f in failures])
@@ -135,29 +135,28 @@ class TestXmlSchema(unittest.TestCase):
     # Exploratory testing: I want to use external programs that aren't
     # well documented as part of my code, so I'm using unittests to
     # explore the behavior of the system.
-    def test_run_subprocess(self):
-        exit_code, stderr, stdout = run_subprocess('ls')
+    def test__run_subprocess(self):
+        exit_code, stderr, stdout = _run_subprocess('ls')
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)
         self.assertNotEquals('', stdout)
 
-        exit_code, stderr, stdout = run_subprocess(['echo', 'foo', 'bar'])
+        exit_code, stderr, stdout = _run_subprocess(['echo', 'foo', 'bar'])
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)
         self.assertEquals('foo bar\n', stdout)
 
         stdin = 'foo bar\nbaz\n'
-        exit_code, stderr, stdout = run_subprocess('cat', stdin)
+        exit_code, stderr, stdout = _run_subprocess('cat', stdin)
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)
         self.assertEquals(stdin, stdout)
 
         exit_code, stderr, stdout = \
-            run_subprocess(['cat', 'this_file_does_not_exist'])
+            _run_subprocess(['cat', 'this_file_does_not_exist'])
         self.assertNotEquals(0, exit_code)
         self.assertNotEquals('', stderr)
         self.assertEquals('', stdout)
-
 
     def test_run_xml_schema(self):
         # Correct XML, but doesn't match the schema
@@ -171,23 +170,23 @@ class TestXmlSchema(unittest.TestCase):
         self.assertIsNone(res)
 
     def test_run_schematron(self):
-        exit_code, stderr, stdout = probatron('./testfiles/bundle.xml')
+        exit_code, stderr, stdout = _probatron('./testfiles/bundle.xml')
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)
         self.assertNotEquals('', stdout)
 
         exit_code, stderr, stdout = \
-            probatron_with_stdin(None, SCHEMATRON_SCHEMA,
-                                 stdin='<library><book/><book/></library>')
+            _probatron_with_stdin(None, SCHEMATRON_SCHEMA,
+                                  stdin='<library><book/><book/></library>')
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)
         self.assertNotEquals('', stdout)
 
-        svrl = probatron_with_svrl_result('./testfiles/bundle.xml')
-        self.assertFalse(svrl_has_failures(svrl))
+        svrl = _probatron_with_svrl_result('./testfiles/bundle.xml')
+        self.assertFalse(_svrl_has_failures(svrl))
 
-        svrl = probatron_with_svrl_result('./testfiles/bad_bundle.xml')
-        self.assertTrue(svrl_has_failures(svrl))
+        svrl = _probatron_with_svrl_result('./testfiles/bad_bundle.xml')
+        self.assertTrue(_svrl_has_failures(svrl))
 
         self.assertIsNone(schematron_failures('./testfiles/bundle.xml'))
         self.assertIsNotNone(schematron_failures('./testfiles/bad_bundle.xml'))
