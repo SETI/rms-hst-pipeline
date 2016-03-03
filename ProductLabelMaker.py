@@ -3,11 +3,11 @@ import tempfile
 
 import ArchiveFile
 import DummyProductFileXmlMaker
-import FitsProductFileXmlMaker
 import FileArchives
+import FitsProductFileXmlMaker
 import InstrumentXmlMaker
-import LabelMaker
 import LID
+import LabelMaker
 import Product
 import ProductFilesXmlMaker
 import ProductInfo
@@ -88,19 +88,15 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath '/Product_Observational/Observation_Area'
         instrument = self.component.collection().instrument()
-        if instrument == 'acs':
-            instrumentMaker = InstrumentXmlMaker.AcsXmlMaker(self.document)
-        elif instrument == 'wfc3':
-            instrumentMaker = InstrumentXmlMaker.Wfc3XmlMaker(self.document)
-        elif instrument == 'wfpc2':
-            instrumentMaker = InstrumentXmlMaker.Wfpc2XmlMaker(self.document)
-        else:
-            raise Exception('Unknown instrument %s' % instrument)
+        instrumentMaker = InstrumentXmlMaker.factories[instrument](
+            self.document)
         instrumentMaker.create_xml(observation_area)
 
         # At XPath '/Product_Observational'
-        xml_maker = ProductFilesXmlMaker.ProductFilesXmlMaker(self.document,
-                                                              product)
+        xml_maker = ProductFilesXmlMaker.ProductFilesXmlMaker(
+            FitsProductFileXmlMaker.FitsProductFileXmlMaker,
+            self.document,
+            product)
         targnames = set(xml_maker.create_xml(root))
 
         if len(targnames) == 1:

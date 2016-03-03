@@ -107,3 +107,10 @@ class Wfpc2XmlMaker(InstrumentXmlMaker):
 
     def observing_system_component_lid(self):
         return 'urn:nasa:pds:context:instrument:insthost.wfpc2.hst'
+
+
+factories = {
+    'acs': AcsXmlMaker,
+    'wfc3': Wfc3XmlMaker,
+    'wfpc2': Wfpc2XmlMaker
+    }

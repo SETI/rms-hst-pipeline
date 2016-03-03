@@ -64,13 +64,9 @@ class ProductFilesHaveBundleProposalId(Pass.NullPass):
     def do_product_file(self, file):
         try:
             proposid = pyfits.getval(file.full_filepath(), 'PROPOSID')
-        except IOError as e:
-            # We know that much (all?) of the contents of hst_00000
-            # are there due to IOErrors, so let's not report them.
-            # Report others, though.
-            if self.bundle_proposal_id != 0:
-                self.report('IOError %s reading file %s of product %s' %
-                            (e, file, file.component))
+        except IOError:
+            # We ignore IOErrors as they'll get picked up when we try
+            # to build labels.
             proposid = None
         except KeyError:
             proposid = None
