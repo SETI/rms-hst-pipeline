@@ -186,7 +186,7 @@ def _createLabel():
     product = Product.Product(archive, product_lid)
     product_lm = ProductLabelMaker.ProductLabelMaker(product)
     product_filepath = '/tmp/product.xml'
-    product_lm.create_default_xml_file(product_filepath)
+    product_lm.write_xml_to_file(product_filepath)
     assert label_checks(product_filepath)
     os.system('open /tmp/product.xml')
 

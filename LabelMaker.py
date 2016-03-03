@@ -41,7 +41,7 @@ class LabelMaker(XmlUtils.XmlUtils):
         """The default name for the XML label for this type of component."""
         pass
 
-    def create_default_xml_file(self, xml_filepath=None):
+    def write_xml_to_file(self, xml_filepath=None):
         """
         Pretty-print the XML document to a file.  If no filepath is
         given, it will be written to the default label filepath for

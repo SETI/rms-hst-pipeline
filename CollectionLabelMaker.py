@@ -159,7 +159,7 @@ def test_synthesis():
         if b.proposal_id() != 0:
             for c in b.collections():
                 lm = CollectionLabelMaker(c)
-                lm.create_default_xml_file('collection.xml')
+                lm.write_xml_to_file('collection.xml')
                 lm.create_default_inventory_file(
                     'collection_suffix_inventory.tab')
                 if LabelMaker.xml_schema_check('collection.xml'):

@@ -158,7 +158,7 @@ def test_synthesis():
             for p in c.products():
                 print p
                 lm = ProductLabelMaker(p)
-                lm.create_default_xml_file(fp)
+                lm.write_xml_to_file(fp)
                 if not (LabelMaker.xml_schema_check(fp) and
                         LabelMaker.schematron_check(fp)):
                     print '%s did not validate; aborting' % p
@@ -173,7 +173,7 @@ def make_and_test_product_label(lid):
     p = Product.Product(a, lid)
     lm = ProductLabelMaker(p)
     fp = '/tmp/product.xml'
-    lm.create_default_xml_file(fp)
+    lm.write_xml_to_file(fp)
     failures = XmlSchema.xml_schema_failures(fp) or \
         XmlSchema.schematron_failures(fp)
     if failures:

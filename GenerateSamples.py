@@ -36,19 +36,19 @@ def make_samples(dst_dir, product_lid):
     product = Product.Product(archive, product_lid)
     product_lm = ProductLabelMaker.ProductLabelMaker(product)
     product_filepath = os.path.join(dst_dir, 'product.xml')
-    product_lm.create_default_xml_file(product_filepath)
+    product_lm.write_xml_to_file(product_filepath)
     assert label_checks(product_filepath)
 
     collection = product.collection()
     collection_lm = CollectionLabelMaker.CollectionLabelMaker(collection)
     collection_filepath = os.path.join(dst_dir, 'collection.xml')
-    collection_lm.create_default_xml_file(collection_filepath)
+    collection_lm.write_xml_to_file(collection_filepath)
     assert label_checks(collection_filepath)
 
     bundle = collection.bundle()
     bundle_lm = BundleLabelMaker.BundleLabelMaker(bundle)
     bundle_filepath = os.path.join(dst_dir, 'bundle.xml')
-    bundle_lm.create_default_xml_file(bundle_filepath)
+    bundle_lm.write_xml_to_file(bundle_filepath)
     assert label_checks(bundle_filepath)
 
 

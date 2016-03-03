@@ -83,7 +83,7 @@ def test_synthesis():
     for b in a.bundles():
         if b.proposal_id() != 0:
             lm = BundleLabelMaker(b)
-            lm.create_default_xml_file('bundle.xml')
+            lm.write_xml_to_file('bundle.xml')
             if LabelMaker.xml_schema_check('bundle.xml'):
                 print ('Yay: bundle.xml for %s ' +
                        'conforms to the XML schema.') % str(b)

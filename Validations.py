@@ -195,7 +195,7 @@ class CorrectBundleLabel(CorrectLabel):
         if before and not self.past_limit():
             lm = BundleLabelMaker.BundleLabelMaker(bundle)
             filename = '/tmp/bundle.xml'
-            lm.create_default_xml_file(filename)
+            lm.write_xml_to_file(filename)
             self.check_label(bundle.lid, filename)
 
 
@@ -207,7 +207,7 @@ class CorrectCollectionLabel(CorrectLabel):
         if before and not self.past_limit():
             lm = CollectionLabelMaker.CollectionLabelMaker(collection)
             filename = '/tmp/collection.xml'
-            lm.create_default_xml_file(filename)
+            lm.write_xml_to_file(filename)
             self.check_label(collection.lid, filename)
 
 
@@ -224,7 +224,7 @@ class CorrectProductLabel(CorrectLabel):
             self.assert_boolean(lm, 'Building xml for %s' % product)
             if lm:
                 filename = '/tmp/product.xml'
-                lm.create_default_xml_file(filename)
+                lm.write_xml_to_file(filename)
                 self.check_label(product.lid, filename)
 
 std_validation = Pass.CompositePass([
