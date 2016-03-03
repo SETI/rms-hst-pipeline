@@ -29,10 +29,10 @@ class LabelMaker(XmlUtils.XmlUtils):
                                                                  None)
         super(LabelMaker, self).__init__(document)
 
-        self.create_default_xml()
+        self.create_xml()
 
     @abc.abstractmethod
-    def create_default_xml(self):
+    def create_xml(self):
         """Create the XML label for the component."""
         pass
 

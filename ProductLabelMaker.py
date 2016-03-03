@@ -24,7 +24,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
     def default_xml_name(self):
         assert False, 'ProductLabelMaker.default_xml_name unimplemented'
 
-    def create_default_xml(self):
+    def create_xml(self):
         product = self.component
 
         # At XPath '/'

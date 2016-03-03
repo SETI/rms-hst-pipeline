@@ -13,7 +13,7 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
     def default_xml_name(self):
         return 'bundle.xml'
 
-    def create_default_xml(self):
+    def create_xml(self):
         bundle = self.component
 
         # At XPath '/'

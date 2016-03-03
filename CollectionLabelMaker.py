@@ -40,7 +40,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         with io.open(inv_filepath, 'w', newline='\r\n') as f:
             f.write(self.inventoryDocument)
 
-    def create_default_xml(self):
+    def create_xml(self):
         collection = self.component
 
         # At XPath '/'
