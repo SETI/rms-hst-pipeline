@@ -87,22 +87,21 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         # At XPath '/Product_Observational/Observation_Area'
         instrument = self.component.collection().instrument()
         if instrument == 'acs':
-            InstrumentXmlMaker.AcsXmlMaker(self.document,
-                                           observation_area)
+            instrumentMaker = InstrumentXmlMaker.AcsXmlMaker(self.document)
         elif instrument == 'wfc3':
-            InstrumentXmlMaker.Wfc3XmlMaker(self.document,
-                                            observation_area)
+            instrumentMaker = InstrumentXmlMaker.Wfc3XmlMaker(self.document)
         elif instrument == 'wfpc2':
-            InstrumentXmlMaker.Wfpc2XmlMaker(self.document,
-                                             observation_area)
+            instrumentMaker = InstrumentXmlMaker.Wfpc2XmlMaker(self.document)
         else:
             raise Exception('Unknown instrument %s' % instrument)
+        instrumentMaker.create_xml(observation_area)
 
         # At XPath '/Product_Observational'
         def runFPFXM(archiveFile):
             try:
                 fpfxm = FitsProductFileXmlMaker.FitsProductFileXmlMaker(
-                    self.document, root, archiveFile)
+                    self.document, archiveFile)
+                fpfxm.create_xml(root)
                 return fpfxm.targname
             except IOError:
                 return None

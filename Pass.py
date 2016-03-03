@@ -9,6 +9,8 @@ class Pass(object):
     abstract class.
     """
 
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self):
         """Create a Pass object."""
         self.pass_runner = None

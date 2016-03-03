@@ -1,23 +1,11 @@
 import abc
 
-import XmlUtils
+import XmlMaker
 
 
-class InstrumentXmlMaker(XmlUtils.XmlUtils):
-    """
-    A class to build an Observing_System node in a PDS4 product label.
-    """
-    def __init__(self, document, parent):
-        """
-        Create the XML corresponding to an Observing_System node,
-        given the XML document and the parent node to which the new
-        XML will be added.
-        """
-        assert document
-        assert parent
-        self.parent = parent
+class InstrumentXmlMaker(XmlMaker.XmlMaker):
+    def __init__(self, document):
         super(InstrumentXmlMaker, self).__init__(document)
-        self.create_default_xml()
 
     @abc.abstractmethod
     def observing_system_name(self):
@@ -31,9 +19,11 @@ class InstrumentXmlMaker(XmlUtils.XmlUtils):
     def observing_system_component_lid(self):
         pass
 
-    def create_default_xml(self):
+    def create_xml(self, parent):
+        assert parent
+
         # At XPath 'Observing_System'
-        observing_system = self.create_child(self.parent, 'Observing_System')
+        observing_system = self.create_child(parent, 'Observing_System')
         name, observing_system_component_hst, \
             observing_system_component_inst = \
             self.create_children(observing_system,
@@ -78,8 +68,8 @@ class InstrumentXmlMaker(XmlUtils.XmlUtils):
 
 
 class AcsXmlMaker(InstrumentXmlMaker):
-    def __init__(self, document, parent):
-        super(AcsXmlMaker, self).__init__(document, parent)
+    def __init__(self, document):
+        super(AcsXmlMaker, self).__init__(document)
 
     def observing_system_name(self):
         return 'Hubble Space Telescope Advanced Camera for Surveys'
@@ -92,8 +82,8 @@ class AcsXmlMaker(InstrumentXmlMaker):
 
 
 class Wfc3XmlMaker(InstrumentXmlMaker):
-    def __init__(self, document, parent):
-        super(Wfc3XmlMaker, self).__init__(document, parent)
+    def __init__(self, document):
+        super(Wfc3XmlMaker, self).__init__(document)
 
     def observing_system_name(self):
         return 'Hubble Space Telescope Wide Field Camera 3'
@@ -106,8 +96,8 @@ class Wfc3XmlMaker(InstrumentXmlMaker):
 
 
 class Wfpc2XmlMaker(InstrumentXmlMaker):
-    def __init__(self, document, parent):
-        super(Wfpc2XmlMaker, self).__init__(document, parent)
+    def __init__(self, document):
+        super(Wfpc2XmlMaker, self).__init__(document)
 
     def observing_system_name(self):
         return 'Hubble Space Telescope Wide-Field Planetary Camera 2'

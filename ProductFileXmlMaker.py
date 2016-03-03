@@ -1,37 +1,21 @@
 import abc
 
 import ArchiveFile
+import XmlMaker
 import XmlUtils
 
 
-class ProductFileXmlMaker(XmlUtils.XmlUtils):
-    """
-    An abstract class to build the part of a PDS4 product label
-    corresponding to a single file within the product.  This class
-    provides functionality to the ProductLabelMaker.
-    """
-
-    def __init__(self, document, root, archive_file):
-        """
-        Create the XML corresponding to a single file within the
-        product, given the XML document, the root node to which the
-        new XML will be added, and the file in the product for which
-        XML is to be created.
-        """
-        assert document
-        assert root
-        self.root = root
+class ProductFileXmlMaker(XmlMaker.XmlMaker):
+    def __init__(self, document, archive_file):
         assert isinstance(archive_file, ArchiveFile.ArchiveFile)
         self.archive_file = archive_file
-
         super(ProductFileXmlMaker, self).__init__(document)
-        self.create_default_xml()
 
-    def create_default_xml(self):
-        """Create the XML nodes for the product file."""
+    def create_xml(self, parent):
+        assert parent
 
         # At XPath '/Product_Observational/File_Area_Observational'
-        file_area_observational = self.create_child(self.root,
+        file_area_observational = self.create_child(parent,
                                                     'File_Area_Observational')
 
         # At XPath '/Product_Observational/File_Area_Observational/File'

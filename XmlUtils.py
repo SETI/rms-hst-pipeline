@@ -1,14 +1,12 @@
-import abc
 import xml.dom
 
 
 class XmlUtils(object):
     """An abstract class providing XML functionality."""
 
-    __metaclass__ = abc.ABCMeta
-
     def __init__(self, document):
         """Store the document (which provides the XML functionality)."""
+        assert document
         self.document = document
 
     def add_processing_instruction(self, lhs, rhs):
