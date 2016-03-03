@@ -9,6 +9,7 @@ class ProductFileXmlMaker(XmlMaker.XmlMaker):
     def __init__(self, document, archive_file):
         assert isinstance(archive_file, ArchiveFile.ArchiveFile)
         self.archive_file = archive_file
+        self.result = None
         super(ProductFileXmlMaker, self).__init__(document)
 
     def create_xml(self, parent):

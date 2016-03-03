@@ -9,7 +9,9 @@ import InstrumentXmlMaker
 import LabelMaker
 import LID
 import Product
+import ProductFilesXmlMaker
 import ProductInfo
+import TargetIdentificationXmlMaker
 import Targets
 import XmlSchema
 
@@ -97,56 +99,23 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         instrumentMaker.create_xml(observation_area)
 
         # At XPath '/Product_Observational'
-        def runFPFXM(archiveFile):
-            try:
-                fpfxm = FitsProductFileXmlMaker.FitsProductFileXmlMaker(
-                    self.document, archiveFile)
-                fpfxm.create_xml(root)
-                return fpfxm.targname
-            except IOError:
-                return None
+        xml_maker = ProductFilesXmlMaker.ProductFilesXmlMaker(self.document,
+                                                              product)
+        targnames = set(xml_maker.create_xml(root))
 
-        targnames = set([runFPFXM(archiveFile)
-                         for archiveFile in product.files()])
         if len(targnames) == 1:
             # Consistent
             targname = targnames.pop()
             if targname:
-                self.create_target_identification_xml(targname,
-                                                      observation_area)
+                t = TargetIdentificationXmlMaker.TargetIdentificationXmlMaker(
+                    self.document, targname)
+                t.create_xml(observation_area)
         elif len(targnames) == 0:
             # TODO How to handle?
             pass
         else:
             # Inconsistent
             print 'Targnames == %s' % targnames
-
-    def create_target_identification_xml(self,
-                                         targname,
-                                         observation_area):
-        # Move this back up
-        target_identification = self.create_child(observation_area,
-                                                  'Target_Identification')
-        nameType = Targets.targname_to_target(targname)
-        if nameType:
-            name, type, internal_reference = \
-                self.create_children(target_identification,
-                                     ['name', 'type', 'Internal_Reference'])
-            self.set_text(name, nameType[0])
-            self.set_text(type, nameType[1])
-            lid_reference, reference_type = \
-                self.create_children(internal_reference,
-                                     ['lid_reference', 'reference_type'])
-            self.set_text(lid_reference,
-                          'urn:nasa:pds:context:target:%s.%s' %
-                          (nameType[1].lower(), nameType[0].lower()))
-            self.set_text(reference_type, 'data_to_target')
-        else:
-            name, type = \
-                self.create_children(target_identification, ['name', 'type'])
-            self.set_text(name, self.info.unknown_target_identification_name())
-            self.set_text(type,
-                          self.info.unknown_target_identification_type())
 
 
 def test_synthesis():
