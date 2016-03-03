@@ -7,8 +7,11 @@ import FitsProductFileXmlMaker
 import FileArchives
 import InstrumentXmlMaker
 import LabelMaker
+import LID
+import Product
 import ProductInfo
 import Targets
+import XmlSchema
 
 
 class ProductLabelMaker(LabelMaker.LabelMaker):
@@ -83,10 +86,17 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath '/Product_Observational/Observation_Area'
         instrument = self.component.collection().instrument()
-        InstrumentXmlMaker.InstrumentXmlMaker(self.document,
-                                              observation_area,
-                                              self.info,
-                                              instrument)
+        if instrument == 'acs':
+            InstrumentXmlMaker.AcsXmlMaker(self.document,
+                                           observation_area)
+        elif instrument == 'wfc3':
+            InstrumentXmlMaker.Wfc3XmlMaker(self.document,
+                                            observation_area)
+        elif instrument == 'wfpc2':
+            InstrumentXmlMaker.Wfpc2XmlMaker(self.document,
+                                             observation_area)
+        else:
+            raise Exception('Unknown instrument %s' % instrument)
 
         # At XPath '/Product_Observational'
         def runFPFXM(archiveFile):
@@ -155,5 +165,24 @@ def test_synthesis():
                     sys.exit(1)
 
 
+def make_and_test_product_label(lid):
+    if isinstance(lid, str):
+        lid = LID.LID(lid)
+    assert isinstance(lid, LID.LID)
+    a = FileArchives.get_any_archive()
+    p = Product.Product(a, lid)
+    lm = ProductLabelMaker(p)
+    fp = '/tmp/product.xml'
+    lm.create_default_xml_file(fp)
+    failures = XmlSchema.xml_schema_failures(fp) or \
+        XmlSchema.schematron_failures(fp)
+    if failures:
+        print 'Label for %s at %r did not validate.' % (p, fp)
+        print failures
+        sys.exit(1)
+
+
 if __name__ == '__main__':
-    test_synthesis()
+    # test_synthesis()
+    make_and_test_product_label(
+        'urn:nasa:pds:hst_05167:data_wfpc2_cmh:visit_04')
