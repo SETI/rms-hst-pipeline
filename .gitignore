@@ -1,4 +1,8 @@
+# Python cruft
 *.pyc
+
+# Mac OS X cruft
+.DS_Store
 
 # Emacs cruft
 *~

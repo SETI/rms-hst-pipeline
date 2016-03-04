@@ -18,7 +18,13 @@ class ProductInfo(Info.Info):
         Return the text appearing at XPath
         '/Product_Observational/Identification_Area/title'.
         """
-        return self.PLACEHOLDER('title')
+        collection = self.product.collection()
+        image_tag = collection.suffix().upper() + ' images'
+        visit = self.product.visit()
+        prod_id = str(collection.bundle().proposal_id())
+        template = 'This collection contains the %s ' + \
+            'obtained from visit %s of the HST Observing Program %s.'
+        return template % (image_tag, visit, prod_id)
 
     def start_date_time(self):
         """
@@ -37,16 +43,25 @@ class ProductInfo(Info.Info):
     def investigation_area_name(self):
         """
         Return the text appearing at XPath
-        '/Product_Observational/Observation_Area/Investigation_Area/name'.
+        '/Product_Observational/Observation_Area/Investigation_Area/name'
         """
-        return self.PLACEHOLDER('investigation_area_name')
+        return 'HST observing program %d' % self.product.bundle().proposal_id()
 
     def investigation_area_type(self):
         """
         Return the text appearing at XPath
-        '/Product_Observational/Observation_Area/Investigation_Area/type'.
+        '/Product_Observational/Observation_Area/Investigation_Area/type'
         """
-        return self.CHEATING_PLACEHOLDER('Mission', 'investigation_area_type')
+        return 'Individual Investigation'
+
+    def investigation_lidvid_reference(self):
+        """
+        Return the text appearing at XPath
+        '/Product_Observational/Observation_Area/Investigation_Area/Internal_Reference/lidvid_reference'
+        """
+        template = \
+            'urn:nasa:pds:context:investigation:investigation.hst_%05d::1.0'
+        return template % self.product.bundle().proposal_id()
 
     def internal_reference_type(self):
         """
@@ -54,6 +69,13 @@ class ProductInfo(Info.Info):
         '/Product_Observational/Observation_Area/Investigation_Area/Internal_Reference/reference_type'.
         """
         return 'data_to_investigation'
+
+    def modification_history_description(self):
+        """
+        Return the text appearing at XPath
+        '/Product_Observational/Identification_Area/Modification_History/description'
+        """
+        return 'PDS4 version-in-development of the product'
 
     def observing_system_name(self):
         """

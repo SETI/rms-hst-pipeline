@@ -20,7 +20,7 @@ class CollectionInfo(Info.Info):
         """
         image_tag = self.collection.suffix().upper() + ' images'
         prod_id = str(self.collection.bundle().proposal_id())
-        template = 'This collection contains the raw %s ' + \
+        template = 'This collection contains the %s ' + \
             'obtained from HST Observing Program %s.'
         return template % (image_tag, prod_id)
 

@@ -46,13 +46,15 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath '/Product_Observational/Identification_Area'
         logical_identifier, version_id, title, \
-            information_model_version, product_class = \
+            information_model_version, product_class, \
+            modification_history = \
             self.create_children(identification_area, [
                 'logical_identifier',
                 'version_id',
                 'title',
                 'information_model_version',
-                'product_class'])
+                'product_class',
+                'Modification_History'])
 
         self.set_text(logical_identifier, str(product.lid))
         self.set_text(version_id, self.info.version_id())
@@ -60,6 +62,17 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
         self.set_text(information_model_version,
                       self.info.information_model_version())
         self.set_text(product_class, 'Product_Observational')
+
+        modification_detail = self.create_child(modification_history,
+                                                'Modification_Detail')
+        modification_date, version_id, description = \
+            self.create_children(modification_detail, ['modification_date',
+                                                       'version_id',
+                                                       'description'])
+        self.set_text(modification_date, self.info.modification_date())
+        self.set_text(version_id, self.info.version_id())
+        self.set_text(description,
+                      self.info.modification_history_description())
 
         # At XPath '/Product_Observational/Observation_Area'
         time_coordinates, investigation_area = \
@@ -82,8 +95,11 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath
         # '/Product_Observational/Observation_Area/Investigation_Area/Internal_Reference'
-        reference_type = self.create_child(internal_reference,
-                                           'reference_type')
+        lidvid_reference, reference_type = \
+            self.create_children(internal_reference, ['lidvid_reference',
+                                                      'reference_type'])
+        self.set_text(lidvid_reference,
+                      self.info.investigation_lidvid_reference())
         self.set_text(reference_type, self.info.internal_reference_type())
 
         # At XPath '/Product_Observational/Observation_Area'

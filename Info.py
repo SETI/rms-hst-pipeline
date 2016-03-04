@@ -1,3 +1,6 @@
+import time
+
+
 class Info(object):
     """
     A helper object associated with an ArchiveComponent or
@@ -29,7 +32,10 @@ schematypens=\"http://purl.oclc.org/dsdl/schematron\""""
         return '1.5.0.0'
 
     def version_id(self):
-        return '1.0'
+        return '0.1'
+
+    def modification_date(self):
+        return time.strftime('%Y-%m-%d', time.gmtime())
 
     def PLACEHOLDER(self, tag):
         """
