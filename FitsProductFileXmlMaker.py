@@ -75,7 +75,7 @@ class XmlFitsPass(FitsPass):
         if before:
             self.hdu = hdu
             try:
-                self.targname = hdu.header['targname']
+                self.targname = hdu.header['TARGNAME']
             except KeyError:
                 pass
         else:
