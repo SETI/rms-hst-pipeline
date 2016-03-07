@@ -53,6 +53,7 @@ class ProductFilesHaveCollectionSuffix(Pass.NullPass):
 class ProductFilesHaveBundleProposalId(Pass.NullPass):
     def __init__(self):
         self.bundle_proposal_id = None
+        self.collection_suffix = None
         super(ProductFilesHaveBundleProposalId, self).__init__()
 
     def do_bundle(self, bundle, before):
@@ -60,6 +61,12 @@ class ProductFilesHaveBundleProposalId(Pass.NullPass):
             self.bundle_proposal_id = bundle.proposal_id()
         else:
             self.bundle_proposal_id = None
+
+    def do_collection(self, collection, before):
+        if before:
+            self.collection_suffix = collection.suffix()
+        else:
+            self.collection_suffix = None
 
     def do_product_file(self, file):
         try:
@@ -73,7 +80,10 @@ class ProductFilesHaveBundleProposalId(Pass.NullPass):
 
         # if it exists, ensure it matches the bundle_proposal_id
         if proposid is not None:
-            self.assert_equals(self.bundle_proposal_id, proposid)
+            if self.collection_suffix == 'lrc':
+                self.assert_equals(0, proposid)
+            else:
+                self.assert_equals(self.bundle_proposal_id, proposid)
 
 
 class ProductFilesHaveProductVisit(Pass.NullPass):
