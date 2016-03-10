@@ -1,6 +1,8 @@
 import os.path
+import pprint  # TODO remove
 import re
 import sys
+import traceback
 
 import pyfits
 
@@ -11,6 +13,7 @@ import LabelMaker
 import LID
 import Pass
 import ProductLabelMaker
+import ProductPass
 import XmlSchema
 
 
@@ -233,6 +236,22 @@ class CorrectProductLabel(CorrectLabel):
                 lm.write_xml_to_file(filename)
                 self.check_label(product.lid, filename)
 
+class DemoProductPass(Pass.NullPass):
+    def do_product(self, product, before):
+        if before:
+            pp = ProductPass.ProductLabelProductPass()
+            ppr = ProductPass.ProductPassRunner()
+            print 60 * '-'
+            print 8 * '-', product
+            try:
+                res = ppr.run_product(pp, product)
+                print "SUCCESS"
+                print pprint.PrettyPrinter(indent=2, width=78).pprint(res)
+            except:
+                print "FAILURE"
+                print traceback.format_exc()
+
+
 std_validation = Pass.CompositePass([
         CountFilesPass(),
         ProductFilesHaveBundleProposalId(),
@@ -242,6 +261,7 @@ std_validation = Pass.CompositePass([
         CorrectBundleLabel(),
         CorrectCollectionLabel(),
         CorrectProductLabel(),
+        # DemoProductPass(),
         # BundleContainsBundleXml(),
         # CollectionContainsCollectionXml(),
         ])

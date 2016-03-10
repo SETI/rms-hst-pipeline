@@ -11,6 +11,7 @@ import LabelMaker
 import Product
 import ProductFilesXmlMaker
 import ProductInfo
+import ProductPass
 import TargetIdentificationXmlMaker
 import Targets
 import XmlSchema
@@ -151,6 +152,11 @@ def make_and_test_product_label(lid):
     assert isinstance(lid, LID.LID)
     a = FileArchives.get_any_archive()
     p = Product.Product(a, lid)
+
+    pp = ProductPass.ProductLabelProductPass()
+    ppr = ProductPass.ProductPassRunner()
+    print ppr.run_product(pp, p)
+
     lm = ProductLabelMaker(p)
     fp = '/tmp/product.xml'
     lm.write_xml_to_file(fp)
@@ -164,5 +170,7 @@ def make_and_test_product_label(lid):
 
 if __name__ == '__main__':
     # test_synthesis()
+#    make_and_test_product_label(
+#        'urn:nasa:pds:hst_05167:data_wfpc2_cmh:visit_04')
     make_and_test_product_label(
-        'urn:nasa:pds:hst_05167:data_wfpc2_cmh:visit_04')
+        'urn:nasa:pds:hst_09746:data_acs_raw:visit_25')
