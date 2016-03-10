@@ -240,6 +240,26 @@ def lift(func):
 
     return lifted
 
+
+def sequence(list_of_results):
+    """
+    Given a list of Results, return a Result containing a list (or
+    exceptions).
+    """
+
+    # TODO Seems as if you should be able to find common code in
+    # lift() and sequence() and refactor it out.
+
+    exceptions = []
+    for result in list_of_results:
+        if result.is_failure():
+            exceptions.extend(result.exceptions)
+    if exceptions:
+        return Failure(exceptions)
+    else:
+        return Success([result.value for result in list_of_results])
+
+
 ############################################################
 
 
@@ -515,6 +535,33 @@ class TestHeuristic(unittest.TestCase):
         self.assertEquals(2, len(res.exceptions))
         self.assertEquals('bar', res.exceptions[0].args[0])
         self.assertEquals('foo', res.exceptions[1].args[0])
+
+    def test_sequence(self):
+        one = Success(1)
+        two = Success(2)
+        fails_foo = HFunction(_fails_with_message('foo')).run(None)
+        fails_bar = HFunction(_fails_with_message('bar')).run(None)
+
+        res = sequence([one, two])
+        self.assertTrue(res.is_success())
+        self.assertEquals([1, 2], res.value)
+
+        res = sequence([one, fails_foo])
+        self.assertFalse(res.is_success())
+        self.assertEquals(1, len(res.exceptions))
+        self.assertEquals('foo', res.exceptions[0].args[0])
+
+        res = sequence([fails_bar, two])
+        self.assertFalse(res.is_success())
+        self.assertEquals(1, len(res.exceptions))
+        self.assertEquals('bar', res.exceptions[0].args[0])
+
+        res = sequence([fails_bar, fails_foo])
+        self.assertFalse(res.is_success())
+        self.assertEquals(2, len(res.exceptions))
+        self.assertEquals('bar', res.exceptions[0].args[0])
+        self.assertEquals('foo', res.exceptions[1].args[0])
+
 
 if __name__ == '__main__':
     unittest.main()
