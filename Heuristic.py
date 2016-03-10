@@ -10,6 +10,8 @@ class Result(object):
     """
     The result of a call of Heuristic.run().  This is an abstract base
     class with only two subclasses: Success and Failure.
+
+    Haskell equivalent: Either Exceptions a
     """
     __metaclass__ = abc.ABCMeta
 
@@ -26,6 +28,8 @@ class Success(Result):
     """
     A result of a successful call to Heuristic.run().  Contains the
     result value.
+
+    Haskell equivalent: (Right a :: Either Exceptions a)
     """
     def __init__(self, value):
         self.value = value
@@ -44,6 +48,8 @@ class Failure(Result):
     """
     A result of a failed call of Heuristic.run().  Contains the
     exceptions raised by the calculation.
+
+    Haskell equivalent (Left exceptions :: Either Exceptions a)
     """
     def __init__(self, exceptions):
         self.exceptions = exceptions
@@ -62,6 +68,8 @@ class Heuristic(object):
     """
     A composable representation of a calculation on one argument that
     may fail.
+
+    Haskell equivalent: (a -> Either Exceptions b)
     """
     __metaclass__ = abc.ABCMeta
 
@@ -77,6 +85,8 @@ class Heuristic(object):
 class HFunction(Heuristic):
     """
     A wrapper around a unary function to make it act as a Heuristic.
+
+    Haskell equivalent: runEither (?)
     """
     def __init__(self, func):
         """Create a Heuristic from the given function."""
@@ -109,6 +119,8 @@ class HOrElses(Heuristic):
 
     If any succeeds, the composite succeeds.  If all fail, the
     composite fails.
+
+    Haskell equivalent: msum
     """
 
     def __init__(self, label, or_elses):
@@ -154,6 +166,9 @@ class HAndThens(Heuristic):
 
     If all succeed, the composite succeeds.  If any fails, the
     composite fails.
+
+    Haskell equivalent: (foldr (>>=) return
+    :: [Either Exception a] -> Either Exception a)
     """
 
     def __init__(self, label, and_thens):
@@ -191,6 +206,42 @@ class HAndThens(Heuristic):
 
 
 ############################################################
+
+def lift(func):
+    """
+    Return a new function that takes and returns Result-wrapped values
+    instead.  If the original function's arguments contain failures,
+    return the failures; else Success-wrap the result of running the
+    old function on its unwrapped arguments.
+
+    Mathematicians would say that lift() "lifts" f from the realm of
+    ordinary values into the realm of Result-wrapped values.  That is,
+    lift(f) takes and returns wrapped values, but otherwise behaves
+    the same as the original function f.
+
+    The original function f should not raise exceptions.
+
+    Haskell equivalent: liftMn where n is an integer, for instance,
+    (liftM2 :: (a -> b -> c) -> Either Exceptions a -> Either
+    Exceptions b -> Either Exceptions c)
+
+    Note: it differs in that the Haskell version would propagate only
+    the first exception, while here we collect all of them.
+    """
+    def lifted(*args):
+        exceptions = []
+        for arg in args:
+            if arg.is_failure():
+                exceptions.extend(arg.exceptions)
+        if exceptions:
+            return Failure(exceptions)
+        else:
+            return Success(func(*[arg.value for arg in args]))
+
+    return lifted
+
+############################################################
+
 
 def _toHeuristic(arg):
     """Wrap the argument if necessary and return an instance of Heuristic."""
@@ -434,6 +485,36 @@ class TestHeuristic(unittest.TestCase):
         self.assertTrue(res.is_success())
         self.assertEquals(3, res.value)
 
+    def test_lifted(self):
+        def pair(a, b):
+            """Empty Docstring"""
+            return (a, b)
+        lifted_pair = lift(pair)
+
+        one = Success(1)
+        two = Success(2)
+        fails_foo = HFunction(_fails_with_message('foo')).run(None)
+        fails_bar = HFunction(_fails_with_message('bar')).run(None)
+
+        res = lifted_pair(one, two)
+        self.assertTrue(res.is_success())
+        self.assertEquals((1, 2), res.value)
+
+        res = lifted_pair(one, fails_foo)
+        self.assertFalse(res.is_success())
+        self.assertEquals(1, len(res.exceptions))
+        self.assertEquals('foo', res.exceptions[0].args[0])
+
+        res = lifted_pair(fails_bar, two)
+        self.assertFalse(res.is_success())
+        self.assertEquals(1, len(res.exceptions))
+        self.assertEquals('bar', res.exceptions[0].args[0])
+
+        res = lifted_pair(fails_bar, fails_foo)
+        self.assertFalse(res.is_success())
+        self.assertEquals(2, len(res.exceptions))
+        self.assertEquals('bar', res.exceptions[0].args[0])
+        self.assertEquals('foo', res.exceptions[1].args[0])
 
 if __name__ == '__main__':
     unittest.main()
