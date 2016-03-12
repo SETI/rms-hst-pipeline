@@ -15,38 +15,38 @@ class ProductPassRunner(object):
     # Has no internal state.  Turn into a function?  Why did I reify
     # the runner in the other case?
 
-    def run_product(self, productPass, product):
-        assert isinstance(productPass, ProductPass), 'e'
+    def run_product(self, product_pass, product):
+        assert isinstance(product_pass, ProductPass), 'e'
         assert isinstance(product, Product.Product), 'f'
-        return productPass.process_product(
+        return product_pass.process_product(
             product,
-            [self.run_file(productPass, f) for f in product.files()])
+            [self.run_file(product_pass, f) for f in product.files()])
 
-    def run_file(self, productPass, file):
-        assert isinstance(productPass, ProductPass), 'g'
+    def run_file(self, product_pass, file):
+        assert isinstance(product_pass, ProductPass), 'g'
         assert file, 'd'
         try:
             fits = pyfits.open(file.full_filepath())
             try:
-                return productPass.process_file(
+                return product_pass.process_file(
                     file,
-                    [self.run_hdu(productPass, n, hdu) for
+                    [self.run_hdu(product_pass, n, hdu) for
                      n, hdu in enumerate(fits)])
             finally:
                 fits.close()
         except Exception as e:
-            return productPass.process_file(file, e)
+            return product_pass.process_file(file, e)
 
-    def run_hdu(self, productPass, n, hdu):
-        assert isinstance(productPass, ProductPass), 'a'
+    def run_hdu(self, product_pass, n, hdu):
+        assert isinstance(product_pass, ProductPass), 'a'
         assert isinstance(n, int), 'b'
         assert hdu is not None, 'c'
-        h = productPass.process_hdu_header(n, hdu.header)
+        h = product_pass.process_hdu_header(n, hdu.header)
         if hdu.fileinfo()['datSpan']:
-            d = productPass.process_hdu_data(n, hdu.data)
+            d = product_pass.process_hdu_data(n, hdu.data)
         else:
             d = None
-        return productPass.process_hdu(n, hdu, h, d)
+        return product_pass.process_hdu(n, hdu, h, d)
 
 
 class ProductPass(object):
@@ -84,29 +84,29 @@ class CompositeProductPass(ProductPass):
         self.passes = passes
 
     def process_hdu_header(self, n, header):
-        return [productPass.process_hdu_header(n, header)
-                for productPass in self.passes]
+        return [product_pass.process_hdu_header(n, header)
+                for product_pass in self.passes]
 
     def process_hdu_data(self, n, data):
-        return [productPass.process_hdu_data(n, data)
-                for productPass in self.passes]
+        return [product_pass.process_hdu_data(n, data)
+                for product_pass in self.passes]
 
     def process_hdu(self, n, hdus, hs, ds):
-        return [productPass.process_hdu(n, hdu, h, d)
-                for (productPass, hdu, h, d) in zip(self.passes, hdus, hs, ds)]
+        return [product_pass.process_hdu(n, hdu, h, d)
+                for (product_pass, hdu, h, d) in zip(self.passes, hdus, hs, ds)]
 
     def process_file(self, file, hdu_lists_or_exception):
         # TODO This is not a solution.
         if isinstance(hdu_lists_or_exception, Exception):
             return [hdu_lists_or_exception for _ in self.passes]
         else:
-            return [productPass.process_file(file, he)
-                    for (productPass, he)
+            return [product_pass.process_file(file, he)
+                    for (product_pass, he)
                     in zip(self.passes, hdu_lists_or_exception)]
 
     def process_product(self, product, files):
-        return [productPass.process_product(product, file)
-                for (productPass, file) in zip(self.passes, files)]
+        return [product_pass.process_product(product, file)
+                for (product_pass, file) in zip(self.passes, files)]
 
 # If you have process_product() for each element pass return a
 # key-value pair, then dict(runner.run_product(product,
