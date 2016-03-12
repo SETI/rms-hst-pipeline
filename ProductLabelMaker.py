@@ -170,7 +170,7 @@ def make_and_test_product_label(lid):
 
 if __name__ == '__main__':
     # test_synthesis()
-#    make_and_test_product_label(
-#        'urn:nasa:pds:hst_05167:data_wfpc2_cmh:visit_04')
+    # make_and_test_product_label(
+    # 'urn:nasa:pds:hst_05167:data_wfpc2_cmh:visit_04')
     make_and_test_product_label(
         'urn:nasa:pds:hst_09746:data_acs_raw:visit_25')

@@ -236,6 +236,7 @@ class CorrectProductLabel(CorrectLabel):
                 lm.write_xml_to_file(filename)
                 self.check_label(product.lid, filename)
 
+
 class DemoProductPass(Pass.NullPass):
     def do_product(self, product, before):
         if before:

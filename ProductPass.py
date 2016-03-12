@@ -1,7 +1,12 @@
 import abc
+import pprint
+import traceback
 
 import pyfits
 
+import FileArchives
+import Heuristic
+import LID
 import Product
 
 
@@ -25,8 +30,8 @@ class ProductPassRunner(object):
             try:
                 return productPass.process_file(
                     file,
-                    [self.run_hdu(productPass, n, hdu)
-                     for n, hdu in enumerate(fits)])
+                    [self.run_hdu(productPass, n, hdu) for
+                     n, hdu in enumerate(fits)])
             finally:
                 fits.close()
         except Exception as e:
@@ -41,7 +46,7 @@ class ProductPassRunner(object):
             d = productPass.process_hdu_data(n, hdu.data)
         else:
             d = None
-        return productPass.process_hdu(hdu, h, d)
+        return productPass.process_hdu(n, hdu, h, d)
 
 
 class ProductPass(object):
@@ -61,7 +66,7 @@ class ProductPass(object):
         pass
 
     @abc.abstractmethod
-    def process_hdu(self, hdu, h, d):
+    def process_hdu(self, n, hdu, h, d):
         pass
 
     @abc.abstractmethod
@@ -86,8 +91,8 @@ class CompositeProductPass(ProductPass):
         return [productPass.process_hdu_data(n, data)
                 for productPass in self.passes]
 
-    def process_hdu(self, hdus, hs, ds):
-        return [productPass.process_hdu(hdu, h, d)
+    def process_hdu(self, n, hdus, hs, ds):
+        return [productPass.process_hdu(n, hdu, h, d)
                 for (productPass, hdu, h, d) in zip(self.passes, hdus, hs, ds)]
 
     def process_file(self, file, hdu_lists_or_exception):
@@ -135,7 +140,7 @@ class TargetProductPass(ProductPass):
     def process_hdu_data(self, n, data):
         return None
 
-    def process_hdu(self, hdu, h, d):
+    def process_hdu(self, n, hdu, h, d):
         return h
 
     def process_file(self, file, hs):
@@ -200,7 +205,7 @@ class FileAreaProductPass(ProductPass):
             pass
         return res
 
-    def process_hdu(self, hdu, h, d):
+    def process_hdu(self, n, hdu, h, d):
         # Grab the result from the hdu_header and augment with info
         # from the hdu's fileinfo()
         res = h
@@ -208,7 +213,7 @@ class FileAreaProductPass(ProductPass):
         res['header_offset'] = h_off = info['hdrLoc']
         res['data_offset'] = d_off = info['datLoc']
         res['header_size'] = d_off - h_off
-        res['local_identifier'] = 'hdu_%d' % 0  # TODO Wrong!
+        res['local_identifier'] = 'hdu_%d' % n
         return res
 
     def process_file(self, file, hdu_list):
@@ -216,7 +221,12 @@ class FileAreaProductPass(ProductPass):
 
     def process_product(self, product, files):
         # A dict of lists of HDUs indexed by the file's basename
-        return ('File_Area_Observational', dict(files))
+        try:
+            d = dict(files)
+            return ('File_Area_Observational', dict(files))
+        except:
+            print 'files = %r' % files
+        return ('File_Area_Observational', {})
 
 
 class ProductLabelProductPass(CompositeProductPass):
@@ -232,9 +242,25 @@ class ProductLabelProductPass(CompositeProductPass):
 
     def process_product(self, product, targs):
         res0 = super(ProductLabelProductPass,
-                             self).process_product(product, targs)
+                     self).process_product(product, targs)
         try:
             res = dict(res0)
             return res
         except:
             return None
+
+
+if __name__ == '__main__':
+    lid = LID.LID('urn:nasa:pds:hst_09746:data_acs_raw:visit_25')
+    product = Product.Product(FileArchives.get_any_archive(), lid)
+    pp = ProductLabelProductPass()
+    ppr = ProductPassRunner()
+    print 60 * '-'
+    print 8 * '-', product
+    try:
+        res = ppr.run_product(pp, product)
+        print "SUCCESS"
+        print pprint.PrettyPrinter(indent=2, width=78).pprint(res)
+    except:
+        print "FAILURE"
+        print traceback.format_exc()
