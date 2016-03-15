@@ -10,8 +10,87 @@ import LID
 import Product
 
 
+class ProductPass(object):
+    """
+    Handles a (conceptual) pass over a product to extract, or
+    summarize, the information in the product.
+
+    Since I/O takes so much time relatively, we want to perform all
+    our passes simultaneously and avoid multiple passes over the
+    files.  But to make the code easy to adapt and maintain, we'd like
+    not to have to put all the code for various passes into the same
+    function.
+
+    This class allows you to specify the extracting process in pieces,
+    each piece in a method, and ProductPassRunner calls the pieces in
+    order.  CompositeProductPass lets you combine separate
+    ProductPasses so that the extractions are interleaved, saving on
+    time spent in I/O.
+
+    Extraction, or summarization, works bottom-up.  At each level
+    (product, file, hdu, header and data) you get the object for that
+    level and the summaries you've already made from its lower
+    component levels.  This process is sometimes called a "fold" or a
+    "catamorphism".
+    """
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def process_product(self, product, files):
+        """
+        Extract the needed information from a product and the
+        summaries you already made from its files.
+        """
+        pass
+
+    @abc.abstractmethod
+    def process_file(self, file, hdus):
+        """
+        Extract the needed information from a product's FITS file
+        (ArchiveFile) and the summaries you already made from its
+        HDUs.
+        """
+        pass
+
+    @abc.abstractmethod
+    def process_hdu(self, n, hdu, h, d):
+        """
+        Extract the needed information from the FITS HDU, its index,
+        and the header and data summaries you already made from this
+        HDU.
+        """
+        pass
+
+    @abc.abstractmethod
+    def process_hdu_header(self, n, header):
+        """
+        Extract the needed information from the FITS HDU header and
+        its index.
+        """
+        pass
+
+    @abc.abstractmethod
+    def process_hdu_data(self, n, data):
+        """
+        Extract the needed information from the FITS HDU data and
+        its index.
+        """
+        pass
+
+
 class ProductPassRunner(object):
+    """
+    Functionality to run a ProductPass over a Product.  Uses the
+    Heuristic framework to propagate errors.
+    """
+
     def run_product(self, product_pass, product):
+        """
+        Run the ProductPass over the Product and return a
+        Heuristic.Result.  If a Success, the value is the intended
+        result; if a Failure, it contains the exceptions thrown during
+        the calculation.
+        """
         results = Heuristic.sequence([self.run_file(product_pass, file)
                                       for file in product.files()])
         if results.is_failure():
@@ -23,6 +102,9 @@ class ProductPassRunner(object):
                                          files))(results.value)
 
     def run_file(self, product_pass, file):
+        """
+        Run the ProductPass over the File and return a Heuristic.Result.
+        """
         filepath = file.full_filepath()
         res = Heuristic.HFunction(lambda fp: pyfits.open(fp))(filepath)
         if res.is_failure():
@@ -42,6 +124,9 @@ class ProductPassRunner(object):
         return Heuristic.Success(product_pass.process_file(file, hdus))
 
     def run_hdu(self, product_pass, n, hdu):
+        """
+        Run the ProductPass over the HDU and return a Heuristic.Result.
+        """
         hdr = product_pass.process_hdu_header(n, hdu.header)
         dat = product_pass.process_hdu_data(n, hdu.data)
         return Heuristic.Success(product_pass.process_hdu(n, hdu, hdr, dat))
@@ -51,30 +136,6 @@ class ProductPassRunner(object):
 
     def __repr__(self):
         return 'ProductPassRunner()'
-
-
-class ProductPass(object):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def process_product(self, product, files):
-        pass
-
-    @abc.abstractmethod
-    def process_file(self, file, hdus):
-        pass
-
-    @abc.abstractmethod
-    def process_hdu(self, n, hdu, h, d):
-        pass
-
-    @abc.abstractmethod
-    def process_hdu_header(self, n, header):
-        pass
-
-    @abc.abstractmethod
-    def process_hdu_data(self, n, data):
-        pass
 
 
 # If you have process_product() for each element pass return a
@@ -90,13 +151,15 @@ class ProductPass(object):
 
 class TargetProductPass(ProductPass):
     """
-    When run, return the pair ('target_set', ts) where ts is the set
-    of the values of the key 'TARGNAME' in the primary HDUs of all
-    files in the product.  If it does not contain exactly one element,
-    we have missing data (0) or ambiguity (>1).
+    Return the pair ('target_set', ts) where ts is the set of the
+    values of the key 'TARGNAME' in the primary HDUs of all files in
+    the product.  If it does not contain exactly one element, we have
+    missing data (0) or ambiguity (>1).
     """
 
     def process_hdu_header(self, n, header):
+        # Target names are only in the first (index=0) header; ignore
+        # the rest.
         if n == 0:
             try:
                 res = header['TARGNAME']
@@ -154,7 +217,7 @@ class FileAreaProductPass(ProductPass):
     """
 
     def process_hdu_data(self, n, data):
-        pass
+        return None
 
     def process_hdu_header(self, n, header):
         res = {}
@@ -204,8 +267,14 @@ class FileAreaProductPass(ProductPass):
 
 
 class CompositeProductPass(ProductPass):
+    """
+    Combines a list of ProductPasses into a single ProductPass.
+    Contains the plumbing to run the various calculations to the right
+    places.
+    """
+
     def __init__(self, passes):
-        assert passes, 'x'
+        assert passes, 'CompositeProductPass: passes should not be empty'
         self.passes = passes
 
     def process_hdu_header(self, n, header):
