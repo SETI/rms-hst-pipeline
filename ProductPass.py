@@ -11,13 +11,6 @@ import Product
 
 
 class ProductPassRunner(object):
-
-    def __str__(self):
-        return 'ProductPassRunner'
-
-    def __repr__(self):
-        return 'ProductPassRunner()'
-
     def run_product(self, product_pass, product):
         results = Heuristic.sequence([self.run_file(product_pass, file)
                                       for file in product.files()])
@@ -27,11 +20,11 @@ class ProductPassRunner(object):
         return Heuristic.HFunction(
             lambda (files):
             product_pass.process_product(product,
-                                         files)).run(results.value)
+                                         files))(results.value)
 
     def run_file(self, product_pass, file):
         filepath = file.full_filepath()
-        res = Heuristic.HFunction(lambda fp: pyfits.open(fp)).run(filepath)
+        res = Heuristic.HFunction(lambda fp: pyfits.open(fp))(filepath)
         if res.is_failure():
             return res
         else:
@@ -53,13 +46,14 @@ class ProductPassRunner(object):
         dat = product_pass.process_hdu_data(n, hdu.data)
         return Heuristic.Success(product_pass.process_hdu(n, hdu, hdr, dat))
 
+    def __str__(self):
+        return 'ProductPassRunner'
+
+    def __repr__(self):
+        return 'ProductPassRunner()'
+
 
 class ProductPass(object):
-
-    # Has no internal state.  Names can be changed later.  Runs
-    # itself.  Ahh, the rub comes when you try to compose.  So we
-    # return a vector of results and pass them up.
-
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
@@ -102,12 +96,6 @@ class TargetProductPass(ProductPass):
     we have missing data (0) or ambiguity (>1).
     """
 
-    def __str__(self):
-        return 'TargetProductPass'
-
-    def __repr__(self):
-        return 'TargetProductPass()'
-
     def process_hdu_header(self, n, header):
         if n == 0:
             try:
@@ -132,6 +120,12 @@ class TargetProductPass(ProductPass):
         res = ('target_set',
                set([targ for targ in targs if targ is not None]))
         return res
+
+    def __str__(self):
+        return 'TargetProductPass'
+
+    def __repr__(self):
+        return 'TargetProductPass()'
 
 
 BITPIX_TABLE = {
@@ -158,12 +152,6 @@ class FileAreaProductPass(ProductPass):
     dict is a dictionary with file basenames as keys and lists of HDU
     info as values.
     """
-
-    def __str__(self):
-        return 'FileAreaProductPass'
-
-    def __repr__(self):
-        return 'FileAreaProductPass()'
 
     def process_hdu_data(self, n, data):
         pass
@@ -208,17 +196,17 @@ class FileAreaProductPass(ProductPass):
         # A dict of lists of HDUs indexed by the file's basename
         return ('File_Area_Observational', dict(files))
 
+    def __str__(self):
+        return 'FileAreaProductPass'
+
+    def __repr__(self):
+        return 'FileAreaProductPass()'
+
 
 class CompositeProductPass(ProductPass):
     def __init__(self, passes):
         assert passes, 'x'
         self.passes = passes
-
-    def __str__(self):
-        return 'CompositeProductPass(%s)' % self.passes
-
-    def __repr__(self):
-        return 'CompositeProductPass(%r)' % self.passes
 
     def process_hdu_header(self, n, header):
         return [product_pass.process_hdu_header(n, header)
@@ -244,6 +232,12 @@ class CompositeProductPass(ProductPass):
         return [product_pass.process_product(product, file)
                 for (product_pass, file) in zip(self.passes, zip(*files))]
 
+    def __str__(self):
+        return 'CompositeProductPass(%s)' % self.passes
+
+    def __repr__(self):
+        return 'CompositeProductPass(%r)' % self.passes
+
 
 class ProductLabelProductPass(CompositeProductPass):
     """
@@ -252,12 +246,6 @@ class ProductLabelProductPass(CompositeProductPass):
     dict['File_Area_Observational'] is a dict of lists of HDU
     information for each file, indexed by the files' basenames.
     """
-    def __str__(self):
-        return 'ProductLabelProductPass'
-
-    def __repr__(self):
-        return 'ProductLabelProductPass()'
-
     def __init__(self):
         passes = [TargetProductPass(), FileAreaProductPass()]
         super(ProductLabelProductPass, self).__init__(passes)
@@ -270,6 +258,12 @@ class ProductLabelProductPass(CompositeProductPass):
             return res
         except:
             return None
+
+    def __str__(self):
+        return 'ProductLabelProductPass'
+
+    def __repr__(self):
+        return 'ProductLabelProductPass()'
 
 
 if __name__ == '__main__':

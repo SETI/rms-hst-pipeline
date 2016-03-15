@@ -74,7 +74,7 @@ class Heuristic(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def run(self, arg):
+    def __call__(self, arg):
         """
         Run the heuristic returning either a Success wrapper around
         the result, or a Failure wrapper around the raised exceptions.
@@ -106,7 +106,7 @@ class HFunction(Heuristic):
     def __str__(self):
         return 'HFunction(%s)' % self.func
 
-    def run(self, arg):
+    def __call__(self, arg):
         """
         Run the wrapped function, returning a Result containing either
         the successful result value or the exceptions raised by the
@@ -145,7 +145,7 @@ class HOrElses(Heuristic):
     def __str__(self):
         return 'HOrElses(%s, %s)' % (self.label, self.or_elses)
 
-    def run(self, arg):
+    def __call__(self, arg):
         """
         Run the alternative heuristics until one succeeds and return
         that value as a Success.  If none of them succeed, collect all
@@ -154,7 +154,7 @@ class HOrElses(Heuristic):
         """
         exceptions = []
         for h in self.or_elses:
-            res = h.run(arg)
+            res = h(arg)
             if res.is_success():
                 return res
             else:
@@ -193,7 +193,7 @@ class HAndThens(Heuristic):
     def __str__(self):
         return 'HAndThens(%s, %s)' % (self.label, self.and_thens)
 
-    def run(self, arg):
+    def __call__(self, arg):
         """
         Run the Heuristics chained, with the successful result value
         of each becoming the input argument to the next, and return
@@ -204,7 +204,7 @@ class HAndThens(Heuristic):
         """
         if self.and_thens:
             for h in self.and_thens:
-                res = h.run(arg)
+                res = h(arg)
                 if res.is_success():
                     arg = res.value
                 else:
@@ -367,11 +367,11 @@ class TestHeuristic(unittest.TestCase):
         self.assertFalse(Success(None).is_failure())
 
     def test_HFunction(self):
-        res = HFunction(_doubles).run(3)
+        res = HFunction(_doubles)(3)
         self.assertTrue(res.is_success())
         self.assertEquals(6, res.value)
 
-        res = HFunction(_fails).run(3)
+        res = HFunction(_fails)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
 
@@ -409,35 +409,35 @@ class TestHeuristic(unittest.TestCase):
 
         # Test that the first success returns, not trying further
         # alternatives
-        res = h_or_elses(doubles, succ).run(3)
+        res = h_or_elses(doubles, succ)(3)
         self.assertTrue(res.is_success())
         self.assertEquals(6, res.value)
 
-        res = h_or_elses(succ, doubles).run(3)
+        res = h_or_elses(succ, doubles)(3)
         self.assertTrue(res.is_success())
         self.assertEquals(4, res.value)
 
-        res = h_or_elses(doubles, fails_foo).run(3)
+        res = h_or_elses(doubles, fails_foo)(3)
         self.assertTrue(res.is_success())
         self.assertEquals(6, res.value)
 
-        res = h_or_elses(fails_foo, doubles).run(3)
+        res = h_or_elses(fails_foo, doubles)(3)
         self.assertTrue(res.is_success())
         self.assertEquals(6, res.value)
 
         # Test that multiple failures return all their exceptions.
-        res = h_or_elses(fails_foo, fails_bar).run(3)
+        res = h_or_elses(fails_foo, fails_bar)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(['foo', 'bar'],
                           [e.args[0] for e in res.exceptions])
 
-        res = h_or_elses(fails_bar, fails_foo).run(3)
+        res = h_or_elses(fails_bar, fails_foo)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(['bar', 'foo'],
                           [e.args[0] for e in res.exceptions])
 
         # Test that using a label wraps any exceptions.
-        res = h_or_elses('wrapper', fails_bar, fails_foo).run(3)
+        res = h_or_elses('wrapper', fails_bar, fails_foo)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
         (lab, es) = res.exceptions[0]
@@ -445,7 +445,7 @@ class TestHeuristic(unittest.TestCase):
         self.assertEquals(['bar', 'foo'], [e.args[0] for e in es])
 
         # Test empty case: no alternatives means immediate failure.
-        res = h_or_elses().run(3)
+        res = h_or_elses()(3)
         self.assertFalse(res.is_success())
         self.assertEquals(0, len(res.exceptions))
 
@@ -482,37 +482,37 @@ class TestHeuristic(unittest.TestCase):
         fails_bar = HFunction(_fails_with_message('bar'))
 
         # Test that successful calculations run chained in order
-        res = h_and_thens(doubles, succ).run(3)
+        res = h_and_thens(doubles, succ)(3)
         self.assertTrue(res.is_success())
         self.assertEquals(7, res.value)
 
-        res = h_and_thens(succ, doubles).run(3)
+        res = h_and_thens(succ, doubles)(3)
         self.assertTrue(res.is_success())
         self.assertEquals(8, res.value)
 
         # Test that the first failure aborts the calculation
-        res = h_and_thens(doubles, fails_foo).run(3)
+        res = h_and_thens(doubles, fails_foo)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
         self.assertEquals('foo', res.exceptions[0].args[0])
 
-        res = h_and_thens(fails_bar, doubles).run(3)
+        res = h_and_thens(fails_bar, doubles)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
         self.assertEquals('bar', res.exceptions[0].args[0])
 
-        res = h_and_thens(fails_foo, fails_bar).run(3)
+        res = h_and_thens(fails_foo, fails_bar)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
         self.assertEquals('foo', res.exceptions[0].args[0])
 
-        res = h_and_thens(fails_bar, fails_foo).run(3)
+        res = h_and_thens(fails_bar, fails_foo)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
         self.assertEquals('bar', res.exceptions[0].args[0])
 
         # Test that using a label wraps any exceptions.
-        res = h_and_thens('wrapper', fails_bar, fails_foo).run(3)
+        res = h_and_thens('wrapper', fails_bar, fails_foo)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
         (lab, es) = res.exceptions[0]
@@ -521,7 +521,7 @@ class TestHeuristic(unittest.TestCase):
 
         # Test empty case: no actions means immediate success with no
         # change in argument.
-        res = h_and_thens().run(3)
+        res = h_and_thens()(3)
         self.assertTrue(res.is_success())
         self.assertEquals(3, res.value)
 
@@ -533,8 +533,8 @@ class TestHeuristic(unittest.TestCase):
 
         one = Success(1)
         two = Success(2)
-        fails_foo = HFunction(_fails_with_message('foo')).run(None)
-        fails_bar = HFunction(_fails_with_message('bar')).run(None)
+        fails_foo = HFunction(_fails_with_message('foo'))(None)
+        fails_bar = HFunction(_fails_with_message('bar'))(None)
 
         res = lifted_pair(one, two)
         self.assertTrue(res.is_success())
@@ -559,8 +559,8 @@ class TestHeuristic(unittest.TestCase):
     def test_sequence(self):
         one = Success(1)
         two = Success(2)
-        fails_foo = HFunction(_fails_with_message('foo')).run(None)
-        fails_bar = HFunction(_fails_with_message('bar')).run(None)
+        fails_foo = HFunction(_fails_with_message('foo'))(None)
+        fails_bar = HFunction(_fails_with_message('bar'))(None)
 
         res = sequence([one, two])
         self.assertTrue(res.is_success())
