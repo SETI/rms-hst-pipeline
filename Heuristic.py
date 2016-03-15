@@ -35,10 +35,10 @@ class Success(Result):
         self.value = value
 
     def __repr__(self):
-        return 'Success(%r)' % self.value
+        return 'Success(%r)' % (self.value,)
 
     def __str__(self):
-        return self.__repr__()
+        return 'Success(%s)' % (self.value,)
 
     def is_success(self):
         return True
@@ -79,6 +79,14 @@ class Heuristic(object):
         Run the heuristic returning either a Success wrapper around
         the result, or a Failure wrapper around the raised exceptions.
         """
+        pass
+
+    @abc.abstractmethod
+    def __str__(self):
+        pass
+
+    @abc.abstractmethod
+    def __repr__(self):
         pass
 
 
@@ -179,6 +187,12 @@ class HAndThens(Heuristic):
         self.label = label
         self.and_thens = and_thens
 
+    def __repr__(self):
+        return 'HAndThens(%r, %r)' % (self.label, self.and_thens)
+
+    def __str__(self):
+        return 'HAndThens(%s, %s)' % (self.label, self.and_thens)
+
     def run(self, arg):
         """
         Run the Heuristics chained, with the successful result value
@@ -205,7 +219,11 @@ class HAndThens(Heuristic):
         return res
 
 
+def isDoubleSuccess(res):
+    return res.is_success() and isinstance(res.value, Success)
+
 ############################################################
+
 
 def lift(func):
     """
@@ -245,6 +263,8 @@ def sequence(list_of_results):
     """
     Given a list of Results, return a Result containing a list (or
     exceptions).
+
+    Haskell equivalent: sequence :: [m a] -> m [a]
     """
 
     # TODO Seems as if you should be able to find common code in

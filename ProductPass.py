@@ -12,41 +12,46 @@ import Product
 
 class ProductPassRunner(object):
 
-    # Has no internal state.  Turn into a function?  Why did I reify
-    # the runner in the other case?
+    def __str__(self):
+        return 'ProductPassRunner'
+
+    def __repr__(self):
+        return 'ProductPassRunner()'
 
     def run_product(self, product_pass, product):
-        assert isinstance(product_pass, ProductPass), 'e'
-        assert isinstance(product, Product.Product), 'f'
-        return product_pass.process_product(
-            product,
-            [self.run_file(product_pass, f) for f in product.files()])
+        results = Heuristic.sequence([self.run_file(product_pass, file)
+                                      for file in product.files()])
+        if results.is_failure():
+            return results
+
+        return Heuristic.HFunction(
+            lambda (files):
+            product_pass.process_product(product,
+                                         files)).run(results.value)
 
     def run_file(self, product_pass, file):
-        assert isinstance(product_pass, ProductPass), 'g'
-        assert file, 'd'
-        try:
-            fits = pyfits.open(file.full_filepath())
-            try:
-                return product_pass.process_file(
-                    file,
-                    [self.run_hdu(product_pass, n, hdu) for
-                     n, hdu in enumerate(fits)])
-            finally:
-                fits.close()
-        except Exception as e:
-            return product_pass.process_file(file, e)
+        filepath = file.full_filepath()
+        res = Heuristic.HFunction(lambda fp: pyfits.open(fp)).run(filepath)
+        if res.is_failure():
+            return res
+        else:
+            fits = res.value
+
+        hdus = [self.run_hdu(product_pass, n, hdu)
+                for n, hdu in enumerate(fits)]
+        fits.close()
+        res = Heuristic.sequence(hdus)
+        if res.is_failure():
+            return res
+        else:
+            hdus = res.value
+
+        return Heuristic.Success(product_pass.process_file(file, hdus))
 
     def run_hdu(self, product_pass, n, hdu):
-        assert isinstance(product_pass, ProductPass), 'a'
-        assert isinstance(n, int), 'b'
-        assert hdu is not None, 'c'
-        h = product_pass.process_hdu_header(n, hdu.header)
-        if hdu.fileinfo()['datSpan']:
-            d = product_pass.process_hdu_data(n, hdu.data)
-        else:
-            d = None
-        return product_pass.process_hdu(n, hdu, h, d)
+        hdr = product_pass.process_hdu_header(n, hdu.header)
+        dat = product_pass.process_hdu_data(n, hdu.data)
+        return Heuristic.Success(product_pass.process_hdu(n, hdu, hdr, dat))
 
 
 class ProductPass(object):
@@ -62,7 +67,7 @@ class ProductPass(object):
         pass
 
     @abc.abstractmethod
-    def process_file(self, hdu_list_or_exception):
+    def process_file(self, file, hdus):
         pass
 
     @abc.abstractmethod
@@ -77,36 +82,6 @@ class ProductPass(object):
     def process_hdu_data(self, n, data):
         pass
 
-
-class CompositeProductPass(ProductPass):
-    def __init__(self, passes):
-        assert passes, 'x'
-        self.passes = passes
-
-    def process_hdu_header(self, n, header):
-        return [product_pass.process_hdu_header(n, header)
-                for product_pass in self.passes]
-
-    def process_hdu_data(self, n, data):
-        return [product_pass.process_hdu_data(n, data)
-                for product_pass in self.passes]
-
-    def process_hdu(self, n, hdus, hs, ds):
-        return [product_pass.process_hdu(n, hdu, h, d)
-                for (product_pass, hdu, h, d) in zip(self.passes, hdus, hs, ds)]
-
-    def process_file(self, file, hdu_lists_or_exception):
-        # TODO This is not a solution.
-        if isinstance(hdu_lists_or_exception, Exception):
-            return [hdu_lists_or_exception for _ in self.passes]
-        else:
-            return [product_pass.process_file(file, he)
-                    for (product_pass, he)
-                    in zip(self.passes, hdu_lists_or_exception)]
-
-    def process_product(self, product, files):
-        return [product_pass.process_product(product, file)
-                for (product_pass, file) in zip(self.passes, files)]
 
 # If you have process_product() for each element pass return a
 # key-value pair, then dict(runner.run_product(product,
@@ -127,6 +102,12 @@ class TargetProductPass(ProductPass):
     we have missing data (0) or ambiguity (>1).
     """
 
+    def __str__(self):
+        return 'TargetProductPass'
+
+    def __repr__(self):
+        return 'TargetProductPass()'
+
     def process_hdu_header(self, n, header):
         if n == 0:
             try:
@@ -143,11 +124,9 @@ class TargetProductPass(ProductPass):
     def process_hdu(self, n, hdu, h, d):
         return h
 
-    def process_file(self, file, hs):
-        if isinstance(hs, Exception):
-            return 'UNKNOWN'
-        else:
-            return hs[0]
+    def process_file(self, file, hdus):
+        # It's found, if at all, in the first HDU
+        return hdus[0]
 
     def process_product(self, product, targs):
         res = ('target_set',
@@ -179,6 +158,12 @@ class FileAreaProductPass(ProductPass):
     dict is a dictionary with file basenames as keys and lists of HDU
     info as values.
     """
+
+    def __str__(self):
+        return 'FileAreaProductPass'
+
+    def __repr__(self):
+        return 'FileAreaProductPass()'
 
     def process_hdu_data(self, n, data):
         pass
@@ -216,17 +201,48 @@ class FileAreaProductPass(ProductPass):
         res['local_identifier'] = 'hdu_%d' % n
         return res
 
-    def process_file(self, file, hdu_list):
-        return (file.basename, hdu_list)
+    def process_file(self, file, hdus):
+        return (file.basename, hdus)
 
     def process_product(self, product, files):
         # A dict of lists of HDUs indexed by the file's basename
-        try:
-            d = dict(files)
-            return ('File_Area_Observational', dict(files))
-        except:
-            print 'files = %r' % files
-        return ('File_Area_Observational', {})
+        return ('File_Area_Observational', dict(files))
+
+
+class CompositeProductPass(ProductPass):
+    def __init__(self, passes):
+        assert passes, 'x'
+        self.passes = passes
+
+    def __str__(self):
+        return 'CompositeProductPass(%s)' % self.passes
+
+    def __repr__(self):
+        return 'CompositeProductPass(%r)' % self.passes
+
+    def process_hdu_header(self, n, header):
+        return [product_pass.process_hdu_header(n, header)
+                for product_pass in self.passes]
+
+    def process_hdu_data(self, n, data):
+        return [product_pass.process_hdu_data(n, data)
+                for product_pass in self.passes]
+
+    def process_hdu(self, n, hdu, hs, ds):
+        return [product_pass.process_hdu(n, hdu, h, d)
+                for (product_pass, h, d)
+                in zip(self.passes, hs, ds)]
+
+    def process_file(self, file, hdus):
+        return [product_pass.process_file(file, hdu)
+                for (product_pass, hdu)
+                in zip(self.passes, hdus)]
+
+    def process_product(self, product, files):
+        # since zip() is effectively a transposition, zip() can play
+        # its own inverse
+        return [product_pass.process_product(product, file)
+                for (product_pass, file) in zip(self.passes, zip(*files))]
 
 
 class ProductLabelProductPass(CompositeProductPass):
@@ -236,13 +252,19 @@ class ProductLabelProductPass(CompositeProductPass):
     dict['File_Area_Observational'] is a dict of lists of HDU
     information for each file, indexed by the files' basenames.
     """
+    def __str__(self):
+        return 'ProductLabelProductPass'
+
+    def __repr__(self):
+        return 'ProductLabelProductPass()'
+
     def __init__(self):
         passes = [TargetProductPass(), FileAreaProductPass()]
         super(ProductLabelProductPass, self).__init__(passes)
 
-    def process_product(self, product, targs):
+    def process_product(self, product, files):
         res0 = super(ProductLabelProductPass,
-                     self).process_product(product, targs)
+                     self).process_product(product, files)
         try:
             res = dict(res0)
             return res
@@ -253,14 +275,21 @@ class ProductLabelProductPass(CompositeProductPass):
 if __name__ == '__main__':
     lid = LID.LID('urn:nasa:pds:hst_09746:data_acs_raw:visit_25')
     product = Product.Product(FileArchives.get_any_archive(), lid)
+    # pp = FileAreaProductPass()
+    # pp = TargetProductPass()
     pp = ProductLabelProductPass()
     ppr = ProductPassRunner()
     print 60 * '-'
     print 8 * '-', product
     try:
         res = ppr.run_product(pp, product)
-        print "SUCCESS"
-        print pprint.PrettyPrinter(indent=2, width=78).pprint(res)
+        print "SUCCESSFUL CALCULATION"
+        if res.is_success():
+            print pprint.PrettyPrinter(indent=2, width=78).pprint(res.value)
+        else:
+            print pprint.PrettyPrinter(indent=2,
+                                       width=78).pprint(res.exceptions)
+
     except:
-        print "FAILURE"
+        print "FAILED CALCULATION"
         print traceback.format_exc()
