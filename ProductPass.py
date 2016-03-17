@@ -15,11 +15,11 @@ class ProductPass(object):
     Handles a (conceptual) pass over a product to extract, or
     summarize, the information in the product.
 
-    Since I/O takes so much time relatively, we want to perform all
-    our passes simultaneously and avoid multiple passes over the
-    files.  But to make the code easy to adapt and maintain, we'd like
-    not to have to put all the code for various passes into the same
-    function.
+    Since I/O takes so much time (particularly opening and parsing
+    FITS files), we want to perform all our passes simultaneously and
+    avoid multiple runs over the set of files.  But to make the code
+    easy to adapt and maintain, we'd like not to have to cram all the
+    code for various passes into the same Python function.
 
     This class allows you to specify the extracting process in pieces,
     each piece in a method, and ProductPassRunner calls the pieces in
@@ -83,6 +83,11 @@ class ProductPassRunner(object):
     Functionality to run a ProductPass over a Product.  Uses the
     Heuristic framework to propagate errors.
     """
+
+    # TODO After reflection, I'd like to drop the assumption that the
+    # ProductPass calls will never raise exceptions.  The client still
+    # writes the code normally, but ProductPassRunner needs to catch
+    # exceptions and wrap the results as needed.
 
     def run_product(self, product_pass, product):
         """
