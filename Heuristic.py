@@ -1,15 +1,18 @@
 """
-Module docstring goes here, with an explanation of why one needs to
-use Heuristic objects instead of just calling functions.
+Normally Python calculations either produce a value or raise an
+exception.  This module lets us build more complex calculations by
+composing basic ones, creating a calculation that might try multiple
+alternate algorithms and can return multiple exceptions on failure.
 """
 import abc
+import traceback
 import unittest
 
 
 class Result(object):
     """
-    The result of a call of Heuristic.run().  This is an abstract base
-    class with only two subclasses: Success and Failure.
+    The result of a call of Heuristic.__call__().  This is an abstract
+    base class with only two subclasses: Success and Failure.
 
     Haskell equivalent: Either Exceptions a
     """
@@ -26,8 +29,8 @@ class Result(object):
 
 class Success(Result):
     """
-    A result of a successful call to Heuristic.run().  Contains the
-    result value.
+    A result of a successful call to Heuristic.__call__().  Contains
+    the result value.
 
     Haskell equivalent: (Right a :: Either Exceptions a)
     """
@@ -46,7 +49,7 @@ class Success(Result):
 
 class Failure(Result):
     """
-    A result of a failed call of Heuristic.run().  Contains the
+    A result of a failed call of Heuristic.__call__().  Contains the
     exceptions raised by the calculation.
 
     Haskell equivalent (Left exceptions :: Either Exceptions a)
@@ -115,7 +118,14 @@ class HFunction(Heuristic):
         try:
             res = self.func(arg)
         except Exception as e:
-            return Failure([e])
+            # TODO I'm just capturing the traceback as a string.  I
+            # could be more sophisticated about it.
+            if True:
+                e.traceback = traceback.format_exc()
+                return Failure([e])
+            else:
+                ex = ExceptionWithStackTrace(e, traceback.format_exc())
+                return Failure([ex])
         else:
             return Success(res)
 
@@ -335,6 +345,35 @@ def h_and_thens(*args):
         label = None
 
     return HAndThens(label, [_toHeuristic(arg) for arg in args])
+
+############################################################
+
+
+class Exceptions(object):
+    pass
+
+
+class ExceptionWithStackTrace(Exceptions):
+    def __init__(self, exception, stack_trace):
+        assert exception
+        self.exception = exception
+        self.args = exception.args
+
+        assert stack_trace
+        self.stack_trace = stack_trace
+
+
+class ExceptionGroup(Exceptions):
+    def __init__(self, label, exceptions):
+        # label may be None.
+        self.label = label
+        # exceptions is a list of Exceptions.  (An un-Pythonic type
+        # check follows.)
+        assert exceptions
+        assert isinstance(exceptions, list)
+        for ex in exceptions:
+            assert isinstance(ex, Exceptions)
+        self.exceptions = exceptions
 
 ############################################################
 
