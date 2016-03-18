@@ -1,10 +1,6 @@
 """
 A pass to collect data from the FITS headers in an archive.
 """
-import collections
-import pprint
-import sys
-
 import pyfits
 
 import FileArchives
@@ -32,7 +28,7 @@ class FitsPass(Pass.NullPass):
                 pass
                 # print 'No key TARGNAME'
             fits.close()
-        except IOError as e:
+        except IOError:
             # self.fits_error = True
             # print 'Exception on %s: %s' % (file, e)
             pass

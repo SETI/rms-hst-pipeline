@@ -5,8 +5,6 @@ import shutil
 import tempfile
 import unittest
 
-import HstFilename
-
 
 class OldFileArchive:
     def __init__(self, root):

@@ -4,7 +4,6 @@ import traceback
 
 import pyfits
 
-import OldFileArchive
 import OldFileArchives
 import HstFilename
 

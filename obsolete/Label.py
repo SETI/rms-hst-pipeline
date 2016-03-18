@@ -1,5 +1,3 @@
-import shutil
-import tempfile
 import unittest
 # We need to use xml.dom instead of the other XML implementations
 # because it allows setting ProcessingInstruction on the document.
