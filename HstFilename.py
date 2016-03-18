@@ -41,7 +41,7 @@ class HstFilename(object):
         return self._basename()[1:4].lower()
 
     def suffix(self):
-        return re.match('\A[^_]+_([^\.]+)\..*\Z',
+        return re.match(r'\A[^_]+_([^\.]+)\..*\Z',
                         self._basename()).group(1)
 
     def visit(self):

@@ -54,7 +54,7 @@ def xml_schema_failures(filepath, schema=XML_SCHEMA, stdin=None):
     there are no failures; returns a string containing the failures if
     they exist.
     """
-    exit_code, stderr, stdout = _xmllint(filepath, schema=schema, stdin=stdin)
+    exit_code, stderr, _stdout = _xmllint(filepath, schema=schema, stdin=stdin)
     if exit_code == 0:
         return None
     else:

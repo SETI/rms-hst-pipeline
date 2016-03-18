@@ -9,7 +9,7 @@ import LID
 class Bundle(ArchiveComponent.ArchiveComponent):
     """A PDS4 Bundle."""
 
-    DIRECTORY_PATTERN = '\Ahst_([0-9]{5})\Z'
+    DIRECTORY_PATTERN = r'\Ahst_([0-9]{5})\Z'
 
     def __init__(self, arch, lid):
         """

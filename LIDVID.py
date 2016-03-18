@@ -1,6 +1,7 @@
+import unittest
+
 import LID
 import VID
-import unittest
 
 
 class LIDVID(object):
@@ -21,7 +22,7 @@ class LIDVID(object):
         return (self.lid == other.lid) and (self.vid == other.vid)
 
     def __ne__(self, other):
-        return not (self == other)
+        return not self == other
 
     def __str__(self):
         return self.lidvid

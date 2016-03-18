@@ -48,7 +48,7 @@ class FitsPass(object):
         pass
 
 
-def runFitsPass(filepath, fits_pass):
+def run_fits_pass(filepath, fits_pass):
     fits = pyfits.open(filepath)
     try:
         fits_pass.do_fits(fits, True)
@@ -69,6 +69,7 @@ class XmlFitsPass(FitsPass):
         self.xml = xml
         self.file_area_observational = file_area_observational
         self.targname = None
+        self.hdu = None
 
     def do_hdu(self, hdu, n, before):
         if before:
@@ -163,11 +164,11 @@ class FitsProductFileXmlMaker(ProductFileXmlMaker.ProductFileXmlMaker):
 
     def create_file_data_xml(self, file_area_observational):
         xfp = XmlFitsPass(self, file_area_observational)
-        runFitsPass(self.archive_file.full_filepath(), xfp)
+        run_fits_pass(self.archive_file.full_filepath(), xfp)
         self.targname = xfp.targname
 
 
-def _createLabel():
+def _create_label():
     def label_checks(filepath):
         return LabelMaker.xml_schema_check(filepath) and \
             LabelMaker.schematron_check(filepath)
@@ -184,4 +185,4 @@ def _createLabel():
 
 
 if __name__ == '__main__':
-    _createLabel()
+    _create_label()

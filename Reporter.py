@@ -49,6 +49,7 @@ class CsvReporter(Reporter):
         """Create the reporter using the given filepath for the CSV file."""
         assert filepath
         self.filepath = filepath
+        self.csv_writer = None
         self.file = None
 
     def report(self, pass_, context, msg, tag):

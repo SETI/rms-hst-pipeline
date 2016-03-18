@@ -43,5 +43,5 @@ class ArchiveComponent(object):
         for basename in os.listdir(dir):
             if basename[0] != '.':
                 file = os.path.join(dir, basename)
-                if (os.path.isfile(file)):
+                if os.path.isfile(file):
                     yield ArchiveFile.ArchiveFile(self, basename)

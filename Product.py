@@ -9,7 +9,7 @@ import Collection
 class Product(ArchiveComponent.ArchiveComponent):
     """A PDS4 Product."""
 
-    DIRECTORY_PATTERN = '\Avisit_([a-z0-9]{2})\Z'
+    DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
 
     def __init__(self, arch, lid):
         """

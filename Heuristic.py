@@ -230,7 +230,7 @@ class HAndThens(Heuristic):
         return res
 
 
-def isDoubleSuccess(res):
+def is_double_success(res):
     return res.is_success() and isinstance(res.value, Success)
 
 ############################################################
@@ -294,7 +294,7 @@ def sequence(list_of_results):
 ############################################################
 
 
-def _toHeuristic(arg):
+def _to_heuristic(arg):
     """Wrap the argument if necessary and return an instance of Heuristic."""
     if isinstance(arg, Heuristic):
         return arg
@@ -324,7 +324,7 @@ def h_or_elses(*args):
     else:
         label = None
 
-    return HOrElses(label, [_toHeuristic(arg) for arg in args])
+    return HOrElses(label, [_to_heuristic(arg) for arg in args])
 
 
 def h_and_thens(*args):
@@ -345,7 +345,7 @@ def h_and_thens(*args):
     else:
         label = None
 
-    return HAndThens(label, [_toHeuristic(arg) for arg in args])
+    return HAndThens(label, [_to_heuristic(arg) for arg in args])
 
 
 ############################################################

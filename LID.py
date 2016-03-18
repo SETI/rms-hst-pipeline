@@ -19,9 +19,9 @@ class LID(object):
         assert ids[0] == 'urn'
         assert ids[1] == 'nasa'
         assert ids[2] == 'pds'
-        allowedCharsRE = '\\A[-._a-z0-9]+\\Z'
+        allowed_chars_re = r'\A[-._a-z0-9]+\Z'
         for id in ids:
-            assert re.match(allowedCharsRE, id)
+            assert re.match(allowed_chars_re, id)
 
         # Assign the Id fields
         self.lid = str

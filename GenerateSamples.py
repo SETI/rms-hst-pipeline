@@ -54,8 +54,8 @@ def make_samples(dst_dir, product_lid):
 
 
 if __name__ == '__main__':
-    now = datetime.datetime.now()
-    today = now.strftime('%Y-%m-%d')
-    dst_dir = '/Users/spaceman/SampleGeneratedLabels-%s' % today
-    make_samples(dst_dir,
+    NOW = datetime.datetime.now()
+    TODAY = NOW.strftime('%Y-%m-%d')
+    DST_DIR = '/Users/spaceman/SampleGeneratedLabels-%s' % TODAY
+    make_samples(DST_DIR,
                  LID.LID('urn:nasa:pds:hst_09059:data_acs_raw:visit_01'))

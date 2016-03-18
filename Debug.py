@@ -30,8 +30,8 @@ def trace(f):
     return wrapped
 
 
-def really_assert(bool, msg=None):
-    if not bool:
+def really_assert(condition, msg=None):
+    if not condition:
         if msg:
             print msg
         else:

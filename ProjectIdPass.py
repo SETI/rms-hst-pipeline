@@ -45,7 +45,7 @@ class ProjectIdPass(Pass.NullPass):
         print repr(self.char_to_num_dict)
 
 
-def runPass():
+def run_pass():
     archive = FileArchives.get_any_archive()
     p = ProjectIdPass()
     Pass.PassRunner().run(archive,
@@ -55,4 +55,4 @@ def runPass():
 
 
 if __name__ == '__main__':
-    runPass()
+    run_pass()

@@ -11,9 +11,9 @@ class TargetIdentificationXmlMaker(XmlMaker.XmlMaker):
         # Move this back up
         target_identification = self.create_child(parent,
                                                   'Target_Identification')
-        nameType = Targets.targname_to_target(self.targname)
-        if nameType is None:
-            nameType = ('Magrathea', 'Planet')
+        name_type = Targets.targname_to_target(self.targname)
+        if name_type is None:
+            name_type = ('Magrathea', 'Planet')
             # Placeholder information until we can better detect targets
             name, type, description, internal_reference = \
                 self.create_children(target_identification,
@@ -25,8 +25,8 @@ class TargetIdentificationXmlMaker(XmlMaker.XmlMaker):
             name, type, internal_reference = \
                 self.create_children(target_identification,
                                      ['name', 'type', 'Internal_Reference'])
-        self.set_text(name, nameType[0])
-        self.set_text(type, nameType[1])
+        self.set_text(name, name_type[0])
+        self.set_text(type, name_type[1])
         lid_reference, reference_type = \
             self.create_children(internal_reference,
                                  ['lid_reference', 'reference_type'])
@@ -35,5 +35,5 @@ class TargetIdentificationXmlMaker(XmlMaker.XmlMaker):
         # provisional.  Update it.
         self.set_text(lid_reference,
                       'urn:nasa:pds:context:target:%s.%s' %
-                      (nameType[1].lower(), nameType[0].lower()))
+                      (name_type[1].lower(), name_type[0].lower()))
         self.set_text(reference_type, 'data_to_target')

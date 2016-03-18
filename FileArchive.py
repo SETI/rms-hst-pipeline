@@ -38,21 +38,21 @@ class FileArchive(object):
     @staticmethod
     def is_valid_visit(vis):
         try:
-            return re.match('\A[a-z0-9][a-z0-9]\Z', vis) is not None
+            return re.match(r'\A[a-z0-9][a-z0-9]\Z', vis) is not None
         except:
             return False
 
     @staticmethod
     def is_valid_bundle_dir_basename(dirname):
-        return re.match('\Ahst_[0-9]{5}\Z', dirname) is not None
+        return re.match(r'\Ahst_[0-9]{5}\Z', dirname) is not None
 
     @staticmethod
     def is_valid_collection_dir_basename(dirname):
-        return re.match('\Adata_[a-z0-9]+_', dirname) is not None
+        return re.match(r'\Adata_[a-z0-9]+_', dirname) is not None
 
     @staticmethod
     def is_valid_product_dir_basename(dirname):
-        return re.match('\Avisit_[a-z0-9]{2}\Z', dirname) is not None
+        return re.match(r'\Avisit_[a-z0-9]{2}\Z', dirname) is not None
 
     @staticmethod
     def is_hidden_file_basename(basename):

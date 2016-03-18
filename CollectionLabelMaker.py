@@ -10,7 +10,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, collection):
         super(CollectionLabelMaker, self).__init__(
             collection, CollectionInfo.CollectionInfo(collection))
-        self.inventoryDocument = None
+        self.inventory_document = None
         self.create_default_collection_inventory()
 
     def default_xml_name(self):
@@ -27,18 +27,18 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         # Line endings are native here (i.e., possibly wrong,
         # depending on the platform), but we make sure to write using
         # io.open() with newline='\r\n'
-        self.inventoryDocument = ''.join(lines)
+        self.inventory_document = ''.join(lines)
 
     def create_default_inventory_file(self, inv_filepath=None):
         if inv_filepath is None:
             inv_name = self.default_inventory_name()
             inv_filepath = os.path.join(self.component.directory_filepath(),
                                         inv_name)
-        # Line endings in the inventoryDocument are native (i.e.,
+        # Line endings in the inventory_document are native (i.e.,
         # possibly wrong, depending on the platform), so we must write
         # using io.open() with newline='\r\n'
         with io.open(inv_filepath, 'w', newline='\r\n') as f:
-            f.write(self.inventoryDocument)
+            f.write(self.inventory_document)
 
     def create_xml(self):
         collection = self.component
@@ -61,7 +61,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath '/Product_Collection/Identification_Area'
         logical_identifier, version_id, title, information_model_version, \
-            product_class, citationInformation = \
+            product_class, citation_information = \
             self.create_children(identification_area, [
                 'logical_identifier',
                 'version_id',
@@ -80,7 +80,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
         # At XPath
         # '/Product_Collection/Identification_Area/Citation_Information'
         publication_year, description = \
-            self.create_children(citationInformation,
+            self.create_children(citation_information,
                                  ['publication_year', 'description'])
 
         self.set_text(publication_year,

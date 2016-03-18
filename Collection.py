@@ -10,7 +10,7 @@ import Product
 class Collection(ArchiveComponent.ArchiveComponent):
     """A PDS4 Collection."""
 
-    DIRECTORY_PATTERN = '\Adata_([a-z0-9]+)_([a-z0-9_]+)\Z'
+    DIRECTORY_PATTERN = r'\Adata_([a-z0-9]+)_([a-z0-9_]+)\Z'
 
     def __init__(self, arch, lid):
         """
