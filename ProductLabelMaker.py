@@ -101,9 +101,9 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
         # At XPath '/Product_Observational/Observation_Area'
         instrument = self.component.collection().instrument()
-        instrumentMaker = InstrumentXmlMaker.factories[instrument](
+        instrument_maker = InstrumentXmlMaker.factories[instrument](
             self.document)
-        instrumentMaker.create_xml(observation_area)
+        instrument_maker.create_xml(observation_area)
 
         # At XPath '/Product_Observational'
         xml_maker = ProductFilesXmlMaker.ProductFilesXmlMaker(

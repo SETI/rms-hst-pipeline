@@ -4,8 +4,6 @@ import unittest
 
 
 class HstFilename(object):
-    s = '/some/random/folder/j6gp01mmq_trl.fits'
-
     def __init__(self, filename):
         self.filename = filename
         assert len(os.path.basename(filename)) > 6, \
@@ -49,6 +47,8 @@ class HstFilename(object):
 
 ############################################################
 
+_TEST_FILENAME = '/some/random/folder/j6gp01mmq_trl.fits'
+
 
 class TestHstFilename(unittest.TestCase):
     def test_init(self):
@@ -68,24 +68,24 @@ class TestHstFilename(unittest.TestCase):
         HstFilename('I123456')  # case-less
 
     def test_str(self):
-        s = HstFilename.s
-        self.assertEqual(s, HstFilename(s).__str__())
+        hst = HstFilename(_TEST_FILENAME)
+        self.assertEqual(_TEST_FILENAME, hst.__str__())
 
     def test_repr(self):
-        s = HstFilename.s
-        self.assertEqual('HstFilename(\'' + s + '\')', repr(HstFilename(s)))
+        hst = HstFilename(_TEST_FILENAME)
+        self.assertEqual('HstFilename(\'' + _TEST_FILENAME + '\')', repr(hst))
 
     def test_instrument_name(self):
-        s = HstFilename.s
-        self.assertEqual('acs', HstFilename(s).instrument_name())
+        hst = HstFilename(_TEST_FILENAME)
+        self.assertEqual('acs', hst.instrument_name())
 
     def test_hst_internal_proposal_id(self):
-        s = HstFilename.s
-        self.assertEqual('6gp', HstFilename(s).hst_internal_proposal_id())
+        hst = HstFilename(_TEST_FILENAME)
+        self.assertEqual('6gp', hst.hst_internal_proposal_id())
 
     def test_visit(self):
-        s = HstFilename.s
-        self.assertEqual('01', HstFilename(s).visit())
+        hst = HstFilename(_TEST_FILENAME)
+        self.assertEqual('01', hst.visit())
 
 if __name__ == '__main__':
     unittest.main()

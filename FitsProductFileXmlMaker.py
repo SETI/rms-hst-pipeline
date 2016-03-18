@@ -161,6 +161,7 @@ class XmlFitsPass(FitsPass):
 class FitsProductFileXmlMaker(ProductFileXmlMaker.ProductFileXmlMaker):
     def __init__(self, document, archive_file):
         super(FitsProductFileXmlMaker, self).__init__(document, archive_file)
+        self.targname = None
 
     def create_file_data_xml(self, file_area_observational):
         xfp = XmlFitsPass(self, file_area_observational)

@@ -360,13 +360,13 @@ def _triples(n): return n * 3
 def _succ(n): return n + 1
 
 
-def _fails(n): raise Exception('I failed')
+def _fails(_): raise Exception('I failed')
 
 
 def _fails_with_message(msg):
-    def _fails(arg):
+    def _fails_msg(_):
         raise Exception(msg)
-    return _fails
+    return _fails_msg
 
 
 class TestHeuristic(unittest.TestCase):

@@ -153,6 +153,9 @@ class BundleContainsBundleXml(Pass.LimitedReportingPass):
 
 class CollectionContainsCollectionXml(Pass.LimitedReportingPass):
     def __init__(self):
+        self.collection_inv_name = None
+        self.collection_xml_name = None
+        self.saw_collection_inv = None
         self.saw_collection_xml = None
         super(CollectionContainsCollectionXml, self).__init__()
 
