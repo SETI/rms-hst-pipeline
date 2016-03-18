@@ -78,7 +78,7 @@ class TestLID(unittest.TestCase):
     def test_init(self):
         # sanity-check
         with self.assertRaises(Exception):
-            LID(null)
+            LID(None)
 
         # test segments
         with self.assertRaises(Exception):

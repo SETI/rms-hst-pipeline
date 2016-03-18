@@ -8,7 +8,6 @@ import LID
 import Product
 import ProductFileXmlMaker
 import ProductLabelMaker
-import XmlUtils
 
 
 BITPIX_TABLE = {

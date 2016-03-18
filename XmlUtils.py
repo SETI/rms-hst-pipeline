@@ -1,6 +1,3 @@
-import xml.dom
-
-
 class XmlUtils(object):
     """An abstract class providing XML functionality."""
 
@@ -27,7 +24,6 @@ class XmlUtils(object):
         Create a child nodes of the parent with the given tags,
         returning them.
         """
-        d = self.document
         return [self.create_child(parent, name) for name in names]
 
     def set_text(self, parent, txt):

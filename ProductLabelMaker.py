@@ -1,8 +1,5 @@
 import sys
-import tempfile
 
-import ArchiveFile
-import DummyProductFileXmlMaker
 import FileArchives
 import FitsProductFileXmlMaker
 import InstrumentXmlMaker
@@ -13,7 +10,6 @@ import ProductFilesXmlMaker
 import ProductInfo
 import ProductPass
 import TargetIdentificationXmlMaker
-import Targets
 import XmlSchema
 
 

@@ -2,7 +2,6 @@ import abc
 
 import ArchiveFile
 import XmlMaker
-import XmlUtils
 
 
 class ProductFileXmlMaker(XmlMaker.XmlMaker):

@@ -36,7 +36,7 @@ class TestLIDVID(unittest.TestCase):
     def test_init(self):
         # sanity-check
         with self.assertRaises(Exception):
-            LIDVID(null)
+            LIDVID(None)
 
         with self.assertRaises(Exception):
             LIDVID('::2.0')

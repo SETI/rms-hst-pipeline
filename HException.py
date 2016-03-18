@@ -67,7 +67,7 @@ class HExceptionGroup(HExc):
     def to_xml(self, document):
         res = document.createElement('HExceptionGroup')
         if self.label:
-            attr = res.setAttribute('label', self.label)
+            res.setAttribute('label', self.label)
         for ex in self.exceptions:
             child = ex.to_xml(document)
             res.appendChild(child)

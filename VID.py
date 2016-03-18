@@ -41,7 +41,7 @@ class TestVID(unittest.TestCase):
     def test_init(self):
         # sanity-check
         with self.assertRaises(Exception):
-            VID(null)
+            VID(None)
 
         with self.assertRaises(Exception):
             VID('foo')

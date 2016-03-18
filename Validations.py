@@ -1,6 +1,4 @@
-import os.path
 import pprint  # TODO remove
-import re
 import sys
 import traceback
 
@@ -9,7 +7,6 @@ import pyfits
 import BundleLabelMaker
 import CollectionLabelMaker
 import HstFilename
-import LabelMaker
 import LID
 import Pass
 import ProductLabelMaker

@@ -408,7 +408,8 @@ class TestHeuristic(unittest.TestCase):
         self.assertIsNone(h.label)
         for o in h.or_elses:
             self.assertTrue(isinstance(o, HFunction))
-        self.assertEquals([_doubles, _succ], [h.func for h in h.or_elses])
+        self.assertEquals([_doubles, _succ],
+                          [or_else.func for or_else in h.or_elses])
 
     def test_HOrElses(self):
         # I use h_or_elses() sugar here; the test above proves it to be
@@ -482,7 +483,8 @@ class TestHeuristic(unittest.TestCase):
         self.assertIsNone(h.label)
         for a in h.and_thens:
             self.assertTrue(isinstance(a, HFunction))
-        self.assertEquals([_doubles, _succ], [h.func for h in h.and_thens])
+        self.assertEquals([_doubles, _succ],
+                          [and_then.func for and_then in h.and_thens])
 
     def test_HAndThens(self):
         # I use h_and_thens() sugar here; the test above proves it to
