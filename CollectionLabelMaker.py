@@ -32,7 +32,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
     def create_default_inventory_file(self, inv_filepath=None):
         if inv_filepath is None:
             inv_name = self.default_inventory_name()
-            inv_filepath = os.path.join(self.component.directory_filepath(),
+            inv_filepath = os.path.join(self.component.absolute_filepath(),
                                         inv_name)
         # Line endings in the inventory_document are native (i.e.,
         # possibly wrong, depending on the platform), so we must write

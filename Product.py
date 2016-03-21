@@ -21,7 +21,7 @@ class Product(ArchiveComponent.ArchiveComponent):
     def __repr__(self):
         return 'Product(%r, %r)' % (self.archive, self.lid)
 
-    def directory_filepath(self):
+    def absolute_filepath(self):
         """Return the absolute filepath to the component's directory."""
         return os.path.join(self.archive.root, self.lid.bundle_id,
                             self.lid.collection_id, self.lid.product_id)

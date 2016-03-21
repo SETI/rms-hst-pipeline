@@ -49,7 +49,7 @@ class LabelMaker(XmlUtils.XmlUtils):
         """
         if xml_filepath is None:
             xml_name = self.default_xml_name()
-            xml_filepath = os.path.join(self.component.directory_filepath(),
+            xml_filepath = os.path.join(self.component.absolute_filepath(),
                                         xml_name)
         with open(xml_filepath, 'w') as output_file:
             pretty = True

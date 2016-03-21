@@ -22,7 +22,7 @@ class Collection(ArchiveComponent.ArchiveComponent):
     def __repr__(self):
         return 'Collection(%r, %r)' % (self.archive, self.lid)
 
-    def directory_filepath(self):
+    def absolute_filepath(self):
         """Return the absolute filepath to the component's directory."""
         return os.path.join(self.archive.root,
                             self.lid.bundle_id, self.lid.collection_id)
@@ -31,7 +31,7 @@ class Collection(ArchiveComponent.ArchiveComponent):
         """
         Generate the products of this bundle as Product objects.
         """
-        dir_fp = self.directory_filepath()
+        dir_fp = self.absolute_filepath()
         for subdir in os.listdir(dir_fp):
             if re.match(Product.Product.DIRECTORY_PATTERN, subdir):
                 product_lid = LID.LID('%s:%s' % (self.lid.lid, subdir))

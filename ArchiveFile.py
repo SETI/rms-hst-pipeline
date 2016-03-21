@@ -31,5 +31,5 @@ class ArchiveFile(object):
 
     def full_filepath(self):
         """Return the full, absolute filepath to the file."""
-        return os.path.join(self.component.directory_filepath(),
+        return os.path.join(self.component.absolute_filepath(),
                             self.basename)
