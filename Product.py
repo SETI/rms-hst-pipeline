@@ -1,15 +1,33 @@
 import os.path
 import re
+import shutil
+import tempfile
+import unittest
 
 import ArchiveComponent
+import ArchiveFile
 import Bundle
 import Collection
+import FileArchive
+import LID
+
+
+def _find_filepath_under_dir(dir, filename):
+    """
+    Find a file by name in a directory or one of its subdirectories
+    and return the absolute filepath.  Assume the directory path is
+    absolute and that only one file with that name exists under the
+    directory.
+    """
+    for (dirpath, dirnames, filenames) in os.walk(dir):
+        if filename in filenames:
+            return os.path.join(dirpath, filename)
 
 
 class Product(ArchiveComponent.ArchiveComponent):
     """A PDS4 Product."""
 
-    DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
+    VISIT_DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
 
     def __init__(self, arch, lid):
         """
@@ -23,16 +41,25 @@ class Product(ArchiveComponent.ArchiveComponent):
 
     def absolute_filepath(self):
         """Return the absolute filepath to the component's directory."""
-        return os.path.join(self.archive.root, self.lid.bundle_id,
-                            self.lid.collection_id, self.lid.product_id)
+        collection_fp = self.collection().absolute_filepath()
+        return _find_filepath_under_dir(collection_fp,
+                                        self.lid.product_id + '.fits')
 
     def visit(self):
         """
         Return the visit code for this product.  It is calculated from
-        the product's LID.
+        the product's filepath
         """
-        return re.match(Product.DIRECTORY_PATTERN,
-                        self.lid.product_id).group(1)
+        fp = self.absolute_filepath()
+        visit_fp = os.path.basename(os.path.dirname(fp))
+        return re.match(Product.VISIT_DIRECTORY_PATTERN, visit_fp).group(1)
+
+    def files(self):
+        return [ArchiveFile.ArchiveFile(self,
+                                        self.absolute_filepath())]
+
+    def absolute_filepath_is_directory(self):
+        return False
 
     def collection(self):
         """Return the collection this product belongs to."""
@@ -41,3 +68,40 @@ class Product(ArchiveComponent.ArchiveComponent):
     def bundle(self):
         """Return the bundle this product belongs to."""
         return Bundle.Bundle(self.archive, self.lid.parent_lid().parent_lid())
+
+
+class TestProduct(unittest.TestCase):
+    def test_find_filepath_under_dir(self):
+        # This is only a sanity test since we assume os.walk() works
+        # correctly.
+        tempdir = tempfile.mkdtemp()
+        try:
+            dst_dir = os.path.join(tempdir, 'a/b/c/d/e')
+            os.makedirs(dst_dir)
+            filepath = os.path.join(dst_dir, 'foo.fits')
+            with open(filepath, 'w') as f:
+                f.write('Hi!\n')
+            self.assertEqual(filepath,
+                             _find_filepath_under_dir(dst_dir, 'foo.fits'))
+        finally:
+            shutil.rmtree(tempdir)
+
+    def test_visit(self):
+        tempdir = tempfile.mkdtemp()
+        try:
+            archive = FileArchive.FileArchive(tempdir)
+            visit_dir = os.path.join(tempdir,
+                                     'hst_99999/data_acs_xxx/visit_23/')
+            os.makedirs(visit_dir)
+            filepath = os.path.join(visit_dir, 'foo_xxx.fits')
+            with open(filepath, 'w') as f:
+                f.write('Hi!\n')
+            lid = LID.LID('urn:nasa:pds:hst_99999:data_acs_xxx:foo_xxx')
+            product = Product(archive, lid)
+            self.assertEqual('23', product.visit())
+        finally:
+            shutil.rmtree(tempdir)
+
+
+if __name__ == '__main__':
+    unittest.main()

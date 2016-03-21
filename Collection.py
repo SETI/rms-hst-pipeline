@@ -32,10 +32,12 @@ class Collection(ArchiveComponent.ArchiveComponent):
         Generate the products of this bundle as Product objects.
         """
         dir_fp = self.absolute_filepath()
-        for subdir in os.listdir(dir_fp):
-            if re.match(Product.Product.DIRECTORY_PATTERN, subdir):
-                product_lid = LID.LID('%s:%s' % (self.lid.lid, subdir))
-                yield Product.Product(self.archive, product_lid)
+        for (dirpath, dirnames, filenames) in os.walk(dir_fp):
+            for filename in filenames:
+                (root, ext) = os.path.splitext(filename)
+                if ext == '.fits':
+                    product_lid = LID.LID('%s:%s' % (self.lid.lid, root))
+                    yield Product.Product(self.archive, product_lid)
 
     def instrument(self):
         """

@@ -32,10 +32,16 @@ class ArchiveComponent(object):
     @abc.abstractmethod
     def absolute_filepath(self):
         """
-        Return the absolute filepath to the component's directory or
-        file.
+        Return the absolute filepath to the component's directory
+        (Bundle, Collection) or file (Product).
         """
         pass
+
+    def absolute_filepath_is_directory(self):
+        """
+        Return True iff absolute_filepath() returns a directory.
+        """
+        return True
 
     def files(self):
         """
