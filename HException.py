@@ -17,6 +17,10 @@ class HExc(object):
     def to_xml(self, document):
         pass
 
+    @abc.abstractmethod
+    def is_group(self):
+        pass
+
     def print_as_xml(self):
         document = xml.dom.getDOMImplementation().createDocument(None,
                                                                  None,
@@ -39,6 +43,9 @@ class HException(HExc):
 
     def __str__(self):
         return 'HException(%s, %s)' % (self.exception, self.stack_trace)
+
+    def is_group(self):
+        return False
 
     def to_xml(self, document):
         res = document.createElement('HException')
@@ -63,6 +70,9 @@ class HExceptionGroup(HExc):
 
     def __str__(self):
         return 'HExceptionGroup(%s, %s)' % (self.label, self.exceptions)
+
+    def is_group(self):
+        return True
 
     def to_xml(self, document):
         res = document.createElement('HExceptionGroup')

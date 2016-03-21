@@ -453,9 +453,11 @@ class TestHeuristic(unittest.TestCase):
         res = h_or_elses('wrapper', fails_bar, fails_foo)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
-        (lab, es) = res.exceptions[0]
-        self.assertEquals('wrapper', lab)
-        self.assertEquals(['bar', 'foo'], [e.exception.args[0] for e in es])
+        exception = res.exceptions[0]
+        self.assertTrue(exception.is_group())
+        self.assertEquals('wrapper', exception.label)
+        self.assertEquals(['bar', 'foo'],
+                          [e.exception.args[0] for e in exception.exceptions])
 
         # Test empty case: no alternatives means immediate failure.
         res = h_or_elses()(3)
@@ -529,9 +531,11 @@ class TestHeuristic(unittest.TestCase):
         res = h_and_thens('wrapper', fails_bar, fails_foo)(3)
         self.assertFalse(res.is_success())
         self.assertEquals(1, len(res.exceptions))
-        (lab, es) = res.exceptions[0]
-        self.assertEquals('wrapper', lab)
-        self.assertEquals(['bar'], [e.exception.args[0] for e in es])
+        exception = res.exceptions[0]
+        self.assertTrue(exception.is_group())
+        self.assertEquals('wrapper', exception.label)
+        self.assertEquals(['bar'],
+                          [e.exception.args[0] for e in exception.exceptions])
 
         # Test empty case: no actions means immediate success with no
         # change in argument.
