@@ -18,13 +18,16 @@ class ProductInfo(Info.Info):
         Return the text appearing at XPath
         '/Product_Observational/Identification_Area/title'.
         """
+        # TODO This needs to be updated since making products contain
+        # only one image.
+
         collection = self.product.collection()
-        image_tag = collection.suffix().upper() + ' images'
-        visit = self.product.visit()
+        image_tag = collection.suffix().upper() + ' image'
+        # visit = self.product.visit()
         prod_id = str(collection.bundle().proposal_id())
         template = 'This collection contains the %s ' + \
-            'obtained from visit %s of the HST Observing Program %s.'
-        return template % (image_tag, visit, prod_id)
+            'obtained the HST Observing Program %s.'
+        return template % (image_tag, prod_id)
 
     def start_date_time(self):
         """
@@ -76,32 +79,3 @@ class ProductInfo(Info.Info):
         '/Product_Observational/Identification_Area/Modification_History/description'
         """
         return 'PDS4 version-in-development of the product'
-
-    def observing_system_name(self):
-        """
-        Return the text appearing at XPath
-        '/Product_Observational/Observation_Area/Observing_System/name'
-        """
-        return self.PLACEHOLDER('observing_system_name')
-
-    def observing_system_component_name(self):
-        """
-        Return the text appearing at XPath
-        '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component/name'.
-        """
-        return self.PLACEHOLDER('observing_system_component_name')
-
-    def observing_system_component_type(self):
-        """
-        Return the text appearing at XPath
-        '/Product_Observational/Observation_Area/Observing_System/Observing_System_Component/type'.
-        """
-        return self.CHEATING_PLACEHOLDER('Instrument',
-                                         'observing_system_component_type')
-
-    def unknown_target_identification_name(self):
-        return self.PLACEHOLDER('unknown_target_identification_name')
-
-    def unknown_target_identification_type(self):
-        return self.CHEATING_PLACEHOLDER('Galaxy',
-                                         'unknown_target_identification_type')
