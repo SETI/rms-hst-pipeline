@@ -42,8 +42,11 @@ class Product(ArchiveComponent.ArchiveComponent):
     def absolute_filepath(self):
         """Return the absolute filepath to the component's directory."""
         collection_fp = self.collection().absolute_filepath()
-        return _find_filepath_under_dir(collection_fp,
-                                        self.lid.product_id + '.fits')
+        res = _find_filepath_under_dir(collection_fp,
+                                       self.lid.product_id + '.fits')
+        assert res, ('Product.absolute_filepath(%r) = %r '
+                     'where collection_fp = %r' % (self, res, collection_fp))
+        return res
 
     def visit(self):
         """
@@ -55,8 +58,8 @@ class Product(ArchiveComponent.ArchiveComponent):
         return re.match(Product.VISIT_DIRECTORY_PATTERN, visit_fp).group(1)
 
     def files(self):
-        return [ArchiveFile.ArchiveFile(self,
-                                        self.absolute_filepath())]
+        basename = os.path.basename(self.absolute_filepath())
+        return [ArchiveFile.ArchiveFile(self, basename)]
 
     def absolute_filepath_is_directory(self):
         return False

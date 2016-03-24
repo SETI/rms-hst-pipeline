@@ -14,9 +14,14 @@ class ArchiveFile(object):
         subdirectories.  That won't always be true.
         """
 
-        assert comp
+        assert comp, ('ArchiveFile.__init__() '
+                      'where comp = %r and basename = %r' %
+                      (comp, basename))
         self.component = comp
-        assert basename
+        assert basename, ('ArchiveFile.__init__() '
+                          'where comp = %r and basename = %r' %
+                          (comp, basename))
+        assert os.path.basename(basename) == basename
         self.basename = basename
 
     def __eq__(self, other):

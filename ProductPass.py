@@ -84,11 +84,6 @@ class ProductPassRunner(object):
     Heuristic framework to propagate errors.
     """
 
-    # TODO After reflection, I'd like to drop the assumption that the
-    # ProductPass calls will never raise exceptions.  The client still
-    # writes the code normally, but ProductPassRunner needs to catch
-    # exceptions and wrap the results as needed.
-
     def run_product(self, product_pass, product):
         """
         Run the ProductPass over the Product and return a
@@ -126,7 +121,9 @@ class ProductPassRunner(object):
         else:
             hdus = res.value
 
-        return Heuristic.Success(product_pass.process_file(file, hdus))
+        return Heuristic.HFunction(
+            lambda(_): product_pass.process_file(file, hdus))(None)
+        # return Heuristic.Success(product_pass.process_file(file, hdus))
 
     def run_hdu(self, product_pass, n, hdu):
         """
@@ -134,7 +131,10 @@ class ProductPassRunner(object):
         """
         hdr = product_pass.process_hdu_header(n, hdu.header)
         dat = product_pass.process_hdu_data(n, hdu.data)
-        return Heuristic.Success(product_pass.process_hdu(n, hdu, hdr, dat))
+
+        return Heuristic.HFunction(
+            lambda(_): product_pass.process_hdu(n, hdu, hdr, dat))(None)
+        # return Heuristic.Success(product_pass.process_hdu(n, hdu, hdr, dat))
 
     def __str__(self):
         return 'ProductPassRunner'
@@ -341,7 +341,8 @@ class ProductLabelProductPass(CompositeProductPass):
 
 
 if __name__ == '__main__':
-    lid = LID.LID('urn:nasa:pds:hst_09746:data_acs_raw:visit_25')
+    # in visit_25
+    lid = LID.LID('urn:nasa:pds:hst_09746:data_acs_raw:j8rl25pbq_raw')
     product = Product.Product(FileArchives.get_any_archive(), lid)
     # pp = FileAreaProductPass()
     # pp = TargetProductPass()
