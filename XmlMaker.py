@@ -4,7 +4,14 @@ import XmlUtils
 
 
 class XmlMaker(XmlUtils.XmlUtils):
-    """An abstract class that can create portions of XML documents."""
+    """
+    An abstract class that can create portions of XML documents.
+
+    In the initializer, you add any extra information you need to
+    build the XML element(s).
+
+    In create_xml(), you create the needed XML.
+    """
 
     __metaclass__ = abc.ABCMeta
 

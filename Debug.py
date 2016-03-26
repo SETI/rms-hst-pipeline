@@ -1,4 +1,5 @@
 import functools
+import pprint
 import sys
 import traceback
 
@@ -14,16 +15,19 @@ def trace(f):
     def wrapped(*args, **kwargs):
         global _indent_level
         print '%sEntering %s(args=%s, kwargs=%s)' % \
-            (_indent(), f.__name__, args, kwargs)
+            (_indent(), f.__name__,
+             pprint.pformat(args), pprint.pformat(kwargs))
         _indent_level += 1
         try:
             res = f(*args, **kwargs)
-            print '%sExiting %s(args=%s, kwargs=%s)\nreturning %r' % \
-                (_indent(), f.__name__, args, kwargs, res)
+            print '%sExiting %s()returning %s' % \
+                (_indent(), f.__name__,
+                 pprint.pformat(res))
             return res
         except BaseException as e:
-            print '%sExiting %s(args=%s, kwargs=%s)\nwith exception %s' % \
-                (_indent(), f.__name__, args, kwargs, e)
+            print '%sExiting %s() with exception %s' % \
+                (_indent(), f.__name__,
+                 pprint.pformat(e))
             raise
         finally:
             _indent_level -= 1

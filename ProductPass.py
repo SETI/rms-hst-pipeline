@@ -1,9 +1,11 @@
 import abc
 import pprint
 import traceback
+import pprint
 
 import pyfits
 
+import Debug
 import FileArchives
 import Heuristic
 import LID
@@ -119,11 +121,10 @@ class ProductPassRunner(object):
         if res.is_failure():
             return res
         else:
-            hdus = res.value
+            hdus = zip(*res.value)
 
         return Heuristic.HFunction(
             lambda(_): product_pass.process_file(file, hdus))(None)
-        # return Heuristic.Success(product_pass.process_file(file, hdus))
 
     def run_hdu(self, product_pass, n, hdu):
         """
@@ -134,7 +135,6 @@ class ProductPassRunner(object):
 
         return Heuristic.HFunction(
             lambda(_): product_pass.process_hdu(n, hdu, hdr, dat))(None)
-        # return Heuristic.Success(product_pass.process_hdu(n, hdu, hdr, dat))
 
     def __str__(self):
         return 'ProductPassRunner'
@@ -313,6 +313,31 @@ class CompositeProductPass(ProductPass):
         return 'CompositeProductPass(%r)' % self.passes
 
 
+class TimeProductPass(ProductPass):
+    def process_hdu_data(self, n, data):
+        return None
+
+    def process_hdu_header(self, n, data):
+        res = ('2000-01-02Z', '2000-01-02Z')
+        return res
+
+    def process_hdu(self, n, hdu, h, d):
+        return h
+
+    def process_file(self, file, hdus):
+        return hdus[0]
+
+    def process_product(self, product, files):
+        time_set = set([file for file in files if file is not None])
+        return ('Time', time_set)
+
+    def __str__(self):
+        return 'TimeProductPass()'
+
+    def __repr__(self):
+        return 'TimeProductPass()'
+
+
 class ProductLabelProductPass(CompositeProductPass):
     """
     When run, produce a dictionary such that dict['target_set'] is the
@@ -321,7 +346,9 @@ class ProductLabelProductPass(CompositeProductPass):
     information for each file, indexed by the files' basenames.
     """
     def __init__(self):
-        passes = [TargetProductPass(), FileAreaProductPass()]
+        passes = [TargetProductPass(),
+                  FileAreaProductPass(),
+                  TimeProductPass()]
         super(ProductLabelProductPass, self).__init__(passes)
 
     def process_product(self, product, files):
@@ -346,6 +373,7 @@ if __name__ == '__main__':
     product = Product.Product(FileArchives.get_any_archive(), lid)
     # pp = FileAreaProductPass()
     # pp = TargetProductPass()
+    # pp = TimeProductPass()
     pp = ProductLabelProductPass()
     ppr = ProductPassRunner()
     print 60 * '-'
@@ -354,10 +382,10 @@ if __name__ == '__main__':
         res = ppr.run_product(pp, product)
         print "SUCCESSFUL CALCULATION"
         if res.is_success():
-            print pprint.PrettyPrinter(indent=2, width=78).pprint(res.value)
+            print pprint.PrettyPrinter(indent=2, width=78).pformat(res.value)
         else:
             print pprint.PrettyPrinter(indent=2,
-                                       width=78).pprint(res.exceptions)
+                                       width=78).pformat(res.exceptions)
 
     except:
         print "FAILED CALCULATION"
