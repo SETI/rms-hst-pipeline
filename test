@@ -12,8 +12,6 @@ echo '-- LID'
 python LID.py
 echo '-- LIDVID'
 python LIDVID.py
-echo '-- Product'
-python Product.py
 echo '-- VID'
 python VID.py
 echo '-- XmlSchema'
