@@ -111,11 +111,11 @@ class FileAreaProductPass(ProductPass.ProductPass):
         return res
 
     def process_file(self, file, hdus):
-        return (file.basename, hdus)
+        return hdus
 
     def process_product(self, product, files):
-        # A dict of lists of HDUs indexed by the file's basename
-        return ('File_Area_Observational', dict(files))
+        # Tuple of HDUs' structures
+        return ('File_Area_Observational', files[0])
 
     def __repr__(self):
         return 'FileAreaProductPass()'
@@ -152,9 +152,10 @@ class TimeProductPass(ProductPass.ProductPass):
 class ProductLabelProductPass(ProductPass.CompositeProductPass):
     """
     When run, produce a dictionary such that dict['target_set'] is the
-    set of targets named in primary HDUs within this product and
+    set of targets named in primary HDUs within this product,
     dict['File_Area_Observational'] is a dict of lists of HDU
-    information for each file, indexed by the files' basenames.
+    information for the product file, and dict['Time'] is a pair of
+    the start and end times of the observation.
     """
     def __init__(self):
         passes = [TargetProductPass(),

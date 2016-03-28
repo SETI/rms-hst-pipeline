@@ -19,6 +19,9 @@ def _find_filepath_under_dir(dir, filename):
     absolute and that only one file with that name exists under the
     directory.
     """
+    # TODO: we can get the visit number from the filename, so no need
+    # to review all the directories (or at least we can try the most
+    # likely one first).
     for (dirpath, dirnames, filenames) in os.walk(dir):
         if filename in filenames:
             return os.path.join(dirpath, filename)
