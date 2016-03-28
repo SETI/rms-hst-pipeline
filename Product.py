@@ -40,7 +40,7 @@ class Product(ArchiveComponent.ArchiveComponent):
         return 'Product(%r, %r)' % (self.archive, self.lid)
 
     def absolute_filepath(self):
-        """Return the absolute filepath to the component's directory."""
+        """Return the absolute filepath to the product file."""
         collection_fp = self.collection().absolute_filepath()
         res = _find_filepath_under_dir(collection_fp,
                                        self.lid.product_id + '.fits')
