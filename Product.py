@@ -44,7 +44,7 @@ class Product(ArchiveComponent.ArchiveComponent):
         """Return the absolute filepath to the product file."""
         collection_fp = self.collection().absolute_filepath()
         res = _find_product_file(collection_fp,
-                                       self.lid.product_id + '.fits')
+                                 self.lid.product_id + '.fits')
         assert res, ('Product.absolute_filepath(%r) = %r '
                      'where collection_fp = %r' % (self, res, collection_fp))
         return res
@@ -72,4 +72,3 @@ class Product(ArchiveComponent.ArchiveComponent):
     def bundle(self):
         """Return the bundle this product belongs to."""
         return Bundle.Bundle(self.archive, self.lid.parent_lid().parent_lid())
-
