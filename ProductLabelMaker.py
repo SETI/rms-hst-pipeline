@@ -8,6 +8,7 @@ import LabelMaker
 import Product
 import ProductFilesXmlMaker
 import ProductInfo
+import ProductLabelProductPass
 import ProductPass
 import TargetIdentificationXmlMaker
 import XmlSchema
@@ -149,7 +150,7 @@ def make_and_test_product_label(lid):
     a = FileArchives.get_any_archive()
     p = Product.Product(a, lid)
 
-    pp = ProductPass.ProductLabelProductPass()
+    pp = ProductLabelProductPass.ProductLabelProductPass()
     ppr = ProductPass.ProductPassRunner()
     print ppr.run_product(pp, p)
 
