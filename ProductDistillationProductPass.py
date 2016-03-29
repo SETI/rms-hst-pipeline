@@ -42,7 +42,7 @@ class TargetProductPass(ProductPass.ProductPass):
             raise Exception('No target found')
         target = Targets.targname_to_target(target.upper())
         if target is None:
-            raise Exception('Unknown target %s' % files[0])
+            pass  # raise Exception('Unknown target %s' % files[0])
         return ('target', target)
 
     def __repr__(self):
