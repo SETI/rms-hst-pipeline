@@ -20,9 +20,9 @@ class InstrumentInfo(object):
         pass
 
 
-class AcsInstrumentInfo(InstrumentInstrumentInfo):
-    def __init__(self, document):
-        super(AcsInstrumentInfo, self).__init__(document)
+class AcsInstrumentInfo(InstrumentInfo):
+    def __init__(self):
+        super(AcsInstrumentInfo, self).__init__()
 
     def observing_system_name(self):
         return 'Hubble Space Telescope Advanced Camera for Surveys'
@@ -34,9 +34,9 @@ class AcsInstrumentInfo(InstrumentInstrumentInfo):
         return 'urn:nasa:pds:context:instrument:insthost.acs.hst'
 
 
-class Wfc3InstrumentInfo(InstrumentInstrumentInfo):
-    def __init__(self, document):
-        super(Wfc3InstrumentInfo, self).__init__(document)
+class Wfc3InstrumentInfo(InstrumentInfo):
+    def __init__(self):
+        super(Wfc3InstrumentInfo, self).__init__()
 
     def observing_system_name(self):
         return 'Hubble Space Telescope Wide Field Camera 3'
@@ -48,9 +48,9 @@ class Wfc3InstrumentInfo(InstrumentInstrumentInfo):
         return 'urn:nasa:pds:context:instrument:insthost.wfc3.hst'
 
 
-class Wfpc2InstrumentInfo(InstrumentInstrumentInfo):
-    def __init__(self, document):
-        super(Wfpc2InstrumentInfo, self).__init__(document)
+class Wfpc2InstrumentInfo(InstrumentInfo):
+    def __init__(self):
+        super(Wfpc2InstrumentInfo, self).__init__()
 
     def observing_system_name(self):
         return 'Hubble Space Telescope Wide-Field Planetary Camera 2'
@@ -72,9 +72,10 @@ class InstrumentXmlMakerD(XmlMaker.XmlMaker):
     """Version of InstrumentXmlMaker run on distillation"""
     def __init__(self, document, instrument):
         super(InstrumentXmlMakerD, self).__init__(document)
-        assert FileArchive.is_valid_instrument(instrument), \
+        assert FileArchive.FileArchive.is_valid_instrument(instrument), \
             'invalid instrument %s' % instrument
-        self.instrument_info = _factories[instrument]
+        self.instrument_info = _factories[instrument]()
+        assert self.instrument_info
 
     def create_xml(self, parent):
         assert parent
