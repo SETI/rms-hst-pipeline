@@ -60,7 +60,7 @@ class Product(ArchiveComponent.ArchiveComponent):
 
     def files(self):
         basename = os.path.basename(self.absolute_filepath())
-        return [ArchiveFile.ArchiveFile(self, basename)]
+        yield ArchiveFile.ArchiveFile(self, basename)
 
     def absolute_filepath_is_directory(self):
         return False
