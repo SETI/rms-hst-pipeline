@@ -5,10 +5,10 @@ import traceback
 
 import FileArchives
 
+
 ##############################
 # structured exception info
 ##############################
-
 
 class ExceptionInfo(object):
     # def to_xml(self):  pass # to be implemented
@@ -201,15 +201,25 @@ class Runner(object):
 
     def run_fits(self, reducer, file):
         def generate_hdus():
-            fits = pyfits.open(file.full_filepath())
             try:
-                for n, hdu in enumerate(fits):
-                    yield (n, hdu)
-            finally:
-                fits.close()
+                fits = pyfits.open(file.full_filepath())
+                try:
+                    for n, hdu in enumerate(fits):
+                        yield (n, hdu)
+                finally:
+                    fits.close()
+            except IOError:
+                yield None
 
         hdus = generate_hdus()
-        hdus_ = itertools.imap(lambda(x): self.run_hdu(reducer, x), hdus)
+
+        def wrap(x):
+            if x:
+                self.run_hdu(reducer, x)
+            else:
+                return None
+
+        hdus_ = itertools.imap(wrap, hdus)
         return reducer.reduce_fits_gen(file, hdus_)
 
     def run_hdu(self, reducer, (n, hdu)):
@@ -342,6 +352,12 @@ class NullReducer(Reducer):
     def reduce_data_unit(self, n, du):
         pass
 
+    def __str__(self):
+        return 'NullReducer'
+
+    def __repr__(self):
+        return 'NullReducer'
+
 
 class CompositeReducer(Reducer):
     def __init__(self, reducers):
@@ -384,10 +400,14 @@ class CompositeReducer(Reducer):
     def reduce_data_unit(self, n, du):
         return [r.reduce_data_unit(n, du) for r in self.reducers]
 
+    def __str__(self):
+        return 'CompositeReducer(%s)' % str(self.reducers)
+
 
 def checked_zip(*args):
     # Check that all the arguments are the same length
-    assert len(set([len(arg) for arg in args])) == 1
+    argSet = set([len(arg) for arg in args])
+    assert len(argSet) == 1, str(args)
     return zip(*args)
 
 
@@ -420,6 +440,8 @@ class ReducerAdapter(GenReducer):
     def reduce_data_unit(self, n, du):
         return self.reducer.reduce_data_unit(n, du)
 
+    def __str__(self):
+        return 'ReducerAdapter(%s)' % str(self.reducer)
 
 ############################################################
 # testing
@@ -452,6 +474,40 @@ class CheckFitsReducer(NullGenReducer):
         except Exception as e:
             return e.message
 
+    def __str__(self):
+        return 'CheckFitsReducer'
+
+
+class ReducerAdapterWithFitsFix(ReducerAdapter):
+    def __init__(self, reducers):
+        ReducerAdapter.__init__(self, reducers)
+
+    def reduce_product_gen(self, archive, lid, fits_files_):
+        try:
+            return ReducerAdapter.reduce_product_gen(self, archive,
+                                                     lid, fits_files_)
+        except Exception:
+            return [1, 1, 1, 1, 1]
+
+    def __str__(self):
+        return 'ReducerAdapterWithFitsFix(%s)' % str(self.reducers)
+
+
+class NullReducer2(NullReducer):
+    def reduce_archive(self, root, bundles):
+        print 'archive %s' % (root,)
+
+    def reduce_bundle(self, archive, lid, collections):
+        print 'bundle %s' % (str(lid),)
+
+    def reduce_collection(self, archive, lid, products):
+        print 'collection %s' % (str(lid),)
+
+    def __str__(self):
+        return 'NullReducer2'
+
+    def __repr__(self):
+        return 'NullReducer2()'
 
 if __name__ == '__main__':
     archive = FileArchives.get_any_archive()
@@ -461,9 +517,12 @@ if __name__ == '__main__':
         Runner().run_archive(reducer, archive)
     else:
         # check composite reduction
-        n = NullReducer()
-        c = CompositeReducer(5 * [n])
+        rs = 4 * [NullReducer()]
+        rs.append(NullReducer2())
+        c = CompositeReducer(rs)
+        # r = ReducerAdapterWithFitsFix(c)
         r = ReducerAdapter(c)
+
         # This raises an exception on a malformed FITS file.  How do I
         # catch that and still test the composition?
         Runner().run_archive(r, archive)
