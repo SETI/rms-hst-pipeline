@@ -148,7 +148,10 @@ if __name__ == '__main__':
     except pdart.exceptions.ExceptionInfo.CalculationException as e:
         print e.exception_info.to_pretty_xml()
 
+    print 60 * '-'
+
     try:
-        pdart.exceptions.Combinators.parallel_list('Labels are for jars!', 3 * [foo])
+        pdart.exceptions.Combinators.parallel_list('Labels are for jars!',
+                                                   3 * [foo])
     except pdart.exceptions.ExceptionInfo.CalculationException as e:
         print e.exception_info.to_pretty_xml()
