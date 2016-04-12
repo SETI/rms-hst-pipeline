@@ -33,7 +33,7 @@ def _run_subprocess(cmd, stdin=None):
     return (exit_code, stderr, stdout)
 
 
-def _xmllint(filepath, schema=XML_SCHEMA, stdin=None):
+def _xmllint_schema(filepath, schema=XML_SCHEMA, stdin=None):
     """
     Run xmllint on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
@@ -54,7 +54,9 @@ def xml_schema_failures(filepath, schema=XML_SCHEMA, stdin=None):
     there are no failures; returns a string containing the failures if
     they exist.
     """
-    exit_code, stderr, _ = _xmllint(filepath, schema=schema, stdin=stdin)
+    exit_code, stderr, _ = _xmllint_schema(filepath,
+                                           schema=schema,
+                                           stdin=stdin)
     if exit_code == 0:
         return None
     else:

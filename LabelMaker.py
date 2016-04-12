@@ -5,7 +5,7 @@ import xml.dom
 
 import ArchiveComponent
 import Info
-import XmlSchema
+import pdart.xml.Schema
 import XmlUtils
 
 
@@ -66,7 +66,7 @@ def xml_schema_check(filepath):
     Test the XML label at the filepath against the PDS4 v1.5 XML
     schema, returning true iff it passes.
     """
-    failures = XmlSchema.xml_schema_failures(filepath)
+    failures = pdart.xml.Schema.xml_schema_failures(filepath)
     return failures is None
 
 
@@ -76,5 +76,5 @@ def schematron_check(filepath):
     Schematron schema, returning true iff it passes.
     """
 
-    failures = XmlSchema.schematron_failures(filepath)
+    failures = pdart.xml.Schema.schematron_failures(filepath)
     return failures is None

@@ -11,7 +11,7 @@ import LID
 import Pass
 import ProductLabelMaker
 import ProductPass
-import XmlSchema
+import pdart.xml.Schema
 
 
 class CountFilesPass(Pass.NullPass):
@@ -185,12 +185,12 @@ class CorrectLabel(Pass.LimitedReportingPass):
     def check_label(self, lid, filename):
         assert isinstance(lid, LID.LID)
         if not self.past_limit():
-            failures = XmlSchema.xml_schema_failures(filename)
+            failures = pdart.xml.Schema.xml_schema_failures(filename)
             if failures:
                 self.report('Label for %s failed XML schema test' % lid,
                             failures)
             else:
-                failures = XmlSchema.schematron_failures(filename)
+                failures = pdart.xml.Schema.schematron_failures(filename)
                 if failures:
                     self.report('Label for %s failed Schematron test' % lid,
                                 failures)

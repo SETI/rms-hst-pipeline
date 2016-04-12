@@ -11,7 +11,7 @@ import ProductInfo
 import ProductLabelProductPass
 import ProductPass
 import TargetIdentificationXmlMaker
-import XmlSchema
+import pdart.xml.Schema
 
 
 class ProductLabelMaker(LabelMaker.LabelMaker):
@@ -157,8 +157,8 @@ def make_and_test_product_label(lid):
     lm = ProductLabelMaker(p)
     fp = '/tmp/product.xml'
     lm.write_xml_to_file(fp)
-    failures = XmlSchema.xml_schema_failures(fp) or \
-        XmlSchema.schematron_failures(fp)
+    failures = pdart.xml.Schema.xml_schema_failures(fp) or \
+        pdart.xml.Schema.schematron_failures(fp)
     if failures:
         print 'Label for %s at %r did not validate.' % (p, fp)
         print failures
