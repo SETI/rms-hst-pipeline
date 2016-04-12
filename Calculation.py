@@ -4,85 +4,8 @@ import pyfits
 import traceback
 
 import FileArchives
-
-
-##############################
-# structured exception info
-##############################
-
-class ExceptionInfo(object):
-    # def to_xml(self):  pass # to be implemented
-    pass
-
-
-class SingleExceptionInfo(ExceptionInfo):
-    def __init__(self, exception, stack_trace):
-        self.exception = exception
-        self.stack_trace = stack_trace
-
-    def __str__(self):
-        return 'SimpleExceptionInfo(%s)' % str(self.exception)
-
-
-class GroupedExceptionInfo(ExceptionInfo):
-    def __init__(self, label, exception_infos):
-        self.label = label
-        self.exception_infos = exception_infos
-
-    def __str__(self):
-        return 'GroupedExceptionInfo(%r, %s)' % \
-            (self.label, self.exception_infos)
-
-
-##############################
-# Results: values or exceptions
-##############################
-
-
-class _Result(object):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def is_success(self):
-        pass
-
-    def is_failure(self):
-        return not self.is_success()
-
-
-class _Failure(_Result):
-    def __init__(self, exception_info):
-        _Result.__init__(self)
-        self.exception_info = exception_info
-
-    def is_success(self):
-        return False
-
-    def __str__(self):
-        return '_Failure(%s)' % (self.exception_info, )
-
-
-class _Success(_Result):
-    def __init__(self, value):
-        _Result.__init__(self)
-        self.value = value
-
-    def is_success(self):
-        return True
-
-    def __str__(self):
-        return '_Success(%s)' % (self.value, )
-
-
-##############################
-# exception to carry structured info
-##############################
-
-
-class CalculationException(Exception):
-    def __init__(self, msg, exception_info):
-        Exception.__init__(self, msg)
-        self.exception_info = exception_info
+import pdart.exceptions.ExceptionInfo
+import pdart.exceptions.Result
 
 ##############################
 # conversion of code
@@ -95,8 +18,8 @@ def _code_to_rcode(func):
             res = func(*args, **kwargs)
         except Exception as e:
             exception_info = SingleExceptionInfo(e, traceback.format_exc())
-            return _Failure(exception_info)
-        return _Success(res)
+            return Failure(exception_info)
+        return Success(res)
     return rfunc
 
 
@@ -452,14 +375,17 @@ class CheckFitsReducer(NullGenReducer):
     # Files map to code
     def reduce_archive_gen(self, root, bundles_):
         list(bundles_)
+        print 'archive', root
 
     def reduce_bundle_gen(self, archive, lid, collections_):
         list(collections_)
+        print 'bundle', lid
 
     def reduce_collection_gen(self, archive, lid, products_):
         list(products_)
 
     def reduce_product_gen(self, archive, lid, files_):
+        print 'product', lid
         msgs = [msg for msg in list(files_) if msg is not None]
         msg_count = len(msgs)
         if msg_count is 0:
