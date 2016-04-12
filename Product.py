@@ -10,7 +10,6 @@ import Bundle
 import Collection
 import FileArchive
 import HstFilename
-import LID
 
 
 def _find_product_file(dir, filename):

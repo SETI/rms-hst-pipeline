@@ -3,7 +3,7 @@ import sys
 import FileArchives
 import FitsProductFileXmlMaker
 import InstrumentXmlMaker
-import LID
+import pdart.pds4.LID
 import LabelMaker
 import Product
 import ProductFilesXmlMaker
@@ -145,8 +145,8 @@ def test_synthesis():
 
 def make_and_test_product_label(lid):
     if isinstance(lid, str):
-        lid = LID.LID(lid)
-    assert isinstance(lid, LID.LID)
+        lid = pdart.pds4.LID.LID(lid)
+    assert isinstance(lid, pdart.pds4.LID.LID)
     a = FileArchives.get_any_archive()
     p = Product.Product(a, lid)
 

@@ -9,11 +9,11 @@ python HstFilename.py
 echo '-- IdTables2'
 python IdTables2.py
 echo '-- LID'
-python LID.py
+python pdart/pds4/LID.py
 echo '-- LIDVID'
-python LIDVID.py
+python pdart/pds4/LIDVID.py
 echo '-- VID'
-python VID.py
+python pdart/pds4/VID.py
 echo '-- XmlSchema'
 python pdart/xml/Schema.py
 echo starting archive validation at `date "+%Y-%m-%d %H:%M"`

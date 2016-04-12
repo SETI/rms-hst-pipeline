@@ -7,7 +7,7 @@ import BundleLabelMaker
 import CollectionLabelMaker
 import FileArchives
 import LabelMaker
-import LID
+import pdart.pds4.LID
 import Product
 import ProductLabelMaker
 
@@ -57,5 +57,6 @@ if __name__ == '__main__':
     NOW = datetime.datetime.now()
     TODAY = NOW.strftime('%Y-%m-%d')
     DST_DIR = '/Users/spaceman/SampleGeneratedLabels-%s' % TODAY
-    make_samples(DST_DIR,
-                 LID.LID('urn:nasa:pds:hst_09059:data_acs_raw:visit_01'))
+    make_samples(
+        DST_DIR,
+        pdart.pds4.LID.LID('urn:nasa:pds:hst_09059:data_acs_raw:visit_01'))

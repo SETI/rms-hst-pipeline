@@ -7,7 +7,7 @@ import pyfits
 import BundleLabelMaker
 import CollectionLabelMaker
 import HstFilename
-import LID
+import pdart.pds4.LID
 import Pass
 import ProductLabelMaker
 import ProductPass
@@ -183,7 +183,7 @@ class CorrectLabel(Pass.LimitedReportingPass):
         super(CorrectLabel, self).__init__()
 
     def check_label(self, lid, filename):
-        assert isinstance(lid, LID.LID)
+        assert isinstance(lid, pdart.pds4.LID.LID)
         if not self.past_limit():
             failures = pdart.xml.Schema.xml_schema_failures(filename)
             if failures:

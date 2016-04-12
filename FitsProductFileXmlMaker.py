@@ -4,7 +4,7 @@ import pyfits
 
 import FileArchives
 import LabelMaker
-import LID
+import pdart.pds4.LID
 import Product
 import ProductFileXmlMaker
 import ProductLabelMaker
@@ -174,8 +174,10 @@ def _create_label():
         return LabelMaker.xml_schema_check(filepath) and \
             LabelMaker.schematron_check(filepath)
 
-    product_lid = LID.LID('urn:nasa:pds:hst_09059:data_acs_raw:visit_01')
-    # product_lid = LID.LID('urn:nasa:pds:hst_10534:data_wfpc2_c0m:visit_01')
+    product_lid = pdart.pds4.LID.LID(
+        'urn:nasa:pds:hst_09059:data_acs_raw:visit_01')
+    # product_lid = pdart.pds4.LID.LID(
+    # 'urn:nasa:pds:hst_10534:data_wfpc2_c0m:visit_01')
     archive = FileArchives.get_any_archive()
     product = Product.Product(archive, product_lid)
     product_lm = ProductLabelMaker.ProductLabelMaker(product)

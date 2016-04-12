@@ -2,7 +2,7 @@ import pprint
 import traceback
 
 import FileArchives
-import LID
+import pdart.pds4.LID
 import Product
 import ProductPass
 import Targets
@@ -189,7 +189,8 @@ class ProductDistillationProductPass(ProductPass.CompositeProductPass):
 
 if __name__ == '__main__':
     # in visit_25
-    lid = LID.LID('urn:nasa:pds:hst_09746:data_acs_raw:j8rl25pbq_raw')
+    lid = pdart.pds4.LID.LID(
+        'urn:nasa:pds:hst_09746:data_acs_raw:j8rl25pbq_raw')
     product = Product.Product(FileArchives.get_any_archive(), lid)
     # pp = FileAreaProductPass()
     # pp = TargetProductPass()

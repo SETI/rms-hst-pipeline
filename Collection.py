@@ -3,7 +3,7 @@ import re
 
 import ArchiveComponent
 import Bundle
-import LID
+import pdart.pds4.LID
 import Product
 
 
@@ -36,7 +36,8 @@ class Collection(ArchiveComponent.ArchiveComponent):
             for filename in filenames:
                 (root, ext) = os.path.splitext(filename)
                 if ext == '.fits':
-                    product_lid = LID.LID('%s:%s' % (self.lid.lid, root))
+                    product_lid = pdart.pds4.LID.LID('%s:%s' %
+                                                     (self.lid.lid, root))
                     yield Product.Product(self.archive, product_lid)
 
     def instrument(self):

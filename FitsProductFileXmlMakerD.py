@@ -4,7 +4,6 @@ import pyfits
 
 import FileArchives
 import LabelMaker
-import LID
 import Product
 import XmlMaker
 

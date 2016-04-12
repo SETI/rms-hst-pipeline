@@ -3,7 +3,7 @@ import re
 
 import ArchiveComponent
 import Collection
-import LID
+import pdart.pds4.LID
 
 
 class Bundle(ArchiveComponent.ArchiveComponent):
@@ -32,7 +32,8 @@ class Bundle(ArchiveComponent.ArchiveComponent):
         dir_fp = self.absolute_filepath()
         for subdir in os.listdir(dir_fp):
             if re.match(Collection.Collection.DIRECTORY_PATTERN, subdir):
-                collection_lid = LID.LID('%s:%s' % (self.lid.lid, subdir))
+                collection_lid = pdart.pds4.LID.LID('%s:%s' %
+                                                    (self.lid.lid, subdir))
                 yield Collection.Collection(self.archive, collection_lid)
 
     def products(self):
