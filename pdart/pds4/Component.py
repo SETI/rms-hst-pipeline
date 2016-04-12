@@ -5,7 +5,7 @@ import os.path
 import ArchiveFile
 
 
-class ArchiveComponent(object):
+class Component(object):
     """
     A bundle, component, or product within an archive.  This is an
     abstract class.
@@ -15,7 +15,7 @@ class ArchiveComponent(object):
 
     def __init__(self, arch, lid):
         """
-        Create an ArchiveComponent given the archive it lives in and
+        Create an Component given the archive it lives in and
         its LID.
         """
         assert arch

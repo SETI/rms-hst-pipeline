@@ -8,7 +8,6 @@ import pyfits
 import Debug
 import FileArchives
 import Heuristic
-import Product
 
 
 class ProductPass(object):

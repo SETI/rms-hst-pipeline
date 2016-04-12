@@ -1,4 +1,4 @@
-import Bundle
+import pdart.pds4.Bundle
 import Info
 
 
@@ -10,7 +10,7 @@ class BundleInfo(Info.Info):
 
     def __init__(self, bundle):
         """Create an object associated with the given Bundle."""
-        assert isinstance(bundle, Bundle.Bundle)
+        assert isinstance(bundle, pdart.pds4.Bundle.Bundle)
         self.bundle = bundle
 
     def title(self):

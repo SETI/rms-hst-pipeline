@@ -3,7 +3,7 @@ import traceback
 
 import FileArchives
 import pdart.pds4.LID
-import Product
+import pdart.pds4.Product
 import ProductPass
 
 
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     # in visit_25
     lid = pdart.pds4.LID.LID(
         'urn:nasa:pds:hst_09746:data_acs_raw:j8rl25pbq_raw')
-    product = Product.Product(FileArchives.get_any_archive(), lid)
+    product = pdart.pds4.Product.Product(FileArchives.get_any_archive(), lid)
     # pp = FileAreaProductPass()
     # pp = TargetProductPass()
     # pp = TimeProductPass()

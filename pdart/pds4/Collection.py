@@ -1,13 +1,13 @@
 import os.path
 import re
 
-import ArchiveComponent
-import Bundle
+import pdart.pds4.Bundle
+import pdart.pds4.Component
 import pdart.pds4.LID
 import Product
 
 
-class Collection(ArchiveComponent.ArchiveComponent):
+class Collection(pdart.pds4.Component.Component):
     """A PDS4 Collection."""
 
     DIRECTORY_PATTERN = r'\Adata_([a-z0-9]+)_([a-z0-9_]+)\Z'
@@ -58,4 +58,4 @@ class Collection(ArchiveComponent.ArchiveComponent):
 
     def bundle(self):
         """Return the bundle this collection belongs to."""
-        return Bundle.Bundle(self.archive, self.lid.parent_lid())
+        return pdart.pds4.Bundle.Bundle(self.archive, self.lid.parent_lid())

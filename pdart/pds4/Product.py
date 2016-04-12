@@ -4,10 +4,10 @@ import shutil
 import tempfile
 import unittest
 
-import ArchiveComponent
+import pdart.pds4.Component
 import ArchiveFile
-import Bundle
-import Collection
+import pdart.pds4.Bundle
+import pdart.pds4.Collection
 import FileArchive
 import HstFilename
 
@@ -24,7 +24,7 @@ def _find_product_file(dir, filename):
     return os.path.join(dir, 'visit_%s' % visit, filename)
 
 
-class Product(ArchiveComponent.ArchiveComponent):
+class Product(pdart.pds4.Component.Component):
     """A PDS4 Product."""
 
     VISIT_DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
@@ -66,8 +66,10 @@ class Product(ArchiveComponent.ArchiveComponent):
 
     def collection(self):
         """Return the collection this product belongs to."""
-        return Collection.Collection(self.archive, self.lid.parent_lid())
+        return pdart.pds4.Collection.Collection(self.archive, 
+                                                self.lid.parent_lid())
 
     def bundle(self):
         """Return the bundle this product belongs to."""
-        return Bundle.Bundle(self.archive, self.lid.parent_lid().parent_lid())
+        return pdart.pds4.Bundle.Bundle(self.archive,
+                                        self.lid.parent_lid().parent_lid())

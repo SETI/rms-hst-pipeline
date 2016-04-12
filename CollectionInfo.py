@@ -1,4 +1,4 @@
-import Collection
+import pdart.pds4.Collection
 import Info
 
 
@@ -10,7 +10,7 @@ class CollectionInfo(Info.Info):
 
     def __init__(self, collection):
         """Create an object associated with the given Collection."""
-        assert isinstance(collection, Collection.Collection)
+        assert isinstance(collection, pdart.pds4.Collection.Collection)
         self.collection = collection
 
     def title(self):

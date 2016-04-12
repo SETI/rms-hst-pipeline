@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import unittest
 
-import Bundle
+import pdart.pds4.Bundle
 import pdart.pds4.LID
 
 
@@ -62,9 +62,9 @@ class FileArchive(object):
     def bundles(self):
         """Generate the bundles stored in this archive."""
         for subdir in os.listdir(self.root):
-            if re.match(Bundle.Bundle.DIRECTORY_PATTERN, subdir):
+            if re.match(pdart.pds4.Bundle.Bundle.DIRECTORY_PATTERN, subdir):
                 bundle_lid = pdart.pds4.LID.LID('urn:nasa:pds:%s' % subdir)
-                yield Bundle.Bundle(self, bundle_lid)
+                yield pdart.pds4.Bundle.Bundle(self, bundle_lid)
 
     def collections(self):
         """Generate the collections stored in this archive."""

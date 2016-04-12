@@ -3,7 +3,7 @@ import os
 import os.path
 import xml.dom
 
-import ArchiveComponent
+import pdart.pds4.Component
 import Info
 import pdart.xml.Schema
 import XmlUtils
@@ -12,7 +12,7 @@ import XmlUtils
 class LabelMaker(XmlUtils.XmlUtils):
     """
     An abstract class of objects that can build PDS4 labels for
-    ArchiveComponents.
+    Components.
     """
 
     def __init__(self, component, info):
@@ -20,7 +20,7 @@ class LabelMaker(XmlUtils.XmlUtils):
         Create the label for an ArchiveComponent with the help of a
         matching Info object to provide values for fields.
         """
-        assert isinstance(component, ArchiveComponent.ArchiveComponent)
+        assert isinstance(component, pdart.pds4.Component.Component)
         self.component = component
         assert isinstance(info, Info.Info)
         self.info = info

@@ -8,7 +8,7 @@ import CollectionLabelMaker
 import FileArchives
 import LabelMaker
 import pdart.pds4.LID
-import Product
+import pdart.pds4.Product
 import ProductLabelMaker
 
 
@@ -34,7 +34,7 @@ def make_samples(dst_dir, product_lid):
             LabelMaker.schematron_check(filepath)
 
     archive = FileArchives.get_any_archive()
-    product = Product.Product(archive, product_lid)
+    product = pdart.pds4.Product.Product(archive, product_lid)
     product_lm = ProductLabelMaker.ProductLabelMaker(product)
     product_filepath = os.path.join(dst_dir, 'product.xml')
     product_lm.write_xml_to_file(product_filepath)

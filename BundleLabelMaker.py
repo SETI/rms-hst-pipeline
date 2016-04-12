@@ -1,4 +1,4 @@
-import Bundle
+import pdart.pds4.Bundle
 import BundleInfo
 import FileArchives
 import LabelMaker
@@ -6,7 +6,7 @@ import LabelMaker
 
 class BundleLabelMaker(LabelMaker.LabelMaker):
     def __init__(self, bundle):
-        assert isinstance(bundle, Bundle.Bundle)
+        assert isinstance(bundle, pdart.pds4.Bundle.Bundle)
         super(BundleLabelMaker, self).__init__(bundle,
                                                BundleInfo.BundleInfo(bundle))
 

@@ -2,7 +2,7 @@ import os.path
 
 
 class ArchiveFile(object):
-    """A file belonging to an ArchiveComponent."""
+    """A file belonging to an Component."""
 
     def __init__(self, comp, basename):
         """

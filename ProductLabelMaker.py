@@ -5,7 +5,7 @@ import FitsProductFileXmlMaker
 import InstrumentXmlMaker
 import pdart.pds4.LID
 import LabelMaker
-import Product
+import pdart.pds4.Product
 import ProductFilesXmlMaker
 import ProductInfo
 import ProductLabelProductPass
@@ -148,7 +148,7 @@ def make_and_test_product_label(lid):
         lid = pdart.pds4.LID.LID(lid)
     assert isinstance(lid, pdart.pds4.LID.LID)
     a = FileArchives.get_any_archive()
-    p = Product.Product(a, lid)
+    p = pdart.pds4.Product.Product(a, lid)
 
     pp = ProductLabelProductPass.ProductLabelProductPass()
     ppr = ProductPass.ProductPassRunner()

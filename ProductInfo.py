@@ -1,4 +1,4 @@
-import Product
+import pdart.pds4.Product
 import Info
 
 
@@ -10,7 +10,7 @@ class ProductInfo(Info.Info):
 
     def __init__(self, product):
         """Create an object associated with the given Product."""
-        assert isinstance(product, Product.Product)
+        assert isinstance(product, pdart.pds4.Product.Product)
         self.product = product
 
     def title(self):
