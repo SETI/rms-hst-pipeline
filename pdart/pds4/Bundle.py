@@ -49,5 +49,5 @@ class Bundle(pdart.pds4.Component.Component):
         Return the proposal ID for this bundle.  It is calculated
         from the bundle's LID.
         """
-        return int(re.match(pdart.pds4.Bundle.DIRECTORY_PATTERN,
+        return int(re.match(Bundle.DIRECTORY_PATTERN,
                             self.lid.bundle_id).group(1))

@@ -47,8 +47,7 @@ class ProductPass(object):
     def process_file(self, file, hdus):
         """
         Extract the needed information from a product's FITS file
-        (ArchiveFile) and the summaries you already made from its
-        HDUs.
+        (File) and the summaries you already made from its HDUs.
         """
         pass
 

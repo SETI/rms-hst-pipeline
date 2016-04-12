@@ -3,8 +3,8 @@ import time
 
 class Info(object):
     """
-    A helper object associated with an ArchiveComponent or
-    ArchiveFile, providing information to fill in label fields for it.
+    A helper object associated with an ArchiveComponent or File,
+    providing information to fill in label fields for it.
     """
 
     def pds_namespace_url(self):

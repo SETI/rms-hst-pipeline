@@ -2,7 +2,7 @@ import abc
 import os
 import os.path
 
-import ArchiveFile
+import pdart.pds4.File
 
 
 class Component(object):
@@ -53,4 +53,4 @@ class Component(object):
             if basename[0] != '.':
                 file = os.path.join(dir, basename)
                 if os.path.isfile(file):
-                    yield ArchiveFile.ArchiveFile(self, basename)
+                    yield pdart.pds4.File.File(self, basename)

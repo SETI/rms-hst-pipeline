@@ -4,10 +4,10 @@ import shutil
 import tempfile
 import unittest
 
-import pdart.pds4.Component
-import ArchiveFile
 import pdart.pds4.Bundle
 import pdart.pds4.Collection
+import pdart.pds4.Component
+import pdart.pds4.File
 import FileArchive
 import HstFilename
 
@@ -59,7 +59,7 @@ class Product(pdart.pds4.Component.Component):
 
     def files(self):
         basename = os.path.basename(self.absolute_filepath())
-        yield ArchiveFile.ArchiveFile(self, basename)
+        yield pdart.pds4.File.File(self, basename)
 
     def absolute_filepath_is_directory(self):
         return False

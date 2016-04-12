@@ -1,12 +1,12 @@
 import abc
 
-import ArchiveFile
+import pdart.pds4.File
 import XmlMaker
 
 
 class ProductFileXmlMaker(XmlMaker.XmlMaker):
     def __init__(self, document, archive_file):
-        assert isinstance(archive_file, ArchiveFile.ArchiveFile), \
+        assert isinstance(archive_file, pdart.pds4.File.File), \
             'type(%s) = %s' % (archive_file, type(archive_file))
         self.archive_file = archive_file
         self.result = None

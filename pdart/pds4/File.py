@@ -1,12 +1,12 @@
 import os.path
 
 
-class ArchiveFile(object):
+class File(object):
     """A file belonging to an Component."""
 
     def __init__(self, comp, basename):
         """
-        Create an ArchiveFile given the component it belongs to and
+        Create an File given the component it belongs to and
         the basename (that is, filepath without directory part) for
         the file.
 
@@ -14,11 +14,11 @@ class ArchiveFile(object):
         subdirectories.  That won't always be true.
         """
 
-        assert comp, ('ArchiveFile.__init__() '
+        assert comp, ('File.__init__() '
                       'where comp = %r and basename = %r' %
                       (comp, basename))
         self.component = comp
-        assert basename, ('ArchiveFile.__init__() '
+        assert basename, ('File.__init__() '
                           'where comp = %r and basename = %r' %
                           (comp, basename))
         assert os.path.basename(basename) == basename
@@ -32,7 +32,7 @@ class ArchiveFile(object):
         return '%s in %r' % (self.basename, self.component)
 
     def __repr__(self):
-        return 'ArchiveFile(%r, %r)' % (self.basename, self.component)
+        return 'File(%r, %r)' % (self.basename, self.component)
 
     def full_filepath(self):
         """Return the full, absolute filepath to the file."""
