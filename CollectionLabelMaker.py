@@ -2,7 +2,7 @@ import io
 import os
 
 import CollectionInfo
-import FileArchives
+import pdart.pds4.Archives
 import LabelMaker
 
 
@@ -154,7 +154,7 @@ class CollectionLabelMaker(LabelMaker.LabelMaker):
 
 
 def test_synthesis():
-    a = FileArchives.get_any_archive()
+    a = pdart.pds4.Archives.get_any_archive()
     for b in a.bundles():
         if b.proposal_id() != 0:
             for c in b.collections():

@@ -6,7 +6,6 @@ import pprint
 import pyfits
 
 import Debug
-import FileArchives
 import Heuristic
 
 

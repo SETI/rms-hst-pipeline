@@ -1,7 +1,7 @@
 #!/bin/bash
 echo Running unit tests:
-echo '-- FileArchive'
-python FileArchive.py
+echo '-- Archive'
+python pdart/pds4/Archive.py
 echo '-- Heuristic'
 python Heuristic.py
 echo '-- HstFilename'

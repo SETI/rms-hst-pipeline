@@ -1,6 +1,6 @@
 import sys
 
-import FileArchives
+import pdart.pds4.Archives
 import FitsProductFileXmlMaker
 import InstrumentXmlMaker
 import pdart.pds4.LID
@@ -129,7 +129,7 @@ class ProductLabelMaker(LabelMaker.LabelMaker):
 
 
 def test_synthesis():
-    a = FileArchives.get_any_archive()
+    a = pdart.pds4.Archives.get_any_archive()
     fp = '/tmp/foo.xml'
     for b in a.bundles():
         for c in b.collections():
@@ -147,7 +147,7 @@ def make_and_test_product_label(lid):
     if isinstance(lid, str):
         lid = pdart.pds4.LID.LID(lid)
     assert isinstance(lid, pdart.pds4.LID.LID)
-    a = FileArchives.get_any_archive()
+    a = pdart.pds4.Archives.get_any_archive()
     p = pdart.pds4.Product.Product(a, lid)
 
     pp = ProductLabelProductPass.ProductLabelProductPass()

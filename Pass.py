@@ -5,7 +5,7 @@ import Reporter
 
 class Pass(object):
     """
-    A set of actions to be performed on a FileArchive.  This is an
+    A set of actions to be performed on a Archive.  This is an
     abstract class.
     """
 
@@ -25,13 +25,13 @@ class Pass(object):
     @abc.abstractmethod
     def do_archive(self, archive, before):
         """
-        Perform actions before or after the contents of a FileArchive
+        Perform actions before or after the contents of a Archive
         are processed.  This method is called twice; the Boolean
         argument tells you if you're being called before (True) or
         after (False).
 
         In general, if you don't need information from the contents,
-        prefer to act before the FileArchive's contents are processed.
+        prefer to act before the Archive's contents are processed.
         """
         pass
 
@@ -237,7 +237,7 @@ class CompositePass(NullPass):
 
 class PassRunner(object):
     """
-    A object to run a (possible composite) Pass over a FileArchive,
+    A object to run a (possible composite) Pass over a Archive,
     reporting results through a configurable Reporter.  It provides
     access to the context (location in the archive) while running the
     pass.
@@ -260,7 +260,7 @@ class PassRunner(object):
         self.reporter.report(pass_, repr(self.context), msg, tag)
 
     def run(self, archive, p):
-        """Run the Pass on the FileArchive."""
+        """Run the Pass on the Archive."""
         p.set_pass_runner(self)
 
         self.reporter.begin_reporting()

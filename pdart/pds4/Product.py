@@ -8,7 +8,7 @@ import pdart.pds4.Bundle
 import pdart.pds4.Collection
 import pdart.pds4.Component
 import pdart.pds4.File
-import FileArchive
+import pdart.pds4.Archive
 import HstFilename
 
 

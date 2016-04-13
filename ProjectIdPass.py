@@ -1,6 +1,6 @@
 import pyfits
 
-import FileArchives
+import pdart.pds4.Archives
 import HstFilename
 import Pass
 import Validations
@@ -46,7 +46,7 @@ class ProjectIdPass(Pass.NullPass):
 
 
 def run_pass():
-    archive = FileArchives.get_any_archive()
+    archive = pdart.pds4.Archives.get_any_archive()
     p = ProjectIdPass()
     Pass.PassRunner().run(archive,
                           Pass.CompositePass([Validations.CountFilesPass(),

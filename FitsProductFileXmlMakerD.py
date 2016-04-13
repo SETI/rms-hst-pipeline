@@ -2,7 +2,6 @@ import os
 
 import pyfits
 
-import FileArchives
 import LabelMaker
 import XmlMaker
 

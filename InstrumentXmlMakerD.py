@@ -1,6 +1,6 @@
 import abc
 
-import FileArchive
+import pdart.pds4.Archive
 import XmlMaker
 
 
@@ -72,7 +72,7 @@ class InstrumentXmlMakerD(XmlMaker.XmlMaker):
     """Version of InstrumentXmlMaker run on distillation"""
     def __init__(self, document, instrument):
         super(InstrumentXmlMakerD, self).__init__(document)
-        assert FileArchive.FileArchive.is_valid_instrument(instrument), \
+        assert pdart.pds4.Archive.Archive.is_valid_instrument(instrument), \
             'invalid instrument %s' % instrument
         self.instrument_info = _factories[instrument]()
         assert self.instrument_info

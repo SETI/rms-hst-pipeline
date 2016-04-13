@@ -3,7 +3,7 @@ import itertools
 import pyfits
 import traceback
 
-import FileArchives
+import pdart.pds4.Archives
 import pdart.exceptions.ExceptionInfo
 import pdart.exceptions.Result
 
@@ -368,7 +368,7 @@ class NullReducer2(NullReducer):
         return 'NullReducer2()'
 
 if __name__ == '__main__':
-    archive = FileArchives.get_any_archive()
+    archive = pdart.pds4.Archives.get_any_archive()
     if True:
         # check a pass with limited recursion
         reducer = CheckFitsReducer()

@@ -1,6 +1,6 @@
 import pdart.pds4.Bundle
 import BundleInfo
-import FileArchives
+import pdart.pds4.Archives
 import LabelMaker
 
 
@@ -79,7 +79,7 @@ class BundleLabelMaker(LabelMaker.LabelMaker):
 def test_synthesis():
     # Create sample bundle.xml files for the non-hst_00000 bundles and
     # test them against the XML schema.
-    a = FileArchives.get_any_archive()
+    a = pdart.pds4.Archives.get_any_archive()
     for b in a.bundles():
         if b.proposal_id() != 0:
             lm = BundleLabelMaker(b)

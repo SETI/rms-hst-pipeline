@@ -4,8 +4,6 @@ import pyfits
 import traceback
 import xml.dom
 
-import FileArchives
-
 import pdart.exceptions.Combinators
 import pdart.exceptions.ExceptionInfo
 import pdart.exceptions.Result

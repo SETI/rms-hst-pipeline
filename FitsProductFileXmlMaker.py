@@ -2,7 +2,7 @@ import os
 
 import pyfits
 
-import FileArchives
+import pdart.pds4.Archives
 import LabelMaker
 import pdart.pds4.LID
 import pdart.pds4.Product
@@ -178,7 +178,7 @@ def _create_label():
         'urn:nasa:pds:hst_09059:data_acs_raw:visit_01')
     # product_lid = pdart.pds4.LID.LID(
     # 'urn:nasa:pds:hst_10534:data_wfpc2_c0m:visit_01')
-    archive = FileArchives.get_any_archive()
+    archive = pdart.pds4.Archives.get_any_archive()
     product = pdart.pds4.Product.Product(archive, product_lid)
     product_lm = ProductLabelMaker.ProductLabelMaker(product)
     product_filepath = '/tmp/product.xml'

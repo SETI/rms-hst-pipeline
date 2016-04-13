@@ -3,7 +3,7 @@ import re
 
 import pyfits
 
-import FileArchives
+import pdart.pds4.Archives
 
 DATE_TIME_RE = re.compile('(DATE|TIME)', re.IGNORECASE)
 
@@ -13,7 +13,7 @@ def is_date_time(k):
 
 
 def search_for_datetime():
-    archive = FileArchives.get_any_archive()
+    archive = pdart.pds4.Archives.get_any_archive()
     for p in archive.products():
         filepath = p.absolute_filepath()
         try:
@@ -32,7 +32,7 @@ def search_for_datetime():
 
 
 def search_for_datetime_patterns():
-    archive = FileArchives.get_any_archive()
+    archive = pdart.pds4.Archives.get_any_archive()
     patterns = {}
     for p in archive.products():
         suffix = p.collection().suffix()

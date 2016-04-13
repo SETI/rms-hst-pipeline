@@ -8,7 +8,7 @@ import pdart.pds4.Bundle
 import pdart.pds4.LID
 
 
-class FileArchive(object):
+class Archive(object):
     """An archive containing PDS4 Bundles."""
 
     def __init__(self, root):
@@ -23,7 +23,7 @@ class FileArchive(object):
         return repr(self.root)
 
     def __repr__(self):
-        return 'FileArchive(%r)' % self.root
+        return 'Archive(%r)' % self.root
 
     # Verifying parts
 
@@ -82,61 +82,61 @@ class FileArchive(object):
 ############################################################
 
 
-class TestFileArchive(unittest.TestCase):
+class TestArchive(unittest.TestCase):
     def test_init(self):
         with self.assertRaises(Exception):
-            FileArchive(None)
+            Archive(None)
         with self.assertRaises(Exception):
-            FileArchive("I'm/betting/this/directory/doesn't/exist")
+            Archive("I'm/betting/this/directory/doesn't/exist")
 
-        FileArchive('/')        # guaranteed to exist
+        Archive('/')        # guaranteed to exist
 
         # but try with another directory
         tempdir = tempfile.mkdtemp()
         try:
-            FileArchive(tempdir)
+            Archive(tempdir)
         finally:
             shutil.rmtree(tempdir)
 
     def test_str(self):
         tempdir = tempfile.mkdtemp()
-        a = FileArchive(tempdir)
+        a = Archive(tempdir)
         self.assertEqual(repr(tempdir), str(a))
 
     def test_eq(self):
         tempdir = tempfile.mkdtemp()
         tempdir2 = tempfile.mkdtemp()
-        self.assertEquals(FileArchive(tempdir), FileArchive(tempdir))
-        self.assertNotEquals(FileArchive(tempdir), FileArchive(tempdir2))
+        self.assertEquals(Archive(tempdir), Archive(tempdir))
+        self.assertNotEquals(Archive(tempdir), Archive(tempdir2))
 
     def test_repr(self):
         tempdir = tempfile.mkdtemp()
-        a = FileArchive(tempdir)
-        self.assertEqual('FileArchive(%r)' % tempdir, repr(a))
+        a = Archive(tempdir)
+        self.assertEqual('Archive(%r)' % tempdir, repr(a))
 
     def test_is_valid_instrument(self):
-        self.assertTrue(FileArchive.is_valid_instrument('wfc3'))
-        self.assertTrue(FileArchive.is_valid_instrument('wfpc2'))
-        self.assertTrue(FileArchive.is_valid_instrument('acs'))
-        self.assertFalse(FileArchive.is_valid_instrument('Acs'))
-        self.assertFalse(FileArchive.is_valid_instrument('ACS'))
-        self.assertFalse(FileArchive.is_valid_instrument('ABC'))
-        self.assertFalse(FileArchive.is_valid_instrument(None))
+        self.assertTrue(Archive.is_valid_instrument('wfc3'))
+        self.assertTrue(Archive.is_valid_instrument('wfpc2'))
+        self.assertTrue(Archive.is_valid_instrument('acs'))
+        self.assertFalse(Archive.is_valid_instrument('Acs'))
+        self.assertFalse(Archive.is_valid_instrument('ACS'))
+        self.assertFalse(Archive.is_valid_instrument('ABC'))
+        self.assertFalse(Archive.is_valid_instrument(None))
 
     def test_is_valid_proposal(self):
-        self.assertFalse(FileArchive.is_valid_proposal(-1))
-        self.assertTrue(FileArchive.is_valid_proposal(0))
-        self.assertTrue(FileArchive.is_valid_proposal(1))
-        self.assertFalse(FileArchive.is_valid_proposal(100000))
-        self.assertFalse(FileArchive.is_valid_proposal(3.14159265))
-        self.assertFalse(FileArchive.is_valid_proposal('xxx'))
-        self.assertFalse(FileArchive.is_valid_proposal(None))
+        self.assertFalse(Archive.is_valid_proposal(-1))
+        self.assertTrue(Archive.is_valid_proposal(0))
+        self.assertTrue(Archive.is_valid_proposal(1))
+        self.assertFalse(Archive.is_valid_proposal(100000))
+        self.assertFalse(Archive.is_valid_proposal(3.14159265))
+        self.assertFalse(Archive.is_valid_proposal('xxx'))
+        self.assertFalse(Archive.is_valid_proposal(None))
 
     def test_is_valid_visit(self):
-        self.assertTrue(FileArchive.is_valid_visit('01'))
-        self.assertFalse(FileArchive.is_valid_visit('xxx'))
-        self.assertFalse(FileArchive.is_valid_visit(01))
-        self.assertFalse(FileArchive.is_valid_visit(None))
+        self.assertTrue(Archive.is_valid_visit('01'))
+        self.assertFalse(Archive.is_valid_visit('xxx'))
+        self.assertFalse(Archive.is_valid_visit(01))
+        self.assertFalse(Archive.is_valid_visit(None))
 
 if __name__ == '__main__':
     unittest.main()
