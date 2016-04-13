@@ -5,7 +5,7 @@ python pdart/pds4/Archive.py
 echo '-- Heuristic'
 python Heuristic.py
 echo '-- HstFilename'
-python HstFilename.py
+python pdart/pds4/HstFilename.py
 echo '-- IdTables2'
 python IdTables2.py
 echo '-- LID'

@@ -6,11 +6,11 @@ import pyfits
 
 import BundleLabelMaker
 import CollectionLabelMaker
-import HstFilename
-import pdart.pds4.LID
 import Pass
 import ProductLabelMaker
 import ProductPass
+import pdart.pds4.HstFilename
+import pdart.pds4.LID
 import pdart.xml.Schema
 
 
@@ -45,7 +45,8 @@ class ProductFilesHaveCollectionSuffix(Pass.NullPass):
 
     def do_product_file(self, file):
         # get file suffix
-        file_suffix = HstFilename.HstFilename(file.basename).suffix()
+        file_suffix = \
+            pdart.pds4.HstFilename.HstFilename(file.basename).suffix()
         self.assert_equals(self.collection_suffix, file_suffix,
                            'Unexpected suffix for file %r' % file)
 
@@ -98,7 +99,7 @@ class ProductFilesHaveProductVisit(Pass.NullPass):
             self.product_visit = None
 
     def do_product_file(self, file):
-        hstFile = HstFilename.HstFilename(file.full_filepath())
+        hstFile = pdart.pds4.HstFilename.HstFilename(file.full_filepath())
         self.assert_equals(self.product_visit, hstFile.visit(),
                            'Unexpected visit value for file %r' % file)
 
@@ -110,7 +111,7 @@ class BundleContainsOneSingleHstInternalProposalId(Pass.NullPass):
         super(BundleContainsOneSingleHstInternalProposalId, self).__init__()
 
     def do_product_file(self, file):
-        hst_file = HstFilename.HstFilename(file.full_filepath())
+        hst_file = pdart.pds4.HstFilename.HstFilename(file.full_filepath())
         self.hst_internal_proposal_ids.add(hst_file.hst_internal_proposal_id())
 
     def do_bundle(self, bundle, before):

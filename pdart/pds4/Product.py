@@ -9,7 +9,7 @@ import pdart.pds4.Collection
 import pdart.pds4.Component
 import pdart.pds4.File
 import pdart.pds4.Archive
-import HstFilename
+import pdart.pds4.HstFilename
 
 
 def _find_product_file(dir, filename):
@@ -19,7 +19,7 @@ def _find_product_file(dir, filename):
     absolute and that only one file with that name exists under the
     directory.
     """
-    hstFilename = HstFilename.HstFilename(filename)
+    hstFilename = pdart.pds4.HstFilename.HstFilename(filename)
     visit = hstFilename.visit()
     return os.path.join(dir, 'visit_%s' % visit, filename)
 

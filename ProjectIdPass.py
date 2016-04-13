@@ -1,7 +1,7 @@
 import pyfits
 
 import pdart.pds4.Archives
-import HstFilename
+import pdart.pds4.HstFilename
 import Pass
 import Validations
 
@@ -27,7 +27,7 @@ class ProjectIdPass(Pass.NullPass):
             self.bundle_proposal_id = None
 
     def do_product_file(self, file):
-        hst_filename = HstFilename.HstFilename(file.basename)
+        hst_filename = pdart.pds4.HstFilename.HstFilename(file.basename)
         hst_proposal_id = hst_filename.hst_internal_proposal_id()
         try:
             proposid = str(pyfits.getval(file.full_filepath(), 'PROPOSID'))
