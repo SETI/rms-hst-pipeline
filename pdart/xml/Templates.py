@@ -1,6 +1,7 @@
 import xml.dom
 import xml.sax
 
+
 def interpretText(txt):
     def builder(doc):
         return doc.createTextNode(txt)
@@ -11,7 +12,9 @@ def interpretDocumentTemplate(template):
     def builder(dictionary):
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         stack = [doc]
+
         class Builder(xml.sax.ContentHandler):
+
             def startElement(self, name, attrs):
                 if name == 'PARAM':
                     param = dictionary[attrs['name']]
@@ -27,15 +30,19 @@ def interpretDocumentTemplate(template):
                     for name in attrs.getNames():
                         elmt.setAttribute(name, attrs[name])
                 stack.append(elmt)
+
             def endElement(self, name):
                 elmt = stack.pop()
                 elmt.normalize()
                 stack[-1].appendChild(elmt)
+
             def characters(self, content):
                 node = doc.createTextNode(content)
                 stack[-1].appendChild(node)
+
             def ignorableWhitespace(self, content):
                 pass
+
             def processingInstruction(self, target, data):
                 pi = doc.createProcessingInstruction(target, data)
                 stack[-1].appendChild(pi)
@@ -45,12 +52,15 @@ def interpretDocumentTemplate(template):
 
     return builder
 
+
 def interpretTemplate(template):
     def parameterizer(dictionary):
         def builder(document):
             doc = document
             stack = []
+
             class Builder(xml.sax.ContentHandler):
+
                 def startElement(self, name, attrs):
                     if name == 'PARAM':
                         param = dictionary[attrs['name']]
@@ -64,6 +74,7 @@ def interpretTemplate(template):
                             elmt.setAttribute(name, attrs[name])
                     assert isinstance(elmt, xml.dom.Node)
                     stack.append(elmt)
+
                 def endElement(self, name):
                     elmt = stack.pop()
                     elmt.normalize()
@@ -71,6 +82,7 @@ def interpretTemplate(template):
                         stack[-1].appendChild(elmt)
                     else:
                         stack.append(elmt)
+
                 def characters(self, content):
                     node = doc.createTextNode(content)
                     stack[-1].appendChild(node)
@@ -83,9 +95,11 @@ def interpretTemplate(template):
 univDocTemplate = interpretDocumentTemplate(
     '<?xml version="1.0" ?><coffin><PARAM name="body"/></coffin>')
 
+
 def test2():
     body = interpretTemplate('<body/>')({})
     print univDocTemplate({'body': body}).toxml()
+
 
 def test():
     template2 = """<x>Namche <PARAM name="baz"/>.
@@ -103,7 +117,7 @@ I said <PARAM name="baz"/> not BIZARRE.</x>"""
 <bar>shark</bar>
 </foo>"""
     interpreted = interpretDocumentTemplate(template)
-    dictionary = {'two': interpreted2({ 'baz' : 'bazaar'}) }
+    dictionary = {'two': interpreted2({'baz': 'bazaar'})}
     print interpreted(dictionary).toxml()
 
 if __name__ == '__main__':

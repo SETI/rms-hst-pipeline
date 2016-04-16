@@ -42,7 +42,7 @@ def multiple_implementations(label, *funcs):
                 exception_infos.append(res.exception_info)
         # if we got here, there were no successes
         exception_info = GroupedExceptionInfo(label, exception_infos)
-        raise CalculationException(exception_info)
+        raise CalculationException(label, exception_info)
     return afunc
 
 

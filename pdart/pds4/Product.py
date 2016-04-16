@@ -66,7 +66,7 @@ class Product(pdart.pds4.Component.Component):
 
     def collection(self):
         """Return the collection this product belongs to."""
-        return pdart.pds4.Collection.Collection(self.archive, 
+        return pdart.pds4.Collection.Collection(self.archive,
                                                 self.lid.parent_lid())
 
     def bundle(self):

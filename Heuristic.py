@@ -370,14 +370,6 @@ def _fails_with_message(msg):
 
 
 class TestHeuristic(unittest.TestCase):
-    def test_is_success(self):
-        self.assertTrue(Success(None).is_success())
-        self.assertFalse(Failure([]).is_success())
-
-    def test_is_failure(self):
-        self.assertTrue(Failure([]).is_failure())
-        self.assertFalse(Success(None).is_failure())
-
     def test_HFunction(self):
         res = HFunction(_doubles)(3)
         self.assertTrue(res.is_success())

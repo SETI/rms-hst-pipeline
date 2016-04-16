@@ -4,8 +4,16 @@ import xml.dom
 
 class CalculationException(Exception):
     def __init__(self, msg, exception_info):
+        assert isinstance(exception_info, ExceptionInfo)
         Exception.__init__(self, msg)
         self.exception_info = exception_info
+
+    def __str__(self):
+        return 'CalculationException(%s)' % self.message
+
+    def __repr__(self):
+        return 'CalculationException(%r, %r)' % (self.message,
+                                                 self.exception_info)
 
 
 class ExceptionInfo(object):
