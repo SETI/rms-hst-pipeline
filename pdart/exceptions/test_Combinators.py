@@ -8,9 +8,9 @@ class TestCombinators(unittest.TestCase):
     def test_normalized_exceptions(self):
         def explode():
             raise Exception('Boom!')
-        explode_ = normalized_exceptions(explode)
+        explode = normalized_exceptions(explode)
         try:
-            explode_()
+            explode()
             self.assertTrue(False)
         except CalculationException as e:
             pass  # expected
@@ -43,3 +43,7 @@ class TestCombinators(unittest.TestCase):
         except CalculationException as ce:
             print '*********', repr(ce)
             self.assertTrue(False)
+
+    def test_parallel_list(self):
+        # TODO
+        pass

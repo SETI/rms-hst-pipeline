@@ -3,6 +3,8 @@ import xml.dom
 
 
 class CalculationException(Exception):
+    """An Exception carrying ExceptionInfo"""
+
     def __init__(self, msg, exception_info):
         assert isinstance(exception_info, ExceptionInfo)
         Exception.__init__(self, msg)
@@ -64,7 +66,9 @@ class SingleExceptionInfo(ExceptionInfo):
 
 class GroupedExceptionInfo(ExceptionInfo):
     def __init__(self, label, exception_infos):
+        assert isinstance(label, str)
         self.label = label
+        assert isinstance(exception_infos, list)
         self.exception_infos = exception_infos
 
     def to_xml_fragment(self, document):

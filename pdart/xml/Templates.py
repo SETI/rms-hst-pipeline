@@ -2,13 +2,13 @@ import xml.dom
 import xml.sax
 
 
-def interpretText(txt):
+def interpret_text(txt):
     def builder(doc):
         return doc.createTextNode(txt)
     return builder
 
 
-def interpretDocumentTemplate(template):
+def interpret_document_template(template):
     def builder(dictionary):
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         stack = [doc]
@@ -53,7 +53,7 @@ def interpretDocumentTemplate(template):
     return builder
 
 
-def interpretTemplate(template):
+def interpret_template(template):
     def parameterizer(dictionary):
         def builder(document):
             doc = document
@@ -91,34 +91,3 @@ def interpretTemplate(template):
             return stack[-1]
         return builder
     return parameterizer
-
-univDocTemplate = interpretDocumentTemplate(
-    '<?xml version="1.0" ?><coffin><PARAM name="body"/></coffin>')
-
-
-def test2():
-    body = interpretTemplate('<body/>')({})
-    print univDocTemplate({'body': body}).toxml()
-
-
-def test():
-    template2 = """<x>Namche <PARAM name="baz"/>.
-I said <PARAM name="baz"/> not BIZARRE.</x>"""
-
-    interpreted2 = interpretTemplate(template2)
-
-    template = """<?xml version="1.0" ?>
-<?pi targ dat?>
-<foo>AustraliaFightersFighters
-<PARAM name="two"/>
-<bar drink="rakshi">elephant</bar>
-<bar>eagle</bar>
-<bar>tiger</bar>
-<bar>shark</bar>
-</foo>"""
-    interpreted = interpretDocumentTemplate(template)
-    dictionary = {'two': interpreted2({'baz': 'bazaar'})}
-    print interpreted(dictionary).toxml()
-
-if __name__ == '__main__':
-    test()

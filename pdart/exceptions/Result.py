@@ -2,13 +2,18 @@ import abc
 
 
 class Result(object):
+    """
+    The result of running a function: either Success or Failure.
+    """
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def is_success(self):
+        """Return True if the Result is a Success"""
         pass
 
     def is_failure(self):
+        """Return True if the Result is a Failure"""
         return not self.is_success()
 
 
