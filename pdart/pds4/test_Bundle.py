@@ -16,7 +16,7 @@ class TestBundle(unittest.TestCase):
         # check that creation of bundle fails with collection LID
         lid = LID('urn:nasa:pds:bundle:collection')
         try:
-            b = Bundle(arch, lid)
+            Bundle(arch, lid)
             self.assertTrue(False)
         except Exception:
             pass
@@ -37,8 +37,8 @@ class TestBundle(unittest.TestCase):
     def test_products(self):
         arch = get_any_archive()
         bundle = list(arch.bundles())[0]
-        for c in bundle.products():
-            self.assertEquals(bundle, c.bundle())
+        for p in bundle.products():
+            self.assertEquals(bundle, p.bundle())
 
     def test_proposal_id(self):
         arch = get_any_archive()
