@@ -14,7 +14,8 @@ class Collection(pdart.pds4.Component.Component):
 
     def __init__(self, arch, lid):
         """
-        Create a Collection given the archive it lives in and its LID.
+        Create a :class:`Collection` given the :class:`Archive` it
+        lives in and its :class:`LID`.
         """
         assert lid.is_collection_lid()
         super(Collection, self).__init__(arch, lid)
@@ -29,7 +30,8 @@ class Collection(pdart.pds4.Component.Component):
 
     def products(self):
         """
-        Generate the products of this bundle as Product objects.
+        Generate the products of this :class:`Collection` as
+        :class:`Product` objects.
         """
         dir_fp = self.absolute_filepath()
         for (dirpath, dirnames, filenames) in os.walk(dir_fp):
@@ -42,16 +44,16 @@ class Collection(pdart.pds4.Component.Component):
 
     def instrument(self):
         """
-        Return the instrument for this collection.  It is calculated
-        from the collection's LID.
+        Return the instrument for this :class:`Collection`.  It is
+        calculated from the collection's :class:`LID`.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
                         self.lid.collection_id).group(1)
 
     def suffix(self):
         """
-        Return the suffix for FITS files in this collection.  It is
-        calculated from the collection's LID.
+        Return the suffix for FITS files in this :class:`Collection`.
+        It is calculated from the collection's :class:`LID`.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
                         self.lid.collection_id).group(2)

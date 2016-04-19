@@ -3,7 +3,8 @@ import abc
 
 class Result(object):
     """
-    The result of running a function: either Success or Failure.
+    The result of running a function: either :class:`Success` or
+    :class:`Failure`.
     """
     __metaclass__ = abc.ABCMeta
 
@@ -20,7 +21,7 @@ class Result(object):
 class Failure(Result):
     """
     The result of running a function and failing: a wrapper around
-    ExceptionInfo.
+    :class:`ExceptionInfo`.
     """
     def __init__(self, exception_info):
         Result.__init__(self)

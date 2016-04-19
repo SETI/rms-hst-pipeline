@@ -29,9 +29,9 @@ def _rcode_to_code(rfunc):
 def normalized_exceptions(func):
     """
     Given a function, return an equivalent function except that when
-    the original raises an Exception, the result function will instead
-    raise a CalculationException containing ExceptionInfo for the
-    exception.
+    the original raises an :class:`Exception`, the result function
+    will instead raise a :class:`CalculationException` containing
+    :class:`ExceptionInfo` for the exception.
     """
     return _rcode_to_code(_code_to_rcode(func))
 
@@ -40,13 +40,15 @@ def multiple_implementations(label, *funcs):
     """
     Given a string label and a number of functions, return the result
     of the first function that succeeds or raise a
-    CalculationException containing GroupedExceptionInfo for the
-    exceptions raised by each function.
+    :class:`CalculationException` containing
+    :class:`GroupedExceptionInfo` for the exceptions raised by each
+    function.
 
     This is a generalization of function call to multiple, alternative
     implementations.  If any one succeeds, you get the result.  If
     they all fail, you get all the exceptions and all the stack traces
-    wrapped into a GroupedExceptionInfo in a CalculationException.
+    wrapped into a :class:`GroupedExceptionInfo` in a
+    :class:`CalculationException`.
     """
     def afunc(*args, **kwargs):
         exception_infos = []

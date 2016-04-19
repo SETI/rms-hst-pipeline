@@ -3,7 +3,7 @@ import xml.dom
 
 
 class CalculationException(Exception):
-    """An Exception carrying ExceptionInfo"""
+    """An :class:`Exception` carrying :class:`ExceptionInfo`"""
 
     def __init__(self, msg, exception_info):
         assert isinstance(exception_info, ExceptionInfo)
@@ -20,17 +20,23 @@ class CalculationException(Exception):
 
 class ExceptionInfo(object):
     """
-    An abstract class wrapping either a single Exception or a labeled
-    group of Exceptions.
+    An abstract class wrapping either a single :class:`Exception` or a
+    labeled group of :class:`Exception`.
     """
     __metaclass__ = abc.ABCMeta
 
     def to_pretty_xml(self):
-        """Return human-readable XML text for this ExceptionInfo."""
+        """
+        Return human-readable XML text for this
+        :class:`ExceptionInfo.`
+        """
         return self.to_xml().toprettyxml()
 
     def to_xml(self):
-        """Return an XML document data structure for this ExceptionInfo."""
+        """
+        Return an XML document data structure for this
+        :class:`ExceptionInfo`.
+        """
         document = xml.dom.getDOMImplementation().createDocument(None,
                                                                  None,
                                                                  None)
@@ -40,13 +46,15 @@ class ExceptionInfo(object):
 
     @abc.abstractmethod
     def to_xml_fragment(self, document):
-        """Return an XML data structure for this ExceptionInfo."""
+        """
+        Return an XML data structure for this :class:`ExceptionInfo`.
+        """
         pass
 
 
 class SingleExceptionInfo(ExceptionInfo):
     """
-    A class wrapping a single Exception.
+    A class wrapping a single :class:`Exception`.
     """
     def __init__(self, exception, stack_trace):
         self.exception = exception
@@ -76,7 +84,7 @@ class SingleExceptionInfo(ExceptionInfo):
 
 class GroupedExceptionInfo(ExceptionInfo):
     """
-    A class wrapping a labeled group of Exception.
+    A class wrapping a labeled group of :class:`Exception`.
     """
     def __init__(self, label, exception_infos):
         assert isinstance(label, str)

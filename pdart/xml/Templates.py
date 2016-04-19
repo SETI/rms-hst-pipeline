@@ -67,7 +67,7 @@ def interpret_template(template):
     Return a parameterizing function that takes a dictionary and
     returns an builder function, performing substitution of the PARAM
     elements with entries from the dictionary, as
-    interpret_template_document does.
+    :func:`interpret_document_template` does.
 
     The returned builder function takes a document and returns XML.
     """

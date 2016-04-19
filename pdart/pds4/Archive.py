@@ -6,10 +6,13 @@ import pdart.pds4.LID
 
 
 class Archive(object):
-    """An archive containing PDS4 Bundles."""
+    """An :class:`Archive` containing PDS4 Bundles."""
 
     def __init__(self, root):
-        """Create an archive given a filepath to an existing directory."""
+        """
+        Create an :class:`Archive` given a filepath to an existing
+        directory.
+        """
         assert os.path.exists(root) and os.path.isdir(root)
         self.root = root
 
@@ -60,20 +63,20 @@ class Archive(object):
 
     # Walking the hierarchy with objects
     def bundles(self):
-        """Generate the bundles stored in this archive."""
+        """Generate the bundles stored in this :class:`Archive`."""
         for subdir in os.listdir(self.root):
             if re.match(pdart.pds4.Bundle.Bundle.DIRECTORY_PATTERN, subdir):
                 bundle_lid = pdart.pds4.LID.LID('urn:nasa:pds:%s' % subdir)
                 yield pdart.pds4.Bundle.Bundle(self, bundle_lid)
 
     def collections(self):
-        """Generate the collections stored in this archive."""
+        """Generate the collections stored in this :class:`Archive`."""
         for b in self.bundles():
             for c in b.collections():
                 yield c
 
     def products(self):
-        """Generate the products stored in this archive."""
+        """Generate the products stored in this :class:`Archive`."""
         for b in self.bundles():
             for c in b.collections():
                 for p in c.products():
