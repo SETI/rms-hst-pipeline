@@ -1,7 +1,6 @@
 import traceback
 
-from pdart.exceptions.ExceptionInfo \
-    import CalculationException, GroupedExceptionInfo, SingleExceptionInfo
+from pdart.exceptions.ExceptionInfo import *
 from pdart.exceptions.Result import Failure, Success
 
 
@@ -28,10 +27,27 @@ def _rcode_to_code(rfunc):
 
 
 def normalized_exceptions(func):
+    """
+    Given a function, return an equivalent function except that when
+    the original raises an Exception, the result function will instead
+    raise a CalculationException containing ExceptionInfo for the
+    exception.
+    """
     return _rcode_to_code(_code_to_rcode(func))
 
 
 def multiple_implementations(label, *funcs):
+    """
+    Given a string label and a number of functions, return the result
+    of the first function that succeeds or raise a
+    CalculationException containing GroupedExceptionInfo for the
+    exceptions raised by each function.
+
+    This is a generalization of function call to multiple, alternative
+    implementations.  If any one succeeds, you get the result.  If
+    they all fail, you get all the exceptions and all the stack traces
+    wrapped into a GroupedExceptionInfo in a CalculationException.
+    """
     def afunc(*args, **kwargs):
         exception_infos = []
         for func in funcs:

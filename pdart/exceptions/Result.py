@@ -18,6 +18,10 @@ class Result(object):
 
 
 class Failure(Result):
+    """
+    The result of running a function and failing: a wrapper around
+    ExceptionInfo.
+    """
     def __init__(self, exception_info):
         Result.__init__(self)
         self.exception_info = exception_info
@@ -30,6 +34,10 @@ class Failure(Result):
 
 
 class Success(Result):
+    """
+    The result of running a function successfully: a wrapper around
+    the returned value.
+    """
     def __init__(self, value):
         Result.__init__(self)
         self.value = value

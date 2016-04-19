@@ -19,12 +19,18 @@ class CalculationException(Exception):
 
 
 class ExceptionInfo(object):
+    """
+    An abstract class wrapping either a single Exception or a labeled
+    group of Exceptions.
+    """
     __metaclass__ = abc.ABCMeta
 
     def to_pretty_xml(self):
+        """Return human-readable XML text for this ExceptionInfo."""
         return self.to_xml().toprettyxml()
 
     def to_xml(self):
+        """Return an XML document data structure for this ExceptionInfo."""
         document = xml.dom.getDOMImplementation().createDocument(None,
                                                                  None,
                                                                  None)
@@ -34,10 +40,14 @@ class ExceptionInfo(object):
 
     @abc.abstractmethod
     def to_xml_fragment(self, document):
+        """Return an XML data structure for this ExceptionInfo."""
         pass
 
 
 class SingleExceptionInfo(ExceptionInfo):
+    """
+    A class wrapping a single Exception.
+    """
     def __init__(self, exception, stack_trace):
         self.exception = exception
         self.stack_trace = stack_trace
@@ -65,6 +75,9 @@ class SingleExceptionInfo(ExceptionInfo):
 
 
 class GroupedExceptionInfo(ExceptionInfo):
+    """
+    A class wrapping a labeled group of Exception.
+    """
     def __init__(self, label, exception_infos):
         assert isinstance(label, str)
         self.label = label

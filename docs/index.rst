@@ -9,9 +9,15 @@ Welcome to PDART's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-.. automodule:: pdart
+.. automodule:: pdart.exceptions.Combinators
+    :members:
+
+.. automodule:: pdart.exceptions.ExceptionInfo
+    :members:
+
+.. automodule:: pdart.exceptions.Result
     :members:
 
 .. automodule:: pdart.pds4.Archive
@@ -47,8 +53,12 @@ Contents:
 .. automodule:: pdart.pds4.VID
     :members:
 
-.. automodule:: pdart.exceptions.ExceptionInfo
+.. automodule:: pdart.xml.Schema
     :members:
+
+.. automodule:: pdart.xml.Templates
+    :members:
+
 
 
 

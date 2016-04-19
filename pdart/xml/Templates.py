@@ -3,12 +3,21 @@ import xml.sax
 
 
 def interpret_text(txt):
+    """
+    Return a builder function that takes an XML document and returns a
+    text node containing the text.
+    """
     def builder(doc):
         return doc.createTextNode(txt)
     return builder
 
 
 def interpret_document_template(template):
+    """
+    Return a builder function that takes a dictionary and returns an
+    XML document containing the template text, with any PARAM elements
+    replaced by looking up their 'name' attribute in the dictionary.
+    """
     def builder(dictionary):
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         stack = [doc]
@@ -54,6 +63,14 @@ def interpret_document_template(template):
 
 
 def interpret_template(template):
+    """
+    Return a parameterizing function that takes a dictionary and
+    returns an builder function, performing substitution of the PARAM
+    elements with entries from the dictionary, as
+    interpret_template_document does.
+
+    The returned builder function takes a document and returns XML.
+    """
     def parameterizer(dictionary):
         def builder(document):
             doc = document
