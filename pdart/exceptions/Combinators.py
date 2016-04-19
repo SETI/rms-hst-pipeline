@@ -8,6 +8,8 @@ def _code_to_rcode(func):
     def rfunc(*args, **kwargs):
         try:
             res = func(*args, **kwargs)
+        except CalculationException as ce:
+            return Failure(ce.exception_info)
         except Exception as e:
             exception_info = SingleExceptionInfo(e, traceback.format_exc())
             return Failure(exception_info)

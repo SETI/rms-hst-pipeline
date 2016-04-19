@@ -53,6 +53,9 @@ Contents:
 .. automodule:: pdart.pds4.VID
     :members:
 
+.. automodule:: pdart.reductions.Reduction
+    :members:
+
 .. automodule:: pdart.xml.Schema
     :members:
 
