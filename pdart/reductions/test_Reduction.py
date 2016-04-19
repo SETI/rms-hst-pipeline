@@ -1,6 +1,5 @@
-import pdart.pds4.Archives
-
 from pdart.exceptions.ExceptionInfo import CalculationException
+from pdart.pds4.Archives import *
 from pdart.reductions.Reduction import *
 
 
@@ -14,10 +13,10 @@ class RecursiveReduction(Reduction):
     def reduce_collection(self, archive, lid, get_reduced_products):
         return 1 + sum(get_reduced_products())
 
-    def reduce_product(self, archive, lid, get_reduced_files):
-        return 1 + sum(get_reduced_files())
+    def reduce_product(self, archive, lid, get_reduced_fits_files):
+        return 1 + sum(get_reduced_fits_files())
 
-    def reduce_fits(self, file, get_reduced_hdus):
+    def reduce_fits_file(self, file, get_reduced_hdus):
         try:
             return 1 + sum(get_reduced_hdus())
         except Exception:
@@ -25,9 +24,9 @@ class RecursiveReduction(Reduction):
 
 
 def test_reductions():
-    arch = pdart.pds4.Archives.get_any_archive()
+    arch = get_any_archive()
     try:
-        count = ReductionRunner().run_archive(RecursiveReduction(), arch)
+        count = run_reduction(RecursiveReduction(), arch)
         assert count == 137567
     except CalculationException as ce:
         print ce.exception_info.to_pretty_xml()
