@@ -26,14 +26,17 @@ class Archive(object):
 
     @staticmethod
     def is_valid_instrument(inst):
+        """Return True iff the argument is a valid instrument name."""
         return inst in ['acs', 'wfc3', 'wfpc2']
 
     @staticmethod
     def is_valid_proposal(prop):
+        """Return True iff the argument is a valid integer HST proposal ID."""
         return isinstance(prop, int) and 0 <= prop and prop <= 99999
 
     @staticmethod
     def is_valid_visit(vis):
+        """Return True iff the argument is a valid visit ID."""
         try:
             return re.match(r'\A[a-z0-9][a-z0-9]\Z', vis) is not None
         except:

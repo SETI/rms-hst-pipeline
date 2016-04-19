@@ -3,7 +3,7 @@ import pdart.pds4.Archive
 
 def get_full_archive():
     """
-    Returns the complete Archive located on the 3TB external drive
+    Return the complete Archive located on the 3TB external drive
     connected to the nightly-build machine.
     """
     return pdart.pds4.Archive.Archive('/Volumes/PDART-3TB')
@@ -11,7 +11,7 @@ def get_full_archive():
 
 def get_mini_archive():
     """
-    Returns the small test Archive located on my development machine.
+    Return the small test Archive located on my development machine.
     """
     return pdart.pds4.Archive.Archive('/Users/spaceman/Desktop/Archive')
 

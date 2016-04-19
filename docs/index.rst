@@ -14,6 +14,39 @@ Contents:
 .. automodule:: pdart
     :members:
 
+.. automodule:: pdart.pds4.Archive
+    :members:
+
+.. automodule:: pdart.pds4.Archives
+    :members:
+
+.. automodule:: pdart.pds4.Bundle
+    :members:
+
+.. automodule:: pdart.pds4.Collection
+    :members:
+
+.. automodule:: pdart.pds4.Component
+    :members:
+
+.. automodule:: pdart.pds4.File
+    :members:
+
+.. automodule:: pdart.pds4.HstFilename
+    :members:
+
+.. automodule:: pdart.pds4.LID
+    :members:
+
+.. automodule:: pdart.pds4.LIDVID
+    :members:
+
+.. automodule:: pdart.pds4.Product
+    :members:
+
+.. automodule:: pdart.pds4.VID
+    :members:
+
 .. automodule:: pdart.exceptions.ExceptionInfo
     :members:
 
