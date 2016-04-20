@@ -1,5 +1,6 @@
 from pdart.pds4.Bundle import *
 from pdart.reductions.Reduction import *
+from pdart.xml.Schema import *
 from pdart.xml.Templates import *
 
 make_label = interpret_document_template(
@@ -59,5 +60,19 @@ class BundleLabelReduction(Reduction):
         return make_bundle_entry_member(dict)
 
 
-def make_bundle_label(bundle):
-    return ReductionRunner().run_bundle(BundleLabelReduction(), bundle)
+def make_bundle_label(bundle, verify):
+    """
+    Create the label text for this bundle.  If verify is True, verify
+    the label against its XML and Schematron schemas.  Raise an
+    exception if either fails.
+    """
+    label = ReductionRunner().run_bundle(BundleLabelReduction(), bundle)
+    if verify:
+        failures = xml_schema_failures(None, label) and \
+            schematron_failures(None, label)
+    else:
+        failures = None
+    if failures is None:
+        return label
+    else:
+        raise Exception('Validation errors: ' + failures)

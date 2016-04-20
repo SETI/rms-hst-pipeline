@@ -49,8 +49,9 @@ class TestXmlSchema(unittest.TestCase):
         self.assertNotEquals('', stdout)
 
         exit_code, stderr, stdout = \
-            probatron_with_stdin(None, SCHEMATRON_SCHEMA,
-                                 stdin='<library><book/><book/></library>')
+            probatron_with_stdin(None,
+                                 stdin='<library><book/><book/></library>',
+                                 schema=SCHEMATRON_SCHEMA)
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)
         self.assertNotEquals('', stdout)

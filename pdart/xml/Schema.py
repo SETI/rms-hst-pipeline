@@ -32,7 +32,7 @@ def run_subprocess(cmd, stdin=None):
     return (exit_code, stderr, stdout)
 
 
-def _xmllint_schema(filepath, schema=XML_SCHEMA, stdin=None):
+def _xmllint_schema(filepath, stdin=None, schema=XML_SCHEMA):
     """
     Run xmllint on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
@@ -46,7 +46,7 @@ def _xmllint_schema(filepath, schema=XML_SCHEMA, stdin=None):
                               stdin=stdin)
 
 
-def xml_schema_failures(filepath, schema=XML_SCHEMA, stdin=None):
+def xml_schema_failures(filepath, stdin=None, schema=XML_SCHEMA):
     """
     Run xmllint on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns None if
@@ -54,8 +54,8 @@ def xml_schema_failures(filepath, schema=XML_SCHEMA, stdin=None):
     they exist.
     """
     exit_code, stderr, _ = _xmllint_schema(filepath,
-                                           schema=schema,
-                                           stdin=stdin)
+                                           stdin=stdin,
+                                           schema=schema)
     if exit_code == 0:
         return None
     else:
@@ -77,7 +77,7 @@ def probatron(filepath, schema=SCHEMATRON_SCHEMA):
                            filepath, schema])
 
 
-def probatron_with_stdin(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
+def probatron_with_stdin(filepath, stdin=None, schema=SCHEMATRON_SCHEMA):
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
@@ -97,14 +97,14 @@ def probatron_with_stdin(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
 
 
 def probatron_with_svrl_result(filepath,
-                               schema=SCHEMATRON_SCHEMA,
-                               stdin=None):
+                               stdin=None,
+                               schema=SCHEMATRON_SCHEMA):
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns the
     SVRL as XML.
     """
-    exit_code, stderr, stdout = probatron_with_stdin(filepath, schema, stdin)
+    exit_code, stderr, stdout = probatron_with_stdin(filepath, stdin, schema)
     assert exit_code == 0, 'exit_code = %r' % exit_code
     assert stderr == '', 'stderr = %r' % stderr
     return xml.dom.minidom.parseString(stdout)
@@ -118,14 +118,14 @@ def svrl_has_failures(svrl):
     return len(_svrl_failures(svrl)) > 0
 
 
-def schematron_failures(filepath, schema=SCHEMATRON_SCHEMA, stdin=None):
+def schematron_failures(filepath, stdin=None, schema=SCHEMATRON_SCHEMA):
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns None if
     there are no failures; returns a string containing the failures if
     they exist.
     """
-    svrl = probatron_with_svrl_result(filepath, schema, stdin)
+    svrl = probatron_with_svrl_result(filepath, stdin, schema)
     failures = _svrl_failures(svrl)
     if len(failures) > 0:
         # should I have a pretty option here for human-readability?
