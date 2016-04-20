@@ -68,7 +68,7 @@ class CollectionLabelReduction(Reduction):
         collection = Collection(archive, lid)
         suffix = collection.suffix()
         proposal_id = collection.bundle().proposal_id()
-        inventory_name = 'collection_%s_inventory.tab' % suffix
+        inventory_name = make_collection_inventory_name(suffix)
 
         dict = {'lid': interpret_text(str(lid)),
                 'suffix': interpret_text(suffix.upper()),
@@ -82,3 +82,13 @@ class CollectionLabelReduction(Reduction):
 def make_collection_label(collection):
     return ReductionRunner().run_collection(CollectionLabelReduction(),
                                             collection)
+
+
+def make_collection_inventory_name(suffix):
+    return 'collection_%s_inventory.tab' % suffix
+
+
+def make_collection_inventory(collection):
+    lines = [u'P,%s\r\n' % str(product.lid)
+             for product in collection.products()]
+    return ''.join(lines)

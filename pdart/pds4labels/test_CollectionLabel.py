@@ -7,3 +7,4 @@ def test_make_collection_label():
     b = list(arch.bundles())[0]
     c = list(b.collections())[0]
     make_collection_label(c)
+    make_collection_inventory(c)
