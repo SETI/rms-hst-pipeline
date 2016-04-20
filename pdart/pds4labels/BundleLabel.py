@@ -62,9 +62,9 @@ class BundleLabelReduction(Reduction):
 
 def make_bundle_label(bundle, verify):
     """
-    Create the label text for this bundle.  If verify is True, verify
-    the label against its XML and Schematron schemas.  Raise an
-    exception if either fails.
+    Create the label text for this :class:`Bundle`.  If verify is
+    True, verify the label against its XML and Schematron schemas.
+    Raise an exception if either fails.
     """
     label = ReductionRunner().run_bundle(BundleLabelReduction(), bundle)
     if verify:

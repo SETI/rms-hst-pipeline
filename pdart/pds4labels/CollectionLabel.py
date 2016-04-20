@@ -82,9 +82,9 @@ class CollectionLabelReduction(Reduction):
 
 def make_collection_label(collection, verify):
     """
-    Create the label text for this bundle.  If verify is True, verify
-    the label against its XML and Schematron schemas.  Raise an
-    exception if either fails.
+    Create the label text for this :class:`Collection`.  If verify is
+    True, verify the label against its XML and Schematron schemas.
+    Raise an exception if either fails.
     """
     label = ReductionRunner().run_collection(CollectionLabelReduction(),
                                              collection)

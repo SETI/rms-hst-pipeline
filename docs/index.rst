@@ -56,6 +56,12 @@ Contents:
 .. automodule:: pdart.pds4labels.BundleLabel
     :members:
 
+.. automodule:: pdart.pds4labels.CollectionLabel
+    :members:
+
+.. automodule:: pdart.pds4labels.ProductLabel
+    :members:
+
 .. automodule:: pdart.reductions.Reduction
     :members:
 
