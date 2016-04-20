@@ -119,6 +119,7 @@ def interpret_template(template):
         return builder
     return parameterizer
 
+
 def combine_multiple_nodes(doc_funcs):
     """
     Convert a list of functions that take a document and return an XML

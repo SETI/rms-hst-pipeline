@@ -178,4 +178,9 @@ def test_synthesis():
                            str(c)
 
 if __name__ == '__main__':
-    test_synthesis()
+    # test_synthesis()
+    a = pdart.pds4.Archives.get_any_archive()
+    b = list(a.bundles())[0]
+    c = list(b.collections())[0]
+    lm = CollectionLabelMaker(c)
+    lm.write_xml_to_file('collection.xml')
