@@ -2,15 +2,15 @@ import os.path
 
 
 class File(object):
-    """A file belonging to an Component."""
+    """A file belonging to an :class:`Component`."""
 
     def __init__(self, comp, basename):
         """
-        Create an File given the component it belongs to and
+        Create an File given the :class:`Component` it belongs to and
         the basename (that is, filepath without directory part) for
         the file.
 
-        Note that this assumes that products don't contain
+        Note that this assumes that :class:`Product`s don't contain
         subdirectories.  That won't always be true.
         """
 

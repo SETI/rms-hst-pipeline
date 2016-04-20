@@ -53,6 +53,9 @@ Contents:
 .. automodule:: pdart.pds4.VID
     :members:
 
+.. automodule:: pdart.pds4labels.BundleLabel
+    :members:
+
 .. automodule:: pdart.reductions.Reduction
     :members:
 

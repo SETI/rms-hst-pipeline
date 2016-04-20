@@ -30,20 +30,30 @@ def interpret_document_template(template):
                     if type(param) == str:
                         elmt = doc.createTextNode(param)
                         assert isinstance(elmt, xml.dom.Node)
+                        stack.append(elmt)
                     else:
                         elmt = param(doc)
-                        assert isinstance(elmt, xml.dom.Node)
-                    assert isinstance(elmt, xml.dom.Node)
+                        if isinstance(elmt, list):
+                            for e in elmt:
+                                assert isinstance(e, xml.dom.Node)
+                        else:
+                            assert isinstance(elmt, xml.dom.Node)
+                        stack.append(elmt)
                 else:
                     elmt = doc.createElement(name)
                     for name in attrs.getNames():
                         elmt.setAttribute(name, attrs[name])
-                stack.append(elmt)
+                    stack.append(elmt)
 
             def endElement(self, name):
                 elmt = stack.pop()
-                elmt.normalize()
-                stack[-1].appendChild(elmt)
+                if isinstance(elmt, list):
+                    for e in elmt:
+                        e.normalize()
+                        stack[-1].appendChild(e)
+                else:
+                    elmt.normalize()
+                    stack[-1].appendChild(elmt)
 
             def characters(self, content):
                 node = doc.createTextNode(content)
@@ -108,3 +118,13 @@ def interpret_template(template):
             return stack[-1]
         return builder
     return parameterizer
+
+def combine_multiple_nodes(doc_funcs):
+    """
+    Convert a list of functions that take a document and return an XML
+    node into a single function that takes a document and returns a
+    list of XML nodes.
+    """
+    def func(document):
+        return [doc_func(document) for doc_func in doc_funcs]
+    return func

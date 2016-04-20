@@ -114,7 +114,7 @@ class ReductionRunner(object):
 
 def run_reduction(reduction, archive):
     """
-    Run a :class:`Reduction` on an :class:`Archive` using the standard
+    Run a :class:`Reduction` on an :class:`Archive` using the default
     recursion.
     """
     return ReductionRunner().run_archive(reduction, archive)

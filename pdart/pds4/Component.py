@@ -7,16 +7,16 @@ import pdart.pds4.File
 
 class Component(object):
     """
-    A bundle, component, or product within an archive.  This is an
-    abstract class.
+    A :class:`Bundle`, :class:`Collection`, or :class:`Product` within
+    an :class:`Archive`.  This is an abstract class.
     """
 
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, arch, lid):
         """
-        Create an Component given the archive it lives in and
-        its LID.
+        Create an :class:`Component` given the :class:`Archive` it
+        lives in and its :class:`LID`.
         """
         assert arch
         self.archive = arch
@@ -32,21 +32,22 @@ class Component(object):
     @abc.abstractmethod
     def absolute_filepath(self):
         """
-        Return the absolute filepath to the component's directory
-        (Bundle, Collection) or file (Product).
+        Return the absolute filepath to the :class:`Component`'s
+        directory (:class:`Bundle`, :class:`Collection`) or file
+        (:class:`Product`).
         """
         pass
 
     def absolute_filepath_is_directory(self):
         """
-        Return True iff absolute_filepath() returns a directory.
+        Return True iff :func:`absolute_filepath()` returns a directory.
         """
         return True
 
     def files(self):
         """
-        Generate all the files belonging to this component as ArchiveFile
-        objects.
+        Generate all the files belonging to this :class:`Component` as
+        :class:`File` objects.
         """
         dir = self.absolute_filepath()
         for basename in os.listdir(dir):
