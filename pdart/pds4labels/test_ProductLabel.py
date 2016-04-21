@@ -7,4 +7,5 @@ def test_make_product_label():
     b = list(arch.bundles())[0]
     c = list(b.collections())[0]
     p = list(c.products())[0]
-    make_product_label(p, False)
+    print make_product_label(p, True)
+    assert False
