@@ -101,11 +101,31 @@ def mk_Investigation_Area_lidvid(proposal_id):
         proposal_id
 
 
+hdu_contents = interpret_template("""<Header>
+<local_identifier></local_identifier>
+<offset unit="byte"><PARAM name="offset"/></offset>
+<object_length unit="byte"><PARAM name="object_length"/></object_length>
+<parsing_standard_id>FITS 3.0</parsing_standard_id>
+<description>Global FITS Header</description>
+</Header>""")
+
+
 class ProductLabelReduction(Reduction):
     """
     Reduction of a :class:`Product` to its PDS4 label as a string.
     """
-    def reduce_product(self, archive, lid, get_reduced_products):
+    def reduce_product(self, archive, lid, get_reduced_fits_files):
+        file_contents = get_reduced_fits_files()
+        # file_contents :: [Doc -> [Node]]
+
+        def file_contents_(doc):
+            res = []
+            for fc in file_contents:
+                res.extend(fc(doc))
+            return res
+        # file_contents_ :: Doc -> [Node]
+        assert is_doc_to_list_of_nodes_function(file_contents_)
+
         product = Product(archive, lid)
         suffix = product.collection().suffix()
         proposal_id = product.bundle().proposal_id()
@@ -122,9 +142,26 @@ class ProductLabelReduction(Reduction):
                 'Observing_System': observing_system({}),
                 'Target_Identification': target_identification({}),
                 'file_name': interpret_text(file_name),
-                'file_contents': interpret_text('***file_contents***'),
+                'file_contents': file_contents_
                 }
         return make_label(dict).toxml()
+
+    def reduce_fits_file(self, file, get_reduced_hdus):
+        reduced_hdus = get_reduced_hdus()
+        assert is_list_of_doc_to_node_functions(reduced_hdus)
+        res = combine_multiple_nodes(reduced_hdus)
+        assert is_doc_to_list_of_nodes_function(res)
+        return res
+
+    def reduce_hdu(self, n, hdu,
+                   get_reduced_header_unit,
+                   get_reduced_data_unit):
+        offset = str('123')
+        object_length = str('456')
+        res = hdu_contents({'offset': offset,
+                            'object_length': object_length})
+        assert is_doc_to_node_function(res)
+        return res
 
 
 def make_product_label(product, verify):

@@ -1,3 +1,5 @@
+import pyfits
+
 from pdart.exceptions.Combinators import parallel_list
 
 
@@ -86,15 +88,15 @@ class ReductionRunner(object):
             fits = pyfits.open(file.full_filepath())
             try:
                 return parallel_list('run_fits_file',
-                                     [lambda: self.run_hdu(self, reduction,
-                                                           (n, hdu))
+                                     [lambda: self.run_hdu(reduction,
+                                                           n, hdu)
                                       for n, hdu in enumerate(fits)])
             finally:
                 fits.close()
 
         return reduction.reduce_fits_file(file, get_reduced_hdus)
 
-    def run_hdu(self, reduction, (n, hdu)):
+    def run_hdu(self, reduction, n, hdu):
         def get_reduced_header_unit():
             return reduction.reduce_header_unit(n, lambda: hdu.header)
 

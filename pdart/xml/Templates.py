@@ -125,7 +125,54 @@ def combine_multiple_nodes(doc_funcs):
     Convert a list of functions that take a document and return an XML
     node into a single function that takes a document and returns a
     list of XML nodes.
+
+    [Doc -> Node] -> Doc -> [Node]
     """
+    CHECK_TYPES = True
+    if CHECK_TYPES:
+        assert is_list_of_doc_to_node_functions(doc_funcs)
+
     def func(document):
         return [doc_func(document) for doc_func in doc_funcs]
+    if CHECK_TYPES:
+        assert is_doc_to_list_of_nodes_function(func)
     return func
+
+
+DOC = xml.dom.getDOMImplementation().createDocument(None, None, None)
+
+
+def is_function(func):
+    # a -> b
+    return hasattr(func, '__call__')
+
+
+def is_doc_to_node_function(func):
+    # Doc -> Node
+    if not is_function(func):
+        return False
+    return isinstance(func(DOC), xml.dom.Node)
+
+
+def is_list_of_doc_to_node_functions(func_list):
+    # [Doc -> Node]
+    if not isinstance(func_list, list):
+        return False
+    for func in func_list:
+        if not is_doc_to_node_function(func):
+            return False
+    return True
+
+
+def is_doc_to_list_of_nodes_function(func):
+    # Doc -> [Node]
+    if not is_function(func):
+        return False
+    res = func(DOC)
+    if isinstance(res, list):
+        for n in res:
+            if not isinstance(n, xml.dom.Node):
+                return False
+        return True
+    else:
+        return False
