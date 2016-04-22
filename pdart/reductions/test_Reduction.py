@@ -3,7 +3,7 @@ from pdart.pds4.Archives import *
 from pdart.reductions.Reduction import *
 
 
-class RecursiveReduction(Reduction):
+class TestRecursiveReduction(Reduction):
     def reduce_archive(self, archive_root, get_reduced_bundles):
         return 1 + sum(get_reduced_bundles())
 
@@ -17,16 +17,16 @@ class RecursiveReduction(Reduction):
         return 1 + sum(get_reduced_fits_files())
 
     def reduce_fits_file(self, file, get_reduced_hdus):
-        try:
-            return 1 + sum(get_reduced_hdus())
-        except Exception:
-            return 1
+        # We don't go any deeper because it takes too long for a unit
+        # test.  (In fact, it might be too long with the full
+        # archive.)
+        return 1
 
 
 def test_reductions():
     arch = get_any_archive()
     try:
-        count = run_reduction(RecursiveReduction(), arch)
+        count = run_reduction(TestRecursiveReduction(), arch)
         assert count == 137567
     except CalculationException as ce:
         print ce.exception_info.to_pretty_xml()
