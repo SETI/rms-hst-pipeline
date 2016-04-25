@@ -148,8 +148,8 @@ class ProductLabelReduction(Reduction):
 
     def reduce_fits_file(self, file, get_reduced_hdus):
         reduced_hdus = get_reduced_hdus()
-        assert is_list_of_doc_to_node_functions(reduced_hdus)
-        res = combine_multiple_nodes(reduced_hdus)
+        assert is_list_of_doc_to_list_of_nodes_functions(reduced_hdus)
+        res = combine_multiple_lists_of_nodes(reduced_hdus)
         assert is_doc_to_list_of_nodes_function(res)
         return res
 
@@ -160,10 +160,12 @@ class ProductLabelReduction(Reduction):
         fileinfo = hdu.fileinfo()
         offset = str(fileinfo['hdrLoc'])
         object_length = str(fileinfo['datLoc'] - fileinfo['hdrLoc'])
-        res = header_contents({'local_identifier': local_identifier,
-                               'offset': offset,
-                               'object_length': object_length})
-        assert is_doc_to_node_function(res)
+        header = header_contents({'local_identifier': local_identifier,
+                                  'offset': offset,
+                                  'object_length': object_length})
+        assert is_doc_to_node_function(header)
+        res = combine_multiple_nodes([header])
+        assert is_doc_to_list_of_nodes_function(res)
         return res
 
 

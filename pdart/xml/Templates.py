@@ -139,6 +139,29 @@ def combine_multiple_nodes(doc_funcs):
     return func
 
 
+def combine_multiple_lists_of_nodes(doc_funcs):
+    """
+    Convert a list of functions that each take a document and return a
+    list of XML node into a single function that takes a document and
+    returns a list of XML nodes.
+
+    [Doc -> [Node]] -> Doc -> [Node]
+    """
+    CHECK_TYPES = True
+    if CHECK_TYPES:
+        assert is_list_of_doc_to_list_of_nodes_functions(doc_funcs)
+
+    def func(document):
+        res = []
+        for doc_func in doc_funcs:
+            res.extend(doc_func(document))
+        return res
+
+    if CHECK_TYPES:
+        assert is_doc_to_list_of_nodes_function(func)
+    return func
+
+
 DOC = xml.dom.getDOMImplementation().createDocument(None, None, None)
 
 
@@ -160,6 +183,16 @@ def is_list_of_doc_to_node_functions(func_list):
         return False
     for func in func_list:
         if not is_doc_to_node_function(func):
+            return False
+    return True
+
+
+def is_list_of_doc_to_list_of_nodes_functions(func_list):
+    # [Doc -> [Node]]
+    if not isinstance(func_list, list):
+        return False
+    for func in func_list:
+        if not is_doc_to_list_of_nodes_function(func):
             return False
     return True
 
