@@ -110,6 +110,20 @@ header_contents = interpret_template("""<Header>
 </Header>""")
 
 
+data_contents = interpret_template("""<Array_2D_Image>
+<offset unit="byte"><PARAM name="offset" /></offset>
+<axes><PARAM name="axes" /></axes>
+<axis_index_order>Last Index Fastest</axis_index_order>
+<PARAM name="Element_Array" />
+<PARAM name="Axis_Arrays" />
+</Array_2D_Image>""")
+
+element_array = interpret_template("""<ElementArray>
+a<data_type><PARAM name="data_type" /></data_type></ElementArray>""")
+
+axis_array = interpret_template("""<Axis_Array/>""")
+
+
 class ProductLabelReduction(Reduction):
     """
     Reduction of a :class:`Product` to its PDS4 label as a string.
@@ -164,7 +178,27 @@ class ProductLabelReduction(Reduction):
                                   'offset': offset,
                                   'object_length': object_length})
         assert is_doc_to_node_function(header)
-        res = combine_multiple_nodes([header])
+
+        if fileinfo['datSpan']:
+            axes = hdu.header['NAXIS']
+            # FIXME un-hard-coding
+            elmt_arr = element_array({'data_type': 'UnsignedByte'})
+            # FIXME un-hard-coding
+            axis_arrs = axis_array({})
+            data = data_contents({
+                    'offset': str(fileinfo['datLoc']),
+                    'axes': str(axes),
+                    'Element_Array': elmt_arr,
+                    # FIXME Behold the problem: can't yet pass
+                    # multiple nodes in a parameter.
+                    'Axis_Arrays': axis_arrs
+                    })
+            assert is_doc_to_node_function(data)
+            node_functions = [header, data]
+        else:
+            node_functions = [header]
+
+        res = combine_multiple_nodes(node_functions)
         assert is_doc_to_list_of_nodes_function(res)
         return res
 
