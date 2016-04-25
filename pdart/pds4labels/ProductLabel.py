@@ -115,13 +115,17 @@ data_contents = interpret_template("""<Array_2D_Image>
 <axes><NODE name="axes" /></axes>
 <axis_index_order>Last Index Fastest</axis_index_order>
 <NODE name="Element_Array" />
-<NODE name="Axis_Arrays" />
+<FRAGMENT name="Axis_Arrays" />
 </Array_2D_Image>""")
 
 element_array = interpret_template("""<ElementArray>
-a<data_type><NODE name="data_type" /></data_type></ElementArray>""")
+<data_type><NODE name="data_type" /></data_type></ElementArray>""")
 
-axis_array = interpret_template("""<Axis_Array/>""")
+axis_array = interpret_template("""<Axis_Array>
+<axis_name><NODE name="axis_name"/></axis_name>
+<elements><NODE name="elements"/></elements>
+<sequence_number><NODE name="sequence_number"/></sequence_number>
+</Axis_Array>""")
 
 
 class ProductLabelReduction(Reduction):
@@ -184,14 +188,19 @@ class ProductLabelReduction(Reduction):
             # FIXME un-hard-coding
             elmt_arr = element_array({'data_type': 'UnsignedByte'})
             # FIXME un-hard-coding
-            axis_arrs = axis_array({})
+            axis_arr1 = axis_array({'axis_name': 'Line',
+                                    'elements': '1062',
+                                    'sequence_number': '1'})
+            axis_arr2 = axis_array({'axis_name': 'Sample',
+                                    'elements': '1062',
+                                    'sequence_number': '2'})
             data = data_contents({
                     'offset': str(fileinfo['datLoc']),
                     'axes': str(axes),
                     'Element_Array': elmt_arr,
                     # FIXME Behold the problem: can't yet pass
                     # multiple nodes in a parameter.
-                    'Axis_Arrays': axis_arrs
+                    'Axis_Arrays': combine_multiple_nodes([axis_arr1, axis_arr2])
                     })
             assert is_doc_to_node_function(data)
             node_functions = [header, data]

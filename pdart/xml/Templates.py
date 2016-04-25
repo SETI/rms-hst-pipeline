@@ -108,14 +108,21 @@ def interpret_template(template):
                             elmt = doc.createTextNode(param)
                         else:
                             elmt = param(doc)
+                        assert isinstance(elmt, xml.dom.Node)
+                        stack.append(elmt)
                     elif name == 'FRAGMENT':
-                        assert False, 'unimplemented'
+                        param = dictionary[attrs['name']]
+                        elmts = param(doc)
+                        assert isinstance(elmts, list)
+                        for elmt in elmts:
+                            assert isinstance(elmt, xml.dom.Node)
+                        stack.append(elmts)
                     else:
                         elmt = doc.createElement(name)
                         for name in attrs.getNames():
                             elmt.setAttribute(name, attrs[name])
-                    assert isinstance(elmt, xml.dom.Node)
-                    stack.append(elmt)
+                        assert isinstance(elmt, xml.dom.Node)
+                        stack.append(elmt)
 
                 def endElement(self, name):
                     if name == 'FRAGMENT':

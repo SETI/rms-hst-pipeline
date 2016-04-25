@@ -11,10 +11,7 @@ def test_make_product_label():
     p = list(c.products())[-1]
 
     # Verify the label against its XML Schema and Schematron.
-    VERIFY = False
-    # FIXME Verification temporarily turned off while I rework the XML
-    # templates to handle node lists, which are needed for valid
-    # product labels.
+    VERIFY = True
 
     # Be verbose if you want to inspect the full results when running
     # the test, whether it's valid or not.
