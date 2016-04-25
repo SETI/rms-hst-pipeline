@@ -15,7 +15,7 @@ def interpret_text(txt):
 def interpret_document_template(template):
     """
     Return a builder function that takes a dictionary and returns an
-    XML document containing the template text, with any PARAM elements
+    XML document containing the template text, with any NODE elements
     replaced by looking up their 'name' attribute in the dictionary.
     """
     def builder(dictionary):
@@ -25,7 +25,7 @@ def interpret_document_template(template):
         class Builder(xml.sax.ContentHandler):
 
             def startElement(self, name, attrs):
-                if name == 'PARAM':
+                if name == 'NODE':
                     param = dictionary[attrs['name']]
                     if type(param) == str:
                         elmt = doc.createTextNode(param)
@@ -75,7 +75,7 @@ def interpret_document_template(template):
 def interpret_template(template):
     """
     Return a parameterizing function that takes a dictionary and
-    returns an builder function, performing substitution of the PARAM
+    returns an builder function, performing substitution of the NODE
     elements with entries from the dictionary, as
     :func:`interpret_document_template` does.
 
@@ -89,7 +89,7 @@ def interpret_template(template):
             class Builder(xml.sax.ContentHandler):
 
                 def startElement(self, name, attrs):
-                    if name == 'PARAM':
+                    if name == 'NODE':
                         param = dictionary[attrs['name']]
                         if type(param) == str:
                             elmt = doc.createTextNode(param)

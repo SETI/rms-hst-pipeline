@@ -15,10 +15,10 @@ make_label = interpret_document_template(
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.xsd">
   <Identification_Area>
-    <logical_identifier><PARAM name="lid" /></logical_identifier>
+    <logical_identifier><NODE name="lid" /></logical_identifier>
     <version_id>0.1</version_id>
-    <title>This collection contains the <PARAM name="suffix" /> \
-image obtained the HST Observing Program <PARAM name="proposal_id" />\
+    <title>This collection contains the <NODE name="suffix" /> \
+image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
     <information_model_version>1.5.0.0</information_model_version>
     <product_class>Product_Observational</product_class>
@@ -31,23 +31,23 @@ image obtained the HST Observing Program <PARAM name="proposal_id" />\
     </Modification_History>
   </Identification_Area>
   <Observation_Area>
-    <PARAM name="Time_Coordinates" />
+    <NODE name="Time_Coordinates" />
     <Investigation_Area>
-      <name><PARAM name="Investigation_Area_name" /></name>
+      <name><NODE name="Investigation_Area_name" /></name>
       <type>Individual Investigation</type>
       <Internal_Reference>
-        <lidvid_reference><PARAM name="investigation_lidvid" />\
+        <lidvid_reference><NODE name="investigation_lidvid" />\
         </lidvid_reference>
         <reference_type>data_to_investigation</reference_type>
       </Internal_Reference>
     </Investigation_Area>
-    <PARAM name="Observing_System" />
-    <PARAM name="Target_Identification" />
+    <NODE name="Observing_System" />
+    <NODE name="Target_Identification" />
   </Observation_Area>
   <File_Area_Observational>
     <File>
-      <file_name><PARAM name="file_name" /></file_name>
-      <PARAM name="file_contents" />
+      <file_name><NODE name="file_name" /></file_name>
+      <NODE name="file_contents" />
     </File>
   </File_Area_Observational>
 </Product_Observational>""")
@@ -102,24 +102,24 @@ def mk_Investigation_Area_lidvid(proposal_id):
 
 
 header_contents = interpret_template("""<Header>
-<local_identifier><PARAM name="local_identifier"/></local_identifier>
-<offset unit="byte"><PARAM name="offset"/></offset>
-<object_length unit="byte"><PARAM name="object_length"/></object_length>
+<local_identifier><NODE name="local_identifier"/></local_identifier>
+<offset unit="byte"><NODE name="offset"/></offset>
+<object_length unit="byte"><NODE name="object_length"/></object_length>
 <parsing_standard_id>FITS 3.0</parsing_standard_id>
 <description>Global FITS Header</description>
 </Header>""")
 
 
 data_contents = interpret_template("""<Array_2D_Image>
-<offset unit="byte"><PARAM name="offset" /></offset>
-<axes><PARAM name="axes" /></axes>
+<offset unit="byte"><NODE name="offset" /></offset>
+<axes><NODE name="axes" /></axes>
 <axis_index_order>Last Index Fastest</axis_index_order>
-<PARAM name="Element_Array" />
-<PARAM name="Axis_Arrays" />
+<NODE name="Element_Array" />
+<NODE name="Axis_Arrays" />
 </Array_2D_Image>""")
 
 element_array = interpret_template("""<ElementArray>
-a<data_type><PARAM name="data_type" /></data_type></ElementArray>""")
+a<data_type><NODE name="data_type" /></data_type></ElementArray>""")
 
 axis_array = interpret_template("""<Axis_Array/>""")
 

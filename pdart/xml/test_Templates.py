@@ -15,16 +15,16 @@ class TestTemplates(unittest.TestCase):
         self.assertEquals('<?xml version="1.0" ?><body/>', body({}).toxml())
 
         body_with_param = interpret_document_template(
-            '<body_with_param><PARAM name="foo"/></body_with_param>')
+            '<body_with_param><NODE name="foo"/></body_with_param>')
         self.assertEquals(
             '<?xml version="1.0" ?><body_with_param>bar</body_with_param>',
             body_with_param({'foo': 'bar'}).toxml())
 
     def test_interpret_template(self):
         make_body = interpret_document_template(
-            '<doc><PARAM name="foo"/></doc>')
+            '<doc><NODE name="foo"/></doc>')
 
-        make_template = interpret_template('<foo><PARAM name="bar"/></foo>')
+        make_template = interpret_template('<foo><NODE name="bar"/></foo>')
 
         template = make_template({'bar': interpret_text('BAR')})
         body = make_body({'foo': template})
