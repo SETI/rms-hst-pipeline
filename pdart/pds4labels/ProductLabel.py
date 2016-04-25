@@ -101,8 +101,8 @@ def mk_Investigation_Area_lidvid(proposal_id):
         proposal_id
 
 
-hdu_contents = interpret_template("""<Header>
-<local_identifier></local_identifier>
+header_contents = interpret_template("""<Header>
+<local_identifier><PARAM name="local_identifier"/></local_identifier>
 <offset unit="byte"><PARAM name="offset"/></offset>
 <object_length unit="byte"><PARAM name="object_length"/></object_length>
 <parsing_standard_id>FITS 3.0</parsing_standard_id>
@@ -156,10 +156,13 @@ class ProductLabelReduction(Reduction):
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
-        offset = str('123')
-        object_length = str('456')
-        res = hdu_contents({'offset': offset,
-                            'object_length': object_length})
+        local_identifier = 'hdu_%d' % n
+        fileinfo = hdu.fileinfo()
+        offset = str(fileinfo['hdrLoc'])
+        object_length = str(fileinfo['datLoc'] - fileinfo['hdrLoc'])
+        res = header_contents({'local_identifier': local_identifier,
+                               'offset': offset,
+                               'object_length': object_length})
         assert is_doc_to_node_function(res)
         return res
 
