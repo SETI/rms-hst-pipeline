@@ -65,6 +65,9 @@ Contents:
 .. automodule:: pdart.reductions.Reduction
     :members:
 
+.. automodule:: pdart.xml.Pretty
+    :members:
+
 .. automodule:: pdart.xml.Schema
     :members:
 
