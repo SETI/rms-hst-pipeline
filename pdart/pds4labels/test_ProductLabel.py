@@ -15,9 +15,9 @@ def test_make_product_label():
 
     # Be verbose if you want to inspect the full results when running
     # the test, whether it's valid or not.
-    VERBOSE_RESULTS = False
+    FAIL_WITH_VERBOSE_RESULTS = False
 
-    if VERBOSE_RESULTS:
+    if FAIL_WITH_VERBOSE_RESULTS:
         try:
             print pretty_print(make_product_label(p, VERIFY))
         except CalculationException as ce:

@@ -85,6 +85,13 @@ def multiple_implementations(label, *funcs):
 #     return pfunc
 
 def parallel_list(label, arg_funcs):
+    """
+    Given a string label and a list of functions that take no
+    arguments (thunks), run the functions in parallel, and if all
+    succeed, return the list of the results.  If any one or more
+    fails, raise a :class:`CalculationException` containing all the
+    exceptions and stack traces in a :class:`GroupedExceptionInfo`.
+    """
     exception_infos = []
     results = []
     for arg_func in arg_funcs:

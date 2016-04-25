@@ -86,10 +86,35 @@ class ReductionRunner(object):
     def run_fits_file(self, reduction, file):
         def get_reduced_hdus():
             fits = pyfits.open(file.full_filepath())
+
+            # We have to jump through some hoops to make sure that in
+            # building the parallel list we return, we capture the n
+            # and hdu *values* not the *variables* that hold them.  In
+            # the obvious (but wrong) implementation I first wrote,
+            #
+            # [lambda: self.run_hdu(reduction, n, hdu) for n, hdu in
+            # enumerate(fits)]
+            #
+            # it captured the n and hdu *variables* and as a result,
+            # all of the resulting list got the same n and hdu (the
+            # last ones, since the lambdas didn't get run until after
+            # the enumeration was done).  If we pass n and hdu as
+            # arguments, their current *value* is used rather than just
+            # capturing the variable.
+            #
+            # Ignore this if it makes your head hurt.
+            def build_thunk(n, hdu):
+                """
+                Return a no-argument function (a thunk) that runs
+                self.run_hdu() with the given n and hdu values.
+                """
+                def thunk():
+                    return self.run_hdu(reduction, n, hdu)
+                return thunk
+
             try:
                 return parallel_list('run_fits_file',
-                                     [lambda: self.run_hdu(reduction,
-                                                           n, hdu)
+                                     [build_thunk(n, hdu)
                                       for n, hdu in enumerate(fits)])
             finally:
                 fits.close()
