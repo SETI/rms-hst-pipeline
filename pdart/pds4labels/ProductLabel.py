@@ -53,13 +53,13 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
 </Product_Observational>""")
 
 
-# PLACEHOLDER
+# FIXME - PLACEHOLDER
 time_coordinates = interpret_template("""<Time_Coordinates>
       <start_date_time>2000-01-02Z</start_date_time>
       <stop_date_time>2000-01-02Z</stop_date_time>
     </Time_Coordinates>""")
 
-# PLACEHOLDER
+# FIXME - PLACEHOLDER
 observing_system = interpret_template("""<Observing_System>
       <name>Hubble Space Telescope Advanced Camera for Surveys</name>
       <Observing_System_Component>
@@ -80,7 +80,7 @@ observing_system = interpret_template("""<Observing_System>
       </Observing_System_Component>
     </Observing_System>""")
 
-# PLACEHOLDER
+# FIXME - PLACEHOLDER
 target_identification = interpret_template("""<Target_Identification>
       <name>Magrathea</name>
       <type>Planet</type>
@@ -126,6 +126,36 @@ axis_array = interpret_template("""<Axis_Array>
 <elements><NODE name="elements"/></elements>
 <sequence_number><NODE name="sequence_number"/></sequence_number>
 </Axis_Array>""")
+
+
+def mk_axis_arrays(hdu, axes):
+    return combine_multiple_nodes([mk_axis_array(hdu, i)
+                                   for i in range(1, axes + 1)])
+
+_AXIS_NAME_TABLE = {
+    1: 'Line',
+    2: 'Sample'
+    }
+
+_BITPIX_TABLE = {
+    # TODO Verify these
+    8: 'UnsignedByte',
+    16: 'SignedMSB2',
+    32: 'SignedMSB4',
+    64: 'SignedMSB8',
+    -32: 'IEEE754MSBSingle',
+    -62: 'IEEE754MSBDouble'
+    }
+
+
+def mk_axis_array(hdu, i):
+    axis_name = _AXIS_NAME_TABLE[i]
+    elements = str(hdu.header['NAXIS%d' % i])
+    # TODO Check the semantics of sequence_number
+    sequence_number = str(i)
+    return axis_array({'axis_name': axis_name,
+                       'elements': elements,
+                       'sequence_number': sequence_number})
 
 
 class ProductLabelReduction(Reduction):
@@ -185,22 +215,14 @@ class ProductLabelReduction(Reduction):
 
         if fileinfo['datSpan']:
             axes = hdu.header['NAXIS']
-            # FIXME un-hard-coding
-            elmt_arr = element_array({'data_type': 'UnsignedByte'})
-            # FIXME un-hard-coding
-            axis_arr1 = axis_array({'axis_name': 'Line',
-                                    'elements': '1062',
-                                    'sequence_number': '1'})
-            axis_arr2 = axis_array({'axis_name': 'Sample',
-                                    'elements': '1062',
-                                    'sequence_number': '2'})
+            data_type = _BITPIX_TABLE[hdu.header['BITPIX']]
+            elmt_arr = element_array({'data_type': data_type})
+
             data = data_contents({
                     'offset': str(fileinfo['datLoc']),
                     'axes': str(axes),
                     'Element_Array': elmt_arr,
-                    # FIXME Behold the problem: can't yet pass
-                    # multiple nodes in a parameter.
-                    'Axis_Arrays': combine_multiple_nodes([axis_arr1, axis_arr2])
+                    'Axis_Arrays': mk_axis_arrays(hdu, axes)
                     })
             assert is_doc_to_node_function(data)
             node_functions = [header, data]
