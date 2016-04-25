@@ -15,8 +15,10 @@ def interpret_text(txt):
 def interpret_document_template(template):
     """
     Return a builder function that takes a dictionary and returns an
-    XML document containing the template text, with any NODE elements
-    replaced by looking up their 'name' attribute in the dictionary.
+    XML document containing the template text, with any NODE and
+    FRAGMENT elements replaced by looking up their 'name' attribute in
+    the dictionary.  NODE elements must evaluate to be XML nodes;
+    FRAGMENT must evaluate to be lists of XML nodes.
     """
     def builder(dictionary):
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
@@ -39,6 +41,13 @@ def interpret_document_template(template):
                         else:
                             assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
+                elif name == 'FRAGMENT':
+                    param = dictionary[attrs['name']]
+                    elmts = param(doc)
+                    assert isinstance(elmts, list)
+                    for elmt in elmts:
+                        assert isinstance(elmt, xml.dom.Node)
+                    stack.append(elmts)
                 else:
                     elmt = doc.createElement(name)
                     for name in attrs.getNames():
@@ -46,12 +55,16 @@ def interpret_document_template(template):
                     stack.append(elmt)
 
             def endElement(self, name):
-                elmt = stack.pop()
-                if isinstance(elmt, list):
-                    for e in elmt:
-                        e.normalize()
-                        stack[-1].appendChild(e)
+                if name == 'FRAGMENT':
+                    elmts = stack.pop()
+                    assert isinstance(elmts, list)
+                    for elmt in elmts:
+                        assert isinstance(elmt, xml.dom.Node)
+                        elmt.normalize()
+                        stack[-1].appendChild(elmt)
                 else:
+                    elmt = stack.pop()
+                    assert isinstance(elmt, xml.dom.Node)
                     elmt.normalize()
                     stack[-1].appendChild(elmt)
 
@@ -76,7 +89,7 @@ def interpret_template(template):
     """
     Return a parameterizing function that takes a dictionary and
     returns an builder function, performing substitution of the NODE
-    elements with entries from the dictionary, as
+    and FRAGMENT elements with entries from the dictionary, as
     :func:`interpret_document_template` does.
 
     The returned builder function takes a document and returns XML.
@@ -95,6 +108,8 @@ def interpret_template(template):
                             elmt = doc.createTextNode(param)
                         else:
                             elmt = param(doc)
+                    elif name == 'FRAGMENT':
+                        assert False, 'unimplemented'
                     else:
                         elmt = doc.createElement(name)
                         for name in attrs.getNames():
@@ -103,12 +118,21 @@ def interpret_template(template):
                     stack.append(elmt)
 
                 def endElement(self, name):
-                    elmt = stack.pop()
-                    elmt.normalize()
-                    if stack:
-                        stack[-1].appendChild(elmt)
+                    if name == 'FRAGMENT':
+                        elmts = stack.pop()
+                        for elmt in elmts:
+                            elmt.normalize()
+                            if stack:
+                                stack[-1].appendChild(elmt)
+                            else:
+                                stack.append(elmt)
                     else:
-                        stack.append(elmt)
+                        elmt = stack.pop()
+                        elmt.normalize()
+                        if stack:
+                            stack[-1].appendChild(elmt)
+                        else:
+                            stack.append(elmt)
 
                 def characters(self, content):
                     node = doc.createTextNode(content)

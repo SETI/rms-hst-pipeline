@@ -21,7 +21,7 @@ make_label = interpret_document_template(
   <Bundle>
     <bundle_type>Archive</bundle_type>
   </Bundle>
-  <NODE name="Bundle_Member_Entries"/>
+  <FRAGMENT name="Bundle_Member_Entries"/>
 </Product_Bundle>""")
 
 make_bundle_entry_member = interpret_template(

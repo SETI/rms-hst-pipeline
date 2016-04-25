@@ -47,7 +47,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
   <File_Area_Observational>
     <File>
       <file_name><NODE name="file_name" /></file_name>
-      <NODE name="file_contents" />
+      <FRAGMENT name="file_contents" />
     </File>
   </File_Area_Observational>
 </Product_Observational>""")
