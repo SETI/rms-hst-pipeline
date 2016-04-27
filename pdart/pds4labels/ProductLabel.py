@@ -55,33 +55,11 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
 </Product_Observational>""")
 
 
-# FIXME - PLACEHOLDER
+# TODO Generalize this?
 time_coordinates = interpret_template("""<Time_Coordinates>
-      <start_date_time>2000-01-02Z</start_date_time>
-      <stop_date_time>2000-01-02Z</stop_date_time>
+      <start_date_time><NODE name="start_date_time"/></start_date_time>
+      <stop_date_time><NODE name="stop_date_time"/></stop_date_time>
     </Time_Coordinates>""")
-
-# FIXME - PLACEHOLDER
-observing_system = interpret_template("""<Observing_System>
-      <name>Hubble Space Telescope Advanced Camera for Surveys</name>
-      <Observing_System_Component>
-        <name>Hubble Space Telescope</name>
-        <type>Spacecraft</type>
-        <Internal_Reference>
-          <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
-          <reference_type>is_instrument_host</reference_type>
-        </Internal_Reference>
-      </Observing_System_Component>
-      <Observing_System_Component>
-        <name>Advanced Camera for Surveys</name>
-        <type>Instrument</type>
-        <Internal_Reference>
-          <lid_reference>urn:nasa:pds:context:instrument:insthost.acs.hst</lid_reference>
-          <reference_type>is_instrument</reference_type>
-        </Internal_Reference>
-      </Observing_System_Component>
-    </Observing_System>""")
-
 
 def mk_Investigation_Area_name(proposal_id):
     return 'HST observing program %d' % proposal_id
@@ -175,10 +153,17 @@ class ProductLabelReduction(Reduction):
         target_type = 'Planet'
         target_description = 'Home of Slartibartfast'
 
+        # TODO Un-hard-code these
+        start_date_time = '2000-01-02Z'
+        stop_date_time = '2000-01-02Z'
+
         dict = {'lid': interpret_text(str(lid)),
                 'suffix': interpret_text(suffix.upper()),
                 'proposal_id': interpret_text(str(proposal_id)),
-                'Time_Coordinates': time_coordinates({}),
+                'Time_Coordinates': time_coordinates({
+                    'start_date_time': start_date_time,
+                    'stop_date_time': stop_date_time
+                    }),
                 'Investigation_Area_name':
                     interpret_text(mk_Investigation_Area_name(proposal_id)),
                 'investigation_lidvid':
