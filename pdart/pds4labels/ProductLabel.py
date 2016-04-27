@@ -79,7 +79,6 @@ header_contents = interpret_template("""<Header>
 <description>Global FITS Header</description>
 </Header>""")
 
-
 data_contents = interpret_template("""<Array_2D_Image>
 <offset unit="byte"><NODE name="offset" /></offset>
 <axes><NODE name="axes" /></axes>
@@ -145,6 +144,7 @@ class ProductLabelReduction(Reduction):
         assert is_doc_to_list_of_nodes_function(file_contents_)
 
         product = Product(archive, lid)
+        instrument = product.collection().instrument()
         suffix = product.collection().suffix()
         proposal_id = product.bundle().proposal_id()
         file_name = os.path.basename(product.absolute_filepath())
@@ -169,8 +169,7 @@ class ProductLabelReduction(Reduction):
                     interpret_text(mk_Investigation_Area_name(proposal_id)),
                 'investigation_lidvid':
                     interpret_text(mk_Investigation_Area_lidvid(proposal_id)),
-                # TODO Un-hard-code
-                'Observing_System': observing_system('acs'),
+                'Observing_System': observing_system(instrument),
                 'Target_Identification':
                     target_identification(target_name,
                                           target_type,
