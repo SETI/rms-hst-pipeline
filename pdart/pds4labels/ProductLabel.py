@@ -4,6 +4,7 @@ from pdart.pds4.Product import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
+from pdart.pds4labels.ObservingSystem import *
 from pdart.pds4labels.TargetIdentification import *
 
 make_label = interpret_document_template(
@@ -182,7 +183,8 @@ class ProductLabelReduction(Reduction):
                     interpret_text(mk_Investigation_Area_name(proposal_id)),
                 'investigation_lidvid':
                     interpret_text(mk_Investigation_Area_lidvid(proposal_id)),
-                'Observing_System': observing_system({}),
+                # TODO Un-hard-code
+                'Observing_System': observing_system('acs'),
                 'Target_Identification':
                     target_identification(target_name,
                                           target_type,
