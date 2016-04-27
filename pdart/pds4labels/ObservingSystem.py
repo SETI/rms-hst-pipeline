@@ -14,7 +14,8 @@ _observing_system = interpret_template("""<Observing_System>
         <name><NODE name="component_name"/></name>
         <type>Instrument</type>
         <Internal_Reference>
-          <lid_reference>urn:nasa:pds:context:instrument:insthost.acs.<NODE name="abbreviation"/></lid_reference>
+          <lid_reference>urn:nasa:pds:context:instrument:insthost.acs.\
+<NODE name="abbreviation"/></lid_reference>
           <reference_type>is_instrument</reference_type>
         </Internal_Reference>
       </Observing_System_Component>
@@ -38,6 +39,7 @@ wfpc2_observing_system = _observing_system({
         'component_name': 'Wide-Field Planetary Camera 2',
         'abbreviation': 'wfpc2'
         })
+
 
 def observing_system(instrument):
     return {'acs': acs_observing_system,

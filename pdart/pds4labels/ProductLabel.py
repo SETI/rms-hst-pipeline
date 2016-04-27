@@ -61,6 +61,7 @@ time_coordinates = interpret_template("""<Time_Coordinates>
       <stop_date_time><NODE name="stop_date_time"/></stop_date_time>
     </Time_Coordinates>""")
 
+
 def mk_Investigation_Area_name(proposal_id):
     return 'HST observing program %d' % proposal_id
 
