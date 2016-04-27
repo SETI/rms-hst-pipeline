@@ -4,6 +4,7 @@ from pdart.pds4.Product import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
+from pdart.pds4labels.TargetIdentification import *
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -79,17 +80,6 @@ observing_system = interpret_template("""<Observing_System>
         </Internal_Reference>
       </Observing_System_Component>
     </Observing_System>""")
-
-# FIXME - PLACEHOLDER
-target_identification = interpret_template("""<Target_Identification>
-      <name>Magrathea</name>
-      <type>Planet</type>
-      <description>Home of Slartibartfast (placeholder)</description>
-      <Internal_Reference>
-        <lid_reference>urn:nasa:pds:context:target:planet.magrathea</lid_reference>
-        <reference_type>data_to_target</reference_type>
-      </Internal_Reference>
-    </Target_Identification>""")
 
 
 def mk_Investigation_Area_name(proposal_id):
@@ -179,6 +169,11 @@ class ProductLabelReduction(Reduction):
         proposal_id = product.bundle().proposal_id()
         file_name = os.path.basename(product.absolute_filepath())
 
+        # TODO Un-hard-code these
+        target_name = 'Magrathea'
+        target_type = 'Planet'
+        target_description = 'Home of Slartibartfast'
+
         dict = {'lid': interpret_text(str(lid)),
                 'suffix': interpret_text(suffix.upper()),
                 'proposal_id': interpret_text(str(proposal_id)),
@@ -188,7 +183,10 @@ class ProductLabelReduction(Reduction):
                 'investigation_lidvid':
                     interpret_text(mk_Investigation_Area_lidvid(proposal_id)),
                 'Observing_System': observing_system({}),
-                'Target_Identification': target_identification({}),
+                'Target_Identification':
+                    target_identification(target_name,
+                                          target_type,
+                                          target_description),
                 'file_name': interpret_text(file_name),
                 'file_contents': file_contents_
                 }
