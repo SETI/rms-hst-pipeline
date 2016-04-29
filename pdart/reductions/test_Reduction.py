@@ -31,3 +31,16 @@ def test_reductions():
     except CalculationException as ce:
         print ce.exception_info.to_pretty_xml()
         raise
+
+
+# def test_types():
+#     print reduction_types({
+#             'archive': 'None',
+#             'bundle': 'None',
+#             'collection': 'None',
+#             'product': 'ProductLabel',
+#             'fits_file': 'dict',
+#             'hdu': 'dict',
+#             'header_unit': 'None',
+#             'data_unit': 'None' })
+#     assert False

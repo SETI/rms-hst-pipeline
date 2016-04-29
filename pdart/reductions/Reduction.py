@@ -35,6 +35,58 @@ class Reduction(object):
         pass
 
 
+def reduction_types(dict):
+    """
+    Return a string showing the types of the methods of Reduction.
+    The dictionary argument gives the types of the reductions.
+    """
+    format_str = """reduce_archive(
+    archive_root: str,
+    get_reduced_bundles: () -> [{bundle}])
+    ): {archive}
+
+reduce_bundle(
+    archive: Archive,
+    lid: LID,
+    get_reduced_collections: () -> [{collection}])
+    ): {bundle}
+
+reduce_collection(
+    archive: Archive,
+    lid: LID,
+    get_reduced_products: () -> [{product}])
+    ): {collection}
+
+reduce_product(
+    archive: Archive,
+    lid: LID,
+    get_reduced_fits_files: () -> [{fits_file}])
+    ): {product}
+
+reduce_fits_file(
+    file: string,
+    get_reduced_hdus: () -> [{hdu}])
+    ): {product}
+
+reduce_hdu(
+    n: int,
+    hdu: hdu,
+    get_reduced_header_unit: () -> {header_unit},
+    get_reduced_data_unit: () -> {data_unit})
+    : {hdu}
+
+reduce_header_unit(
+    n: int,
+    get_header_unit: () -> header_unit)
+    ): {header_unit}
+
+reduce_data_unit(
+    n: int,
+    get_data_unit: () -> data_unit)
+    ): {data_unit}"""
+    return format_str.format(**dict)
+
+
 class ReductionRunner(object):
     """
     An algorithm to recursively reduce PDS4 and FITS structures

@@ -18,7 +18,7 @@ def indexed(func):
     Python, but you can read one, we make cache a dictionary
     and write to its value (which is not a variable).
     """
-    cache = { 'set': False, 'value': None }
+    cache = {'set': False, 'value': None}
 
     def store_func_result():
         if not cache['set']:
