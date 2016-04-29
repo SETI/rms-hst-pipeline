@@ -1,11 +1,6 @@
 from pdart.reductions.Reduction import *
 
 
-def transpose(list_of_lists):
-    """Convert a list of lists into its transpose."""
-    return map(list, zip(*list_of_lists))
-
-
 def indexed(func):
     """
     Convert a no-argument function returning a list, into a function
@@ -20,18 +15,25 @@ def indexed(func):
     performed.
 
     Because you can't write to a variable outside a function in
-    Python, but you can read one, we make cache a list of length one
-    and write to its first element (which is not a variable).
+    Python, but you can read one, we make cache a dictionary
+    and write to its value (which is not a variable).
     """
-    cache = [None]
+    cache = { 'set': False, 'value': None }
 
     def store_func_result():
-        if not cache[0]:
-            cache[0] = transpose(func())
+        if not cache['set']:
+            cache['set'] = True
+            cache['value'] = func()
+
+    def i_th(elmt, i):
+        if elmt is None:
+            return None
+        else:
+            return elmt[i]
 
     def indexed_func(i):
         store_func_result()
-        return cache[0][i]
+        return [i_th(elmt, i) for elmt in cache['value']]
 
     return indexed_func
 
@@ -52,7 +54,7 @@ class CompositeReduction(Reduction):
     """
     def __init__(self, reductions):
         assert reductions
-        assert isinstance(reductions, [])
+        assert isinstance(reductions, list)
         self.reductions = reductions
         self.count = len(reductions)
 
@@ -90,7 +92,7 @@ class CompositeReduction(Reduction):
                    get_reduced_data_unit):
         get_reduced_header_unit_indexed = indexed(get_reduced_header_unit)
         get_reduced_data_unit_indexed = indexed(get_reduced_data_unit)
-        return [r.reduct_hdu(n, hdu,
+        return [r.reduce_hdu(n, hdu,
                              get_reduced_header_unit_indexed(i),
                              get_reduced_data_unit_indexed(i))
                 for i, r in enumerate(self.reductions)]

@@ -1,14 +1,6 @@
 from pdart.reductions.CompositeReduction import *
 
 
-def test_transpose():
-    """A sanity check to make sure transpose works."""
-    l = [[1, 2], [3, 4], [5, 6]]
-    expected = [[1, 3, 5], [2, 4, 6]]
-    actual = transpose(l)
-    assert expected == actual, 'Expected %s; got %s' % (expected, actual)
-
-
 def test_indexed():
     # Test scenario: there are 3 subcomponents and 2 reductions in the
     # composite.  Indices for get_reduced_xxx_indexed() should be 0
