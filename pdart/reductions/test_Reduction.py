@@ -33,14 +33,16 @@ def test_reductions():
         raise
 
 
-# def test_types():
-#     print reduction_types({
-#             'archive': 'None',
-#             'bundle': 'None',
-#             'collection': 'None',
-#             'product': 'ProductLabel',
-#             'fits_file': 'dict',
-#             'hdu': 'dict',
-#             'header_unit': 'None',
-#             'data_unit': 'None' })
-#     assert False
+if False:
+    def test_type_documentation():
+        d = { 'archive': 'None',
+              'bundle': 'None',
+              'collection': 'None',
+              'product': 'ProductLabel',
+              'fits_file': 'dict',
+              'hdu': 'dict',
+              'header_unit': 'None',
+              'data_unit': 'None' };
+        print reduction_type_documentation(d)
+
+        assert False

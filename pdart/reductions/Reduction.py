@@ -35,12 +35,21 @@ class Reduction(object):
         pass
 
 
-def reduction_types(dict):
+def reduction_type_documentation(dict):
     """
     Return a string showing the types of the methods of Reduction.
     The dictionary argument gives the types of the reductions.
     """
-    format_str = """reduce_archive(
+    format_str = """archive reduces to {archive}
+bundle reduces to {bundle}
+collection reduces to {collection}
+product reduces to {product}
+fits_file reduces to {fits_file}
+hdu reduces to {hdu}
+header_unit reduces to {header_unit}
+data_unit reduces to {data_unit}
+
+reduce_archive(
     archive_root: str,
     get_reduced_bundles: () -> [{bundle}])
     ): {archive}

@@ -4,8 +4,8 @@ from pdart.reductions.Reduction import *
 def indexed(func):
     """
     Convert a no-argument function returning a list, into a function
-    that, given an index i, returns the i-th elements of each element
-    of the result of the original function.
+    that, given an index i, returns the i-th element of the result of
+    the original function.
 
     Note that the original function will either never be called (if
     the indexed function is never called), or will be called only once
@@ -105,3 +105,13 @@ class CompositeReduction(Reduction):
         # TODO header_unit and data_unit shouldn't be functions.
         data_unit = get_data_unit()
         return [r.reduce_data_unit(n, data_unit) for r in self.reductions]
+
+
+def composite_reduction_type(dicts):
+    KEYS = ['archive', 'bundle', 'collection', 'product',
+            'fits_file', 'hdu', 'header_unit', 'data_unit']
+    res = {}
+    for k in KEYS:
+        vs = [d[k] for d in dicts]
+        res[k] = '(' + ', '.join(vs) + ')'
+    return res

@@ -15,3 +15,17 @@ def test_indexed():
     expected = [2, 4, 6]
     actual = get_reduced_xxx_indexed(1)
     assert expected == actual, 'Expected %s; got %s' % (expected, actual)
+
+if False:
+    def test_type_documentation():
+        d = { 'archive': 'None',
+              'bundle': 'None',
+              'collection': 'None',
+              'product': 'ProductLabel',
+              'fits_file': 'dict',
+              'hdu': 'dict',
+              'header_unit': 'None',
+              'data_unit': 'None' };
+        print reduction_type_documentation(composite_reduction_type([d, d]))
+
+        assert False
