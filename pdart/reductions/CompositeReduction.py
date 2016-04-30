@@ -17,6 +17,8 @@ def indexed(func):
     Because you can't write to a variable outside a function in
     Python, but you can read one, we make cache a dictionary
     and write to its value (which is not a variable).
+
+    (() -> [a1, a2, ..., an]) -> (i -> ai)
     """
     cache = {'set': False, 'value': None}
 
@@ -26,16 +28,69 @@ def indexed(func):
             cache['value'] = func()
 
     def i_th(elmt, i):
-        if elmt is None:
-            return None
-        else:
-            return elmt[i]
+        return elmt[i]
 
     def indexed_func(i):
         store_func_result()
-        return [i_th(elmt, i) for elmt in cache['value']]
+        return cache['value'][i]
 
     return indexed_func
+
+# For a composite of two reductions:
+#
+# archive reduces to (archive_1, archive_2)
+# bundle reduces to (bundle_1, bundle_2)
+# collection reduces to (collection_1, collection_2)
+# product reduces to (product_1, product_2)
+# fits_file reduces to (fits_file_1, fits_file_2)
+# hdu reduces to (hdu_1, hdu_2)
+# header_unit reduces to (header_unit_1, header_unit_2)
+# data_unit reduces to (data_unit_1, data_unit_2)
+#
+# reduce_archive(
+#     archive_root: str,
+#     get_reduced_bundles: () -> [(bundle_1, bundle_2)])
+#     ): (archive_1, archive_2)
+#
+# reduce_bundle(
+#     archive: Archive,
+#     lid: LID,
+#     get_reduced_collections: () -> [(collection_1, collection_2)])
+#     ): (bundle_1, bundle_2)
+#
+# reduce_collection(
+#     archive: Archive,
+#     lid: LID,
+#     get_reduced_products: () -> [(product_1, product_2)])
+#     ): (collection_1, collection_2)
+#
+# reduce_product(
+#     archive: Archive,
+#     lid: LID,
+#     get_reduced_fits_files: () -> [(fits_file_1, fits_file_2)])
+#     ): (product_1, product_2)
+#
+# reduce_fits_file(
+#     file: string,
+#     get_reduced_hdus: () -> [(hdu_1, hdu_2)])
+#     ): (fits_file_1, fits_file_2)
+#
+# reduce_hdu(
+#     n: int,
+#     hdu: hdu,
+#     get_reduced_header_unit: () -> (header_unit_1, header_unit_2),
+#     get_reduced_data_unit: () -> (data_unit_1, data_unit_2))
+#     : (hdu_1, hdu_2)
+#
+# reduce_header_unit(
+#     n: int,
+#     get_header_unit: () -> header_unit)
+#     ): (header_unit_1, header_unit_2)
+#
+# reduce_data_unit(
+#     n: int,
+#     get_data_unit: () -> data_unit)
+#     ): (data_unit_1, data_unit_2)
 
 
 class CompositeReduction(Reduction):

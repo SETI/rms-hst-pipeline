@@ -75,7 +75,7 @@ reduce_product(
 reduce_fits_file(
     file: string,
     get_reduced_hdus: () -> [{hdu}])
-    ): {product}
+    ): {fits_file}
 
 reduce_hdu(
     n: int,

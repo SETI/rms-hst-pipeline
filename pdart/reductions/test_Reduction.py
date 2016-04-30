@@ -35,14 +35,13 @@ def test_reductions():
 
 if False:
     def test_type_documentation():
-        d = { 'archive': 'None',
-              'bundle': 'None',
-              'collection': 'None',
-              'product': 'ProductLabel',
-              'fits_file': 'dict',
-              'hdu': 'dict',
-              'header_unit': 'None',
-              'data_unit': 'None' };
+        d = {'archive': 'None',
+             'bundle': 'None',
+             'collection': 'None',
+             'product': 'ProductLabel',
+             'fits_file': 'dict',
+             'hdu': 'dict',
+             'header_unit': 'None',
+             'data_unit': 'None'}
         print reduction_type_documentation(d)
-
         assert False
