@@ -29,10 +29,10 @@ class Reduction(object):
                    get_reduced_data_unit):
         pass
 
-    def reduce_header_unit(self, n, get_header_unit):
+    def reduce_header_unit(self, n, header_unit):
         pass
 
-    def reduce_data_unit(self, n, get_data_unit):
+    def reduce_data_unit(self, n, data_unit):
         pass
 
 
@@ -87,12 +87,12 @@ reduce_hdu(
 
 reduce_header_unit(
     n: int,
-    get_header_unit: () -> header_unit)
+    header_unit: header_unit)
     ): {header_unit}
 
 reduce_data_unit(
     n: int,
-    get_data_unit: () -> data_unit)
+    data_unit: data_unit)
     ): {data_unit}"""
     return format_str.format(**dict)
 
@@ -125,11 +125,11 @@ class ReductionRunner(object):
         pass
 
     @abc.abstractmethod
-    def run_header_unit(self, reduction, n, hu):
+    def run_header_unit(self, reduction, n, header_unit):
         pass
 
     @abc.abstractmethod
-    def run_data_unit(self, reduction, n, du):
+    def run_data_unit(self, reduction, n, data_unit):
         pass
 
 
@@ -221,20 +221,21 @@ class DefaultReductionRunner(object):
 
     def run_hdu(self, reduction, n, hdu):
         def get_reduced_header_unit():
-            return reduction.reduce_header_unit(n, lambda: hdu.header)
+            return reduction.reduce_header_unit(n, hdu.header)
 
         def get_reduced_data_unit():
-            return reduction.reduce_data_unit(n, lambda: hdu.data)
+            return reduction.reduce_data_unit(n, hdu.data)
 
-        return reduction.reduce_hdu(n, hdu,
+        return reduction.reduce_hdu(n,
+                                    hdu,
                                     get_reduced_header_unit,
                                     get_reduced_data_unit)
 
-    def run_header_unit(self, reduction, n, hu):
-        return reduction.reduce_header_unit(n, get_header_unit)
+    def run_header_unit(self, reduction, n, header_unit):
+        return reduction.reduce_header_unit(n, header_unit)
 
-    def run_data_unit(self, reduction, n, du):
-        return reduction.reduce_data_unit(n, get_data_unit)
+    def run_data_unit(self, reduction, n, data_unit):
+        return reduction.reduce_data_unit(n, data_unit)
 
 
 def run_reduction(reduction, archive):

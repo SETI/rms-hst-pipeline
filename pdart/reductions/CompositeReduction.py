@@ -152,13 +152,10 @@ class CompositeReduction(Reduction):
                              get_reduced_data_unit_indexed(i))
                 for i, r in enumerate(self.reductions)]
 
-    def reduce_header_unit(self, n, get_header_unit):
-        header_unit = get_header_unit()
+    def reduce_header_unit(self, n, header_unit):
         return [r.reduce_header_unit(n, header_unit) for r in self.reductions]
 
-    def reduce_data_unit(self, n, get_data_unit):
-        # TODO header_unit and data_unit shouldn't be functions.
-        data_unit = get_data_unit()
+    def reduce_data_unit(self, n, data_unit):
         return [r.reduce_data_unit(n, data_unit) for r in self.reductions]
 
 
