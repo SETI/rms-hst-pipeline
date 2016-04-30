@@ -3,94 +3,44 @@ from pdart.reductions.Reduction import *
 
 def indexed(func):
     """
-    Convert a no-argument function returning a list, into a function
-    that, given an index i, returns the i-th element of the result of
-    the original function.
+    Convert a thunk to a function returning thunks.
 
-    Note that the original function will either never be called (if
-    the indexed function is never called), or will be called only once
-    (if any indexed function is called).
+    The get_reduced_xxx argument passed to :class:`CompositeReduction`
+    reduce_yyy() methods is a thunk that returns a list (of the same
+    length as the list of xxx substructures) of lists (of the same
+    length as the list of reductions in the composite).
 
-    This is to make sure that unnecessary recursions are not
-    performed.
+    When you give a reduction index to the result thunk, you get a
+    thunk that returns a list with all the reduced substructures that
+    should go to that reduction.
 
-    Because you can't write to a variable outside a function in
-    Python, but you can read one, we make cache a dictionary
-    and write to its value (which is not a variable).
-
-    (() -> [a1, a2, ..., an]) -> (i -> ai)
+    The elements of the result of original thunk are accessed
+    res[sub][red].  Then indexed(f)(r)() returns [res[s][r] for s in
+    range(0, len(res)], or equivalently, [res_elmt[r] for res_elmt in
+    res], or equivalently, transpose(res)[r].
     """
     cache = {'set': False, 'value': None}
+
+    def transpose(list_of_lists): return map(list, zip(*list_of_lists))
 
     def store_func_result():
         if not cache['set']:
             cache['set'] = True
-            cache['value'] = func()
+            # The original function
+            cache['value'] = transpose(func())
 
     def i_th(elmt, i):
-        return elmt[i]
+        try:
+            return elmt[i]
+        except IndexError:
+            print 'tried to index %s at %d' % (elmt, i)
+            raise
 
     def indexed_func(i):
         store_func_result()
-        return cache['value'][i]
+        return (lambda: i_th(cache['value'], i))
 
     return indexed_func
-
-# For a composite of two reductions:
-#
-# archive reduces to (archive_1, archive_2)
-# bundle reduces to (bundle_1, bundle_2)
-# collection reduces to (collection_1, collection_2)
-# product reduces to (product_1, product_2)
-# fits_file reduces to (fits_file_1, fits_file_2)
-# hdu reduces to (hdu_1, hdu_2)
-# header_unit reduces to (header_unit_1, header_unit_2)
-# data_unit reduces to (data_unit_1, data_unit_2)
-#
-# reduce_archive(
-#     archive_root: str,
-#     get_reduced_bundles: () -> [(bundle_1, bundle_2)])
-#     ): (archive_1, archive_2)
-#
-# reduce_bundle(
-#     archive: Archive,
-#     lid: LID,
-#     get_reduced_collections: () -> [(collection_1, collection_2)])
-#     ): (bundle_1, bundle_2)
-#
-# reduce_collection(
-#     archive: Archive,
-#     lid: LID,
-#     get_reduced_products: () -> [(product_1, product_2)])
-#     ): (collection_1, collection_2)
-#
-# reduce_product(
-#     archive: Archive,
-#     lid: LID,
-#     get_reduced_fits_files: () -> [(fits_file_1, fits_file_2)])
-#     ): (product_1, product_2)
-#
-# reduce_fits_file(
-#     file: string,
-#     get_reduced_hdus: () -> [(hdu_1, hdu_2)])
-#     ): (fits_file_1, fits_file_2)
-#
-# reduce_hdu(
-#     n: int,
-#     hdu: hdu,
-#     get_reduced_header_unit: () -> (header_unit_1, header_unit_2),
-#     get_reduced_data_unit: () -> (data_unit_1, data_unit_2))
-#     : (hdu_1, hdu_2)
-#
-# reduce_header_unit(
-#     n: int,
-#     get_header_unit: () -> header_unit)
-#     ): (header_unit_1, header_unit_2)
-#
-# reduce_data_unit(
-#     n: int,
-#     get_data_unit: () -> data_unit)
-#     ): (data_unit_1, data_unit_2)
 
 
 class CompositeReduction(Reduction):

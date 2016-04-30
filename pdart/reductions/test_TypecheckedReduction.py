@@ -163,7 +163,6 @@ if False:
             raise
 
 if False:
-    # FIXME this one fails
     def test_composite():
         tc1 = ComponentTypechecks(1)
         tc2 = ComponentTypechecks(2)

@@ -5,16 +5,12 @@ def test_indexed():
     res = [[1, 2], [3, 4], [5, 6]]
     get_reduced_xxx_indexed = indexed(lambda: res)
 
-    expected = [1, 2]
-    actual = get_reduced_xxx_indexed(0)
+    expected = [1, 3, 5]
+    actual = get_reduced_xxx_indexed(0)()
     assert expected == actual, 'Expected %s; got %s' % (expected, actual)
 
-    expected = [3, 4]
-    actual = get_reduced_xxx_indexed(1)
-    assert expected == actual, 'Expected %s; got %s' % (expected, actual)
-
-    expected = [5, 6]
-    actual = get_reduced_xxx_indexed(2)
+    expected = [2, 4, 6]
+    actual = get_reduced_xxx_indexed(1)()
     assert expected == actual, 'Expected %s; got %s' % (expected, actual)
 
 if False:

@@ -139,29 +139,6 @@ product_label_reduction_type = {
     }
 
 
-# product reduces to String
-# fits_file reduces to (Document -> Fragment)
-# hdu reduces to (Document -> Fragment)
-#
-# reduce_product(
-#     archive: Archive,
-#     lid: LID,
-#     get_reduced_fits_files: () -> [(Document -> Fragment)])
-#     ): String
-#
-# reduce_fits_file(
-#     file: string,
-#     get_reduced_hdus: () -> [(Document -> Fragment)])
-#     ): (Document -> Fragment)
-#
-# reduce_hdu(
-#     n: int,
-#     hdu: hdu,
-#     get_reduced_header_unit: () -> None,
-#     get_reduced_data_unit: () -> None)
-#     : (Document -> Fragment)
-
-
 class ProductLabelReduction(Reduction):
     """
     Reduction of a :class:`Product` to its PDS4 label as a string.
