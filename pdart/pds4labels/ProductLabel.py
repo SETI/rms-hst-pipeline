@@ -260,8 +260,8 @@ def make_product_label(product, verify):
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label = ReductionRunner().run_product(ProductLabelReduction(),
-                                          product)
+    label = DefaultReductionRunner().run_product(ProductLabelReduction(),
+                                                 product)
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)

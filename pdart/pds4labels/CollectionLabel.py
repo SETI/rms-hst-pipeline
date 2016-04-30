@@ -86,8 +86,8 @@ def make_collection_label(collection, verify):
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label = ReductionRunner().run_collection(CollectionLabelReduction(),
-                                             collection)
+    label = DefaultReductionRunner().run_collection(CollectionLabelReduction(),
+                                                    collection)
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)

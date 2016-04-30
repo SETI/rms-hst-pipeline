@@ -1,3 +1,4 @@
+import abc
 import pyfits
 
 from pdart.exceptions.Combinators import parallel_list
@@ -97,6 +98,42 @@ reduce_data_unit(
 
 
 class ReductionRunner(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def run_archive(self, reduction, archive):
+        pass
+
+    @abc.abstractmethod
+    def run_bundle(self, reduction, bundle):
+        pass
+
+    @abc.abstractmethod
+    def run_collection(self, reduction, collection):
+        pass
+
+    @abc.abstractmethod
+    def run_product(self, reduction, product):
+        pass
+
+    @abc.abstractmethod
+    def run_fits_file(self, reduction, file):
+        pass
+
+    @abc.abstractmethod
+    def run_hdu(self, reduction, n, hdu):
+        pass
+
+    @abc.abstractmethod
+    def run_header_unit(self, reduction, n, hu):
+        pass
+
+    @abc.abstractmethod
+    def run_data_unit(self, reduction, n, du):
+        pass
+
+
+class DefaultReductionRunner(object):
     """
     An algorithm to recursively reduce PDS4 and FITS structures
     according to a :class:`Reduction` instance.
@@ -205,4 +242,4 @@ def run_reduction(reduction, archive):
     Run a :class:`Reduction` on an :class:`Archive` using the default
     recursion.
     """
-    return ReductionRunner().run_archive(reduction, archive)
+    return DefaultReductionRunner().run_archive(reduction, archive)

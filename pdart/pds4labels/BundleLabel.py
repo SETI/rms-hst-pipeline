@@ -66,7 +66,8 @@ def make_bundle_label(bundle, verify):
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label = ReductionRunner().run_bundle(BundleLabelReduction(), bundle)
+    label = DefaultReductionRunner().run_bundle(BundleLabelReduction(),
+                                                bundle)
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)
