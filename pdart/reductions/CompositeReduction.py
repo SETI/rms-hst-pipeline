@@ -1,6 +1,32 @@
 from pdart.reductions.Reduction import *
 
 
+def indexed2(func):
+    # FIXME Document and clean this up.  We have this version for
+    # header and data units because there are only ever one element in
+    # them.
+    cache = {'set': False, 'value': None}
+
+    def store_func_result():
+        if not cache['set']:
+            cache['set'] = True
+            # The original function
+            cache['value'] = func()
+
+    def i_th(elmt, i):
+        try:
+            return elmt[i]
+        except IndexError:
+            print 'tried to index %s at %d' % (elmt, i)
+            raise
+
+    def indexed2_func(i):
+        store_func_result()
+        return (lambda: i_th(cache['value'], i))
+
+    return indexed2_func
+
+
 def indexed(func):
     """
     Convert a thunk to a function returning thunks.
@@ -95,8 +121,8 @@ class CompositeReduction(Reduction):
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
-        get_reduced_header_unit_indexed = indexed(get_reduced_header_unit)
-        get_reduced_data_unit_indexed = indexed(get_reduced_data_unit)
+        get_reduced_header_unit_indexed = indexed2(get_reduced_header_unit)
+        get_reduced_data_unit_indexed = indexed2(get_reduced_data_unit)
         return [r.reduce_hdu(n, hdu,
                              get_reduced_header_unit_indexed(i),
                              get_reduced_data_unit_indexed(i))

@@ -2,6 +2,7 @@ import os.path
 
 from pdart.pds4.Product import *
 from pdart.reductions.Reduction import *
+from pdart.reductions.CompositeReduction import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
 from pdart.pds4labels.ObservingSystem import *
@@ -139,7 +140,19 @@ product_label_reduction_type = {
     }
 
 
-class ProductLabelReduction(Reduction):
+class ProductLabelReduction(CompositeReduction):
+    # TODO Just to test CompositeReduction in action.  I'll use this
+    # to refactor the original (Old-) ProductLabelReduction.
+    def __init__(self):
+        CompositeReduction.__init__(self, [OldProductLabelReduction(),
+                                           NewProductLabelReduction()])
+
+
+class NewProductLabelReduction(Reduction):
+    pass
+
+
+class OldProductLabelReduction(Reduction):
     """
     Reduction of a :class:`Product` to its PDS4 label as a string.
     """
@@ -237,8 +250,8 @@ def make_product_label(product, verify):
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label = DefaultReductionRunner().run_product(ProductLabelReduction(),
-                                                 product)
+    label, x = DefaultReductionRunner().run_product(ProductLabelReduction(),
+                                                    product)
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)
