@@ -128,7 +128,7 @@ class CompositeReduction(Reduction):
     def reduce_collection(self, archive, lid, get_reduced_products):
         get_reduced_products_indexed = indexed(get_reduced_products)
         return [r.reduce_collection(archive, lid,
-                                    get_reduced_products(i))
+                                    get_reduced_products_indexed(i))
                 for i, r in enumerate(self.reductions)]
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):

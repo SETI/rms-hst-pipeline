@@ -27,7 +27,70 @@ class Typechecks(object):
         pass
 
 
+class CompositeTypechecks(Typechecks):
+    def __init__(self, typechecks):
+        for tc in typechecks:
+            assert isinstance(tc, Typechecks)
+        self.typechecks = typechecks
+        self.size = len(typechecks)
+
+    def check_is_archive_reduction(self, obj):
+        assert isinstance(obj, list)
+        assert self.size == len(obj)
+        for tc, red in zip(self.typechecks, obj):
+            tc.check_is_archive_reduction(red)
+
+    def check_is_bundle_reduction(self, obj):
+        assert isinstance(obj, list)
+        assert self.size == len(obj)
+        for tc, red in zip(self.typechecks, obj):
+            tc.check_is_bundle_reduction(red)
+
+    def check_is_collection_reduction(self, obj):
+        assert isinstance(obj, list)
+        assert self.size == len(obj)
+        for tc, red in zip(self.typechecks, obj):
+            tc.check_is_collection_reduction(red)
+
+    def check_is_product_reduction(self, obj):
+        assert isinstance(obj, list)
+        assert self.size == len(obj)
+        for tc, red in zip(self.typechecks, obj):
+            tc.check_is_product_reduction(red)
+
+    def check_is_fits_file_reduction(self, obj):
+        assert isinstance(obj, list)
+        assert self.size == len(obj)
+        for tc, red in zip(self.typechecks, obj):
+            tc.check_is_fits_file_reduction(red)
+
+    def check_is_hdu_reduction(self, obj):
+        assert isinstance(obj, list)
+        assert self.size == len(obj)
+        for tc, red in zip(self.typechecks, obj):
+            tc.check_is_hdu_reduction(red)
+
+    def check_is_header_unit_reduction(self, obj):
+        assert isinstance(obj, list)
+        assert self.size == len(obj)
+        for tc, red in zip(self.typechecks, obj):
+            tc.check_is_header_unit_reduction(red)
+
+    def check_is_data_unit_reduction(self, obj):
+        assert isinstance(obj, list)
+        assert self.size == len(obj)
+        for tc, red in zip(self.typechecks, obj):
+            tc.check_is_data_unit_reduction(red)
+
+
+def is_function(func):
+    # a -> b
+    return hasattr(func, '__call__')
+
+
 def check_thunk(check, thunk):
+    assert is_function(thunk)
+
     def checked_thunk():
         res = thunk()
         check(res)
@@ -36,13 +99,15 @@ def check_thunk(check, thunk):
 
 
 def check_list_thunk(check, thunk):
-    def checked_thunk():
+    assert is_function(thunk)
+
+    def checked_list_thunk():
         res = thunk()
         assert isinstance(res, list)
         for r in res:
             check(r)
         return res
-    return checked_thunk
+    return checked_list_thunk
 
 
 class TypecheckedReduction(Reduction):

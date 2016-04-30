@@ -221,10 +221,10 @@ class DefaultReductionRunner(object):
 
     def run_hdu(self, reduction, n, hdu):
         def get_reduced_header_unit():
-            return reduction.reduce_header_unit(n, hdu.header)
+            return self.run_header_unit(reduction, n, hdu.header)
 
         def get_reduced_data_unit():
-            return reduction.reduce_data_unit(n, hdu.data)
+            return self.run_data_unit(reduction, n, hdu.data)
 
         return reduction.reduce_hdu(n,
                                     hdu,
