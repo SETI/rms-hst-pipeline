@@ -27,7 +27,9 @@ def test_reductions():
     arch = get_any_archive()
     try:
         count = run_reduction(TestRecursiveReduction(), arch)
-        assert count == 137567
+        # One value for mini archive on dev machine and one for full
+        # archive on test machine.
+        assert count in [137567, 605707]
     except CalculationException as ce:
         print ce.exception_info.to_pretty_xml()
         raise
