@@ -91,6 +91,42 @@ product_label_reduction_type = {
     }
 
 
+class SuperProductLabelReduction(CompositeReduction):
+    def __init__(self):
+        CompositeReduction.__init__(self,
+                                    [FileContentsLabelReduction(),
+                                     TargetIdentificationLabelReduction(),
+                                     TimeCoordinatesLabelReduction()])
+
+    def reduce_product(self, archive, lid, get_reduced_fits_files):
+        product = Product(archive, lid)
+        instrument = product.collection().instrument()
+        suffix = product.collection().suffix()
+        proposal_id = product.bundle().proposal_id()
+        file_name = os.path.basename(product.absolute_filepath())
+
+        reduced_fits_file = get_reduced_fits_files()[0]
+        (file_contents,
+         target_identification,
+         time_coordinates) = reduced_fits_file
+        
+
+        return make_label({
+                'lid': str(lid),
+                'suffix': suffix.upper(),
+                'proposal_id': str(proposal_id),
+                'Investigation_Area_name':
+                    mk_Investigation_Area_name(proposal_id),
+                'investigation_lidvid':
+                    mk_Investigation_Area_lidvid(proposal_id),
+                'Observing_System': observing_system(instrument),
+                'file_name': file_name,
+                'Time_Coordinates': time_coordinates,
+                'Target_Identification': target_identification,
+                'file_contents': file_contents
+                }).toxml()
+
+
 class ProductLabelReduction(CompositeReduction):
     def __init__(self):
         CompositeReduction.__init__(self, [OldProductLabelReduction(),
@@ -282,10 +318,9 @@ def make_product_label(product, verify):
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label, new_label, contents = \
-        DefaultReductionRunner().run_product(ProductLabelReduction(),
+    label = \
+        DefaultReductionRunner().run_product(SuperProductLabelReduction(),
                                              product)
-    # print 'Contents:', contents.toxml()
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)

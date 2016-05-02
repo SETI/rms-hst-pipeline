@@ -63,15 +63,9 @@ element_array = interpret_template("""<ElementArray>
 
 
 class FileContentsLabelReduction(Reduction):
-    def reduce_product(self, archive, lid, get_reduced_fits_files):
-        reduced_fits_file = get_reduced_fits_files()[0]
-        mk_file = interpret_document_template(
-            """<File><FRAGMENT name="file_contents"/></File>""")
-        return mk_file(reduced_fits_file)
-
     def reduce_fits_file(self, file, get_reduced_hdus):
         reduced_hdus = get_reduced_hdus()
-        return {'file_contents': combine_fragments_into_fragment(reduced_hdus)}
+        return combine_fragments_into_fragment(reduced_hdus)
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,

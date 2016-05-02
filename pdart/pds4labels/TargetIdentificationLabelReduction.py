@@ -7,9 +7,8 @@ from pdart.pds4labels.TargetIdentification import *
 
 class TargetIdentificationLabelReduction(Reduction):
     def reduce_fits_file(self, file, get_reduced_hdus):
-        res = get_reduced_hdus()[0]
-        assert isinstance(res, dict)
-        return res
+        reduced_hdus = get_reduced_hdus()
+        return reduced_hdus[0]
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
@@ -35,9 +34,8 @@ class TargetIdentificationLabelReduction(Reduction):
             else:
                 (target_name, target_type, target_description) = target
 
-            return {'Target_Identification':
-                        target_identification(target_name,
-                                              target_type,
-                                              target_description)}
+            return target_identification(target_name,
+                                         target_type,
+                                         target_description)
         else:
             pass

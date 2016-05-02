@@ -12,9 +12,8 @@ time_coordinates = interpret_template("""<Time_Coordinates>
 
 class TimeCoordinatesLabelReduction(Reduction):
     def reduce_fits_file(self, file, get_reduced_hdus):
-        res = get_reduced_hdus()[0]
-        assert isinstance(res, dict)
-        return res
+        reduced_hdus = get_reduced_hdus()
+        return reduced_hdus[0]
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
@@ -39,6 +38,6 @@ class TimeCoordinatesLabelReduction(Reduction):
                 stop_date_time = '2000-01-02Z'
             tc = time_coordinates({'start_date_time': start_date_time,
                                    'stop_date_time': stop_date_time})
-            return {'Time_Coordinates': tc}
+            return tc
         else:
             pass
