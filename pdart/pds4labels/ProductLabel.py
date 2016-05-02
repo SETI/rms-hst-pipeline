@@ -1,5 +1,8 @@
 import os.path
 
+import pdart.add_pds_tools
+import julian
+
 from pdart.pds4.Product import *
 from pdart.reductions.Reduction import *
 from pdart.reductions.CompositeReduction import *
@@ -40,7 +43,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
       <type>Individual Investigation</type>
       <Internal_Reference>
         <lidvid_reference><NODE name="investigation_lidvid" />\
-        </lidvid_reference>
+</lidvid_reference>
         <reference_type>data_to_investigation</reference_type>
       </Internal_Reference>
     </Investigation_Area>
@@ -70,6 +73,14 @@ def mk_Investigation_Area_name(proposal_id):
 def mk_Investigation_Area_lidvid(proposal_id):
     return 'urn:nasa:pds:context:investigation:investigation.hst_%05d::1.0' % \
         proposal_id
+
+
+def remove_trailing_decimal(number):
+    while number[-1] == '0':
+        number = number[:-1]
+    if number[-1] == '.':
+        number = number[:-1]
+    return number
 
 
 header_contents = interpret_template("""<Header>
@@ -149,7 +160,79 @@ class ProductLabelReduction(CompositeReduction):
 
 
 class NewProductLabelReduction(Reduction):
-    pass
+    def reduce_product(self, archive, lid, get_reduced_fits_files):
+        product = Product(archive, lid)
+        instrument = product.collection().instrument()
+        suffix = product.collection().suffix()
+        proposal_id = product.bundle().proposal_id()
+        file_name = os.path.basename(product.absolute_filepath())
+
+        reduced_fits_files = dict(get_reduced_fits_files()[0])
+        return make_label({
+                'lid': str(lid),
+                'suffix': suffix.upper(),
+                'proposal_id': str(proposal_id),
+                'Investigation_Area_name':
+                    mk_Investigation_Area_name(proposal_id),
+                'investigation_lidvid':
+                    mk_Investigation_Area_lidvid(proposal_id),
+                'Observing_System': observing_system(instrument),
+                'file_name': file_name,
+                'Time_Coordinates': reduced_fits_files['Time_Coordinates'],
+                'Target_Identification':
+                    reduced_fits_files['Target_Identification'],
+                'file_contents': combine_multiple_nodes(
+                    [interpret_text('*** file_contents ***')])
+                })
+
+    def reduce_fits_file(self, file, get_reduced_hdus):
+        return get_reduced_hdus()[0]
+
+    def reduce_hdu(self, n, hdu,
+                   get_reduced_header_unit,
+                   get_reduced_data_unit):
+        if n == 0:
+            return get_reduced_header_unit()
+        else:
+            pass
+
+    def reduce_header_unit(self, n, header_unit):
+        if n == 0:
+            try:
+                date_obs = header_unit['DATE-OBS']
+                time_obs = header_unit['TIME-OBS']
+                exptime = header_unit['EXPTIME']
+                start_date_time = '%sT%s' % (date_obs, time_obs)
+                stop_date_time = julian.tai_from_iso(start_date_time) + exptime
+                stop_date_time = remove_trailing_decimal(stop_date_time)
+            except KeyError:
+                # Insert placeholders
+                start_date_time = '2000-01-02Z'
+                stop_date_time = '2000-01-02Z'
+
+            try:
+                targname = header_unit['TARGNAME']
+                target = targname_to_target(targname)
+            except KeyError:
+                target = None
+
+            if target is None:
+                # Insert placeholder
+                target_name = 'Magrathea'
+                target_type = 'Planet'
+                target_description = 'Home of Slartibartfast'
+            else:
+                (target_name, target_type, target_description) = target
+
+            return [('Time_Coordinates',
+                     time_coordinates({'start_date_time': start_date_time,
+                                       'stop_date_time': stop_date_time})),
+                    ('Target_Identification',
+                     target_identification(target_name,
+                                           target_type,
+                                           target_description))]
+        else:
+            pass
 
 
 class OldProductLabelReduction(Reduction):
@@ -250,8 +333,10 @@ def make_product_label(product, verify):
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label, x = DefaultReductionRunner().run_product(ProductLabelReduction(),
-                                                    product)
+    label, new_label = \
+        DefaultReductionRunner().run_product(ProductLabelReduction(),
+                                             product)
+    # print 'New version:', new_label.toxml()
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)
