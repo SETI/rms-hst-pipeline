@@ -18,7 +18,8 @@ def interpret_document_template(template):
     XML document containing the template text, with any NODE and
     FRAGMENT elements replaced by looking up their 'name' attribute in
     the dictionary.  NODE elements must evaluate to be XML nodes;
-    FRAGMENT must evaluate to be lists of XML nodes.
+    FRAGMENT elements must evaluate to be an XML fragment (a list of
+    XML nodes).
     """
     def builder(dictionary):
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
@@ -151,13 +152,13 @@ def interpret_template(template):
     return parameterizer
 
 
-def combine_multiple_nodes(doc_funcs):
+def combine_nodes_into_fragment(doc_funcs):
     """
     Convert a list of functions that take a document and return an XML
-    node into a single function that takes a document and returns a
-    list of XML nodes.
+    node into a single function that takes a document and returns an
+    XML fragment (i.e., list of XML nodes).
 
-    [Doc -> Node] -> Doc -> [Node]
+    [Doc -> Node] -> Doc -> Fragment
     """
     CHECK_TYPES = True
     if CHECK_TYPES:
@@ -166,21 +167,21 @@ def combine_multiple_nodes(doc_funcs):
     def func(document):
         return [doc_func(document) for doc_func in doc_funcs]
     if CHECK_TYPES:
-        assert is_doc_to_list_of_nodes_function(func)
+        assert is_doc_to_fragment_function(func)
     return func
 
 
-def combine_multiple_lists_of_nodes(doc_funcs):
+def combine_fragments_into_fragment(doc_funcs):
     """
-    Convert a list of functions that each take a document and return a
-    list of XML node into a single function that takes a document and
-    returns a list of XML nodes.
+    Convert a list of functions that take a document and return an XML
+    fragment (list of nodes) into a single function that takes a
+    document and returns an XML fragment.
 
-    [Doc -> [Node]] -> Doc -> [Node]
+    [Doc -> Fragment] -> Doc -> Fragment
     """
     CHECK_TYPES = True
     if CHECK_TYPES:
-        assert is_list_of_doc_to_list_of_nodes_functions(doc_funcs)
+        assert is_list_of_doc_to_fragment_functions(doc_funcs)
 
     def func(document):
         res = []
@@ -189,7 +190,7 @@ def combine_multiple_lists_of_nodes(doc_funcs):
         return res
 
     if CHECK_TYPES:
-        assert is_doc_to_list_of_nodes_function(func)
+        assert is_doc_to_fragment_function(func)
     return func
 
 
@@ -218,18 +219,18 @@ def is_list_of_doc_to_node_functions(func_list):
     return True
 
 
-def is_list_of_doc_to_list_of_nodes_functions(func_list):
-    # [Doc -> [Node]]
+def is_list_of_doc_to_fragment_functions(func_list):
+    # [Doc -> Fragment]
     if not isinstance(func_list, list):
         return False
     for func in func_list:
-        if not is_doc_to_list_of_nodes_function(func):
+        if not is_doc_to_fragment_function(func):
             return False
     return True
 
 
-def is_doc_to_list_of_nodes_function(func):
-    # Doc -> [Node]
+def is_doc_to_fragment_function(func):
+    # Doc -> Fragment
     if not is_function(func):
         return False
     res = func(DOC)

@@ -51,7 +51,7 @@ class BundleLabelReduction(Reduction):
                                                          lid).proposal_id())),
                 'Citation_Information': placeholder_citation_information,
                 'Bundle_Member_Entries':
-                combine_multiple_nodes(reduced_collections)
+                combine_nodes_into_fragment(reduced_collections)
                 }
         return make_label(dict).toxml()
 

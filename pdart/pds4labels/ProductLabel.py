@@ -110,7 +110,7 @@ axis_array = interpret_template("""<Axis_Array>
 
 
 def mk_axis_arrays(hdu, axes):
-    return combine_multiple_nodes([mk_axis_array(hdu, i)
+    return combine_nodes_into_fragment([mk_axis_array(hdu, i)
                                    for i in range(1, axes + 1)])
 
 _AXIS_NAME_TABLE = {
@@ -181,7 +181,7 @@ class NewProductLabelReduction(Reduction):
                 'Time_Coordinates': reduced_fits_files['Time_Coordinates'],
                 'Target_Identification':
                     reduced_fits_files['Target_Identification'],
-                'file_contents': combine_multiple_nodes(
+                'file_contents': combine_nodes_into_fragment(
                     [interpret_text('*** file_contents ***')])
                 })
 
@@ -241,15 +241,15 @@ class OldProductLabelReduction(Reduction):
     """
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         file_contents = get_reduced_fits_files()
-        # file_contents :: [Doc -> [Node]]
+        # file_contents :: [Doc -> Fragment]
 
         def file_contents_(doc):
             res = []
             for fc in file_contents:
                 res.extend(fc(doc))
             return res
-        # file_contents_ :: Doc -> [Node]
-        assert is_doc_to_list_of_nodes_function(file_contents_)
+        # file_contents_ :: Doc -> Fragment
+        assert is_doc_to_fragment_function(file_contents_)
 
         product = Product(archive, lid)
         instrument = product.collection().instrument()
@@ -289,9 +289,9 @@ class OldProductLabelReduction(Reduction):
 
     def reduce_fits_file(self, file, get_reduced_hdus):
         reduced_hdus = get_reduced_hdus()
-        assert is_list_of_doc_to_list_of_nodes_functions(reduced_hdus)
-        res = combine_multiple_lists_of_nodes(reduced_hdus)
-        assert is_doc_to_list_of_nodes_function(res)
+        assert is_list_of_doc_to_fragment_functions(reduced_hdus)
+        res = combine_fragments_into_fragment(reduced_hdus)
+        assert is_doc_to_fragment_function(res)
         return res
 
     def reduce_hdu(self, n, hdu,
@@ -322,8 +322,8 @@ class OldProductLabelReduction(Reduction):
         else:
             node_functions = [header]
 
-        res = combine_multiple_nodes(node_functions)
-        assert is_doc_to_list_of_nodes_function(res)
+        res = combine_nodes_into_fragment(node_functions)
+        assert is_doc_to_fragment_function(res)
         return res
 
 
