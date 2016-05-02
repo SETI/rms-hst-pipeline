@@ -156,7 +156,52 @@ class ProductLabelReduction(CompositeReduction):
     # to refactor the original (Old-) ProductLabelReduction.
     def __init__(self):
         CompositeReduction.__init__(self, [OldProductLabelReduction(),
-                                           NewProductLabelReduction()])
+                                           NewProductLabelReduction(),
+                                           FileContentsLabelReduction()])
+
+
+class FileContentsLabelReduction(Reduction):
+    def reduce_product(self, archive, lid, get_reduced_fits_files):
+        reduced_fits_file = get_reduced_fits_files()[0]
+        return interpret_document_template(
+            """<File><FRAGMENT name="file_contents"/></File>""")(reduced_fits_file)
+
+    def reduce_fits_file(self, file, get_reduced_hdus):
+        reduced_hdus = get_reduced_hdus()
+        return {'file_contents':
+                     combine_fragments_into_fragment(reduced_hdus)}
+
+    def reduce_hdu(self, n, hdu,
+                   get_reduced_header_unit,
+                   get_reduced_data_unit):
+        local_identifier = 'hdu_%d' % n
+        fileinfo = hdu.fileinfo()
+        offset = str(fileinfo['hdrLoc'])
+        object_length = str(fileinfo['datLoc'] - fileinfo['hdrLoc'])
+        header = header_contents({'local_identifier': local_identifier,
+                                  'offset': offset,
+                                  'object_length': object_length})
+        assert is_doc_to_node_function(header)
+
+        if fileinfo['datSpan']:
+            axes = hdu.header['NAXIS']
+            data_type = _BITPIX_TABLE[hdu.header['BITPIX']]
+            elmt_arr = element_array({'data_type': data_type})
+
+            data = data_contents({
+                    'offset': str(fileinfo['datLoc']),
+                    'axes': str(axes),
+                    'Element_Array': elmt_arr,
+                    'Axis_Arrays': mk_axis_arrays(hdu, axes)
+                    })
+            assert is_doc_to_node_function(data)
+            node_functions = [header, data]
+        else:
+            node_functions = [header]
+
+        res = combine_nodes_into_fragment(node_functions)
+        assert is_doc_to_fragment_function(res)
+        return res
 
 
 class NewProductLabelReduction(Reduction):
@@ -333,10 +378,10 @@ def make_product_label(product, verify):
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label, new_label = \
+    label, new_label, contents = \
         DefaultReductionRunner().run_product(ProductLabelReduction(),
                                              product)
-    # print 'New version:', new_label.toxml()
+    # print 'Contents:', contents.toxml()
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)
