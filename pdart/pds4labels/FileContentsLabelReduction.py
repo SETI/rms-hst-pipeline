@@ -63,13 +63,20 @@ element_array = interpret_template("""<ElementArray>
 
 
 class FileContentsLabelReduction(Reduction):
+    """
+    Reduce a product to an XML fragment template containing the Header
+    and Array_2D_Image elements describing its contents.
+    """
+
     def reduce_fits_file(self, file, get_reduced_hdus):
+        # Doc -> Fragment
         reduced_hdus = get_reduced_hdus()
         return combine_fragments_into_fragment(reduced_hdus)
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
+        # Doc -> Fragment
         local_identifier = 'hdu_%d' % n
         fileinfo = hdu.fileinfo()
         offset = str(fileinfo['hdrLoc'])

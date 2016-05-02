@@ -11,19 +11,23 @@ time_coordinates = interpret_template("""<Time_Coordinates>
 
 
 class TimeCoordinatesLabelReduction(Reduction):
+    """Reduce a product to an XML Time_Coordinates node template."""
     def reduce_fits_file(self, file, get_reduced_hdus):
+        # Doc -> Node
         reduced_hdus = get_reduced_hdus()
         return reduced_hdus[0]
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
+        # Doc -> Node or None
         if n == 0:
             return get_reduced_header_unit()
         else:
             pass
 
     def reduce_header_unit(self, n, header_unit):
+        # Doc -> Node or None
         if n == 0:
             try:
                 date_obs = header_unit['DATE-OBS']

@@ -4,15 +4,14 @@ import pdart.add_pds_tools
 import julian
 
 from pdart.pds4.Product import *
-from pdart.reductions.Reduction import *
+from pdart.pds4labels.FileContentsLabelReduction import *
+from pdart.pds4labels.ObservingSystem import *
+from pdart.pds4labels.TargetIdentificationLabelReduction import *
+from pdart.pds4labels.TimeCoordinatesLabelReduction import *
 from pdart.reductions.CompositeReduction import *
+from pdart.reductions.Reduction import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
-from pdart.pds4labels.FileContentsLabelReduction import *
-from pdart.pds4labels.TimeCoordinatesLabelReduction import *
-from pdart.pds4labels.ObservingSystem import *
-from pdart.pds4labels.TargetIdentification import *
-from pdart.pds4labels.TargetIdentificationLabelReduction import *
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>

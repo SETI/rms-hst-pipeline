@@ -54,20 +54,25 @@ def target_identification(name, type, description):
             'lower_type': type.lower()})
     return func
 
+
 class TargetIdentificationLabelReduction(Reduction):
+    """Reduce a product to an XML Target_Identification node template."""
     def reduce_fits_file(self, file, get_reduced_hdus):
+        # Doc -> Node
         reduced_hdus = get_reduced_hdus()
         return reduced_hdus[0]
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
+        # Doc -> Node or None
         if n == 0:
             return get_reduced_header_unit()
         else:
             pass
 
     def reduce_header_unit(self, n, header_unit):
+        # Doc -> Node or None
         if n == 0:
             try:
                 targname = header_unit['TARGNAME']
