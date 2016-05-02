@@ -8,8 +8,11 @@ from pdart.reductions.Reduction import *
 from pdart.reductions.CompositeReduction import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
+from pdart.pds4labels.FileContentsLabelReduction import *
+from pdart.pds4labels.TimeCoordinatesLabelReduction import *
 from pdart.pds4labels.ObservingSystem import *
 from pdart.pds4labels.TargetIdentification import *
+from pdart.pds4labels.TargetIdentificationLabelReduction import *
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -59,13 +62,6 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
 </Product_Observational>""")
 
 
-# TODO Generalize this?
-time_coordinates = interpret_template("""<Time_Coordinates>
-      <start_date_time><NODE name="start_date_time"/></start_date_time>
-      <stop_date_time><NODE name="stop_date_time"/></stop_date_time>
-    </Time_Coordinates>""")
-
-
 def mk_Investigation_Area_name(proposal_id):
     return 'HST observing program %d' % proposal_id
 
@@ -83,62 +79,6 @@ def remove_trailing_decimal(number):
     return number
 
 
-header_contents = interpret_template("""<Header>
-<local_identifier><NODE name="local_identifier"/></local_identifier>
-<offset unit="byte"><NODE name="offset"/></offset>
-<object_length unit="byte"><NODE name="object_length"/></object_length>
-<parsing_standard_id>FITS 3.0</parsing_standard_id>
-<description>Global FITS Header</description>
-</Header>""")
-
-data_contents = interpret_template("""<Array_2D_Image>
-<offset unit="byte"><NODE name="offset" /></offset>
-<axes><NODE name="axes" /></axes>
-<axis_index_order>Last Index Fastest</axis_index_order>
-<NODE name="Element_Array" />
-<FRAGMENT name="Axis_Arrays" />
-</Array_2D_Image>""")
-
-element_array = interpret_template("""<ElementArray>
-<data_type><NODE name="data_type" /></data_type></ElementArray>""")
-
-axis_array = interpret_template("""<Axis_Array>
-<axis_name><NODE name="axis_name"/></axis_name>
-<elements><NODE name="elements"/></elements>
-<sequence_number><NODE name="sequence_number"/></sequence_number>
-</Axis_Array>""")
-
-
-def mk_axis_arrays(hdu, axes):
-    return combine_nodes_into_fragment([mk_axis_array(hdu, i)
-                                   for i in range(1, axes + 1)])
-
-_AXIS_NAME_TABLE = {
-    1: 'Line',
-    2: 'Sample'
-    }
-
-_BITPIX_TABLE = {
-    # TODO Verify these
-    8: 'UnsignedByte',
-    16: 'SignedMSB2',
-    32: 'SignedMSB4',
-    64: 'SignedMSB8',
-    -32: 'IEEE754MSBSingle',
-    -62: 'IEEE754MSBDouble'
-    }
-
-
-def mk_axis_array(hdu, i):
-    axis_name = _AXIS_NAME_TABLE[i]
-    elements = str(hdu.header['NAXIS%d' % i])
-    # TODO Check the semantics of sequence_number
-    sequence_number = str(i)
-    return axis_array({'axis_name': axis_name,
-                       'elements': elements,
-                       'sequence_number': sequence_number})
-
-
 product_label_reduction_type = {
     'archive': 'None',
     'bundle': 'None',
@@ -152,56 +92,10 @@ product_label_reduction_type = {
 
 
 class ProductLabelReduction(CompositeReduction):
-    # TODO Just to test CompositeReduction in action.  I'll use this
-    # to refactor the original (Old-) ProductLabelReduction.
     def __init__(self):
         CompositeReduction.__init__(self, [OldProductLabelReduction(),
                                            NewProductLabelReduction(),
                                            FileContentsLabelReduction()])
-
-
-class FileContentsLabelReduction(Reduction):
-    def reduce_product(self, archive, lid, get_reduced_fits_files):
-        reduced_fits_file = get_reduced_fits_files()[0]
-        return interpret_document_template(
-            """<File><FRAGMENT name="file_contents"/></File>""")(reduced_fits_file)
-
-    def reduce_fits_file(self, file, get_reduced_hdus):
-        reduced_hdus = get_reduced_hdus()
-        return {'file_contents':
-                     combine_fragments_into_fragment(reduced_hdus)}
-
-    def reduce_hdu(self, n, hdu,
-                   get_reduced_header_unit,
-                   get_reduced_data_unit):
-        local_identifier = 'hdu_%d' % n
-        fileinfo = hdu.fileinfo()
-        offset = str(fileinfo['hdrLoc'])
-        object_length = str(fileinfo['datLoc'] - fileinfo['hdrLoc'])
-        header = header_contents({'local_identifier': local_identifier,
-                                  'offset': offset,
-                                  'object_length': object_length})
-        assert is_doc_to_node_function(header)
-
-        if fileinfo['datSpan']:
-            axes = hdu.header['NAXIS']
-            data_type = _BITPIX_TABLE[hdu.header['BITPIX']]
-            elmt_arr = element_array({'data_type': data_type})
-
-            data = data_contents({
-                    'offset': str(fileinfo['datLoc']),
-                    'axes': str(axes),
-                    'Element_Array': elmt_arr,
-                    'Axis_Arrays': mk_axis_arrays(hdu, axes)
-                    })
-            assert is_doc_to_node_function(data)
-            node_functions = [header, data]
-        else:
-            node_functions = [header]
-
-        res = combine_nodes_into_fragment(node_functions)
-        assert is_doc_to_fragment_function(res)
-        return res
 
 
 class NewProductLabelReduction(Reduction):
@@ -350,6 +244,16 @@ class OldProductLabelReduction(Reduction):
                                   'offset': offset,
                                   'object_length': object_length})
         assert is_doc_to_node_function(header)
+
+        _BITPIX_TABLE = {
+            # TODO Remove this
+            8: 'UnsignedByte',
+            16: 'SignedMSB2',
+            32: 'SignedMSB4',
+            64: 'SignedMSB8',
+            -32: 'IEEE754MSBSingle',
+            -62: 'IEEE754MSBDouble'
+            }
 
         if fileinfo['datSpan']:
             axes = hdu.header['NAXIS']
