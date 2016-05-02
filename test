@@ -1,22 +1,5 @@
 #!/bin/bash
-echo Running unit tests:
-echo '-- Archive'
-python pdart/pds4/Archive.py
-echo '-- Heuristic'
-python Heuristic.py
-echo '-- HstFilename'
-python pdart/pds4/HstFilename.py
-echo '-- IdTables2'
-python IdTables2.py
-echo '-- LID'
-python pdart/pds4/LID.py
-echo '-- LIDVID'
-python pdart/pds4/LIDVID.py
-echo '-- VID'
-python pdart/pds4/VID.py
-echo '-- XmlSchema'
-python pdart/xml/Schema.py
-echo starting archive validation at `date "+%Y-%m-%d %H:%M"`
-python ValidateArchive.py
-echo finished archive validation at `date "+%Y-%m-%d %H:%M"`
+echo starting tests at `date "+%Y-%m-%d %H:%M"`
+py.test
+echo finished tests at `date "+%Y-%m-%d %H:%M"`
 
