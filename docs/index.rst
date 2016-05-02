@@ -59,10 +59,28 @@ Contents:
 .. automodule:: pdart.pds4labels.CollectionLabel
     :members:
 
+.. automodule:: pdart.pds4labels.FileContentsLabelReduction
+    :members:
+
+.. automodule:: pdart.pds4labels.ObservingSystem
+    :members:
+
 .. automodule:: pdart.pds4labels.ProductLabel
     :members:
 
+.. automodule:: pdart.pds4labels.TargetIdentificationLabelReduction
+    :members:
+
+.. automodule:: pdart.pds4labels.TimeCoordinatesLabelReduction
+    :members:
+
+.. automodule:: pdart.reductions.CompositeReduction
+    :members:
+
 .. automodule:: pdart.reductions.Reduction
+    :members:
+
+.. automodule:: pdart.reductions.TypecheckedReduction
     :members:
 
 .. automodule:: pdart.xml.Pretty
