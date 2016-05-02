@@ -71,27 +71,7 @@ def mk_Investigation_Area_lidvid(proposal_id):
         proposal_id
 
 
-def remove_trailing_decimal(number):
-    while number[-1] == '0':
-        number = number[:-1]
-    if number[-1] == '.':
-        number = number[:-1]
-    return number
-
-
-product_label_reduction_type = {
-    'archive': 'None',
-    'bundle': 'None',
-    'collection': 'None',
-    'product': 'String',
-    'fits_file': '(Document -> Fragment)',
-    'hdu': '(Document -> Fragment)',
-    'header_unit': 'None',
-    'data_unit': 'None'
-    }
-
-
-class SuperProductLabelReduction(CompositeReduction):
+class ProductLabelReduction(CompositeReduction):
     def __init__(self):
         CompositeReduction.__init__(self,
                                     [FileContentsLabelReduction(),
@@ -100,25 +80,26 @@ class SuperProductLabelReduction(CompositeReduction):
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         product = Product(archive, lid)
+        file_name = os.path.basename(product.absolute_filepath())
+
         instrument = product.collection().instrument()
         suffix = product.collection().suffix()
+
         proposal_id = product.bundle().proposal_id()
-        file_name = os.path.basename(product.absolute_filepath())
+        investigation_area_name = mk_Investigation_Area_name(proposal_id)
+        investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
 
         reduced_fits_file = get_reduced_fits_files()[0]
         (file_contents,
          target_identification,
          time_coordinates) = reduced_fits_file
-        
 
         return make_label({
                 'lid': str(lid),
                 'suffix': suffix.upper(),
                 'proposal_id': str(proposal_id),
-                'Investigation_Area_name':
-                    mk_Investigation_Area_name(proposal_id),
-                'investigation_lidvid':
-                    mk_Investigation_Area_lidvid(proposal_id),
+                'Investigation_Area_name': investigation_area_name,
+                'investigation_lidvid': investigation_area_lidvid,
                 'Observing_System': observing_system(instrument),
                 'file_name': file_name,
                 'Time_Coordinates': time_coordinates,
@@ -127,200 +108,14 @@ class SuperProductLabelReduction(CompositeReduction):
                 }).toxml()
 
 
-class ProductLabelReduction(CompositeReduction):
-    def __init__(self):
-        CompositeReduction.__init__(self, [OldProductLabelReduction(),
-                                           NewProductLabelReduction(),
-                                           FileContentsLabelReduction()])
-
-
-class NewProductLabelReduction(Reduction):
-    def reduce_product(self, archive, lid, get_reduced_fits_files):
-        product = Product(archive, lid)
-        instrument = product.collection().instrument()
-        suffix = product.collection().suffix()
-        proposal_id = product.bundle().proposal_id()
-        file_name = os.path.basename(product.absolute_filepath())
-
-        reduced_fits_files = dict(get_reduced_fits_files()[0])
-        return make_label({
-                'lid': str(lid),
-                'suffix': suffix.upper(),
-                'proposal_id': str(proposal_id),
-                'Investigation_Area_name':
-                    mk_Investigation_Area_name(proposal_id),
-                'investigation_lidvid':
-                    mk_Investigation_Area_lidvid(proposal_id),
-                'Observing_System': observing_system(instrument),
-                'file_name': file_name,
-                'Time_Coordinates': reduced_fits_files['Time_Coordinates'],
-                'Target_Identification':
-                    reduced_fits_files['Target_Identification'],
-                'file_contents': combine_nodes_into_fragment(
-                    [interpret_text('*** file_contents ***')])
-                })
-
-    def reduce_fits_file(self, file, get_reduced_hdus):
-        return get_reduced_hdus()[0]
-
-    def reduce_hdu(self, n, hdu,
-                   get_reduced_header_unit,
-                   get_reduced_data_unit):
-        if n == 0:
-            return get_reduced_header_unit()
-        else:
-            pass
-
-    def reduce_header_unit(self, n, header_unit):
-        if n == 0:
-            try:
-                date_obs = header_unit['DATE-OBS']
-                time_obs = header_unit['TIME-OBS']
-                exptime = header_unit['EXPTIME']
-                start_date_time = '%sT%s' % (date_obs, time_obs)
-                stop_date_time = julian.tai_from_iso(start_date_time) + exptime
-                stop_date_time = remove_trailing_decimal(stop_date_time)
-            except KeyError:
-                # Insert placeholders
-                start_date_time = '2000-01-02Z'
-                stop_date_time = '2000-01-02Z'
-
-            try:
-                targname = header_unit['TARGNAME']
-                target = targname_to_target(targname)
-            except KeyError:
-                target = None
-
-            if target is None:
-                # Insert placeholder
-                target_name = 'Magrathea'
-                target_type = 'Planet'
-                target_description = 'Home of Slartibartfast'
-            else:
-                (target_name, target_type, target_description) = target
-
-            return [('Time_Coordinates',
-                     time_coordinates({'start_date_time': start_date_time,
-                                       'stop_date_time': stop_date_time})),
-                    ('Target_Identification',
-                     target_identification(target_name,
-                                           target_type,
-                                           target_description))]
-        else:
-            pass
-
-
-class OldProductLabelReduction(Reduction):
-    """
-    Reduction of a :class:`Product` to its PDS4 label as a string.
-    """
-    def reduce_product(self, archive, lid, get_reduced_fits_files):
-        file_contents = get_reduced_fits_files()
-        # file_contents :: [Doc -> Fragment]
-
-        def file_contents_(doc):
-            res = []
-            for fc in file_contents:
-                res.extend(fc(doc))
-            return res
-        # file_contents_ :: Doc -> Fragment
-        assert is_doc_to_fragment_function(file_contents_)
-
-        product = Product(archive, lid)
-        instrument = product.collection().instrument()
-        suffix = product.collection().suffix()
-        proposal_id = product.bundle().proposal_id()
-        file_name = os.path.basename(product.absolute_filepath())
-
-        # TODO Un-hard-code these
-        target_name = 'Magrathea'
-        target_type = 'Planet'
-        target_description = 'Home of Slartibartfast'
-
-        # TODO Un-hard-code these
-        start_date_time = '2000-01-02Z'
-        stop_date_time = '2000-01-02Z'
-
-        dict = {'lid': interpret_text(str(lid)),
-                'suffix': interpret_text(suffix.upper()),
-                'proposal_id': interpret_text(str(proposal_id)),
-                'Time_Coordinates': time_coordinates({
-                    'start_date_time': start_date_time,
-                    'stop_date_time': stop_date_time
-                    }),
-                'Investigation_Area_name':
-                    interpret_text(mk_Investigation_Area_name(proposal_id)),
-                'investigation_lidvid':
-                    interpret_text(mk_Investigation_Area_lidvid(proposal_id)),
-                'Observing_System': observing_system(instrument),
-                'Target_Identification':
-                    target_identification(target_name,
-                                          target_type,
-                                          target_description),
-                'file_name': interpret_text(file_name),
-                'file_contents': file_contents_
-                }
-        return make_label(dict).toxml()
-
-    def reduce_fits_file(self, file, get_reduced_hdus):
-        reduced_hdus = get_reduced_hdus()
-        assert is_list_of_doc_to_fragment_functions(reduced_hdus)
-        res = combine_fragments_into_fragment(reduced_hdus)
-        assert is_doc_to_fragment_function(res)
-        return res
-
-    def reduce_hdu(self, n, hdu,
-                   get_reduced_header_unit,
-                   get_reduced_data_unit):
-        local_identifier = 'hdu_%d' % n
-        fileinfo = hdu.fileinfo()
-        offset = str(fileinfo['hdrLoc'])
-        object_length = str(fileinfo['datLoc'] - fileinfo['hdrLoc'])
-        header = header_contents({'local_identifier': local_identifier,
-                                  'offset': offset,
-                                  'object_length': object_length})
-        assert is_doc_to_node_function(header)
-
-        _BITPIX_TABLE = {
-            # TODO Remove this
-            8: 'UnsignedByte',
-            16: 'SignedMSB2',
-            32: 'SignedMSB4',
-            64: 'SignedMSB8',
-            -32: 'IEEE754MSBSingle',
-            -62: 'IEEE754MSBDouble'
-            }
-
-        if fileinfo['datSpan']:
-            axes = hdu.header['NAXIS']
-            data_type = _BITPIX_TABLE[hdu.header['BITPIX']]
-            elmt_arr = element_array({'data_type': data_type})
-
-            data = data_contents({
-                    'offset': str(fileinfo['datLoc']),
-                    'axes': str(axes),
-                    'Element_Array': elmt_arr,
-                    'Axis_Arrays': mk_axis_arrays(hdu, axes)
-                    })
-            assert is_doc_to_node_function(data)
-            node_functions = [header, data]
-        else:
-            node_functions = [header]
-
-        res = combine_nodes_into_fragment(node_functions)
-        assert is_doc_to_fragment_function(res)
-        return res
-
-
 def make_product_label(product, verify):
     """
     Create the label text for this :class:`Product`.  If verify is
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label = \
-        DefaultReductionRunner().run_product(SuperProductLabelReduction(),
-                                             product)
+    label = DefaultReductionRunner().run_product(ProductLabelReduction(),
+                                                 product)
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)
