@@ -143,19 +143,28 @@ class DefaultReductionRunner(object):
     def run_archive(self, reduction, archive):
         def get_reduced_bundles():
             bundles = list(archive.bundles())
+
+            def make_thunk(bundle):
+                def thunk():
+                    return self.run_bundle(reduction, bundle)
+                return thunk
+
             return parallel_list('run_archive',
-                                 [lambda: self.run_bundle(reduction, bundle)
-                                  for bundle in bundles])
+                                 [make_thunk(bundle) for bundle in bundles])
 
         return reduction.reduce_archive(archive.root, get_reduced_bundles)
 
     def run_bundle(self, reduction, bundle):
         def get_reduced_collections():
             collections = list(bundle.collections())
-            return parallel_list('run_bundle',
-                                 [lambda: self.run_collection(reduction,
-                                                              collection)
-                                  for collection in collections])
+
+            def make_thunk(collection):
+                def thunk():
+                    return self.run_collection(reduction, collection)
+                return thunk
+
+            return parallel_list('run_bundle', [make_thunk(collection)
+                                                for collection in collections])
 
         return reduction.reduce_bundle(bundle.archive, bundle.lid,
                                        get_reduced_collections)
@@ -163,9 +172,13 @@ class DefaultReductionRunner(object):
     def run_collection(self, reduction, collection):
         def get_reduced_products():
             products = list(collection.products())
+
+            def make_thunk(product):
+                def thunk():
+                    return self.run_product(reduction, product)
+                return thunk
             return parallel_list('run_collection',
-                                 [lambda: self.run_product(reduction, product)
-                                  for product in products])
+                                 [make_thunk(product) for product in products])
 
         return reduction.reduce_collection(collection.archive,
                                            collection.lid,
@@ -174,9 +187,13 @@ class DefaultReductionRunner(object):
     def run_product(self, reduction, product):
         def get_reduced_fits_files():
             files = list(product.files())
+
+            def make_thunk(file):
+                def thunk():
+                    return self.run_fits_file(reduction, file)
+                return thunk
             return parallel_list('run_product',
-                                 [lambda: self.run_fits_file(reduction, file)
-                                  for file in files])
+                                 [make_thunk(file) for file in files])
 
         return reduction.reduce_product(product.archive, product.lid,
                                         get_reduced_fits_files)
@@ -185,27 +202,7 @@ class DefaultReductionRunner(object):
         def get_reduced_hdus():
             fits = pyfits.open(file.full_filepath())
 
-            # We have to jump through some hoops to make sure that in
-            # building the parallel list we return, we capture the n
-            # and hdu *values* not the *variables* that hold them.  In
-            # the obvious (but wrong) implementation I first wrote,
-            #
-            # [lambda: self.run_hdu(reduction, n, hdu) for n, hdu in
-            # enumerate(fits)]
-            #
-            # it captured the n and hdu *variables* and as a result,
-            # all of the resulting list got the same n and hdu (the
-            # last ones, since the lambdas didn't get run until after
-            # the enumeration was done).  If we pass n and hdu as
-            # arguments, their current *value* is used rather than just
-            # capturing the variable.
-            #
-            # Ignore this if it makes your head hurt.
             def build_thunk(n, hdu):
-                """
-                Return a no-argument function (a thunk) that runs
-                self.run_hdu() with the given n and hdu values.
-                """
                 def thunk():
                     return self.run_hdu(reduction, n, hdu)
                 return thunk
