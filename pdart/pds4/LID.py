@@ -34,11 +34,8 @@ class LID(object):
         self.collection_id = ids[4]
         self.product_id = ids[5]
 
-    def __eq__(self, other):
-        return self.lid == other.lid
-
-    def __ne__(self, other):
-        return self.lid != other.lid
+    def __cmp__(self, other):
+        return cmp(self.lid, other.lid)
 
     def __str__(self):
         return self.lid

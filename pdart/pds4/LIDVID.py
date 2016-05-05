@@ -16,11 +16,11 @@ class LIDVID(object):
         self.lid = LID.LID(segs[0])
         self.vid = VID.VID(segs[1])
 
-    def __eq__(self, other):
-        return (self.lid == other.lid) and (self.vid == other.vid)
-
-    def __ne__(self, other):
-        return not self == other
+    def __cmp__(self, other):
+        res = cmp(self.lid, other.lid)
+        if res == 0:
+            res = cmp(self.vid, other.vid)
+        return res
 
     def __str__(self):
         return self.lidvid

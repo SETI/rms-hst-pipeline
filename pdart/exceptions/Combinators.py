@@ -106,3 +106,16 @@ def parallel_list(label, arg_funcs):
         raise CalculationException(label, exception_info)
     else:
         return results
+
+
+def raise_verbosely(thunk):
+    """
+    Run the thunk, returning a result.  If it raises a
+    CalculationException, pretty-print the full exception info as XML
+    and reraise the exception.
+    """
+    try:
+        return thunk()
+    except CalculationException as ce:
+        print ce.exception_info.to_pretty_xml()
+        raise
