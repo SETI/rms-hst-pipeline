@@ -110,9 +110,9 @@ class TestRecursiveReduction(Reduction):
         return 1 + sum(get_reduced_fits_files())
 
     def reduce_fits_file(self, file, get_reduced_hdus):
-        # We don't go any deeper because it takes too long for a unit
-        # test.  (In fact, it might be too long with the full
-        # archive.)
+        # We don't go any deeper because it requires opening and
+        # parsing the FITS file and the cost of opening all the files
+        # would make it run too slowly for a unit test.
         return 1
 
 

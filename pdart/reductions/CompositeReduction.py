@@ -21,8 +21,10 @@ def indexed2(func):
             raise
 
     def indexed2_func(i):
-        store_func_result()
-        return (lambda: i_th(cache['value'], i))
+        def thunk():
+            store_func_result()
+            return i_th(cache['value'], i)
+        return thunk
 
     return indexed2_func
 
@@ -63,8 +65,10 @@ def indexed(func):
             raise
 
     def indexed_func(i):
-        store_func_result()
-        return (lambda: i_th(cache['value'], i))
+        def thunk():
+            store_func_result()
+            return i_th(cache['value'], i)
+        return thunk
 
     return indexed_func
 
@@ -91,6 +95,7 @@ class CompositeReduction(Reduction):
 
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles_indexed = indexed(get_reduced_bundles)
+
         return [r.reduce_archive(archive_root,
                                  get_reduced_bundles_indexed(i))
                 for i, r in enumerate(self.reductions)]
