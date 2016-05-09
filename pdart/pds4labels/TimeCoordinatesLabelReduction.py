@@ -1,3 +1,5 @@
+import pdart.add_pds_tools
+import julian
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
@@ -10,24 +12,38 @@ time_coordinates = interpret_template("""<Time_Coordinates>
     </Time_Coordinates>""")
 
 
+def _remove_trailing_decimal(str):
+    """
+    Given a string, remove any trailing zeros and then any trailing
+    decimal point and return it.
+    """
+    # remove any trailing zeros
+    while str[-1] == '0':
+        str = str[:-1]
+    # remove any trailing decimal point
+    if str[-1] == '.':
+        str = str[:-1]
+    return str
+
+
 class TimeCoordinatesLabelReduction(Reduction):
     """Reduce a product to an XML Time_Coordinates node template."""
     def reduce_fits_file(self, file, get_reduced_hdus):
-        # Doc -> Node
+        # returns Doc -> Node
         reduced_hdus = get_reduced_hdus()
         return reduced_hdus[0]
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
-        # Doc -> Node or None
+        # returns (Doc -> Node) or None
         if n == 0:
             return get_reduced_header_unit()
         else:
             pass
 
     def reduce_header_unit(self, n, header_unit):
-        # Doc -> Node or None
+        # returns (Doc -> Node) or None
         if n == 0:
             try:
                 date_obs = header_unit['DATE-OBS']
@@ -35,7 +51,7 @@ class TimeCoordinatesLabelReduction(Reduction):
                 exptime = header_unit['EXPTIME']
                 start_date_time = '%sT%s' % (date_obs, time_obs)
                 stop_date_time = julian.tai_from_iso(start_date_time) + exptime
-                stop_date_time = remove_trailing_decimal(stop_date_time)
+                stop_date_time = _remove_trailing_decimal(stop_date_time)
             except KeyError:
                 # Insert placeholders
                 start_date_time = '2000-01-02Z'

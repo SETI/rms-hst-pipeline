@@ -1,8 +1,5 @@
 import os.path
 
-import pdart.add_pds_tools
-import julian
-
 from pdart.pds4.Product import *
 from pdart.pds4labels.FileContentsLabelReduction import *
 from pdart.pds4labels.ObservingSystem import *
