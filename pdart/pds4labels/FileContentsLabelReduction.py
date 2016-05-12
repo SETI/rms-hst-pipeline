@@ -40,7 +40,7 @@ def mk_axis_arrays(hdu, axes):
                            'sequence_number': sequence_number})
 
     return combine_nodes_into_fragment(
-        [mk_axis_array(hdu, i) for i in range(1, axes + 1)])
+        [mk_axis_array(hdu, i + 1) for i in range(0, axes)])
 
 header_contents = interpret_template("""<Header>
 <local_identifier><NODE name="local_identifier"/></local_identifier>
@@ -50,16 +50,24 @@ header_contents = interpret_template("""<Header>
 <description>Global FITS Header</description>
 </Header>""")
 
-data_contents = interpret_template("""<Array_2D_Image>
+data_1d_contents = interpret_template("""<Array>
 <offset unit="byte"><NODE name="offset" /></offset>
-<axes><NODE name="axes" /></axes>
+<axes>1</axes>
+<axis_index_order>Last Index Fastest</axis_index_order>
+<NODE name="Element_Array" />
+<FRAGMENT name="Axis_Arrays" />
+</Array>""")
+
+data_2d_contents = interpret_template("""<Array_2D_Image>
+<offset unit="byte"><NODE name="offset" /></offset>
+<axes>2</axes>
 <axis_index_order>Last Index Fastest</axis_index_order>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
 </Array_2D_Image>""")
 
-element_array = interpret_template("""<ElementArray>
-<data_type><NODE name="data_type" /></data_type></ElementArray>""")
+element_array = interpret_template("""<Element_Array>
+<data_type><NODE name="data_type" /></data_type></Element_Array>""")
 
 
 class FileContentsLabelReduction(Reduction):
@@ -91,12 +99,18 @@ class FileContentsLabelReduction(Reduction):
             data_type = _BITPIX_TABLE[hdu.header['BITPIX']]
             elmt_arr = element_array({'data_type': data_type})
 
-            data = data_contents({
-                    'offset': str(fileinfo['datLoc']),
-                    'axes': str(axes),
-                    'Element_Array': elmt_arr,
-                    'Axis_Arrays': mk_axis_arrays(hdu, axes)
-                    })
+            if axes == 1:
+                data = data_1d_contents({
+                        'offset': str(fileinfo['datLoc']),
+                        'Element_Array': elmt_arr,
+                        'Axis_Arrays': mk_axis_arrays(hdu, axes)
+                        })
+            elif axes == 2:
+                data = data_2d_contents({
+                        'offset': str(fileinfo['datLoc']),
+                        'Element_Array': elmt_arr,
+                        'Axis_Arrays': mk_axis_arrays(hdu, axes)
+                        })
             assert is_doc_to_node_function(data)
             node_functions = [header, data]
         else:

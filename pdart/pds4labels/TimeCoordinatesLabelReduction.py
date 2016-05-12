@@ -49,10 +49,10 @@ class TimeCoordinatesLabelReduction(Reduction):
                 date_obs = header_unit['DATE-OBS']
                 time_obs = header_unit['TIME-OBS']
                 exptime = header_unit['EXPTIME']
-                start_date_time = '%sT%s' % (date_obs, time_obs)
+                start_date_time = '%sT%sZ' % (date_obs, time_obs)
                 stop_date_time = julian.tai_from_iso(start_date_time) + exptime
-                stop_date_time = str(stop_date_time)
-                stop_date_time = _remove_trailing_decimal(stop_date_time)
+                stop_date_time = julian.iso_from_tai(stop_date_time,
+                                                     suffix='Z')
             except KeyError:
                 # Insert placeholders
                 start_date_time = '2000-01-02Z'

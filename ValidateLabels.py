@@ -35,24 +35,43 @@ class CanMakeValidProductLabelsReduction(ProductLabelReduction):
         get_reduced_collections()
 
     def reduce_collection(self, archive, lid, get_reduced_products):
-        for label in get_reduced_products():
-            if label:
+        for prod in get_reduced_products():
+            if prod:
+                lid, label = prod
                 failures = xml_schema_failures(None, label) and \
                     schematron_failures(None, label)
                 if failures is not None:
-                    raise Exception('Validation errors: ' + failures)
+                    raise Exception('Validation errors in %s: %s' %
+                                    (lid, failures))
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
+        reduced_fits_files = get_reduced_fits_files()
+        for fits_file in reduced_fits_files:
+            if fits_file is None:
+                return None
+
+        def get_reduced_fits_files_no_fail():
+            return reduced_fits_files
+
+        return (lid,
+                ProductLabelReduction.reduce_product(
+                    self,
+                    archive,
+                    lid,
+                    get_reduced_fits_files_no_fail))
+
+    def reduce_fits_file(self, file, get_reduced_hdus):
         try:
-            return ProductLabelReduction.reduce_product(self,
-                                                        archive,
-                                                        lid,
-                                                        get_reduced_fits_files)
+            reduced_hdus = get_reduced_hdus()
         except IOError:
-            # FIXME I'm overlooking IOErrors for now, likely caused by
-            # bad FITS headers.  I need to figure out how to handle
-            # these.
-            pass
+            return None
+
+        def get_reduced_hdus_no_fail():
+            return reduced_hdus
+
+        return ProductLabelReduction.reduce_fits_file(self,
+                                                      file,
+                                                      get_reduced_hdus_no_fail)
 
 
 class ValidateLabelsReduction(CompositeReduction):
