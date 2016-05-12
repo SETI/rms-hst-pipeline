@@ -51,6 +51,7 @@ class TimeCoordinatesLabelReduction(Reduction):
                 exptime = header_unit['EXPTIME']
                 start_date_time = '%sT%s' % (date_obs, time_obs)
                 stop_date_time = julian.tai_from_iso(start_date_time) + exptime
+                stop_date_time = str(stop_date_time)
                 stop_date_time = _remove_trailing_decimal(stop_date_time)
             except KeyError:
                 # Insert placeholders

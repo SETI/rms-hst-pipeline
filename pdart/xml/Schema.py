@@ -61,9 +61,7 @@ def xml_schema_failures(filepath, stdin=None, schema=XML_SCHEMA):
     else:
         # ignore stdout
         assert stderr
-        # TODO The replace probably ought to be done only in the
-        # reporting, only as necessary
-        return stderr.replace('\n', '\\n')
+        return stderr
 
 
 def probatron(filepath, schema=SCHEMATRON_SCHEMA):
@@ -89,8 +87,10 @@ def probatron_with_stdin(filepath, stdin=None, schema=SCHEMATRON_SCHEMA):
         (handle, filepath) = tempfile.mkstemp()
         try:
             f = os.fdopen(handle, 'w')
-            f.write(stdin)
-            f.close()
+            try:
+                f.write(stdin)
+            finally:
+                f.close()
             return probatron(filepath, schema)
         finally:
             os.remove(filepath)

@@ -36,7 +36,6 @@ class TestXmlSchema(unittest.TestCase):
             xml_schema_failures('-',
                                 stdin='<library><book/><book/></library>')
         self.assertIsNotNone(failures)
-        self.assertNotIn('\n', failures)
 
         # Valid XML according to the schema.
         failures = xml_schema_failures('./testfiles/bundle.xml')
@@ -65,4 +64,3 @@ class TestXmlSchema(unittest.TestCase):
         self.assertIsNone(schematron_failures('./testfiles/bundle.xml'))
         failures = schematron_failures('./testfiles/bad_bundle.xml')
         self.assertIsNotNone(failures)
-        self.assertNotIn('\n', failures)

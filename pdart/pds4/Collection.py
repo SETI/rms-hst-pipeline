@@ -10,7 +10,7 @@ import Product
 class Collection(pdart.pds4.Component.Component):
     """A PDS4 Collection."""
 
-    DIRECTORY_PATTERN = r'\Adata_([a-z0-9]+)_([a-z0-9_]+)\Z'
+    DIRECTORY_PATTERN = r'\A[a-z]+_([a-z0-9]+)_([a-z0-9_]+)\Z'
 
     def __init__(self, arch, lid):
         """
