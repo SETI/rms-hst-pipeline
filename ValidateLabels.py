@@ -1,9 +1,17 @@
+"""
+SCRIPT: Run through the archive creating and validating bundle,
+collection and product labels.  If it fails, print the combined
+exception to stdout.  If it succeeds, do nothing.  The labels are not
+saved to disk.
+"""
+
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
 from pdart.reductions.CompositeReduction import *
+from pdart.reductions.InstrumentationReductions import *
 
 
 class CanMakeValidBundleLabelsReduction(BundleLabelReduction):
@@ -72,20 +80,6 @@ class CanMakeValidProductLabelsReduction(ProductLabelReduction):
         return ProductLabelReduction.reduce_fits_file(self,
                                                       file,
                                                       get_reduced_hdus_no_fail)
-
-
-class LogProductsReduction(Reduction):
-    def reduce_archive(self, archive_root, get_reduced_bundles):
-        get_reduced_bundles()
-
-    def reduce_bundle(self, archive, lid, get_reduced_collections):
-        get_reduced_collections()
-
-    def reduce_collection(self, archive, lid, get_reduced_products):
-        get_reduced_products()
-
-    def reduce_product(self, archive, lid, get_reduced_products):
-        print str(lid)
 
 
 class ValidateLabelsReduction(CompositeReduction):

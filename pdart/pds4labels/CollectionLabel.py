@@ -1,3 +1,5 @@
+import io
+
 from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Schema import *
@@ -107,3 +109,19 @@ def make_collection_inventory(collection):
     lines = [u'P,%s\r\n' % str(product.lid)
              for product in collection.products()]
     return ''.join(lines)
+
+
+def make_collection_label_and_inventory(collection):
+    """
+    Create the label and inventory for a collection and write to the disk.
+    """
+    dir = collection.absolute_filepath()
+    label_filepath = os.path.join(dir, "collection.xml")
+    inventory_name = make_collection_inventory_name(collection.suffix())
+    inventory_filepath = os.path.join(dir, inventory_name)
+
+    with io.open(inventory_filepath, 'w', newline='') as f:
+        f.write(make_collection_inventory(collection))
+
+    with io.open(label_filepath, 'w') as f:
+        f.write(make_collection_label(collection, True))

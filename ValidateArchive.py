@@ -1,3 +1,9 @@
+"""
+SCRIPT: Run through the archive checking for certain invariant
+properties.  If any of the properties fail to hold, print the combined
+exception to stdout.  If it succeeds, do nothing.
+"""
+
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4.Bundle import *
@@ -13,7 +19,7 @@ def unions(sets):
     return res
 
 
-class BundleContainsOneSingleHstInternalProposalId(Reduction):
+class BundleContainsOneSingleHstInternalProposalIdReduction(Reduction):
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 
@@ -106,7 +112,7 @@ class ProductFilesHaveProductVisitReduction(Reduction):
 class ValidationReduction(CompositeReduction):
     def __init__(self):
         CompositeReduction.__init__(self, [
-                BundleContainsOneSingleHstInternalProposalId(),
+                BundleContainsOneSingleHstInternalProposalIdReduction(),
                 ProductFilesHaveBundleProposalIdReduction(),
                 ProductFilesHaveCollectionSuffixReduction(),
                 ProductFilesHaveProductVisitReduction()])

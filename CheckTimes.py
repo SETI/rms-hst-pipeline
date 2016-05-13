@@ -1,3 +1,9 @@
+"""
+SCRIPT: Run through the archive and print the sorted set of LIDs of
+the products whose FITS file contains sufficient datetime information
+to calculate start and stop times of the observation.
+"""
+
 from pdart.pds4.Archives import *
 from pdart.exceptions.Combinators import *
 from pdart.reductions.Reduction import *

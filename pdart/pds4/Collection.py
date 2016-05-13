@@ -37,7 +37,7 @@ class Collection(pdart.pds4.Component.Component):
         for (dirpath, dirnames, filenames) in os.walk(dir_fp):
             for filename in filenames:
                 (root, ext) = os.path.splitext(filename)
-                if ext == '.fits':
+                if ext in ['.fits', '.jpg']:
                     product_lid = pdart.pds4.LID.LID('%s:%s' %
                                                      (self.lid.lid, root))
                     yield Product.Product(self.archive, product_lid)

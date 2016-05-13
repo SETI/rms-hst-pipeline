@@ -1,3 +1,5 @@
+import os.path
+
 import abc
 import pyfits
 
@@ -200,19 +202,23 @@ class DefaultReductionRunner(object):
 
     def run_fits_file(self, reduction, file):
         def get_reduced_hdus():
-            fits = pyfits.open(file.full_filepath())
+            filepath = file.full_filepath()
+            if os.path.splitext(filepath)[1] == '.fits':
+                fits = pyfits.open(filepath)
 
-            def build_thunk(n, hdu):
-                def thunk():
-                    return self.run_hdu(reduction, n, hdu)
-                return thunk
+                def build_thunk(n, hdu):
+                    def thunk():
+                        return self.run_hdu(reduction, n, hdu)
+                    return thunk
 
-            try:
-                return parallel_list('run_fits_file',
-                                     [build_thunk(n, hdu)
-                                      for n, hdu in enumerate(fits)])
-            finally:
-                fits.close()
+                try:
+                    return parallel_list('run_fits_file',
+                                         [build_thunk(n, hdu)
+                                          for n, hdu in enumerate(fits)])
+                finally:
+                    fits.close()
+            else:
+                return []
 
         return reduction.reduce_fits_file(file, get_reduced_hdus)
 
