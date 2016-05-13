@@ -1,12 +1,11 @@
 import os
 import re
 
-import pdart.pds4.Component
-import pdart.pds4.Collection
-import pdart.pds4.LID
+from pdart.pds4.Component import *
+from pdart.pds4.LID import *
 
 
-class Bundle(pdart.pds4.Component.Component):
+class Bundle(Component):
     """A PDS4 Bundle."""
 
     DIRECTORY_PATTERN = r'\Ahst_([0-9]{5})\Z'
@@ -31,14 +30,14 @@ class Bundle(pdart.pds4.Component.Component):
         Generate the collections of this :class:`Bundle` as
         :class:`Collection` objects.
         """
+        from pdart.pds4.Collection import Collection
+
         dir_fp = self.absolute_filepath()
         for subdir in os.listdir(dir_fp):
-            if re.match(pdart.pds4.Collection.Collection.DIRECTORY_PATTERN,
+            if re.match(Collection.DIRECTORY_PATTERN,
                         subdir):
-                collection_lid = pdart.pds4.LID.LID('%s:%s' %
-                                                    (self.lid.lid, subdir))
-                yield pdart.pds4.Collection.Collection(self.archive,
-                                                       collection_lid)
+                collection_lid = LID('%s:%s' % (self.lid.lid, subdir))
+                yield Collection(self.archive, collection_lid)
 
     def products(self):
         """

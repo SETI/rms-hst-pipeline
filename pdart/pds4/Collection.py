@@ -1,13 +1,12 @@
 import os.path
 import re
 
-import pdart.pds4.Bundle
-import pdart.pds4.Component
-import pdart.pds4.LID
-import Product
+from pdart.pds4.Component import *
+from pdart.pds4.LID import *
+from pdart.pds4.Product import *
 
 
-class Collection(pdart.pds4.Component.Component):
+class Collection(Component):
     """A PDS4 Collection."""
 
     DIRECTORY_PATTERN = r'\A[a-z]+_([a-z0-9]+)_([a-z0-9_]+)\Z'
@@ -38,9 +37,8 @@ class Collection(pdart.pds4.Component.Component):
             for filename in filenames:
                 (root, ext) = os.path.splitext(filename)
                 if ext in ['.fits', '.jpg']:
-                    product_lid = pdart.pds4.LID.LID('%s:%s' %
-                                                     (self.lid.lid, root))
-                    yield Product.Product(self.archive, product_lid)
+                    product_lid = LID('%s:%s' % (self.lid.lid, root))
+                    yield Product(self.archive, product_lid)
 
     def instrument(self):
         """
@@ -60,4 +58,5 @@ class Collection(pdart.pds4.Component.Component):
 
     def bundle(self):
         """Return the bundle this collection belongs to."""
-        return pdart.pds4.Bundle.Bundle(self.archive, self.lid.parent_lid())
+        from pdart.pds4.Bundle import Bundle
+        return Bundle(self.archive, self.lid.parent_lid())

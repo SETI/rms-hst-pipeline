@@ -4,12 +4,10 @@ import shutil
 import tempfile
 import unittest
 
-import pdart.pds4.Bundle
-import pdart.pds4.Collection
-import pdart.pds4.Component
-import pdart.pds4.File
-import pdart.pds4.Archive
-import pdart.pds4.HstFilename
+from pdart.pds4.Component import *
+from pdart.pds4.File import *
+from pdart.pds4.Archive import *
+from pdart.pds4.HstFilename import *
 
 
 def _find_product_file(dir, filename):
@@ -19,7 +17,7 @@ def _find_product_file(dir, filename):
     absolute and that only one file with that name exists under the
     directory.
     """
-    hstFilename = pdart.pds4.HstFilename.HstFilename(filename)
+    hstFilename = HstFilename(filename)
     visit = hstFilename.visit()
     return os.path.join(dir, 'visit_%s' % visit, filename)
 
@@ -59,17 +57,19 @@ class Product(pdart.pds4.Component.Component):
 
     def files(self):
         basename = os.path.basename(self.absolute_filepath())
-        yield pdart.pds4.File.File(self, basename)
+        yield File(self, basename)
 
     def absolute_filepath_is_directory(self):
         return False
 
     def collection(self):
         """Return the collection this product belongs to."""
-        return pdart.pds4.Collection.Collection(self.archive,
-                                                self.lid.parent_lid())
+        from pdart.pds4.Collection import Collection
+        return Collection(self.archive,
+                          self.lid.parent_lid())
 
     def bundle(self):
         """Return the bundle this product belongs to."""
-        return pdart.pds4.Bundle.Bundle(self.archive,
-                                        self.lid.parent_lid().parent_lid())
+        from pdart.pds4.Bundle import Bundle
+        return Bundle(self.archive,
+                      self.lid.parent_lid().parent_lid())
