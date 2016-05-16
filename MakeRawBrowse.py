@@ -25,6 +25,13 @@ import pdart.add_pds_tools
 import picmaker
 
 
+def data_lid_to_browse_lid(lid):
+    parts = lid.lid.split(':')
+    assert parts[4][0:5] == 'data_'
+    parts[4] = 'browse_' + parts[4][5:]
+    return LID(':'.join(parts))
+
+
 class MakeRawBrowseReduction(Reduction):
     def __init__(self):
         self.current_collection = None
@@ -44,7 +51,7 @@ class MakeRawBrowseReduction(Reduction):
             return
         collection = Collection(archive, lid)
         if collection.suffix() == 'raw':
-            new_lid = LID(re.sub(r'data', 'browse', str(lid)))
+            new_lid = data_lid_to_browse_lid(lid)
             browse_collection = Collection(archive, new_lid)
             try:
                 os.mkdir(browse_collection.absolute_filepath())
@@ -60,19 +67,24 @@ class MakeRawBrowseReduction(Reduction):
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         product = Product(archive, lid)
         get_reduced_fits_files()
-        new_lid = LID(re.sub(r'data', 'browse', str(lid)))
+        new_lid = data_lid_to_browse_lid(lid)
         browse_product = Product(archive, new_lid)
-        make_product_label(browse_product, True)
+        # make_product_label(browse_product, True)
 
     def reduce_fits_file(self, file, get_reduced_hdus):
+        """
+        Create a JPG file from the FITS file and put it into the
+        parallel browse_ directory.
+        """
         basename = os.path.basename(file.full_filepath())
         basename = os.path.splitext(basename)[0] + '.jpg'
-        target = os.path.join(self.browse_collection_directory,
-                              basename)
-        res = \
-            picmaker.ImagesToPics([file.full_filepath()],
-                                  self.browse_collection_directory,
-                                  filter="None")
+        visit = HstFilename(basename).visit()
+        target_dir = os.path.join(self.browse_collection_directory,
+                                  ('visit_%s' % visit))
+        res = picmaker.ImagesToPics([file.full_filepath()],
+                                    target_dir,
+                                    filter="None",
+                                    percentiles=(1, 99))
 
 
 class DeleteRawBrowseReduction(Reduction):
