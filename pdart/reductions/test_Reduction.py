@@ -97,6 +97,10 @@ def test_check_reduction():
 
 
 class TestRecursiveReduction(Reduction):
+    """
+    Counts the number of archives, bundles, collections, products, and
+    FITS files.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         return 1 + sum(get_reduced_bundles())
 
@@ -122,7 +126,7 @@ def test_reductions():
         count = run_reduction(TestRecursiveReduction(), arch)
         # FIXME One value for mini archive on dev machine and one for
         # full archive on test machine.
-        assert count in [9529]
+        assert count in [9529, 583510]
     except CalculationException as ce:
         print ce.exception_info.to_pretty_xml()
         raise
