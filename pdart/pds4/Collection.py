@@ -36,7 +36,7 @@ class Collection(Component):
         for (dirpath, dirnames, filenames) in os.walk(dir_fp):
             for filename in filenames:
                 (root, ext) = os.path.splitext(filename)
-                if ext in ['.fits', '.jpg']:
+                if ext in Product.FILE_EXTS:
                     product_lid = LID('%s:%s' % (self.lid.lid, root))
                     yield Product(self.archive, product_lid)
 

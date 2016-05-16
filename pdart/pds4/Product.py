@@ -4,28 +4,31 @@ import shutil
 import tempfile
 import unittest
 
+from pdart.pds4.Archive import *
 from pdart.pds4.Component import *
 from pdart.pds4.File import *
-from pdart.pds4.Archive import *
 from pdart.pds4.HstFilename import *
 
 
-def _find_product_file(dir, filename):
+def _find_product_file(visit_dir, product_id):
     """
     Find a file by name in a directory or one of its subdirectories
     and return the absolute filepath.  Assume the directory path is
     absolute and that only one file with that name exists under the
-    directory.
+    directory.  Return None on failure.
     """
-    hstFilename = HstFilename(filename)
-    visit = hstFilename.visit()
-    return os.path.join(dir, 'visit_%s' % visit, filename)
+    for ext in Product.FILE_EXTS:
+        filepath = os.path.join(visit_dir, product_id + ext)
+        if os.path.isfile(filepath):
+            return filepath
+    return None
 
 
 class Product(pdart.pds4.Component.Component):
     """A PDS4 Product."""
 
     VISIT_DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
+    FILE_EXTS = ['.fits', '.jpg']
 
     def __init__(self, arch, lid):
         """
@@ -39,21 +42,27 @@ class Product(pdart.pds4.Component.Component):
 
     def absolute_filepath(self):
         """Return the absolute filepath to the product file."""
+        visit_fp = self.visit_filepath()
+        res = _find_product_file(visit_fp, self.lid.product_id)
+
         collection_fp = self.collection().absolute_filepath()
-        res = _find_product_file(collection_fp,
-                                 self.lid.product_id + '.fits')
         assert res, ('Product.absolute_filepath(%r) = %r '
                      'where collection_fp = %r' % (self, res, collection_fp))
         return res
+
+    def visit_filepath(self):
+        hst_filename = HstFilename(self.lid.product_id)
+        collection_filepath = self.collection().absolute_filepath()
+        visit_segment = 'visit_%s' % self.visit()
+        return os.path.join(collection_filepath, visit_segment)
 
     def visit(self):
         """
         Return the visit code for this product.  It is calculated from
         the product's filepath
         """
-        fp = self.absolute_filepath()
-        visit_fp = os.path.basename(os.path.dirname(fp))
-        return re.match(Product.VISIT_DIRECTORY_PATTERN, visit_fp).group(1)
+        hst_filename = HstFilename(self.lid.product_id)
+        return hst_filename.visit()
 
     def files(self):
         basename = os.path.basename(self.absolute_filepath())

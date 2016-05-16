@@ -13,9 +13,10 @@ import shutil
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4.Collection import *
-from pdart.pds4.Product import *
 from pdart.pds4.LID import *
+from pdart.pds4.Product import *
 from pdart.pds4labels.CollectionLabel import *
+from pdart.pds4labels.ProductLabel import *
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.InstrumentationReductions import *
 from pdart.reductions.Reduction import *
@@ -61,7 +62,7 @@ class MakeRawBrowseReduction(Reduction):
         get_reduced_fits_files()
         new_lid = LID(re.sub(r'data', 'browse', str(lid)))
         browse_product = Product(archive, new_lid)
-        # make_product_label(browse_product, True)
+        make_product_label(browse_product, True)
 
     def reduce_fits_file(self, file, get_reduced_hdus):
         basename = os.path.basename(file.full_filepath())

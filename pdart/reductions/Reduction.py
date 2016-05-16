@@ -218,6 +218,7 @@ class DefaultReductionRunner(object):
                 finally:
                     fits.close()
             else:
+                # Non-FITS files have no hdus, reduced or otherwise
                 return []
 
         return reduction.reduce_fits_file(file, get_reduced_hdus)

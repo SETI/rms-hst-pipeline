@@ -13,6 +13,7 @@ class File(object):
         Note that this assumes that :class:`Product`s don't contain
         subdirectories.  That won't always be true.
         """
+        from pdart.pds4.Product import Product
 
         assert comp, ('File.__init__() '
                       'where comp = %r and basename = %r' %
@@ -22,6 +23,7 @@ class File(object):
                           'where comp = %r and basename = %r' %
                           (comp, basename))
         assert os.path.basename(basename) == basename
+        assert os.path.splitext(basename)[1] in Product.FILE_EXTS
         self.basename = basename
 
     def __eq__(self, other):

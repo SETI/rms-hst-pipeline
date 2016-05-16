@@ -26,13 +26,21 @@ class TestProduct(unittest.TestCase):
 
     def test_absolute_filepath(self):
         arch = get_any_archive()
-        lid = LID('urn:nasa:pds:bundle:collection:uproduct')
-        p = Product(arch, lid)
-        visit = HstFilename('uproduct.fits').visit()
-        self.assertEquals(os.path.join(arch.root, 'bundle',
-                                       'collection', 'visit_' + visit,
-                                       'uproduct.fits'),
-                          p.absolute_filepath())
+        for p in arch.products():
+            lid = p.lid
+            visit = p.visit()
+
+            actual_fp = p.absolute_filepath()
+            expected_fps = [os.path.join(arch.root,
+                                         lid.bundle_id,
+                                         lid.collection_id,
+                                         ('visit_%s' % visit),
+                                         lid.product_id + ext)
+                            for ext in Product.FILE_EXTS]
+
+            assert actual_fp in expected_fps
+            # We only check the first product
+            return
 
     def test_bundle(self):
         arch = get_any_archive()
