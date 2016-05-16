@@ -1,5 +1,9 @@
 import os.path
 
+# We only import PSD4 subcomponent modules to avoid circular imports.
+# If you want to import a supercomponent module, do it within a
+# function or method.
+
 
 class File(object):
     """A file belonging to an :class:`Component`."""

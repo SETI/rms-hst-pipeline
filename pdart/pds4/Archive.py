@@ -1,8 +1,8 @@
 import os.path
 import re
 
-import pdart.pds4.Bundle
-import pdart.pds4.LID
+from pdart.pds4.Bundle import *
+from pdart.pds4.LID import *
 
 
 class Archive(object):
@@ -65,9 +65,9 @@ class Archive(object):
     def bundles(self):
         """Generate the bundles stored in this :class:`Archive`."""
         for subdir in os.listdir(self.root):
-            if re.match(pdart.pds4.Bundle.Bundle.DIRECTORY_PATTERN, subdir):
-                bundle_lid = pdart.pds4.LID.LID('urn:nasa:pds:%s' % subdir)
-                yield pdart.pds4.Bundle.Bundle(self, bundle_lid)
+            if re.match(Bundle.DIRECTORY_PATTERN, subdir):
+                bundle_lid = LID('urn:nasa:pds:%s' % subdir)
+                yield Bundle(self, bundle_lid)
 
     def collections(self):
         """Generate the collections stored in this :class:`Archive`."""

@@ -1,6 +1,11 @@
 import os
 import re
 
+# We only import PDS4 subcomponent modules to avoid circular imports.
+# If you want to import a supercomponent module, do it within a
+# function or method.
+
+from pdart.pds4.Collection import Collection
 from pdart.pds4.Component import *
 from pdart.pds4.LID import *
 
@@ -30,8 +35,6 @@ class Bundle(Component):
         Generate the collections of this :class:`Bundle` as
         :class:`Collection` objects.
         """
-        from pdart.pds4.Collection import Collection
-
         dir_fp = self.absolute_filepath()
         for subdir in os.listdir(dir_fp):
             if re.match(Collection.DIRECTORY_PATTERN,

@@ -4,7 +4,10 @@ import shutil
 import tempfile
 import unittest
 
-from pdart.pds4.Archive import *
+# We only import PDS4 subcomponent modules to avoid circular imports.
+# If you want to import a supercomponent module, do it within a
+# function or method.
+
 from pdart.pds4.Component import *
 from pdart.pds4.File import *
 from pdart.pds4.HstFilename import *

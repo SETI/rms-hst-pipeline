@@ -1,9 +1,12 @@
 import os.path
 import re
 
+# We only import PDS4 subcomponent modules to avoid circular imports.
+# If you want to import a supercomponent module, do it within a
+# function or method.
+
 from pdart.pds4.Component import *
 from pdart.pds4.LID import *
-from pdart.pds4.Product import *
 
 
 class Collection(Component):
@@ -32,6 +35,8 @@ class Collection(Component):
         Generate the products of this :class:`Collection` as
         :class:`Product` objects.
         """
+        from pdart.pds4.Product import Product
+
         dir_fp = self.absolute_filepath()
         for (dirpath, dirnames, filenames) in os.walk(dir_fp):
             for filename in filenames:
