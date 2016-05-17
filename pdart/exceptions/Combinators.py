@@ -92,6 +92,11 @@ def parallel_list(label, arg_funcs):
     fails, raise a :class:`CalculationException` containing all the
     exceptions and stack traces in a :class:`GroupedExceptionInfo`.
     """
+
+    # Style note: unlike multiple_interpretations, this takes a list
+    # rather than a *list because it explicitly says "list": you're
+    # creating a parallel list from a plist.  That's why.
+
     exception_infos = []
     results = []
     for arg_func in arg_funcs:
