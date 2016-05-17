@@ -2,8 +2,7 @@ import abc
 import os
 import os.path
 
-import pdart.pds4.File
-
+from pdart.pds4.LID import *
 
 class Component(object):
     """
@@ -21,6 +20,7 @@ class Component(object):
         assert arch
         self.archive = arch
         assert lid
+        assert isinstance(lid, LID)
         self.lid = lid
 
     def __eq__(self, other):
@@ -49,9 +49,10 @@ class Component(object):
         Generate all the files belonging to this :class:`Component` as
         :class:`File` objects.
         """
+        from pdart.pds4.File import File
         dir = self.absolute_filepath()
         for basename in os.listdir(dir):
             if basename[0] != '.':
                 file = os.path.join(dir, basename)
                 if os.path.isfile(file):
-                    yield pdart.pds4.File.File(self, basename)
+                    yield File(self, basename)

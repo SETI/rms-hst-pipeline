@@ -27,7 +27,7 @@ def _find_product_file(visit_dir, product_id):
     return None
 
 
-class Product(pdart.pds4.Component.Component):
+class Product(Component):
     """A PDS4 Product."""
 
     VISIT_DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
