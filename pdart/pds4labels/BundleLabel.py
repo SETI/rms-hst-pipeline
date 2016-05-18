@@ -56,8 +56,7 @@ class BundleLabelReduction(Reduction):
                 combine_nodes_into_fragment(reduced_collections)
                 }
         label = make_label(dict).toxml()
-        bundle_fp = Bundle(archive, lid).absolute_filepath()
-        label_fp = os.path.join(bundle_fp, 'bundle.xml')
+        label_fp = Bundle(archive, lid).label_filepath()
         with open(label_fp, 'w') as f:
             f.write(label)
         return label

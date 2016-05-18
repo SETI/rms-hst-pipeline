@@ -71,7 +71,7 @@ class CollectionLabelReduction(Reduction):
         collection = Collection(archive, lid)
         suffix = collection.suffix()
         proposal_id = collection.bundle().proposal_id()
-        inventory_name = make_collection_inventory_name(suffix)
+        inventory_name = collection.inventory_name()
 
         dict = {'lid': interpret_text(str(lid)),
                 'suffix': interpret_text(suffix.upper()),
@@ -80,12 +80,9 @@ class CollectionLabelReduction(Reduction):
                 'inventory_name': interpret_text(inventory_name)
                 }
         label = make_label(dict).toxml()
-        collection_fp = Collection(archive, lid).absolute_filepath()
-        label_fp = os.path.join(collection_fp, 'collection.xml')
+        label_fp = Collection(archive, lid).label_filepath()
 
-        inventory_name = make_collection_inventory_name(collection.suffix())
-        inventory_filepath = os.path.join(collection_fp, inventory_name)
-
+        inventory_filepath = collection.inventory_filepath()
         with io.open(inventory_filepath, 'w', newline='') as f:
             f.write(make_collection_inventory(collection))
 
@@ -113,10 +110,6 @@ def make_collection_label(collection, verify):
         raise Exception('Validation errors: ' + failures)
 
 
-def make_collection_inventory_name(suffix):
-    return 'collection_%s_inventory.tab' % suffix
-
-
 def make_collection_inventory(collection):
     lines = [u'P,%s\r\n' % str(product.lid)
              for product in collection.products()]
@@ -127,13 +120,10 @@ def make_collection_label_and_inventory(collection):
     """
     Create the label and inventory for a collection and write to the disk.
     """
-    dir = collection.absolute_filepath()
-    label_filepath = os.path.join(dir, "collection.xml")
-    inventory_name = make_collection_inventory_name(collection.suffix())
-    inventory_filepath = os.path.join(dir, inventory_name)
-
+    inventory_filepath = collection.inventory_filepath()
     with io.open(inventory_filepath, 'w', newline='') as f:
         f.write(make_collection_inventory(collection))
 
+    label_filepath = collection.label_filepath()
     with io.open(label_filepath, 'w') as f:
         f.write(make_collection_label(collection, True))

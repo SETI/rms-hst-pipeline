@@ -103,11 +103,7 @@ class ProductLabelReduction(CompositeReduction):
                 'file_contents': file_contents
                 }).toxml()
 
-        product_fp = Product(archive, lid).absolute_filepath()
-        (dir, product_basename) = os.path.split(product_fp)
-        (root, ext) = os.path.splitext(product_basename)
-        label_basename = root + '.xml'
-        label_fp = os.path.join(dir, label_basename)
+        label_fp = Product(archive, lid).label_filepath()
         with open(label_fp, 'w') as f:
             f.write(label)
         return label

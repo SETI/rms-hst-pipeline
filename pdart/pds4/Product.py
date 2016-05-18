@@ -53,6 +53,13 @@ class Product(Component):
                      'where collection_fp = %r' % (self, res, collection_fp))
         return res
 
+    def label_filepath(self):
+        product_fp = self.absolute_filepath()
+        (dir, product_basename) = os.path.split(product_fp)
+        (root, ext) = os.path.splitext(product_basename)
+        label_basename = root + '.xml'
+        return os.path.join(dir, label_basename)
+
     def visit_filepath(self):
         hst_filename = HstFilename(self.lid.product_id)
         collection_filepath = self.collection().absolute_filepath()

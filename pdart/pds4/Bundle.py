@@ -1,4 +1,5 @@
 import os
+import os.path
 import re
 
 # We only import PDS4 subcomponent modules to avoid circular imports.
@@ -41,6 +42,9 @@ class Bundle(Component):
                         subdir):
                 collection_lid = LID('%s:%s' % (self.lid.lid, subdir))
                 yield Collection(self.archive, collection_lid)
+
+    def label_filepath(self):
+        return os.path.join(self.absolute_filepath(), 'bundle.xml')
 
     def products(self):
         """

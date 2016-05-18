@@ -30,6 +30,16 @@ class Collection(Component):
         return os.path.join(self.archive.root,
                             self.lid.bundle_id, self.lid.collection_id)
 
+    def label_filepath(self):
+        collection_fp = self.absolute_filepath()
+        return os.path.join(collection_fp, 'collection.xml')
+
+    def inventory_name(self):
+        return 'collection_%s_inventory.tab' % self.suffix()
+
+    def inventory_filepath(self):
+        return os.path.join(self.absolute_filepath(), self.inventory_name())
+
     def products(self):
         """
         Generate the products of this :class:`Collection` as
