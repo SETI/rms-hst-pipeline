@@ -1,3 +1,5 @@
+import os.path
+
 from pdart.pds4.Bundle import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Schema import *
@@ -53,7 +55,12 @@ class BundleLabelReduction(Reduction):
                 'Bundle_Member_Entries':
                 combine_nodes_into_fragment(reduced_collections)
                 }
-        return make_label(dict).toxml()
+        label = make_label(dict).toxml()
+        bundle_fp = Bundle(archive, lid).absolute_filepath()
+        label_fp = os.path.join(bundle_fp, 'bundle.xml')
+        with open(label_fp, 'w') as f:
+            f.write(label)
+        return label
 
     def reduce_collection(self, archive, lid, get_reduced_products):
         dict = {'lid': interpret_text(str(lid))}

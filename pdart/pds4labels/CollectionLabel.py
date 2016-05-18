@@ -79,7 +79,19 @@ class CollectionLabelReduction(Reduction):
                 'Citation_Information': placeholder_citation_information,
                 'inventory_name': interpret_text(inventory_name)
                 }
-        return make_label(dict).toxml()
+        label = make_label(dict).toxml()
+        collection_fp = Collection(archive, lid).absolute_filepath()
+        label_fp = os.path.join(collection_fp, 'collection.xml')
+
+        inventory_name = make_collection_inventory_name(collection.suffix())
+        inventory_filepath = os.path.join(collection_fp, inventory_name)
+
+        with io.open(inventory_filepath, 'w', newline='') as f:
+            f.write(make_collection_inventory(collection))
+
+        with open(label_fp, 'w') as f:
+            f.write(label)
+        return label
 
 
 def make_collection_label(collection, verify):

@@ -90,7 +90,7 @@ class ProductLabelReduction(CompositeReduction):
          target_identification,
          time_coordinates) = reduced_fits_file
 
-        return make_label({
+        label = make_label({
                 'lid': str(lid),
                 'suffix': suffix.upper(),
                 'proposal_id': str(proposal_id),
@@ -102,6 +102,15 @@ class ProductLabelReduction(CompositeReduction):
                 'Target_Identification': target_identification,
                 'file_contents': file_contents
                 }).toxml()
+
+        product_fp = Product(archive, lid).absolute_filepath()
+        (dir, product_basename) = os.path.split(product_fp)
+        (root, ext) = os.path.splitext(product_basename)
+        label_basename = root + '.xml'
+        label_fp = os.path.join(dir, label_basename)
+        with open(label_fp, 'w') as f:
+            f.write(label)
+        return label
 
 
 def make_product_label(product, verify):
