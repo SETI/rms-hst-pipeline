@@ -43,10 +43,11 @@ class TestCollection(unittest.TestCase):
         for p in collection.products():
             self.assertEquals(collection, p.collection())
 
-    def test_instrument_and_suffix(self):
+    def test_prefix_instrument_and_suffix(self):
         arch = get_any_archive()
         bundle = list(arch.bundles())[0]
         collection = list(bundle.collections())[0]
         self.assertEquals(collection.lid.collection_id,
-                          'data_%s_%s' % (collection.instrument(),
-                                          collection.suffix()))
+                          '%s_%s_%s' % (collection.prefix(),
+                                        collection.instrument(),
+                                        collection.suffix()))

@@ -12,7 +12,8 @@ from pdart.pds4.LID import *
 class Collection(Component):
     """A PDS4 Collection."""
 
-    DIRECTORY_PATTERN = r'\A[a-z]+_([a-z0-9]+)_([a-z0-9_]+)\Z'
+    # The Collection id is of the form '<prefix>_<instrument>_<suffix>'
+    DIRECTORY_PATTERN = r'\A([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)\Z'
 
     def __init__(self, arch, lid):
         """
@@ -32,10 +33,11 @@ class Collection(Component):
 
     def label_filepath(self):
         collection_fp = self.absolute_filepath()
-        return os.path.join(collection_fp, 'collection.xml')
+        name = 'collection_%s.xml' % self.prefix()
+        return os.path.join(collection_fp, name)
 
     def inventory_name(self):
-        return 'collection_%s_inventory.tab' % self.suffix()
+        return 'collection_%s.csv' % self.prefix()
 
     def inventory_filepath(self):
         return os.path.join(self.absolute_filepath(), self.inventory_name())
@@ -61,6 +63,16 @@ class Collection(Component):
         calculated from the collection's :class:`LID`.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
+                        self.lid.collection_id).group(2)
+
+    def prefix(self):
+        """
+        Return the prefix for FITS files in this :class:`Collection`.
+        It is calculated from the collection's :class:`LID`.
+
+        'data' and 'browse' are some possible results.
+        """
+        return re.match(Collection.DIRECTORY_PATTERN,
                         self.lid.collection_id).group(1)
 
     def suffix(self):
@@ -69,7 +81,7 @@ class Collection(Component):
         It is calculated from the collection's :class:`LID`.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
-                        self.lid.collection_id).group(2)
+                        self.lid.collection_id).group(3)
 
     def bundle(self):
         """Return the bundle this collection belongs to."""
