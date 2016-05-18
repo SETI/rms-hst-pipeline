@@ -87,24 +87,8 @@ class MakeRawBrowseReduction(Reduction):
                                     percentiles=(1, 99))
 
 
-class DeleteRawBrowseReduction(Reduction):
-    def reduce_archive(self, archive_root, get_reduced_bundles):
-        get_reduced_bundles()
-
-    def reduce_bundle(self, archive, lid, get_reduced_collections):
-        get_reduced_collections()
-
-    def reduce_collection(self, archive, lid, get_reduced_products):
-        if 'browse_' == lid.collection_id[0:7]:
-            collection = Collection(archive, lid)
-            shutil.rmtree(collection.absolute_filepath())
-
 if __name__ == '__main__':
     archive = get_any_archive()
-    if True:
-        reduction = CompositeReduction([LogCollectionsReduction(),
-                                        MakeRawBrowseReduction()])
-        raise_verbosely(lambda: run_reduction(reduction, archive))
-    if True:
-        reduction = DeleteRawBrowseReduction()
-        raise_verbosely(lambda: run_reduction(reduction, archive))
+    reduction = CompositeReduction([LogCollectionsReduction(),
+                                    MakeRawBrowseReduction()])
+    raise_verbosely(lambda: run_reduction(reduction, archive))
