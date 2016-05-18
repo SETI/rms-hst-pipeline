@@ -8,6 +8,7 @@ from pdart.reductions.Reduction import *
 import pdart.add_pds_tools
 import picmaker
 
+
 def data_lid_to_browse_lid(lid):
     parts = lid.lid.split(':')
     assert parts[4][0:5] == 'data_'
@@ -21,7 +22,7 @@ def ensure_directory(dir):
         os.mkdir(dir)
     except OSError:
         pass
-    assert os.path.isdir(dir)
+    assert os.path.isdir(dir), dir
 
 
 class BrowseProductImageReduction(Reduction):
@@ -46,7 +47,7 @@ class BrowseProductImageReduction(Reduction):
             browse_collection = Collection(archive, new_lid)
             self.browse_collection_directory = \
                 browse_collection.absolute_filepath()
-            ensure_directory(browse_collection_directory)
+            ensure_directory(self.browse_collection_directory)
 
             get_reduced_products()
             self.browse_collection_directory = None
@@ -61,9 +62,9 @@ class BrowseProductImageReduction(Reduction):
         visit = HstFilename(basename).visit()
         target_dir = os.path.join(self.browse_collection_directory,
                                   ('visit_%s' % visit))
+
         ensure_directory(target_dir)
         picmaker.ImagesToPics([file.full_filepath()],
                               target_dir,
                               filter="None",
                               percentiles=(1, 99))
-    

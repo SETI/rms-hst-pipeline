@@ -1,4 +1,7 @@
+import os.path
+
 from pdart.pds4.LID import *
+from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
 from pdart.reductions.CompositeReduction import *
 from pdart.xml.Templates import *
@@ -70,9 +73,15 @@ class BrowseProductLabelReduction(Reduction):
         get_reduced_collections()
 
     def reduce_collection(self, archive, lid, get_reduced_products):
-        get_reduced_products()
+        collection = Collection(archive, lid)
+        # FIXME This test is duplicated in BrowseProductImage.  Can't
+        # I move it up into the CompositeReduction that composes these
+        # two?
+        if collection.prefix() == 'data' and collection.suffix() == 'raw':
+            get_reduced_products()
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
+        # None
         product = Product(archive, lid)
         collection = product.collection()
         bundle = collection.bundle()
@@ -80,8 +89,11 @@ class BrowseProductLabelReduction(Reduction):
         proposal_id = bundle.proposal_id()
         suffix = collection.suffix()
         browse_lid = make_browse_lid(lid)
+        browse_product = Product(archive, browse_lid)
+        browse_image_file = list(browse_product.files())[0]
+        object_length = os.path.getsize(browse_image_file.full_filepath())
+
         browse_file_name = lid.product_id + '.jpg'
-        object_length = 666
 
         label = make_label({
                 'proposal_id': str(proposal_id),
@@ -92,4 +104,7 @@ class BrowseProductLabelReduction(Reduction):
                 'object_length': str(object_length)
                 }).toxml()
 
-        return label
+        label_fp = browse_product.label_filepath()
+
+        with open(label_fp, 'w') as f:
+            f.write(label)
