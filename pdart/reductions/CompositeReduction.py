@@ -5,11 +5,11 @@ def indexed2(func):
     # FIXME Document and clean this up.  We have this version for
     # header and data units because there are only ever one element in
     # them.
-    cache = {'set': False, 'value': None}
+    cache = {'is_set': False, 'value': None}
 
     def store_func_result():
-        if not cache['set']:
-            cache['set'] = True
+        if not cache['is_set']:
+            cache['is_set'] = True
             # The original function
             cache['value'] = func()
 
@@ -47,13 +47,13 @@ def indexed(func):
     range(0, len(res)], or equivalently, [res_elmt[r] for res_elmt in
     res], or equivalently, transpose(res)[r].
     """
-    cache = {'set': False, 'value': None}
+    cache = {'is_set': False, 'value': None}
 
     def transpose(list_of_lists): return map(list, zip(*list_of_lists))
 
     def store_func_result():
-        if not cache['set']:
-            cache['set'] = True
+        if not cache['is_set']:
+            cache['is_set'] = True
             # The original function
             cache['value'] = transpose(func())
 
