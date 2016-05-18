@@ -4,6 +4,7 @@ import os.path
 
 from pdart.pds4.LID import *
 
+
 class Component(object):
     """
     A :class:`Bundle`, :class:`Collection`, or :class:`Product` within

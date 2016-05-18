@@ -1,35 +1,9 @@
+from pdart.exceptions.Combinators import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
 
 # For product labels: produces the Target_Identification element.
-
-approximate_target_table = {
-    'JUP': ('Jupiter', 'Planet'),
-    'SAT': ('Saturn', 'Planet'),
-    'URA': ('Uranus', 'Planet'),
-    'NEP': ('Neptune', 'Planet'),
-    'PLU': ('Pluto', 'Dwarf Planet'),
-    'PLCH': ('Pluto', 'Dwarf Planet'),
-    'IO': ('Io', 'Satellite'),
-    'EUR': ('Europa', 'Satellite'),
-    'GAN': ('Ganymede', 'Satellite'),
-    'CALL': ('Callisto', 'Satellite'),
-    'TITAN': ('Titan', 'Satellite'),
-    'TRIT': ('Triton', 'Satellite'),
-    'DIONE': ('Dione', 'Satellite'),
-    'IAPETUS': ('Iapetus', 'Satellite')
-    }
-
-
-def targname_to_target(targname):
-    assert targname
-    for prefix, (name, type) in approximate_target_table.iteritems():
-        if targname.startswith(prefix):
-            desc = 'The %s %s' % (type.lower(), name)
-            return (name, type, desc)
-    return None
-
 
 def target_identification(name, type, description):
     """
@@ -55,6 +29,45 @@ def target_identification(name, type, description):
     return func
 
 
+_approximate_target_table = {
+    'JUP': ('Jupiter', 'Planet'),
+    'SAT': ('Saturn', 'Planet'),
+    'URA': ('Uranus', 'Planet'),
+    'NEP': ('Neptune', 'Planet'),
+    'PLU': ('Pluto', 'Dwarf Planet'),
+    'PLCH': ('Pluto', 'Dwarf Planet'),
+    'IO': ('Io', 'Satellite'),
+    'EUR': ('Europa', 'Satellite'),
+    'GAN': ('Ganymede', 'Satellite'),
+    'CALL': ('Callisto', 'Satellite'),
+    'TITAN': ('Titan', 'Satellite'),
+    'TRIT': ('Triton', 'Satellite'),
+    'DIONE': ('Dione', 'Satellite'),
+    'IAPETUS': ('Iapetus', 'Satellite')
+    }
+
+
+def _get_target_from_header_unit(header_unit):
+    targname = header_unit['TARGNAME']
+    for prefix, (name, type) in _approximate_target_table.iteritems():
+        if targname.startswith(prefix):
+            desc = 'The %s %s' % (type.lower(), name)
+            return (name, type, desc)
+    raise Exception('TARGNAME %s doesn\'t match approximations' % targname)
+
+
+def _get_placeholder_target(header_unit):
+    target_name = 'Magrathea'
+    target_type = 'Planet'
+    target_description = 'Home of Slartibartfast'
+    return (target_name, target_type, target_description)
+
+
+_get_target = multiple_implementations('get_target',
+                                       _get_target_from_header_unit,
+                                       _get_placeholder_target)
+
+
 class TargetIdentificationLabelReduction(Reduction):
     """Reduce a product to an XML Target_Identification node template."""
     def reduce_fits_file(self, file, get_reduced_hdus):
@@ -74,20 +87,9 @@ class TargetIdentificationLabelReduction(Reduction):
     def reduce_header_unit(self, n, header_unit):
         # Doc -> Node or None
         if n == 0:
-            try:
-                targname = header_unit['TARGNAME']
-                target = targname_to_target(targname)
-            except KeyError:
-                target = None
-
-            if target is None:
-                # Insert placeholder
-                target_name = 'Magrathea'
-                target_type = 'Planet'
-                target_description = 'Home of Slartibartfast'
-            else:
-                (target_name, target_type, target_description) = target
-
+            (target_name,
+             target_type,
+             target_description) = _get_target(header_unit)
             return target_identification(target_name,
                                          target_type,
                                          target_description)
