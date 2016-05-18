@@ -56,7 +56,7 @@ def _get_target_from_header_unit(header_unit):
     raise Exception('TARGNAME %s doesn\'t match approximations' % targname)
 
 
-def _get_placeholder_target(header_unit):
+def _get_placeholder_target(*args, **kwargs):
     target_name = 'Magrathea'
     target_type = 'Planet'
     target_description = 'Home of Slartibartfast'
