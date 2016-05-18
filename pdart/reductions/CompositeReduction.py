@@ -2,28 +2,28 @@ from pdart.reductions.Reduction import *
 
 
 def indexed2(func):
-    # FIXME Document and clean this up.  We have this version for
+    # FIXME Document and clean this up.  We use this version for
     # header and data units because there are only ever one element in
     # them.
     cache = {'is_set': False, 'value': None}
 
-    def store_func_result():
+    def cache_func_result():
         if not cache['is_set']:
             cache['is_set'] = True
             # The original function
             cache['value'] = func()
 
-    def i_th(elmt, i):
-        try:
-            return elmt[i]
-        except IndexError:
-            print 'tried to index %s at %d' % (elmt, i)
-            raise
-
     def indexed2_func(i):
         def thunk():
-            store_func_result()
-            return i_th(cache['value'], i)
+            cache_func_result()
+            value = cache['value']
+            try:
+                return value[i]
+            except IndexError:
+                raise IndexError(
+                    'list index %d out of range for %s in indexed2()' %
+                    (i, value))
+
         return thunk
 
     return indexed2_func
@@ -51,23 +51,23 @@ def indexed(func):
 
     def transpose(list_of_lists): return map(list, zip(*list_of_lists))
 
-    def store_func_result():
+    def cache_func_result():
         if not cache['is_set']:
             cache['is_set'] = True
             # The original function
             cache['value'] = transpose(func())
 
-    def i_th(elmt, i):
-        try:
-            return elmt[i]
-        except IndexError:
-            print 'tried to index %s at %d' % (elmt, i)
-            raise
-
     def indexed_func(i):
         def thunk():
-            store_func_result()
-            return i_th(cache['value'], i)
+            cache_func_result()
+            value = cache['value']
+            try:
+                return value[i]
+            except IndexError:
+                raise IndexError(
+                    'list index %d out of range for %s in indexed()' %
+                    (i, value))
+
         return thunk
 
     return indexed_func
