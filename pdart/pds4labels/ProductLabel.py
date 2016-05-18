@@ -75,6 +75,7 @@ class ProductLabelReduction(CompositeReduction):
                                      TimeCoordinatesLabelReduction()])
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
+        # string
         product = Product(archive, lid)
         file_name = os.path.basename(product.absolute_filepath())
 
