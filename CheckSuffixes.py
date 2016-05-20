@@ -72,4 +72,5 @@ if __name__ == '__main__':
 #
 # Trailer file containing calacs processing comments: 'trl'
 #
-# Remaining: 'd0m', 'flt_hlet', 'shm', 'x0m'
+# Remaining:  'crc', 'd0m',  'drc', 'flc',  'flt_hlet',  'ima', 'lrc',
+# 'lsp', 'pdq', 'sfl', 'shm', 'x0m'
