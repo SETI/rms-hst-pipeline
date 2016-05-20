@@ -51,17 +51,6 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
 </Product_Browse>""")
 
 
-def make_browse_lid(lid):
-    coll_parts = lid.collection_id.split('_')
-    assert coll_parts[0] == 'data'
-    coll_parts[0] = 'browse'
-    collection_id = '_'.join(coll_parts)
-
-    lid_parts = lid.lid.split(':')
-    lid_parts[4] = collection_id
-    return LID(':'.join(lid_parts))
-
-
 class BrowseProductLabelReduction(Reduction):
     """
     Run on "real" product, but produce a label for the browse product.
@@ -83,13 +72,14 @@ class BrowseProductLabelReduction(Reduction):
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         # None
         product = Product(archive, lid)
-        collection = product.collection()
-        bundle = collection.bundle()
 
-        proposal_id = bundle.proposal_id()
+        collection = product.collection()
         suffix = collection.suffix()
-        browse_lid = make_browse_lid(lid)
-        browse_product = Product(archive, browse_lid)
+
+        bundle = collection.bundle()
+        proposal_id = bundle.proposal_id()
+
+        browse_product = product.browse_product()
         browse_image_file = list(browse_product.files())[0]
         object_length = os.path.getsize(browse_image_file.full_filepath())
 
@@ -98,7 +88,7 @@ class BrowseProductLabelReduction(Reduction):
         label = make_label({
                 'proposal_id': str(proposal_id),
                 'suffix': suffix,
-                'browse_lid': str(browse_lid),
+                'browse_lid': str(browse_product.lid),
                 'data_lid': str(lid),
                 'browse_file_name': browse_file_name,
                 'object_length': str(object_length)

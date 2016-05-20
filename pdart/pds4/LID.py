@@ -66,3 +66,20 @@ class LID(object):
         else:
             parts = self.lid.split(':')
             return LID(':'.join(parts[:-1]))
+
+    def to_browse_lid(self):
+        """
+        Convert a LID within a data_ collection into the corresponding
+        LID in the browse_ collection.
+        """
+        assert self.collection_id, 'to_browse_lid(): Can\'t call on bundle LID'
+        collection_id_parts = self.collection_id.split('_')
+        assert collection_id_parts[0] == 'data', \
+            'to_browse_lid: Only legal within data_ collections'
+        collection_id_parts[0] = 'browse'
+        browse_collection_id = '_'.join(collection_id_parts)
+
+        lid_parts = self.lid.split(':')
+        lid_parts[4] = browse_collection_id
+        browse_collection_lid = ':'.join(lid_parts)
+        return LID(browse_collection_lid)

@@ -9,13 +9,6 @@ import pdart.add_pds_tools
 import picmaker
 
 
-def data_lid_to_browse_lid(lid):
-    parts = lid.lid.split(':')
-    assert parts[4][0:5] == 'data_'
-    parts[4] = 'browse_' + parts[4][5:]
-    return LID(':'.join(parts))
-
-
 def ensure_directory(dir):
     """Make the directory if it doesn't already exist."""
     try:
@@ -43,8 +36,7 @@ class BrowseProductImageReduction(Reduction):
     def reduce_collection(self, archive, lid, get_reduced_products):
         collection = Collection(archive, lid)
         if collection.prefix() == 'data' and collection.suffix() == 'raw':
-            new_lid = data_lid_to_browse_lid(lid)
-            browse_collection = Collection(archive, new_lid)
+            browse_collection = collection.browse_collection()
             self.browse_collection_directory = \
                 browse_collection.absolute_filepath()
             ensure_directory(self.browse_collection_directory)

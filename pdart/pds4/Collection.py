@@ -87,3 +87,6 @@ class Collection(Component):
         """Return the bundle this collection belongs to."""
         from pdart.pds4.Bundle import Bundle
         return Bundle(self.archive, self.lid.parent_lid())
+
+    def browse_collection(self):
+        return Collection(self.archive, self.lid.to_browse_lid())

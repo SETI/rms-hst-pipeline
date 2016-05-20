@@ -2,8 +2,7 @@
 SCRIPT: Run through the archive and generate a browse collection for
 each RAW collection, writing them to disk including the collection
 inventory and verified label.  If it fails at any point, print the
-combined exception as XML to stdout.  Optionally delete the
-collections afterwards.  (Does not currently create product labels.)
+combined exception as XML to stdout.
 """
 
 from pdart.exceptions.Combinators import *

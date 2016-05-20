@@ -74,4 +74,15 @@ class TestLID(unittest.TestCase):
         self.assertEquals("LID('urn:nasa:pds:bundle:collection:product')",
                           repr(LID('urn:nasa:pds:bundle:collection:product')))
 
+    def test_to_browse_lid(self):
+        data_coll_lid = LID('urn:nasa:pds:bundle:data_collection_raw')
+        browse_coll_lid = LID('urn:nasa:pds:bundle:browse_collection_raw')
+        self.assertEquals(browse_coll_lid, data_coll_lid.to_browse_lid())
+
+        data_prod_lid = LID(
+            'urn:nasa:pds:bundle:data_collection_raw:data_product')
+        browse_prod_lid = LID(
+            'urn:nasa:pds:bundle:browse_collection_raw:data_product')
+        self.assertEquals(browse_prod_lid, data_prod_lid.to_browse_lid())
+
     # TODO Write tests for is_bundle_id, etc.

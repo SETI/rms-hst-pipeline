@@ -92,3 +92,6 @@ class Product(Component):
         from pdart.pds4.Bundle import Bundle
         return Bundle(self.archive,
                       self.lid.parent_lid().parent_lid())
+
+    def browse_product(self):
+        return Product(self.archive, self.lid.to_browse_lid())
