@@ -124,9 +124,7 @@ def test_reductions():
     arch = get_any_archive()
     try:
         count = run_reduction(TestRecursiveReduction(), arch)
-        # FIXME One value for mini archive on dev machine and one for
-        # full archive on test machine.
-        assert count in [9529, 583510]
+        assert count in [9529, 583510], '(assumes no browse products)'
     except CalculationException as ce:
         print ce.exception_info.to_pretty_xml()
         raise
