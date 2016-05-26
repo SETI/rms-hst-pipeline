@@ -86,10 +86,11 @@ class CheckHduReduction(Reduction):
 
 def test_check_reduction():
     arch = get_any_archive()
-    run_reduction(CheckBundleReduction(), arch)
-    run_reduction(CheckCollectionReduction(), arch)
-    run_reduction(CheckProductReduction(), arch)
-    run_reduction(CheckFileReduction(), arch)
+    for red in [CheckBundleReduction(),
+                CheckCollectionReduction(),
+                CheckProductReduction(),
+                CheckFileReduction()]:
+        run_reduction(red, arch)
     if False:
         # This one is slow because it has to open and parse each
         # FITS file.
