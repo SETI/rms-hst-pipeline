@@ -36,7 +36,7 @@ class WrappedReduction(Reduction):
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
-        return self.base_reduction.reduce_hdu(self, n, hdu,
+        return self.base_reduction.reduce_hdu(n, hdu,
                                               get_reduced_header_unit,
                                               get_reduced_data_unit)
 
