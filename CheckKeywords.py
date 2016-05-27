@@ -1,6 +1,6 @@
 """
 SCRIPT: Run through the archive and print the sorted set of keywords
-found in the FITS files of RAW products.
+found in the first header unit of the FITS files of RAW products.
 """
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
@@ -20,27 +20,34 @@ def union_dicts(dicts):
 
 class CheckKeywordsReduction(Reduction):
     def reduce_archive(self, archive_root, get_reduced_bundles):
+        # dict
         return union_dicts(get_reduced_bundles())
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
+        # dict
         return union_dicts(get_reduced_collections())
 
     def reduce_collection(self, archive, lid, get_reduced_products):
+        # dict
         collection = Collection(archive, lid)
         if collection.suffix() == 'raw':
-            return union_dicts(get_reduced_products())
+            return union_dicts([rp for rp in get_reduced_products()
+                                if rp is not None])
         else:
             return {}
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
+        # dict or None
         return get_reduced_fits_files()[0]
 
     def reduce_fits_file(self, file, get_reduced_hdus):
+        # dict or None
         return get_reduced_hdus()[0]
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
+        # dict or None
         if n == 0:
             return {k: 1 for k in hdu.header.iterkeys() if k != ''}
 

@@ -49,7 +49,11 @@ def indexed(func):
     """
     cache = {'is_set': False, 'value': None}
 
-    def transpose(list_of_lists): return map(list, zip(*list_of_lists))
+    def transpose(list_of_lists):
+        try:
+            return map(list, zip(*list_of_lists))
+        except TypeError as e:
+            raise TypeError('%s; list_of_lists=%s' % (e, list_of_lists))
 
     def cache_func_result():
         if not cache['is_set']:

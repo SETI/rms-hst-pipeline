@@ -2,9 +2,11 @@ import os.path
 
 from pdart.pds4.Product import *
 from pdart.pds4labels.FileContentsLabelReduction import *
+from pdart.pds4labels.HstParametersReduction import *
 from pdart.pds4labels.ObservingSystem import *
 from pdart.pds4labels.TargetIdentificationLabelReduction import *
 from pdart.pds4labels.TimeCoordinatesLabelReduction import *
+from pdart.reductions.BadFitsFileReduction import *
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Schema import *
@@ -48,6 +50,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     </Investigation_Area>
     <NODE name="Observing_System" />
     <NODE name="Target_Identification" />
+    <Mission_Area><NODE name="General_HST_Parameters" /></Mission_Area>
   </Observation_Area>
   <File_Area_Observational>
     <File>
@@ -67,12 +70,30 @@ def mk_Investigation_Area_lidvid(proposal_id):
         proposal_id
 
 
-class ProductLabelReduction(CompositeReduction):
+class ProductLabelReduction(BadFitsFileReduction):
+    """
+    Reduce a product to the label of its first (presumably only) FITS
+    file, write the label into the archive and return the label.  If
+    the FITS file is bad, return None.
+    """
     def __init__(self):
-        CompositeReduction.__init__(self,
-                                    [FileContentsLabelReduction(),
-                                     TargetIdentificationLabelReduction(),
-                                     TimeCoordinatesLabelReduction()])
+        base_reduction = CompositeReduction(
+            [FileContentsLabelReduction(),
+             TargetIdentificationLabelReduction(),
+             HstParametersReduction(),
+             TimeCoordinatesLabelReduction()])
+        BadFitsFileReduction.__init__(self, base_reduction)
+
+    def _nones(self):
+        """
+        Return a tuple of Nones of the same length as the list of
+        reductions composed (used as a failure value when the FITS
+        file can't be read).
+        """
+        return len(self.base_reduction.reductions) * (None,)
+
+    def bad_fits_file_reduction(self, file):
+        return self._nones()
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         # string
@@ -87,8 +108,14 @@ class ProductLabelReduction(CompositeReduction):
         investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
 
         reduced_fits_file = get_reduced_fits_files()[0]
+
+        # on a bad FITS file, return None
+        if reduced_fits_file == self._nones():
+            return None
+
         (file_contents,
          target_identification,
+         general_hst_parameters,
          time_coordinates) = reduced_fits_file
 
         label = make_label({
@@ -101,6 +128,7 @@ class ProductLabelReduction(CompositeReduction):
                 'file_name': file_name,
                 'Time_Coordinates': time_coordinates,
                 'Target_Identification': target_identification,
+                'General_HST_Parameters': general_hst_parameters,
                 'file_contents': file_contents
                 }).toxml()
 
@@ -112,12 +140,15 @@ class ProductLabelReduction(CompositeReduction):
 
 def make_product_label(product, verify):
     """
-    Create the label text for this :class:`Product`.  If verify is
-    True, verify the label against its XML and Schematron schemas.
-    Raise an exception if either fails.
+    Create the label text for this :class:`Product`.  If the FITS file
+    is bad, raise an exception.  If verify is True, verify the label
+    against its XML and Schematron schemas.  Raise an exception if
+    either fails.
     """
     label = DefaultReductionRunner().run_product(ProductLabelReduction(),
                                                  product)
+    if label is None:
+        raise Exception('Bad FITS file')
     if verify:
         failures = xml_schema_failures(None, label) and \
             schematron_failures(None, label)

@@ -40,8 +40,8 @@ class WrappedReduction(Reduction):
                                               get_reduced_header_unit,
                                               get_reduced_data_unit)
 
-    def reduce_header_unit(n, header_unit):
+    def reduce_header_unit(self, n, header_unit):
         return self.base_reduction.reduce_header_unit(n, header_unit)
 
-    def reduce_data_unit(n, data_unit):
+    def reduce_data_unit(self, n, data_unit):
         return self.base_reduction.reduce_data_unit(n, data_unit)
