@@ -35,7 +35,7 @@ class DbCReduction(Reduction):
         pass
 
     @contract(n='int,>=0', hdu='*',
-              get_reduced_header_unit='func', 
+              get_reduced_header_unit='func',
               get_reduced_data_unit='func')
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,

@@ -72,29 +72,29 @@ class BrowseProductLabelReduction(Reduction):
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         # None
         product = Product(archive, lid)
-
         collection = product.collection()
-        suffix = collection.suffix()
+        if collection.prefix() == 'data' and collection.suffix() == 'raw':
+            suffix = collection.suffix()
 
-        bundle = collection.bundle()
-        proposal_id = bundle.proposal_id()
+            bundle = collection.bundle()
+            proposal_id = bundle.proposal_id()
 
-        browse_product = product.browse_product()
-        browse_image_file = list(browse_product.files())[0]
-        object_length = os.path.getsize(browse_image_file.full_filepath())
+            browse_product = product.browse_product()
+            browse_image_file = list(browse_product.files())[0]
+            object_length = os.path.getsize(browse_image_file.full_filepath())
 
-        browse_file_name = lid.product_id + '.jpg'
+            browse_file_name = lid.product_id + '.jpg'
 
-        label = make_label({
-                'proposal_id': str(proposal_id),
-                'suffix': suffix,
-                'browse_lid': str(browse_product.lid),
-                'data_lid': str(lid),
-                'browse_file_name': browse_file_name,
-                'object_length': str(object_length)
-                }).toxml()
+            label = make_label({
+                    'proposal_id': str(proposal_id),
+                    'suffix': suffix,
+                    'browse_lid': str(browse_product.lid),
+                    'data_lid': str(lid),
+                    'browse_file_name': browse_file_name,
+                    'object_length': str(object_length)
+                    }).toxml()
 
-        label_fp = browse_product.label_filepath()
+            label_fp = browse_product.label_filepath()
 
-        with open(label_fp, 'w') as f:
-            f.write(label)
+            with open(label_fp, 'w') as f:
+                f.write(label)

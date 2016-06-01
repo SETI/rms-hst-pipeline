@@ -1,7 +1,7 @@
 """
 SCRIPT: Run through the archive and generate labels (but not browse
-products or labels).  If it fails at any point, print the combined
-exception as XML to stdout.
+products or labels).  Do not validate them.  If it fails at any point,
+print the combined exception as XML to stdout.
 """
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *

@@ -49,14 +49,18 @@ class BrowseProductImageReduction(Reduction):
 
     def reduce_fits_file(self, file, get_reduced_hdus):
         # None
-        basename = os.path.basename(file.full_filepath())
-        basename = os.path.splitext(basename)[0] + '.jpg'
-        visit = HstFilename(basename).visit()
-        target_dir = os.path.join(self.browse_collection_directory,
-                                  ('visit_%s' % visit))
+        try:
+            basename = os.path.basename(file.full_filepath())
+            basename = os.path.splitext(basename)[0] + '.jpg'
+            visit = HstFilename(basename).visit()
+            target_dir = os.path.join(self.browse_collection_directory,
+                                      ('visit_%s' % visit))
 
-        ensure_directory(target_dir)
-        picmaker.ImagesToPics([file.full_filepath()],
-                              target_dir,
-                              filter="None",
-                              percentiles=(1, 99))
+            ensure_directory(target_dir)
+            picmaker.ImagesToPics([file.full_filepath()],
+                                  target_dir,
+                                  filter="None",
+                                  percentiles=(1, 99))
+        except:
+            print 'Exception in', file
+            raise
