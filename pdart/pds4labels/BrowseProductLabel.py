@@ -51,6 +51,10 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
 </Product_Browse>""")
 
 
+def is_raw_data_collection(collection):
+    return collection.prefix() == 'data' and collection.suffix() == 'raw'
+
+
 class BrowseProductLabelReduction(Reduction):
     """
     Run on "real" product, but produce a label for the browse product.
@@ -63,17 +67,14 @@ class BrowseProductLabelReduction(Reduction):
 
     def reduce_collection(self, archive, lid, get_reduced_products):
         collection = Collection(archive, lid)
-        # FIXME This test is duplicated in BrowseProductImage.  Can't
-        # I move it up into the CompositeReduction that composes these
-        # two?
-        if collection.prefix() == 'data' and collection.suffix() == 'raw':
+        if is_raw_data_collection(collection):
             get_reduced_products()
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         # None
         product = Product(archive, lid)
         collection = product.collection()
-        if collection.prefix() == 'data' and collection.suffix() == 'raw':
+        if is_raw_data_collection(collection):
             suffix = collection.suffix()
 
             bundle = collection.bundle()
