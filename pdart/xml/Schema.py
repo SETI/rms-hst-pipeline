@@ -105,8 +105,8 @@ def probatron_with_svrl_result(filepath,
     SVRL as XML.
     """
     exit_code, stderr, stdout = probatron_with_stdin(filepath, stdin, schema)
-    assert exit_code == 0, 'exit_code = %r' % exit_code
     assert stderr == '', 'stderr = %r' % stderr
+    assert exit_code == 0, 'exit_code = %r' % exit_code
     return xml.dom.minidom.parseString(stdout)
 
 

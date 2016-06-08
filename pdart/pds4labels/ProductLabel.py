@@ -18,6 +18,7 @@ make_label = interpret_document_template(
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational
    xmlns="http://pds.nasa.gov/pds4/pds/v1"
+   xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
    xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.xsd">
@@ -50,7 +51,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     </Investigation_Area>
     <NODE name="Observing_System" />
     <NODE name="Target_Identification" />
-    <Mission_Area><NODE name="General_HST_Parameters" /></Mission_Area>
+    <Mission_Area><NODE name="HST" /></Mission_Area>
   </Observation_Area>
   <File_Area_Observational>
     <File>
@@ -115,7 +116,7 @@ class ProductLabelReduction(BadFitsFileReduction):
 
         (file_contents,
          target_identification,
-         general_hst_parameters,
+         hst,
          time_coordinates) = reduced_fits_file
 
         label = make_label({
@@ -128,7 +129,7 @@ class ProductLabelReduction(BadFitsFileReduction):
                 'file_name': file_name,
                 'Time_Coordinates': time_coordinates,
                 'Target_Identification': target_identification,
-                'General_HST_Parameters': general_hst_parameters,
+                'HST': hst,
                 'file_contents': file_contents
                 }).toxml()
 

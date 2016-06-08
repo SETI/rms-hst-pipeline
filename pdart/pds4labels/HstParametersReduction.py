@@ -2,91 +2,109 @@ from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
 
-hst_parameters = interpret_template("""<General_HST_Parameters>
-<FRAGMENT name="hst_parameters"/>
-</General_HST_Parameters>""")
+hst = interpret_template("""<hst:HST>
+<NODE name="parameters_general"/>
+<NODE name="parameters_instrument"/>
+</hst:HST>""")
+
+parameters_general = interpret_template("""<hst:Parameters_General>
+<FRAGMENT name="parameters_general"/>
+</hst:Parameters_General>""")
+
+parameters_acs = interpret_template("""<hst:Parameters_ACS>
+</hst:Parameters_ACS>""")
+
+parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
+</hst:Parameters_WFC3>""")
+
+parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
+</hst:Parameters_WFPC2>""")
 
 stsci_group_id = interpret_template(
-    """<stsci_group_id><NODE name="stsci_group_id" /></stsci_group_id>""")
+    """<hst:stsci_group_id><NODE name="stsci_group_id" />\
+</hst:stsci_group_id>""")
 
 hst_proposal_id = interpret_template(
-    """<hst_proposal_id><NODE name="hst_proposal_id" /></hst_proposal_id>""")
+    """<hst:hst_proposal_id><NODE name="hst_proposal_id" />\
+</hst:hst_proposal_id>""")
 
 hst_pi_name = interpret_template(
-    """<hst_pi_name><NODE name="hst_pi_name" /></hst_pi_name>""")
+    """<hst:hst_pi_name><NODE name="hst_pi_name" /></hst:hst_pi_name>""")
 
 instrument_id = interpret_template(
-    """<instrument_id><NODE name="instrument_id" /></instrument_id>""")
+    """<hst:instrument_id><NODE name="instrument_id" /></hst:instrument_id>""")
 
 detector_id = interpret_template(
-    """<detector_id><NODE name="detector_id" /></detector_id>""")
+    """<hst:detector_id><NODE name="detector_id" /></hst:detector_id>""")
 
 observation_type = interpret_template(
-    """<observation_type><NODE name="observation_type" />\
-</observation_type>""")
+    """<hst:observation_type><NODE name="observation_type" />\
+</hst:observation_type>""")
 
 product_type = interpret_template(
-    """<product_type><NODE name="product_type" /></product_type>""")
+    """<hst:product_type><NODE name="product_type" /></hst:product_type>""")
 
 exposure_duration = interpret_template(
-    """<exposure_duration><NODE name="exposure_duration" />\
-</exposure_duration>""")
+    """<hst:exposure_duration><NODE name="exposure_duration" />\
+</hst:exposure_duration>""")
 
 hst_target_name = interpret_template(
-    """<hst_target_name><NODE name="hst_target_name" /></hst_target_name>""")
+    """<hst:hst_target_name><NODE name="hst_target_name" />\
+</hst:hst_target_name>""")
 
 filter_name = interpret_template(
-    """<filter_name><NODE name="filter_name" /></filter_name>""")
+    """<hst:filter_name><NODE name="filter_name" /></hst:filter_name>""")
 
 center_filter_wavelength = interpret_template(
-    """<center_filter_wavelength><NODE name="center_filter_wavelength" />\
-</center_filter_wavelength>""")
+    """<hst:center_filter_wavelength><NODE name="center_filter_wavelength" />\
+</hst:center_filter_wavelength>""")
 
 bandwidth = interpret_template(
-    """<bandwidth><NODE name="bandwidth" /></bandwidth>""")
+    """<hst:bandwidth><NODE name="bandwidth" /></hst:bandwidth>""")
 
 wavelength_resolution = interpret_template(
-    """<wavelength_resolution><NODE name="wavelength_resolution" />\
-</wavelength_resolution>""")
+    """<hst:wavelength_resolution><NODE name="wavelength_resolution" />\
+</hst:wavelength_resolution>""")
 
 maximum_wavelength = interpret_template(
-    """<maximum_wavelength><NODE name="maximum_wavelength" />\
-</maximum_wavelength>""")
+    """<hst:maximum_wavelength><NODE name="maximum_wavelength" />\
+</hst:maximum_wavelength>""")
 
 minimum_wavelength = interpret_template(
-    """<minimum_wavelength><NODE name="minimum_wavelength" />\
-</minimum_wavelength>""")
+    """<hst:minimum_wavelength><NODE name="minimum_wavelength" />\
+</hst:minimum_wavelength>""")
 
 aperture_type = interpret_template(
-    """<aperture_type><NODE name="aperture_type" /></aperture_type>""")
+    """<hst:aperture_type><NODE name="aperture_type" /></hst:aperture_type>""")
 
 exposure_type = interpret_template(
-    """<exposure_type><NODE name="exposure_type" /></exposure_type>""")
+    """<hst:exposure_type><NODE name="exposure_type" /></hst:exposure_type>""")
 
 fine_guidance_system_lock_type = interpret_template(
-    """<fine_guidance_system_lock_type>\
+    """<hst:fine_guidance_system_lock_type>\
 <NODE name="fine_guidance_system_lock_type" />\
-</fine_guidance_system_lock_type>""")
+</hst:fine_guidance_system_lock_type>""")
 
 gain_mode_id = interpret_template(
-    """<gain_mode_id><NODE name="gain_mode_id" /></gain_mode_id>""")
+    """<hst:gain_mode_id><NODE name="gain_mode_id" /></hst:gain_mode_id>""")
 
 instrument_mode_id = interpret_template(
-    """<instrument_mode_id><NODE name="instrument_mode_id" />\
-</instrument_mode_id>""")
+    """<hst:instrument_mode_id><NODE name="instrument_mode_id" />\
+</hst:instrument_mode_id>""")
 
 lines = interpret_template(
-    """<lines><NODE name="lines" /></lines>""")
+    """<hst:lines><NODE name="lines" /></hst:lines>""")
 
 line_samples = interpret_template(
-    """<line_samples><NODE name="line_samples" /></line_samples>""")
+    """<hst:line_samples><NODE name="line_samples" /></hst:line_samples>""")
 
 gyroscope_mode = interpret_template(
-    """<gyroscope_mode><NODE name="gyroscope_mode" /></gyroscope_mode>""")
+    """<hst:gyroscope_mode><NODE name="gyroscope_mode" />\
+</hst:gyroscope_mode>""")
 
 moving_target_flag = interpret_template(
-    """<moving_target_flag><NODE name="moving_target_flag" />\
-</moving_target_flag>""")
+    """<hst:moving_target_flag><NODE name="moving_target_flag" />\
+</hst:moving_target_flag>""")
 
 
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
@@ -203,7 +221,7 @@ class HstParametersReduction(Reduction):
             # element name) to the XML template.  Each tuple may
             # create a node (function).  We combine them into a
             # fragment (function) and wrap the fragment as our
-            # General_HST_Parameters.
+            # Parameters_General.
             nodeCalcs = [
                 (stsci_group_id, 'stsci_group_id',
                  lambda: placeholder('stsci_group_id')),
@@ -211,48 +229,49 @@ class HstParametersReduction(Reduction):
                  lambda: str(header['PROPOSID'])),
                 (hst_pi_name, 'hst_pi_name',
                  lambda: get_hst_pi_name(instrument, header)),
-                (instrument_id, 'instrument_id',
-                 lambda: header['INSTRUME']),
-                (detector_id, 'detector_id',
-                 lambda: get_detector_id(instrument, header)),
-                (observation_type, 'observation_type',
-                 lambda: get_observation_type(instrument,
-                                              header)),
-                (product_type, 'product_type',
-                 lambda: placeholder('product_type')),
-                (exposure_duration, 'exposure_duration',
-                 lambda: str(header['EXPTIME'])),
                 (hst_target_name, 'hst_target_name',
                  lambda: header['TARGNAME']),
-                (filter_name, 'filter_name',
-                 lambda: get_filter_name(instrument, header)),
-                (center_filter_wavelength, 'center_filter_wavelength',
-                 lambda: get_center_filter_wavelength(instrument, header)),
-                (bandwidth, 'bandwidth',
-                 lambda: get_bandwidth(instrument, header)),
-                (wavelength_resolution, 'wavelength_resolution',
-                 lambda: placeholder('wavelength_resolution')),
-                (maximum_wavelength, 'maximum_wavelength',
-                 lambda: placeholder('maximum_wavelength')),
-                (minimum_wavelength, 'minimum_wavelength',
-                 lambda: placeholder('minimum_wavelength')),
                 (aperture_type, 'aperture_type',
                  lambda: get_aperture_type(instrument, header)),
+                (exposure_duration, 'exposure_duration',
+                 lambda: str(header['EXPTIME'])),
                 (exposure_type, 'exposure_type', lambda: header['EXPFLAG']),
+                (filter_name, 'filter_name',
+                 lambda: get_filter_name(instrument, header)),
                 (fine_guidance_system_lock_type,
                  'fine_guidance_system_lock_type', lambda: header['FSGLOCK']),
-                (gain_mode_id, 'gain_mode_id',
-                 lambda: get_gain_mode_id(instrument, header)),
-                (instrument_mode_id, 'instrument_mode_id',
-                 lambda: header['OBSMODE']),
-                (lines, 'lines', lambda: placeholder('lines')),
-                (line_samples, 'line_samples',
-                 lambda: placeholder('line_samples')),
                 (gyroscope_mode, 'gyroscope_mode',
                  lambda: placeholder('gyroscope_mode')),
+                (instrument_mode_id, 'instrument_mode_id',
+                 lambda: header['OBSMODE']),
                 (moving_target_flag, 'moving_target_flag',
                  lambda: placeholder('moving_target_flag'))
                 ]
+
+#                (instrument_id, 'instrument_id',
+#                 lambda: header['INSTRUME']),
+#                (detector_id, 'detector_id',
+#                 lambda: get_detector_id(instrument, header)),
+#                (observation_type, 'observation_type',
+#                 lambda: get_observation_type(instrument,
+#                                              header)),
+#                (product_type, 'product_type',
+#                 lambda: placeholder('product_type')),
+#                (center_filter_wavelength, 'center_filter_wavelength',
+#                 lambda: get_center_filter_wavelength(instrument, header)),
+#                (bandwidth, 'bandwidth',
+#                 lambda: get_bandwidth(instrument, header)),
+#                (wavelength_resolution, 'wavelength_resolution',
+#                 lambda: placeholder('wavelength_resolution')),
+#                (maximum_wavelength, 'maximum_wavelength',
+#                 lambda: placeholder('maximum_wavelength')),
+#                (minimum_wavelength, 'minimum_wavelength',
+#                 lambda: placeholder('minimum_wavelength')),
+#                (gain_mode_id, 'gain_mode_id',
+#                 lambda: get_gain_mode_id(instrument, header)),
+#                (lines, 'lines', lambda: placeholder('lines')),
+#                (line_samples, 'line_samples',
+#                 lambda: placeholder('line_samples'))
 
             # Turn each (successful) tuple into a node.
             nodes = []
@@ -269,5 +288,15 @@ class HstParametersReduction(Reduction):
 
             frag = combine_nodes_into_fragment(nodes)
 
+            if instrument == 'acs':
+                parameters_instrument = parameters_acs({})
+            elif instrument == 'wfpc2':
+                parameters_instrument = parameters_wfpc2({})
+            elif instrument == 'wfc3':
+                parameters_instrument = parameters_wfc3({})
+
             # Wrap the fragment and return it.
-            return hst_parameters({'hst_parameters': frag})
+            return hst({
+                    'parameters_general': parameters_general(
+                        {'parameters_general': frag}),
+                    'parameters_instrument': parameters_instrument})

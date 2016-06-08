@@ -9,6 +9,7 @@ from pdart.reductions.Reduction import *
 import pdart.add_pds_tools
 import picmaker
 
+
 def ensure_directory(dir):
     """Make the directory if it doesn't already exist."""
     try:
