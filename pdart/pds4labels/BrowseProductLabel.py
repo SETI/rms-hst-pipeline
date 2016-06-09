@@ -22,7 +22,7 @@ make_label = interpret_document_template(
     <title>This product contains a browse image of a <NODE name="suffix" /> \
 image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
-    <information_model_version>1.5.0.0</information_model_version>
+    <information_model_version>1.6.0.0</information_model_version>
     <product_class>Product_Browse</product_class>
     <Modification_History>
       <Modification_Detail>

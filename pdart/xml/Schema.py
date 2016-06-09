@@ -4,8 +4,10 @@ import tempfile
 import xml.dom.minidom
 
 
-XML_SCHEMA = './xml/PDS4_PDS_1500.xsd.xml'
-SCHEMATRON_SCHEMA = './xml/PDS4_PDS_1500.sch.xml'
+PDS_XML_SCHEMA = './xml/PDS4_PDS_1600.xsd.xml'
+PDS_SCHEMATRON_SCHEMA = './xml/PDS4_PDS_1600.sch.xml'
+HST_XML_SCHEMA = './xml/PDS4_HST_1600_0200.xsd.xml'
+HST_SCHEMATRON_SCHEMA = './xml/PDS4_HST_1600_0200.sch.xml'
 
 
 def run_subprocess(cmd, stdin=None):
@@ -32,7 +34,7 @@ def run_subprocess(cmd, stdin=None):
     return (exit_code, stderr, stdout)
 
 
-def _xmllint_schema(filepath, stdin=None, schema=XML_SCHEMA):
+def _xmllint_schema(filepath, stdin=None, schema=PDS_XML_SCHEMA):
     """
     Run xmllint on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
@@ -46,7 +48,7 @@ def _xmllint_schema(filepath, stdin=None, schema=XML_SCHEMA):
                               stdin=stdin)
 
 
-def xml_schema_failures(filepath, stdin=None, schema=XML_SCHEMA):
+def xml_schema_failures(filepath, stdin=None, schema=PDS_XML_SCHEMA):
     """
     Run xmllint on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns None if
@@ -64,7 +66,7 @@ def xml_schema_failures(filepath, stdin=None, schema=XML_SCHEMA):
         return stderr
 
 
-def probatron(filepath, schema=SCHEMATRON_SCHEMA):
+def probatron(filepath, schema=PDS_SCHEMATRON_SCHEMA):
     """
     Run probatron on the XML at the filepath validating against the
     schema.  Returns a triple of exit_code, stderr and stdout.
@@ -75,7 +77,7 @@ def probatron(filepath, schema=SCHEMATRON_SCHEMA):
                            filepath, schema])
 
 
-def probatron_with_stdin(filepath, stdin=None, schema=SCHEMATRON_SCHEMA):
+def probatron_with_stdin(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
@@ -98,7 +100,7 @@ def probatron_with_stdin(filepath, stdin=None, schema=SCHEMATRON_SCHEMA):
 
 def probatron_with_svrl_result(filepath,
                                stdin=None,
-                               schema=SCHEMATRON_SCHEMA):
+                               schema=PDS_SCHEMATRON_SCHEMA):
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns the
@@ -118,7 +120,7 @@ def svrl_has_failures(svrl):
     return len(_svrl_failures(svrl)) > 0
 
 
-def schematron_failures(filepath, stdin=None, schema=SCHEMATRON_SCHEMA):
+def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns None if

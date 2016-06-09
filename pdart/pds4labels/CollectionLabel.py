@@ -17,7 +17,7 @@ make_label = interpret_document_template(
     <title>This collection contains the <NODE name="suffix"/> \
 images obtained from HST Observing Program \
 <NODE name="proposal_id"/>.</title>
-    <information_model_version>1.5.0.0</information_model_version>
+    <information_model_version>1.6.0.0</information_model_version>
     <product_class>Product_Collection</product_class>
 
     <NODE name="Citation_Information" />
