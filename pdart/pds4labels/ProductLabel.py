@@ -21,7 +21,7 @@ make_label = interpret_document_template(
    xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
    xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.xsd">
+   xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.xsd">
   <Identification_Area>
     <logical_identifier><NODE name="lid" /></logical_identifier>
     <version_id>0.1</version_id>

@@ -1,0 +1,31 @@
+<project name="xsdValidator" default="archive">
+  <target name="init">
+    <mkdir dir="build/classes"/>
+    <mkdir dir="dist"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="src"
+	   destdir="build/classes" />
+  </target>
+
+  <target name="archive" depends="compile">
+    <property name="manifest.mf"
+	      location="build/MANIFEST.MF" />
+    <tstamp>
+      <format property="timestamp" pattern="yyyy-MM-dd_ HH:mm:ss" />
+    </tstamp>
+    <manifest file="${manifest.mf}" >
+      <attribute name="Built-On" value="${timestamp}" />
+      <attribute name="Main-Class" value="org.seti.XsdValidator" />
+    </manifest>
+    <jar destfile="dist/XsdValidator.jar" 
+	 basedir="build/classes"
+	 manifest="${manifest.mf}" />
+  </target>
+
+  <target name="clean">
+    <delete dir="build"/>
+    <delete dir="dist"/>
+  </target>
+</project>
