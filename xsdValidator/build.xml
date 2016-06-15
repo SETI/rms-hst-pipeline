@@ -17,7 +17,7 @@
     </tstamp>
     <manifest file="${manifest.mf}" >
       <attribute name="Built-On" value="${timestamp}" />
-      <attribute name="Main-Class" value="org.seti.XsdValidator" />
+      <attribute name="Main-Class" value="org.seti.pdart.XsdValidator" />
     </manifest>
     <jar destfile="dist/XsdValidator.jar" 
 	 basedir="build/classes"
