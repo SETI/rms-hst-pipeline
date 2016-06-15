@@ -24,7 +24,12 @@
 	 manifest="${manifest.mf}" />
   </target>
 
-  <target name="run" depends="archive">
+  <target name="install" depends="archive">
+    <copy file="dist/XsdValidator.jar"
+	  todir=".." />
+  </target>
+
+  <target name="test" depends="archive">
     <java jar="dist/XsdValidator.jar" fork="true">
       <arg value="../xml/PDS4_PDS_1600.xsd.xml" />
       <arg value="../xml/PDS4_HST_1600_0200.xsd.xml" />

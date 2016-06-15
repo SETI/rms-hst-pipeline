@@ -34,10 +34,29 @@ def run_subprocess(cmd, stdin=None):
     return (exit_code, stderr, stdout)
 
 
+def _xsd_validator_schema(filepath,
+                          stdin=None,
+                          schemas=[PDS_XML_SCHEMA, HST_XML_SCHEMA]):
+    """
+    Run XsdValidator.jar on the XML at the filepath (ignored if stdin
+    is not None) or on stdin, validating against the schemas.  Returns
+    a triple of exit_code, stderr, and stdout.
+    """
+    args = ['java', '-jar', 'XsdValidator.jar']
+    args.extend(schemas)
+    if stdin is None:
+        args.append(filepath)
+        print args
+        return run_subprocess(args)
+    else:
+        args.append('-')
+        print args
+        return run_subprocess(args)
+
 def _xmllint_schema(filepath, stdin=None, schema=PDS_XML_SCHEMA):
     """
     Run xmllint on the XML at the filepath (ignored if stdin is not
-    None) or in stdin, validating against the schema.  Returns a
+    None) or on stdin, validating against the schema.  Returns a
     triple of exit_code, stderr and stdout.
     """
     if stdin is None:
@@ -58,6 +77,27 @@ def xml_schema_failures(filepath, stdin=None, schema=PDS_XML_SCHEMA):
     exit_code, stderr, _ = _xmllint_schema(filepath,
                                            stdin=stdin,
                                            schema=schema)
+    if exit_code == 0:
+        return None
+    else:
+        # ignore stdout
+        assert stderr
+        return stderr
+
+
+def xml_schema_failures(filepath, stdin=None, schema=PDS_XML_SCHEMA):
+    """
+    Run an XML Schema validator on the XML at the filepath (ignored if
+    stdin is not None) or in stdin, validating against the schema.
+    Returns None if there are no failures; returns a string containing
+    the failures if they exist.
+    """
+    if True:
+        exit_code, stderr, _ = _xsd_validator_schema(filepath, stdin=stdin)
+    else:
+        exit_code, stderr, _ = _xmllint_schema(filepath,
+                                               stdin=stdin,
+                                               schema=schema)
     if exit_code == 0:
         return None
     else:

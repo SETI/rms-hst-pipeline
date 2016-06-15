@@ -19,7 +19,7 @@ public class XsdValidator {
     class Args {
         private static final String usageMsg
             = "usage: java -jar XsdValidator.jar "
-            + "<schemaFile> ... <xmlFile>";
+            + "<schemaFile> ... [ <xmlFile> | - ]";
 
         void usage(){
             System.err.println(usageMsg);
@@ -42,8 +42,13 @@ public class XsdValidator {
                 schemaDocuments.add(streamSource);
             }
             String xmlFilepath = args[argsLength - 1];
-            File file = new File(xmlFilepath);
-            xmlSource = new StreamSource(file);
+
+	    if ("-".equals(xmlFilepath)){
+		xmlSource = new StreamSource(System.in);
+	    } else {
+		File file = new File(xmlFilepath);
+		xmlSource = new StreamSource(file);
+	    }
         }
     }
 
