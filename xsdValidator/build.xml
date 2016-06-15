@@ -24,6 +24,14 @@
 	 manifest="${manifest.mf}" />
   </target>
 
+  <target name="run" depends="archive">
+    <java jar="dist/XsdValidator.jar" fork="true">
+      <arg value="../xml/PDS4_PDS_1600.xsd.xml" />
+      <arg value="../xml/PDS4_HST_1600_0200.xsd.xml" />
+      <arg value="/Users/spaceman/Desktop/Archive/hst_11972/data_wfpc2_d0m/visit_83/ubaj830km_d0m.xml" />
+    </java>
+  </target>
+
   <target name="clean">
     <delete dir="build"/>
     <delete dir="dist"/>
