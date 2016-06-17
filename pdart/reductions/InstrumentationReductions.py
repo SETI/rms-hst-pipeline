@@ -1,3 +1,5 @@
+import sys
+
 from pdart.reductions.Reduction import *
 
 
@@ -7,7 +9,7 @@ class LogBundlesReduction(Reduction):
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
         print 'Bundle', str(lid)
-
+        sys.stdout.flush()
 
 class LogCollectionsReduction(Reduction):
     def reduce_archive(self, archive_root, get_reduced_bundles):
@@ -18,6 +20,7 @@ class LogCollectionsReduction(Reduction):
 
     def reduce_collection(self, archive, lid, get_reduced_products):
         print 'Collection', str(lid)
+        sys.stdout.flush()
 
 
 class LogProductsReduction(Reduction):
@@ -32,3 +35,4 @@ class LogProductsReduction(Reduction):
 
     def reduce_product(self, archive, lid, get_reduced_products):
         print 'Product', str(lid)
+        sys.stdout.flush()
