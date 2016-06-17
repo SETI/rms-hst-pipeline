@@ -46,12 +46,11 @@ def _xsd_validator_schema(filepath,
     args.extend(schemas)
     if stdin is None:
         args.append(filepath)
-        print args
         return run_subprocess(args)
     else:
         args.append('-')
-        print args
-        return run_subprocess(args)
+        return run_subprocess(args, stdin=stdin)
+
 
 def _xmllint_schema(filepath, stdin=None, schema=PDS_XML_SCHEMA):
     """
@@ -65,24 +64,6 @@ def _xmllint_schema(filepath, stdin=None, schema=PDS_XML_SCHEMA):
     else:
         return run_subprocess(['xmllint', '--noout', '--schema', schema, '-'],
                               stdin=stdin)
-
-
-def xml_schema_failures(filepath, stdin=None, schema=PDS_XML_SCHEMA):
-    """
-    Run xmllint on the XML at the filepath (ignored if stdin is not
-    None) or in stdin, validating against the schema.  Returns None if
-    there are no failures; returns a string containing the failures if
-    they exist.
-    """
-    exit_code, stderr, _ = _xmllint_schema(filepath,
-                                           stdin=stdin,
-                                           schema=schema)
-    if exit_code == 0:
-        return None
-    else:
-        # ignore stdout
-        assert stderr
-        return stderr
 
 
 def xml_schema_failures(filepath, stdin=None, schema=PDS_XML_SCHEMA):

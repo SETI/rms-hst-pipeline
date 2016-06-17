@@ -11,6 +11,7 @@ class LogBundlesReduction(Reduction):
         print 'Bundle', str(lid)
         sys.stdout.flush()
 
+
 class LogCollectionsReduction(Reduction):
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
