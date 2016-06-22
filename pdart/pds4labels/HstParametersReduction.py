@@ -37,6 +37,11 @@ parameters_acs = interpret_template("""<hst:Parameters_ACS>
 </hst:Parameters_ACS>""")
 
 parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
+<hst:detector_id><NODE name="detector_id" /></hst:detector_id>
+<hst:observation_type><NODE name="observation_type" /></hst:observation_type>
+<hst:repeat_exposure_count><NODE name="repeat_exposure_count" />\
+</hst:repeat_exposure_count>
+<hst:subarray_flag><NODE name="subarray_flag" /></hst:subarray_flag>
 </hst:Parameters_WFC3>""")
 
 parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
@@ -260,38 +265,12 @@ class HstParametersReduction(Reduction):
                                                             header),
                  'exposure_type': get_exposure_type(instrument, header),
                  'filter_name': get_filter_name(instrument, header),
-
                  'fine_guidance_system_lock_type':
                      get_fine_guidance_system_lock_type(instrument, header),
                  'gyroscope_mode': placeholder('gyroscope_mode'),
                  'instrument_mode_id': get_instrument_mode_id(instrument,
                                                               header),
                  'moving_target_flag': 'true'}
-
-#                (instrument_id, 'instrument_id',
-#                 lambda: header['INSTRUME']),
-#                (detector_id, 'detector_id',
-#                 lambda: get_detector_id(instrument, header)),
-#                (observation_type, 'observation_type',
-#                 lambda: get_observation_type(instrument,
-#                                              header)),
-#                (product_type, 'product_type',
-#                 lambda: placeholder('product_type')),
-#                (center_filter_wavelength, 'center_filter_wavelength',
-#                 lambda: get_center_filter_wavelength(instrument, header)),
-#                (bandwidth, 'bandwidth',
-#                 lambda: get_bandwidth(instrument, header)),
-#                (wavelength_resolution, 'wavelength_resolution',
-#                 lambda: placeholder('wavelength_resolution')),
-#                (maximum_wavelength, 'maximum_wavelength',
-#                 lambda: placeholder('maximum_wavelength')),
-#                (minimum_wavelength, 'minimum_wavelength',
-#                 lambda: placeholder('minimum_wavelength')),
-#                (gain_mode_id, 'gain_mode_id',
-#                 lambda: get_gain_mode_id(instrument, header)),
-#                (lines, 'lines', lambda: placeholder('lines')),
-#                (line_samples, 'line_samples',
-#                 lambda: placeholder('line_samples'))
 
             if instrument == 'acs':
                 parameters_instrument = parameters_acs(
@@ -301,8 +280,7 @@ class HstParametersReduction(Reduction):
                          get_observation_type(instrument, header),
                      'repeat_exposure_count':
                          get_repeat_exposure_count(instrument, header),
-                     'subarray_flag': get_subarray_flag(instrument, header)
-                     })
+                     'subarray_flag': get_subarray_flag(instrument, header)})
             elif instrument == 'wfpc2':
                 parameters_instrument = parameters_wfpc2(
                     {'bandwidth': get_bandwidth(instrument, header),
@@ -316,7 +294,13 @@ class HstParametersReduction(Reduction):
                      'wf3_flag': get_wf3_flag(instrument, header),
                      'wf4_flag': get_wf4_flag(instrument, header)})
             elif instrument == 'wfc3':
-                parameters_instrument = parameters_wfc3({})
+                parameters_instrument = parameters_wfc3(
+                    {'detector_id': get_detector_id(instrument, header),
+                     'observation_type':
+                         get_observation_type(instrument, header),
+                     'repeat_exposure_count':
+                         get_repeat_exposure_count(instrument, header),
+                     'subarray_flag': get_subarray_flag(instrument, header)})
 
             # Wrap the fragment and return it.
             return hst({
