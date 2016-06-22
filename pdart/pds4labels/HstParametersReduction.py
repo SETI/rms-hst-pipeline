@@ -34,9 +34,43 @@ parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 </hst:Parameters_WFC3>""")
 
 parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
+<hst:bandwidth><NODE name="bandwidth" /></hst:bandwidth>
+<hst:center_filter_wavelength><NODE name="center_filter_wavelength" />\
+</hst:center_filter_wavelength>
+<hst:targeted_detector_id><NODE name="targeted_detector_id" />\
+</hst:targeted_detector_id>
+<hst:gain_mode_id><NODE name="gain_mode_id" /></hst:gain_mode_id>
+<hst:pc1_flag><NODE name="pc1_flag" /></hst:pc1_flag>
+<hst:wf2_flag><NODE name="wf2_flag" /></hst:wf2_flag>
+<hst:wf3_flag><NODE name="wf3_flag" /></hst:wf3_flag>
+<hst:wf4_flag><NODE name="wf4_flag" /></hst:wf4_flag>
 </hst:Parameters_WFPC2>""")
 
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
+
+
+def get_targeted_detector_id(instrument, header):
+    return placeholder('targeted_detector_id')
+
+
+def get_pc1_flag(instrument, header):
+    # return placeholder('pc1_flag')
+    return '0'
+
+
+def get_wf2_flag(instrument, header):
+    # return placeholder('wf2_flag')
+    return '0'
+
+
+def get_wf3_flag(instrument, header):
+    # return placeholder('wf3_flag')
+    return '0'
+
+
+def get_wf4_flag(instrument, header):
+    # return placeholder('wf4_flag')
+    return '0'
 
 
 def get_aperture_type(instrument, header):
@@ -49,12 +83,20 @@ def get_aperture_type(instrument, header):
 
 def get_bandwidth(instrument, header):
     if instrument == 'wfpc2':
-        return str(header['BANDWID'] * 1.e-4)
+        try:
+            return str(header['BANDWID'] * 1.e-4)
+        except KeyError:
+            # return placeholder('bandwidth')
+            return '0.0'
 
 
 def get_center_filter_wavelength(instrument, header):
     if instrument == 'wfpc2':
-        return str(header['CENTRWV'] * 1.e-4)
+        try:
+            return str(header['CENTRWV'] * 1.e-4)
+        except KeyError:
+            # return placeholder('center_filter_wavelength')
+            return '0.0'
 
 
 def get_detector_id(instrument, header):
@@ -72,8 +114,8 @@ def get_exposure_duration(instrument, header):
     try:
         return str(header['EXPTIME'])
     except KeyError:
-        return "0.0"
         # return placeholder('exposure_duration')
+        return '0.0'
 
 
 def get_exposure_type(instrument, header):
@@ -124,7 +166,10 @@ def get_gain_mode_id(instrument, header):
     if instrument == 'acs':
         return str(header['ATODGAIN'])
     elif instrument == 'wfpc2':
-        return 'A2D' + str(int(header['ATODGAIN']))
+        try:
+            return 'A2D' + str(int(header['ATODGAIN']))
+        except KeyError:
+            return placeholder('gain_mode_id')
 
 
 def get_hst_pi_name(instrument, header):
@@ -237,7 +282,17 @@ class HstParametersReduction(Reduction):
             if instrument == 'acs':
                 parameters_instrument = parameters_acs({})
             elif instrument == 'wfpc2':
-                parameters_instrument = parameters_wfpc2({})
+                parameters_instrument = parameters_wfpc2(
+                    {'bandwidth': get_bandwidth(instrument, header),
+                     'center_filter_wavelength':
+                         get_center_filter_wavelength(instrument, header),
+                     'targeted_detector_id':
+                         get_targeted_detector_id(instrument, header),
+                     'gain_mode_id': get_gain_mode_id(instrument, header),
+                     'pc1_flag': get_pc1_flag(instrument, header),
+                     'wf2_flag': get_wf2_flag(instrument, header),
+                     'wf3_flag': get_wf3_flag(instrument, header),
+                     'wf4_flag': get_wf4_flag(instrument, header)})
             elif instrument == 'wfc3':
                 parameters_instrument = parameters_wfc3({})
 

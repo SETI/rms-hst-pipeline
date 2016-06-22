@@ -39,16 +39,16 @@ images obtained from HST Observing Program \
         <fields>2</fields>
         <groups>0</groups>
         <Field_Delimited>
-          <data_type>ASCII_String</data_type>
-          <maximum_field_length unit="byte">1</maximum_field_length>
           <name>Member Status</name>
           <field_number>1</field_number>
+          <data_type>ASCII_String</data_type>
+          <maximum_field_length unit="byte">1</maximum_field_length>
         </Field_Delimited>
         <Field_Delimited>
-          <data_type>ASCII_LIDVID_LID</data_type>
-          <maximum_field_length unit="byte">255</maximum_field_length>
           <name>LIDVID_LID</name>
           <field_number>2</field_number>
+          <data_type>ASCII_LIDVID_LID</data_type>
+          <maximum_field_length unit="byte">255</maximum_field_length>
         </Field_Delimited>
       </Record_Delimited>
       <reference_type>inventory_has_member_product</reference_type>
