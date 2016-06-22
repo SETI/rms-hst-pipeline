@@ -28,6 +28,12 @@ parameters_general = interpret_template("""<hst:Parameters_General>
 </hst:Parameters_General>""")
 
 parameters_acs = interpret_template("""<hst:Parameters_ACS>
+<hst:detector_id><NODE name="detector_id" /></hst:detector_id>
+<hst:gain_mode_id><NODE name="gain_mode_id" /></hst:gain_mode_id>
+<hst:observation_type><NODE name="observation_type" /></hst:observation_type>
+<hst:repeat_exposure_count><NODE name="repeat_exposure_count" />\
+</hst:repeat_exposure_count>
+<hst:subarray_flag><NODE name="subarray_flag" /></hst:subarray_flag>
 </hst:Parameters_ACS>""")
 
 parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
@@ -47,6 +53,14 @@ parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 </hst:Parameters_WFPC2>""")
 
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
+
+
+def get_repeat_exposure_count(instrument, header):
+    return placeholder('repeat_exposure_count')
+
+
+def get_subarray_flag(instrument, header):
+    return placeholder('subarray_flag')
 
 
 def get_targeted_detector_id(instrument, header):
@@ -280,7 +294,15 @@ class HstParametersReduction(Reduction):
 #                 lambda: placeholder('line_samples'))
 
             if instrument == 'acs':
-                parameters_instrument = parameters_acs({})
+                parameters_instrument = parameters_acs(
+                    {'detector_id': get_detector_id(instrument, header),
+                     'gain_mode_id': get_gain_mode_id(instrument, header),
+                     'observation_type':
+                         get_observation_type(instrument, header),
+                     'repeat_exposure_count':
+                         get_repeat_exposure_count(instrument, header),
+                     'subarray_flag': get_subarray_flag(instrument, header)
+                     })
             elif instrument == 'wfpc2':
                 parameters_instrument = parameters_wfpc2(
                     {'bandwidth': get_bandwidth(instrument, header),
