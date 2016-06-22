@@ -131,7 +131,7 @@ class ProductLabelReduction(BadFitsFileReduction):
                 'file_name': file_name,
                 'Time_Coordinates': time_coordinates,
                 'Target_Identification': target_identification,
-                'HST': hst,
+                'HST': hst(instrument),
                 'file_contents': file_contents
                 }).toxml()
 
