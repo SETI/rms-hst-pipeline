@@ -158,3 +158,21 @@ def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
         return ('\n'.join([f.toxml() for f in failures])).replace('\n', '\\n')
     else:
         return None
+
+
+def verify_label_or_throw(label):
+    try:
+        failures = xml_schema_failures(None, label)
+        if failures is not None:
+            raise Exception('XML schema validation errors: ' + failures)
+        failures = schematron_failures(None, label)
+        if failures is not None:
+            raise Exception('Schematron validation errors: ' + failures)
+    except:
+        import time
+        print label
+        t = int(time.time() * 1000)
+        fp = 'tmp%d.xml' % t
+        with open(fp, 'w') as f:
+            f.write(label)
+        raise

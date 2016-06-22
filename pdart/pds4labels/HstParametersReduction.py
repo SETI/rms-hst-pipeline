@@ -8,7 +8,23 @@ hst = interpret_template("""<hst:HST>
 </hst:HST>""")
 
 parameters_general = interpret_template("""<hst:Parameters_General>
-<FRAGMENT name="parameters_general"/>
+  <hst:stsci_group_id><NODE name="stsci_group_id" /></hst:stsci_group_id>
+  <hst:hst_proposal_id><NODE name="hst_proposal_id" /></hst:hst_proposal_id>
+  <hst:hst_pi_name><NODE name="hst_pi_name" /></hst:hst_pi_name>
+  <hst:hst_target_name><NODE name="hst_target_name" /></hst:hst_target_name>
+  <hst:aperture_type><NODE name="aperture_type" /></hst:aperture_type>
+  <hst:exposure_duration><NODE name="exposure_duration" />\
+</hst:exposure_duration>
+  <hst:exposure_type><NODE name="exposure_type" /></hst:exposure_type>
+  <hst:filter_name><NODE name="filter_name" /></hst:filter_name>
+  <hst:fine_guidance_system_lock_type>\
+<NODE name="fine_guidance_system_lock_type" />\
+</hst:fine_guidance_system_lock_type>
+  <hst:gyroscope_mode><NODE name="gyroscope_mode" /></hst:gyroscope_mode>
+  <hst:instrument_mode_id><NODE name="instrument_mode_id" />\
+</hst:instrument_mode_id>
+  <hst:moving_target_flag><NODE name="moving_target_flag" />\
+</hst:moving_target_flag>
 </hst:Parameters_General>""")
 
 parameters_acs = interpret_template("""<hst:Parameters_ACS>
@@ -20,99 +36,13 @@ parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 </hst:Parameters_WFPC2>""")
 
-stsci_group_id = interpret_template(
-    """<hst:stsci_group_id><NODE name="stsci_group_id" />\
-</hst:stsci_group_id>""")
-
-hst_proposal_id = interpret_template(
-    """<hst:hst_proposal_id><NODE name="hst_proposal_id" />\
-</hst:hst_proposal_id>""")
-
-hst_pi_name = interpret_template(
-    """<hst:hst_pi_name><NODE name="hst_pi_name" /></hst:hst_pi_name>""")
-
-instrument_id = interpret_template(
-    """<hst:instrument_id><NODE name="instrument_id" /></hst:instrument_id>""")
-
-detector_id = interpret_template(
-    """<hst:detector_id><NODE name="detector_id" /></hst:detector_id>""")
-
-observation_type = interpret_template(
-    """<hst:observation_type><NODE name="observation_type" />\
-</hst:observation_type>""")
-
-product_type = interpret_template(
-    """<hst:product_type><NODE name="product_type" /></hst:product_type>""")
-
-exposure_duration = interpret_template(
-    """<hst:exposure_duration><NODE name="exposure_duration" />\
-</hst:exposure_duration>""")
-
-hst_target_name = interpret_template(
-    """<hst:hst_target_name><NODE name="hst_target_name" />\
-</hst:hst_target_name>""")
-
-filter_name = interpret_template(
-    """<hst:filter_name><NODE name="filter_name" /></hst:filter_name>""")
-
-center_filter_wavelength = interpret_template(
-    """<hst:center_filter_wavelength><NODE name="center_filter_wavelength" />\
-</hst:center_filter_wavelength>""")
-
-bandwidth = interpret_template(
-    """<hst:bandwidth><NODE name="bandwidth" /></hst:bandwidth>""")
-
-wavelength_resolution = interpret_template(
-    """<hst:wavelength_resolution><NODE name="wavelength_resolution" />\
-</hst:wavelength_resolution>""")
-
-maximum_wavelength = interpret_template(
-    """<hst:maximum_wavelength><NODE name="maximum_wavelength" />\
-</hst:maximum_wavelength>""")
-
-minimum_wavelength = interpret_template(
-    """<hst:minimum_wavelength><NODE name="minimum_wavelength" />\
-</hst:minimum_wavelength>""")
-
-aperture_type = interpret_template(
-    """<hst:aperture_type><NODE name="aperture_type" /></hst:aperture_type>""")
-
-exposure_type = interpret_template(
-    """<hst:exposure_type><NODE name="exposure_type" /></hst:exposure_type>""")
-
-fine_guidance_system_lock_type = interpret_template(
-    """<hst:fine_guidance_system_lock_type>\
-<NODE name="fine_guidance_system_lock_type" />\
-</hst:fine_guidance_system_lock_type>""")
-
-gain_mode_id = interpret_template(
-    """<hst:gain_mode_id><NODE name="gain_mode_id" /></hst:gain_mode_id>""")
-
-instrument_mode_id = interpret_template(
-    """<hst:instrument_mode_id><NODE name="instrument_mode_id" />\
-</hst:instrument_mode_id>""")
-
-lines = interpret_template(
-    """<hst:lines><NODE name="lines" /></hst:lines>""")
-
-line_samples = interpret_template(
-    """<hst:line_samples><NODE name="line_samples" /></hst:line_samples>""")
-
-gyroscope_mode = interpret_template(
-    """<hst:gyroscope_mode><NODE name="gyroscope_mode" />\
-</hst:gyroscope_mode>""")
-
-moving_target_flag = interpret_template(
-    """<hst:moving_target_flag><NODE name="moving_target_flag" />\
-</hst:moving_target_flag>""")
-
-
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
 
 
 def get_aperture_type(instrument, header):
     if instrument == 'wfpc2':
-        return None
+        # TODO: should be None?  But it's required.  What to do?
+        return placeholder('aperature_type')
     else:
         return header['APERTURE']
 
@@ -138,31 +68,56 @@ def get_detector_id(instrument, header):
         return detector
 
 
+def get_exposure_duration(instrument, header):
+    try:
+        return str(header['EXPTIME'])
+    except KeyError:
+        return "0.0"
+        # return placeholder('exposure_duration')
+
+
+def get_exposure_type(instrument, header):
+    try:
+        return str(header['EXPFLAG'])
+    except KeyError:
+        return placeholder('exposure_type')
+
+
 def get_filter_name(instrument, header):
-    if instrument == 'wfpc2':
-        filtnam1 = header['FILTNAM1'].strip()
-        filtnam2 = header['FILTNAM2'].strip()
-        if filtnam1 == '':
-            return filtnam2
-        elif filtnam2 == '':
-            return filtnam1
-        else:
-            return '%s+%s' % (filtnam1, filtnam2)
-    elif instrument == 'acs':
-        filter1 = header['FILTER1']
-        filter2 = header['FILTER2']
-        if filter1.startswith('CLEAR'):
-            if filter2.startswith('CLEAR'):
-                return 'CLEAR'
+    try:
+        if instrument == 'wfpc2':
+            filtnam1 = header['FILTNAM1'].strip()
+            filtnam2 = header['FILTNAM2'].strip()
+            if filtnam1 == '':
+                return filtnam2
+            elif filtnam2 == '':
+                return filtnam1
             else:
-                return filter2
-        else:
-            if filter2.startswith('CLEAR'):
-                return filter1
+                return '%s+%s' % (filtnam1, filtnam2)
+        elif instrument == 'acs':
+            filter1 = header['FILTER1']
+            filter2 = header['FILTER2']
+            if filter1.startswith('CLEAR'):
+                if filter2.startswith('CLEAR'):
+                    return 'CLEAR'
+                else:
+                    return filter2
             else:
-                return '%s+%s' % (filter1, filter2)
-    elif instrument == 'wfc3':
-        return header['FILTER']
+                if filter2.startswith('CLEAR'):
+                    return filter1
+                else:
+                    return '%s+%s' % (filter1, filter2)
+        elif instrument == 'wfc3':
+            return header['FILTER']
+    except KeyError:
+        return placeholder('filter_name')
+
+
+def get_fine_guidance_system_lock_type(instrument, header):
+    try:
+        return header['FSGLOCK']
+    except KeyError:
+        return placeholder('fine_guidance_system_lock_type')
 
 
 def get_gain_mode_id(instrument, header):
@@ -173,16 +128,36 @@ def get_gain_mode_id(instrument, header):
 
 
 def get_hst_pi_name(instrument, header):
-    return '%s, %s %s' % (header['PR_INV_L'],
-                          header['PR_INV_F'],
-                          header['PR_INV_M'])
+    try:
+        return '%s, %s %s' % (header['PR_INV_L'],
+                              header['PR_INV_F'],
+                              header['PR_INV_M'])
+    except KeyError:
+        return placeholder('hst_pi_name')
+
+
+def get_hst_proposal_id(instrument, header):
+    try:
+        return str(header['PROPOSID'])
+    except KeyError:
+        return placeholder('hst_proposal_id')
+
+
+def get_hst_target_name(instrument, header):
+    try:
+        return header['TARGNAME']
+    except KeyError:
+        return placeholder('hst_target_name')
 
 
 def get_instrument_mode_id(instrument, header):
-    if instrument == 'wfpc2':
-        return header['MODE']
-    else:
-        return header['OBSMODE']
+    try:
+        if instrument == 'wfpc2':
+            return header['MODE']
+        else:
+            return header['OBSMODE']
+    except KeyError:
+        return placeholder('instrument_mode_id')
 
 
 def get_observation_type(instrument, header):
@@ -198,55 +173,41 @@ def placeholder(tag):
 
 class HstParametersReduction(Reduction):
     def reduce_product(self, archive, lid, get_reduced_fits_files):
-        # return String
-        wrapped = get_reduced_fits_files()[0]
-        return wrapper({'wrapped': wrapped}).toxml()
+        # return (Doc -> Node)
+        res = get_reduced_fits_files()[0]
+        assert res
+        return res
 
     def reduce_fits_file(self, file, get_reduced_hdus):
         # returns (Doc -> Node)
-        return get_reduced_hdus()[0]
+        res = get_reduced_hdus()[0]
+        assert res
+        return res
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
         # returns (Doc -> Node) or None
         if n == 0:
-            instrument = 'acs'
+            instrument = 'wfpc2'
             header = hdu.header
 
-            # This is a list of XML templates, element names, and
-            # thunks to calculate what will go inside the templates.
-            # For each tuple, we run the thunk and if it returns a
-            # non-None answer, we use it as parameter (with the
-            # element name) to the XML template.  Each tuple may
-            # create a node (function).  We combine them into a
-            # fragment (function) and wrap the fragment as our
-            # Parameters_General.
-            nodeCalcs = [
-                (stsci_group_id, 'stsci_group_id',
-                 lambda: placeholder('stsci_group_id')),
-                (hst_proposal_id, 'hst_proposal_id',
-                 lambda: str(header['PROPOSID'])),
-                (hst_pi_name, 'hst_pi_name',
-                 lambda: get_hst_pi_name(instrument, header)),
-                (hst_target_name, 'hst_target_name',
-                 lambda: header['TARGNAME']),
-                (aperture_type, 'aperture_type',
-                 lambda: get_aperture_type(instrument, header)),
-                (exposure_duration, 'exposure_duration',
-                 lambda: str(header['EXPTIME'])),
-                (exposure_type, 'exposure_type', lambda: header['EXPFLAG']),
-                (filter_name, 'filter_name',
-                 lambda: get_filter_name(instrument, header)),
-                (fine_guidance_system_lock_type,
-                 'fine_guidance_system_lock_type', lambda: header['FSGLOCK']),
-                (gyroscope_mode, 'gyroscope_mode',
-                 lambda: placeholder('gyroscope_mode')),
-                (instrument_mode_id, 'instrument_mode_id',
-                 lambda: header['OBSMODE']),
-                (moving_target_flag, 'moving_target_flag',
-                 lambda: placeholder('moving_target_flag'))
-                ]
+            d = {'stsci_group_id': placeholder('stsci_group_id'),
+                 'hst_proposal_id': get_hst_proposal_id(instrument, header),
+                 'hst_pi_name': get_hst_pi_name(instrument, header),
+                 'hst_target_name': get_hst_target_name(instrument, header),
+                 'aperture_type': get_aperture_type(instrument, header),
+                 'exposure_duration': get_exposure_duration(instrument,
+                                                            header),
+                 'exposure_type': get_exposure_type(instrument, header),
+                 'filter_name': get_filter_name(instrument, header),
+
+                 'fine_guidance_system_lock_type':
+                     get_fine_guidance_system_lock_type(instrument, header),
+                 'gyroscope_mode': placeholder('gyroscope_mode'),
+                 'instrument_mode_id': get_instrument_mode_id(instrument,
+                                                              header),
+                 'moving_target_flag': 'true'}
 
 #                (instrument_id, 'instrument_id',
 #                 lambda: header['INSTRUME']),
@@ -273,21 +234,6 @@ class HstParametersReduction(Reduction):
 #                (line_samples, 'line_samples',
 #                 lambda: placeholder('line_samples'))
 
-            # Turn each (successful) tuple into a node.
-            nodes = []
-            for (template, name, thunk) in nodeCalcs:
-                try:
-                    res = thunk()
-                    if res:
-                        if not isinstance(res, str):
-                            print 'Not a string:', name
-                            res = str(res)
-                        nodes.append(template({name: res}))
-                except:
-                    pass
-
-            frag = combine_nodes_into_fragment(nodes)
-
             if instrument == 'acs':
                 parameters_instrument = parameters_acs({})
             elif instrument == 'wfpc2':
@@ -297,6 +243,5 @@ class HstParametersReduction(Reduction):
 
             # Wrap the fragment and return it.
             return hst({
-                    'parameters_general': parameters_general(
-                        {'parameters_general': frag}),
+                    'parameters_general': parameters_general(d),
                     'parameters_instrument': parameters_instrument})

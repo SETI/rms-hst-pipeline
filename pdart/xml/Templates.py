@@ -29,12 +29,14 @@ def interpret_document_template(template):
 
             def startElement(self, name, attrs):
                 if name == 'NODE':
-                    param = dictionary[attrs['name']]
+                    param_name = attrs['name']
+                    param = dictionary[param_name]
                     if type(param) == str:
                         elmt = doc.createTextNode(param)
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
                     else:
+                        assert is_function(param), param_name
                         elmt = param(doc)
                         if isinstance(elmt, list):
                             for e in elmt:
@@ -43,7 +45,9 @@ def interpret_document_template(template):
                             assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
                 elif name == 'FRAGMENT':
-                    param = dictionary[attrs['name']]
+                    param_name = attrs['name']
+                    param = dictionary[param_name]
+                    assert is_function(param), param_name
                     elmts = param(doc)
                     assert isinstance(elmts, list)
                     for elmt in elmts:
@@ -104,15 +108,19 @@ def interpret_template(template):
 
                 def startElement(self, name, attrs):
                     if name == 'NODE':
-                        param = dictionary[attrs['name']]
+                        param_name = attrs['name']
+                        param = dictionary[param_name]
                         if type(param) == str:
                             elmt = doc.createTextNode(param)
                         else:
+                            assert is_function(param), param_name
                             elmt = param(doc)
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
                     elif name == 'FRAGMENT':
-                        param = dictionary[attrs['name']]
+                        param_name = attrs['name']
+                        param = dictionary[param_name]
+                        assert is_function(param), param_name
                         elmts = param(doc)
                         assert isinstance(elmts, list)
                         for elmt in elmts:

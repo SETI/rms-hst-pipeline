@@ -43,6 +43,10 @@ citation_information_description ###</description>
 
 
 class BundleLabelReduction(Reduction):
+    def __init__(self, verify=False):
+        Reduction.__init__(self)
+        self.verify = verify
+
     """
     Reduction of a :class:`Bundle` to its PDS4 label as a string.
     """
@@ -59,6 +63,10 @@ class BundleLabelReduction(Reduction):
         label_fp = Bundle(archive, lid).label_filepath()
         with open(label_fp, 'w') as f:
             f.write(label)
+
+        if self.verify:
+            verify_label_or_throw(label)
+
         return label
 
     def reduce_collection(self, archive, lid, get_reduced_products):
@@ -72,14 +80,5 @@ def make_bundle_label(bundle, verify):
     True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
-    label = DefaultReductionRunner().run_bundle(BundleLabelReduction(),
-                                                bundle)
-    if verify:
-        failures = xml_schema_failures(None, label) and \
-            schematron_failures(None, label)
-    else:
-        failures = None
-    if failures is None:
-        return label
-    else:
-        raise Exception('Validation errors: ' + failures)
+    return DefaultReductionRunner().run_bundle(BundleLabelReduction(verify),
+                                               bundle)

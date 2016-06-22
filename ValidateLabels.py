@@ -17,7 +17,7 @@ from pdart.reductions.InstrumentationReductions import *
 class CanMakeValidBundleLabelsReduction(BundleLabelReduction):
     def reduce_archive(self, archive_root, get_reduced_bundles):
         for label in get_reduced_bundles():
-            failures = xml_schema_failures(None, label) and \
+            failures = xml_schema_failures(None, label) or \
                 schematron_failures(None, label)
             if failures is not None:
                 raise Exception('Validation errors: ' + failures)
@@ -29,7 +29,7 @@ class CanMakeValidCollectionLabelsReduction(CollectionLabelReduction):
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
         for label in get_reduced_collections():
-            failures = xml_schema_failures(None, label) and \
+            failures = xml_schema_failures(None, label) or \
                 schematron_failures(None, label)
             if failures is not None:
                 raise Exception('Validation errors: ' + failures)
@@ -46,7 +46,7 @@ class CanMakeValidProductLabelsReduction(ProductLabelReduction):
         for prod in get_reduced_products():
             if prod:
                 lid, label = prod
-                failures = xml_schema_failures(None, label) and \
+                failures = xml_schema_failures(None, label) or \
                     schematron_failures(None, label)
                 if failures is not None:
                     raise Exception('Validation errors in %s: %s' %

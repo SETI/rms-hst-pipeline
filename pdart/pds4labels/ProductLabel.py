@@ -78,13 +78,14 @@ class ProductLabelReduction(BadFitsFileReduction):
     file, write the label into the archive and return the label.  If
     the FITS file is bad, return None.
     """
-    def __init__(self):
+    def __init__(self, verify=False):
         base_reduction = CompositeReduction(
             [FileContentsLabelReduction(),
              TargetIdentificationLabelReduction(),
              HstParametersReduction(),
              TimeCoordinatesLabelReduction()])
         BadFitsFileReduction.__init__(self, base_reduction)
+        self.verify = verify
 
     def _nones(self):
         """
@@ -137,6 +138,10 @@ class ProductLabelReduction(BadFitsFileReduction):
         label_fp = Product(archive, lid).label_filepath()
         with open(label_fp, 'w') as f:
             f.write(label)
+
+        if self.verify:
+            verify_label_or_throw(label)
+
         return label
 
 
@@ -147,16 +152,9 @@ def make_product_label(product, verify):
     against its XML and Schematron schemas.  Raise an exception if
     either fails.
     """
-    label = DefaultReductionRunner().run_product(ProductLabelReduction(),
+    label = DefaultReductionRunner().run_product(ProductLabelReduction(verify),
                                                  product)
     if label is None:
         raise Exception('Bad FITS file')
-    if verify:
-        failures = xml_schema_failures(None, label) and \
-            schematron_failures(None, label)
-    else:
-        failures = None
-    if failures is None:
-        return label
-    else:
-        raise Exception('Validation errors: ' + failures)
+
+    return label

@@ -13,14 +13,15 @@ from pdart.reductions.InstrumentationReductions import *
 
 
 class MakeLabelsReduction(CompositeReduction):
-    def __init__(self):
+    def __init__(self, verify):
         CompositeReduction.__init__(self,
-                                    [BundleLabelReduction(),
-                                     CollectionLabelReduction(),
-                                     ProductLabelReduction()])
+                                    [BundleLabelReduction(verify),
+                                     CollectionLabelReduction(verify),
+                                     ProductLabelReduction(verify)])
 
 if __name__ == '__main__':
     archive = get_any_archive()
+    verify = True
     reduction = CompositeReduction([LogProductsReduction(),
-                                    MakeLabelsReduction()])
+                                    MakeLabelsReduction(verify)])
     raise_verbosely(lambda: run_reduction(reduction, archive))

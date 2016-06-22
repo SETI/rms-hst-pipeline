@@ -1,0 +1,4 @@
+#!/bin/bash
+find ~/Desktop/Archive -name '*.xml' -delete
+find ~/Desktop/Archive -name '*.csv' -delete
+find ~/Desktop/Archive -name '*.tab' -delete
