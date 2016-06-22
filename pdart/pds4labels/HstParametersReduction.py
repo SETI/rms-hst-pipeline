@@ -263,16 +263,19 @@ class HstParametersReduction(Reduction):
                 header = hdu.header
 
                 d = {'stsci_group_id': placeholder('stsci_group_id'),
-                     'hst_proposal_id': get_hst_proposal_id(instrument, header),
+                     'hst_proposal_id':
+                         get_hst_proposal_id(instrument, header),
                      'hst_pi_name': get_hst_pi_name(instrument, header),
-                     'hst_target_name': get_hst_target_name(instrument, header),
+                     'hst_target_name':
+                         get_hst_target_name(instrument, header),
                      'aperture_type': get_aperture_type(instrument, header),
                      'exposure_duration': get_exposure_duration(instrument,
                                                                 header),
                      'exposure_type': get_exposure_type(instrument, header),
                      'filter_name': get_filter_name(instrument, header),
                      'fine_guidance_system_lock_type':
-                         get_fine_guidance_system_lock_type(instrument, header),
+                         get_fine_guidance_system_lock_type(instrument,
+                                                            header),
                      'gyroscope_mode': placeholder('gyroscope_mode'),
                      'instrument_mode_id': get_instrument_mode_id(instrument,
                                                                   header),
@@ -286,7 +289,8 @@ class HstParametersReduction(Reduction):
                              get_observation_type(instrument, header),
                          'repeat_exposure_count':
                              get_repeat_exposure_count(instrument, header),
-                         'subarray_flag': get_subarray_flag(instrument, header)})
+                         'subarray_flag':
+                             get_subarray_flag(instrument, header)})
                 elif instrument == 'wfpc2':
                     parameters_instrument = parameters_wfpc2(
                         {'bandwidth': get_bandwidth(instrument, header),
@@ -306,7 +310,8 @@ class HstParametersReduction(Reduction):
                              get_observation_type(instrument, header),
                          'repeat_exposure_count':
                              get_repeat_exposure_count(instrument, header),
-                         'subarray_flag': get_subarray_flag(instrument, header)})
+                         'subarray_flag':
+                             get_subarray_flag(instrument, header)})
                 else:
                     assert False, 'Bad instrument value: %s' % instrument
 

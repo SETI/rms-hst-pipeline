@@ -169,10 +169,12 @@ def verify_label_or_throw(label):
         if failures is not None:
             raise Exception('Schematron validation errors: ' + failures)
     except:
-        import time
-        print label
-        t = int(time.time() * 1000)
-        fp = 'tmp%d.xml' % t
-        with open(fp, 'w') as f:
-            f.write(label)
+        PRINT_AND_SAVE_LABEL = False
+        if PRINT_AND_SAVE_LABEL:
+            import time
+            print label
+            t = int(time.time() * 1000)
+            fp = 'tmp%d.xml' % t
+            with open(fp, 'w') as f:
+                f.write(label)
         raise
