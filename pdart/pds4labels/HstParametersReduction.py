@@ -61,7 +61,8 @@ wrapper = interpret_document_template("""<NODE name="wrapped" />""")
 
 
 def get_repeat_exposure_count(instrument, header):
-    return placeholder('repeat_exposure_count')
+    # return placeholder('repeat_exposure_count')
+    return '0'
 
 
 def get_subarray_flag(instrument, header):
@@ -122,7 +123,11 @@ def get_center_filter_wavelength(instrument, header):
 
 
 def get_detector_id(instrument, header):
-    detector = header['DETECTOR']
+    try:
+        detector = header['DETECTOR']
+    except KeyError:
+        return placeholder('detector_id')
+
     if instrument == 'wfpc2':
         if detector == '1':
             return 'PC1'
@@ -185,13 +190,13 @@ def get_fine_guidance_system_lock_type(instrument, header):
 
 
 def get_gain_mode_id(instrument, header):
-    if instrument == 'acs':
-        return str(header['ATODGAIN'])
-    elif instrument == 'wfpc2':
-        try:
-            return 'A2D' + str(int(header['ATODGAIN']))
-        except KeyError:
-            return placeholder('gain_mode_id')
+    try:
+        if instrument == 'acs':
+            return str(header['ATODGAIN'])
+        elif instrument == 'wfpc2':
+                return 'A2D' + str(int(header['ATODGAIN']))
+    except KeyError:
+        return placeholder('gain_mode_id')
 
 
 def get_hst_pi_name(instrument, header):
@@ -207,7 +212,8 @@ def get_hst_proposal_id(instrument, header):
     try:
         return str(header['PROPOSID'])
     except KeyError:
-        return placeholder('hst_proposal_id')
+        # return placeholder('hst_proposal_id')
+        return '0'
 
 
 def get_hst_target_name(instrument, header):
@@ -228,10 +234,11 @@ def get_instrument_mode_id(instrument, header):
 
 
 def get_observation_type(instrument, header):
-    if instrument == 'wfpc2':
-        return None
-    else:
-        return header['OBSTYPE']
+    if instrument != 'wfpc2':
+        try:
+            return header['OBSTYPE']
+        except KeyError:
+            return placeholder('observation_type')
 
 
 def placeholder(tag):
