@@ -1,3 +1,5 @@
+import sys
+
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
@@ -60,73 +62,66 @@ parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
 
 
-def get_repeat_exposure_count(instrument, header):
-    # return placeholder('repeat_exposure_count')
-    return '0'
+def get_repeat_exposure_count(product_id, instrument, header):
+    return placeholder_int(product_id, 'repeat_exposure_count')
 
 
-def get_subarray_flag(instrument, header):
-    return placeholder('subarray_flag')
+def get_subarray_flag(product_id, instrument, header):
+    return placeholder(product_id, 'subarray_flag')
 
 
-def get_targeted_detector_id(instrument, header):
-    return placeholder('targeted_detector_id')
+def get_targeted_detector_id(product_id, instrument, header):
+    return placeholder(product_id, 'targeted_detector_id')
 
 
-def get_pc1_flag(instrument, header):
-    # return placeholder('pc1_flag')
-    return '0'
+def get_pc1_flag(product_id, instrument, header):
+    return placeholder_int(product_id, 'pc1_flag')
 
 
-def get_wf2_flag(instrument, header):
-    # return placeholder('wf2_flag')
-    return '0'
+def get_wf2_flag(product_id, instrument, header):
+    return placeholder_int(product_id, 'wf2_flag')
 
 
-def get_wf3_flag(instrument, header):
-    # return placeholder('wf3_flag')
-    return '0'
+def get_wf3_flag(product_id, instrument, header):
+    return placeholder_int(product_id, 'wf3_flag')
 
 
-def get_wf4_flag(instrument, header):
-    # return placeholder('wf4_flag')
-    return '0'
+def get_wf4_flag(product_id, instrument, header):
+    return placeholder_int(product_id, 'wf4_flag')
 
 
-def get_aperture_type(instrument, header):
+def get_aperture_type(product_id, instrument, header):
     if instrument == 'wfpc2':
         # TODO: should be None?  But it's required.  What to do?
-        return placeholder('aperature_type')
+        return placeholder(product_id, 'aperature_type')
     else:
         try:
             return header['APERTURE']
         except KeyError:
-            return placeholder('aperature_type')
+            return placeholder(product_id, 'aperature_type')
 
 
-def get_bandwidth(instrument, header):
+def get_bandwidth(product_id, instrument, header):
     if instrument == 'wfpc2':
         try:
             return str(header['BANDWID'] * 1.e-4)
         except KeyError:
-            # return placeholder('bandwidth')
-            return '0.0'
+            return placeholder_float(product_id, 'bandwidth')
 
 
-def get_center_filter_wavelength(instrument, header):
+def get_center_filter_wavelength(product_id, instrument, header):
     if instrument == 'wfpc2':
         try:
             return str(header['CENTRWV'] * 1.e-4)
         except KeyError:
-            # return placeholder('center_filter_wavelength')
-            return '0.0'
+            return placeholder_float(product_id, 'center_filter_wavelength')
 
 
-def get_detector_id(instrument, header):
+def get_detector_id(product_id, instrument, header):
     try:
         detector = header['DETECTOR']
     except KeyError:
-        return placeholder('detector_id')
+        return placeholder(product_id, 'detector_id')
 
     if instrument == 'wfpc2':
         if detector == '1':
@@ -137,22 +132,21 @@ def get_detector_id(instrument, header):
         return detector
 
 
-def get_exposure_duration(instrument, header):
+def get_exposure_duration(product_id, instrument, header):
     try:
         return str(header['EXPTIME'])
     except KeyError:
-        # return placeholder('exposure_duration')
-        return '0.0'
+        return placeholder_float(product_id, 'exposure_duration')
 
 
-def get_exposure_type(instrument, header):
+def get_exposure_type(product_id, instrument, header):
     try:
         return str(header['EXPFLAG'])
     except KeyError:
-        return placeholder('exposure_type')
+        return placeholder(product_id, 'exposure_type')
 
 
-def get_filter_name(instrument, header):
+def get_filter_name(product_id, instrument, header):
     try:
         if instrument == 'wfpc2':
             filtnam1 = header['FILTNAM1'].strip()
@@ -179,70 +173,90 @@ def get_filter_name(instrument, header):
         elif instrument == 'wfc3':
             return header['FILTER']
     except KeyError:
-        return placeholder('filter_name')
+        return placeholder(product_id, 'filter_name')
 
 
-def get_fine_guidance_system_lock_type(instrument, header):
+def get_fine_guidance_system_lock_type(product_id, instrument, header):
     try:
         return header['FSGLOCK']
     except KeyError:
-        return placeholder('fine_guidance_system_lock_type')
+        return placeholder(product_id, 'fine_guidance_system_lock_type')
 
 
-def get_gain_mode_id(instrument, header):
+def get_gain_mode_id(product_id, instrument, header):
     try:
         if instrument == 'acs':
             return str(header['ATODGAIN'])
         elif instrument == 'wfpc2':
-                return 'A2D' + str(int(header['ATODGAIN']))
+            return 'A2D' + str(int(header['ATODGAIN']))
     except KeyError:
-        return placeholder('gain_mode_id')
+        return placeholder(product_id, 'gain_mode_id')
 
 
-def get_hst_pi_name(instrument, header):
+def get_hst_pi_name(product_id, instrument, header):
     try:
         return '%s, %s %s' % (header['PR_INV_L'],
                               header['PR_INV_F'],
                               header['PR_INV_M'])
     except KeyError:
-        return placeholder('hst_pi_name')
+        return placeholder(product_id, 'hst_pi_name')
 
 
-def get_hst_proposal_id(instrument, header):
+def get_hst_proposal_id(product_id, instrument, header):
     try:
         return str(header['PROPOSID'])
     except KeyError:
-        # return placeholder('hst_proposal_id')
-        return '0'
+        return placeholder_int(product_id, 'hst_proposal_id')
 
 
-def get_hst_target_name(instrument, header):
+def get_hst_target_name(product_id, instrument, header):
     try:
         return header['TARGNAME']
     except KeyError:
-        return placeholder('hst_target_name')
+        return placeholder(product_id, 'hst_target_name')
 
 
-def get_instrument_mode_id(instrument, header):
+def get_instrument_mode_id(product_id, instrument, header):
     try:
         if instrument == 'wfpc2':
             return header['MODE']
         else:
             return header['OBSMODE']
     except KeyError:
-        return placeholder('instrument_mode_id')
+        return placeholder(product_id, 'instrument_mode_id')
 
 
-def get_observation_type(instrument, header):
+def get_observation_type(product_id, instrument, header):
     if instrument != 'wfpc2':
         try:
             return header['OBSTYPE']
         except KeyError:
-            return placeholder('observation_type')
+            return placeholder(product_id, 'observation_type')
 
 
-def placeholder(tag):
+def known_placeholder(product_id, tag):
     return '### placeholder for %s ###' % tag
+
+
+def placeholder(product_id, tag):
+    note_problem(product_id, tag)
+    return '### placeholder for %s ###' % tag
+
+
+def placeholder_int(product_id, tag):
+    note_problem(product_id, tag)
+    return '0'
+
+
+def placeholder_float(product_id, tag):
+    note_problem(product_id, tag)
+    return '0.0'
+
+
+def note_problem(product_id, tag):
+    if False:
+        print ('PROBLEM %s: %s' % (tag, product_id))
+        sys.stdout.flush()
 
 
 class HstParametersReduction(Reduction):
@@ -251,12 +265,12 @@ class HstParametersReduction(Reduction):
         instrument = Product(archive, lid).collection().instrument()
         assert isinstance(instrument, str)
         func = get_reduced_fits_files()[0]
-        res = func(instrument)
+        res = func((lid.product_id, instrument))
         assert res
         return res
 
     def reduce_fits_file(self, file, get_reduced_hdus):
-        # returns (String -> (Doc -> Node))
+        # returns ((String, String) -> (Doc -> Node))
         res = get_reduced_hdus()[0]
         assert res
         return res
@@ -264,61 +278,89 @@ class HstParametersReduction(Reduction):
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
-        # returns (String -> (Doc -> Node)) or None
+        # returns ((String, String) -> (Doc -> Node)) or None
         if n == 0:
-            def result(instrument):
+            def result((product_id, instrument)):
                 header = hdu.header
 
-                d = {'stsci_group_id': placeholder('stsci_group_id'),
+                d = {'stsci_group_id': known_placeholder(product_id,
+                                                         'stsci_group_id'),
                      'hst_proposal_id':
-                         get_hst_proposal_id(instrument, header),
-                     'hst_pi_name': get_hst_pi_name(instrument, header),
+                         get_hst_proposal_id(product_id, instrument, header),
+                     'hst_pi_name': get_hst_pi_name(product_id, instrument,
+                                                    header),
                      'hst_target_name':
-                         get_hst_target_name(instrument, header),
-                     'aperture_type': get_aperture_type(instrument, header),
-                     'exposure_duration': get_exposure_duration(instrument,
+                         get_hst_target_name(product_id, instrument, header),
+                     'aperture_type': get_aperture_type(product_id, instrument,
+                                                        header),
+                     'exposure_duration': get_exposure_duration(product_id,
+                                                                instrument,
                                                                 header),
-                     'exposure_type': get_exposure_type(instrument, header),
-                     'filter_name': get_filter_name(instrument, header),
+                     'exposure_type': get_exposure_type(product_id, instrument,
+                                                        header),
+                     'filter_name': get_filter_name(product_id, instrument,
+                                                    header),
                      'fine_guidance_system_lock_type':
-                         get_fine_guidance_system_lock_type(instrument,
+                         get_fine_guidance_system_lock_type(product_id,
+                                                            instrument,
                                                             header),
-                     'gyroscope_mode': placeholder('gyroscope_mode'),
-                     'instrument_mode_id': get_instrument_mode_id(instrument,
+                     'gyroscope_mode': known_placeholder(product_id,
+                                                         'gyroscope_mode'),
+                     'instrument_mode_id': get_instrument_mode_id(product_id,
+                                                                  instrument,
                                                                   header),
                      'moving_target_flag': 'true'}
 
                 if instrument == 'acs':
                     parameters_instrument = parameters_acs(
-                        {'detector_id': get_detector_id(instrument, header),
-                         'gain_mode_id': get_gain_mode_id(instrument, header),
+                        {'detector_id': get_detector_id(product_id,
+                                                        instrument, header),
+                         'gain_mode_id': get_gain_mode_id(product_id,
+                                                          instrument, header),
                          'observation_type':
-                             get_observation_type(instrument, header),
+                             get_observation_type(product_id, instrument,
+                                                  header),
                          'repeat_exposure_count':
-                             get_repeat_exposure_count(instrument, header),
+                             get_repeat_exposure_count(product_id, instrument,
+                                                       header),
                          'subarray_flag':
-                             get_subarray_flag(instrument, header)})
+                             get_subarray_flag(product_id, instrument,
+                                               header)})
                 elif instrument == 'wfpc2':
                     parameters_instrument = parameters_wfpc2(
-                        {'bandwidth': get_bandwidth(instrument, header),
+                        {'bandwidth': get_bandwidth(product_id, instrument,
+                                                    header),
                          'center_filter_wavelength':
-                             get_center_filter_wavelength(instrument, header),
+                             get_center_filter_wavelength(product_id,
+                                                          instrument,
+                                                          header),
                          'targeted_detector_id':
-                             get_targeted_detector_id(instrument, header),
-                         'gain_mode_id': get_gain_mode_id(instrument, header),
-                         'pc1_flag': get_pc1_flag(instrument, header),
-                         'wf2_flag': get_wf2_flag(instrument, header),
-                         'wf3_flag': get_wf3_flag(instrument, header),
-                         'wf4_flag': get_wf4_flag(instrument, header)})
+                             get_targeted_detector_id(product_id, instrument,
+                                                      header),
+                         'gain_mode_id': get_gain_mode_id(product_id,
+                                                          instrument, header),
+                         'pc1_flag': get_pc1_flag(product_id, instrument,
+                                                  header),
+                         'wf2_flag': get_wf2_flag(product_id, instrument,
+                                                  header),
+                         'wf3_flag': get_wf3_flag(product_id, instrument,
+                                                  header),
+                         'wf4_flag': get_wf4_flag(product_id, instrument,
+                                                  header)})
                 elif instrument == 'wfc3':
                     parameters_instrument = parameters_wfc3(
-                        {'detector_id': get_detector_id(instrument, header),
+                        {'detector_id': get_detector_id(product_id,
+                                                        instrument,
+                                                        header),
                          'observation_type':
-                             get_observation_type(instrument, header),
+                             get_observation_type(product_id,
+                                                  instrument, header),
                          'repeat_exposure_count':
-                             get_repeat_exposure_count(instrument, header),
+                             get_repeat_exposure_count(product_id,
+                                                       instrument, header),
                          'subarray_flag':
-                             get_subarray_flag(instrument, header)})
+                             get_subarray_flag(product_id,
+                                               instrument, header)})
                 else:
                     assert False, 'Bad instrument value: %s' % instrument
 

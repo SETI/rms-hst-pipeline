@@ -3,6 +3,8 @@ SCRIPT: Run through the archive and generate labels (but not browse
 products or labels).  Do not validate them.  If it fails at any point,
 print the combined exception as XML to stdout.
 """
+import sys
+
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
@@ -12,12 +14,24 @@ from pdart.reductions.CompositeReduction import *
 from pdart.reductions.InstrumentationReductions import *
 
 
+class ProductLabelReductionWithMessage(ProductLabelReduction):
+    def __init__(self, verify):
+        ProductLabelReduction.__init__(self, verify)
+
+    def reduce_product(self, archive, lid, get_reduced_fits_files):
+        res = ProductLabelReduction.reduce_product(self, archive, lid,
+                                                   get_reduced_fits_files)
+        if res is None:
+            note_problem(lid.product_id, 'bad_fits_file')
+        return res
+
+
 class MakeLabelsReduction(CompositeReduction):
     def __init__(self, verify):
         CompositeReduction.__init__(self,
                                     [BundleLabelReduction(verify),
                                      CollectionLabelReduction(verify),
-                                     ProductLabelReduction(verify)])
+                                     ProductLabelReductionWithMessage(verify)])
 
 if __name__ == '__main__':
     archive = get_any_archive()
