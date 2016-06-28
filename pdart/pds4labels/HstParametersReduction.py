@@ -93,12 +93,12 @@ def get_wf4_flag(product_id, instrument, header):
 def get_aperture_type(product_id, instrument, header):
     if instrument == 'wfpc2':
         # TODO: should be None?  But it's required.  What to do?
-        return placeholder(product_id, 'aperature_type')
+        return placeholder(product_id, 'aperture_type')
     else:
         try:
             return header['APERTURE']
         except KeyError:
-            return placeholder(product_id, 'aperature_type')
+            return placeholder(product_id, 'aperture_type')
 
 
 def get_bandwidth(product_id, instrument, header):
