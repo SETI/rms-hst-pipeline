@@ -178,7 +178,7 @@ def get_filter_name(product_id, instrument, header):
 
 def get_fine_guidance_system_lock_type(product_id, instrument, header):
     try:
-        return header['FSGLOCK']
+        return header['FGSLOCK']
     except KeyError:
         return placeholder(product_id, 'fine_guidance_system_lock_type')
 
