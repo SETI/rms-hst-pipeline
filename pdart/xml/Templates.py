@@ -35,6 +35,10 @@ def interpret_document_template(template):
                         elmt = doc.createTextNode(param)
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
+                    elif type(param) == unicode:
+                        elmt = doc.createTextNode(param)
+                        assert isinstance(elmt, xml.dom.Node)
+                        stack.append(elmt)
                     else:
                         assert is_function(param), param_name
                         elmt = param(doc)
@@ -111,6 +115,8 @@ def interpret_template(template):
                         param_name = attrs['name']
                         param = dictionary[param_name]
                         if type(param) == str:
+                            elmt = doc.createTextNode(param)
+                        elif type(param) == unicode:
                             elmt = doc.createTextNode(param)
                         else:
                             assert is_function(param), param_name
