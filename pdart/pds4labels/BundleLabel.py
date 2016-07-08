@@ -32,7 +32,7 @@ make_bundle_entry_member = interpret_template(
     <member_status>Primary</member_status>
     <reference_type>bundle_has_data_collection</reference_type>
 </Bundle_Member_Entry>"""
-)
+    )
 
 placeholder_citation_information = interpret_template(
     """<Citation_Information>
@@ -57,7 +57,7 @@ class BundleLabelReduction(Reduction):
                                                          lid).proposal_id())),
                 'Citation_Information': placeholder_citation_information,
                 'Bundle_Member_Entries':
-                combine_nodes_into_fragment(reduced_collections)
+                    combine_nodes_into_fragment(reduced_collections)
                 }
         label = make_label(dict).toxml()
         label_fp = Bundle(archive, lid).label_filepath()
@@ -82,3 +82,36 @@ def make_bundle_label(bundle, verify):
     """
     return DefaultReductionRunner().run_bundle(BundleLabelReduction(verify),
                                                bundle)
+
+
+def make_db_bundle_label(conn, lid, verify):
+    """
+    Create the label text for the bundle having this :class:'LID'
+    using the database connection.  If verify is True, verify the
+    label against its XML and Schematron schemas.  Raise an exception
+    if either fails.
+    """
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT label_filepath, proposal_id FROM bundles WHERE bundle=?',
+        (lid,))
+    (label_fp, proposal_id) = cursor.fetchone()
+    cursor.execute('SELECT collection from collections WHERE bundle=?', (lid,))
+    cls = cursor.fetchall()
+    collection_lids = [cl[0] for cl in cls]
+    reduced_collections = [make_bundle_entry_member({'lid': collection_lid})
+                           for collection_lid in collection_lids]
+    label = make_label({
+            'lid': lid,
+            'proposal_id': str(proposal_id),
+            'Citation_Information': placeholder_citation_information,
+            'Bundle_Member_Entries': combine_nodes_into_fragment(
+                reduced_collections)
+            }).toxml()
+    with open(label_fp, 'w') as f:
+        f.write(label)
+
+    if verify:
+        verify_label_or_throw(label)
+
+    return label

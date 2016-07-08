@@ -1,4 +1,5 @@
 import io
+import sys
 
 from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
@@ -116,6 +117,15 @@ def make_collection_inventory(collection):
     return ''.join(lines)
 
 
+def make_db_collection_inventory(conn, collection_lid):
+    cursor = conn.cursor()
+    cursor.execute('SELECT product FROM products WHERE collection=?',
+                   (collection_lid,))
+    result = cursor.fetchall()
+    lines = [u'P,%s\r\n' % str(product) for (product,) in result]
+    return ''.join(lines)
+
+
 def make_collection_label_and_inventory(collection):
     """
     Create the label and inventory for a collection and write to the disk.
@@ -127,3 +137,38 @@ def make_collection_label_and_inventory(collection):
     label_filepath = collection.label_filepath()
     with io.open(label_filepath, 'w') as f:
         f.write(make_collection_label(collection, True))
+
+
+def make_db_collection_label_and_inventory(conn, lid, verify):
+    """
+    Create the label and inventory for the collection having this
+    :class:'LID' using the database collection.  Write them to disk.
+    If verify is True, verify the label against its XML and Schematron
+    schemas.  Raise an exception if either fails.
+    """
+    cursor = conn.cursor()
+    cursor.execute(
+        """SELECT label_filepath, bundle, suffix,
+           inventory_name, inventory_filepath
+           FROM collections WHERE collection=?""", (lid,))
+    (label_fp, bundle, suffix, inventory_name, inventory_filepath) = \
+        cursor.fetchone()
+
+    cursor.execute(
+        'SELECT proposal_id FROM bundles where bundle=?', (bundle,))
+    (proposal_id,) = cursor.fetchone()
+    label = make_label({
+            'lid': lid,
+            'suffix': suffix,
+            'proposal_id': str(proposal_id),
+            'Citation_Information': placeholder_citation_information,
+            'inventory_name': inventory_name
+    }).toxml()
+    with open(label_fp, 'w') as f:
+        f.write(label)
+
+    if verify:
+        verify_label_or_throw(label)
+
+    with io.open(inventory_filepath, 'w', newline='') as f:
+        f.write(make_db_collection_inventory(conn, lid))

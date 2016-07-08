@@ -27,9 +27,20 @@ class Bundle(Component):
     def __repr__(self):
         return 'Bundle(%r, %r)' % (self.archive, self.lid)
 
+    def proposal_id(self):
+        """
+        Return the proposal ID for this :class:`Bundle`.  It is
+        calculated from the bundle's :class:`LID`.
+        """
+        return int(re.match(Bundle.DIRECTORY_PATTERN,
+                            self.lid.bundle_id).group(1))
+
     def absolute_filepath(self):
         """Return the absolute filepath to the component's directory."""
         return os.path.join(self.archive.root, self.lid.bundle_id)
+
+    def label_filepath(self):
+        return os.path.join(self.absolute_filepath(), 'bundle.xml')
 
     def collections(self):
         """
@@ -43,9 +54,6 @@ class Bundle(Component):
                 collection_lid = LID('%s:%s' % (self.lid.lid, subdir))
                 yield Collection(self.archive, collection_lid)
 
-    def label_filepath(self):
-        return os.path.join(self.absolute_filepath(), 'bundle.xml')
-
     def products(self):
         """
         Generate the products of this :class:`Bundle` as
@@ -54,11 +62,3 @@ class Bundle(Component):
         for collection in self.collections():
             for product in collection.products():
                 yield product
-
-    def proposal_id(self):
-        """
-        Return the proposal ID for this :class:`Bundle`.  It is
-        calculated from the bundle's :class:`LID`.
-        """
-        return int(re.match(Bundle.DIRECTORY_PATTERN,
-                            self.lid.bundle_id).group(1))

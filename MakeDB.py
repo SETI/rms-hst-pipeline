@@ -12,11 +12,14 @@ from pdart.pds4.Archives import *
 def makeBundlesTable(conn, archive):
     conn.execute('DROP TABLE IF EXISTS bundles')
     table_creation = """CREATE TABLE bundles (
-        bundle VARCHAR PRIMARY KEY NOT NULL
+        bundle VARCHAR PRIMARY KEY NOT NULL,
+        label_filepath VARCHAR NOT NULL,
+        proposal_id INT NOT NULL
         )"""
     conn.execute(table_creation)
-    bs = [(str(b.lid),) for b in archive.bundles()]
-    conn.executemany('INSERT INTO bundles VALUES (?)', bs)
+    bs = [(str(b.lid), b.label_filepath(), b.proposal_id())
+          for b in archive.bundles()]
+    conn.executemany('INSERT INTO bundles VALUES (?, ?, ?)', bs)
     conn.commit()
 
 
@@ -24,15 +27,23 @@ def makeCollectionsTable(conn, archive):
     conn.execute('DROP TABLE IF EXISTS collections')
     table_creation = """CREATE TABLE collections (
         collection VARCHAR PRIMARY KEY NOT NULL,
+        label_filepath VARCHAR NOT NULL,
         bundle VARCHAR NOT NULL,
+        prefix VARCHAR NOT NULL,
+        suffix VARCHAR NOT NULL,
+        instrument VARCHAR NOT NULL,
+        inventory_name VARCHAR NOT NULL,
+        inventory_filepath VARCHAR NOT NULL,
         FOREIGN KEY(bundle) REFERENCES bundles(bundle)
             );"""
     conn.execute(table_creation)
 
-    cs = [(str(c.lid), str(b.lid))
+    cs = [(str(c.lid), c.label_filepath(), str(b.lid),
+           c.prefix(), c.suffix(), c.instrument(),
+           c.inventory_name(), c.inventory_filepath())
           for b in archive.bundles()
           for c in b.collections()]
-    conn.executemany('INSERT INTO collections VALUES (?, ?)', cs)
+    conn.executemany('INSERT INTO collections VALUES (?,?,?,?,?,?,?,?)', cs)
     conn.commit()
 
 
@@ -40,14 +51,16 @@ def makeProductsTable(conn, archive):
     conn.execute('DROP TABLE IF EXISTS products')
     table_creation = """CREATE TABLE products (
         product VARCHAR PRIMARY KEY NOT NULL,
+        label_filepath VARCHAR NOT NULL,
         collection VARCHAR NOT NULL,
+        visit VARCHAR NOT NULL,
         FOREIGN KEY(collection) REFERENCES collections(collection)
         )"""
     conn.execute(table_creation)
-    ps = [(str(p.lid), str(c.lid))
+    ps = [(str(p.lid), p.label_filepath(), str(c.lid), p.visit())
           for c in archive.collections()
           for p in c.products()]
-    conn.executemany('INSERT INTO products VALUES (?, ?)', ps)
+    conn.executemany('INSERT INTO products VALUES (?, ?, ?, ?)', ps)
     conn.commit()
 
 
