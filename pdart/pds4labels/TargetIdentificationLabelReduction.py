@@ -64,6 +64,27 @@ _get_target = multiple_implementations('_get_target',
                                        _get_placeholder_target)
 
 
+def _db_get_target_from_header_unit(conn, lid):
+    cursor = conn.cursor()
+    cursor.execute("""SELECT value FROM cards
+        WHERE product=? AND hdu_index=0 AND keyword='TARGNAME'""")
+    (targname,) = cursor.fetchone()
+
+    for prefix, (name, type) in _approximate_target_table.iteritems():
+        if targname.startswith(prefix):
+            return (name, type, 'The %s %s' % (type.lower(), name))
+    raise Exception('TARGNAME %s doesn\'t match approximations' % targname)
+
+
+_get_db_target = multiple_implementations('_get_db_target',
+                                          _db_get_target_from_header_unit,
+                                          _get_placeholder_target)
+
+
+def get_db_target(conn, lid):
+    return target_identification(*(_get_db_target(conn, lid)))
+
+
 class TargetIdentificationLabelReduction(Reduction):
     """Reduce a product to an XML Target_Identification node template."""
     def reduce_fits_file(self, file, get_reduced_hdus):

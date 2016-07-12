@@ -158,3 +158,45 @@ def make_product_label(product, verify):
         raise Exception('Bad FITS file')
 
     return label
+
+
+def make_db_product_label(conn, lid, verify):
+    """
+    Create the label text for the product having this :class:'LID'
+    using the database connection.  If verify is True, verify the
+    label against its XML and Schematron schemas.  Raise an exception
+    if either fails.
+    """
+    cursor = conn.cursor()
+    cursor.execute("""SELECT label_filepath, collection, product_id
+                      FROM products WHERE product=?""",
+                   (lid,))
+    (label_fp, collection, product_id) = cursor.fetchone()
+
+    cursor.execute("""SELECT bundle, instrument, suffix
+                      FROM collections WHERE collection=?""",
+                   (collection,))
+    (bundle, instrument, suffix) = cursor.fetchone()
+
+    cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',
+                   (bundle,))
+    (proposal_id,) = cursor.fetchone()
+
+    label = make_label({
+            'lid': str(lid),
+            'proposal_id': str(proposal_id),
+            'suffix': suffix,
+            'Investigation_Area_name': mk_Investigation_Area_name(proposal_id),
+            'investigation_lidvid': mk_Investigation_Area_lidvid(proposal_id),
+            'Observing_System': observing_system(instrument),
+            'Time_Coordinates': get_db_time_coordinates(conn, lid),
+            'Target_Identification': get_db_target(conn, lid),
+            'HST': get_db_hst_parameters(conn, lid)
+            }).toxml()
+    with open(label_fp, 'w') as f:
+        f.write(label)
+
+    if verify:
+        verify_label_or_throw(label)
+
+    return label

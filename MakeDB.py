@@ -54,13 +54,15 @@ def makeProductsTable(conn, archive):
         label_filepath VARCHAR NOT NULL,
         collection VARCHAR NOT NULL,
         visit VARCHAR NOT NULL,
+        product_id VARCHAR NOT NULL,
         FOREIGN KEY(collection) REFERENCES collections(collection)
         )"""
     conn.execute(table_creation)
-    ps = [(str(p.lid), p.label_filepath(), str(c.lid), p.visit())
+    ps = [(str(p.lid), p.label_filepath(), str(c.lid),
+           p.visit(), p.lid.product_id)
           for c in archive.collections()
           for p in c.products()]
-    conn.executemany('INSERT INTO products VALUES (?, ?, ?, ?)', ps)
+    conn.executemany('INSERT INTO products VALUES (?, ?, ?, ?, ?)', ps)
     conn.commit()
 
 

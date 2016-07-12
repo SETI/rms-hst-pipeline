@@ -5,8 +5,10 @@ development.
 """
 import sqlite3
 
+from pdart.exceptions.Combinators import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
+from pdart.pds4labels.ProductLabel import *
 
 
 def make_db_bundle_labels(conn):
@@ -25,10 +27,24 @@ def make_db_collection_labels_and_inventories(conn):
     for lid in collection_lids:
         make_db_collection_label_and_inventory(conn, lid, True)
 
-if __name__ == '__main__':
+
+def make_db_product_labels(conn):
+    cursor = conn.cursor()
+    cursor.execute('SELECT product FROM products')
+    product_lids = [lid for (lid,) in cursor.fetchall()]
+    for lid in product_lids:
+        assert isinstance(lid, unicode), type(lid)
+        make_db_product_label(conn, lid, True)
+
+
+def dev():
     conn = sqlite3.connect('/Users/spaceman/Desktop/Archive/archive.spike.db')
     try:
+        make_db_product_labels(conn)
         make_db_collection_labels_and_inventories(conn)
         make_db_bundle_labels(conn)
     finally:
         conn.close()
+
+if __name__ == '__main__':
+    raise_verbosely(dev)
