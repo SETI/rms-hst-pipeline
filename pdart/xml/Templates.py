@@ -40,7 +40,8 @@ def interpret_document_template(template):
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
                     else:
-                        assert is_function(param), param_name
+                        assert is_function(param), ('%s is type %s' %
+                                                    (param_name, type(param)))
                         elmt = param(doc)
                         if isinstance(elmt, list):
                             for e in elmt:
@@ -51,7 +52,8 @@ def interpret_document_template(template):
                 elif name == 'FRAGMENT':
                     param_name = attrs['name']
                     param = dictionary[param_name]
-                    assert is_function(param), param_name
+                    assert is_function(param), ('%s is type %s' %
+                                                (param_name, type(param)))
                     elmts = param(doc)
                     assert isinstance(elmts, list)
                     for elmt in elmts:
@@ -119,14 +121,17 @@ def interpret_template(template):
                         elif type(param) == unicode:
                             elmt = doc.createTextNode(param)
                         else:
-                            assert is_function(param), param_name
+                            assert is_function(param), ('%s is type %s' %
+                                                        (param_name,
+                                                         type(param)))
                             elmt = param(doc)
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
                     elif name == 'FRAGMENT':
                         param_name = attrs['name']
                         param = dictionary[param_name]
-                        assert is_function(param), param_name
+                        assert is_function(param), ('%s is type %s' %
+                                                    (param_name, type(param)))
                         elmts = param(doc)
                         assert isinstance(elmts, list)
                         for elmt in elmts:
