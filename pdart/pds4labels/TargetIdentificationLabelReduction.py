@@ -65,10 +65,11 @@ _get_target = multiple_implementations('_get_target',
 
 
 def _db_get_target_from_header_unit(conn, lid):
-    cursor = conn.cursor()
-    cursor.execute("""SELECT value FROM cards
-        WHERE product=? AND hdu_index=0 AND keyword='TARGNAME'""")
-    (targname,) = cursor.fetchone()
+    with closing(conn.cursor()) as cursor:
+        cursor.execute(
+            """SELECT value FROM cards
+               WHERE product=? AND hdu_index=0 AND keyword='TARGNAME'""")
+        (targname,) = cursor.fetchone()
 
     for prefix, (name, type) in _approximate_target_table.iteritems():
         if targname.startswith(prefix):

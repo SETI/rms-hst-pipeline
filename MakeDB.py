@@ -51,6 +51,7 @@ def makeProductsTable(conn, archive):
     conn.execute('DROP TABLE IF EXISTS products')
     table_creation = """CREATE TABLE products (
         product VARCHAR PRIMARY KEY NOT NULL,
+        filename VARCHAR NOT NULL,
         label_filepath VARCHAR NOT NULL,
         collection VARCHAR NOT NULL,
         visit VARCHAR NOT NULL,
@@ -58,11 +59,12 @@ def makeProductsTable(conn, archive):
         FOREIGN KEY(collection) REFERENCES collections(collection)
         )"""
     conn.execute(table_creation)
-    ps = [(str(p.lid), p.label_filepath(), str(c.lid),
+    ps = [(str(p.lid), os.path.basename(p.absolute_filepath()),
+           p.label_filepath(), str(c.lid),
            p.visit(), p.lid.product_id)
           for c in archive.collections()
           for p in c.products()]
-    conn.executemany('INSERT INTO products VALUES (?, ?, ?, ?, ?)', ps)
+    conn.executemany('INSERT INTO products VALUES (?,?,?,?,?,?)', ps)
     conn.commit()
 
 
@@ -77,6 +79,14 @@ def makeHdusAndCardsTables(conn, archive):
     def desired_keyword(kw):
         """Return True if the keyword is wanted"""
         return kw
+
+    conn.execute('DROP TABLE IF EXISTS bad_fits_files')
+    table_creation = """CREATE TABLE bad_fits_files (
+        product VARCHAR NOT NULL,
+        message VARCHAR NOT NULL,
+        FOREIGN KEY (product) REFERENCES products(product)
+        )"""
+    conn.execute(table_creation)
 
     conn.execute('DROP TABLE IF EXISTS hdus')
     table_creation = """CREATE TABLE hdus (
@@ -126,8 +136,9 @@ def makeHdusAndCardsTables(conn, archive):
                                      'VALUES (?, ?, ?, ?)', cs)
             finally:
                 fits.close()
-        except IOError:
-            pass
+        except IOError as e:
+            conn.execute('INSERT INTO bad_fits_files VALUES (?,?)',
+                         (str(p.lid), str(e)))
 
     conn.commit()
 

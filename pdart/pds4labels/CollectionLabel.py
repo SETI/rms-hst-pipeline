@@ -1,3 +1,4 @@
+from contextlib import closing
 import io
 import sys
 
@@ -118,11 +119,11 @@ def make_collection_inventory(collection):
 
 
 def make_db_collection_inventory(conn, collection_lid):
-    cursor = conn.cursor()
-    cursor.execute('SELECT product FROM products WHERE collection=?',
-                   (collection_lid,))
-    result = cursor.fetchall()
-    lines = [u'P,%s\r\n' % str(product) for (product,) in result]
+    with closing(conn.cursor()) as cursor:
+        lines = [u'P,%s\r\n' % str(product)
+                 for (product,) in cursor.execute(
+                'SELECT product FROM products WHERE collection=?',
+                (collection_lid,))]
     return ''.join(lines)
 
 
@@ -146,17 +147,18 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
     If verify is True, verify the label against its XML and Schematron
     schemas.  Raise an exception if either fails.
     """
-    cursor = conn.cursor()
-    cursor.execute(
-        """SELECT label_filepath, bundle, suffix,
-           inventory_name, inventory_filepath
-           FROM collections WHERE collection=?""", (lid,))
-    (label_fp, bundle, suffix, inventory_name, inventory_filepath) = \
-        cursor.fetchone()
+    with closing(conn.cursor()) as cursor:
+        cursor.execute(
+            """SELECT label_filepath, bundle, suffix,
+               inventory_name, inventory_filepath
+               FROM collections WHERE collection=?""", (lid,))
+        (label_fp, bundle, suffix, inventory_name, inventory_filepath) = \
+            cursor.fetchone()
 
-    cursor.execute(
-        'SELECT proposal_id FROM bundles where bundle=?', (bundle,))
-    (proposal_id,) = cursor.fetchone()
+        cursor.execute(
+            'SELECT proposal_id FROM bundles where bundle=?', (bundle,))
+        (proposal_id,) = cursor.fetchone()
+
     label = make_label({
             'lid': lid,
             'suffix': suffix,
@@ -164,6 +166,7 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
             'Citation_Information': placeholder_citation_information,
             'inventory_name': inventory_name
     }).toxml()
+
     with open(label_fp, 'w') as f:
         f.write(label)
 
@@ -172,3 +175,5 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
 
     with io.open(inventory_filepath, 'w', newline='') as f:
         f.write(make_db_collection_inventory(conn, lid))
+
+    print 'collection label and inventory for', lid

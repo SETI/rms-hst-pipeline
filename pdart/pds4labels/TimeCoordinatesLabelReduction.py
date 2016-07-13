@@ -1,3 +1,5 @@
+from contextlib import closing
+
 import pdart.add_pds_tools
 import julian
 
@@ -82,24 +84,24 @@ class TimeCoordinatesLabelReduction(Reduction):
 
 
 def _db_get_start_stop_times_from_header_unit(conn, lid):
-    cursor = conn.cursor()
-    cursor.execute(
-        """SELECT value FROM cards
-           WHERE product=? AND hdu_index=0 AND keyword='DATE-OBS'""",
-        (str(lid),))
-    (date_obs,) = cursor.fetchone()
+    with closing(conn.cursor()) as cursor:
+        cursor.execute(
+            """SELECT value FROM cards
+               WHERE product=? AND hdu_index=0 AND keyword='DATE-OBS'""",
+            (str(lid),))
+        (date_obs,) = cursor.fetchone()
 
-    cursor.execute(
-        """SELECT value FROM cards
-           WHERE product=? AND hdu_index=0 AND keyword='TIME-OBS'""",
-        (str(lid),))
-    (time_obs,) = cursor.fetchone()
+        cursor.execute(
+            """SELECT value FROM cards
+               WHERE product=? AND hdu_index=0 AND keyword='TIME-OBS'""",
+            (str(lid),))
+        (time_obs,) = cursor.fetchone()
 
-    cursor.execute(
-        """SELECT value FROM cards
-           WHERE product=? AND hdu_index=0 AND keyword='EXPTIME'""",
-        (str(lid),))
-    (exptime,) = cursor.fetchone()
+        cursor.execute(
+            """SELECT value FROM cards
+               WHERE product=? AND hdu_index=0 AND keyword='EXPTIME'""",
+            (str(lid),))
+        (exptime,) = cursor.fetchone()
 
     start_date_time = '%sT%sZ' % (date_obs, time_obs)
     stop_date_time = julian.tai_from_iso(start_date_time) + exptime

@@ -73,8 +73,16 @@ parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
 
 
+def get_db_repeat_exposure_count(conn, lid):
+    return db_placeholder_int(conn, lid, 'repeat_exposure_count')
+
+
 def get_repeat_exposure_count(product_id, instrument, header):
     return placeholder_int(product_id, 'repeat_exposure_count')
+
+
+def get_db_subarray_flag(conn, lid):
+    return db_placeholder(conn, lid, 'subarray_flag')
 
 
 def get_subarray_flag(product_id, instrument, header):
@@ -99,6 +107,31 @@ def get_wf3_flag(product_id, instrument, header):
 
 def get_wf4_flag(product_id, instrument, header):
     return placeholder_int(product_id, 'wf4_flag')
+
+
+def _get_db_aperture_type(conn, lid):
+    cursor = conn.cursor()
+    cursor.execute("""SELECT collection
+                      FROM products WHERE product=?""",
+                   (lid,))
+    (collection,) = cursor.fetchone()
+
+    cursor.execute("""SELECT instrument
+                      FROM collections WHERE collection=?""",
+                   (collection,))
+    (instrument,) = cursor.fetchone()
+
+    assert instrument != 'wfpc2'
+    return get_db_keyword_value(conn, lid, 'APERTURE')
+
+
+def _get_db_aperture_type_placeholder(conn, lid):
+    return db_placeholder(conn, lid, 'aperture_type')
+
+get_db_aperture_type = multiple_implementations(
+    'get_db_aperture_type',
+    _get_db_aperture_type,
+    _get_db_aperture_type_placeholder)
 
 
 def get_aperture_type(product_id, instrument, header):
@@ -160,6 +193,37 @@ def get_center_filter_wavelength(product_id, instrument, header):
             return placeholder_float(product_id, 'center_filter_wavelength')
 
 
+def _get_db_detector_id(conn, lid):
+    cursor = conn.cursor()
+    cursor.execute("""SELECT collection, product_id
+                      FROM products WHERE product=?""",
+                   (lid,))
+    (collection, product_id) = cursor.fetchone()
+
+    cursor.execute("""SELECT instrument
+                      FROM collections WHERE collection=?""",
+                   (collection,))
+    (instrument,) = cursor.fetchone()
+
+    detector = get_db_keyword_value(conn, lid, 'DETECTOR')
+    if instrument == 'wfpc2':
+        if detector == '1':
+            return 'PC1'
+        else:
+            return 'WF' + detector
+    else:
+        return detector
+
+
+def _get_db_detector_id_placeholder(conn, lid):
+    return db_placeholder(conn, lid, 'detector_id')
+
+get_db_detector_id = multiple_implementations(
+    'get_db_detector_id',
+    _get_db_detector_id,
+    _get_db_detector_id_placeholder)
+
+
 def get_detector_id(product_id, instrument, header):
     try:
         detector = header['DETECTOR']
@@ -176,7 +240,7 @@ def get_detector_id(product_id, instrument, header):
 
 
 def _get_db_exposure_duration(conn, lid):
-    return get_db_keyword_value(conn, lid, 'EXPTIME')
+    return str(get_db_keyword_value(conn, lid, 'EXPTIME'))
 
 
 def _get_db_exposure_duration_placeholder(conn, lid):
@@ -359,7 +423,7 @@ def get_hst_pi_name(product_id, instrument, header):
 
 
 def _get_db_hst_proposal_id(conn, lid):
-    return get_db_keyword_value(conn, lid, 'PROPOSID')
+    return str(get_db_keyword_value(conn, lid, 'PROPOSID'))
 
 
 def _get_db_hst_proposal_id_placeholder(conn, lid):
@@ -384,7 +448,7 @@ def _get_db_hst_target_name(conn, lid):
 
 
 def _get_db_hst_target_name_placeholder(conn, lid):
-    db_placeholder(conn, lid, 'hst_target_name')
+    return db_placeholder(conn, lid, 'hst_target_name')
 
 
 get_db_hst_target_name = multiple_implementations(
@@ -425,6 +489,30 @@ def get_instrument_mode_id(product_id, instrument, header):
             return header['OBSMODE']
     except KeyError:
         return placeholder(product_id, 'instrument_mode_id')
+
+
+def _get_db_observation_type(conn, lid):
+    cursor = conn.cursor()
+    cursor.execute("""SELECT collection, product_id
+                      FROM products WHERE product=?""",
+                   (lid,))
+    (collection, product_id) = cursor.fetchone()
+
+    cursor.execute("""SELECT instrument
+                      FROM collections WHERE collection=?""",
+                   (collection,))
+    (instrument,) = cursor.fetchone()
+    assert instrument != 'wfpc2'
+    return get_db_keyword_value(conn, lid, 'OBSTYPE')
+
+
+def _get_db_observation_type_placeholder(conn, lid):
+    return db_placeholder(conn, lid, 'observation_type')
+
+get_db_observation_type = multiple_implementations(
+    'get_db_observation_type',
+    _get_db_observation_type,
+    _get_db_observation_type_placeholder)
 
 
 def get_observation_type(product_id, instrument, header):
@@ -605,15 +693,12 @@ def get_db_hst_parameters(conn, lid):
                    (collection,))
     (instrument,) = cursor.fetchone()
 
-    header = None
-
     d = {'stsci_group_id': known_placeholder(product_id,
                                              'stsci_group_id'),
          'hst_proposal_id': get_db_hst_proposal_id(conn, lid),
          'hst_pi_name': get_db_hst_pi_name(conn, lid),
          'hst_target_name': get_db_hst_target_name(conn, lid),
-         'aperture_type': get_aperture_type(product_id, instrument,
-                                            header),
+         'aperture_type': get_db_aperture_type(conn, lid),
          'exposure_duration': get_db_exposure_duration(conn, lid),
          'exposure_type': get_db_exposure_type(conn, lid),
          'filter_name': get_db_filter_name(conn, lid),
@@ -626,20 +711,16 @@ def get_db_hst_parameters(conn, lid):
 
     if instrument == 'acs':
         parameters_instrument = parameters_acs(
-            {'detector_id': get_detector_id(product_id,
-                                            instrument, header),
-             'gain_mode_id': get_gain_mode_id(product_id,
-                                              instrument, header),
-             'observation_type':
-                 get_observation_type(product_id, instrument,
-                                      header),
-             'repeat_exposure_count':
-                 get_repeat_exposure_count(product_id, instrument,
-                                           header),
-             'subarray_flag':
-                 get_subarray_flag(product_id, instrument,
-                                   header)})
+            {'detector_id': get_db_detector_id(conn, lid),
+             'gain_mode_id': get_db_gain_mode_id(conn, lid),
+             'observation_type': get_db_observation_type(conn, lid),
+             'repeat_exposure_count': get_db_repeat_exposure_count(conn, lid),
+             'subarray_flag': get_db_subarray_flag(conn, lid)})
     elif instrument == 'wfpc2':
+        # TODO I don't have samples of WFPC2 in the archive yet, so
+        # this code is untested (well, broken).
+        header = None
+
         parameters_instrument = parameters_wfpc2(
             {'bandwidth': get_db_bandwidth(conn, lid),
              'center_filter_wavelength':

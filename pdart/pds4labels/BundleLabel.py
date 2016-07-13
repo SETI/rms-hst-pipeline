@@ -1,3 +1,4 @@
+from contextlib import closing
 import os.path
 
 from pdart.pds4.Bundle import *
@@ -91,16 +92,18 @@ def make_db_bundle_label(conn, lid, verify):
     label against its XML and Schematron schemas.  Raise an exception
     if either fails.
     """
-    cursor = conn.cursor()
-    cursor.execute(
-        'SELECT label_filepath, proposal_id FROM bundles WHERE bundle=?',
-        (lid,))
-    (label_fp, proposal_id) = cursor.fetchone()
-    cursor.execute('SELECT collection from collections WHERE bundle=?', (lid,))
-    cls = cursor.fetchall()
-    collection_lids = [cl[0] for cl in cls]
-    reduced_collections = [make_bundle_entry_member({'lid': collection_lid})
-                           for collection_lid in collection_lids]
+    with closing(conn.cursor()) as cursor:
+        cursor.execute(
+            'SELECT label_filepath, proposal_id FROM bundles WHERE bundle=?',
+            (lid,))
+        (label_fp, proposal_id) = cursor.fetchone()
+
+        reduced_collections = \
+            [make_bundle_entry_member({'lid': collection_lid})
+             for (collection_lid,)
+             in cursor.execute(
+                'SELECT collection from collections WHERE bundle=?', (lid,))]
+
     label = make_label({
             'lid': lid,
             'proposal_id': str(proposal_id),

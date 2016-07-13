@@ -1,3 +1,4 @@
+from contextlib import closing
 import os.path
 
 from pdart.pds4.Product import *
@@ -167,25 +168,28 @@ def make_db_product_label(conn, lid, verify):
     label against its XML and Schematron schemas.  Raise an exception
     if either fails.
     """
-    cursor = conn.cursor()
-    cursor.execute("""SELECT label_filepath, collection, product_id
-                      FROM products WHERE product=?""",
-                   (lid,))
-    (label_fp, collection, product_id) = cursor.fetchone()
+    with closing(conn.cursor()) as cursor:
+        cursor.execute(
+            """SELECT filename, label_filepath, collection, product_id
+               FROM products WHERE product=?""",
+            (lid,))
+        (file_name, label_fp, collection, product_id) = cursor.fetchone()
 
-    cursor.execute("""SELECT bundle, instrument, suffix
-                      FROM collections WHERE collection=?""",
-                   (collection,))
-    (bundle, instrument, suffix) = cursor.fetchone()
+        cursor.execute("""SELECT bundle, instrument, suffix
+                          FROM collections WHERE collection=?""",
+                       (collection,))
+        (bundle, instrument, suffix) = cursor.fetchone()
 
-    cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',
-                   (bundle,))
-    (proposal_id,) = cursor.fetchone()
+        cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',
+                       (bundle,))
+        (proposal_id,) = cursor.fetchone()
 
     label = make_label({
             'lid': str(lid),
             'proposal_id': str(proposal_id),
             'suffix': suffix,
+            'file_name': file_name,
+            'file_contents': get_db_file_contents(conn, lid),
             'Investigation_Area_name': mk_Investigation_Area_name(proposal_id),
             'investigation_lidvid': mk_Investigation_Area_lidvid(proposal_id),
             'Observing_System': observing_system(instrument),
@@ -195,6 +199,8 @@ def make_db_product_label(conn, lid, verify):
             }).toxml()
     with open(label_fp, 'w') as f:
         f.write(label)
+
+    print 'product label for', lid
 
     if verify:
         verify_label_or_throw(label)
