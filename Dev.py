@@ -29,24 +29,18 @@ def make_db_collection_labels_and_inventories(conn):
 
 def make_db_product_labels(conn):
     with closing(conn.cursor()) as cursor:
-        for (lid,) in cursor.execute('SELECT product FROM products'):
+        for (lid,) in cursor.execute(
+            """SELECT product FROM products EXCEPT
+               SELECT product FROM bad_fits_files"""):
             assert isinstance(lid, unicode), type(lid)
-            with closing(conn.cursor()) as cursor2:
-                cursor2.execute(
-                    'SELECT message FROM bad_fits_files WHERE product=?',
-                    (str(lid),))
-                res = cursor2.fetchone()
-            if res is None:
-                make_db_product_label(conn, lid, VERIFY)
-            else:
-                print 'bad fits file for', str(lid)
+            make_db_product_label(conn, lid, VERIFY)
 
 
 def dev():
     with closing(sqlite3.connect(
             '/Users/spaceman/Desktop/Archive/archive.spike.db')) as conn:
-        make_db_collection_labels_and_inventories(conn)
         make_db_product_labels(conn)
+        make_db_collection_labels_and_inventories(conn)
         make_db_bundle_labels(conn)
 
 if __name__ == '__main__':

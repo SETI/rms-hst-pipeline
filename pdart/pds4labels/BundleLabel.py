@@ -114,6 +114,8 @@ def make_db_bundle_label(conn, lid, verify):
     with open(label_fp, 'w') as f:
         f.write(label)
 
+    print 'bundle label for', lid
+
     if verify:
         verify_label_or_throw(label)
 
