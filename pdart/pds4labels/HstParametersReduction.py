@@ -74,8 +74,8 @@ parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
 
 
-def get_db_repeat_exposure_count(conn, lid):
-    return db_placeholder_int(conn, lid, 'repeat_exposure_count')
+def get_db_repeat_exposure_count(conn, lid, product_id):
+    return placeholder_int(product_id, 'repeat_exposure_count')
 
 
 def get_repeat_exposure_count(product_id, instrument, header):
@@ -221,12 +221,11 @@ def get_detector_id(product_id, instrument, header):
         return detector
 
 
-def _get_db_exposure_duration(conn, lid):
+def _get_db_exposure_duration(conn, lid, product_id):
     return str(get_db_keyword_value(conn, lid, 'EXPTIME'))
 
 
-def _get_db_exposure_duration_placeholder(conn, lid):
-    product_id = get_db_product_id(conn, lid)
+def _get_db_exposure_duration_placeholder(conn, lid, product_id):
     return placeholder_float(product_id, 'exposure_duration')
 
 get_db_exposure_duration = multiple_implementations(
@@ -242,12 +241,11 @@ def get_exposure_duration(product_id, instrument, header):
         return placeholder_float(product_id, 'exposure_duration')
 
 
-def _get_db_exposure_type(conn, lid):
+def _get_db_exposure_type(conn, lid, product_id):
     return get_db_keyword_value(conn, lid, 'EXPFLAG')
 
 
-def _get_db_exposure_type_placeholder(conn, lid):
-    product_id = get_db_product_id(conn, lid)
+def _get_db_exposure_type_placeholder(conn, lid, product_id):
     return placeholder(product_id, 'exposure_type')
 
 get_db_exposure_type = multiple_implementations(
@@ -263,7 +261,7 @@ def get_exposure_type(product_id, instrument, header):
         return placeholder(product_id, 'exposure_type')
 
 
-def _get_db_filter_name(conn, lid):
+def _get_db_filter_name(conn, lid, product_name):
     if instrument == 'wfpc2':
         filtnam1 = get_db_keyword_value(conn, lid, 'FILTNAM1').strip()
         filtnam2 = get_db_keyword_value(conn, lid, 'FILTNAM2').strip()
@@ -290,8 +288,7 @@ def _get_db_filter_name(conn, lid):
         return get_db_keyword_value(conn, lid, 'FILTER')
 
 
-def _get_db_filter_name_placeholder(conn, lid):
-    product_id = get_db_product_id(conn, lid)
+def _get_db_filter_name_placeholder(conn, lid, product_id):
     return placeholder(product_id, 'filter_name')
 
 get_db_filter_name = multiple_implementations(
@@ -330,12 +327,11 @@ def get_filter_name(product_id, instrument, header):
         return placeholder(product_id, 'filter_name')
 
 
-def _get_db_fine_guidance_system_lock_type(conn, lid):
+def _get_db_fine_guidance_system_lock_type(conn, lid, product_id):
     return get_db_keyword_value(conn, lid, 'FGSLOCK')
 
 
-def _get_db_fine_guidance_system_lock_type_placeholder(conn, lid):
-    product_id = get_db_product_id(conn, lid)
+def _get_db_fine_guidance_system_lock_type_placeholder(conn, lid, product_id):
     return placeholder(product_id, 'fine_guidance_system_lock_type')
 
 get_db_fine_guidance_system_lock_type = multiple_implementations(
@@ -351,7 +347,7 @@ def get_fine_guidance_system_lock_type(product_id, instrument, header):
         return placeholder(product_id, 'fine_guidance_system_lock_type')
 
 
-def _get_db_gain_mode_id(conn, lid):
+def _get_db_gain_mode_id(conn, lid, product_id):
     atodgain = get_db_keyword_value(conn, lid, 'ATODGAIN')
     if instrument == 'acs':
         return str(atodgain)
@@ -359,8 +355,7 @@ def _get_db_gain_mode_id(conn, lid):
         return 'A2D' + str(int(atodgain))
 
 
-def _get_db_gain_mode_id_placeholder(conn, lid):
-    product_id = get_db_product_id(conn, lid)
+def _get_db_gain_mode_id_placeholder(conn, lid, product_id):
     return placeholder(product_id, 'gain_mode_id')
 
 get_db_gain_mode_id = multiple_implementations(
@@ -404,12 +399,12 @@ def get_hst_pi_name(product_id, instrument, header):
         return placeholder(product_id, 'hst_pi_name')
 
 
-def _get_db_hst_proposal_id(conn, lid):
+def _get_db_hst_proposal_id(conn, lid, product_id):
     return str(get_db_keyword_value(conn, lid, 'PROPOSID'))
 
 
-def _get_db_hst_proposal_id_placeholder(conn, lid):
-    return db_placeholder_int(conn, lid, 'hst_proposal_id')
+def _get_db_hst_proposal_id_placeholder(conn, lid, product_id):
+    return placeholder_int(product_id, 'hst_proposal_id')
 
 
 get_db_hst_proposal_id = multiple_implementations(
@@ -446,15 +441,14 @@ def get_hst_target_name(product_id, instrument, header):
         return placeholder(product_id, 'hst_target_name')
 
 
-def _get_db_instrument_mode_id(conn, lid):
+def _get_db_instrument_mode_id(conn, lid, product_id):
     if instrument == 'wfpc2':
         return get_db_keyword_value(conn, lid, 'MODE')
     else:
         return get_db_keyword_value(conn, lid, 'OBSMODE')
 
 
-def _get_db_instrument_mode_id_placeholder(conn, lid):
-    product_id = get_db_product_id(conn, lid)
+def _get_db_instrument_mode_id_placeholder(conn, lid, product_id):
     return placeholder(product_id, 'instrument_mode_id')
 
 get_db_instrument_mode_id = multiple_implementations(
@@ -502,27 +496,12 @@ def known_placeholder(product_id, tag):
     return '### placeholder for %s ###' % tag
 
 
-def get_db_product_id(conn, lid):
-    with closing(conn.cursor()) as cursor:
-        cursor.execute('SELECT product_id FROM products WHERE product=?',
-                       (str(lid),))
-        (product_id,) = cursor.fetchone()
-
-    return product_id
-
-
 def placeholder(product_id, tag):
     note_problem(product_id, tag)
     return '### placeholder for %s ###' % tag
 
 
 def placeholder_int(product_id, tag):
-    note_problem(product_id, tag)
-    return '0'
-
-
-def db_placeholder_int(conn, lid, tag):
-    product_id = get_db_product_id(conn, lid)
     note_problem(product_id, tag)
     return '0'
 
@@ -654,29 +633,31 @@ class HstParametersReduction(Reduction):
 def get_db_hst_parameters(conn, lid, instrument, product_id):
     d = {'stsci_group_id': known_placeholder(product_id,
                                              'stsci_group_id'),
-         'hst_proposal_id': get_db_hst_proposal_id(conn, lid),
+         'hst_proposal_id': get_db_hst_proposal_id(conn, lid, product_id),
          'hst_pi_name': get_db_hst_pi_name(conn, lid, product_id),
          'hst_target_name': get_db_hst_target_name(conn, lid, product_id),
          'aperture_type': get_db_aperture_type(conn, lid,
                                                instrument, product_id),
-         'exposure_duration': get_db_exposure_duration(conn, lid),
-         'exposure_type': get_db_exposure_type(conn, lid),
-         'filter_name': get_db_filter_name(conn, lid),
+         'exposure_duration': get_db_exposure_duration(conn, lid, product_id),
+         'exposure_type': get_db_exposure_type(conn, lid, product_id),
+         'filter_name': get_db_filter_name(conn, lid, product_id),
          'fine_guidance_system_lock_type':
-             get_db_fine_guidance_system_lock_type(conn, lid),
+             get_db_fine_guidance_system_lock_type(conn, lid, product_id),
          'gyroscope_mode': known_placeholder(product_id,
                                              'gyroscope_mode'),
-         'instrument_mode_id': get_db_instrument_mode_id(conn, lid),
+         'instrument_mode_id': get_db_instrument_mode_id(conn, lid,
+                                                         product_id),
          'moving_target_flag': 'true'}
 
     if instrument == 'acs':
         parameters_instrument = parameters_acs(
             {'detector_id': get_db_detector_id(conn, lid,
                                                instrument, product_id),
-             'gain_mode_id': get_db_gain_mode_id(conn, lid),
+             'gain_mode_id': get_db_gain_mode_id(conn, lid, product_id),
              'observation_type':
                  get_db_observation_type(conn, lid, instrument, product_id),
-             'repeat_exposure_count': get_db_repeat_exposure_count(conn, lid),
+             'repeat_exposure_count': get_db_repeat_exposure_count(conn, lid,
+                                                                   product_id),
              'subarray_flag': get_db_subarray_flag(conn, lid, product_id)})
     elif instrument == 'wfpc2':
         # TODO I don't have samples of WFPC2 in the archive yet, so
@@ -691,7 +672,7 @@ def get_db_hst_parameters(conn, lid, instrument, product_id):
              'targeted_detector_id':
                  get_targeted_detector_id(product_id, instrument,
                                           header),
-             'gain_mode_id': get_db_gain_mode_id(conn, lid),
+             'gain_mode_id': get_db_gain_mode_id(conn, lid, product_id),
              'pc1_flag': get_pc1_flag(product_id, instrument,
                                       header),
              'wf2_flag': get_wf2_flag(product_id, instrument,
