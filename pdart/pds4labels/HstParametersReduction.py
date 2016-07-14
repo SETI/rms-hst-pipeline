@@ -82,8 +82,8 @@ def get_repeat_exposure_count(product_id, instrument, header):
     return placeholder_int(product_id, 'repeat_exposure_count')
 
 
-def get_db_subarray_flag(conn, lid):
-    return db_placeholder(conn, lid, 'subarray_flag')
+def get_db_subarray_flag(conn, lid, product_id):
+    return placeholder(product_id, 'subarray_flag')
 
 
 def get_subarray_flag(product_id, instrument, header):
@@ -110,11 +110,11 @@ def get_wf4_flag(product_id, instrument, header):
     return placeholder_int(product_id, 'wf4_flag')
 
 
-def _get_db_aperture_type_placeholder(conn, lid, instrument):
-    return db_placeholder(conn, lid, 'aperture_type')
+def _get_db_aperture_type_placeholder(conn, lid, instrument, product_id):
+    return placeholder(product_id, 'aperture_type')
 
 
-def _get_db_aperture_type(conn, lid, instrument):
+def _get_db_aperture_type(conn, lid, instrument, product_id):
     if instrument == 'wfpc2':
         return _get_db_aperture_type_placeholder(conn, lid, instrument)
     else:
@@ -137,14 +137,13 @@ def get_aperture_type(product_id, instrument, header):
             return placeholder(product_id, 'aperture_type')
 
 
-def _get_db_bandwidth(conn, lid):
+def _get_db_bandwidth(conn, lid, product_id):
     if instrument == 'wfpc2':
         bandwid = float(get_db_keyword_value(conn, lid, 'BANDWID'))
         return str(bandwid * 1.e-4)
 
 
-def _get_db_bandwidth_placeholder(conn, lid):
-    product_id = get_db_product_id(conn, lid)
+def _get_db_bandwidth_placeholder(conn, lid, product_id):
     return placeholder_float(product_id, 'bandwidth')
 
 get_db_bandwidth = multiple_implementations(
@@ -161,14 +160,16 @@ def get_bandwidth(product_id, instrument, header):
             return placeholder_float(product_id, 'bandwidth')
 
 
-def _get_db_center_filter_wavelength(conn, lid):
+def _get_db_center_filter_wavelength(conn, lid, instrument, product_id):
     if instrument == 'wfpc2':
         centrwv = float(get_db_keyword_value(conn, lid, 'CENTRWV'))
         return str(centrwv * 1.e-4)
+    else:
+        raise Exception('Unhandled instrument %s' % instrument)
 
 
-def _get_db_center_filter_wavelength_placeholder(conn, lid):
-    product_id = get_db_product_id(conn, lid)
+def _get_db_center_filter_wavelength_placeholder(conn, lid,
+                                                 instrument, product_id):
     return placeholder_float(product_id, 'center_filter_wavelength')
 
 get_db_center_filter_wavelength = multiple_implementations(
@@ -185,7 +186,7 @@ def get_center_filter_wavelength(product_id, instrument, header):
             return placeholder_float(product_id, 'center_filter_wavelength')
 
 
-def _get_db_detector_id(conn, lid, instrument):
+def _get_db_detector_id(conn, lid, instrument, product_id):
     detector = get_db_keyword_value(conn, lid, 'DETECTOR')
     if instrument == 'wfpc2':
         if detector == '1':
@@ -196,8 +197,8 @@ def _get_db_detector_id(conn, lid, instrument):
         return detector
 
 
-def _get_db_detector_id_placeholder(conn, lid, instrument):
-    return db_placeholder(conn, lid, 'detector_id')
+def _get_db_detector_id_placeholder(conn, lid, instrument, product_id):
+    return placeholder(product_id, 'detector_id')
 
 get_db_detector_id = multiple_implementations(
     'get_db_detector_id',
@@ -378,15 +379,15 @@ def get_gain_mode_id(product_id, instrument, header):
         return placeholder(product_id, 'gain_mode_id')
 
 
-def _get_db_hst_pi_name(conn, lid):
+def _get_db_hst_pi_name(conn, lid, product_id):
     pr_inv_l = get_db_keyword_value(conn, lid, 'PR_INV_L')
     pr_inv_f = get_db_keyword_value(conn, lid, 'PR_INV_F')
     pr_inv_m = get_db_keyword_value(conn, lid, 'PR_INV_M')
     return '%s, %s %s' % (pr_inv_l, pr_inv_f, pr_inv_m)
 
 
-def _get_db_hst_pi_name_placeholder(conn, lid):
-    return db_placeholder(conn, lid, 'hst_pi_name')
+def _get_db_hst_pi_name_placeholder(conn, lid, product_id):
+    return placeholder(product_id, 'hst_pi_name')
 
 get_db_hst_pi_name = multiple_implementations(
     'get_db_hst_pi_name',
@@ -424,12 +425,12 @@ def get_hst_proposal_id(product_id, instrument, header):
         return placeholder_int(product_id, 'hst_proposal_id')
 
 
-def _get_db_hst_target_name(conn, lid):
+def _get_db_hst_target_name(conn, lid, product_id):
     return get_db_keyword_value(conn, lid, 'TARGNAME')
 
 
-def _get_db_hst_target_name_placeholder(conn, lid):
-    return db_placeholder(conn, lid, 'hst_target_name')
+def _get_db_hst_target_name_placeholder(conn, lid, product_id):
+    return placeholder(product_id, 'hst_target_name')
 
 
 get_db_hst_target_name = multiple_implementations(
@@ -472,15 +473,15 @@ def get_instrument_mode_id(product_id, instrument, header):
         return placeholder(product_id, 'instrument_mode_id')
 
 
-def _get_db_observation_type_placeholder(conn, lid, instrument):
-    return db_placeholder(conn, lid, 'observation_type')
+def _get_db_observation_type_placeholder(conn, lid, instrument, product_id):
+    return placeholder(product_id, 'observation_type')
 
 
-def _get_db_observation_type(conn, lid, instrument):
+def _get_db_observation_type(conn, lid, instrument, product_id):
     if instrument != 'wfpc2':
         return get_db_keyword_value(conn, lid, 'OBSTYPE')
     else:
-        return _get_db_observation_type_placeholder(conn, lid, instrument)
+        raise Exception('Unhandled instrument %s' % instrument)
 
 
 get_db_observation_type = multiple_implementations(
@@ -511,12 +512,6 @@ def get_db_product_id(conn, lid):
 
 
 def placeholder(product_id, tag):
-    note_problem(product_id, tag)
-    return '### placeholder for %s ###' % tag
-
-
-def db_placeholder(conn, lid, tag):
-    product_id = get_db_product_id(conn, lid)
     note_problem(product_id, tag)
     return '### placeholder for %s ###' % tag
 
@@ -660,9 +655,10 @@ def get_db_hst_parameters(conn, lid, instrument, product_id):
     d = {'stsci_group_id': known_placeholder(product_id,
                                              'stsci_group_id'),
          'hst_proposal_id': get_db_hst_proposal_id(conn, lid),
-         'hst_pi_name': get_db_hst_pi_name(conn, lid),
-         'hst_target_name': get_db_hst_target_name(conn, lid),
-         'aperture_type': get_db_aperture_type(conn, lid, instrument),
+         'hst_pi_name': get_db_hst_pi_name(conn, lid, product_id),
+         'hst_target_name': get_db_hst_target_name(conn, lid, product_id),
+         'aperture_type': get_db_aperture_type(conn, lid,
+                                               instrument, product_id),
          'exposure_duration': get_db_exposure_duration(conn, lid),
          'exposure_type': get_db_exposure_type(conn, lid),
          'filter_name': get_db_filter_name(conn, lid),
@@ -675,21 +671,23 @@ def get_db_hst_parameters(conn, lid, instrument, product_id):
 
     if instrument == 'acs':
         parameters_instrument = parameters_acs(
-            {'detector_id': get_db_detector_id(conn, lid, instrument),
+            {'detector_id': get_db_detector_id(conn, lid,
+                                               instrument, product_id),
              'gain_mode_id': get_db_gain_mode_id(conn, lid),
              'observation_type':
-                 get_db_observation_type(conn, lid, instrument),
+                 get_db_observation_type(conn, lid, instrument, product_id),
              'repeat_exposure_count': get_db_repeat_exposure_count(conn, lid),
-             'subarray_flag': get_db_subarray_flag(conn, lid)})
+             'subarray_flag': get_db_subarray_flag(conn, lid, product_id)})
     elif instrument == 'wfpc2':
         # TODO I don't have samples of WFPC2 in the archive yet, so
         # this code is untested (well, broken).
         header = None
 
         parameters_instrument = parameters_wfpc2(
-            {'bandwidth': get_db_bandwidth(conn, lid),
+            {'bandwidth': get_db_bandwidth(conn, lid, product_id),
              'center_filter_wavelength':
-                 get_db_center_filter_wavelength(conn, lid),
+                 get_db_center_filter_wavelength(conn, lid,
+                                                 instrument, product_id),
              'targeted_detector_id':
                  get_targeted_detector_id(product_id, instrument,
                                           header),
