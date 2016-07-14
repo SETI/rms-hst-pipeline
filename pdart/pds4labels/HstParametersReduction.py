@@ -1,3 +1,4 @@
+from contextlib import closing
 import sys
 
 from pdart.exceptions.Combinators import *
@@ -7,11 +8,11 @@ from pdart.xml.Templates import *
 
 def get_db_keyword_value(conn, lid, keyword):
     # assumes first header
-    cursor = conn.cursor()
-    cursor.execute("""SELECT value FROM cards
-                      WHERE product=? AND hdu_index=0 AND keyword=?""",
-                   (str(lid,), keyword))
-    (value,) = cursor.fetchone()
+    with closing(conn.cursor()) as cursor:
+        cursor.execute("""SELECT value FROM cards
+                          WHERE product=? AND hdu_index=0 AND keyword=?""",
+                       (str(lid,), keyword))
+        (value,) = cursor.fetchone()
     return value
 
 
@@ -109,24 +110,15 @@ def get_wf4_flag(product_id, instrument, header):
     return placeholder_int(product_id, 'wf4_flag')
 
 
-def _get_db_aperture_type(conn, lid):
-    cursor = conn.cursor()
-    cursor.execute("""SELECT collection
-                      FROM products WHERE product=?""",
-                   (lid,))
-    (collection,) = cursor.fetchone()
-
-    cursor.execute("""SELECT instrument
-                      FROM collections WHERE collection=?""",
-                   (collection,))
-    (instrument,) = cursor.fetchone()
-
-    assert instrument != 'wfpc2'
-    return get_db_keyword_value(conn, lid, 'APERTURE')
-
-
-def _get_db_aperture_type_placeholder(conn, lid):
+def _get_db_aperture_type_placeholder(conn, lid, instrument):
     return db_placeholder(conn, lid, 'aperture_type')
+
+
+def _get_db_aperture_type(conn, lid, instrument):
+    if instrument == 'wfpc2':
+        return _get_db_aperture_type_placeholder(conn, lid, instrument)
+    else:
+        return get_db_keyword_value(conn, lid, 'APERTURE')
 
 get_db_aperture_type = multiple_implementations(
     'get_db_aperture_type',
@@ -193,18 +185,7 @@ def get_center_filter_wavelength(product_id, instrument, header):
             return placeholder_float(product_id, 'center_filter_wavelength')
 
 
-def _get_db_detector_id(conn, lid):
-    cursor = conn.cursor()
-    cursor.execute("""SELECT collection, product_id
-                      FROM products WHERE product=?""",
-                   (lid,))
-    (collection, product_id) = cursor.fetchone()
-
-    cursor.execute("""SELECT instrument
-                      FROM collections WHERE collection=?""",
-                   (collection,))
-    (instrument,) = cursor.fetchone()
-
+def _get_db_detector_id(conn, lid, instrument):
     detector = get_db_keyword_value(conn, lid, 'DETECTOR')
     if instrument == 'wfpc2':
         if detector == '1':
@@ -215,7 +196,7 @@ def _get_db_detector_id(conn, lid):
         return detector
 
 
-def _get_db_detector_id_placeholder(conn, lid):
+def _get_db_detector_id_placeholder(conn, lid, instrument):
     return db_placeholder(conn, lid, 'detector_id')
 
 get_db_detector_id = multiple_implementations(
@@ -491,23 +472,16 @@ def get_instrument_mode_id(product_id, instrument, header):
         return placeholder(product_id, 'instrument_mode_id')
 
 
-def _get_db_observation_type(conn, lid):
-    cursor = conn.cursor()
-    cursor.execute("""SELECT collection, product_id
-                      FROM products WHERE product=?""",
-                   (lid,))
-    (collection, product_id) = cursor.fetchone()
-
-    cursor.execute("""SELECT instrument
-                      FROM collections WHERE collection=?""",
-                   (collection,))
-    (instrument,) = cursor.fetchone()
-    assert instrument != 'wfpc2'
-    return get_db_keyword_value(conn, lid, 'OBSTYPE')
-
-
-def _get_db_observation_type_placeholder(conn, lid):
+def _get_db_observation_type_placeholder(conn, lid, instrument):
     return db_placeholder(conn, lid, 'observation_type')
+
+
+def _get_db_observation_type(conn, lid, instrument):
+    if instrument != 'wfpc2':
+        return get_db_keyword_value(conn, lid, 'OBSTYPE')
+    else:
+        return _get_db_observation_type_placeholder(conn, lid, instrument)
+
 
 get_db_observation_type = multiple_implementations(
     'get_db_observation_type',
@@ -528,10 +502,11 @@ def known_placeholder(product_id, tag):
 
 
 def get_db_product_id(conn, lid):
-    cursor = conn.cursor()
-    cursor.execute('SELECT product_id FROM products WHERE product=?',
-                   (str(lid),))
-    (product_id,) = cursor.fetchone()
+    with closing(conn.cursor()) as cursor:
+        cursor.execute('SELECT product_id FROM products WHERE product=?',
+                       (str(lid),))
+        (product_id,) = cursor.fetchone()
+
     return product_id
 
 
@@ -681,24 +656,13 @@ class HstParametersReduction(Reduction):
             return result
 
 
-def get_db_hst_parameters(conn, lid):
-    cursor = conn.cursor()
-    cursor.execute("""SELECT collection, product_id
-                      FROM products WHERE product=?""",
-                   (lid,))
-    (collection, product_id) = cursor.fetchone()
-
-    cursor.execute("""SELECT instrument
-                      FROM collections WHERE collection=?""",
-                   (collection,))
-    (instrument,) = cursor.fetchone()
-
+def get_db_hst_parameters(conn, lid, instrument, product_id):
     d = {'stsci_group_id': known_placeholder(product_id,
                                              'stsci_group_id'),
          'hst_proposal_id': get_db_hst_proposal_id(conn, lid),
          'hst_pi_name': get_db_hst_pi_name(conn, lid),
          'hst_target_name': get_db_hst_target_name(conn, lid),
-         'aperture_type': get_db_aperture_type(conn, lid),
+         'aperture_type': get_db_aperture_type(conn, lid, instrument),
          'exposure_duration': get_db_exposure_duration(conn, lid),
          'exposure_type': get_db_exposure_type(conn, lid),
          'filter_name': get_db_filter_name(conn, lid),
@@ -711,9 +675,10 @@ def get_db_hst_parameters(conn, lid):
 
     if instrument == 'acs':
         parameters_instrument = parameters_acs(
-            {'detector_id': get_db_detector_id(conn, lid),
+            {'detector_id': get_db_detector_id(conn, lid, instrument),
              'gain_mode_id': get_db_gain_mode_id(conn, lid),
-             'observation_type': get_db_observation_type(conn, lid),
+             'observation_type':
+                 get_db_observation_type(conn, lid, instrument),
              'repeat_exposure_count': get_db_repeat_exposure_count(conn, lid),
              'subarray_flag': get_db_subarray_flag(conn, lid)})
     elif instrument == 'wfpc2':

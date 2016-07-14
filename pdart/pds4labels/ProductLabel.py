@@ -195,7 +195,7 @@ def make_db_product_label(conn, lid, verify):
             'Observing_System': observing_system(instrument),
             'Time_Coordinates': get_db_time_coordinates(conn, lid),
             'Target_Identification': get_db_target(conn, lid),
-            'HST': get_db_hst_parameters(conn, lid)
+            'HST': get_db_hst_parameters(conn, lid, instrument, product_id)
             }).toxml()
     with open(label_fp, 'w') as f:
         f.write(label)
