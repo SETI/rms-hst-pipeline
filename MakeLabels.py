@@ -1,7 +1,7 @@
 """
 SCRIPT: Run through the archive and generate labels (but not browse
-products or labels).  Do not validate them.  If it fails at any point,
-print the combined exception as XML to stdout.
+products or labels).  Possibly validate them.  If it fails at any
+point, print the combined exception as XML to stdout.
 """
 import sys
 
@@ -35,7 +35,7 @@ class MakeLabelsReduction(CompositeReduction):
 
 if __name__ == '__main__':
     archive = get_any_archive()
-    verify = True
+    verify = False
     reduction = CompositeReduction([LogProductsReduction(),
                                     MakeLabelsReduction(verify)])
     raise_verbosely(lambda: run_reduction(reduction, archive))

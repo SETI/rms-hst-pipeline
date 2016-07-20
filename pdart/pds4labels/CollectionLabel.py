@@ -177,3 +177,4 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
         f.write(make_db_collection_inventory(conn, lid))
 
     print 'collection label and inventory for', lid
+    sys.stdout.flush()

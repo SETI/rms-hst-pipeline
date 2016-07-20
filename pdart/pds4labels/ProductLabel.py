@@ -1,5 +1,6 @@
 from contextlib import closing
 import os.path
+import sys
 
 from pdart.pds4.Product import *
 from pdart.pds4labels.FileContentsLabelReduction import *
@@ -201,6 +202,7 @@ def make_db_product_label(conn, lid, verify):
         f.write(label)
 
     print 'product label for', lid
+    sys.stdout.flush()
 
     if verify:
         verify_label_or_throw(label)

@@ -1,5 +1,6 @@
 from contextlib import closing
 import os.path
+import sys
 
 from pdart.pds4.Bundle import *
 from pdart.reductions.Reduction import *
@@ -115,6 +116,7 @@ def make_db_bundle_label(conn, lid, verify):
         f.write(label)
 
     print 'bundle label for', lid
+    sys.stdout.flush()
 
     if verify:
         verify_label_or_throw(label)
