@@ -83,25 +83,10 @@ class TimeCoordinatesLabelReduction(Reduction):
             pass
 
 
-def _db_get_start_stop_times_from_header_unit(conn, lid):
-    with closing(conn.cursor()) as cursor:
-        cursor.execute(
-            """SELECT value FROM cards
-               WHERE product=? AND hdu_index=0 AND keyword='DATE-OBS'""",
-            (str(lid),))
-        (date_obs,) = cursor.fetchone()
-
-        cursor.execute(
-            """SELECT value FROM cards
-               WHERE product=? AND hdu_index=0 AND keyword='TIME-OBS'""",
-            (str(lid),))
-        (time_obs,) = cursor.fetchone()
-
-        cursor.execute(
-            """SELECT value FROM cards
-               WHERE product=? AND hdu_index=0 AND keyword='EXPTIME'""",
-            (str(lid),))
-        (exptime,) = cursor.fetchone()
+def _db_get_start_stop_times_from_header_unit(headers):
+    date_obs = headers[0]['DATE-OBS']
+    time_obs = headers[0]['TIME-OBS']
+    exptime = headers[0]['EXPTIME']
 
     start_date_time = '%sT%sZ' % (date_obs, time_obs)
     stop_date_time = julian.tai_from_iso(start_date_time) + exptime
@@ -118,5 +103,5 @@ _db_get_start_stop_times = multiple_implementations(
     _get_placeholder_start_stop_times)
 
 
-def get_db_time_coordinates(conn, lid):
-    return time_coordinates(_db_get_start_stop_times(conn, lid))
+def get_db_time_coordinates(headers, conn, lid):
+    return time_coordinates(_db_get_start_stop_times(headers))

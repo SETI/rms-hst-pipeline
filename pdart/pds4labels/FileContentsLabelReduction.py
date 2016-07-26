@@ -45,26 +45,20 @@ def mk_axis_arrays(hdu, axes):
         [mk_axis_array(hdu, i + 1) for i in range(0, axes)])
 
 
-def db_mk_axis_arrays(conn, lid, hdu_index, axes):
+def _db_mk_axis_arrays(headers, hdu_index, axes):
     # I can probably speed this up by getting the data in bulk.
-    with closing(conn.cursor()) as cursor:
+    def mk_axis_array(i):
+        axis_name = _AXIS_NAME_TABLE[i]
 
-        def mk_axis_array(i):
-            axis_name = _AXIS_NAME_TABLE[i]
+        elements = headers[hdu_index]['NAXIS%d' % i]
+        # TODO Check the semantics of sequence_number
+        sequence_number = str(i)
+        return axis_array({'axis_name': axis_name,
+                           'elements': str(elements),
+                           'sequence_number': sequence_number})
 
-            cursor.execute("""SELECT value FROM cards
-                              WHERE product=? AND hdu_index=? AND keyword=?""",
-                           ((str(lid), hdu_index, ('NAXIS%d' % i))))
-            (elements,) = cursor.fetchone()
-
-            # TODO Check the semantics of sequence_number
-            sequence_number = str(i)
-            return axis_array({'axis_name': axis_name,
-                               'elements': str(elements),
-                               'sequence_number': sequence_number})
-
-        return combine_nodes_into_fragment(
-            [mk_axis_array(i + 1) for i in range(0, axes)])
+    return combine_nodes_into_fragment(
+        [mk_axis_array(i + 1) for i in range(0, axes)])
 
 header_contents = interpret_template("""<Header>
 <local_identifier><NODE name="local_identifier"/></local_identifier>
@@ -145,59 +139,48 @@ class FileContentsLabelReduction(Reduction):
         return res
 
 
-def get_db_file_contents(conn, lid):
+def get_db_file_contents(headers, conn, lid):
+
+    def get_hdu_contents(hdu_index, hdrLoc, datLoc, datSpan):
+        local_identifier = 'hdu_%d' % hdu_index
+        offset = str(hdrLoc)
+        object_length = str(datLoc - hdrLoc)
+        header = header_contents({'local_identifier': local_identifier,
+                                  'offset': offset,
+                                  'object_length': object_length})
+
+        assert is_doc_to_node_function(header)
+
+        if datSpan:
+            bitpix = headers[hdu_index]['BITPIX']
+            axes = headers[hdu_index]['NAXIS']
+            data_type = _BITPIX_TABLE[bitpix]
+            elmt_arr = element_array({'data_type': data_type})
+
+            if axes == 1:
+                data = data_1d_contents({
+                        'offset': str(datLoc),
+                        'Element_Array': elmt_arr,
+                        'Axis_Arrays': _db_mk_axis_arrays(headers,
+                                                          hdu_index, axes)
+                        })
+            elif axes == 2:
+                data = data_2d_contents({
+                        'offset': str(datLoc),
+                        'Element_Array': elmt_arr,
+                        'Axis_Arrays': _db_mk_axis_arrays(headers,
+                                                          hdu_index, axes)
+                        })
+            assert is_doc_to_node_function(data)
+            node_functions = [header, data]
+        else:
+            node_functions = [header]
+
+        res = combine_nodes_into_fragment(node_functions)
+        assert is_doc_to_fragment_function(res)
+        return res
 
     with closing(conn.cursor()) as cursor:
-        def get_hdu_contents(hdu_index, hdrLoc, datLoc, datSpan):
-            local_identifier = 'hdu_%d' % hdu_index
-            offset = str(hdrLoc)
-            object_length = str(datLoc - hdrLoc)
-            header = header_contents({'local_identifier': local_identifier,
-                                      'offset': offset,
-                                      'object_length': object_length})
-
-            assert is_doc_to_node_function(header)
-
-            if datSpan:
-                with closing(conn.cursor()) as cursor2:
-                    cursor2.execute(
-                        """SELECT value FROM cards
-                           WHERE product=? AND hdu_index=? AND keyword=?""",
-                        (str(lid), hdu_index, 'NAXIS'))
-                    (naxis,) = cursor2.fetchone()
-                    cursor2.execute(
-                        """SELECT value FROM cards
-                           WHERE product=? AND hdu_index=? AND keyword=?""",
-                        (str(lid), hdu_index, 'BITPIX'))
-                    (bitpix,) = cursor2.fetchone()
-
-                axes = naxis
-                data_type = _BITPIX_TABLE[bitpix]
-                elmt_arr = element_array({'data_type': data_type})
-
-                if axes == 1:
-                    data = data_1d_contents({
-                            'offset': str(datLoc),
-                            'Element_Array': elmt_arr,
-                            'Axis_Arrays': db_mk_axis_arrays(conn, lid,
-                                                             hdu_index, axes)
-                            })
-                elif axes == 2:
-                    data = data_2d_contents({
-                            'offset': str(datLoc),
-                            'Element_Array': elmt_arr,
-                            'Axis_Arrays': db_mk_axis_arrays(conn, lid,
-                                                             hdu_index, axes)
-                            })
-                assert is_doc_to_node_function(data)
-                node_functions = [header, data]
-            else:
-                node_functions = [header]
-
-            res = combine_nodes_into_fragment(node_functions)
-            assert is_doc_to_fragment_function(res)
-            return res
-
         return combine_fragments_into_fragment(
             [get_hdu_contents(*hdu)
              for hdu in cursor.execute(

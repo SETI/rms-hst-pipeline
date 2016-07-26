@@ -162,6 +162,17 @@ def make_product_label(product, verify):
     return label
 
 
+def _make_header_dictionary(lid, hdu_index, cursor):
+    cursor.execute("""SELECT keyword, value FROM cards
+                      WHERE product=? AND hdu_index=?""",
+                   (lid, hdu_index))
+    return dict(cursor.fetchall())
+
+
+def _make_header_dictionaries(lid, hdu_count, cursor):
+    return [_make_header_dictionary(lid, i, cursor) for i in range(hdu_count)]
+
+
 def make_db_product_label(conn, lid, verify):
     """
     Create the label text for the product having this :class:'LID'
@@ -171,10 +182,12 @@ def make_db_product_label(conn, lid, verify):
     """
     with closing(conn.cursor()) as cursor:
         cursor.execute(
-            """SELECT filename, label_filepath, collection, product_id
+            """SELECT filename, label_filepath, collection,
+                      product_id, hdu_count
                FROM products WHERE product=?""",
             (lid,))
-        (file_name, label_fp, collection, product_id) = cursor.fetchone()
+        (file_name, label_fp, collection,
+         product_id, hdu_count) = cursor.fetchone()
 
         cursor.execute("""SELECT bundle, instrument, suffix
                           FROM collections WHERE collection=?""",
@@ -185,18 +198,21 @@ def make_db_product_label(conn, lid, verify):
                        (bundle,))
         (proposal_id,) = cursor.fetchone()
 
+        headers = _make_header_dictionaries(lid, hdu_count, cursor)
+
     label = make_label({
             'lid': str(lid),
             'proposal_id': str(proposal_id),
             'suffix': suffix,
             'file_name': file_name,
-            'file_contents': get_db_file_contents(conn, lid),
+            'file_contents': get_db_file_contents(headers, conn, lid),
             'Investigation_Area_name': mk_Investigation_Area_name(proposal_id),
             'investigation_lidvid': mk_Investigation_Area_lidvid(proposal_id),
             'Observing_System': observing_system(instrument),
-            'Time_Coordinates': get_db_time_coordinates(conn, lid),
-            'Target_Identification': get_db_target(conn, lid),
-            'HST': get_db_hst_parameters(conn, lid, instrument, product_id)
+            'Time_Coordinates': get_db_time_coordinates(headers, conn, lid),
+            'Target_Identification': get_db_target(headers, conn, lid),
+            'HST': get_db_hst_parameters(headers, conn, lid,
+                                         instrument, product_id)
             }).toxml()
     with open(label_fp, 'w') as f:
         f.write(label)

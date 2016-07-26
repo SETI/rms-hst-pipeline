@@ -55,6 +55,7 @@ def makeProductsTable(conn, archive):
         label_filepath VARCHAR NOT NULL,
         collection VARCHAR NOT NULL,
         visit VARCHAR NOT NULL,
+        hdu_count INT NOT NULL,
         product_id VARCHAR NOT NULL,
         FOREIGN KEY(collection) REFERENCES collections(collection)
         )"""
@@ -64,7 +65,7 @@ def makeProductsTable(conn, archive):
            p.visit(), p.lid.product_id)
           for c in archive.collections()
           for p in c.products()]
-    conn.executemany('INSERT INTO products VALUES (?,?,?,?,?,?)', ps)
+    conn.executemany('INSERT INTO products VALUES (?,?,?,?,?,0,?)', ps)
     conn.commit()
 
 
@@ -116,10 +117,13 @@ def makeHdusAndCardsTables(conn, archive):
             fits = pyfits.open(p.absolute_filepath())
             try:
                 product_lid = str(p.lid)
+                conn.execute("""UPDATE products SET hdu_count = ?
+                                WHERE product=?""",
+                             (len(fits), product_lid))
                 for (hdu_index, hdu) in enumerate(fits):
                     fileinfo = hdu.fileinfo()
-                    conn.execute('INSERT INTO hdus ' +
-                                 'VALUES (?, ?, ?, ?, ?)',
+                    conn.execute("""INSERT INTO hdus
+                                    VALUES (?, ?, ?, ?, ?)""",
                                  (product_lid,
                                   hdu_index,
                                   fileinfo['hdrLoc'],
@@ -132,8 +136,8 @@ def makeHdusAndCardsTables(conn, archive):
                            hdu_index)
                           for card in header.cards
                           if desired_keyword(card.keyword)]
-                    conn.executemany('INSERT INTO CARDS ' +
-                                     'VALUES (?, ?, ?, ?)', cs)
+                    conn.executemany("""INSERT INTO cards
+                                        VALUES (?, ?, ?, ?)""", cs)
             finally:
                 fits.close()
         except IOError as e:

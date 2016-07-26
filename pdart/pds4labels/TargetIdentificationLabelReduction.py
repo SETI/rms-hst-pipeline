@@ -64,12 +64,8 @@ _get_target = multiple_implementations('_get_target',
                                        _get_placeholder_target)
 
 
-def _db_get_target_from_header_unit(conn, lid):
-    with closing(conn.cursor()) as cursor:
-        cursor.execute(
-            """SELECT value FROM cards
-               WHERE product=? AND hdu_index=0 AND keyword='TARGNAME'""")
-        (targname,) = cursor.fetchone()
+def _db_get_target_from_header_unit(headers):
+    targname = headers[0]['TARGNAME']
 
     for prefix, (name, type) in _approximate_target_table.iteritems():
         if targname.startswith(prefix):
@@ -82,8 +78,8 @@ _get_db_target = multiple_implementations('_get_db_target',
                                           _get_placeholder_target)
 
 
-def get_db_target(conn, lid):
-    return target_identification(*(_get_db_target(conn, lid)))
+def get_db_target(headers, conn, lid):
+    return target_identification(*(_get_db_target(headers)))
 
 
 class TargetIdentificationLabelReduction(Reduction):
