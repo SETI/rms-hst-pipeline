@@ -9,6 +9,9 @@ import sqlite3
 from pdart.pds4.Archives import *
 
 
+INDEXING = True
+
+
 def makeBundlesTable(conn, archive):
     conn.execute('DROP TABLE IF EXISTS bundles')
     table_creation = """CREATE TABLE bundles (
@@ -38,6 +41,11 @@ def makeCollectionsTable(conn, archive):
             );"""
     conn.execute(table_creation)
 
+    if INDEXING:
+        indexing = """CREATE INDEX idx_collections_bundle
+                      ON collections(bundle)"""
+        conn.execute(indexing)
+
     cs = [(str(c.lid), c.label_filepath(), str(b.lid),
            c.prefix(), c.suffix(), c.instrument(),
            c.inventory_name(), c.inventory_filepath())
@@ -60,6 +68,12 @@ def makeProductsTable(conn, archive):
         FOREIGN KEY(collection) REFERENCES collections(collection)
         )"""
     conn.execute(table_creation)
+
+    if INDEXING:
+        indexing = """CREATE INDEX idx_products_collection
+                      ON products(collection)"""
+        conn.execute(indexing)
+
     ps = [(str(p.lid), os.path.basename(p.absolute_filepath()),
            p.label_filepath(), str(c.lid),
            p.visit(), p.lid.product_id)
@@ -101,6 +115,10 @@ def makeHdusAndCardsTables(conn, archive):
         )"""
     conn.execute(table_creation)
 
+    if INDEXING:
+        indexing = """CREATE INDEX idx_hdus_product ON hdus(product)"""
+        conn.execute(indexing)
+
     conn.execute('DROP TABLE IF EXISTS cards')
     table_creation = """CREATE TABLE cards (
         keyword VARCHAR NOT NULL,
@@ -111,6 +129,11 @@ def makeHdusAndCardsTables(conn, archive):
         FOREIGN KEY(product, hdu_index) REFERENCES hdus(product, hdu_index)
         )"""
     conn.execute(table_creation)
+
+    if INDEXING:
+        indexing = """CREATE INDEX idx_cards_product_hdu_index
+                      ON cards(product, hdu_index)"""
+        conn.execute(indexing)
 
     for p in archive.products():
         try:
@@ -147,17 +170,21 @@ def makeHdusAndCardsTables(conn, archive):
     conn.commit()
 
 
+def makeDB(conn, archive):
+    conn.execute('PRAGMA foreign_keys = ON;')
+    makeBundlesTable(conn, archive)
+    makeCollectionsTable(conn, archive)
+    makeProductsTable(conn, archive)
+    makeHdusAndCardsTables(conn, archive)
+
+
 if __name__ == '__main__':
     archive = get_any_archive()
     archive_dir = archive.root
     db_filepath = os.path.join(archive_dir, 'archive.spike.db')
     conn = sqlite3.connect(db_filepath)
-    conn.execute('PRAGMA foreign_keys = ON;')
     try:
-        makeBundlesTable(conn, archive)
-        makeCollectionsTable(conn, archive)
-        makeProductsTable(conn, archive)
-        makeHdusAndCardsTables(conn, archive)
+        makeDB(conn, archive)
     finally:
         conn.close()
 

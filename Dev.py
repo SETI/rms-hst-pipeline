@@ -6,12 +6,16 @@ development.
 from contextlib import closing
 import sqlite3
 
+from MakeDB import *
 from pdart.exceptions.Combinators import *
+from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
 
 VERIFY = False
+OPTIMIZE = True
+IN_MEMORY = False
 
 
 def make_db_bundle_labels(conn):
@@ -36,12 +40,32 @@ def make_db_product_labels(conn):
             make_db_product_label(conn, lid, VERIFY)
 
 
+def getConn():
+    if IN_MEMORY:
+        return sqlite3.connect(':memory:')
+    else:
+        return sqlite3.connect(
+            '/Users/spaceman/Desktop/Archive/archive.spike.db')
+
+
 def dev():
-    with closing(sqlite3.connect(
-            '/Users/spaceman/Desktop/Archive/archive.spike.db')) as conn:
-        make_db_product_labels(conn)
-        make_db_collection_labels_and_inventories(conn)
-        make_db_bundle_labels(conn)
+    archive = get_any_archive()
+    with closing(getConn()) as conn:
+        makeDB(conn, archive)
+        if OPTIMIZE:
+            with closing(conn.cursor()) as cursor:
+                print "going EXCLUSIVE"
+                cursor.execute("""PRAGMA locking_mode = EXCLUSIVE;""")
+        try:
+            make_db_product_labels(conn)
+            make_db_collection_labels_and_inventories(conn)
+            make_db_bundle_labels(conn)
+        finally:
+            if OPTIMIZE:
+                with closing(conn.cursor()) as cursor:
+                    print "going back to NORMAL"
+                    cursor.execute("""PRAGMA locking_mode = NORMAL;""")
+
 
 if __name__ == '__main__':
     raise_verbosely(dev)
