@@ -3,6 +3,7 @@ import os.path
 import sys
 
 from pdart.pds4.Product import *
+from pdart.pds4labels.DatabaseCaches import *
 from pdart.pds4labels.FileContentsLabelReduction import *
 from pdart.pds4labels.HstParametersReduction import *
 from pdart.pds4labels.ObservingSystem import *
@@ -189,14 +190,13 @@ def make_db_product_label(conn, lid, verify):
         (file_name, label_fp, collection,
          product_id, hdu_count) = cursor.fetchone()
 
-        cursor.execute("""SELECT bundle, instrument, suffix
-                          FROM collections WHERE collection=?""",
-                       (collection,))
-        (bundle, instrument, suffix) = cursor.fetchone()
+        d = lookup_collection(conn, collection)
+        bundle = d['bundle']
+        instrument = d['instrument']
+        suffix = d['suffix']
 
-        cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',
-                       (bundle,))
-        (proposal_id,) = cursor.fetchone()
+        d = lookup_bundle(conn, bundle)
+        proposal_id = d['proposal_id']
 
         headers = _make_header_dictionaries(lid, hdu_count, cursor)
 

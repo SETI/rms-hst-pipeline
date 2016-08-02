@@ -1,5 +1,5 @@
 """
-SCRIPT: Run through the database and build bundle labels, collection
+SCRIPT: Build the database then build bundle, collection, and product
 labels, and collection inventories.  This is a temporary script for
 development.
 """
@@ -14,7 +14,6 @@ from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
 
 VERIFY = False
-OPTIMIZE = True
 IN_MEMORY = False
 
 
@@ -52,19 +51,9 @@ def dev():
     archive = get_any_archive()
     with closing(getConn()) as conn:
         makeDB(conn, archive)
-        if OPTIMIZE:
-            with closing(conn.cursor()) as cursor:
-                print "going EXCLUSIVE"
-                cursor.execute("""PRAGMA locking_mode = EXCLUSIVE;""")
-        try:
-            make_db_product_labels(conn)
-            make_db_collection_labels_and_inventories(conn)
-            make_db_bundle_labels(conn)
-        finally:
-            if OPTIMIZE:
-                with closing(conn.cursor()) as cursor:
-                    print "going back to NORMAL"
-                    cursor.execute("""PRAGMA locking_mode = NORMAL;""")
+        make_db_product_labels(conn)
+        make_db_collection_labels_and_inventories(conn)
+        make_db_bundle_labels(conn)
 
 
 if __name__ == '__main__':

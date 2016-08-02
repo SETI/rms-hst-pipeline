@@ -3,6 +3,7 @@ import io
 import sys
 
 from pdart.pds4.Collection import *
+from pdart.pds4labels.DatabaseCaches import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
@@ -147,17 +148,13 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
     If verify is True, verify the label against its XML and Schematron
     schemas.  Raise an exception if either fails.
     """
-    with closing(conn.cursor()) as cursor:
-        cursor.execute(
-            """SELECT label_filepath, bundle, suffix,
-               inventory_name, inventory_filepath
-               FROM collections WHERE collection=?""", (lid,))
-        (label_fp, bundle, suffix, inventory_name, inventory_filepath) = \
-            cursor.fetchone()
-
-        cursor.execute(
-            'SELECT proposal_id FROM bundles where bundle=?', (bundle,))
-        (proposal_id,) = cursor.fetchone()
+    d = lookup_collection(conn, lid)
+    label_fp = d['label_filepath']
+    bundle = d['bundle']
+    suffix = d['suffix']
+    inventory_name = d['inventory_name']
+    inventory_filepath = d['inventory_filepath']
+    proposal_id = lookup_bundle(conn, bundle)['proposal_id']
 
     label = make_label({
             'lid': lid,

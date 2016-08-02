@@ -3,6 +3,7 @@ import os.path
 import sys
 
 from pdart.pds4.Bundle import *
+from pdart.pds4labels.DatabaseCaches import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
@@ -93,12 +94,11 @@ def make_db_bundle_label(conn, lid, verify):
     label against its XML and Schematron schemas.  Raise an exception
     if either fails.
     """
-    with closing(conn.cursor()) as cursor:
-        cursor.execute(
-            'SELECT label_filepath, proposal_id FROM bundles WHERE bundle=?',
-            (lid,))
-        (label_fp, proposal_id) = cursor.fetchone()
+    d = lookup_bundle(conn, lid)
+    label_fp = d['label_filepath']
+    proposal_id = d['proposal_id']
 
+    with closing(conn.cursor()) as cursor:
         reduced_collections = \
             [make_bundle_entry_member({'lid': collection_lid})
              for (collection_lid,)
