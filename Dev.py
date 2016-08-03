@@ -17,10 +17,37 @@ VERIFY = False
 IN_MEMORY = False
 
 
+def make_db_labels(conn):
+    """
+    Write labels for the whole archive in hierarchical order to
+    increase cache hits for bundles and collections.  NOTE: This
+    doesn't seem to run any faster, perhaps because of extra cost to
+    having three open cursors.
+    """
+    with closing(conn.cursor()) as bundle_cursor:
+        for (bundle,) in bundle_cursor.execute('SELECT bundle FROM bundles'):
+
+            with closing(conn.cursor()) as collection_cursor:
+                for (coll,) in collection_cursor.execute(
+                    'SELECT collection FROM collections WHERE bundle=?',
+                    (bundle,)):
+
+                    with closing(conn.cursor()) as product_cursor:
+                        for (prod,) in product_cursor.execute(
+                            """SELECT product FROM products WHERE collection=?
+                               EXCEPT SELECT product FROM bad_fits_files""",
+                            (coll,)):
+
+                            make_db_product_label(conn, prod, VERIFY)
+
+                    make_db_collection_label_and_inventory(conn, coll, VERIFY)
+
+            make_db_bundle_label(conn, bundle, VERIFY)
+
+
 def make_db_bundle_labels(conn):
     with closing(conn.cursor()) as cursor:
         for (lid,) in cursor.execute('SELECT bundle FROM bundles'):
-            assert isinstance(lid, unicode), type(lid)
             make_db_bundle_label(conn, lid, VERIFY)
 
 
@@ -35,11 +62,10 @@ def make_db_product_labels(conn):
         for (lid,) in cursor.execute(
             """SELECT product FROM products EXCEPT
                SELECT product FROM bad_fits_files"""):
-            assert isinstance(lid, unicode), type(lid)
             make_db_product_label(conn, lid, VERIFY)
 
 
-def getConn():
+def get_conn():
     if IN_MEMORY:
         return sqlite3.connect(':memory:')
     else:
@@ -49,11 +75,16 @@ def getConn():
 
 def dev():
     archive = get_any_archive()
-    with closing(getConn()) as conn:
+    with closing(get_conn()) as conn:
         create_database(conn, archive)
-        make_db_product_labels(conn)
-        make_db_collection_labels_and_inventories(conn)
-        make_db_bundle_labels(conn)
+        # It seems to run about the same, building labels
+        # hierarchically or by type.
+        if True:
+            make_db_labels(conn)
+        else:
+            make_db_product_labels(conn)
+            make_db_collection_labels_and_inventories(conn)
+            make_db_bundle_labels(conn)
 
 
 if __name__ == '__main__':
