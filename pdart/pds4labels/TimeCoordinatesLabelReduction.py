@@ -1,33 +1,9 @@
-from contextlib import closing
-
 import pdart.add_pds_tools
 import julian
 
 from pdart.exceptions.Combinators import *
+from pdart.pds4labels.TimeCoordinatesXml import *
 from pdart.reductions.Reduction import *
-from pdart.xml.Templates import *
-
-
-# For product labels: produces the Time_Coordinates element.
-
-time_coordinates = interpret_template("""<Time_Coordinates>
-      <start_date_time><NODE name="start_date_time"/></start_date_time>
-      <stop_date_time><NODE name="stop_date_time"/></stop_date_time>
-    </Time_Coordinates>""")
-
-
-def _remove_trailing_decimal(str):
-    """
-    Given a string, remove any trailing zeros and then any trailing
-    decimal point and return it.
-    """
-    # remove any trailing zeros
-    while str[-1] == '0':
-        str = str[:-1]
-    # remove any trailing decimal point
-    if str[-1] == '.':
-        str = str[:-1]
-    return str
 
 
 def _get_start_stop_times_from_header_unit(header_unit):
@@ -42,17 +18,10 @@ def _get_start_stop_times_from_header_unit(header_unit):
             'stop_date_time': stop_date_time}
 
 
-def _get_placeholder_start_stop_times(*args, **kwargs):
-    start_date_time = '2000-01-02Z'
-    stop_date_time = '2000-01-02Z'
-    return {'start_date_time': start_date_time,
-            'stop_date_time': stop_date_time}
-
-
 _get_start_stop_times = multiple_implementations(
     '_get_start_stop_times',
     _get_start_stop_times_from_header_unit,
-    _get_placeholder_start_stop_times)
+    get_placeholder_start_stop_times)
 
 
 class TimeCoordinatesLabelReduction(Reduction):
@@ -62,7 +31,7 @@ class TimeCoordinatesLabelReduction(Reduction):
         get_start_stop_times = multiple_implementations(
             'get_start_stop_times',
             lambda: get_reduced_hdus()[0],
-            _get_placeholder_start_stop_times())
+            get_placeholder_start_stop_times())
 
         return time_coordinates(get_start_stop_times())
 
@@ -81,27 +50,3 @@ class TimeCoordinatesLabelReduction(Reduction):
             return _get_start_stop_times(header_unit)
         else:
             pass
-
-
-def _db_get_start_stop_times_from_header_unit(headers):
-    date_obs = headers[0]['DATE-OBS']
-    time_obs = headers[0]['TIME-OBS']
-    exptime = headers[0]['EXPTIME']
-
-    start_date_time = '%sT%sZ' % (date_obs, time_obs)
-    stop_date_time = julian.tai_from_iso(start_date_time) + exptime
-    stop_date_time = julian.iso_from_tai(stop_date_time,
-                                         suffix='Z')
-
-    return {'start_date_time': start_date_time,
-            'stop_date_time': stop_date_time}
-
-
-_db_get_start_stop_times = multiple_implementations(
-    '_db_get_start_stop_times',
-    _db_get_start_stop_times_from_header_unit,
-    _get_placeholder_start_stop_times)
-
-
-def get_db_time_coordinates(headers, conn, lid):
-    return time_coordinates(_db_get_start_stop_times(headers))

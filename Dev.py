@@ -13,8 +13,9 @@ from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
 
-VERIFY = False
+VERIFY = True
 IN_MEMORY = False
+CREATE_DB = False
 
 
 def make_db_labels(conn):
@@ -29,14 +30,14 @@ def make_db_labels(conn):
 
             with closing(conn.cursor()) as collection_cursor:
                 for (coll,) in collection_cursor.execute(
-                    'SELECT collection FROM collections WHERE bundle=?',
-                    (bundle,)):
+                  'SELECT collection FROM collections WHERE bundle=?',
+                  (bundle,)):
 
                     with closing(conn.cursor()) as product_cursor:
                         for (prod,) in product_cursor.execute(
-                            """SELECT product FROM products WHERE collection=?
-                               EXCEPT SELECT product FROM bad_fits_files""",
-                            (coll,)):
+                          """SELECT product FROM products WHERE collection=?
+                           EXCEPT SELECT product FROM bad_fits_files""",
+                          (coll,)):
 
                             make_db_product_label(conn, prod, VERIFY)
 
@@ -76,7 +77,8 @@ def get_conn():
 def dev():
     archive = get_any_archive()
     with closing(get_conn()) as conn:
-        create_database(conn, archive)
+        if CREATE_DB:
+            create_database(conn, archive)
         # It seems to run about the same, building labels
         # hierarchically or by type.
         if True:

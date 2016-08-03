@@ -34,8 +34,9 @@ class MakeLabelsReduction(CompositeReduction):
                                      ProductLabelReductionWithMessage(verify)])
 
 if __name__ == '__main__':
+    VERIFY = True
+
     archive = get_any_archive()
-    verify = False
     reduction = CompositeReduction([LogProductsReduction(),
-                                    MakeLabelsReduction(verify)])
+                                    MakeLabelsReduction(VERIFY)])
     raise_verbosely(lambda: run_reduction(reduction, archive))

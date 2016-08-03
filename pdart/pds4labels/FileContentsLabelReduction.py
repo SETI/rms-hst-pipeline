@@ -1,39 +1,11 @@
-from contextlib import closing
-
+from pdart.pds4labels.FileContentsXml import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
 
-# For product labels: produces the fragment of the File node that
-# contains Header and Array_2D_Image elements.
-
-
-_AXIS_NAME_TABLE = {
-    1: 'Line',
-    2: 'Sample'
-    }
-
-_BITPIX_TABLE = {
-    # TODO Verify these
-    8: 'UnsignedByte',
-    16: 'SignedMSB2',
-    32: 'SignedMSB4',
-    64: 'SignedMSB8',
-    -32: 'IEEE754MSBSingle',
-    -62: 'IEEE754MSBDouble'
-    }
-
-
-axis_array = interpret_template("""<Axis_Array>
-<axis_name><NODE name="axis_name"/></axis_name>
-<elements><NODE name="elements"/></elements>
-<sequence_number><NODE name="sequence_number"/></sequence_number>
-</Axis_Array>""")
-
-
-def mk_axis_arrays(hdu, axes):
+def _mk_axis_arrays(hdu, axes):
     def mk_axis_array(hdu, i):
-        axis_name = _AXIS_NAME_TABLE[i]
+        axis_name = AXIS_NAME_TABLE[i]
         elements = str(hdu.header['NAXIS%d' % i])
         # TODO Check the semantics of sequence_number
         sequence_number = str(i)
@@ -43,49 +15,6 @@ def mk_axis_arrays(hdu, axes):
 
     return combine_nodes_into_fragment(
         [mk_axis_array(hdu, i + 1) for i in range(0, axes)])
-
-
-def _db_mk_axis_arrays(headers, hdu_index, axes):
-    # I can probably speed this up by getting the data in bulk.
-    def mk_axis_array(i):
-        axis_name = _AXIS_NAME_TABLE[i]
-
-        elements = headers[hdu_index]['NAXIS%d' % i]
-        # TODO Check the semantics of sequence_number
-        sequence_number = str(i)
-        return axis_array({'axis_name': axis_name,
-                           'elements': str(elements),
-                           'sequence_number': sequence_number})
-
-    return combine_nodes_into_fragment(
-        [mk_axis_array(i + 1) for i in range(0, axes)])
-
-header_contents = interpret_template("""<Header>
-<local_identifier><NODE name="local_identifier"/></local_identifier>
-<offset unit="byte"><NODE name="offset"/></offset>
-<object_length unit="byte"><NODE name="object_length"/></object_length>
-<parsing_standard_id>FITS 3.0</parsing_standard_id>
-<description>Global FITS Header</description>
-</Header>""")
-
-data_1d_contents = interpret_template("""<Array>
-<offset unit="byte"><NODE name="offset" /></offset>
-<axes>1</axes>
-<axis_index_order>Last Index Fastest</axis_index_order>
-<NODE name="Element_Array" />
-<FRAGMENT name="Axis_Arrays" />
-</Array>""")
-
-data_2d_contents = interpret_template("""<Array_2D_Image>
-<offset unit="byte"><NODE name="offset" /></offset>
-<axes>2</axes>
-<axis_index_order>Last Index Fastest</axis_index_order>
-<NODE name="Element_Array" />
-<FRAGMENT name="Axis_Arrays" />
-</Array_2D_Image>""")
-
-element_array = interpret_template("""<Element_Array>
-<data_type><NODE name="data_type" /></data_type></Element_Array>""")
 
 
 class FileContentsLabelReduction(Reduction):
@@ -114,20 +43,20 @@ class FileContentsLabelReduction(Reduction):
 
         if fileinfo['datSpan']:
             axes = hdu.header['NAXIS']
-            data_type = _BITPIX_TABLE[hdu.header['BITPIX']]
+            data_type = BITPIX_TABLE[hdu.header['BITPIX']]
             elmt_arr = element_array({'data_type': data_type})
 
             if axes == 1:
                 data = data_1d_contents({
                         'offset': str(fileinfo['datLoc']),
                         'Element_Array': elmt_arr,
-                        'Axis_Arrays': mk_axis_arrays(hdu, axes)
+                        'Axis_Arrays': _mk_axis_arrays(hdu, axes)
                         })
             elif axes == 2:
                 data = data_2d_contents({
                         'offset': str(fileinfo['datLoc']),
                         'Element_Array': elmt_arr,
-                        'Axis_Arrays': mk_axis_arrays(hdu, axes)
+                        'Axis_Arrays': _mk_axis_arrays(hdu, axes)
                         })
             assert is_doc_to_node_function(data)
             node_functions = [header, data]
@@ -137,54 +66,3 @@ class FileContentsLabelReduction(Reduction):
         res = combine_nodes_into_fragment(node_functions)
         assert is_doc_to_fragment_function(res)
         return res
-
-
-def get_db_file_contents(headers, conn, lid):
-
-    def get_hdu_contents(hdu_index, hdrLoc, datLoc, datSpan):
-        local_identifier = 'hdu_%d' % hdu_index
-        offset = str(hdrLoc)
-        object_length = str(datLoc - hdrLoc)
-        header = header_contents({'local_identifier': local_identifier,
-                                  'offset': offset,
-                                  'object_length': object_length})
-
-        assert is_doc_to_node_function(header)
-
-        if datSpan:
-            bitpix = headers[hdu_index]['BITPIX']
-            axes = headers[hdu_index]['NAXIS']
-            data_type = _BITPIX_TABLE[bitpix]
-            elmt_arr = element_array({'data_type': data_type})
-
-            if axes == 1:
-                data = data_1d_contents({
-                        'offset': str(datLoc),
-                        'Element_Array': elmt_arr,
-                        'Axis_Arrays': _db_mk_axis_arrays(headers,
-                                                          hdu_index, axes)
-                        })
-            elif axes == 2:
-                data = data_2d_contents({
-                        'offset': str(datLoc),
-                        'Element_Array': elmt_arr,
-                        'Axis_Arrays': _db_mk_axis_arrays(headers,
-                                                          hdu_index, axes)
-                        })
-            assert is_doc_to_node_function(data)
-            node_functions = [header, data]
-        else:
-            node_functions = [header]
-
-        res = combine_nodes_into_fragment(node_functions)
-        assert is_doc_to_fragment_function(res)
-        return res
-
-    with closing(conn.cursor()) as cursor:
-        return combine_fragments_into_fragment(
-            [get_hdu_contents(*hdu)
-             for hdu in cursor.execute(
-                    """SELECT hdu_index, hdrLoc, datLoc, datSpan
-                       FROM hdus WHERE product=?
-                       ORDER BY hdu_index ASC""",
-                    (str(lid),))])
