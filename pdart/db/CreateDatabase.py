@@ -38,6 +38,10 @@ def _create_collections_table(conn, archive):
                   ON collections(bundle)"""
     conn.execute(indexing)
 
+    indexing = """CREATE INDEX idx_collections_prefix_suffix
+                  ON collections(prefix, suffix)"""
+    conn.execute(indexing)
+
     cs = [(str(c.lid), c.label_filepath(), str(b.lid),
            c.prefix(), c.suffix(), c.instrument(),
            c.inventory_name(), c.inventory_filepath())

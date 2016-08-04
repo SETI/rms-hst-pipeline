@@ -4,6 +4,8 @@ each RAW collection, writing them to disk including the collection
 inventory and verified label.  If it fails at any point, print the
 combined exception as XML to stdout.
 """
+from contextlib import closing
+import sqlite3
 
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
@@ -27,8 +29,23 @@ class MakeRawBrowseReduction(CompositeReduction):
                                      BrowseProductLabelReduction()])
 
 
+def get_conn():
+    return sqlite3.connect('/Users/spaceman/Desktop/Archive/archive.spike.db')
+
+
 if __name__ == '__main__':
+    USE_DATABASE = True
+    CREATE_DATABASE = False
+
     archive = get_any_archive()
-    reduction = CompositeReduction([LogCollectionsReduction(),
-                                    MakeRawBrowseReduction()])
-    raise_verbosely(lambda: run_reduction(reduction, archive))
+
+    if USE_DATABASE:
+        with closing(get_conn()) as conn:
+            if CREATE_DATABASE:
+                create_database(conn, archive)
+            # make_db_browse_product_images(conn, archive)
+            make_db_browse_product_labels(conn, archive)
+    else:
+        reduction = CompositeReduction([LogCollectionsReduction(),
+                                        MakeRawBrowseReduction()])
+        raise_verbosely(lambda: run_reduction(reduction, archive))
