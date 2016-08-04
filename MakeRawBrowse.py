@@ -7,6 +7,7 @@ combined exception as XML to stdout.
 from contextlib import closing
 import sqlite3
 
+from pdart.db.CreateDatabase import *
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BrowseProductImage import *
@@ -43,7 +44,7 @@ if __name__ == '__main__':
         with closing(get_conn()) as conn:
             if CREATE_DATABASE:
                 create_database(conn, archive)
-            # make_db_browse_product_images(conn, archive)
+            make_db_browse_product_images(conn, archive)
             make_db_browse_product_labels(conn, archive)
     else:
         reduction = CompositeReduction([LogCollectionsReduction(),

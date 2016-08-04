@@ -9,13 +9,15 @@ def _create_bundles_table(conn, archive):
     conn.execute('DROP TABLE IF EXISTS bundles')
     table_creation = """CREATE TABLE bundles (
         bundle VARCHAR PRIMARY KEY NOT NULL,
+        full_filepath VARCHAR NOT NULL,
         label_filepath VARCHAR NOT NULL,
         proposal_id INT NOT NULL
         )"""
     conn.execute(table_creation)
-    bs = [(str(b.lid), b.label_filepath(), b.proposal_id())
+    bs = [(str(b.lid), b.absolute_filepath(),
+           b.label_filepath(), b.proposal_id())
           for b in archive.bundles()]
-    conn.executemany('INSERT INTO bundles VALUES (?, ?, ?)', bs)
+    conn.executemany('INSERT INTO bundles VALUES (?,?,?,?)', bs)
     conn.commit()
 
 
@@ -23,6 +25,7 @@ def _create_collections_table(conn, archive):
     conn.execute('DROP TABLE IF EXISTS collections')
     table_creation = """CREATE TABLE collections (
         collection VARCHAR PRIMARY KEY NOT NULL,
+        full_filepath VARCHAR NOT NULL,
         label_filepath VARCHAR NOT NULL,
         bundle VARCHAR NOT NULL,
         prefix VARCHAR NOT NULL,
@@ -42,12 +45,12 @@ def _create_collections_table(conn, archive):
                   ON collections(prefix, suffix)"""
     conn.execute(indexing)
 
-    cs = [(str(c.lid), c.label_filepath(), str(b.lid),
-           c.prefix(), c.suffix(), c.instrument(),
+    cs = [(str(c.lid), c.absolute_filepath(), c.label_filepath(),
+           str(b.lid), c.prefix(), c.suffix(), c.instrument(),
            c.inventory_name(), c.inventory_filepath())
           for b in archive.bundles()
           for c in b.collections()]
-    conn.executemany('INSERT INTO collections VALUES (?,?,?,?,?,?,?,?)', cs)
+    conn.executemany('INSERT INTO collections VALUES (?,?,?,?,?,?,?,?,?)', cs)
     conn.commit()
 
 
@@ -55,6 +58,7 @@ def _create_products_table(conn, archive):
     conn.execute('DROP TABLE IF EXISTS products')
     table_creation = """CREATE TABLE products (
         product VARCHAR PRIMARY KEY NOT NULL,
+        full_filepath VARCHAR NOT NULL,
         filename VARCHAR NOT NULL,
         label_filepath VARCHAR NOT NULL,
         collection VARCHAR NOT NULL,
@@ -69,12 +73,13 @@ def _create_products_table(conn, archive):
                   ON products(collection)"""
     conn.execute(indexing)
 
-    ps = [(str(p.lid), os.path.basename(p.absolute_filepath()),
+    ps = [(str(p.lid), p.absolute_filepath(),
+           os.path.basename(p.absolute_filepath()),
            p.label_filepath(), str(c.lid),
            p.visit(), p.lid.product_id)
           for c in archive.collections()
           for p in c.products()]
-    conn.executemany('INSERT INTO products VALUES (?,?,?,?,?,0,?)', ps)
+    conn.executemany('INSERT INTO products VALUES (?,?,?,?,?,?,0,?)', ps)
     conn.commit()
 
 

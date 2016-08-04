@@ -49,7 +49,8 @@ class Product(Component):
         res = _find_product_file(visit_fp, self.lid.product_id)
 
         collection_fp = self.collection().absolute_filepath()
-        assert res, ('Product.absolute_filepath(%r) = %r '
+        assert res, ('Couldn\'t find any product files: '
+                     'Product.absolute_filepath(%r) = %r '
                      'where collection_fp = %r' % (self, res, collection_fp))
         return res
 
