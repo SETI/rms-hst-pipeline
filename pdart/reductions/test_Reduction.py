@@ -125,7 +125,7 @@ def test_reductions():
     arch = get_any_archive()
     try:
         count = run_reduction(TestRecursiveReduction(), arch)
-        assert count in [9529, 583622], '(assumes no browse products)'
+        assert count in [12436, 583622], '(assumes no browse products)'
     except CalculationException as ce:
         print ce.exception_info.to_pretty_xml()
         raise

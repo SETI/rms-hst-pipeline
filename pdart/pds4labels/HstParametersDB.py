@@ -301,18 +301,15 @@ def get_db_hst_parameters(headers, conn, lid, instrument, product_id):
                                       header)})
     elif instrument == 'wfc3':
         parameters_instrument = parameters_wfc3(
-            {'detector_id': get_detector_id(product_id,
-                                            instrument,
-                                            header),
+            {'detector_id': get_db_detector_id(headers,
+                                               instrument,
+                                               product_id),
              'observation_type':
-                 get_observation_type(product_id,
-                                      instrument, header),
+                 get_db_observation_type(headers, instrument, product_id),
              'repeat_exposure_count':
-                 get_repeat_exposure_count(product_id,
-                                           instrument, header),
+                 get_db_repeat_exposure_count(conn, lid, product_id),
              'subarray_flag':
-                 get_subarray_flag(product_id,
-                                   instrument, header)})
+                 get_db_subarray_flag(conn, lid, product_id)})
     else:
         assert False, 'Bad instrument value: %s' % instrument
 
