@@ -27,3 +27,11 @@ def get_any_archive():
         return get_full_archive()
     except:
         return get_mini_archive()
+
+
+def get_any_archive_dir():
+    """
+    Return the root directory of the archive returned by
+    get_any_archive().
+    """
+    return get_any_archive().root

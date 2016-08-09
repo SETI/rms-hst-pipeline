@@ -5,6 +5,7 @@ inventory and verified label.  If it fails at any point, print the
 combined exception as XML to stdout.
 """
 from contextlib import closing
+import os.path
 import sqlite3
 
 from pdart.db.CreateDatabase import *
@@ -31,7 +32,8 @@ class MakeRawBrowseReduction(CompositeReduction):
 
 
 def get_conn():
-    return sqlite3.connect('/Users/spaceman/Desktop/Archive/archive.spike.db')
+    return sqlite3.connect(os.path.join(get_any_archive_dir(),
+                                        'archive.spike.db'))
 
 
 if __name__ == '__main__':

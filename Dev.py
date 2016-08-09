@@ -4,6 +4,7 @@ labels, and collection inventories.  This is a temporary script for
 development.
 """
 from contextlib import closing
+import os.path
 import sqlite3
 
 from pdart.exceptions.Combinators import *
@@ -13,9 +14,9 @@ from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
 
-VERIFY = True
+VERIFY = False
 IN_MEMORY = False
-CREATE_DB = False
+CREATE_DB = True
 
 
 def make_db_labels(conn):
@@ -70,8 +71,8 @@ def get_conn():
     if IN_MEMORY:
         return sqlite3.connect(':memory:')
     else:
-        return sqlite3.connect(
-            '/Users/spaceman/Desktop/Archive/archive.spike.db')
+        return sqlite3.connect(os.path.join(get_any_archive_dir(),
+                                            'archive.spike.db'))
 
 
 def dev():
