@@ -39,7 +39,7 @@ def query_dicts(query_args):
 
 if __name__ == '__main__':
     query_args = {
-        'max_records': '1',
+        'max_records': '10',
         'verb': '3'
         }
     ds = query_dicts(query_args)
