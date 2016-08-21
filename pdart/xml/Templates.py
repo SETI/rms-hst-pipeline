@@ -31,11 +31,7 @@ def interpret_document_template(template):
                 if name == 'NODE':
                     param_name = attrs['name']
                     param = dictionary[param_name]
-                    if type(param) == str:
-                        elmt = doc.createTextNode(param)
-                        assert isinstance(elmt, xml.dom.Node)
-                        stack.append(elmt)
-                    elif type(param) == unicode:
+                    if type(param) in [str, unicode]:
                         elmt = doc.createTextNode(param)
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)

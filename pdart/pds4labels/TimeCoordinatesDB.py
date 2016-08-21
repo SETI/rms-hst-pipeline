@@ -22,7 +22,7 @@ _db_get_start_stop_times = multiple_implementations(
     get_placeholder_start_stop_times)
 
 
-def get_db_time_coordinates(headers, conn, lid):
+def get_db_time_coordinates(headers):
     """
     Create and return a <Time_Coordinates> element for the product.
     """

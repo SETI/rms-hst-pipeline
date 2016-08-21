@@ -45,10 +45,9 @@ def make_db_product_label(conn, lid, verify):
             'Investigation_Area_name': mk_Investigation_Area_name(proposal_id),
             'investigation_lidvid': mk_Investigation_Area_lidvid(proposal_id),
             'Observing_System': observing_system(instrument),
-            'Time_Coordinates': get_db_time_coordinates(headers, conn, lid),
-            'Target_Identification': get_db_target(headers, conn, lid),
-            'HST': get_db_hst_parameters(headers, conn, lid,
-                                         instrument, product_id)
+            'Time_Coordinates': get_db_time_coordinates(headers),
+            'Target_Identification': get_db_target(headers),
+            'HST': get_db_hst_parameters(headers, instrument, product_id)
             }).toxml()
     with open(label_fp, 'w') as f:
         f.write(label)

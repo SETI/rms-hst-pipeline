@@ -16,7 +16,7 @@ _get_db_target = multiple_implementations('_get_db_target',
                                           get_placeholder_target)
 
 
-def get_db_target(headers, conn, lid):
+def get_db_target(headers):
     """
     Given the FITS header fields for a product, create a
     <Target_Identification> element using heuristics.
