@@ -8,7 +8,7 @@ from pdart.xml.Schema import *
 
 def make_db_bundle_label(conn, lid, verify):
     """
-    Create the label text for the bundle having this :class:'LID'
+    Create the label text for the bundle having this :class:`LID`
     using the database connection.  If verify is True, verify the
     label against its XML and Schematron schemas.  Raise an exception
     if either fails.

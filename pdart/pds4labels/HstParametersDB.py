@@ -250,6 +250,7 @@ get_db_observation_type = multiple_implementations(
 
 
 def get_db_hst_parameters(headers, conn, lid, instrument, product_id):
+    """Return an <hst:HST> element."""
     d = {'stsci_group_id': known_placeholder(product_id, 'stsci_group_id'),
          'hst_proposal_id': get_db_hst_proposal_id(headers, product_id),
          'hst_pi_name': get_db_hst_pi_name(headers, product_id),

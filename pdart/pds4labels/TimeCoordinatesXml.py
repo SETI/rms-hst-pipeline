@@ -23,6 +23,9 @@ def _remove_trailing_decimal(str):
 
 
 def get_placeholder_start_stop_times(*args, **kwargs):
+    """
+    Return a placeholder <Time_Coordinates> element.
+    """
     start_date_time = '2000-01-02Z'
     stop_date_time = '2000-01-02Z'
     return {'start_date_time': start_date_time,

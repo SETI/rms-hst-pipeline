@@ -19,8 +19,18 @@ def _db_mk_axis_arrays(headers, hdu_index, axes):
 
 
 def get_db_file_contents(headers, conn, lid):
-
+    """
+    Given the dictionary of the header fields from a product's FITS
+    file, an open connection to the database, and the product's
+    :class:`LID`, return an XML fragment containing the needed
+    <Header> and <Array> or <Array_2D_Image> elements for the FITS
+    file's HDUs.
+    """
     def get_hdu_contents(hdu_index, hdrLoc, datLoc, datSpan):
+        """
+        Return an XML fragment containing the needed <Header> and
+        <Array> or <Array_2D_Image> elements for the FITS file's HDUs.
+        """
         local_identifier = 'hdu_%d' % hdu_index
         offset = str(hdrLoc)
         object_length = str(datLoc - hdrLoc)
