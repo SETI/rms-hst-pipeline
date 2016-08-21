@@ -69,8 +69,8 @@ class LID(object):
 
     def to_browse_lid(self):
         """
-        Convert a LID within a data_ collection into the corresponding
-        LID in the browse_ collection.
+        Convert a LID within a data collection into the corresponding
+        LID in the browse collection.
         """
         assert self.collection_id, 'to_browse_lid(): Can\'t call on bundle LID'
         collection_id_parts = self.collection_id.split('_')

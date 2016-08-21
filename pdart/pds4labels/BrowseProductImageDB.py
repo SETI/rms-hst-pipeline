@@ -9,6 +9,10 @@ import picmaker
 
 
 def _make_browse_coll_fp(raw_coll_fp):
+    """
+    Given the filepath to the RAW collection, return the filepath to
+    its browse collection.
+    """
     # TODO Sloppy implementation: assumes only one 'data'
     res = 'browse'.join(re.split('data', raw_coll_fp))
     ensure_directory(res)
@@ -16,6 +20,11 @@ def _make_browse_coll_fp(raw_coll_fp):
 
 
 def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
+    """
+    Given a filepath for the destination browse collection, a filepath
+    for the source RAW file, and the product's visit code, create the
+    browse image and save it.
+    """
     basename = os.path.basename(raw_full_filepath)
     basename = os.path.splitext(basename)[0] + '.jpg'
     target_dir = os.path.join(browse_coll_fp, ('visit_%s' % visit))
@@ -28,6 +37,11 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
 
 
 def make_db_browse_product_images(conn, archive):
+    """
+    Given a database connection and an :class:`Archive`, create browse
+    images for all the RAW products.
+    """
+
     # TODO Polish (with SQL joins?).  First, an inefficient
     # implementation.
     with closing(conn.cursor()) as cursor:

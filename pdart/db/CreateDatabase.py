@@ -6,6 +6,7 @@ from pdart.pds4.Archives import *
 
 
 def _create_bundles_table(conn, archive):
+    """Create the bundles table."""
     conn.execute('DROP TABLE IF EXISTS bundles')
     table_creation = """CREATE TABLE bundles (
         bundle VARCHAR PRIMARY KEY NOT NULL,
@@ -22,6 +23,7 @@ def _create_bundles_table(conn, archive):
 
 
 def _create_collections_table(conn, archive):
+    """Create the collections table."""
     conn.execute('DROP TABLE IF EXISTS collections')
     table_creation = """CREATE TABLE collections (
         collection VARCHAR PRIMARY KEY NOT NULL,
@@ -55,6 +57,7 @@ def _create_collections_table(conn, archive):
 
 
 def _create_products_table(conn, archive):
+    """Create the products table."""
     conn.execute('DROP TABLE IF EXISTS products')
     table_creation = """CREATE TABLE products (
         product VARCHAR PRIMARY KEY NOT NULL,
@@ -84,6 +87,7 @@ def _create_products_table(conn, archive):
 
 
 def _create_hdus_and_cards_tables(conn, archive):
+    """Create the hdus and cards tables."""
     def handle_undefined(val):
         """Convert undefined values to None"""
         if isinstance(val, pyfits.card.Undefined):
@@ -169,6 +173,11 @@ def _create_hdus_and_cards_tables(conn, archive):
 
 
 def create_database(conn, archive):
+    """
+    Given an open Sqlite connection to a fresh database and an
+    :class:`Archive`, populate the database with the archive's
+    information.
+    """
     conn.execute('PRAGMA foreign_keys = ON;')
     _create_bundles_table(conn, archive)
     _create_collections_table(conn, archive)

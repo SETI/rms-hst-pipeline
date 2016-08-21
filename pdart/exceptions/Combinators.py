@@ -46,10 +46,10 @@ def multiple_implementations(label, *funcs):
     :class:`GroupedExceptionInfo` for the exceptions raised by each
     function.
 
-    This is a generalization of function call to multiple, alternative
-    implementations.  If any one succeeds, you get the result.  If
-    they all fail, you get all the exceptions and all the stack traces
-    wrapped into a :class:`GroupedExceptionInfo` in a
+    This is a generalization of function call to calling multiple
+    alternative implementations.  If any one succeeds, you get the
+    result.  If they all fail, you get all the exceptions and all the
+    stack traces wrapped into a :class:`GroupedExceptionInfo` in a
     :class:`CalculationException`.
     """
     def afunc(*args, **kwargs):
