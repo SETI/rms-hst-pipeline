@@ -31,7 +31,7 @@ class TimeCoordinatesLabelReduction(Reduction):
         get_start_stop_times = multiple_implementations(
             'get_start_stop_times',
             lambda: get_reduced_hdus()[0],
-            get_placeholder_start_stop_times())
+            get_placeholder_start_stop_times)
 
         return time_coordinates(get_start_stop_times())
 

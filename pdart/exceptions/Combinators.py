@@ -38,6 +38,16 @@ def normalized_exceptions(func):
     return _rcode_to_code(_code_to_rcode(func))
 
 
+def _create_joined_documentation(funcs):
+    name_docs = ["%s: %s" % (func.__name__, func.__doc__) for func in funcs]
+    return ("multiple implementations:\n" + '\n'.join(name_docs))
+
+
+def _create_joined_name(label, funcs):
+    names = [func.__name__ for func in funcs]
+    return "multiple_implementations(%r, %s)" % (label, ', '.join(names))
+
+
 def multiple_implementations(label, *funcs):
     """
     Given a string label and a number of functions, return the result
@@ -63,6 +73,10 @@ def multiple_implementations(label, *funcs):
         # if we got here, there were no successes
         exception_info = GroupedExceptionInfo(label, exception_infos)
         raise CalculationException(label, exception_info)
+
+    afunc.__name__ = _create_joined_name(label, funcs)
+    afunc.__doc__ = _create_joined_documentation(funcs)
+
     return afunc
 
 
