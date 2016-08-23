@@ -17,8 +17,9 @@ class Collection(Component):
 
     def __init__(self, arch, lid):
         """
-        Create a :class:`Collection` given the :class:`Archive` it
-        lives in and its :class:`LID`.
+        Create a :class:`pdart.pds4.Collection` given the
+        :class:`pdart.pds4.Archive` it lives in and its
+        :class:`pdart.pds4.LID`.
         """
         assert lid.is_collection_lid()
         super(Collection, self).__init__(arch, lid)
@@ -28,16 +29,18 @@ class Collection(Component):
 
     def instrument(self):
         """
-        Return the instrument for this :class:`Collection`.  It is
-        calculated from the collection's :class:`LID`.
+        Return the instrument for this :class:`pdart.pds4.Collection`.
+        It is calculated from the collection's
+        :class:`pdart.pds4.LID`.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
                         self.lid.collection_id).group(2)
 
     def prefix(self):
         """
-        Return the prefix for FITS files in this :class:`Collection`.
-        It is calculated from the collection's :class:`LID`.
+        Return the prefix for FITS files in this
+        :class:`pdart.pds4.Collection`.  It is calculated from the
+        collection's :class:`pdart.pds4.LID`.
 
         'data' and 'browse' are some possible results.
         """
@@ -46,8 +49,9 @@ class Collection(Component):
 
     def suffix(self):
         """
-        Return the suffix for FITS files in this :class:`Collection`.
-        It is calculated from the collection's :class:`LID`.
+        Return the suffix for FITS files in this
+        :class:`pdart.pds4.Collection`.  It is calculated from the
+        collection's :class:`pdart.pds4.LID`.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
                         self.lid.collection_id).group(3)
@@ -70,8 +74,8 @@ class Collection(Component):
 
     def products(self):
         """
-        Generate the products of this :class:`Collection` as
-        :class:`Product` objects.
+        Generate the products of this :class:`pdart.pds4.Collection`
+        as :class:`pdart.pds4.Product` objects.
         """
         from pdart.pds4.Product import Product
 

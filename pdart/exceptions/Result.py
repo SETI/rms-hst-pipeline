@@ -3,8 +3,9 @@ import abc
 
 class Result(object):
     """
-    The result of running a function: either :class:`Success` or
-    :class:`Failure`.
+    The result of running a function: either
+    :class:`pdart.exception.Success` or
+    :class:`pdart.exception.Failure`.
     """
     __metaclass__ = abc.ABCMeta
 
@@ -21,7 +22,7 @@ class Result(object):
 class Failure(Result):
     """
     The result of running a function and failing: a wrapper around
-    :class:`ExceptionInfo`.
+    :class:`pdart.exception.ExceptionInfo`.
     """
     def __init__(self, exception_info):
         Result.__init__(self)

@@ -18,8 +18,9 @@ class Bundle(Component):
 
     def __init__(self, arch, lid):
         """
-        Create a :class:`Bundle` given the :class:`Archive` it lives
-        in and its :class:`LID`.
+        Create a :class:`pdart.pds4.Bundle` given the
+        :class:`pdart.pds4.Archive` it lives in and its
+        :class:`pdart.pds4.LID`.
         """
         assert lid.is_bundle_lid()
         super(Bundle, self).__init__(arch, lid)
@@ -29,8 +30,8 @@ class Bundle(Component):
 
     def proposal_id(self):
         """
-        Return the proposal ID for this :class:`Bundle`.  It is
-        calculated from the bundle's :class:`LID`.
+        Return the proposal ID for this :class:`pdart.pds4.Bundle`.
+        It is calculated from the bundle's :class:`pdart.pds4.LID`.
         """
         return int(re.match(Bundle.DIRECTORY_PATTERN,
                             self.lid.bundle_id).group(1))
@@ -44,8 +45,8 @@ class Bundle(Component):
 
     def collections(self):
         """
-        Generate the collections of this :class:`Bundle` as
-        :class:`Collection` objects.
+        Generate the collections of this :class:`pdart.pds4.Bundle` as
+        :class:`pdart.pds4.Collection` objects.
         """
         dir_fp = self.absolute_filepath()
         for subdir in os.listdir(dir_fp):
@@ -56,8 +57,8 @@ class Bundle(Component):
 
     def products(self):
         """
-        Generate the products of this :class:`Bundle` as
-        :class:`Product` objects.
+        Generate the products of this :class:`pdart.pds4.Bundle` as
+        :class:`pdart.pds4.Product` objects.
         """
         for collection in self.collections():
             for product in collection.products():

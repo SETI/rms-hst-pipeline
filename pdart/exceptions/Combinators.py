@@ -31,9 +31,10 @@ def _rcode_to_code(rfunc):
 def normalized_exceptions(func):
     """
     Given a function, return an equivalent function except that when
-    the original raises an :class:`Exception`, the result function
-    will instead raise a :class:`CalculationException` containing
-    :class:`ExceptionInfo` for the exception.
+    the original raises an :class:`pdart.exception.Exception`, the
+    result function will instead raise a
+    :class:`pdart.exception.CalculationException` containing
+    :class:`pdart.exception.ExceptionInfo` for the exception.
     """
     return _rcode_to_code(_code_to_rcode(func))
 
@@ -52,15 +53,16 @@ def multiple_implementations(label, *funcs):
     """
     Given a string label and a number of functions, return the result
     of the first function that succeeds or raise a
-    :class:`CalculationException` containing
-    :class:`GroupedExceptionInfo` for the exceptions raised by each
-    function.
+    :class:`pdart.exception.CalculationException` containing
+    :class:`pdart.exception.GroupedExceptionInfo` for the exceptions
+    raised by each function.
 
     This is a generalization of function call to calling multiple
     alternative implementations.  If any one succeeds, you get the
     result.  If they all fail, you get all the exceptions and all the
-    stack traces wrapped into a :class:`GroupedExceptionInfo` in a
-    :class:`CalculationException`.
+    stack traces wrapped into a
+    :class:`pdart.exception.GroupedExceptionInfo` in a
+    :class:`pdart.exception.CalculationException`.
     """
     def afunc(*args, **kwargs):
         exception_infos = []
@@ -103,8 +105,9 @@ def parallel_list(label, arg_funcs):
     Given a string label and a list of functions that take no
     arguments (thunks), run the functions in parallel, and if all
     succeed, return the list of the results.  If any one or more
-    fails, raise a :class:`CalculationException` containing all the
-    exceptions and stack traces in a :class:`GroupedExceptionInfo`.
+    fails, raise a :class:`pdart.exception.CalculationException`
+    containing all the exceptions and stack traces in a
+    :class:`pdart.exception.GroupedExceptionInfo`.
     """
 
     # Style note: unlike multiple_interpretations, this takes a list
@@ -130,8 +133,9 @@ def parallel_list(label, arg_funcs):
 def raise_verbosely(thunk):
     """
     Run the thunk, returning a result.  If it raises a
-    CalculationException, pretty-print the full exception info as XML
-    and reraise the exception.
+    :class:`pdart.exception.CalculationException`, pretty-print the
+    full exception info as XML and reraise the exception.  For
+    debugging.
     """
     try:
         return thunk()

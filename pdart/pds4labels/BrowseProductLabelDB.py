@@ -7,8 +7,8 @@ from pdart.pds4labels.BrowseProductLabelXml import *
 
 def make_db_browse_product_labels(conn, archive):
     """
-    Given a database connection and an :class:`Archive`, create PDS4
-    labels for the browse products.
+    Given a database connection and an :class:`pdart.pds4.Archive`,
+    create PDS4 labels for the browse products.
     """
 
     # TODO Polish (with SQL joins?).  First, an inefficient

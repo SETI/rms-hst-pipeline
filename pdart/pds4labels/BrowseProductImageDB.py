@@ -38,8 +38,8 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
 
 def make_db_browse_product_images(conn, archive):
     """
-    Given a database connection and an :class:`Archive`, create browse
-    images for all the RAW products.
+    Given a database connection and an :class:`pdart.pds4.Archive`,
+    create browse images for all the RAW products.
     """
 
     # TODO Polish (with SQL joins?).  First, an inefficient

@@ -12,10 +12,10 @@ from pdart.xml.Schema import *
 
 def make_db_product_label(conn, lid, verify):
     """
-    Create the label text for the product having this :class:`LID`
-    using the database connection.  If verify is True, verify the
-    label against its XML and Schematron schemas.  Raise an exception
-    if either fails.
+    Create the label text for the product having this
+    :class:`pdart.pds4.LID` using the database connection.  If verify
+    is True, verify the label against its XML and Schematron schemas.
+    Raise an exception if either fails.
     """
     with closing(conn.cursor()) as cursor:
         cursor.execute(

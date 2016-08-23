@@ -138,7 +138,7 @@ class ReductionRunner(object):
 class DefaultReductionRunner(object):
     """
     An algorithm to recursively reduce PDS4 and FITS structures
-    according to a :class:`Reduction` instance.
+    according to a :class:`pdart.reductions.Reduction` instance.
 
     You don't have to understand how this works to use it.
     """
@@ -244,7 +244,7 @@ class DefaultReductionRunner(object):
 
 def run_reduction(reduction, archive):
     """
-    Run a :class:`Reduction` on an :class:`Archive` using the default
-    recursion.
+    Run a :class:`pdart.reductions.Reduction` on an
+    :class:`pdart.pds4.Archive` using the default recursion.
     """
     return DefaultReductionRunner().run_archive(reduction, archive)

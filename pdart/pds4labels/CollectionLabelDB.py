@@ -10,7 +10,8 @@ from pdart.xml.Schema import *
 def make_db_collection_inventory(conn, collection_lid):
     """
     Create the collection inventory for the collection having this
-    :class:`LID` using the database connection and return it.
+    :class:`pdart.pds4.LID` using the database connection and return
+    it.
     """
     with closing(conn.cursor()) as cursor:
         lines = [u'P,%s\r\n' % str(product)
@@ -23,9 +24,9 @@ def make_db_collection_inventory(conn, collection_lid):
 def make_db_collection_label_and_inventory(conn, lid, verify):
     """
     Create the label and inventory for the collection having this
-    :class:`LID` using the database connection, writing them to disk.
-    If verify is True, verify the label against its XML and Schematron
-    schemas.  Raise an exception if either fails.
+    :class:`pdart.pds4.LID` using the database connection, writing
+    them to disk.  If verify is True, verify the label against its XML
+    and Schematron schemas.  Raise an exception if either fails.
     """
     d = lookup_collection(conn, lid)
     label_fp = d['label_filepath']

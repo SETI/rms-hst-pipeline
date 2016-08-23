@@ -12,7 +12,8 @@ class BundleLabelReduction(Reduction):
         self.verify = verify
 
     """
-    Reduction of a :class:`Bundle` to its PDS4 label as a string.
+    Reduction of a :class:`pdart.pds4.Bundle` to its PDS4 label as a
+    string.
     """
     def reduce_bundle(self, archive, lid, get_reduced_collections):
         reduced_collections = get_reduced_collections()

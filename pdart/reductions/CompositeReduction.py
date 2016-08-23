@@ -33,10 +33,11 @@ def indexed(func):
     """
     Convert a thunk to a function returning thunks.
 
-    The get_reduced_xxx argument passed to :class:`CompositeReduction`
-    reduce_yyy() methods is a thunk that returns a list (of the same
-    length as the list of xxx substructures) of lists (of the same
-    length as the list of reductions in the composite).
+    The get_reduced_xxx argument passed to
+    :class:`pdart.reductions.CompositeReduction` reduce_yyy() methods
+    is a thunk that returns a list (of the same length as the list of
+    xxx substructures) of lists (of the same length as the list of
+    reductions in the composite).
 
     When you give a reduction index to the result thunk, you get a
     thunk that returns a list with all the reduced substructures that
@@ -79,9 +80,10 @@ def indexed(func):
 
 class CompositeReduction(Reduction):
     """
-    A :class:`Reduction` made from combining :class:`Reduction`s.
-    Results consist of lists of result from the component
-    :class:`Reduction`s but the recursion is only performed once.
+    A :class:`pdart.reduction.Reduction` made from combining
+    :class:`pdart.reductions.Reduction`s.  Results consist of lists of
+    result from the component :class:`pdart.reduction.Reduction`s but
+    the recursion is only performed once.
 
     NOTE: all of the reduce_xxx methods here return lists of length r,
     where r is the length of self.reductions.  All the get_reduced_xxx

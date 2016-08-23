@@ -3,7 +3,10 @@ import xml.dom
 
 
 class CalculationException(Exception):
-    """An :class:`Exception` carrying :class:`ExceptionInfo`"""
+    """
+    An :class:`pdart.exception.Exception` carrying
+    :class:`pdart.exception.ExceptionInfo`
+    """
 
     def __init__(self, msg, exception_info):
         assert isinstance(exception_info, ExceptionInfo)
@@ -20,22 +23,23 @@ class CalculationException(Exception):
 
 class ExceptionInfo(object):
     """
-    An abstract class wrapping either a single :class:`Exception` or a
-    labeled group of :class:`Exception`.
+    An abstract class wrapping either a single
+    :class:`pdart.exception.Exception` or a labeled group of
+    :class:`pdart.exception.Exception`.
     """
     __metaclass__ = abc.ABCMeta
 
     def to_pretty_xml(self):
         """
         Return human-readable XML text for this
-        :class:`ExceptionInfo.`
+        :class:`pdart.exception.ExceptionInfo.`
         """
         return self.to_xml().toprettyxml()
 
     def to_xml(self):
         """
         Return an XML document data structure for this
-        :class:`ExceptionInfo`.
+        :class:`pdart.exception.ExceptionInfo`.
         """
         document = xml.dom.getDOMImplementation().createDocument(None,
                                                                  None,
@@ -47,14 +51,15 @@ class ExceptionInfo(object):
     @abc.abstractmethod
     def to_xml_fragment(self, document):
         """
-        Return an XML data structure for this :class:`ExceptionInfo`.
+        Return an XML data structure for this
+        :class:`pdart.exception.ExceptionInfo`.
         """
         pass
 
 
 class SingleExceptionInfo(ExceptionInfo):
     """
-    A class wrapping a single :class:`Exception`.
+    A class wrapping a single :class:`pdart.exception.Exception`.
     """
     def __init__(self, exception, stack_trace):
         self.exception = exception
@@ -84,7 +89,8 @@ class SingleExceptionInfo(ExceptionInfo):
 
 class GroupedExceptionInfo(ExceptionInfo):
     """
-    A class wrapping a labeled group of :class:`Exception`.
+    A class wrapping a labeled group of
+    :class:`pdart.exception.Exception`.
     """
     def __init__(self, label, exception_infos):
         assert isinstance(label, str)

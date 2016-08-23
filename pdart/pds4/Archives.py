@@ -3,25 +3,26 @@ import pdart.pds4.Archive
 
 def get_full_archive():
     """
-    Return the complete :class:`Archive` located on the multi-terabyte
-    external drive connected to the nightly-build machine.
+    Return the complete :class:`pdart.pds4.Archive` located on the
+    multi-terabyte external drive connected to the nightly-build
+    machine.
     """
     return pdart.pds4.Archive.Archive('/Volumes/PDART-3TB')
 
 
 def get_mini_archive():
     """
-    Return the small test :class:`Archive` located on the development
-    machine.
+    Return the small test :class:`pdart.pds4.Archive` located on the
+    development machine.
     """
     return pdart.pds4.Archive.Archive('/Users/spaceman/Desktop/Archive')
 
 
 def get_any_archive():
     """
-    Return the complete :class:`Archive` if running on the
+    Return the complete :class:`pdart.pds4.Archive` if running on the
     nightly-build machine; otherwise return the small test
-    :class:`Archive` on the development machine.
+    :class:`pdart.pds4.Archive` on the development machine.
     """
     try:
         return get_full_archive()
@@ -32,6 +33,6 @@ def get_any_archive():
 def get_any_archive_dir():
     """
     Return the root directory of the archive returned by
-    get_any_archive().
+    :func:`get_any_archive`.
     """
     return get_any_archive().root

@@ -89,10 +89,10 @@ class ProductLabelReduction(BadFitsFileReduction):
 
 def make_product_label(product, verify):
     """
-    Create the label text for this :class:`Product`.  If the FITS file
-    is bad, raise an exception.  If verify is True, verify the label
-    against its XML and Schematron schemas.  Raise an exception if
-    either fails.
+    Create the label text for this :class:`pdart.pds4.Product`.  If
+    the FITS file is bad, raise an exception.  If verify is True,
+    verify the label against its XML and Schematron schemas.  Raise an
+    exception if either fails.
     """
     label = DefaultReductionRunner().run_product(ProductLabelReduction(verify),
                                                  product)
