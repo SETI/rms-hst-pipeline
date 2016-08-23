@@ -1,3 +1,10 @@
+"""
+This module augments the :class:`pdart.reductions.Reduction.Reduction`
+with some type contracts to verify that the use of types in the code
+is correct.  Unfortunately, currently we can only check that the
+``get_reduced_xxx()` functions are functions; they are not in turn
+typechecked.
+"""
 from contracts import ContractsMeta, contract, new_contract
 
 from pdart.pds4.Archive import *
@@ -12,6 +19,10 @@ except ValueError:
 
 
 class DbCReduction(Reduction):
+    """
+    A :class:`pdart.reductions.Reduction.Reduction` augmented with
+    some typechecks.
+    """
     __metaclass__ = ContractsMeta
 
     @contract(archive_root='str', get_reduced_bundles='func')

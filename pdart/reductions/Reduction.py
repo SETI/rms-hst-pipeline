@@ -1,3 +1,98 @@
+"""
+The central data structure of the PDART project is the archive, which
+is a hierarchical structure.  The archive consists of bundles, which
+consist of collections, which in turn consist of products.  You may
+think of the product consisting of various types of files.  FITS files
+may be further subdivided: they consist of HDUs, each of which
+contains a header section and possibly a data section.
+
+Sometimes when working on hierarchical structures, it's most useful to
+think in terms of converting between similar types of hierarchies.
+For instance, if we need to write a function that creates PDS4 labels
+for an archive, it will consist of bits of code that each create a
+PDS4 label for a bundle, and those bits of code will each contain code
+to create a PDS4 label for a collection, and so on.
+
+Note that the conversion may collapse some parts of the hierarchy.  In
+the extreme case, a conversion may reduce an entire hierarchy to a
+single value.
+
+In mathematics, conversions between similar types of hierarchies are
+called *catamorphisms*.  In some programming languages, they are
+called *folds*.  Here, I call them *reductions* after the Python
+function :func:`reduce` which is a built-in catamorphism: it reduces a
+list to a single (possibly compound) value.
+
+Frankly, :func:`reduce` isn't used much in Python: for a list it's
+usually just as easy to write a ``for``-loop or a list comprehension,
+which acts as the boilerplate for the reduction.  But when hierarchies
+become large like ours, the boilerplate to do the reduction (multiple
+nested ``for``-loops for each level) gets large and bug-prone so it's
+easier in the long run to set up some structure to handle it once and
+for all.
+
+This module defines the :class:`~pdart.reductions.Reduction.Reduction`
+object which contains methods corresponding to each level of the PDART
+hierarchy.  Each method tells how to combine (or reduce) the
+reductions from the next lower part of the hierarchy.  You then feed a
+:class:`~pdart.reductions.Reduction.Reduction` and the archive to
+:func:`~.reductions.Reduction.run_reduction` and it will return
+the combined result.
+
+For instance, if you wanted to count the number of products in an
+archive, rather than writing boilerplate with nested ``for``-loop, you
+could think of it in terms of a
+:class:`~pdart.reductions.Reduction.Reduction`.
+
+    * A product is reduced to the number 1.
+
+    * A collection is reduced to the sum of its products' reductions.
+
+    * A bundle is reduced to the sum of its collections' reductions.
+
+    * An archive is reduced to the sum of its bundles' reductions.
+
+When you run that all, the hierarchy that makes up an archive is
+reduced to a single number: the number of products in the file.
+
+You could implement this as follows::
+
+    class ProductCountReduction(Reduction):
+        def reduce_archive(self, archive_root, get_reduced_bundles):
+            return sum(get_reduced_bundles())
+
+        def reduce_bundle(self, archive, lid, get_reduced_collections):
+            return sum(get_reduced_collections())
+
+        def reduce_collection(self, archive, lid, get_reduced_products):
+            return sum(get_reduced_products())
+
+        def reduce_product(self, archive, lid, get_reduced_fits_files):
+            return 1
+
+    run_reduction(ProductCountReduction(), archive)
+
+(Note the implementation quirk that instead of returning the reduction
+of the next lower level, we return a *function* that returns the
+reduction of the next lower level.  This allows us to avoid recursion
+all the way to the bottom of the structure when we don't need to.  For
+instance, in this case since we do not need to open and parse any FITS
+files we won't, even though the reduction hierarchy can go down to
+individual header and data unit.  *If you don't call it, it won't be
+used.*)
+
+**For the most part, you won't need to write reductions.** We
+generally start out with a reduction that flattens the archive
+hierarchy into SQLite tables.  This simplifies the logic later on as
+flat data is easier to work with and we can also include persistent
+data in the database.
+
+Reductions are a bit easier to work with in a language with
+typechecking by a compiler.  In Python, it's up to the programmer to
+keep things straight.  :func:`reduction_type_documentation` can be
+used to produce a documentation string to remind the user what types
+are supposed to be used where.
+"""
 import os.path
 
 import abc
