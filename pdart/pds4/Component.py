@@ -44,8 +44,7 @@ class Component(object):
 
     def absolute_filepath_is_directory(self):
         """
-        Return True iff :func:`absolute_filepath()` returns a
-        directory.
+        Return True iff :func:`absolute_filepath` returns a directory.
         """
         return True
 

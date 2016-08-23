@@ -1,10 +1,14 @@
+"""
+This module provides an object-oriented wrapper around a SQLite
+connection.
+"""
 import os.path
 import sqlite3
 
 
 class DatabaseArchive:
     """
-    An object wrapper around a Sqlite connection to the archive's
+    An object wrapper around a SQLite connection to the archive's
     database.
     """
     def __init__(self, database_filepath):
