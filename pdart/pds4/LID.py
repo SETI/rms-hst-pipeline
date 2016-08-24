@@ -7,7 +7,7 @@ class LID(object):
 
     def __init__(self, str):
         """
-        Create a LID object from a string, throwing an exception if
+        Create a LID object from a string, raising an exception if
         the LID string is malformed.
         """
 

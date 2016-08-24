@@ -2,7 +2,7 @@
 Functionality to validate XML against various schemas using external
 programs.
 
-:func:`verify_label_or_throw` is the main function used for validating
+:func:`verify_label_or_raise` is the main function used for validating
 PDS4 labels.
 """
 import os
@@ -170,7 +170,7 @@ def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
         return None
 
 
-def verify_label_or_throw(label):
+def verify_label_or_raise(label):
     """
     Given the text of a PDS4 label, run XML Schema *and* Schematron
     validations on it.  Raise an exception on failures.

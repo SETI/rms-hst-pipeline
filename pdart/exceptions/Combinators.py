@@ -78,10 +78,10 @@ Our normal process to combine multiple Python functions into a single
 Python function is to first convert them all into *rcode*, so Python
 can look at both normal and exception results uniformly.  We then
 create a function that handles the results from the *rcode*: since we
-are guaranteed that no exceptions will be thrown (they are all
-converted into :class:`~pdart.exception.Failure` s), Python can work on
-the result like it can on any data.  Then we convert this *rcode* back
-into normal code.  The end-user will never see the *rcode*.
+are guaranteed that no exceptions will be raised (they are all
+converted into :class:`~pdart.exception.Failure` s), Python can work
+on the result like it can on any data.  Then we convert this *rcode*
+back into normal code.  The end-user will never see the *rcode*.
 
 """
 import traceback

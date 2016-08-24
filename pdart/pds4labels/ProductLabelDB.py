@@ -59,7 +59,7 @@ def make_db_product_label(conn, lid, verify):
     sys.stdout.flush()
 
     if verify:
-        verify_label_or_throw(label)
+        verify_label_or_raise(label)
 
     return label
 

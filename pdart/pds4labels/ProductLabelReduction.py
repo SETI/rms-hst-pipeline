@@ -86,7 +86,7 @@ class ProductLabelReduction(BadFitsFileReduction):
             f.write(label)
 
         if self.verify:
-            verify_label_or_throw(label)
+            verify_label_or_raise(label)
 
         return label
 

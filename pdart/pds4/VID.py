@@ -7,7 +7,7 @@ class VID(object):
 
     def __init__(self, str):
         """
-        Create a VID object from a string, throwing an exception if
+        Create a VID object from a string, raising an exception if
         the VID string is malformed.
         """
         vs = str.split('.')
