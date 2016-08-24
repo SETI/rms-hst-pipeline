@@ -1,3 +1,8 @@
+"""
+Functionality to build a ``<Target_Identification />`` XML element of
+a product label using a
+:class:`~pdart.reductions.Reduction.Reduction`.
+"""
 from pdart.exceptions.Combinators import *
 from pdart.reductions.Reduction import *
 from pdart.pds4labels.TargetIdentificationXml import *
@@ -16,7 +21,7 @@ _get_target = multiple_implementations('_get_target',
                                        get_placeholder_target)
 
 
-class TargetIdentificationLabelReduction(Reduction):
+class TargetIdentificationReduction(Reduction):
     """Reduce a product to an XML Target_Identification node template."""
     def reduce_fits_file(self, file, get_reduced_hdus):
         # Doc -> Node

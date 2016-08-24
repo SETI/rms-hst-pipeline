@@ -1,3 +1,7 @@
+"""
+Functionality to build a ``<Target_Identification />`` XML element of
+a product label using a SQLite database.
+"""
 from pdart.exceptions.Combinators import *
 from pdart.pds4labels.TargetIdentificationXml import *
 

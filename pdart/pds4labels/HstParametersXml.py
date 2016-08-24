@@ -1,3 +1,7 @@
+"""
+Templates to create a XML ``<hst:HST />`` node, and placeholder
+functions used by it.
+"""
 import sys
 
 from pdart.xml.Templates import *
@@ -7,6 +11,13 @@ hst = interpret_template("""<hst:HST>
 <NODE name="parameters_general"/>
 <NODE name="parameters_instrument"/>
 </hst:HST>""")
+"""
+An interpreted fragment template to create an ``<hst:HST />``
+XML element.
+
+type: Dict -> Node
+"""
+
 
 parameters_general = interpret_template("""<hst:Parameters_General>
   <hst:stsci_group_id><NODE name="stsci_group_id" /></hst:stsci_group_id>
@@ -27,6 +38,12 @@ parameters_general = interpret_template("""<hst:Parameters_General>
   <hst:moving_target_flag><NODE name="moving_target_flag" />\
 </hst:moving_target_flag>
 </hst:Parameters_General>""")
+"""
+An interpreted fragment template to create an ``<hst:Parameters_General />``
+XML element.
+
+type: Dict -> Node
+"""
 
 parameters_acs = interpret_template("""<hst:Parameters_ACS>
 <hst:detector_id><NODE name="detector_id" /></hst:detector_id>
@@ -36,6 +53,12 @@ parameters_acs = interpret_template("""<hst:Parameters_ACS>
 </hst:repeat_exposure_count>
 <hst:subarray_flag><NODE name="subarray_flag" /></hst:subarray_flag>
 </hst:Parameters_ACS>""")
+"""
+An interpreted fragment template to create an ``<hst:Parameters_ACS />``
+XML element.
+
+type: Dict -> Node
+"""
 
 parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 <hst:detector_id><NODE name="detector_id" /></hst:detector_id>
@@ -44,6 +67,12 @@ parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 </hst:repeat_exposure_count>
 <hst:subarray_flag><NODE name="subarray_flag" /></hst:subarray_flag>
 </hst:Parameters_WFC3>""")
+"""
+An interpreted fragment template to create an ``<hst:Parameters_WFC3 />``
+XML element.
+
+type: Dict -> Node
+"""
 
 parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 <hst:bandwidth><NODE name="bandwidth" /></hst:bandwidth>
@@ -57,6 +86,12 @@ parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 <hst:wf3_flag><NODE name="wf3_flag" /></hst:wf3_flag>
 <hst:wf4_flag><NODE name="wf4_flag" /></hst:wf4_flag>
 </hst:Parameters_WFPC2>""")
+"""
+An interpreted fragment template to create an ``<hst:Parameters_WFPC2 />``
+XML element.
+
+type: Dict -> Node
+"""
 
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
 
@@ -65,45 +100,70 @@ wrapper = interpret_document_template("""<NODE name="wrapped" />""")
 # read-and-parse-FITS-file code.
 
 def placeholder(product_id, tag):
+    """Return placeholder text for an XML tag, noting the problem."""
     note_problem(product_id, tag)
     return '### placeholder for %s ###' % tag
 
 
 def placeholder_int(product_id, tag):
+    """Return a placeholder integer for an XML tag, noting the problem."""
     note_problem(product_id, tag)
     return '0'
 
 
 def placeholder_float(product_id, tag):
+    """Return a placeholder float for an XML tag, noting the problem."""
     note_problem(product_id, tag)
     return '0.0'
 
 
 def note_problem(product_id, tag):
+    """Note use of a placeholder function."""
     if False:
         print ('PROBLEM %s: %s' % (tag, product_id))
         sys.stdout.flush()
 
 
 def known_placeholder(product_id, tag):
+    """Return placeholder text for an XML tag."""
     return '### placeholder for %s ###' % tag
 
 
 def get_targeted_detector_id(product_id, instrument, header):
+    """
+    Return placeholder text for the ``<targeted_detector_id />`` XML
+    element.
+    """
     return placeholder(product_id, 'targeted_detector_id')
 
 
 def get_pc1_flag(product_id, instrument, header):
+    """
+    Return a placeholder integer for the ``<pc1_flag />`` XML element,
+    noting the problem.
+    """
     return placeholder_int(product_id, 'pc1_flag')
 
 
 def get_wf2_flag(product_id, instrument, header):
+    """
+    Return a placeholder integer for the ``<wf2_flag />`` XML element,
+    noting the problem.
+    """
     return placeholder_int(product_id, 'wf2_flag')
 
 
 def get_wf3_flag(product_id, instrument, header):
+    """
+    Return a placeholder integer for the ``<wf3_flag />`` XML element,
+    noting the problem.
+    """
     return placeholder_int(product_id, 'wf3_flag')
 
 
 def get_wf4_flag(product_id, instrument, header):
+    """
+    Return a placeholder integer for the ``<wf4_flag />`` XML element,
+    noting the problem.
+    """
     return placeholder_int(product_id, 'wf4_flag')

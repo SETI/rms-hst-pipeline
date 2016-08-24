@@ -1,14 +1,18 @@
+"""
+Templates to create a ``<Target_Identification />`` XML node for
+product labels.
+"""
 from pdart.exceptions.Combinators import *
 from pdart.xml.Templates import *
 
 
-# For product labels: produces the Target_Identification element.
-
 def target_identification(target_name, target_type, target_description):
     """
     Given a target name and target type, return a function that takes
-    a document and returns a filled-out Target_Identification XML
-    node, used in product labels.
+    a document and returns a filled-out ``<Target_Identification />``
+    XML node, used in product labels.
+
+    type: Doc -> Node
     """
     func = interpret_template("""<Target_Identification>
         <name><NODE name="name"/></name>
@@ -47,4 +51,5 @@ _approximate_target_table = {
 
 
 def get_placeholder_target(*args, **kwargs):
+    """A placeholder triple of target name, type, and description."""
     return ('Magrathea', 'Planet', 'Home of Slartibartfast')

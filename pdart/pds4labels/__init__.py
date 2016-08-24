@@ -14,8 +14,8 @@ from a SQLite database (tables defined in
 :mod:`pdart.db.CreateDatabase`).  The ``reductions`` implementation
 will probably be removed in the near future, so ignore it.
 
-For, say, bundle labels, the ``reductions`` implementation is in
-``BundleLabelReduction.py``.  The ``db`` implementation is in
+For, say, bundle labels, the (ignorable) ``reductions`` implementation
+is in ``BundleLabelReduction.py``.  The ``db`` implementation is in
 ``BundleLabelDB.py``.  Common code (mostly XML templates) is found in
 ``BundleLabelXml.py``.  ``BundleLabel.py`` simply includes both
 implementations so we could import a single module to get either.

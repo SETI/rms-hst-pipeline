@@ -1,3 +1,7 @@
+"""
+Functionality to build an ``<Time_Coordinates />`` XML element using a
+SQLite database.
+"""
 from pdart.exceptions.Combinators import *
 from pdart.pds4labels.TimeCoordinatesXml import *
 

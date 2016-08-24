@@ -22,7 +22,7 @@ def _mk_axis_arrays(hdu, axes):
         [mk_axis_array(hdu, i + 1) for i in range(0, axes)])
 
 
-class FileContentsLabelReduction(Reduction):
+class FileContentsReduction(Reduction):
     """
     Reduce a product to an XML fragment template containing the
     ``<Header />`` and ``<Array_2D_Image />`` elements describing its

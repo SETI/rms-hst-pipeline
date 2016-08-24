@@ -1,3 +1,7 @@
+"""
+Functionality to build an ``<Time_Coordinates />`` XML element using a
+:class:`~pdart.reductions.Reduction.Reduction`.
+"""
 import pdart.add_pds_tools
 import julian
 
@@ -24,8 +28,8 @@ _get_start_stop_times = multiple_implementations(
     get_placeholder_start_stop_times)
 
 
-class TimeCoordinatesLabelReduction(Reduction):
-    """Reduce a product to an XML Time_Coordinates node template."""
+class TimeCoordinatesReduction(Reduction):
+    """Reduce a product to a ``<Time_Coordinates />`` XML template."""
     def reduce_fits_file(self, file, get_reduced_hdus):
         # returns Doc -> Node
         get_start_stop_times = multiple_implementations(

@@ -58,17 +58,17 @@ type: Dict -> Doc
 
 
 def mk_Investigation_Area_name(proposal_id):
+    """
+    Boilerplate for the text content of a ``<name />`` element in the
+    ``<Investigation_Area />`` element.
+    """
     return 'HST observing program %d' % proposal_id
-"""
-Boilerplate for the text content of a ``<name />`` element in the
-``<Investigation_Area />`` element.
-"""
 
 
 def mk_Investigation_Area_lidvid(proposal_id):
+    """
+    Boilerplate for the text content of a ``<lidvid />`` element in
+    the ``<Investigation_Area />`` element.
+    """
     return 'urn:nasa:pds:context:investigation:investigation.hst_%05d::1.0' % \
         proposal_id
-"""
-Boilerplate for the text content of a ``<lidvid />`` element in the
-``<Investigation_Area />`` element.
-"""

@@ -1,17 +1,32 @@
+"""
+Functionality to build an ``<hst:HST />`` XML element using a
+:class:`~pdart.reductions.Reduction.Reduction`.
+"""
 from pdart.exceptions.Combinators import *
 from pdart.pds4labels.HstParametersXml import *
 from pdart.reductions.Reduction import *
 
 
 def get_repeat_exposure_count(product_id, instrument, header):
+    """
+    Return a placeholder integer for the ``<repeat_exposure_count
+    />`` XML element, noting the problem.
+    """
     return placeholder_int(product_id, 'repeat_exposure_count')
 
 
 def get_subarray_flag(product_id, instrument, header):
+    """
+    Return placeholder text for the ``<subarray_flag />`` XML element,
+    noting the problem.
+    """
     return placeholder(product_id, 'subarray_flag')
 
 
 def get_aperture_type(product_id, instrument, header):
+    """
+    Return text for the ``<aperture_type />`` XML element.
+    """
     if instrument == 'wfpc2':
         # TODO: should be None?  But it's required.  What to do?
         return placeholder(product_id, 'aperture_type')
@@ -23,22 +38,31 @@ def get_aperture_type(product_id, instrument, header):
 
 
 def get_bandwidth(product_id, instrument, header):
+    """
+    Return a float for the ``<bandwidth />`` XML element.
+    """
     if instrument == 'wfpc2':
         try:
-            return str(header['BANDWID'] * 1.e-4)
+            return header['BANDWID'] * 1.e-4
         except KeyError:
             return placeholder_float(product_id, 'bandwidth')
 
 
 def get_center_filter_wavelength(product_id, instrument, header):
+    """
+    Return a float for the ``<center_filter_wavelength />`` XML element.
+    """
     if instrument == 'wfpc2':
         try:
-            return str(header['CENTRWV'] * 1.e-4)
+            return header['CENTRWV'] * 1.e-4
         except KeyError:
             return placeholder_float(product_id, 'center_filter_wavelength')
 
 
 def get_detector_id(product_id, instrument, header):
+    """
+    Return text for the ``<detector_id />`` XML element.
+    """
     try:
         detector = header['DETECTOR']
     except KeyError:
@@ -54,13 +78,19 @@ def get_detector_id(product_id, instrument, header):
 
 
 def get_exposure_duration(product_id, instrument, header):
+    """
+    Return a float for the ``<exposure_duration />`` XML element.
+    """
     try:
-        return str(header['EXPTIME'])
+        return header['EXPTIME']
     except KeyError:
         return placeholder_float(product_id, 'exposure_duration')
 
 
 def get_exposure_type(product_id, instrument, header):
+    """
+    Return text for the ``<exposure_type />`` XML element.
+    """
     try:
         return str(header['EXPFLAG'])
     except KeyError:
@@ -68,6 +98,9 @@ def get_exposure_type(product_id, instrument, header):
 
 
 def get_filter_name(product_id, instrument, header):
+    """
+    Return text for the ``<filter_name />`` XML element.
+    """
     try:
         if instrument == 'wfpc2':
             filtnam1 = header['FILTNAM1'].strip()
@@ -98,6 +131,10 @@ def get_filter_name(product_id, instrument, header):
 
 
 def get_fine_guidance_system_lock_type(product_id, instrument, header):
+    """
+    Return text for the ``<fine_guidance_system_lock_type />`` XML
+    element.
+    """
     try:
         return header['FGSLOCK']
     except KeyError:
@@ -105,6 +142,9 @@ def get_fine_guidance_system_lock_type(product_id, instrument, header):
 
 
 def get_gain_mode_id(product_id, instrument, header):
+    """
+    Return text for the ``<gain_mode_id />`` XML element.
+    """
     try:
         if instrument == 'acs':
             return str(header['ATODGAIN'])
@@ -115,6 +155,9 @@ def get_gain_mode_id(product_id, instrument, header):
 
 
 def get_hst_pi_name(product_id, instrument, header):
+    """
+    Return text for the ``<hst_pi_name />`` XML element.
+    """
     try:
         return '%s, %s %s' % (header['PR_INV_L'],
                               header['PR_INV_F'],
@@ -124,6 +167,9 @@ def get_hst_pi_name(product_id, instrument, header):
 
 
 def get_hst_proposal_id(product_id, instrument, header):
+    """
+    Return text for the ``<hst_proposal_id />`` XML element.
+    """
     try:
         return str(header['PROPOSID'])
     except KeyError:
@@ -131,6 +177,9 @@ def get_hst_proposal_id(product_id, instrument, header):
 
 
 def get_hst_target_name(product_id, instrument, header):
+    """
+    Return text for the ``<hst_target_name />`` XML element.
+    """
     try:
         return header['TARGNAME']
     except KeyError:
@@ -138,6 +187,9 @@ def get_hst_target_name(product_id, instrument, header):
 
 
 def get_instrument_mode_id(product_id, instrument, header):
+    """
+    Return text for the ``<instrument_mode_id />`` XML element.
+    """
     try:
         if instrument == 'wfpc2':
             return header['MODE']
@@ -148,6 +200,9 @@ def get_instrument_mode_id(product_id, instrument, header):
 
 
 def get_observation_type(product_id, instrument, header):
+    """
+    Return text for the ``<observation_type />`` XML element.
+    """
     if instrument != 'wfpc2':
         try:
             return header['OBSTYPE']
@@ -156,6 +211,10 @@ def get_observation_type(product_id, instrument, header):
 
 
 class HstParametersReduction(Reduction):
+    """
+    A :class:`~pdart.reductions.Reduction.Reduction` to reduce a
+    product to an ``<hst:HST />`` XML element.
+    """
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         # return (Doc -> Node)
         instrument = Product(archive, lid).collection().instrument()

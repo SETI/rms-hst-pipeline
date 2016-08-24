@@ -10,8 +10,8 @@ from pdart.pds4labels.FileContentsReduction import *
 from pdart.pds4labels.HstParametersReduction import *
 from pdart.pds4labels.ObservingSystem import *
 from pdart.pds4labels.ProductLabelXml import *
-from pdart.pds4labels.TargetIdentificationLabelReduction import *
-from pdart.pds4labels.TimeCoordinatesLabelReduction import *
+from pdart.pds4labels.TargetIdentificationReduction import *
+from pdart.pds4labels.TimeCoordinatesReduction import *
 from pdart.reductions.BadFitsFileReduction import *
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.Reduction import *
@@ -26,10 +26,10 @@ class ProductLabelReduction(BadFitsFileReduction):
     """
     def __init__(self, verify=False):
         base_reduction = CompositeReduction(
-            [FileContentsLabelReduction(),
-             TargetIdentificationLabelReduction(),
+            [FileContentsReduction(),
+             TargetIdentificationReduction(),
              HstParametersReduction(),
-             TimeCoordinatesLabelReduction()])
+             TimeCoordinatesReduction()])
         BadFitsFileReduction.__init__(self, base_reduction)
         self.verify = verify
 
@@ -93,7 +93,7 @@ class ProductLabelReduction(BadFitsFileReduction):
 
 def make_product_label(product, verify):
     """
-    Create the label text for this :class:`pdart.pds4.Product`.  If
+    Create the label text for this :class:`~pdart.pds4.Product`.  If
     the FITS file is bad, raise an exception.  If verify is True,
     verify the label against its XML and Schematron schemas.  Raise an
     exception if either fails.

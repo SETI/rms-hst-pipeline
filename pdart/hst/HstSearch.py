@@ -1,3 +1,6 @@
+"""
+Functionality to retrieve HST data from MAST.
+"""
 import urllib
 
 _DATA_SET = 'hst'

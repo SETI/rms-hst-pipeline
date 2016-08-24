@@ -1,3 +1,4 @@
+"""Templates to create an ``<Observing_System />`` XML element."""
 from pdart.xml.Templates import *
 
 _observing_system = interpret_template("""<Observing_System>
@@ -20,6 +21,12 @@ _observing_system = interpret_template("""<Observing_System>
         </Internal_Reference>
       </Observing_System_Component>
     </Observing_System>""")
+"""
+An interpreted fragment template to create an ``<Observing_System />``
+XML element.
+
+type: Dict -> (Doc -> Node)
+"""
 
 
 acs_observing_system = _observing_system({
@@ -27,21 +34,45 @@ acs_observing_system = _observing_system({
         'component_name': 'Advanced Camera for Surveys',
         'abbreviation': 'acs'
         })
+"""
+An interpreted fragment template to create an ``<Observing_System />``
+XML element.
+
+type: Doc -> Node
+"""
 
 wfc3_observing_system = _observing_system({
         'name': 'Hubble Space Telescope Wide Field Camera 3',
         'component_name': 'Wide Field Camera 3',
         'abbreviation': 'wfc3'
         })
+"""
+An interpreted fragment template to create an ``<Observing_System />``
+XML element.
+
+type: Doc -> Node
+"""
 
 wfpc2_observing_system = _observing_system({
         'name': 'Hubble Space Telescope Wide-Field Planetary Camera 2',
         'component_name': 'Wide-Field Planetary Camera 2',
         'abbreviation': 'wfpc2'
         })
+"""
+An interpreted fragment template to create an ``<Observing_System />``
+XML element.
+
+type: Doc -> Node
+"""
 
 
 def observing_system(instrument):
+    """
+    Given an instrument, return an interpreted fragment template to
+    create an ``<Observing_System />`` XML element.
+
+    type: String -> (Doc -> Node)
+    """
     return {'acs': acs_observing_system,
             'wfc3': wfc3_observing_system,
             'wfpc2': wfpc2_observing_system,

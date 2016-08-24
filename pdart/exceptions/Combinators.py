@@ -10,10 +10,58 @@ of the implementations work, it works.  The other is
 :func:`parallel_list` which acts as a big **and**: all the component
 functions must work or it does not work.
 
+To build a *rule* (a function that uses multiple heuristics to
+calculate a result) just call :func:`multiple_implementations` with a
+label (usually the rule's name, used to label exceptions should it
+fails) and the functions that implement the heuristics.  They must all
+take the same argument list (with the exception that if a function
+ignores its arguments, you may give its arguments as ``(*args,
+**kwargs)``.
+
+For example, assume you need to calculate whether a function halts or
+loops infinitely.  We are using three heuristics: does it contain
+``while True: pass``?, does it contain ``while not False: pass``?, and
+do the entrails of a sacrificed ox suggest that it loops.  The first
+two take the function's source code; the third requires the entrails
+of a sacrificed ox.  The combined rule needs to take all of these.  So
+we write::
+
+    def _contains_while_true_pass(src_text, ignored_entrails):
+        # implementation goes here
+
+    def _contains_while_not_false_pass(src_text, ignored_entrails):
+        # implementation goes here
+
+    def _entrails_say_it_loops(ignored_src_text, entrails):
+        # implementation goes here
+
+    does_function_loop = multiple_implementations(
+        "does_function_loop",
+        _contains_while_true_pass,
+        _contains_while_not_false_pass,
+        _entrails_say_it_loops)
+
+Our rule has the common signature ``does_function_loop(src_text,
+entrails)`` and when run will return True or False if any of the
+heuristic functions succeeds in returning a value.  If they all fail,
+it will raise a :exc:`CalculationException` containing the exceptions
+and their stack traces of every one of the heuristics.  (The entrails
+of the calculation, so to speak.)
+
 The utility function :func:`raise_verbosely` pretty-prints the
 exception(s) as XML if the thunk it's called on fails.  This is needed
 for a compound exception to be legible and is used at the top-level of
-a script.
+a script.  Using our example, we might write::
+
+    if __name__ == '__main__':
+        src = 'import Math; while Math.pi is 3: pass'
+        entrails = get_entrails()
+        def thunk_to_run():
+            print does_function_loop(src, entrails)
+        raise_verbosely(thunk_to_run)
+
+If ``does_function_loop()`` fails, ``raise_verbosely()`` will
+pretty-print the exceptions.
 
 **New to PDART?** You don't need to understand the internals of
 :func:`multiple_implementations` or :func:`parallel_list` to use them.
