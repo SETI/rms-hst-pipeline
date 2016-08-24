@@ -1,3 +1,9 @@
+"""
+The module provides instances of
+:class:`pdart.reductions.Reduction.Reduction` s that log archive
+components as they are processed.  Intended to be used as part of a
+:class:`pdart.reductions.CompositeReduction.CompositeReduction`.
+"""
 import sys
 
 from pdart.reductions.Reduction import *

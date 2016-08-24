@@ -1,3 +1,10 @@
+"""
+Functionality to validate XML against various schemas using external
+programs.
+
+:func:`verify_label_or_throw` is the main function used for validating
+PDS4 labels.
+"""
 import os
 import subprocess
 import tempfile
@@ -138,6 +145,9 @@ def _svrl_failures(svrl):
 
 
 def svrl_has_failures(svrl):
+    """
+    Given an SVRL document, return True iff it contains failures.
+    """
     return len(_svrl_failures(svrl)) > 0
 
 
@@ -161,6 +171,10 @@ def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
 
 
 def verify_label_or_throw(label):
+    """
+    Given the text of a PDS4 label, run XML Schema *and* Schematron
+    validations on it.  Raise an exception on failures.
+    """
     try:
         failures = xml_schema_failures(None, label)
         if failures is not None:
@@ -169,6 +183,7 @@ def verify_label_or_throw(label):
         if failures is not None:
             raise Exception('Schematron validation errors: ' + failures)
     except:
+        # Debugging functionality: write the label to disk.
         PRINT_AND_SAVE_LABEL = False
         if PRINT_AND_SAVE_LABEL:
             import time

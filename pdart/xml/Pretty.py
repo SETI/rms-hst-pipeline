@@ -1,3 +1,6 @@
+"""
+Pretty-printing functionality.
+"""
 from pdart.xml.Schema import run_subprocess
 
 

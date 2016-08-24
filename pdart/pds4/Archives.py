@@ -1,9 +1,10 @@
+"""Functionality to find some standard archives."""
 import pdart.pds4.Archive
 
 
 def get_full_archive():
     """
-    Return the complete :class:`pdart.pds4.Archive` located on the
+    Return the complete :class:`~pdart.pds4.Archive` located on the
     multi-terabyte external drive connected to the nightly-build
     machine.
     """
@@ -12,7 +13,7 @@ def get_full_archive():
 
 def get_mini_archive():
     """
-    Return the small test :class:`pdart.pds4.Archive` located on the
+    Return the small test :class:`~pdart.pds4.Archive` located on the
     development machine.
     """
     return pdart.pds4.Archive.Archive('/Users/spaceman/Desktop/Archive')
@@ -20,9 +21,9 @@ def get_mini_archive():
 
 def get_any_archive():
     """
-    Return the complete :class:`pdart.pds4.Archive` if running on the
+    Return the complete :class:`~pdart.pds4.Archive` if running on the
     nightly-build machine; otherwise return the small test
-    :class:`pdart.pds4.Archive` on the development machine.
+    :class:`~pdart.pds4.Archive` on the development machine.
     """
     try:
         return get_full_archive()

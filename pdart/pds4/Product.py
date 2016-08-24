@@ -1,3 +1,4 @@
+"""Representation of a PDS4 product."""
 import os.path
 import re
 import shutil
@@ -31,7 +32,13 @@ class Product(Component):
     """A PDS4 Product."""
 
     VISIT_DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
+    """
+    A regexp pattern for product visit directory names, used to
+    validate visit directory names or to extract visit ids.
+    """
+
     FILE_EXTS = ['.fits', '.jpg']
+    """Currently legal file extensions for product files."""
 
     def __init__(self, arch, lid):
         """
@@ -55,6 +62,7 @@ class Product(Component):
         return res
 
     def label_filepath(self):
+        """Return the absolute filepath to the product's label."""
         product_fp = self.absolute_filepath()
         (dir, product_basename) = os.path.split(product_fp)
         (root, ext) = os.path.splitext(product_basename)
@@ -62,6 +70,7 @@ class Product(Component):
         return os.path.join(dir, label_basename)
 
     def visit_filepath(self):
+        """Return the absolute filepath to the product's visit directory."""
         hst_filename = HstFilename(self.lid.product_id)
         collection_filepath = self.collection().absolute_filepath()
         visit_segment = 'visit_%s' % self.visit()
@@ -69,17 +78,29 @@ class Product(Component):
 
     def visit(self):
         """
-        Return the visit code for this product.  It is calculated from
-        the product's filepath
+        Return the visit id for this product.  It is calculated from
+        the product's filepath.
         """
         hst_filename = HstFilename(self.lid.product_id)
         return hst_filename.visit()
 
     def files(self):
+        """
+        Generate all the files belonging to this
+        :class:`~pdart.pds4.Product.Product` as
+        :class:`~pdart.pds4.File.File` objects.
+        """
         basename = os.path.basename(self.absolute_filepath())
         yield File(self, basename)
 
     def absolute_filepath_is_directory(self):
+        """
+        Return True iff the product's absolute filepath is a
+        directory.
+
+        Always False because products' filepaths are to their
+        (currently single) file.
+        """
         return False
 
     def collection(self):
@@ -95,4 +116,5 @@ class Product(Component):
                       self.lid.parent_lid().parent_lid())
 
     def browse_product(self):
+        """Return the browse product object for this product."""
         return Product(self.archive, self.lid.to_browse_lid())

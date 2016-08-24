@@ -1,3 +1,8 @@
+"""
+The module provides a wrapper around a
+:class:`~pdart.reductions.Reduction.Reduction` that handles bad FITS
+files where "bad" means "raises an IOError."
+"""
 from pdart.reductions.WrappedReduction import *
 
 

@@ -1,3 +1,8 @@
+"""
+The module provides a wrapper around a
+:class:`~pdart.reductions.Reduction.Reduction` that is useful for
+selectively overriding individual methods.
+"""
 from pdart.reductions.Reduction import *
 
 

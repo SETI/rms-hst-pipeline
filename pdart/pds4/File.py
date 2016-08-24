@@ -1,3 +1,7 @@
+"""
+Representation of a file belonging to a
+:class:`~pdart.pds4.Component`.
+"""
 import os.path
 
 # We only import PSD4 subcomponent modules to avoid circular imports.
@@ -6,16 +10,16 @@ import os.path
 
 
 class File(object):
-    """A file belonging to an :class:`pdart.pds4.Component`."""
+    """A file belonging to an :class:`~pdart.pds4.Component`."""
 
     def __init__(self, comp, basename):
         """
-        Create an File given the :class:`pdart.pds4.Component` it
+        Create an File given the :class:`~pdart.pds4.Component` it
         belongs to and the basename (that is, filepath without
         directory part) for the file.
 
-        Note that this assumes that :class:`pdart.pds4.Product`s don't
-        contain subdirectories.  That won't always be true.
+        Note that this assumes that :class:`~pdart.pds4.Product`s
+        don't contain subdirectories.  That won't always be true.
         """
         from pdart.pds4.Product import Product
 

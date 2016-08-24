@@ -74,12 +74,12 @@ You could implement this as follows::
 
 (Note the implementation quirk that instead of returning the reduction
 of the next lower level, we return a *function* that returns the
-reduction of the next lower level.  This allows us to avoid recursion
+reduction of the next lower level.  This allows us to avoid recursing
 all the way to the bottom of the structure when we don't need to.  For
 instance, in this case since we do not need to open and parse any FITS
-files we won't, even though the reduction hierarchy can go down to
-individual header and data unit.  *If you don't call it, it won't be
-used.*)
+files--an expensive action--we won't, even though the reduction
+hierarchy is capable of going down to individual header and data
+units.  *If you don't call it, it won't be used.*)
 
 **For the most part, you won't need to write reductions.** We
 generally start out with a reduction that flattens the archive
@@ -195,45 +195,85 @@ reduce_data_unit(
 
 
 class ReductionRunner(object):
+    """
+    An abstract class to run a
+    :class:`~pdart.reductions.Reduction.Reduction` on an
+    :class:`~pdart.pds4.Archive.Archive` or one of its substructures
+    (:class:`~pdart.pds4.Bundle.Bundle`,
+    :class:`~pdart.pds4.Collection.Collection`, etc.).
+    """
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def run_archive(self, reduction, archive):
+        """
+        Run the :class:`~pdart.reductions.Reduction.Reduction` on an
+        :class:`~pdart.pds4.Archive.Archive`.
+        """
         pass
 
     @abc.abstractmethod
     def run_bundle(self, reduction, bundle):
+        """
+        Run the :class:`~pdart.reductions.Reduction.Reduction` on an
+        :class:`~pdart.pds4.Bundle.Bundle`.
+        """
         pass
 
     @abc.abstractmethod
     def run_collection(self, reduction, collection):
+        """
+        Run the :class:`~pdart.reductions.Reduction.Reduction` on an
+        :class:`~pdart.pds4.Collection.Collection`.
+        """
         pass
 
     @abc.abstractmethod
     def run_product(self, reduction, product):
+        """
+        Run the :class:`~pdart.reductions.Reduction.Reduction` on an
+        :class:`~pdart.pds4.Product.Product`.
+        """
         pass
 
     @abc.abstractmethod
     def run_fits_file(self, reduction, file):
+        """
+        Run the :class:`~pdart.reductions.Reduction.Reduction` on an
+        FITS file.
+        """
         pass
 
     @abc.abstractmethod
     def run_hdu(self, reduction, n, hdu):
+        """
+        Run the :class:`~pdart.reductions.Reduction.Reduction` on an
+        HDU within a FITS file.
+        """
         pass
 
     @abc.abstractmethod
     def run_header_unit(self, reduction, n, header_unit):
+        """
+        Run the :class:`~pdart.reductions.Reduction.Reduction` on an
+        header unit within a FITS file.
+        """
         pass
 
     @abc.abstractmethod
     def run_data_unit(self, reduction, n, data_unit):
+        """
+        Run the :class:`~pdart.reductions.Reduction.Reduction` on an
+        data unit within a FITS file.
+        """
         pass
 
 
 class DefaultReductionRunner(object):
     """
     An algorithm to recursively reduce PDS4 and FITS structures
-    according to a :class:`pdart.reductions.Reduction` instance.
+    according to a :class:`~pdart.reductions.Reduction.Reduction`
+    instance.
 
     You don't have to understand how this works to use it.
     """
@@ -339,7 +379,7 @@ class DefaultReductionRunner(object):
 
 def run_reduction(reduction, archive):
     """
-    Run a :class:`pdart.reductions.Reduction` on an
-    :class:`pdart.pds4.Archive` using the default recursion.
+    Run a :class:`~pdart.reductions.Reduction.Reduction` on an
+    :class:`~pdart.pds4.Archive.Archive` using the default recursion.
     """
     return DefaultReductionRunner().run_archive(reduction, archive)

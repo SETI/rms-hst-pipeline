@@ -73,15 +73,15 @@ def test_composite_descent():
     assert set(['archive', 'bundle', 'collection']) == tr.trace
 
 
-if False:
-    def test_type_documentation():
-        d = {'archive': 'None',
-             'bundle': 'None',
-             'collection': 'None',
-             'product': 'ProductLabel',
-             'fits_file': 'dict',
-             'hdu': 'dict',
-             'header_unit': 'None',
-             'data_unit': 'None'}
-        print reduction_type_documentation(composite_reduction_type([d, d]))
-        assert False
+# if False:
+#     def test_type_documentation():
+#         d = {'archive': 'None',
+#              'bundle': 'None',
+#              'collection': 'None',
+#              'product': 'ProductLabel',
+#              'fits_file': 'dict',
+#              'hdu': 'dict',
+#              'header_unit': 'None',
+#              'data_unit': 'None'}
+#         print reduction_type_documentation(composite_reduction_type([d, d]))
+#         assert False

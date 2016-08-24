@@ -1,7 +1,24 @@
+"""
+This module provides typechecking for reductions.
+
+Used during development, *this module is not currently used (as of
+2016-08-24).*
+"""
 from pdart.reductions.Reduction import *
 
 
 class Typechecks(object):
+    """
+    A set of methods to typecheck the reductions of an
+    :class:`~pdart.pds4.Archive.Archive` or one of its substructures
+    (:class:`~pdart.pds4.Bundle.Bundle`,
+    :class:`~pdart.pds4.Collection.Collection`, etc.).
+
+    Default behavior is to do nothing.
+
+    Override a method's behavior to raise an exception if a typecheck
+    fails.
+    """
     def check_is_archive_reduction(self, obj):
         pass
 
@@ -28,6 +45,11 @@ class Typechecks(object):
 
 
 class CompositeTypechecks(Typechecks):
+    """
+    A :class:`~pdart.reductions.TypecheckedReduction.Typechecks`
+    composed of a list of them.  Its behavior is to apply all the base
+    :class:`~pdart.reductions.TypecheckedReduction.Typechecks`.
+    """
     def __init__(self, typechecks):
         for tc in typechecks:
             assert isinstance(tc, Typechecks)
@@ -89,6 +111,12 @@ def is_function(func):
 
 
 def check_thunk(check, thunk):
+    """
+    Given a typecheck function that raises an exception if its
+    argument is not as expected and a thunk (a no-argument function),
+    return a new thunk that produces the same result or raises an
+    exception if the result does not pass the typecheck.
+    """
     assert is_function(thunk)
 
     def checked_thunk():
@@ -99,6 +127,13 @@ def check_thunk(check, thunk):
 
 
 def check_list_thunk(check, thunk):
+    """
+    Given a typecheck function that raises an exception if its
+    argument is not as expected and a thunk (a no-argument function)
+    that returns a list, return a new thunk that produces the same
+    list of results or raises an exception if any of the results does
+    not pass the typecheck.
+    """
     assert is_function(thunk)
 
     def checked_list_thunk():
@@ -111,6 +146,12 @@ def check_list_thunk(check, thunk):
 
 
 class TypecheckedReduction(Reduction):
+    """
+    A wrapper around a :class:`~pdart.reductions.Reduction.Reduction`
+    that acts as a :class:`~pdart.reductions.Reduction.Reduction` with
+    a :class:`~pdart.reductions.TypecheckedReduction.Typechecks`
+    applied.
+    """
     def __init__(self, typechecks, base_reduction):
         assert typechecks
         self.typechecks = typechecks
@@ -195,6 +236,13 @@ class TypecheckedReduction(Reduction):
 
 
 class TypecheckedReductionRunner(object):
+    """
+    A class to run a :class:`~pdart.reductions.Reduction.Reduction` on
+    an :class:`~pdart.pds4.Archive.Archive` or one of its
+    substructures (:class:`~pdart.pds4.Bundle.Bundle`,
+    :class:`~pdart.pds4.Collection.Collection`, etc.) while
+    typechecking the reductions.
+    """
     def __init__(self, typechecks, base_runner):
         assert typechecks
         self.typechecks = typechecks

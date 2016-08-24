@@ -1,3 +1,4 @@
+"""Representation of a PDS4 LIDVID."""
 import LID
 import VID
 

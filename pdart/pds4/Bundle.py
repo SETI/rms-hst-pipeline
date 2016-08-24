@@ -1,3 +1,4 @@
+"""Representation of a PDS4 bundle."""
 import os
 import os.path
 import re
@@ -15,12 +16,16 @@ class Bundle(Component):
     """A PDS4 Bundle."""
 
     DIRECTORY_PATTERN = r'\Ahst_([0-9]{5})\Z'
+    """
+    A regexp pattern for bundle directory names, used to validate
+    directory names or to extract proposal ids.
+    """
 
     def __init__(self, arch, lid):
         """
-        Create a :class:`pdart.pds4.Bundle` given the
-        :class:`pdart.pds4.Archive` it lives in and its
-        :class:`pdart.pds4.LID`.
+        Create a :class:`~pdart.pds4.Bundle` given the
+        :class:`~pdart.pds4.Archive` it lives in and its
+        :class:`~pdart.pds4.LID`.
         """
         assert lid.is_bundle_lid()
         super(Bundle, self).__init__(arch, lid)
@@ -30,23 +35,24 @@ class Bundle(Component):
 
     def proposal_id(self):
         """
-        Return the proposal ID for this :class:`pdart.pds4.Bundle`.
-        It is calculated from the bundle's :class:`pdart.pds4.LID`.
+        Return the proposal ID for this :class:`~pdart.pds4.Bundle`.
+        It is calculated from the bundle's :class:`~pdart.pds4.LID`.
         """
         return int(re.match(Bundle.DIRECTORY_PATTERN,
                             self.lid.bundle_id).group(1))
 
     def absolute_filepath(self):
-        """Return the absolute filepath to the component's directory."""
+        """Return the absolute filepath to the bundle's directory."""
         return os.path.join(self.archive.root, self.lid.bundle_id)
 
     def label_filepath(self):
+        """Return the absolute filepath to the bundle's label."""
         return os.path.join(self.absolute_filepath(), 'bundle.xml')
 
     def collections(self):
         """
-        Generate the collections of this :class:`pdart.pds4.Bundle` as
-        :class:`pdart.pds4.Collection` objects.
+        Generate the collections of this :class:`~pdart.pds4.Bundle`
+        as :class:`~pdart.pds4.Collection` objects.
         """
         dir_fp = self.absolute_filepath()
         for subdir in os.listdir(dir_fp):
@@ -57,8 +63,8 @@ class Bundle(Component):
 
     def products(self):
         """
-        Generate the products of this :class:`pdart.pds4.Bundle` as
-        :class:`pdart.pds4.Product` objects.
+        Generate the products of this :class:`~pdart.pds4.Bundle` as
+        :class:`~pdart.pds4.Product` objects.
         """
         for collection in self.collections():
             for product in collection.products():

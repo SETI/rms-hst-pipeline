@@ -1,3 +1,4 @@
+"""Functionality to extract data from HST filenames."""
 import os.path
 import re
 
@@ -61,7 +62,7 @@ class HstFilename(object):
 
     def visit(self):
         """
-        Return the visit ID determined by the two characters after the
+        Return the visit id determined by the two characters after the
         first four of the filename.
         """
         return self._basename()[4:6].lower()

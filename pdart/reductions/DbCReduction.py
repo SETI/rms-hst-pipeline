@@ -2,8 +2,10 @@
 This module augments the :class:`pdart.reductions.Reduction.Reduction`
 with some type contracts to verify that the use of types in the code
 is correct.  Unfortunately, currently we can only check that the
-``get_reduced_xxx()` functions are functions; they are not in turn
-typechecked.
+``get_reduced_xxx()`` functions are functions; their arguments are
+*not* in turn typechecked.
+
+*This is not currently used (as of 2016-08-24).*
 """
 from contracts import ContractsMeta, contract, new_contract
 

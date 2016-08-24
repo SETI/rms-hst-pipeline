@@ -1,3 +1,6 @@
+"""
+Representation of a PDS4 bundle, collection, or product.
+"""
 import abc
 import os
 import os.path
@@ -7,8 +10,8 @@ from pdart.pds4.LID import *
 
 class Component(object):
     """
-    A :class:`pdart.pds4.Bundle`, :class:`pdart.pds4.Collection`, or
-    :class:`pdart.pds4.Product` within an :class:`pdart.pds4.Archive`.
+    A :class:`~pdart.pds4.Bundle`, :class:`~pdart.pds4.Collection`, or
+    :class:`~pdart.pds4.Product` within an :class:`~pdart.pds4.Archive`.
     This is an abstract class.
     """
 
@@ -16,9 +19,9 @@ class Component(object):
 
     def __init__(self, arch, lid):
         """
-        Create an :class:`pdart.pds4.Component` given the
-        :class:`pdart.pds4.Archive` it lives in and its
-        :class:`pdart.pds4.LID`.
+        Create an :class:`~pdart.pds4.Component` given the
+        :class:`~pdart.pds4.Archive` it lives in and its
+        :class:`~pdart.pds4.LID`.
         """
         assert arch
         self.archive = arch
@@ -36,22 +39,22 @@ class Component(object):
     def absolute_filepath(self):
         """
         Return the absolute filepath to the
-        :class:`pdart.pds4.Component`'s directory
-        (:class:`pdart.pds4.Bundle`, :class:`pdart.pds4.Collection`)
-        or file (:class:`pdart.pds4.Product`).
+        :class:`~pdart.pds4.Component`'s directory
+        (:class:`~pdart.pds4.Bundle`, :class:`~pdart.pds4.Collection`)
+        or file (:class:`~pdart.pds4.Product`).
         """
         pass
 
     def absolute_filepath_is_directory(self):
         """
-        Return True iff :func:`absolute_filepath` returns a directory.
+        Return True iff :meth:`absolute_filepath` returns a directory.
         """
         return True
 
     def files(self):
         """
         Generate all the files belonging to this
-        :class:`pdart.pds4.Component` as :class:`pdart.pds4.File`
+        :class:`~pdart.pds4.Component` as :class:`~pdart.pds4.File`
         objects.
         """
         from pdart.pds4.File import File

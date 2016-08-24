@@ -1,16 +1,19 @@
+"""Representation of an archive containing PDS4 bundles."""
 import os.path
 import re
 
 from pdart.pds4.Bundle import *
+from pdart.pds4.Collection import *
+from pdart.pds4.Product import *
 from pdart.pds4.LID import *
 
 
 class Archive(object):
-    """An :class:`pdart.pds4.Archive` containing PDS4 Bundles."""
+    """An :class:`~pdart.pds4.Archive` containing PDS4 Bundles."""
 
     def __init__(self, root):
         """
-        Create an :class:`pdart.pds4.Archive` given a filepath to an existing
+        Create an :class:`~pdart.pds4.Archive` given a filepath to an existing
         directory.
         """
         assert os.path.exists(root) and os.path.isdir(root)
@@ -47,23 +50,37 @@ class Archive(object):
 
     @staticmethod
     def is_valid_bundle_dir_basename(dirname):
-        return re.match(r'\Ahst_[0-9]{5}\Z', dirname) is not None
+        """Return True iff the argument is a valid bundle directory name."""
+        return re.match(Bundle.DIRECTORY_PATTERN, dirname) is not None
 
     @staticmethod
     def is_valid_collection_dir_basename(dirname):
-        return re.match(r'\Adata_[a-z0-9]+_', dirname) is not None
+        """
+        Return True iff the argument is a valid collection directory
+        name.
+        """
+        return re.match(Collection.DIRECTORY_PATTERN, dirname) is not None
 
     @staticmethod
     def is_valid_product_dir_basename(dirname):
-        return re.match(r'\Avisit_[a-z0-9]{2}\Z', dirname) is not None
+        """
+        Return True iff the argument is a valid product visit
+        directory name.
+        """
+        return re.match(Product.VISIT_DIRECTORY_PATTERN, dirname) is not None
 
     @staticmethod
     def is_hidden_file_basename(basename):
+        """
+        Return True iff the file is a hidden file.  Approximated by
+        checking if its first character is a dot (Unix hidden-file
+        convention).
+        """
         return basename[0] == '.'
 
     # Walking the hierarchy with objects
     def bundles(self):
-        """Generate the bundles stored in this :class:`pdart.pds4.Archive`."""
+        """Generate the bundles stored in this :class:`~pdart.pds4.Archive`."""
         for subdir in os.listdir(self.root):
             if re.match(Bundle.DIRECTORY_PATTERN, subdir):
                 bundle_lid = LID('urn:nasa:pds:%s' % subdir)
@@ -72,7 +89,7 @@ class Archive(object):
     def collections(self):
         """
         Generate the collections stored in this
-        :class:`pdart.pds4.Archive`.
+        :class:`~pdart.pds4.Archive`.
         """
         for b in self.bundles():
             for c in b.collections():
@@ -81,7 +98,7 @@ class Archive(object):
     def products(self):
         """
         Generate the products stored in this
-        :class:`pdart.pds4.Archive`.
+        :class:`~pdart.pds4.Archive`.
         """
         for b in self.bundles():
             for c in b.collections():
