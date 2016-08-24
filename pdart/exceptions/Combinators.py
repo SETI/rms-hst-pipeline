@@ -15,9 +15,9 @@ exception(s) as XML if the thunk it's called on fails.  This is needed
 for a compound exception to be legible and is used at the top-level of
 a script.
 
-**You don't need to understand the internals of**
-:func:`multiple_implementations` or :func:`parallel_list` **to use
-them.**
+**New to PDART?** You don't need to understand the internals of
+:func:`multiple_implementations` or :func:`parallel_list` to use them.
+Explanation of internals follows.
 
 The key concept used here is converting from "code" (normal Python
 functions that either return values or raise exceptions) to "rcode" (a
@@ -108,16 +108,16 @@ def _create_joined_name(label, funcs):
 
 def multiple_implementations(label, *funcs):
     """
-    Given a string label and a number of functions, return the result
-    of the first function that succeeds or raise a
+    Given a string label and a list of functions, return the result of
+    the first function that succeeds or raise a
     :exc:`~pdart.exception.CalculationException` containing
     :class:`~pdart.exception.GroupedExceptionInfo` for the exceptions
     raised by each function.
 
-    This is a generalization of function call to calling multiple
-    alternative implementations.  If any one succeeds, you get the
-    result.  If they all fail, you get all the exceptions and all the
-    stack traces wrapped into a
+    This is a generalization of a normal Python function call to a
+    broader concept of calling multiple alternative implementations.
+    If any one succeeds, you get the result.  If they all fail, you
+    get all the exceptions and all the stack traces wrapped into a
     :class:`~pdart.exception.GroupedExceptionInfo` in a
     :exc:`~pdart.exception.CalculationException`.
     """

@@ -1,10 +1,16 @@
+"""
+This module provides functionality for composing
+:class:`~pdart.reductions.Reduction.Reduction` s.
+"""
 from pdart.reductions.Reduction import *
 
 
 def indexed2(func):
-    # FIXME Document and clean this up.  We use this version for
-    # header and data units because there are only ever one element in
-    # them.
+    """
+    A version of :func:`indexed` used for header and data units
+    because there is only ever one element in them.  Most of the
+    documentation for :func:`indexed` should apply.
+    """
     cache = {'is_set': False, 'value': None}
 
     def cache_func_result():
@@ -31,7 +37,17 @@ def indexed2(func):
 
 def indexed(func):
     """
-    Convert a thunk to a function returning thunks.
+    Convert a thunk (no-parameter function) returning a tuple into a
+    function taking an index and returning a thunk that gives the
+    tuple element at that index.
+
+    This function is used to minimize calculation: we only want to
+    reduce lower levels if we need to, but not all reductions in a
+    :class:`CompositeReduction` might need to go equally deep.  By
+    indexing, we delay the calculation unless it's needed, and we also
+    cache the result of lower calculations so they aren't done
+    multiple times.  (You don't have to understand the implementation
+    unless you've found a bug in it.)
 
     The ``get_reduced_xxx()`` argument passed to
     :class:`pdart.reductions.CompositeReduction` 's ``reduce_yyy()``
@@ -47,6 +63,9 @@ def indexed(func):
     ``res[sub][red]``.  Then ``indexed(f)(r)()`` returns ``[res[s][r]
     for s in range(0, len(res)]``, or equivalently, ``[res_elmt[r] for
     res_elmt in res]``, or equivalently, ``transpose(res)[r]``.
+
+    If Python had static types and a compiler that used them, I
+    wouldn't have needed to write the previous paragraph.
     """
     cache = {'is_set': False, 'value': None}
 

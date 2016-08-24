@@ -1,3 +1,7 @@
+"""
+Functionality to build a RAW browse product image using a SQLite
+database.
+"""
 from contextlib import closing
 import os.path
 
@@ -38,7 +42,7 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
 
 def make_db_browse_product_images(conn, archive):
     """
-    Given a database connection and an :class:`pdart.pds4.Archive`,
+    Given a database connection and an :class:`~pdart.pds4.Archive`,
     create browse images for all the RAW products.
     """
 

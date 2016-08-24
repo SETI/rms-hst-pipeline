@@ -116,7 +116,7 @@ Contents:
 .. automodule:: pdart.pds4labels.FileContentsDB
     :members:
 
-.. automodule:: pdart.pds4labels.FileContentsLabelReduction
+.. automodule:: pdart.pds4labels.FileContentsReduction
     :members:
 
 .. automodule:: pdart.pds4labels.FileContentsXml

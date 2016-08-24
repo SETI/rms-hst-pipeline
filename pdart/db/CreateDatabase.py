@@ -178,7 +178,7 @@ def _create_hdus_and_cards_tables(conn, archive):
 def create_database(conn, archive):
     """
     Given an open SQLite connection to a fresh database and an
-    :class:`pdart.pds4.Archive`, populate the database with the
+    :class:`~pdart.pds4.Archive`, populate the database with the
     archive's information.
     """
     conn.execute('PRAGMA foreign_keys = ON;')

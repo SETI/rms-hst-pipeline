@@ -1,3 +1,7 @@
+"""
+A one-item cache for database lookups.  Unclear how much it speeds
+things up.
+"""
 from contextlib import closing
 
 _last_bundle = None

@@ -1,3 +1,8 @@
+"""
+Functionality to build the XML fragment containing the needed
+``<Header />`` and ``<Array />`` or ``<Array_2D_Image />`` elements of
+a product label using a :class:`~pdart.reductions.Reduction.Reduction`.
+"""
 from pdart.pds4labels.FileContentsXml import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
@@ -19,8 +24,9 @@ def _mk_axis_arrays(hdu, axes):
 
 class FileContentsLabelReduction(Reduction):
     """
-    Reduce a product to an XML fragment template containing the Header
-    and Array_2D_Image elements describing its contents.
+    Reduce a product to an XML fragment template containing the
+    ``<Header />`` and ``<Array_2D_Image />`` elements describing its
+    contents.
     """
 
     def reduce_fits_file(self, file, get_reduced_hdus):

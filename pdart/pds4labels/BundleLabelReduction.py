@@ -1,3 +1,7 @@
+"""
+Functionality to build a bundle label using a
+:class:`~pdart.reductions.Reduction.Reduction`.
+"""
 import sys
 
 from pdart.pds4.Bundle import *

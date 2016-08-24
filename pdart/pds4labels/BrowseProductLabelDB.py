@@ -1,3 +1,7 @@
+"""
+Functionality to build a RAW browse product label using a SQLite
+database.
+"""
 from contextlib import closing
 
 from pdart.pds4.LID import *
@@ -7,7 +11,7 @@ from pdart.pds4labels.BrowseProductLabelXml import *
 
 def make_db_browse_product_labels(conn, archive):
     """
-    Given a database connection and an :class:`pdart.pds4.Archive`,
+    Given a database connection and an :class:`~pdart.pds4.Archive`,
     create PDS4 labels for the browse products.
     """
 

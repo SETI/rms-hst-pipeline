@@ -1,6 +1,8 @@
 """
 This module provides an object-oriented wrapper around a SQLite
 connection.
+
+*This module is currently unused (as of 2016-08-24).*
 """
 import os.path
 import sqlite3

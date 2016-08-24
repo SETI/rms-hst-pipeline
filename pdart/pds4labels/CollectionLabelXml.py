@@ -1,3 +1,4 @@
+"""Templates to create a label for a collection."""
 from pdart.xml.Templates import *
 
 
@@ -51,6 +52,11 @@ images obtained from HST Observing Program \
     </Inventory>
   </File_Area_Inventory>
 </Product_Collection>""")
+"""
+An interpreted document template to create a collection label.
+
+type: Dict -> Doc
+"""
 
 placeholder_citation_information = interpret_template(
     """<Citation_Information>
@@ -58,3 +64,9 @@ placeholder_citation_information = interpret_template(
 <description>### placeholder for \
 citation_information_description ###</description>
 </Citation_Information>""")({})
+"""
+An interpreted fragment template to create a ``<Citation_Information
+/>`` XML element.
+
+type: Doc -> Node
+"""

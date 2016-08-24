@@ -1,3 +1,4 @@
+"""A document template to create a label for a RAW browse product."""
 from pdart.xml.Templates import *
 
 make_label = interpret_document_template(
@@ -42,3 +43,8 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     </Encoded_Image>
   </File_Area_Browse>
 </Product_Browse>""")
+"""
+An interpreted document template to create a label for a RAW browse product.
+
+type: Dict -> Doc
+"""

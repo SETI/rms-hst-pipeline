@@ -1,7 +1,8 @@
 """
-**You do not need to understand this module unless you want to
-understand the implementations of** :mod:`pdart.exception.Combinators`
-**or** :mod:`pdart.exception.ExceptionInfo` **.**
+**New to PDART?** You do not need to understand this module unless you
+want to understand the implementations of
+:mod:`pdart.exception.Combinators` or
+:mod:`pdart.exception.ExceptionInfo`.
 
 Normal Python functions either return a result value (possibly
 ``None``) or raise an exception which breaks the normal flow of the

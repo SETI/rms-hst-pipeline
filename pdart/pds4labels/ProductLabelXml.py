@@ -1,3 +1,4 @@
+"""Templates to create a label for a product."""
 from pdart.xml.Templates import *
 
 make_label = interpret_document_template(
@@ -49,12 +50,25 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     <FRAGMENT name="file_contents" />
   </File_Area_Observational>
 </Product_Observational>""")
+"""
+An interpreted document template to create a product label.
+
+type: Dict -> Doc
+"""
 
 
 def mk_Investigation_Area_name(proposal_id):
     return 'HST observing program %d' % proposal_id
+"""
+Boilerplate for the text content of a ``<name />`` element in the
+``<Investigation_Area />`` element.
+"""
 
 
 def mk_Investigation_Area_lidvid(proposal_id):
     return 'urn:nasa:pds:context:investigation:investigation.hst_%05d::1.0' % \
         proposal_id
+"""
+Boilerplate for the text content of a ``<lidvid />`` element in the
+``<Investigation_Area />`` element.
+"""

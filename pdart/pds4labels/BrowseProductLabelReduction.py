@@ -1,3 +1,7 @@
+"""
+Functionality to build a RAW browse product label using a
+:class:`~pdart.reductions.Reduction.Reduction`.
+"""
 import os.path
 
 from pdart.pds4.LID import *

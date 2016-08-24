@@ -1,3 +1,7 @@
+"""
+Functionality to build a RAW browse product image using a
+:class:`~pdart.reductions.Reduction.Reduction`.
+"""
 import os
 import os.path
 
@@ -19,13 +23,22 @@ def ensure_directory(dir):
     assert os.path.isdir(dir), dir
 
 
-def browse_collection_directory(collection):
+def _browse_collection_directory(collection):
+    """
+    Given a :class:`~pdart.pds4.Collection` object, return the
+    absolute filepath of its browse collection, creating it if
+    necessary.
+    """
     dir = collection.browse_collection().absolute_filepath()
     ensure_directory(dir)
     return dir
 
 
 def is_raw_data_collection(collection):
+    """
+    Return True iff the :class:`~pdart.pds4.Collection` is a RAW data
+    collection.
+    """
     return collection.prefix() == 'data' and collection.suffix() == 'raw'
 
 
@@ -60,7 +73,7 @@ class BrowseProductImageReduction(Reduction):
                 basename = os.path.splitext(basename)[0] + '.jpg'
                 visit = HstFilename(basename).visit()
                 target_dir = os.path.join(
-                    browse_collection_directory(collection),
+                    _browse_collection_directory(collection),
                     ('visit_%s' % visit))
 
                 ensure_directory(target_dir)

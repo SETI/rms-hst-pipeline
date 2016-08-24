@@ -9,8 +9,8 @@ The :py:mod:`pdart.exception.ExceptionInfo` module defines an
 exception, :class:`CalculationException`, that can hold this
 information.
 
-**You don't need to understand the internals of this package to use it
-effectively.**
+**New to PDART?** You don't need to understand the internals of this
+package to use it effectively.  Explanation of internals follows.
 
 For any exception raised, we need to keep the exception itself and the
 stack trace active at the time of the raising.  We call this

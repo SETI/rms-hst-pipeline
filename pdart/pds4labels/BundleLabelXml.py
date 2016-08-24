@@ -1,3 +1,4 @@
+"""Templates to create a label for a bundle."""
 from pdart.xml.Templates import *
 
 make_label = interpret_document_template(
@@ -20,6 +21,11 @@ make_label = interpret_document_template(
   </Bundle>
   <FRAGMENT name="Bundle_Member_Entries"/>
 </Product_Bundle>""")
+"""
+An interpreted document template to create a bundle label.
+
+type: Dict -> Doc
+"""
 
 make_bundle_entry_member = interpret_template(
     """<Bundle_Member_Entry>
@@ -28,6 +34,12 @@ make_bundle_entry_member = interpret_template(
     <reference_type>bundle_has_data_collection</reference_type>
 </Bundle_Member_Entry>"""
     )
+"""
+An interpreted fragment template to create a ``<Bundle_Member_Entry
+/>`` XML element.
+
+type: Dict -> (Doc -> Node)
+"""
 
 placeholder_citation_information = interpret_template(
     """<Citation_Information>
@@ -35,3 +47,9 @@ placeholder_citation_information = interpret_template(
 <description>### placeholder for \
 citation_information_description ###</description>
 </Citation_Information>""")({})
+"""
+An interpreted fragment template to create a ``<Citation_Information
+/>`` XML element.
+
+type: Doc -> Node
+"""

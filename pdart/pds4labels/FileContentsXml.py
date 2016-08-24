@@ -1,3 +1,8 @@
+"""
+Templates to create a XML fragment containing the needed ``<Header
+/>`` and ``<Array />`` or ``<Array_2D_Image />`` elements of a product
+label.
+"""
 from pdart.xml.Templates import *
 
 # For product labels: produces the fragment of the File node that
@@ -25,7 +30,12 @@ axis_array = interpret_template("""<Axis_Array>
 <elements><NODE name="elements"/></elements>
 <sequence_number><NODE name="sequence_number"/></sequence_number>
 </Axis_Array>""")
+"""
+An interpreted fragment template to create an ``<Axis_Array />``
+XML element.
 
+type: Dict -> Node
+"""
 
 header_contents = interpret_template("""<Header>
 <local_identifier><NODE name="local_identifier"/></local_identifier>
@@ -34,6 +44,12 @@ header_contents = interpret_template("""<Header>
 <parsing_standard_id>FITS 3.0</parsing_standard_id>
 <description>Global FITS Header</description>
 </Header>""")
+"""
+An interpreted fragment template to create a ``<Header />``
+XML element.
+
+type: Dict -> Node
+"""
 
 data_1d_contents = interpret_template("""<Array>
 <offset unit="byte"><NODE name="offset" /></offset>
@@ -42,6 +58,12 @@ data_1d_contents = interpret_template("""<Array>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
 </Array>""")
+"""
+An interpreted fragment template to create an ``<Array />``
+XML element.
+
+type: Dict -> Node
+"""
 
 data_2d_contents = interpret_template("""<Array_2D_Image>
 <offset unit="byte"><NODE name="offset" /></offset>
@@ -50,6 +72,18 @@ data_2d_contents = interpret_template("""<Array_2D_Image>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
 </Array_2D_Image>""")
+"""
+An interpreted fragment template to create an ``<Array_2D_Image />``
+XML element.
+
+type: Dict -> Node
+"""
 
 element_array = interpret_template("""<Element_Array>
 <data_type><NODE name="data_type" /></data_type></Element_Array>""")
+"""
+An interpreted fragment template to create an ``<Element_Array />``
+XML element.
+
+type: Dict -> Node
+"""

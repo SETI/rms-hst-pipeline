@@ -24,6 +24,7 @@ _db_get_start_stop_times = multiple_implementations(
 
 def get_db_time_coordinates(headers):
     """
-    Create and return a <Time_Coordinates> element for the product.
+    Create and return a ``<Time_Coordinates />`` XML element for the
+    product.
     """
     return time_coordinates(_db_get_start_stop_times(headers))

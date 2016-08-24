@@ -1,8 +1,12 @@
+"""
+Functionality to build a product label using a
+:class:`~pdart.reductions.Reduction.Reduction`.
+"""
 import os.path
 import sys
 
 from pdart.pds4.Product import *
-from pdart.pds4labels.FileContentsLabelReduction import *
+from pdart.pds4labels.FileContentsReduction import *
 from pdart.pds4labels.HstParametersReduction import *
 from pdart.pds4labels.ObservingSystem import *
 from pdart.pds4labels.ProductLabelXml import *

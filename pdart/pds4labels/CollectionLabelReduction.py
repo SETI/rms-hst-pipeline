@@ -1,3 +1,7 @@
+"""
+Functionality to build a collection label using a
+:class:`~pdart.reductions.Reduction.Reduction`.
+"""
 import io
 import sys
 
@@ -13,8 +17,8 @@ class CollectionLabelReduction(Reduction):
         self.verify = verify
 
     """
-    Reduction of a :class:`pdart.pds4.Collection` to its PDS4 label as
-    a string.
+    Reduction of a :class:`~pdart.pds4.Collection` to its PDS4 label
+    as a string.
     """
     def reduce_collection(self, archive, lid, get_reduced_products):
         collection = Collection(archive, lid)
@@ -46,8 +50,8 @@ class CollectionLabelReduction(Reduction):
 
 def make_collection_label(collection, verify):
     """
-    Create the label text for this :class:`pdart.pds4.Collection`.  If
-    verify is True, verify the label against its XML and Schematron
+    Create the label text for this :class:`~pdart.pds4.Collection`.
+    If verify is True, verify the label against its XML and Schematron
     schemas.  Raise an exception if either fails.
     """
     return DefaultReductionRunner().run_collection(
@@ -55,6 +59,10 @@ def make_collection_label(collection, verify):
 
 
 def make_collection_inventory(collection):
+    """
+    Create the inventory text for this
+    :class:`~pdart.pds4.Collection`.
+    """
     lines = [u'P,%s\r\n' % str(product.lid)
              for product in collection.products()]
     return ''.join(lines)

@@ -1,3 +1,6 @@
+"""
+Functionality to build a product label using a SQLite database.
+"""
 from contextlib import closing
 
 from pdart.pds4labels.DatabaseCaches import *
@@ -13,7 +16,7 @@ from pdart.xml.Schema import *
 def make_db_product_label(conn, lid, verify):
     """
     Create the label text for the product having this
-    :class:`pdart.pds4.LID` using the database connection.  If verify
+    :class:`~pdart.pds4.LID` using the database connection.  If verify
     is True, verify the label against its XML and Schematron schemas.
     Raise an exception if either fails.
     """
