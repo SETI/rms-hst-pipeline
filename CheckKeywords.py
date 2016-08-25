@@ -1,6 +1,7 @@
 """
-SCRIPT: Run through the archive and print the sorted set of keywords
-found in the first header unit of the FITS files of RAW products.
+**SCRIPT:** Run through the archive and print the sorted set of
+keywords found in the first header unit of the FITS files of RAW
+products.
 """
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
@@ -8,7 +9,11 @@ from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
 
 
-def union_dicts(dicts):
+def _union_dicts(dicts):
+    """
+    Summarize a list of dictionaries from keywords to integers by
+    summing the integer values.
+    """
     res = {}
     for d in dicts:
         for k, v in d.items():
@@ -19,20 +24,24 @@ def union_dicts(dicts):
 
 
 class CheckKeywordsReduction(Reduction):
+    """
+    Summarize the archive into a dictionary of keywords found in the
+    first header unit of all RAW FITS files in the archive.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         # dict
-        return union_dicts(get_reduced_bundles())
+        return _union_dicts(get_reduced_bundles())
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
         # dict
-        return union_dicts(get_reduced_collections())
+        return _union_dicts(get_reduced_collections())
 
     def reduce_collection(self, archive, lid, get_reduced_products):
         # dict
         collection = Collection(archive, lid)
         if collection.suffix() == 'raw':
-            return union_dicts([rp for rp in get_reduced_products()
-                                if rp is not None])
+            return _union_dicts([rp for rp in get_reduced_products()
+                                 if rp is not None])
         else:
             return {}
 

@@ -1,6 +1,6 @@
 """
-SCRIPT: Run through the archive and print the sorted set of FITS files
-which raise IOErrors when you try to parse them.
+**SCRIPT:** Run through the archive and print the sorted set of FITS
+files which raise ``IOError`` s when you try to parse them.
 """
 
 from pdart.exceptions.Combinators import *
@@ -8,22 +8,27 @@ from pdart.pds4.Archives import *
 from pdart.reductions.BadFitsFileReduction import *
 
 
-def unions(sets):
+def _unions(sets):
+    """Union a list of sets."""
     res = set()
     for s in sets:
         res |= s
     return res
 
 
-class CollectFilesReduction(Reduction):
+class _CollectFilesReduction(Reduction):
+    """
+    Summarizes an archive into a set of reduced FITS files.
+    """
+
     def reduce_archive(self, archive_root, get_reduced_bundles):
-        return unions(get_reduced_bundles())
+        return _unions(get_reduced_bundles())
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
-        return unions(get_reduced_collections())
+        return _unions(get_reduced_collections())
 
     def reduce_collection(self, archive, lid, get_reduced_products):
-        return unions(get_reduced_products())
+        return _unions(get_reduced_products())
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         return set([ff for ff in get_reduced_fits_files() if ff is not None])
@@ -33,8 +38,12 @@ class CollectFilesReduction(Reduction):
 
 
 class CheckBadFitsFileReduction(BadFitsFileReduction):
+    """
+    Summarizes an archive into a set of full filepaths of FITS files
+    that cannot be opened.
+    """
     def __init__(self):
-        BadFitsFileReduction.__init__(self, CollectFilesReduction())
+        BadFitsFileReduction.__init__(self, _CollectFilesReduction())
 
     def bad_fits_file_reduction(self, file):
         return file.full_filepath()

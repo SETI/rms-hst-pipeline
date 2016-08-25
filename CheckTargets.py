@@ -9,7 +9,7 @@ no TARGNAME info, or
 
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
-from pdart.pds4labels.TargetIdentificationLabelReduction import *
+from pdart.pds4labels.TargetIdentificationReduction import *
 from pdart.reductions.Reduction import *
 
 

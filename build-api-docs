@@ -1,11 +1,11 @@
 #! /bin/bash
 
-# This script builds API documentation (similar to JavaDocs) for the
-# ../../pdart module and its submodules.
+# This script builds API documentation (similar to JavaDocs).  It also
+# automatically opens the main index page.
 
 rm -rf apidocs
 sphinx-apidoc -A 'The PDART Team' -V '0.0.1' -F -e -o apidocs ../pdart
-sed -i .bck -e "s/'\.'/'\.\.\/\.\.'/" apidocs/conf.py
+sed -i .bck -e "s/'\.'/'\.\.'/" apidocs/conf.py
 sed -i .bck -e "s/#sys.path/sys.path/" apidocs/conf.py
 cd apidocs && make html && open _build/html/index.html
 
