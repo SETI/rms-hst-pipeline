@@ -1,6 +1,6 @@
 """
-SCRIPT: Run through the archive and extract information into a SQLite
-database.
+**SCRIPT:** Run through the archive and extract information into a
+SQLite database.
 """
 import os.path
 import sqlite3

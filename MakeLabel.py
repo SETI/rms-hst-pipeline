@@ -1,3 +1,7 @@
+"""
+**SCRIPT:** Given a product FITS filepath, create a label.  If the
+label is valid, print it; if not, pretty-print the exceptions.
+"""
 import os.path
 import sys
 
@@ -8,7 +12,11 @@ from pdart.pds4.Product import *
 from pdart.pds4labels.ProductLabel import *
 
 
-def make_product_from_filepath(product_filepath):
+def _make_product_from_filepath(product_filepath):
+    """
+    Given a filepath to a FITS product file, return the
+    :class:``~pdart.pds4.Product.Product`` object for it.
+    """
     (visit_dir, fits_filepath) = os.path.split(product_filepath)
     (product_segment, product_ext) = os.path.splitext(fits_filepath)
     (collection_dir, visit_segment) = os.path.split(visit_dir)
@@ -22,19 +30,19 @@ def make_product_from_filepath(product_filepath):
     return Product(archive, lid)
 
 
-def usage():
+def _usage():
     sys.stderr.write('usage: python MakeLabel.py <product FITS file>\n')
     sys.exit(1)
 
 if __name__ == '__main__':
     if len(sys.argv) is not 2:
-        usage()
+        _usage()
 
     product_filepath = sys.argv[1]
     if os.path.splitext(product_filepath)[1] != '.fits':
-        usage()
+        _usage()
 
-    product = make_product_from_filepath(product_filepath)
+    product = _make_product_from_filepath(product_filepath)
 
     def run():
         label = make_product_label(product, False)

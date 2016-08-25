@@ -1,3 +1,7 @@
+"""
+**SCRIPT:** Given a filepath to a PDS4 label, validates it against
+both the XML Schema and Schematron.
+"""
 import sys
 
 from pdart.xml.Schema import *

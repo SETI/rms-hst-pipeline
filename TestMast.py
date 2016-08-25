@@ -1,3 +1,6 @@
+"""
+This module is a script to explore querying MAST.
+"""
 import csv
 import urllib
 

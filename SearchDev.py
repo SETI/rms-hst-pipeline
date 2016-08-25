@@ -1,3 +1,6 @@
+"""
+This module is a script to explore querying MAST.
+"""
 from pdart.hst.HstSearch import *
 
 # TODO How do I limit on the archive date? sci_archive_date

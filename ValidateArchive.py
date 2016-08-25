@@ -1,5 +1,5 @@
 """
-SCRIPT: Run through the archive checking for certain invariant
+**SCRIPT:** Run through the archive checking for certain invariant
 properties.  If any of the properties fail to hold, print the combined
 exception to stdout.  If it succeeds, do nothing.
 """
@@ -12,7 +12,8 @@ from pdart.pds4.HstFilename import *
 from pdart.reductions.CompositeReduction import *
 
 
-def unions(sets):
+def _unions(sets):
+    """Unions a list of sets."""
     res = set()
     for s in sets:
         res |= s
@@ -20,15 +21,19 @@ def unions(sets):
 
 
 class BundleContainsOneSingleHstInternalProposalIdReduction(Reduction):
+    """
+    Verifies that within the archive, each bundle contains exactly one
+    HST proposal id.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
-        collections = unions(get_reduced_collections())
+        collections = _unions(get_reduced_collections())
         assert 1 == len(collections)
 
     def reduce_collection(self, archive, lid, get_reduced_products):
-        return unions(get_reduced_products())
+        return _unions(get_reduced_products())
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         return set(get_reduced_fits_files())
@@ -38,6 +43,10 @@ class BundleContainsOneSingleHstInternalProposalIdReduction(Reduction):
 
 
 class ProductFilesHaveBundleProposalIdReduction(Reduction):
+    """
+    Verifies that within the archive, each FITS file's ``PROPOSID``
+    field matches the proposal id of the containing bundle.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 
@@ -69,6 +78,11 @@ class ProductFilesHaveBundleProposalIdReduction(Reduction):
 
 
 class ProductFilesHaveCollectionSuffixReduction(Reduction):
+    """
+    Verifies that within the archive, the suffix embedded in each
+    product FITS filename matches the suffix embedded in its
+    containing collection directory name.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 
@@ -76,7 +90,7 @@ class ProductFilesHaveCollectionSuffixReduction(Reduction):
         get_reduced_collections()
 
     def reduce_collection(self, archive, lid, get_reduced_products):
-        reduced_products = unions(get_reduced_products())
+        reduced_products = _unions(get_reduced_products())
         collection = Collection(archive, lid)
         assert set([collection.suffix()]) == reduced_products
 
@@ -91,6 +105,11 @@ class ProductFilesHaveCollectionSuffixReduction(Reduction):
 
 
 class ProductFilesHaveProductVisitReduction(Reduction):
+    """
+    Verifies that within the archive, the visit embedded in each
+    product FITS filename matches the visit embedded in its
+    containing visit directory name.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 
@@ -110,6 +129,9 @@ class ProductFilesHaveProductVisitReduction(Reduction):
 
 
 class ValidationReduction(CompositeReduction):
+    """
+    Combines previous validation reductions.
+    """
     def __init__(self):
         CompositeReduction.__init__(self, [
                 BundleContainsOneSingleHstInternalProposalIdReduction(),

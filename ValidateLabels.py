@@ -1,5 +1,5 @@
 """
-SCRIPT: Run through the archive creating and validating bundle,
+**SCRIPT:** Run through the archive creating and validating bundle,
 collection and product labels.  If it fails, print the combined
 exception to stdout.  If it succeeds, do nothing.  The labels are not
 saved to disk.
@@ -15,6 +15,10 @@ from pdart.reductions.InstrumentationReductions import *
 
 
 class CanMakeValidBundleLabelsReduction(BundleLabelReduction):
+    """
+    Verifies that within the archive, valid bundle labels can be
+    built.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         for label in get_reduced_bundles():
             failures = xml_schema_failures(None, label) or \
@@ -24,6 +28,10 @@ class CanMakeValidBundleLabelsReduction(BundleLabelReduction):
 
 
 class CanMakeValidCollectionLabelsReduction(CollectionLabelReduction):
+    """
+    Verifies that within the archive, valid collection labels can be
+    built.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 
@@ -36,6 +44,10 @@ class CanMakeValidCollectionLabelsReduction(CollectionLabelReduction):
 
 
 class CanMakeValidProductLabelsReduction(ProductLabelReduction):
+    """
+    Verifies that within the archive, valid product labels can be
+    built.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 
@@ -83,6 +95,9 @@ class CanMakeValidProductLabelsReduction(ProductLabelReduction):
 
 
 class ValidateLabelsReduction(CompositeReduction):
+    """
+    Combines previous validation reductions.
+    """
     def __init__(self):
         CompositeReduction.__init__(self, [
                 LogProductsReduction(),

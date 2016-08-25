@@ -1,6 +1,7 @@
 """
-SCRIPT: Run through the archive and for the first product in a raw
-data collection, calculate its label and print it prettily.
+**SCRIPT:** Run through the archive and for (only) the first product
+in the first RAW data collection, calculate its label and print it
+prettily.
 """
 import subprocess
 
@@ -10,6 +11,7 @@ from pdart.pds4labels.ProductLabel import *
 
 
 def make_one_product_label():
+    """Prints a product label for the first RAW product."""
     arch = get_any_archive()
     for b in arch.bundles():
         for c in b.collections():

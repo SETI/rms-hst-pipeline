@@ -1,5 +1,5 @@
 """
-SCRIPT: Run through the archive and print the sorted set of LIDs of
+**SCRIPT:** Run through the archive and print the sorted set of LIDs of
 the products whose FITS file contains sufficient datetime information
 to calculate start and stop times of the observation.
 """
@@ -12,7 +12,8 @@ from pdart.reductions.Reduction import *
 # sufficient datetime information: c0m c1m crj d0m drz flt q0m raw
 
 
-def unions(sets):
+def _unions(sets):
+    """Union a list of sets."""
     res = set()
     for s in sets:
         res |= s
@@ -26,10 +27,10 @@ class CheckTimesReduction(Reduction):
     start and stop times of the observation.
     """
     def reduce_archive(self, archive_root, get_reduced_bundles):
-        return unions(get_reduced_bundles())
+        return _unions(get_reduced_bundles())
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
-        return unions(get_reduced_collections())
+        return _unions(get_reduced_collections())
 
     def reduce_collection(self, archive, lid, get_reduced_products):
         reduced_products = [lid

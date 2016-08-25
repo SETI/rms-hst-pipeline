@@ -1,6 +1,6 @@
 """
-SCRIPT: Run through the archive and print the sorted set of collection
-suffixes.
+**SCRIPT:** Run through the archive and print the sorted set of
+collection suffixes.
 """
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
@@ -8,7 +8,8 @@ from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
 
 
-def unions(sets):
+def _unions(sets):
+    """Union up a list of sets."""
     res = set()
     for s in sets:
         res |= s
@@ -16,8 +17,11 @@ def unions(sets):
 
 
 class CheckSuffixesReduction(Reduction):
+    """
+    Summarizes an archive into a set of collection suffixes.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
-        return unions(get_reduced_bundles())
+        return _unions(get_reduced_bundles())
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
         return set(get_reduced_collections())

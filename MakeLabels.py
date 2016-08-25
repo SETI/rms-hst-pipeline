@@ -1,7 +1,7 @@
 """
-SCRIPT: Run through the archive and generate labels (but not browse
-products or labels).  Possibly validate them.  If it fails at any
-point, print the combined exception as XML to stdout.
+**SCRIPT:** Run through the archive and generate labels (but not
+browse products or their labels).  Possibly validate them.  If it
+fails at any point, print the combined exception as XML to stdout.
 """
 import sys
 
@@ -14,7 +14,11 @@ from pdart.reductions.CompositeReduction import *
 from pdart.reductions.InstrumentationReductions import *
 
 
-class ProductLabelReductionWithMessage(ProductLabelReduction):
+class _ProductLabelReductionWithMessage(ProductLabelReduction):
+    """
+    Summarizes a product into its label (or ``None`` if the FITS file
+    cannot be read, noting the problem).
+    """
     def __init__(self, verify):
         ProductLabelReduction.__init__(self, verify)
 
@@ -26,17 +30,22 @@ class ProductLabelReductionWithMessage(ProductLabelReduction):
         return res
 
 
-class MakeLabelsReduction(CompositeReduction):
+class _MakeLabelsReduction(CompositeReduction):
+    """
+    Summarizes the archive into ``None``, generating labels (and
+    possibly validating them) as a side-effect.
+    """
     def __init__(self, verify):
         CompositeReduction.__init__(self,
                                     [BundleLabelReduction(verify),
                                      CollectionLabelReduction(verify),
-                                     ProductLabelReductionWithMessage(verify)])
+                                     _ProductLabelReductionWithMessage(verify)
+                                     ])
 
 if __name__ == '__main__':
     VERIFY = True
 
     archive = get_any_archive()
     reduction = CompositeReduction([LogProductsReduction(),
-                                    MakeLabelsReduction(VERIFY)])
+                                    _MakeLabelsReduction(VERIFY)])
     raise_verbosely(lambda: run_reduction(reduction, archive))

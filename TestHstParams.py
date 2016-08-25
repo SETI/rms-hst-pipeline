@@ -1,3 +1,7 @@
+"""
+**SCRIPT:** Finds the first product in the archive whose FITS file is
+parseable, generates its ``<hst:HST />`` XML element and prints it.
+"""
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4labels.HstParametersReduction import *

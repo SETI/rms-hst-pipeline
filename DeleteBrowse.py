@@ -1,5 +1,5 @@
 """
-SCRIPT: Run through the archive and delete all browse collections.
+**SCRIPT:** Run through the archive and delete all browse collections.
 """
 
 import shutil
@@ -11,6 +11,10 @@ from pdart.reductions.Reduction import *
 
 
 class DeleteRawBrowseReduction(Reduction):
+    """
+    Summarizes the archive into ``None``; as a side-effect, deletes
+    all browse collections.
+    """
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 

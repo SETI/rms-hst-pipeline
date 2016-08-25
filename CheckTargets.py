@@ -1,10 +1,11 @@
 """
-SCRIPT: Run through the archive and either:
+**SCRIPT:** Run through the archive and either:
 
-(check) print the first parts of the product LIDs for which there is
-no TARGNAME info, or
+    * (check) print the first parts of the product LIDs for which
+      there is no ``TARGNAME`` info, or
 
-(dump) print all product LIDs with the products' target information.
+    * (dump) print all product LIDs with the products' target
+      information.
 """
 
 from pdart.exceptions.Combinators import *
@@ -15,10 +16,11 @@ from pdart.reductions.Reduction import *
 
 class CheckTargetsReduction(Reduction):
     """
-    When run on an archive, collect a dictionary in self.result_dict
-    where the keys are the first part of the product segment of the
-    LID and the values are the set of tails of the product segment of
-    product LIDS for which TARGNAME information exists.
+    When run on an archive, collect a dictionary in
+    ``self.result_dict`` where the keys are the first part of the
+    product segment of the LID and the values are the set of tails of
+    the product segment of product LIDs for which ``TARGNAME``
+    information exists.
     """
     def __init__(self):
         # keys: product part of the idea less the suffix;
@@ -36,12 +38,12 @@ class CheckTargetsReduction(Reduction):
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         """
-        Add an empty set entry to self.result_dict with the first part
-        (up to the underscore) of the product segment of the LID as
-        the key if a value doesn't already exist.  If a TARGNAME was
-        found in the FITS file, add the tail (what's after the first
-        underscore) of the product segment of the LID to the set
-        value.
+        Add an empty set entry to ``self.result_dict`` with the first
+        part (up to the underscore) of the product segment of the LID
+        as the key if a value doesn't already exist.  If a
+        ``TARGNAME`` was found in the FITS file, add the tail (what's
+        after the first underscore) of the product segment of the LID
+        to the set value.
         """
         def get_key(str):
             return str.split('_')[0]
@@ -60,10 +62,11 @@ class CheckTargetsReduction(Reduction):
     def reduce_fits_file(self, file, get_reduced_hdus):
         """
         Return a dictionary holding target information.  The
-        dict['type'] can be READ_ERROR, NO_TARGNAME, UNRESOLVED or
-        RESOLVED.  If one of the last two, dict['targname'] is the raw
-        TARGNAME value from the FITS file.  If RESOLVED,
-        dict['target'] holds the resolved name.
+        ``dict['type']`` can be ``READ_ERROR``, ``NO_TARGNAME``,
+        ``UNRESOLVED`` or ``RESOLVED``.  If one of the last two,
+        ``dict['targname']`` is the raw ``TARGNAME`` value from the
+        FITS file.  If ``RESOLVED``, ``dict['target']`` holds the
+        resolved name.
         """
         try:
             reduced_hdus = get_reduced_hdus()
@@ -84,14 +87,14 @@ class CheckTargetsReduction(Reduction):
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
-        """Return TARGNAME if the first header unit; else None"""
+        """Return ``TARGNAME`` if the first header unit; else ``None``"""
         if n == 0:
             return get_reduced_header_unit()
         else:
             pass
 
     def reduce_header_unit(self, n, header_unit):
-        """Return TARGNAME if the first header unit; else None"""
+        """Return ``TARGNAME`` if the first header unit; else ``None``"""
         if n == 0:
             try:
                 targname = header_unit['TARGNAME']
@@ -102,7 +105,7 @@ class CheckTargetsReduction(Reduction):
 
 class DumpTargetsReduction(Reduction):
     """
-    When run on an archive, print a the product LIDs with their
+    When run on an archive, print the product LIDs with their
     calculated targets.
     """
     def reduce_archive(self, archive_root, get_reduced_bundles):

@@ -1,7 +1,7 @@
 """
-SCRIPT: Run through the archive and generate labels, browse products,
-and their labels.  Do not validate.  If it fails at any point, print
-the combined exception as XML to stdout.
+**SCRIPT:** Run through the archive and generate labels, browse
+products, and their labels.  Do not validate.  If it fails at any
+point, print the combined exception as XML to stdout.
 """
 from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
@@ -29,6 +29,10 @@ class MakeRawBrowseReduction(CompositeReduction):
 
 
 class MakeLabelsReduction(CompositeReduction):
+    """
+    When run on an archive, create labels for each bundle, collection,
+    and product.
+    """
     def __init__(self):
         CompositeReduction.__init__(self,
                                     [BundleLabelReduction(),
