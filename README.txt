@@ -6,6 +6,16 @@ http://conda.pydata.org/miniconda.html.  Miniconda installs Python
 versions, tooling, and libraries into an isolated environment, so it
 won't affect anything else on your machine.  Yay!
 
+My code currently just assumes that there's a pds-tools package living
+in your home directory.  The assumption is encoded (get it?
+*encoded*) in pdart/add_pds_tools.py.  I need parts of the package,
+but don't want to duplicate it into my repository.  For now, either
+make sure you have a copy there by running
+
+> git clone 'https://github.com/SETI/pds-tools.git'
+
+in your home directory, or hack add_pds_tools.py appropriately.
+
 Once Miniconda is installed, running
 
 > ./set-up-environment
@@ -17,7 +27,8 @@ to ensure it's all working.
 
 > source activate pdart
 
-activates the environment.
+activates the Conda environment, putting your tools and libraries in
+scope.
 
 > ./pep8
 
