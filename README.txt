@@ -32,4 +32,12 @@ runs the unit tests.
 builds documentation for the PDART modules.  It will automatically
 open the main page in your browser.
 
+==== ARCHIVES
 
+Some of the code assumes the existence of an archive.  Up to now, I
+(Eric) have been the sole developer, so I've hard-coded my two archive
+locations into pdart.pds4.Archives.  
+
+We'll likely need to find a way to add archives, but for now, just
+hack something in (write your own 'get_bobs_archive()') and we can
+talk about how to do it cleanly.
