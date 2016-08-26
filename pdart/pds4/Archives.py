@@ -2,13 +2,30 @@
 import pdart.pds4.Archive
 
 
+def get_full_archive_dir():
+    """
+    Return the filepath to the complete :class:`~pdart.pds4.Archive`
+    on the multi-terabyte external drive connected to the
+    nightly-build machine.
+    """
+    return '/Volumes/PDART-3TB'
+
+
 def get_full_archive():
     """
     Return the complete :class:`~pdart.pds4.Archive` located on the
     multi-terabyte external drive connected to the nightly-build
     machine.
     """
-    return pdart.pds4.Archive.Archive('/Volumes/PDART-3TB')
+    return pdart.pds4.Archive.Archive(get_full_archive_dir())
+
+
+def get_mini_archive_dir():
+    """
+    Return the filepath to the small test :class:`~pdart.pds4.Archive`
+    located on the development machine.
+    """
+    return '/Users/spaceman/Desktop/Archive'
 
 
 def get_mini_archive():
@@ -16,7 +33,7 @@ def get_mini_archive():
     Return the small test :class:`~pdart.pds4.Archive` located on the
     development machine.
     """
-    return pdart.pds4.Archive.Archive('/Users/spaceman/Desktop/Archive')
+    return pdart.pds4.Archive.Archive(get_mini_archive_dir())
 
 
 def get_any_archive():
