@@ -1,7 +1,7 @@
 """
-SCRIPT: Build the database then build bundle, collection, and product
-labels, and collection inventories.  This is a temporary script for
-development.
+**SCRIPT:** Build the database then build bundle, collection, and
+product labels, and collection inventories.  This is a temporary
+script under active development and so is underdocumented.
 """
 from contextlib import closing
 import os.path

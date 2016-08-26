@@ -10,7 +10,8 @@ My code currently just assumes that there's a pds-tools package living
 in your home directory.  The assumption is encoded (get it?
 *encoded*) in pdart/add_pds_tools.py.  I need parts of the package,
 but don't want to duplicate it into my repository.  For now, either
-make sure you have a copy there by running
+let my setup script install it for you, or make sure you have a copy
+there by running
 
 > git clone 'https://github.com/SETI/pds-tools.git'
 
@@ -21,7 +22,8 @@ Once Miniconda is installed, running
 > ./set-up-environment
 
 creates a Conda environment called 'pdart' and runs basic operations
-to ensure it's all working.
+to ensure it's all working.  Be agreeable and say "yes" to it
+repeatedly.
 
 ==== BASIC OPERATIONS
 

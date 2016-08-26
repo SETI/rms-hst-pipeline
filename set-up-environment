@@ -9,7 +9,7 @@
 ### conda remove --name pdart --all
 
 # Create a minimal environment and activate it.
-conda create --name pdart pep8 pil pip pyparsing pytest sphinx
+conda create --name pdart pep8 pil pip psutil pyparsing pytest sphinx
 source activate pdart
 
 # We install pyfits *before* scipy because it uses an earlier version
@@ -23,8 +23,23 @@ conda install scipy
 # removed in the future.
 pip install PyContracts
 
+# Check for pds-tools.
+if [ ! -d "$HOME/pds-tools" ]; then
+    echo
+    echo "You do not have a copy of pds-tools in your home directory."
+    echo -n "Download from github? [y/n] "
+    read answer
+    if [ $answer == "y" ]; then
+        git clone "https://github.com/SETI/pds-tools.git" "$HOME/pds-tools"
+    else
+        echo "No?  Then hack add_pds_tools.py to point to it."
+        exit 1
+    fi
+fi
+
 # Run our basic operations (checking for formatting, unit-testing, and
 # building docs) to see if the environment is working.
 ./pep8 && ./test && ./build-api-docs
 
-
+echo
+echo "Run 'source activate pdart' to activate the environment."
