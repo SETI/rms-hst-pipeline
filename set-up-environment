@@ -1,0 +1,30 @@
+#!/bin/bash -e
+
+# You must have Miniconda for Python 2.7 installed, probably from
+# http://conda.pydata.org/miniconda.html
+
+# Uncomment the following line back in if you want to rebuild the
+# environment from scratch.
+
+### conda remove --name pdart --all
+
+# Create a minimal environment and activate it.
+conda create --name pdart pep8 pil pip pyparsing pytest sphinx
+source activate pdart
+
+# We install pyfits *before* scipy because it uses an earlier version
+# of numpy.  It doesn't complain if its numpy is upgraded; scipy
+# *does* complain if its version of numpy is downgraded.
+
+conda install -c stsci pyfits=v3.3.0.git
+conda install scipy
+
+# This is used only by pdart.reductions.DbCReduction.  It may be
+# removed in the future.
+pip install PyContracts
+
+# Run our basic operations (checking for formatting, unit-testing, and
+# building docs) to see if the environment is working.
+./pep8 && ./test && ./build-api-docs
+
+
