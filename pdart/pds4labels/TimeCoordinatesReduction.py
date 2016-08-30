@@ -5,9 +5,9 @@ Functionality to build an ``<Time_Coordinates />`` XML element using a
 import pdart.add_pds_tools
 import julian
 
-from pdart.exceptions.Combinators import *
 from pdart.pds4labels.TimeCoordinatesXml import *
 from pdart.reductions.Reduction import *
+from pdart.rules.Combinators import *
 
 
 def _get_start_stop_times_from_header_unit(header_unit):

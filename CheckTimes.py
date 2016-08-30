@@ -5,8 +5,8 @@ to calculate start and stop times of the observation.
 """
 
 from pdart.pds4.Archives import *
-from pdart.exceptions.Combinators import *
 from pdart.reductions.Reduction import *
+from pdart.rules.Combinators import *
 
 # These are the suffixes in the development archive that have
 # sufficient datetime information: c0m c1m crj d0m drz flt q0m raw

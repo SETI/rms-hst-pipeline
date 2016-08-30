@@ -6,8 +6,8 @@ prettily.
 import subprocess
 
 from pdart.pds4.Archives import *
-from pdart.exceptions.Combinators import *
 from pdart.pds4labels.ProductLabel import *
+from pdart.rules.Combinators import *
 
 
 def make_one_product_label():

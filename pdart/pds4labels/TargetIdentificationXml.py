@@ -2,7 +2,7 @@
 Templates to create a ``<Target_Identification />`` XML node for
 product labels.
 """
-from pdart.exceptions.Combinators import *
+from pdart.rules.Combinators import *
 from pdart.xml.Templates import *
 
 

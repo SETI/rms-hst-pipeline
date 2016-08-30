@@ -4,9 +4,9 @@ import pyfits
 import traceback
 import xml.dom
 
-import pdart.exceptions.Combinators
-import pdart.exceptions.ExceptionInfo
-import pdart.exceptions.Result
+import pdart.rules.Combinators
+import pdart.rules.ExceptionInfo
+import pdart.rules.Result
 
 
 class Runner(object):
@@ -142,14 +142,14 @@ if __name__ == '__main__':
     def foo():
         raise Exception("You're killing me!")
     try:
-        pdart.exceptions.Combinators.normalized_exceptions(foo)()
-    except pdart.exceptions.ExceptionInfo.CalculationException as e:
+        pdart.rules.Combinators.normalized_exceptions(foo)()
+    except pdart.rules.ExceptionInfo.CalculationException as e:
         print e.exception_info.to_pretty_xml()
 
     print 60 * '-'
 
     try:
-        pdart.exceptions.Combinators.parallel_list('Labels are for jars!',
+        pdart.rules.Combinators.parallel_list('Labels are for jars!',
                                                    3 * [foo])
-    except pdart.exceptions.ExceptionInfo.CalculationException as e:
+    except pdart.rules.ExceptionInfo.CalculationException as e:
         print e.exception_info.to_pretty_xml()

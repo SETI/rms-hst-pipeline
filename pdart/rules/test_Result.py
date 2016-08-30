@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.exceptions.Result import *
+from pdart.rules.Result import *
 
 
 class TestResult(unittest.TestCase):

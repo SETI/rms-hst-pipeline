@@ -7,12 +7,12 @@ from contextlib import closing
 import os.path
 import sqlite3
 
-from pdart.exceptions.Combinators import *
 from pdart.db.CreateDatabase import create_database
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
+from pdart.rules.Combinators import *
 
 VERIFY = False
 IN_MEMORY = False

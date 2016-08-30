@@ -1,8 +1,7 @@
 """
 **New to PDART?** You do not need to understand this module unless you
 want to understand the implementations of
-:mod:`pdart.exception.Combinators` or
-:mod:`pdart.exception.ExceptionInfo`.
+:mod:`pdart.rules.Combinators` or :mod:`pdart.rules.ExceptionInfo`.
 
 Normal Python functions either return a result value (possibly
 ``None``) or raise an exception which breaks the normal flow of the
@@ -12,27 +11,27 @@ cases uniformly so we can use Python's data-handling capacity to
 handle them.
 
 We do this by wrapping function results: if it's a normal function
-return, it's wrapped by :class:`~pdart.exception.Result.Success`; if
+return, it's wrapped by :class:`~pdart.rules.Result.Success`; if
 the function raised an exception, the exception and its stack trace
-are wrapped in :class:`~pdart.exception.Result.Failure`.  Both are
-subclasses of :class:`~pdart.exception.Result.Result`.
+are wrapped in :class:`~pdart.rules.Result.Failure`.  Both are
+subclasses of :class:`~pdart.rules.Result.Result`.
 
 The end-user should never see these classes: they are only used
 internally to implement functions like
-:func:`~pdart.exception.Combinators.multiple_implementations`.
+:func:`~pdart.rules.Combinators.multiple_implementations`.
 Results are wrapped to let Python work uniformly on all cases, then
 the final result is unwrapped before presenting it to the user.
 """
 import abc
 
-import pdart.exceptions.ExceptionInfo
+import pdart.rules.ExceptionInfo
 
 
 class Result(object):
     """
     The result of running a function: either
-    :class:`~pdart.exception.Result.Success` or
-    :class:`~pdart.exception.Result.Failure`.
+    :class:`~pdart.rules.Result.Success` or
+    :class:`~pdart.rules.Result.Failure`.
     """
     __metaclass__ = abc.ABCMeta
 
@@ -40,14 +39,14 @@ class Result(object):
     def is_success(self):
         """
         Return True if the Result is a
-        :class:`~pdart.exception.Result.Success`.
+        :class:`~pdart.rules.Result.Success`.
         """
         pass
 
     def is_failure(self):
         """
         Return True if the Result is a
-        :class:`~pdart.exception.Result.Failure`.
+        :class:`~pdart.rules.Result.Failure`.
         """
         return not self.is_success()
 
@@ -55,7 +54,7 @@ class Result(object):
 class Failure(Result):
     """
     The result of running a function and failing: a wrapper around
-    :class:`~pdart.exception.ExceptionInfo.ExceptionInfo`.
+    :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
     """
     def __init__(self, exception_info):
         Result.__init__(self)

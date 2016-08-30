@@ -4,12 +4,12 @@ properties.  If any of the properties fail to hold, print the combined
 exception to stdout.  If it succeeds, do nothing.
 """
 
-from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4.Bundle import *
 from pdart.pds4.Collection import *
 from pdart.pds4.HstFilename import *
 from pdart.reductions.CompositeReduction import *
+from pdart.rules.Combinators import *
 
 
 def _unions(sets):

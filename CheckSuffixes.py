@@ -2,10 +2,10 @@
 **SCRIPT:** Run through the archive and print the sorted set of
 collection suffixes.
 """
-from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
+from pdart.rules.Combinators import *
 
 
 def _unions(sets):

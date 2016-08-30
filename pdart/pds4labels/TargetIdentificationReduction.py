@@ -3,9 +3,9 @@ Functionality to build a ``<Target_Identification />`` XML element of
 a product label using a
 :class:`~pdart.reductions.Reduction.Reduction`.
 """
-from pdart.exceptions.Combinators import *
-from pdart.reductions.Reduction import *
 from pdart.pds4labels.TargetIdentificationXml import *
+from pdart.reductions.Reduction import *
+from pdart.rules.Combinators import *
 
 
 def _get_target_from_header_unit(header_unit):

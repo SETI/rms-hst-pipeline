@@ -3,9 +3,9 @@
 files which raise ``IOError`` s when you try to parse them.
 """
 
-from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.reductions.BadFitsFileReduction import *
+from pdart.rules.Combinators import *
 
 
 def _unions(sets):

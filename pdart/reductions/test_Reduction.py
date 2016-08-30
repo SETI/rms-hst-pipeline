@@ -1,6 +1,6 @@
-from pdart.exceptions.ExceptionInfo import CalculationException
 from pdart.pds4.Archives import *
 from pdart.reductions.Reduction import *
+from pdart.rules.ExceptionInfo import CalculationException
 
 
 def _not_all_same(lst):

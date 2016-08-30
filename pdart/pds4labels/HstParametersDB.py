@@ -2,8 +2,8 @@
 Functionality to build an ``<hst:HST />`` XML element using a SQLite
 database.
 """
-from pdart.exceptions.Combinators import *
 from pdart.pds4labels.HstParametersXml import *
+from pdart.rules.Combinators import *
 
 
 def get_db_repeat_exposure_count(product_id):

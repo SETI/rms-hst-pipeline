@@ -2,9 +2,9 @@
 Functionality to build an ``<hst:HST />`` XML element using a
 :class:`~pdart.reductions.Reduction.Reduction`.
 """
-from pdart.exceptions.Combinators import *
 from pdart.pds4labels.HstParametersXml import *
 from pdart.reductions.Reduction import *
+from pdart.rules.Combinators import *
 
 
 def get_repeat_exposure_count(product_id, instrument, header):

@@ -12,11 +12,11 @@ with their stack traces instead of just bailing out at the first.
 This lets the developer fix multiple problems at the end of a failed
 run, making her or him more effective.
 
-The :mod:`pdart.exceptions` package contains the magic to make this
+The :mod:`pdart.rules` package contains the magic to make this
 happen.
 
 **New to PDART?** The meat of this package is the function
-:func:`pdart.exceptions.Combinators.multiple_implementations`, used to
+:func:`pdart.rules.Combinators.multiple_implementations`, used to
 make *rules* (functions with multiple implementations).  Rules may be
 used to try various heuristics to calculate a desired result.
 """

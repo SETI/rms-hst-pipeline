@@ -5,13 +5,13 @@ fails at any point, print the combined exception as XML to stdout.
 """
 import sys
 
-from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.InstrumentationReductions import *
+from pdart.rules.Combinators import *
 
 
 class _ProductLabelReductionWithMessage(ProductLabelReduction):

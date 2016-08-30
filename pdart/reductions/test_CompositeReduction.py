@@ -1,6 +1,6 @@
-from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.reductions.CompositeReduction import *
+from pdart.rules.Combinators import *
 
 
 def test_indexed():

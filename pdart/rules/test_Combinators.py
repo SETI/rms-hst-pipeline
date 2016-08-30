@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.exceptions.Combinators import *
+from pdart.rules.Combinators import *
 
 
 class TestCombinators(unittest.TestCase):

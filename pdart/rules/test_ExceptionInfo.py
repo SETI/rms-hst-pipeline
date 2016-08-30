@@ -1,7 +1,7 @@
 import unittest
 import xml.dom
 
-from pdart.exceptions.ExceptionInfo import *
+from pdart.rules.ExceptionInfo import *
 
 
 def test_ExceptionInfo():

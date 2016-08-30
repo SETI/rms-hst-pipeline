@@ -98,7 +98,7 @@ import os.path
 import abc
 import pyfits
 
-from pdart.exceptions.Combinators import parallel_list
+from pdart.rules.Combinators import parallel_list
 
 
 class Reduction(object):

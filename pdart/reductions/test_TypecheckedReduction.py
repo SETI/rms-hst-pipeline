@@ -1,6 +1,6 @@
-from pdart.exceptions.ExceptionInfo import *
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.TypecheckedReduction import *
+from pdart.rules.ExceptionInfo import *
 
 if False:
     def testSanity():

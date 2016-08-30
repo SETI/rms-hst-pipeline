@@ -8,10 +8,10 @@
       information.
 """
 
-from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4labels.TargetIdentificationReduction import *
 from pdart.reductions.Reduction import *
+from pdart.rules.Combinators import *
 
 
 class CheckTargetsReduction(Reduction):

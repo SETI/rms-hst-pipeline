@@ -5,7 +5,7 @@ information from those exceptions.  Normally, Python does not retain
 this information and just displays the current state when reporting an
 exception, then immediately forgets it.
 
-The :py:mod:`pdart.exception.ExceptionInfo` module defines an
+The :py:mod:`pdart.rules.ExceptionInfo` module defines an
 exception, :class:`CalculationException`, that can hold this
 information.
 
@@ -45,7 +45,7 @@ import xml.dom
 class CalculationException(Exception):
     """
     An :exc:`Exception` carrying
-    :class:`~pdart.exception.ExceptionInfo.ExceptionInfo`
+    :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`
     """
 
     def __init__(self, msg, exception_info):
@@ -65,21 +65,21 @@ class ExceptionInfo(object):
     """
     An abstract class wrapping either a single exception and stack
     trace or a labeled group of
-    :class:`~pdart.exception.ExceptionInfo.ExceptionInfo`.
+    :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
     """
     __metaclass__ = abc.ABCMeta
 
     def to_pretty_xml(self):
         """
         Return human-readable XML text for this
-        :class:`~pdart.exception.ExceptionInfo.ExceptionInfo.`
+        :class:`~pdart.rules.ExceptionInfo.ExceptionInfo.`
         """
         return self.to_xml().toprettyxml()
 
     def to_xml(self):
         """
         Return an XML document data structure for this
-        :class:`~pdart.exception.ExceptionInfo.ExceptionInfo`.
+        :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
         """
         document = xml.dom.getDOMImplementation().createDocument(None,
                                                                  None,
@@ -92,7 +92,7 @@ class ExceptionInfo(object):
     def to_xml_fragment(self, document):
         """
         Return an XML data structure for this
-        :class:`~pdart.exception.ExceptionInfo.ExceptionInfo`.
+        :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
         """
         pass
 
@@ -130,7 +130,7 @@ class SingleExceptionInfo(ExceptionInfo):
 class GroupedExceptionInfo(ExceptionInfo):
     """
     A class wrapping a labeled group of
-    :class:`~pdart.exception.ExceptionInfo.ExceptionInfo`.
+    :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
     """
     def __init__(self, label, exception_infos):
         assert isinstance(label, str)

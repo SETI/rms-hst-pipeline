@@ -21,10 +21,10 @@ ignores its arguments, you may give its arguments as ``(*args,
 For example, assume you need to calculate whether a function halts or
 loops infinitely.  We are using three heuristics: does it contain
 ``while True: pass``?, does it contain ``while not False: pass``?, and
-do the entrails of a sacrificed ox suggest that it loops.  The first
+do the entrails of a sacrificed ox suggest that it loops?  The first
 two take the function's source code; the third requires the entrails
-of a sacrificed ox.  The combined rule needs to take all of these.  So
-we write::
+of a sacrificed ox.  The combined rule needs to take all of these
+arguments.  So we write::
 
     def _contains_while_true_pass(src_text, ignored_entrails):
         # implementation goes here
@@ -69,32 +69,32 @@ Explanation of internals follows.
 
 The key concept used here is converting from "code" (normal Python
 functions that either return values or raise exceptions) to "rcode" (a
-function that uniformly returns a :class:`~pdart.exception.Result`
-value and *never* raises an exception), or the other way (from code
-that returns a wrapped :class:`~pdart.exception.Result` into normal
-Python code that returns an unwrapped result or raises an exception).
+function that uniformly returns a :class:`~pdart.rules.Result` value
+and *never* raises an exception), or the other way (converting code
+that returns a wrapped :class:`~pdart.rules.Result` into normal Python
+code that either returns an unwrapped result or raises an exception).
 
 Our normal process to combine multiple Python functions into a single
 Python function is to first convert them all into *rcode*, so Python
 can look at both normal and exception results uniformly.  We then
 create a function that handles the results from the *rcode*: since we
 are guaranteed that no exceptions will be raised (they are all
-converted into :class:`~pdart.exception.Failure` s), Python can work
+converted into :class:`~pdart.rules.Failure` s), Python can work
 on the result like it can on any data.  Then we convert this *rcode*
 back into normal code.  The end-user will never see the *rcode*.
 
 """
 import traceback
 
-from pdart.exceptions.ExceptionInfo import *
-from pdart.exceptions.Result import Failure, Success
+from pdart.rules.ExceptionInfo import *
+from pdart.rules.Result import Failure, Success
 
 
 def _code_to_rcode(func):
     """
     Convert from a function that either returns a value or raises an
     exception (i.e., a normal Python function) to a function that
-    always returns a :class:`~pdart.exception.Result`.
+    always returns a :class:`~pdart.rules.Result`.
     """
     def rfunc(*args, **kwargs):
         try:
@@ -111,9 +111,9 @@ def _code_to_rcode(func):
 def _rcode_to_code(rfunc):
     """
     Convert from a function that returns a
-    :class:`~pdart.exception.Result` to a function that either returns
+    :class:`~pdart.rules.Result` to a function that either returns
     an unwrapped value or raises a
-    :exc:`~pdart.exception.CalculationException`.
+    :exc:`~pdart.rules.CalculationException`.
     """
     def func(*args, **kwargs):
         res = rfunc(*args, **kwargs)
@@ -128,10 +128,10 @@ def _rcode_to_code(rfunc):
 def normalized_exceptions(func):
     """
     Given a function, return an equivalent function except that when
-    the original raises an :class:`~pdart.exception.Exception`, the
+    the original raises an :class:`~pdart.rules.Exception`, the
     result function will instead raise a
-    :exc:`~pdart.exception.CalculationException` containing
-    :class:`~pdart.exception.ExceptionInfo` for the exception.
+    :exc:`~pdart.rules.CalculationException` containing
+    :class:`~pdart.rules.ExceptionInfo` for the exception.
     """
     return _rcode_to_code(_code_to_rcode(func))
 
@@ -139,7 +139,7 @@ def normalized_exceptions(func):
 def _create_joined_documentation(funcs):
     """
     Synthesize and return a docstring for a combination of functions
-    created by :func:`~pdart.exceptions.multiple_implementations`.
+    created by :func:`~pdart.rules.multiple_implementations`.
     """
     name_docs = ["%s: %s" % (func.__name__, func.__doc__) for func in funcs]
     return ("has more than one implementations:\n" + '\n'.join(name_docs))
@@ -148,7 +148,7 @@ def _create_joined_documentation(funcs):
 def _create_joined_name(label, funcs):
     """
     Synthesize and return a name for a function created by
-    :func:`~pdart.exceptions.multiple_implementations`.
+    :func:`~pdart.rules.multiple_implementations`.
     """
     names = [func.__name__ for func in funcs]
     return "multiple_implementations(%r, %s)" % (label, ', '.join(names))
@@ -158,16 +158,16 @@ def multiple_implementations(label, *funcs):
     """
     Given a string label and a list of functions, return the result of
     the first function that succeeds or raise a
-    :exc:`~pdart.exception.CalculationException` containing
-    :class:`~pdart.exception.GroupedExceptionInfo` for the exceptions
+    :exc:`~pdart.rules.CalculationException` containing
+    :class:`~pdart.rules.GroupedExceptionInfo` for the exceptions
     raised by each function.
 
     This is a generalization of a normal Python function call to a
     broader concept of calling multiple alternative implementations.
     If any one succeeds, you get the result.  If they all fail, you
     get all the exceptions and all the stack traces wrapped into a
-    :class:`~pdart.exception.GroupedExceptionInfo` in a
-    :exc:`~pdart.exception.CalculationException`.
+    :class:`~pdart.rules.GroupedExceptionInfo` in a
+    :exc:`~pdart.rules.CalculationException`.
     """
     def afunc(*args, **kwargs):
         exception_infos = []
@@ -210,9 +210,9 @@ def parallel_list(label, arg_funcs):
     Given a string label and a list of functions that take no
     arguments (thunks), run the functions in parallel, and if all
     succeed, return the list of the results.  If any one or more
-    fails, raise a :exc:`~pdart.exception.CalculationException`
+    fails, raise a :exc:`~pdart.rules.CalculationException`
     containing all the exceptions and stack traces in a
-    :class:`~pdart.exception.GroupedExceptionInfo`.
+    :class:`~pdart.rules.GroupedExceptionInfo`.
     """
 
     # Style note: unlike multiple_interpretations, this takes a list
@@ -238,7 +238,7 @@ def parallel_list(label, arg_funcs):
 def raise_verbosely(thunk):
     """
     Run the thunk, returning a result.  If it raises a
-    :exc:`~pdart.exception.CalculationException`, pretty-print the
+    :exc:`~pdart.rules.CalculationException`, pretty-print the
     full exception info as XML and reraise the exception.  For
     debugging.
     """

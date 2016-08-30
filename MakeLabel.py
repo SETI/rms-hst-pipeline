@@ -5,11 +5,11 @@ label is valid, print it; if not, pretty-print the exceptions.
 import os.path
 import sys
 
-from pdart.exceptions.Combinators import *
 from pdart.pds4.Archive import *
 from pdart.pds4.LID import *
 from pdart.pds4.Product import *
 from pdart.pds4labels.ProductLabel import *
+from pdart.rules.Combinators import *
 
 
 def _make_product_from_filepath(product_filepath):

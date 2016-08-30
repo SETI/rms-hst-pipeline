@@ -3,10 +3,10 @@
 keywords found in the first header unit of the FITS files of RAW
 products.
 """
-from pdart.exceptions.Combinators import *
 from pdart.pds4.Archives import *
 from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
+from pdart.rules.Combinators import *
 
 
 def _union_dicts(dicts):
