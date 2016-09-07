@@ -9,6 +9,10 @@ class DummyTask(Task):
 
 def test_TaskQueue():
     tq = TaskQueue()
+    run_test_TaskQueue(tq)
+
+
+def run_test_TaskQueue(tq):
     assert not tq
     assert not tq.has_pending_tasks()
     assert not tq.has_running_tasks()
