@@ -5,6 +5,8 @@ from pdart.tasks.Task import *
 class DummyTask(Task):
     def to_tuple(self):
         return (0,)
+    def __str__(self):
+        return 'DummyTask'
 
 
 def test_TaskQueue():

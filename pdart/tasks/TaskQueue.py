@@ -108,3 +108,7 @@ class TaskQueue(object):
     def __nonzero__(self):
         """Return True iff the queue contains any tasks."""
         return bool(self.pending_tasks) or bool(self.running_tasks)
+
+    def __eq__(self, other):
+        return self.pending_tasks == other.pending_tasks and \
+            self.running_tasks == other.running_tasks

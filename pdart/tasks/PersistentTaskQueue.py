@@ -1,4 +1,5 @@
 from pdart.tasks.TaskQueue import *
+import pickle
 
 
 class PersistentTaskQueue(TaskQueue):
@@ -33,9 +34,14 @@ class PersistentTaskQueue(TaskQueue):
         self.write()
 
     def write(self):
-        # TODO
-        pass
+        with open(self.filepath, 'w') as f:
+            p = pickle.Pickler(f)
+            print 'Pickling!'
+            p.dump(self)
+        assert self == self.read()
 
     def read(self):
-        # TODO
-        pass
+        with open(self.filepath, 'r') as f:
+            u = pickle.Unpickler(f)
+            print 'Unpickling!'
+            return u.load()

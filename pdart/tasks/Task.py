@@ -26,3 +26,7 @@ class Task(object):
     def __eq__(self, other):
         return type(self) == type(other) and \
             self.to_tuple() == other.to_tuple()
+
+    @abc.abstractmethod
+    def __str__(self):
+        pass
