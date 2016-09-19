@@ -1,4 +1,4 @@
-# INSTALLING THE DEVELOPMENT ENVIRONMENT
+# Installing the development environment
 
 To do a quick, automated set-up of your environment, you should have
 Miniconda for Python 2.7 installed, probably from
@@ -14,7 +14,7 @@ either let my setup script install it for you, or make sure you have a
 copy there by running
 
 ```
-> git clone 'https://github.com/SETI/pds-tools.git'
+$ git clone 'https://github.com/SETI/pds-tools.git'
 ```
 
 in your home directory, or hack ```add_pds_tools.py``` appropriately.
@@ -22,47 +22,55 @@ in your home directory, or hack ```add_pds_tools.py``` appropriately.
 Once Miniconda is installed, running
 
 ```
-> ./set-up-environment
+$ ./set-up-environment
 ```
 
 creates a Conda environment called ```pdart``` and runs basic
 operations to ensure it's all working.  Be agreeable and say "yes" to
 it repeatedly.
 
-# BASIC OPERATIONS
+# Basic operations
 
 ```
-> source activate pdart
+$ source activate pdart
 ```
 
 activates the Conda environment, putting your tools and libraries in
 scope.
 
 ```
-> ./pep8
+$ ./pep8
 ```
 
 checks that all the Python is properly formatted according to PEP8.
 
 ```
-> ./test
+$ ./test
 ```
 
 runs the unit tests.
 
 ```
-> ./build-api-docs
+$ ./build-api-docs
 ```
 
 builds documentation for the PDART modules.  It will automatically
 open the main page in your browser.
 
-# ARCHIVES
+# Archives
 
-Some of the code assumes the existence of an archive.  Up to now, I
-(Eric) have been the sole developer, so I've hard-coded my two archive
-locations into ```pdart.pds4.Archives```.
+Some of the code assumes the existence of an archive (i.e., a
+directory packed full of Hubble imagery organized in a certain way).
+Up to now, I (Eric) have been the sole developer, so I've just
+hard-coded two archive locations into ```pdart.pds4.Archives```.
 
-We'll likely need to find a way to add archives, but for now, just
-hack something in (write your own ```get_bobs_archive()```) and we can
-talk about how to do it cleanly.
+My big archive lives on the multi-terabyte hard disk on my desk.  My
+"mini-archive" is a tiny subset of the big one and it lives on my
+development machine.
+
+We'll likely need to find a way to add new archive locations.  For
+now, you can just hack something in (write your own
+```get_bobs_archive()```) and we can talk later about how to do it
+cleanly.
+
+Talk to me if you need to set up an archive.
