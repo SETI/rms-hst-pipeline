@@ -1,20 +1,33 @@
 import pdart.tasks.Task
+import time
 
 
-class TestTask(pdart.tasks.Task.Task):
+def _a_minute_from_now():
+    return time.time() + 60
+
+
+class NullTask(pdart.tasks.Task.Task):
     """
-    A sample Task for testing.  All instances are equal.
+    A sample Task for testing.  Does nothing.  All instances are
+    equal.
     """
+    def __init__(self):
+        pdart.tasks.Task.Task.__init__(self, _a_minute_from_now())
+
     def __str__(self):
-        return 'TestTask'
+        return 'NullTask'
 
     def to_tuple(self):
         return tuple()
 
+    def run(self):
+        pass
 
-class NumberedTestTask(pdart.tasks.Task.Task):
+
+class NumberedNullTask(pdart.tasks.Task.Task):
     """
-    A sample Task for testing.  No two instances are equal.
+    A sample Task for testing.  Does nothing.  No two instances are
+    equal.
     """
     last_serial_number = 0
 
@@ -25,10 +38,14 @@ class NumberedTestTask(pdart.tasks.Task.Task):
         return res
 
     def __init__(self):
-        self.serial_number = NumberedTestTask.get_serial_number()
+        pdart.tasks.Task.Task.__init__(self, _a_minute_from_now())
+        self.serial_number = NumberedNullTask.get_serial_number()
 
     def __str__(self):
-        return 'TestTask'
+        return 'NullTask'
 
     def to_tuple(self):
         return (self.serial_number,)
+
+    def run(self):
+        pass

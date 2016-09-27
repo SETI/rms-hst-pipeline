@@ -31,7 +31,8 @@ class TaskRunner(object):
             # self.check_self_timeout()  # TODO
             self.fill_running_to_capacity()
 
-    _RUNNING_SET = ['RUNNING', 'TERMINATING']
+    _RUNNING_SET = ['INITIALIZED', 'RUNNING', 'TERMINATING', 'TIMING_OUT']
+    _COMPLETED_SET = ['SUCCEEDED', 'FAILED', 'TERMINATED', 'TIMED_OUT']
 
     def prune_by_status(self):
         """
@@ -42,7 +43,7 @@ class TaskRunner(object):
         for task, process in self.task_queue.running_tasks.iteritems():
             statuses[task] = process.status()
         for task, status in statuses.iteritems():
-            if status not in TaskRunner._RUNNING_SET:
+            if status in TaskRunner._COMPLETED_SET:
                 del self.task_queue.running_tasks[task]
 
     def extend_pending(self, tasks):

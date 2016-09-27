@@ -5,6 +5,10 @@ import signal
 import time
 
 
+def _a_minute_from_now():
+    return time.time() + 60
+
+
 def test_exit_code_to_status():
     assert exit_code_to_status(None) == 'RUNNING'
     assert exit_code_to_status(0) == 'SUCCEEDED'
@@ -16,72 +20,138 @@ def _pass():
     pass
 
 
-def test_RawProcess_returning():
+def run_test_Process_returning(proc):
     # Test one: process immediately returns
-    rp = RawProcess(target=_pass, args=tuple())
-    assert rp
-    assert not rp.was_started()
-    assert not rp.is_alive()
-    assert rp.status() == 'INITIALIZED'
+    assert proc
+    assert not proc.was_started()
+    assert not proc.is_alive()
+    assert proc.status() == 'INITIALIZED'
 
-    rp.start()
-    assert rp.was_started()
+    proc.start()
+    assert proc.was_started()
     # might still be running; might not
-    stat = rp.status()
+    stat = proc.status()
     assert stat in ['RUNNING', 'SUCCEEDED']
     if stat == 'SUCCEEDED':
-        assert not rp.is_alive()
+        assert not proc.is_alive()
 
-    rp.join()
+    proc.join()
     # is definitely not running
-    stat = rp.status()
+    stat = proc.status()
     assert stat == 'SUCCEEDED'
-    assert not rp.is_alive()
+    assert not proc.is_alive()
+
+
+def test_RawProcess_returning():
+    proc = RawProcess(target=_pass, args=tuple())
+    run_test_Process_returning(proc)
+
+
+def test_TerminatableProcess_returning():
+    proc = TerminatableProcess(target=_pass, args=tuple())
+    run_test_Process_returning(proc)
+
+
+def test_TimeoutProcess_returning():
+    proc = TimeoutProcess(_a_minute_from_now(), _pass, tuple())
+    run_test_Process_returning(proc)
 
 
 def _sleep(secs):
     time.sleep(secs)
 
 
-def test_RawProcess_terminate():
+def run_test_Process_terminate(proc):
     # Test two: process hangs
-    rp = RawProcess(target=_sleep, args=(60,))
-    rp.start()
-    assert rp.status() == 'RUNNING'
-    rp.terminate()
-    rp.join()
-    assert rp.status() == 'TERMINATED'
+    proc.start()
+    assert proc.status() == 'RUNNING'
+    proc.terminate()
+    proc.join()
+    assert proc.status() == 'TERMINATED'
 
 
-def _munge():
+def test_RawProcess_terminate():
+    proc = RawProcess(target=_sleep, args=(60,))
+    run_test_Process_terminate(proc)
+
+
+def test_TerminatableProcess_terminate():
+    proc = TerminatableProcess(target=_sleep, args=(60,))
+    run_test_Process_terminate(proc)
+
+
+def test_TimeoutProcess_terminate():
+    proc = TimeoutProcess(_a_minute_from_now(), _sleep, (60,))
+    run_test_Process_terminate(proc)
+
+
+def _nap():
     while True:
         time.sleep(10)
 
 
-def test_RawProcess_terminating():
+_JOIN_SECS = 10 * 1.0 / 1000  # 10 ms
+
+
+def run_test_Process_terminating(proc):
     # Test three: process takes a while to terminate.  Check that it
     # shows 'TERMINATING' status before it goes to 'TERMINATED'.
 
-    JOIN_SECS = 10 * 1.0 / 1000  # 10 ms
+    # Try to end the process (but it'll ignore the request and keep on
+    # going)
+    proc.terminate()
+    assert proc.status() == 'TERMINATING'
+    proc.join(_JOIN_SECS)
+    # it still hasn't terminated even after we wait
+    assert proc.status() == 'TERMINATING'
 
+    # Send a different signal to terminate it with extreme prejudice
+    os.kill(proc.process.pid, signal.SIGKILL)
+
+    proc.join(_JOIN_SECS)
+    # Now it's dead
+    assert proc.status() == 'TERMINATED'
+
+
+def test_TerminatableProcess_terminating():
     # The signal handler needs to be set *before* we fork the
     # process
     original_handler = signal.signal(signal.SIGTERM, signal.SIG_IGN)
-    rp = RawProcess(target=_munge, args=tuple())
-    rp.start()
+    proc = TerminatableProcess(target=_nap, args=tuple())
+    proc.start()
     signal.signal(signal.SIGTERM, original_handler)
 
-    # Try to end the process (but it'll ignore the request and keep on
-    # going)
-    rp.terminate()
-    assert rp.status() == 'TERMINATING'
-    rp.join(JOIN_SECS)
+    run_test_Process_terminating(proc)
+
+
+def test_TimeoutProcess_terminating():
+    # The signal handler needs to be set *before* we fork the
+    # process
+    original_handler = signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    proc = TimeoutProcess(_a_minute_from_now(), _nap, tuple())
+    proc.start()
+    signal.signal(signal.SIGTERM, original_handler)
+
+    run_test_Process_terminating(proc)
+
+
+def test_timing_out():
+    # times out in half a second
+    original_handler = signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    proc = TimeoutProcess(time.time() + 0.5, _nap, tuple())
+    proc.start()
+    signal.signal(signal.SIGTERM, original_handler)
+
+    # a full second later
+    time.sleep(1)
+    assert proc.status() == 'TIMING_OUT'
+    proc.join(_JOIN_SECS)
     # it still hasn't terminated even after we wait
-    assert rp.status() == 'TERMINATING'
+    assert proc.status() == 'TIMING_OUT'
 
     # Send a different signal to terminate it with extreme prejudice
-    os.kill(rp.process.pid, signal.SIGKILL)
+    os.kill(proc.process.pid, signal.SIGKILL)
 
-    rp.join(JOIN_SECS)
+    proc.join(_JOIN_SECS)
     # Now it's dead
-    assert rp.status() == 'TERMINATED'
+    assert proc.status() == 'TIMED_OUT'

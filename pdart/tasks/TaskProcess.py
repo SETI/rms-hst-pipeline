@@ -5,8 +5,9 @@ def _run_task_action(task):
     task.run()
 
 
-class TaskProcess(RawProcess):
+class TaskProcess(TimeoutProcess):
     """A wrapper around RawProcess that runs Task actions"""
     def __init__(self, task):
         assert task
-        RawProcess.__init__(self, target=_run_task_action, args=(task,))
+        TimeoutProcess.__init__(self, task.deadline_time,
+                                target=_run_task_action, args=(task,))

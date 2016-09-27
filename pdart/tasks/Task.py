@@ -13,7 +13,16 @@ class Task(object):
     """
     __metaclass__ = abc.ABCMeta
 
+    def __init__(self, deadline_time):
+        assert deadline_time
+        self.deadline_time = deadline_time
+
+    @abc.abstractmethod
     def run(self):
+        """
+        Do the work of the task.  This will only be run in the forked
+        process.
+        """
         pass
 
     @abc.abstractmethod

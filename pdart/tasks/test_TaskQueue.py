@@ -1,6 +1,6 @@
 from pdart.tasks.TaskQueue import *
 from pdart.tasks.Task import *
-from pdart.tasks.TestTask import TestTask
+from pdart.tasks.TestTask import NullTask
 
 
 def test_TaskQueue():
@@ -9,7 +9,7 @@ def test_TaskQueue():
     assert not tq.has_pending_tasks()
     assert not tq.has_running_tasks()
 
-    t = TestTask()
+    t = NullTask()
     tq.append_pending(t)
     assert tq.has_pending_tasks()
     assert not tq.has_running_tasks()

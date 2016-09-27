@@ -6,8 +6,8 @@ import pdart.tasks.TaskProcess
 
 def test_TaskDict():
     td = TaskDict()
-    t = NumberedTestTask()
-    t2 = NumberedTestTask()
+    t = NumberedNullTask()
+    t2 = NumberedNullTask()
     td.insert_task(t)
     assert t in td
     assert len(td) == 1
