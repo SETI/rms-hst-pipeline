@@ -13,11 +13,15 @@ class Task(object):
     """
     __metaclass__ = abc.ABCMeta
 
-    def run():
+    def run(self):
         pass
 
     @abc.abstractmethod
     def to_tuple(self):
+        """
+        Return a tuple of subobjects to be used to test equality and
+        to hash.
+        """
         return None
 
     def __hash__(self):
