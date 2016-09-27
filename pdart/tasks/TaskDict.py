@@ -27,3 +27,13 @@ class TaskDict(dict):
         assert tasks
         for task in tasks:
             self.insert_task(task)
+
+    def isdisjoint(self, other_tasks):
+        """
+        Return True if the set of keys for this dictionary is disjoint
+        from other_tasks.
+        """
+        for task in other_tasks:
+            if task in self:
+                return False
+        return True

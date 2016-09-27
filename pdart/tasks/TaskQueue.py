@@ -1,11 +1,12 @@
 import collections
+from pdart.tasks.TaskDict import *
 
 
 class TaskQueue(object):
     def __init__(self):
         """Create an empty TaskQueue."""
         self.pending_tasks = collections.deque()
-        self.running_tasks = set()
+        self.running_tasks = TaskDict()
         assert not self
 
     def append_pending(self, task):
@@ -72,15 +73,11 @@ class TaskQueue(object):
         assert self.has_pending_tasks()
         t = self.pending_tasks.popleft()
         assert not self.is_pending(t)
-        self.running_tasks.add(t)
+        self.running_tasks.insert_task(t)
         assert self.is_running(t)
         assert self._tasks_are_disjoint()
-        self.launch_task(t)
+        self.running_tasks[t].start()
         return t
-
-    def launch_task(self, task):
-        """Launch the given task."""
-        print ('Launched task %s.' % task)
 
     def task_finished(self, task):
         """
@@ -88,7 +85,7 @@ class TaskQueue(object):
         running set.
         """
         assert self.is_running(task)
-        self.running_tasks.remove(task)
+        del self.running_tasks[task]
         assert self._tasks_are_disjoint()
 
     def _tasks_are_disjoint(self):

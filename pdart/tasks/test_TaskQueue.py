@@ -1,26 +1,15 @@
 from pdart.tasks.TaskQueue import *
 from pdart.tasks.Task import *
-
-
-class DummyTask(Task):
-    def to_tuple(self):
-        return (0,)
-
-    def __str__(self):
-        return 'DummyTask'
+from pdart.tasks.TestTask import TestTask
 
 
 def test_TaskQueue():
     tq = TaskQueue()
-    run_test_TaskQueue(tq)
-
-
-def run_test_TaskQueue(tq):
     assert not tq
     assert not tq.has_pending_tasks()
     assert not tq.has_running_tasks()
 
-    t = DummyTask()
+    t = TestTask()
     tq.append_pending(t)
     assert tq.has_pending_tasks()
     assert not tq.has_running_tasks()
