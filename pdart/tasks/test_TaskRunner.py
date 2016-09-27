@@ -1,5 +1,5 @@
 from pdart.tasks.TaskRunner import *
-from pdart.tasks.TestTask import *
+from pdart.tasks.NullTask import *
 
 
 def test_TaskRunner():

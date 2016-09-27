@@ -1,6 +1,6 @@
 from pdart.tasks.TaskDict import *
 
-from pdart.tasks.TestTask import *
+from pdart.tasks.NullTask import *
 import pdart.tasks.TaskProcess
 
 

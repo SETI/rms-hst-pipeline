@@ -1,6 +1,6 @@
 from pdart.tasks.TaskQueue import *
 from pdart.tasks.Task import *
-from pdart.tasks.TestTask import NullTask
+from pdart.tasks.NullTask import NullTask
 
 
 def test_TaskQueue():
