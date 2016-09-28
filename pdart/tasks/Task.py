@@ -43,3 +43,19 @@ class Task(object):
     @abc.abstractmethod
     def __str__(self):
         pass
+
+    @abc.abstractmethod
+    def on_success(self, task_runnner):
+        pass
+
+    @abc.abstractmethod
+    def on_failure(self, task_runnner):
+        pass
+
+    @abc.abstractmethod
+    def on_termination(self, task_runnner):
+        pass
+
+    @abc.abstractmethod
+    def on_timeout(self, task_runnner):
+        pass

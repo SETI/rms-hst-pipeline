@@ -23,6 +23,18 @@ class NullTask(pdart.tasks.Task.Task):
     def run(self):
         pass
 
+    def on_success(self, task_runnner):
+        pass
+
+    def on_failure(self, task_runnner):
+        pass
+
+    def on_termination(self, task_runnner):
+        pass
+
+    def on_timeout(self, task_runnner):
+        pass
+
 
 class NumberedNullTask(pdart.tasks.Task.Task):
     """
@@ -48,4 +60,16 @@ class NumberedNullTask(pdart.tasks.Task.Task):
         return (self.serial_number,)
 
     def run(self):
+        pass
+
+    def on_success(self, task_runnner):
+        pass
+
+    def on_failure(self, task_runnner):
+        pass
+
+    def on_termination(self, task_runnner):
+        pass
+
+    def on_timeout(self, task_runnner):
         pass
