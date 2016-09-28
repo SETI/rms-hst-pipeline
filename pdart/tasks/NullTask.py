@@ -54,7 +54,7 @@ class NumberedNullTask(pdart.tasks.Task.Task):
         self.serial_number = NumberedNullTask.get_serial_number()
 
     def __str__(self):
-        return 'NullTask'
+        return ('NumberedNullTask(%d)' % self.serial_number)
 
     def to_tuple(self):
         return (self.serial_number,)

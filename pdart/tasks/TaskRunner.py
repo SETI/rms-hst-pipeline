@@ -31,9 +31,6 @@ class TaskRunner(object):
             # self.check_self_timeout()  # TODO
             self.fill_running_to_capacity()
 
-    _RUNNING_SET = ['INITIALIZED', 'RUNNING', 'TERMINATING', 'TIMING_OUT']
-    _COMPLETED_SET = ['SUCCEEDED', 'FAILED', 'TERMINATED', 'TIMED_OUT']
-
     def prune_by_status(self):
         """
         Remove tasks that have completed, running their
@@ -43,8 +40,34 @@ class TaskRunner(object):
         for task, process in self.task_queue.running_tasks.iteritems():
             statuses[task] = process.status()
         for task, status in statuses.iteritems():
-            if status in TaskRunner._COMPLETED_SET:
+            assert status != 'INITIALIZED'
+            if status == 'SUCCEEDED':
                 del self.task_queue.running_tasks[task]
+                task.on_success(self)
+            elif status == 'FAILED':
+                del self.task_queue.running_tasks[task]
+                task.on_failure(self)
+            elif status == 'TERMINATED':
+                del self.task_queue.running_tasks[task]
+                task.on_termination(self)
+            elif status == 'TIMED_OUT':
+                del self.task_queue.running_tasks[task]
+                task.on_timeout(self)
+            else:
+                # Make sure I've caught all the cases.  These all mean
+                # the task is still running.
+                assert status in ['RUNNING', 'TERMINATING', 'TIMING_OUT']
+
+        # Sanity checking: that only running tasks are still in.  Note
+        # that they may have completed in some way since we last
+        # called status, so we use the old status values to test.
+        for task in self.task_queue.running_tasks:
+            # We might have new tasks queued, so check if this is an
+            # old task first.
+            if task in statuses:
+                assert statuses[task] in ['RUNNING',
+                                          'TERMINATING',
+                                          'TIMING_OUT']
 
     def extend_pending(self, tasks):
         self.task_queue.extend_pending(tasks)
