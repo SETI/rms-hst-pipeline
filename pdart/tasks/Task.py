@@ -18,11 +18,7 @@ class Task(object):
         self.deadline_time = deadline_time
 
     @abc.abstractmethod
-    def run(self):
-        """
-        Do the work of the task.  This will only be run in the forked
-        process.
-        """
+    def __str__(self):
         pass
 
     @abc.abstractmethod
@@ -41,21 +37,29 @@ class Task(object):
             self.to_tuple() == other.to_tuple()
 
     @abc.abstractmethod
-    def __str__(self):
+    def run(self):
+        """
+        Do the work of the task.  This will only be run in the forked
+        process.
+        """
         pass
 
     @abc.abstractmethod
     def on_success(self, task_runnner):
+        """Do this in the main process after success of the task."""
         pass
 
     @abc.abstractmethod
     def on_failure(self, task_runnner):
+        """Do this in the main process after failure of the task."""
         pass
 
     @abc.abstractmethod
     def on_termination(self, task_runnner):
+        """Do this in the main process after termination of the task."""
         pass
 
     @abc.abstractmethod
     def on_timeout(self, task_runnner):
+        """Do this in the main process after timeout of the task."""
         pass
