@@ -1,8 +1,14 @@
 from pdart.tasks.RawProcess import *
+from pdart.tasks.NullTask import NullTask
+from pdart.tasks.TaskProcess import TaskProcess
 
 import os
 import signal
 import time
+
+
+# TODO Some of these tasks hang when they fail.  Set up an automatic
+# clean-up for them so we don't hang the whole test suite.
 
 
 def _a_minute_from_now():
@@ -57,6 +63,22 @@ def test_TimeoutProcess_returning():
     run_test_Process_returning(proc)
 
 
+class PassTask(NullTask):
+    def __init__(self):
+        NullTask.__init__(self)
+
+    def __str__(self):
+        return 'PassTask'
+
+    def run(self):
+        _pass()
+
+
+def test_TaskProcess_returning():
+    proc = TaskProcess(PassTask())
+    run_test_Process_returning(proc)
+
+
 def _sleep(secs):
     time.sleep(secs)
 
@@ -82,6 +104,22 @@ def test_TerminatableProcess_terminate():
 
 def test_TimeoutProcess_terminate():
     proc = TimeoutProcess(_a_minute_from_now(), _sleep, (60,))
+    run_test_Process_terminate(proc)
+
+
+class SleepTask(NullTask):
+    def __init__(self):
+        NullTask.__init__(self)
+
+    def __str__(self):
+        return 'SleepTask'
+
+    def run(self):
+        _sleep()
+
+
+def test_TaskProcess_terminate():
+    proc = TaskProcess(SleepTask())
     run_test_Process_terminate(proc)
 
 
@@ -135,12 +173,30 @@ def test_TimeoutProcess_terminating():
     run_test_Process_terminating(proc)
 
 
-def test_timing_out():
-    # times out in half a second
+class NapTask(NullTask):
+    def __init__(self):
+        NullTask.__init__(self)
+
+    def __str__(self):
+        return 'NapTask'
+
+    def run(self):
+        _nap()
+
+
+def test_TaskProcess_terminating():
+    # The signal handler needs to be set *before* we fork the
+    # process
     original_handler = signal.signal(signal.SIGTERM, signal.SIG_IGN)
-    proc = TimeoutProcess(time.time() + 0.5, _nap, tuple())
+    proc = TaskProcess(NapTask())
     proc.start()
     signal.signal(signal.SIGTERM, original_handler)
+
+    run_test_Process_terminating(proc)
+
+
+def run_test_timing_out(proc):
+    # proc times out in half a second
 
     # a full second later
     time.sleep(1)
@@ -155,3 +211,25 @@ def test_timing_out():
     proc.join(_JOIN_SECS)
     # Now it's dead
     assert proc.status() == 'TIMED_OUT'
+
+
+def test_TimeoutProcess_timing_out():
+    # times out in half a second
+    original_handler = signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    proc = TimeoutProcess(time.time() + 0.5, _nap, tuple())
+    proc.start()
+    signal.signal(signal.SIGTERM, original_handler)
+
+    run_test_timing_out(proc)
+
+
+def test_TaskProcess_timing_out():
+    # times out in half a second
+    original_handler = signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    task = NapTask()
+    task.deadline_time = time.time() + 0.5
+    proc = TaskProcess(task)
+    proc.start()
+    signal.signal(signal.SIGTERM, original_handler)
+
+    run_test_timing_out(proc)
