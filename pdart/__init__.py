@@ -7,6 +7,7 @@ labels for it.
 Label creation happens in the :mod:`pdart.pds4label` package.  Our
 SQLite database tables are defined in the :mod:`pdart.db` package.
 You can learn about *rules* and how to write them in the
-:mod:`pdart.rules` package.
+:mod:`pdart.rules` package.  :mod:`pdart.tasks` holds the code for the
+pipeline to run tasks concurrently in separate processes.
 
 """

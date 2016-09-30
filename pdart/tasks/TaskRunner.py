@@ -1,3 +1,8 @@
+"""
+An object to queue the tasks to run and keep a given number of them
+running simultaneously, launching new tasks when the old ones
+complete.
+"""
 from pdart.tasks.TaskQueue import *
 
 import time
@@ -24,6 +29,15 @@ class TaskRunner(object):
         self.SLEEP_TIME = TaskRunner._DEFAULT_SLEEP_TIME
 
     def run_loop(self):
+        """
+        Launch up to
+        :attr:`~pdart.tasks.TaskRunner.TaskRunner.capacity` tasks in
+        external system processes then sleep, waking up every
+        :attr:`~pdart.tasks.TaskRunner.TaskRunner.SLEEP_TIME` seconds
+        to check on them.  Remove completed tasks, calling their
+        post-completion hook methods, launching new tasks if
+        available.  Quit when the queue is empty.
+        """
         self.fill_running_to_capacity()
         while self.task_queue:
             time.sleep(self.SLEEP_TIME)
@@ -33,8 +47,9 @@ class TaskRunner(object):
 
     def prune_by_status(self):
         """
-        Remove tasks that have completed, running their
-        post-completion methods (TODO).
+        Remove tasks that have completed from
+        :attr:`~pdart.tasks.TaskRunner.TaskRunner.running_tasks`,
+        running their post-completion methods.
         """
         statuses = {}
         for task, process in self.task_queue.running_tasks.iteritems():
@@ -70,16 +85,30 @@ class TaskRunner(object):
                                           'TIMING_OUT']
 
     def extend_pending(self, tasks):
+        """
+        Add the given tasks to the pending list, then launch some if
+        not running at full capacity.
+        """
         self.task_queue.extend_pending(tasks)
         self.fill_running_to_capacity()
 
     def fill_running_to_capacity(self):
+        """
+        Launch more pending tasks if not already running at full
+        capacity.
+        """
         tq = self.task_queue
         while tq.has_pending_tasks() and len(tq.running_tasks) < self.capacity:
             tq.run_next_task()
         assert self._at_capacity()
 
     def _at_capacity(self):
+        """
+        Return ``True`` iff the task queue is at maximum capacity:
+        i.e., either the number of running tasks equals
+        :attr:`~pdart.tasks.TaskRunner.TaskRunner.capacity` or there
+        are no more pending tasks to launch.
+        """
         N = len(self.task_queue.running_tasks)
         if N < self.capacity:
             return not self.task_queue.pending_tasks

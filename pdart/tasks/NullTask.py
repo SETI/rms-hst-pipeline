@@ -1,3 +1,6 @@
+"""
+:class:`~pdart.tasks.Task.Task` subclasses used for testing.
+"""
 import pdart.tasks.Task
 import time
 
@@ -8,8 +11,8 @@ def _a_minute_from_now():
 
 class NullTask(pdart.tasks.Task.Task):
     """
-    A sample Task for testing.  Does nothing.  All instances are
-    equal.
+    A sample :class:`~pdart.tasks.Task.Task` for testing which times
+    out in a minute and does nothing.  All instances are equal.
     """
     def __init__(self):
         pdart.tasks.Task.Task.__init__(self, _a_minute_from_now())
@@ -38,13 +41,15 @@ class NullTask(pdart.tasks.Task.Task):
 
 class NumberedNullTask(pdart.tasks.Task.Task):
     """
-    A sample Task for testing.  Does nothing.  No two instances are
-    equal.
+    A sample :class:`~pdart.tasks.Task.Task` for testing, which times
+    out after a minute and does nothing.  Each instance is tagged with
+    a unique serial number so no two instances are equal.
     """
     last_serial_number = 0
 
     @classmethod
     def get_serial_number(cls):
+        """Return a new serial number."""
         res = cls.last_serial_number
         cls.last_serial_number = res + 1
         return res

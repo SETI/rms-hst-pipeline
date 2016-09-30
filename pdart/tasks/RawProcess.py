@@ -1,10 +1,22 @@
+"""
+Contains a chain of classes representing external system processes in
+which :class:`~pdart.tasks.Task.Task` s are run.  We start with
+Python's :class:`multiprocessing.Process`, wrap it, then incrementally
+add functionality.
+
+We could have written code directly using
+:class:`multiprocessing.Process`, but be incrementally wrapping and
+adding functionality, we can test each layer of functionality
+separately.
+"""
 import multiprocessing
 import time
 
 
 def exit_code_to_status(exit_code):
     """
-    Convert the multiprocessing.Process.exitcode into a status string.
+    Convert the exit code in :attr:`multiprocessing.Process.exitcode`
+    into a status string.
     """
     if exit_code is None:
         return 'RUNNING'
@@ -18,40 +30,64 @@ def exit_code_to_status(exit_code):
 
 class RawProcess(object):
     """
-    A wrapper around a Python multiprocessing.Process with a bit more
-    instrumentation.
+    A wrapper around a Python :class:`multiprocessing.Process` with a
+    bit more instrumentation.
     """
     def __init__(self, target, args):
         assert target
         assert args is not None
         self.process = multiprocessing.Process(target=target, args=args)
 
-    def was_started(self):
-        return self.process.pid is not None
-
     def start(self):
+        """
+        Launch the :class:`multiprocessing.Process` in another system
+        process.
+        """
         assert not self.was_started()
         self.process.start()
 
+    def was_started(self):
+        """
+        Return ``True`` iff
+        :meth:`~pdart.tasks.RawProcess.RawProcess.start` was called.
+        """
+        return self.process.pid is not None
+
     def is_alive(self):
+        """
+        Return ``True`` iff the process was started and has not yet
+        completed.
+        """
         return self.process.is_alive()
 
     def status(self):
+        """
+        Return one of ``INITIALIZED``, ``RUNNING``, ``SUCCEEDED``,
+        ``FAILED``, or ``TERMINATED``.
+        """
         if self.process.pid is None:
             return 'INITIALIZED'
         return exit_code_to_status(self.process.exitcode)
 
     def join(self, timeout=None):
+        """
+        Wait for the given amount of time for the process to complete.
+        If the argument is ``None``, wait indefinitely.
+        """
         assert self.was_started()
         self.process.join(timeout)
 
     def terminate(self):
+        """
+        Try to terminate the process by sending a ``SIGTERM`` signal.
+        """
         self.process.terminate()
 
 
 class TerminatableProcess(RawProcess):
     """
-    A RawProcess plus tracking whether it's been terminated or not.
+    A :class:`~pdart.tasks.RawProcess.RawProcess` plus tracking
+    whether the process been terminated or not.
     """
     def __init__(self, target, args):
         RawProcess.__init__(self, target, args)
@@ -63,6 +99,11 @@ class TerminatableProcess(RawProcess):
             RawProcess.terminate(self)
 
     def status(self):
+        """
+        Like :class:`~pdart.tasks.RawProcess.RawProcess`, but will
+        return ``TERMINATING`` if ``terminate()`` has been called but
+        the process has not yet completed.
+        """
         status = RawProcess.status(self)
         if self.terminating:
             if status == 'RUNNING':
@@ -72,8 +113,8 @@ class TerminatableProcess(RawProcess):
 
 class TimeoutProcess(TerminatableProcess):
     """
-    A TerminatableProcess plus a time limit and tracking on whether
-    it's timed out or not.
+    A :class:`~pdart.tasks.RawProcess.TerminatableProcess` plus a time
+    limit and tracking on whether it's timed out or not.
     """
     def __init__(self, deadline_time, target, args):
         TerminatableProcess.__init__(self, target, args)
@@ -82,6 +123,12 @@ class TimeoutProcess(TerminatableProcess):
         self.deadline_time = deadline_time
 
     def status(self):
+        """
+        Like :class:`~pdart.tasks.RawProcess.TerminatableProcess`, but
+        checks whether the process has exceeded its timeout.  If so it
+        will return ``TIMING_OUT`` and ``TIMED_OUT`` instead of
+        ``TERMINATING`` and ``TERMINATED``.
+        """
         status = TerminatableProcess.status(self)
         if self.timing_out:
             if status == 'TERMINATING':
@@ -95,5 +142,8 @@ class TimeoutProcess(TerminatableProcess):
         return status
 
     def timeout(self):
+        """
+        Mark the process as timed out and terminate it.
+        """
         self.timing_out = True
         self.terminate()
