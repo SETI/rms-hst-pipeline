@@ -21,12 +21,12 @@ attribute of each hole is used as a key into the dictionary to find
 the hole's contents.  The builder function's result is the desired XML
 document.
 
-Holes may be filled with (possibly Unicode) strings which are
-automatically converted to XML text nodes, or with builder functions
-that take an XML document and return either a single XML element (for
-a node hole) or any number of XML elements (for a fragment hole).
-There is some, but minimal typechecking in the building process, so
-the programmer needs to be careful.
+Holes may be filled with ints, floats, or (possibly Unicode) strings
+which are automatically converted to XML text nodes, or with builder
+functions that take an XML document and return either a single XML
+element (for a node hole) or any number of XML elements (for a
+fragment hole).  There is some, but minimal typechecking in the
+building process, so the programmer needs to be careful.
 
 :func:`interpret_template` takes a fragment template and returns a
 function returning a function that must be evaluated in two steps.
@@ -111,9 +111,14 @@ def interpret_document_template(template):
                         elmt = doc.createTextNode(param)
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
+                    elif type(param) in [int, float]:
+                        elmt = doc.createTextNode(str(param))
+                        assert isinstance(elmt, xml.dom.Node)
+                        stack.append(elmt)
                     else:
-                        assert is_function(param), ('%s is type %s' %
-                                                    (param_name, type(param)))
+                        assert is_function(param), \
+                            ('%s is type %s; should be function' %
+                             (param_name, type(param)))
                         elmt = param(doc)
                         if isinstance(elmt, list):
                             for e in elmt:
@@ -124,8 +129,9 @@ def interpret_document_template(template):
                 elif name == 'FRAGMENT':
                     param_name = attrs['name']
                     param = dictionary[param_name]
-                    assert is_function(param), ('%s is type %s' %
-                                                (param_name, type(param)))
+                    assert is_function(param), \
+                        ('%s is type %s; should be function' %
+                         (param_name, type(param)))
                     elmts = param(doc)
                     assert isinstance(elmts, list)
                     for elmt in elmts:
@@ -192,18 +198,21 @@ def interpret_template(template):
                         param = dictionary[param_name]
                         if type(param) in [str, unicode]:
                             elmt = doc.createTextNode(param)
+                        elif type(param) in [int, float]:
+                            elmt = doc.createTextNode(str(param))
                         else:
-                            assert is_function(param), ('%s is type %s' %
-                                                        (param_name,
-                                                         type(param)))
+                            assert is_function(param), \
+                                ('%s is type %s; should be function' %
+                                 (param_name, type(param)))
                             elmt = param(doc)
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
                     elif name == 'FRAGMENT':
                         param_name = attrs['name']
                         param = dictionary[param_name]
-                        assert is_function(param), ('%s is type %s' %
-                                                    (param_name, type(param)))
+                        assert is_function(param), \
+                            ('%s is type %s; should be function' %
+                             (param_name, type(param)))
                         elmts = param(doc)
                         assert isinstance(elmts, list)
                         for elmt in elmts:
