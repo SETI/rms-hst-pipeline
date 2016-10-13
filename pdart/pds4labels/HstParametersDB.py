@@ -33,7 +33,7 @@ def _get_db_aperture_type(headers, instrument, product_id):
         return headers[0]['APERTURE']
 
 
-def _get_db_aperture_type_placeholder(headers, product_id):
+def _get_db_aperture_type_placeholder(headers, instrument, product_id):
     return placeholder(product_id, 'aperture_type')
 
 
