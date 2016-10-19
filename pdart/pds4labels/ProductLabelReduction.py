@@ -15,6 +15,7 @@ from pdart.pds4labels.TimeCoordinatesReduction import *
 from pdart.reductions.BadFitsFileReduction import *
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.Reduction import *
+from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
 
@@ -80,6 +81,7 @@ class ProductLabelReduction(BadFitsFileReduction):
                 'HST': hst((lid.product_id, instrument)),
                 'file_contents': file_contents
                 }).toxml()
+        label = pretty_print(label)
 
         label_fp = Product(archive, lid).label_filepath()
         with open(label_fp, 'w') as f:

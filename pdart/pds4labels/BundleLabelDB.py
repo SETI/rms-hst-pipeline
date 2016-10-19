@@ -4,6 +4,7 @@ import sys
 
 from pdart.pds4labels.BundleLabelXml import *
 from pdart.pds4labels.DatabaseCaches import *
+from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
 
@@ -32,6 +33,8 @@ def make_db_bundle_label(conn, lid, verify):
             'Bundle_Member_Entries': combine_nodes_into_fragment(
                 reduced_collections)
             }).toxml()
+    label = pretty_print(label)
+
     with open(label_fp, 'w') as f:
         f.write(label)
 

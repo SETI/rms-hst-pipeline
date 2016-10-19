@@ -8,6 +8,7 @@ import sys
 from pdart.pds4.Collection import *
 from pdart.pds4labels.CollectionLabelXml import *
 from pdart.reductions.Reduction import *
+from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
 
@@ -33,6 +34,8 @@ class CollectionLabelReduction(Reduction):
                 'inventory_name': interpret_text(inventory_name)
                 }
         label = make_label(dict).toxml()
+        label = pretty_print(label)
+
         label_fp = Collection(archive, lid).label_filepath()
 
         inventory_filepath = collection.inventory_filepath()

@@ -7,6 +7,7 @@ import sys
 
 from pdart.pds4labels.CollectionLabelXml import *
 from pdart.pds4labels.DatabaseCaches import *
+from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
 
@@ -46,6 +47,7 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
             'Citation_Information': placeholder_citation_information,
             'inventory_name': inventory_name
     }).toxml()
+    label = pretty_print(label)
 
     with open(label_fp, 'w') as f:
         f.write(label)

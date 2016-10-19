@@ -9,6 +9,7 @@ from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
 from pdart.pds4labels.BrowseProductLabelXml import *
 from pdart.reductions.CompositeReduction import *
+from pdart.xml.Pretty import *
 
 
 def _is_raw_data_collection(collection):

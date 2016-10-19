@@ -10,6 +10,7 @@ from pdart.pds4labels.ObservingSystem import *
 from pdart.pds4labels.TargetIdentificationDB import *
 from pdart.pds4labels.TimeCoordinatesDB import *
 from pdart.pds4labels.ProductLabelXml import *
+from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
 
@@ -52,6 +53,8 @@ def make_db_product_label(conn, lid, verify):
             'Target_Identification': get_db_target(headers),
             'HST': get_db_hst_parameters(headers, instrument, product_id)
             }).toxml()
+    label = pretty_print(label)
+
     with open(label_fp, 'w') as f:
         f.write(label)
 

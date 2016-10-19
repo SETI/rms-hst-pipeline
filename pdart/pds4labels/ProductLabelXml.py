@@ -50,8 +50,8 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     </File>
     <FRAGMENT name="file_contents" />
   </File_Area_Observational>
-</Product_Observational>""" % \
-        (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
+</Product_Observational>""" %
+    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
 """
 An interpreted document template to create a product label.
 

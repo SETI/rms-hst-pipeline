@@ -7,6 +7,7 @@ from contextlib import closing
 from pdart.pds4.LID import *
 from pdart.pds4.Product import *
 from pdart.pds4labels.BrowseProductLabelXml import *
+from pdart.xml.Pretty import *
 
 
 def make_db_browse_product_labels(conn, archive):

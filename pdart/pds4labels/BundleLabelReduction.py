@@ -8,6 +8,7 @@ from pdart.pds4.Bundle import *
 from pdart.pds4labels.BundleLabelDB import *
 from pdart.pds4labels.BundleLabelXml import *
 from pdart.reductions.Reduction import *
+from pdart.xml.Pretty import *
 
 
 class BundleLabelReduction(Reduction):
@@ -29,6 +30,8 @@ class BundleLabelReduction(Reduction):
                     combine_nodes_into_fragment(reduced_collections)
                 }
         label = make_label(dict).toxml()
+        label = pretty_print(label)
+
         label_fp = Bundle(archive, lid).label_filepath()
         with open(label_fp, 'w') as f:
             f.write(label)
