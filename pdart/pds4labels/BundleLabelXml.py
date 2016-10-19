@@ -1,9 +1,10 @@
 """Templates to create a label for a bundle."""
+from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.sch"
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Bundle xmlns="http://pds.nasa.gov/pds4/pds/v1"
                 xmlns:pds="http://pds.nasa.gov/pds4/pds/v1">
@@ -12,7 +13,7 @@ make_label = interpret_document_template(
     <version_id>0.1</version_id>
     <title>This bundle contains images obtained from HST Observing Program
 <NODE name="proposal_id"/>.</title>
-    <information_model_version>1.6.0.0</information_model_version>
+    <information_model_version>%s</information_model_version>
     <product_class>Product_Bundle</product_class>
     <NODE name="Citation_Information" />
   </Identification_Area>
@@ -20,7 +21,7 @@ make_label = interpret_document_template(
     <bundle_type>Archive</bundle_type>
   </Bundle>
   <FRAGMENT name="Bundle_Member_Entries"/>
-</Product_Bundle>""")
+</Product_Bundle>""" % (PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
 """
 An interpreted document template to create a bundle label.
 

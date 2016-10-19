@@ -14,7 +14,7 @@ import picmaker
 
 def _make_browse_coll_fp(raw_coll_fp):
     """
-    Given the filepath to the RAW collection, return the filepath to
+u    Given the filepath to the RAW collection, return the filepath to
     its browse collection.
     """
     # TODO Sloppy implementation: assumes only one 'data'
@@ -34,6 +34,10 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
     target_dir = os.path.join(browse_coll_fp, ('visit_%s' % visit))
 
     ensure_directory(target_dir)
+
+    # TODO: WFPC2 gives four images, not one, so we'll have to do
+    # something different here.  This probably just builds the first
+    # image.
     picmaker.ImagesToPics([raw_full_filepath],
                           target_dir,
                           filter="None",

@@ -10,11 +10,12 @@ import subprocess
 import tempfile
 import xml.dom.minidom
 
+from pdart.xml.Pds4Version import *
 
-PDS_XML_SCHEMA = './xml/PDS4_PDS_1600.xsd.xml'
-PDS_SCHEMATRON_SCHEMA = './xml/PDS4_PDS_1600.sch.xml'
-HST_XML_SCHEMA = './xml/PDS4_HST_1600_0200.xsd.xml'
-HST_SCHEMATRON_SCHEMA = './xml/PDS4_HST_1600_0200.sch.xml'
+PDS_XML_SCHEMA = './xml/PDS4_PDS_%s.xsd.xml' % PDS4_SHORT_VERSION
+PDS_SCHEMATRON_SCHEMA = './xml/PDS4_PDS_%s.sch.xml' % PDS4_SHORT_VERSION
+HST_XML_SCHEMA = './xml/PDS4_HST_%s_0200.xsd.xml' % PDS4_SHORT_VERSION
+HST_SCHEMATRON_SCHEMA = './xml/PDS4_HST_%s_0200.sch.xml' % PDS4_SHORT_VERSION
 
 
 def run_subprocess(cmd, stdin=None):

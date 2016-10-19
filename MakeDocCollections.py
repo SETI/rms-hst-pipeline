@@ -20,6 +20,11 @@ def _get_pro_url(proposal_id):
     return 'https://www.stsci.edu/hst/phase2-public/%d.pro' % proposal_id
 
 
+def _get_prop_url(proposal_id):
+    """Return the URL to get the PROP file for the given proposal id."""
+    return 'https://www.stsci.edu/hst/phase2-public/%d.prop' % proposal_id
+
+
 def _retrieve_doc(url):
     """Retrives the text at that URL or raises an exception."""
     resp = urllib2.urlopen(url)
@@ -57,11 +62,25 @@ def _retrieve_pro(proposal_id, docs_dir):
     Retrieve the PRO file for the given proposal id and write it
     into the document directory.
     """
-    pro_xml = _retrieve_doc(_get_pro_url(proposal_id))
+    pro_txt = _retrieve_doc(_get_pro_url(proposal_id))
     pro_fp = os.path.join(docs_dir, 'phase2.txt')
     with open(pro_fp, 'w') as f:
-        f.write(pro_xml)
+        f.write(pro_txt)
     print '# Wrote', pro_fp
+
+
+def _retrieve_prop(proposal_id, docs_dir):
+    """
+    Retrieve the PROP file for the given proposal id and write it into
+    the document directory.
+    """
+    prop_txt = _retrieve_doc(_get_prop_url(proposal_id))
+    if not os.path.isdir(docs_dir):
+        os.mkdir(docs_dir)
+    prop_fp = os.path.join(docs_dir, 'phase2.txt')
+    with open(prop_fp, 'w') as f:
+        f.write(prop_txt)
+    print '# Wrote', prop_fp
 
 
 if __name__ == '__main__':
@@ -71,12 +90,19 @@ if __name__ == '__main__':
 
         proposal_id = b.proposal_id()
         docs_dir = os.path.join(b.absolute_filepath(), 'document')
+
+        # TODO You're trying alternatives here.  Rewrite to use tasks.
+
         try:
             _retrieve_apt(proposal_id, docs_dir)
             _retrieve_pro(proposal_id, docs_dir)
             # TODO Create the phase2.pdf file
         except urllib2.HTTPError as e:
             print e
+            try:
+                _retrieve_prop(proposal_id, docs_dir)
+            except urllib2.HTTPError as e2:
+                print e2
 
         # TODO Create the collection_document.tab.
 

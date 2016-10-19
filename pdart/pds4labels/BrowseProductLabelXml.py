@@ -1,22 +1,23 @@
 """A document template to create a label for a RAW browse product."""
+from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.sch"
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Browse
    xmlns="http://pds.nasa.gov/pds4/pds/v1"
    xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.xsd">
+   xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd">
   <Identification_Area>
     <logical_identifier><NODE name="browse_lid" /></logical_identifier>
     <version_id>0.1</version_id>
     <title>This product contains a browse image of a <NODE name="suffix" /> \
 image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
-    <information_model_version>1.6.0.0</information_model_version>
+    <information_model_version>%s</information_model_version>
     <product_class>Product_Browse</product_class>
     <Modification_History>
       <Modification_Detail>
@@ -42,7 +43,8 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
       <encoding_standard_id>JPEG</encoding_standard_id>
     </Encoded_Image>
   </File_Area_Browse>
-</Product_Browse>""")
+</Product_Browse>""" % \
+        (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
 """
 An interpreted document template to create a label for a RAW browse product.
 

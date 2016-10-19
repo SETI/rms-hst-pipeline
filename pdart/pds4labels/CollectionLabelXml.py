@@ -1,10 +1,11 @@
 """Templates to create a label for a collection."""
+from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1500.sch"
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1"
                     xmlns:pds="http://pds.nasa.gov/pds4/pds/v1">
@@ -14,7 +15,7 @@ make_label = interpret_document_template(
     <title>This collection contains the <NODE name="suffix"/> \
 images obtained from HST Observing Program \
 <NODE name="proposal_id"/>.</title>
-    <information_model_version>1.6.0.0</information_model_version>
+    <information_model_version>%s</information_model_version>
     <product_class>Product_Collection</product_class>
 
     <NODE name="Citation_Information" />
@@ -51,7 +52,7 @@ images obtained from HST Observing Program \
       <reference_type>inventory_has_member_product</reference_type>
     </Inventory>
   </File_Area_Inventory>
-</Product_Collection>""")
+</Product_Collection>""" % (PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
 """
 An interpreted document template to create a collection label.
 
