@@ -15,6 +15,11 @@ def _get_apt_url(proposal_id):
     return 'https://www.stsci.edu/hst/phase2-public/%d.apt' % proposal_id
 
 
+def _get_pdf_url(proposal_id):
+    """Return the URL to get the PDF file for the given proposal id."""
+    return 'https://www.stsci.edu/hst/phase2-public/%d.pdf' % proposal_id
+
+
 def _get_pro_url(proposal_id):
     """Return the URL to get the PRO file for the given proposal id."""
     return 'https://www.stsci.edu/hst/phase2-public/%d.pro' % proposal_id
@@ -57,6 +62,18 @@ def _retrieve_apt(proposal_id, docs_dir):
     print '# Wrote', abstract_fp
 
 
+def _retrieve_pdf(proposal_id, docs_dir):
+    """
+    Retrieve the PDF file for the given proposal id and write it
+    into the document directory.
+    """
+    pdf_txt = _retrieve_doc(_get_pdf_url(proposal_id))
+    pdf_fp = os.path.join(docs_dir, 'phase2.txt')
+    with open(pdf_fp, 'w') as f:
+        f.write(pdf_txt)
+    print '# Wrote', pdf_fp
+
+
 def _retrieve_pro(proposal_id, docs_dir):
     """
     Retrieve the PRO file for the given proposal id and write it
@@ -95,6 +112,7 @@ if __name__ == '__main__':
 
         try:
             _retrieve_apt(proposal_id, docs_dir)
+            _retrieve_pdf(proposal_id, docs_dir)
             _retrieve_pro(proposal_id, docs_dir)
             # TODO Create the phase2.pdf file
         except urllib2.HTTPError as e:

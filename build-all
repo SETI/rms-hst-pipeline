@@ -1,0 +1,12 @@
+#! /bin/bash
+date
+rm -rf _build
+./DeleteLabels
+python DeleteDB.py
+python DeleteDocs.py
+python DeleteBrowse.py
+./build-api-docs
+python Dev.py
+python MakeDocCollections.py
+python MakeRawBrowse.py
+date
