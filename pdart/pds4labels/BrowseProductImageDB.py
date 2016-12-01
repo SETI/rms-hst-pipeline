@@ -7,6 +7,7 @@ import os.path
 
 from pdart.pds4.LID import *
 from pdart.pds4labels.BrowseProductImageReduction import ensure_directory
+from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 import pdart.add_pds_tools
 import picmaker
@@ -53,10 +54,11 @@ def make_db_browse_product_images(conn, archive):
     # TODO Polish (with SQL joins?).  First, an inefficient
     # implementation.
     with closing(conn.cursor()) as cursor:
-        colls = list(cursor.execute(
-                """SELECT collection, full_filepath, bundle, suffix
-                   FROM collections
-                   WHERE prefix='data' AND suffix='raw'"""))
+        colls = [ccbs for suff in RAW_SUFFIXES
+                 for ccbs in list(cursor.execute(
+                    """SELECT collection, full_filepath, bundle, suffix
+                       FROM collections
+                       WHERE prefix='data' AND suffix=?""", (suff,)))]
 
         for (c, c_fp, b, suffix) in colls:
             cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',

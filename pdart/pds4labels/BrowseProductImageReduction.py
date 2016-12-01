@@ -1,5 +1,5 @@
 """
-Functionality to build a RAW browse product image using a
+Functionality to build a raw browse product image using a
 :class:`~pdart.reductions.Reduction.Reduction`.
 """
 import os
@@ -9,7 +9,7 @@ from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
 from pdart.pds4.HstFilename import *
 from pdart.reductions.Reduction import *
-
+from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 import pdart.add_pds_tools
 import picmaker
 
@@ -36,10 +36,11 @@ def _browse_collection_directory(collection):
 
 def is_raw_data_collection(collection):
     """
-    Return True iff the :class:`~pdart.pds4.Collection` is a RAW data
+    Return True iff the :class:`~pdart.pds4.Collection` is a raw data
     collection.
     """
-    return collection.prefix() == 'data' and collection.suffix() == 'raw'
+    return collection.prefix() == 'data' \
+        and collection.suffix() in RAW_SUFFIXES
 
 
 class BrowseProductImageReduction(Reduction):

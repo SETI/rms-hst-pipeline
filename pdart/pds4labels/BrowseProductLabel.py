@@ -1,5 +1,5 @@
 """
-Functionality to build a RAW browse product label.  Imports two
+Functionality to build a raw browse product label.  Imports two
 implementations: the original
 :class:`~pdart.reductions.Reduction.Reduction` implementation and the
 new SQLite implementation.  (The former is probably obsolete.)

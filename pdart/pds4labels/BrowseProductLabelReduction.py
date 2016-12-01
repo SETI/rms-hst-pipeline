@@ -8,12 +8,14 @@ from pdart.pds4.LID import *
 from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
 from pdart.pds4labels.BrowseProductLabelXml import *
+from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.reductions.CompositeReduction import *
 from pdart.xml.Pretty import *
 
 
 def _is_raw_data_collection(collection):
-    return collection.prefix() == 'data' and collection.suffix() == 'raw'
+    return collection.prefix() == 'data' \
+        and collection.suffix() in RAW_SUFFIXES
 
 
 class BrowseProductLabelReduction(Reduction):

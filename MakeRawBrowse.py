@@ -1,8 +1,8 @@
 """
 **SCRIPT:** Run through the archive and generate a browse collection
-for each RAW collection, writing them to disk including the collection
-inventory and verified label.  If it fails at any point, print the
-combined exception as XML to stdout.
+for each raw (RAW, FLT, C0F, C0M) collection, writing them to disk
+including the collection inventory and verified label.  If it fails at
+any point, print the combined exception as XML to stdout.
 """
 from contextlib import closing
 import os.path
@@ -12,6 +12,7 @@ from pdart.db.CreateDatabase import *
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BrowseProductImage import *
 from pdart.pds4labels.BrowseProductLabel import *
+from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.InstrumentationReductions import *
 from pdart.rules.Combinators import *
@@ -36,6 +37,14 @@ def _get_conn():
                                         'archive.spike.db'))
 
 
+def _check_raw_browse(archive):
+    for b in archive.bundles():
+        collections = list(b.collections())
+        for c in collections:
+            if c.prefix == 'data' and c.suffix() in RAW_SUFFIXES:
+                assert c.browse_collection() in collections
+
+
 if __name__ == '__main__':
     USE_DATABASE = True
     CREATE_DATABASE = False
@@ -52,3 +61,5 @@ if __name__ == '__main__':
         reduction = CompositeReduction([LogCollectionsReduction(),
                                         _MakeRawBrowseReduction()])
         raise_verbosely(lambda: run_reduction(reduction, archive))
+
+    _check_raw_browse(archive)

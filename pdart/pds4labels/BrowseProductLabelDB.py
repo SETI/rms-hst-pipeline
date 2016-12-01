@@ -1,5 +1,5 @@
 """
-Functionality to build a RAW browse product label using a SQLite
+Functionality to build a raw browse product label using a SQLite
 database.
 """
 from contextlib import closing
@@ -7,6 +7,7 @@ from contextlib import closing
 from pdart.pds4.LID import *
 from pdart.pds4.Product import *
 from pdart.pds4labels.BrowseProductLabelXml import *
+from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.xml.Pretty import *
 
 
@@ -19,15 +20,16 @@ def make_db_browse_product_labels(conn, archive):
     # TODO Polish (with SQL joins?).  First, an inefficient
     # implementation.
     with closing(conn.cursor()) as cursor:
-        colls = list(cursor.execute(
-                """SELECT collection, bundle, suffix FROM collections
-                   WHERE prefix='data' AND suffix='raw'"""))
+        colls = [cbs for suff in RAW_SUFFIXES
+                 for cbs in list(cursor.execute(
+                    """SELECT collection, bundle, suffix FROM collections
+                       WHERE prefix='data' AND suffix=?""", (suff,)))]
 
         for (c, b, suffix) in colls:
             cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',
                            (b,))
             (proposal_id,) = cursor.fetchone()
-            print '>>>>', c
+            # print '>>>>', c
             prods = [p for (p,)
                      in cursor.execute(
                     """SELECT product FROM products WHERE collection=?
