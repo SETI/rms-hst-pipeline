@@ -3,6 +3,8 @@
 browse products or their labels).  Possibly validate them.  If it
 fails at any point, print the combined exception as XML to stdout.
 """
+import os.path
+import pyfits
 import sys
 
 from pdart.pds4.Archives import *
@@ -42,6 +44,33 @@ class _MakeLabelsReduction(CompositeReduction):
                                      _ProductLabelReductionWithMessage(verify)
                                      ])
 
+
+def _has_bad_fits_file(product):
+    fp = product.absolute_filepath()
+    try:
+        fits = pyfits.open(fp)
+        try:
+            return False
+        finally:
+            fits.close()
+    except IOError:
+        return True
+
+
+def _check_labels(archive):
+    for bundle in archive.bundles():
+        fp = bundle.label_filepath()
+        assert os.path.isfile(fp), fp
+        for collection in bundle.collections():
+            fp = collection.label_filepath()
+            assert os.path.isfile(fp), fp
+            fp = collection.inventory_filepath()
+            assert os.path.isfile(fp), fp
+            for product in collection.products():
+                fp = product.label_filepath()
+                assert os.path.isfile(fp) or _has_bad_fits_file(product), fp
+
+
 if __name__ == '__main__':
     VERIFY = True
 
@@ -49,3 +78,5 @@ if __name__ == '__main__':
     reduction = CompositeReduction([LogProductsReduction(),
                                     _MakeLabelsReduction(VERIFY)])
     raise_verbosely(lambda: run_reduction(reduction, archive))
+
+    _check_labels(archive)

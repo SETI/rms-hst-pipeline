@@ -8,6 +8,7 @@ import os.path
 import sqlite3
 
 from pdart.db.CreateDatabase import create_database
+from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
@@ -72,7 +73,7 @@ def get_conn():
         return sqlite3.connect(':memory:')
     else:
         return sqlite3.connect(os.path.join(get_any_archive_dir(),
-                                            'archive.spike.db'))
+                                            DATABASE_NAME))
 
 
 def dev():

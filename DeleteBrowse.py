@@ -26,7 +26,14 @@ class DeleteRawBrowseReduction(Reduction):
             collection = Collection(archive, lid)
             shutil.rmtree(collection.absolute_filepath())
 
+
+def _check_deletion(archive):
+    for collection in archive.collections():
+        assert collection.prefix() is not "browse"
+
+
 if __name__ == '__main__':
     archive = get_any_archive()
     reduction = DeleteRawBrowseReduction()
     raise_verbosely(lambda: run_reduction(reduction, archive))
+    _check_deletion(archive)

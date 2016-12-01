@@ -9,6 +9,7 @@ import os.path
 import sqlite3
 
 from pdart.db.CreateDatabase import *
+from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BrowseProductImage import *
 from pdart.pds4labels.BrowseProductLabel import *
@@ -34,7 +35,7 @@ class _MakeRawBrowseReduction(CompositeReduction):
 
 def _get_conn():
     return sqlite3.connect(os.path.join(get_any_archive_dir(),
-                                        'archive.spike.db'))
+                                        DATABASE_NAME))
 
 
 def _check_raw_browse(archive):
