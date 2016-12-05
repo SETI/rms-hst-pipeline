@@ -7,6 +7,7 @@ class LIDVID(object):
     """Representation of a PDS4 LIDVID."""
 
     def __init__(self, str):
+        # type: (unicode) -> None
         """
         Create a LIDVID object from a string, raising an exception if
         the LIDVID string is malformed.

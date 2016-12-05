@@ -13,8 +13,15 @@ from pdart.pds4.Component import *
 from pdart.pds4.File import *
 from pdart.pds4.HstFilename import *
 
+import pdart.pds4.Archive  # for mypy
+import pdart.pds4.Bundle  # for mypy
+import pdart.pds4.Collection  # for mypy
+import pdart.pds4.LID  # for mypy
+from typing import Iterator  # for mypy
+
 
 def _find_product_file(visit_dir, product_id):
+    # type: (unicode, unicode) -> unicode
     """
     Find a file by name in a directory or one of its subdirectories
     and return the absolute filepath.  Assume the directory path is
@@ -32,15 +39,18 @@ class Product(Component):
     """A PDS4 Product."""
 
     VISIT_DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
+    # type: str
     """
     A regexp pattern for product visit directory names, used to
     validate visit directory names or to extract visit ids.
     """
 
     FILE_EXTS = ['.fits', '.jpg']
+    # type: List[unicode]
     """Currently legal file extensions for product files."""
 
     def __init__(self, arch, lid):
+        # type: (pdart.pds4.Archive.Archive, pdart.pds4.LID.LID) -> None
         """
         Create a Product given the archive it lives in and its LID.
         """
@@ -51,6 +61,7 @@ class Product(Component):
         return 'Product(%r, %r)' % (self.archive, self.lid)
 
     def absolute_filepath(self):
+        # type: () -> unicode
         """Return the absolute filepath to the product file."""
         visit_fp = self.visit_filepath()
         res = _find_product_file(visit_fp, self.lid.product_id)
@@ -62,6 +73,7 @@ class Product(Component):
         return res
 
     def label_filepath(self):
+        # type: () -> unicode
         """Return the absolute filepath to the product's label."""
         product_fp = self.absolute_filepath()
         (dir, product_basename) = os.path.split(product_fp)
@@ -70,6 +82,7 @@ class Product(Component):
         return os.path.join(dir, label_basename)
 
     def visit_filepath(self):
+        # type: () -> unicode
         """Return the absolute filepath to the product's visit directory."""
         hst_filename = HstFilename(self.lid.product_id)
         collection_filepath = self.collection().absolute_filepath()
@@ -77,6 +90,7 @@ class Product(Component):
         return os.path.join(collection_filepath, visit_segment)
 
     def visit(self):
+        # type: () -> unicode
         """
         Return the visit id for this product.  It is calculated from
         the product's filepath.
@@ -85,6 +99,7 @@ class Product(Component):
         return hst_filename.visit()
 
     def files(self):
+        # type: () -> Iterator[File]
         """
         Generate all the files belonging to this
         :class:`~pdart.pds4.Product.Product` as
@@ -94,6 +109,7 @@ class Product(Component):
         yield File(self, basename)
 
     def absolute_filepath_is_directory(self):
+        # type: () -> bool
         """
         Return True iff the product's absolute filepath is a
         directory.
@@ -104,17 +120,20 @@ class Product(Component):
         return False
 
     def collection(self):
+        # type: () -> pdart.pds4.Collection.Collection
         """Return the collection this product belongs to."""
         from pdart.pds4.Collection import Collection
         return Collection(self.archive,
                           self.lid.parent_lid())
 
     def bundle(self):
+        # type: () -> pdart.pds4.Bundle.Bundle
         """Return the bundle this product belongs to."""
         from pdart.pds4.Bundle import Bundle
         return Bundle(self.archive,
                       self.lid.parent_lid().parent_lid())
 
     def browse_product(self):
+        # type: () -> Product
         """Return the browse product object for this product."""
         return Product(self.archive, self.lid.to_browse_lid())

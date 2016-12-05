@@ -9,6 +9,7 @@ from pdart.pds4.LID import LID
 
 class TestCollection(unittest.TestCase):
     def test_init(self):
+        # type: () -> None
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle:collection')
         c = Collection(arch, lid)
@@ -23,6 +24,7 @@ class TestCollection(unittest.TestCase):
             pass
 
     def test_absolute_filepath(self):
+        # type: () -> None
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle:collection')
         c = Collection(arch, lid)
@@ -30,6 +32,7 @@ class TestCollection(unittest.TestCase):
                           c.absolute_filepath())
 
     def test_bundle(self):
+        # type: () -> None
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle:collection')
         c = Collection(arch, lid)
@@ -37,6 +40,7 @@ class TestCollection(unittest.TestCase):
                           c.bundle())
 
     def test_products(self):
+        # type: () -> None
         arch = get_any_archive()
         bundle = list(arch.bundles())[0]
         collection = list(bundle.collections())[0]
@@ -44,6 +48,7 @@ class TestCollection(unittest.TestCase):
             self.assertEquals(collection, p.collection())
 
     def test_prefix_instrument_and_suffix(self):
+        # type: () -> None
         arch = get_any_archive()
         bundle = list(arch.bundles())[0]
         collection = list(bundle.collections())[0]

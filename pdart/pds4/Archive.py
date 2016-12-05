@@ -6,12 +6,14 @@ from pdart.pds4.Bundle import *
 from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
 from pdart.pds4.LID import *
+from typing import Iterator  # for mypy
 
 
 class Archive(object):
     """An :class:`~pdart.pds4.Archive` containing PDS4 Bundles."""
 
     def __init__(self, root):
+        # type: (unicode) -> None
         """
         Create an :class:`~pdart.pds4.Archive` given a filepath to an existing
         directory.
@@ -20,6 +22,8 @@ class Archive(object):
         self.root = root
 
     def __eq__(self, other):
+        if not isinstance(other, Archive):
+            return False
         return self.root == other.root
 
     def __str__(self):
@@ -32,16 +36,19 @@ class Archive(object):
 
     @staticmethod
     def is_valid_instrument(inst):
+        # type: (unicode) -> bool
         """Return True iff the argument is a valid instrument name."""
         return inst in ['acs', 'wfc3', 'wfpc2']
 
     @staticmethod
     def is_valid_proposal(prop):
+        # type: (int) -> bool
         """Return True iff the argument is a valid integer HST proposal ID."""
         return isinstance(prop, int) and 0 <= prop and prop <= 99999
 
     @staticmethod
     def is_valid_visit(vis):
+        # type: (unicode) -> bool
         """Return True iff the argument is a valid visit ID."""
         try:
             return re.match(r'\A[a-z0-9][a-z0-9]\Z', vis) is not None
@@ -50,11 +57,13 @@ class Archive(object):
 
     @staticmethod
     def is_valid_bundle_dir_basename(dirname):
+        # type: (unicode) -> bool
         """Return True iff the argument is a valid bundle directory name."""
         return re.match(Bundle.DIRECTORY_PATTERN, dirname) is not None
 
     @staticmethod
     def is_valid_collection_dir_basename(dirname):
+        # type: (unicode) -> bool
         """
         Return True iff the argument is a valid collection directory
         name.
@@ -63,6 +72,7 @@ class Archive(object):
 
     @staticmethod
     def is_valid_product_dir_basename(dirname):
+        # type: (unicode) -> bool
         """
         Return True iff the argument is a valid product visit
         directory name.
@@ -71,6 +81,7 @@ class Archive(object):
 
     @staticmethod
     def is_hidden_file_basename(basename):
+        # type: (unicode) -> bool
         """
         Return True iff the file is a hidden file.  Approximated by
         checking if its first character is a dot (Unix hidden-file
@@ -80,6 +91,7 @@ class Archive(object):
 
     # Walking the hierarchy with objects
     def bundles(self):
+        # type: () -> Iterator[Bundle]
         """Generate the bundles stored in this :class:`~pdart.pds4.Archive`."""
         for subdir in os.listdir(self.root):
             if re.match(Bundle.DIRECTORY_PATTERN, subdir):
@@ -87,6 +99,7 @@ class Archive(object):
                 yield Bundle(self, bundle_lid)
 
     def collections(self):
+        # type: () -> Iterator[Collection]
         """
         Generate the collections stored in this
         :class:`~pdart.pds4.Archive`.
@@ -96,6 +109,7 @@ class Archive(object):
                 yield c
 
     def products(self):
+        # type: () -> Iterator[Product]
         """
         Generate the products stored in this
         :class:`~pdart.pds4.Archive`.

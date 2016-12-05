@@ -5,6 +5,7 @@ from pdart.pds4.LID import *
 
 class TestLID(unittest.TestCase):
     def test_init(self):
+        # type: () -> None
         # sanity-check
         with self.assertRaises(Exception):
             LID(None)
@@ -57,6 +58,7 @@ class TestLID(unittest.TestCase):
         self.assertEquals('urn:nasa:pds:bundle:collection:product', lid.lid)
 
     def test_eq(self):
+        # type: () -> None
         self.assertTrue(LID('urn:nasa:pds:bundle:collection:product') ==
                         LID('urn:nasa:pds:bundle:collection:product'))
         self.assertFalse(LID('urn:nasa:pds:bundle:collection:product') !=
@@ -67,14 +69,17 @@ class TestLID(unittest.TestCase):
                         LID('urn:nasa:pds:bundle:collection:produit'))
 
     def test_str(self):
+        # type: () -> None
         self.assertEquals('urn:nasa:pds:bundle:collection:product',
                           str(LID('urn:nasa:pds:bundle:collection:product')))
 
     def test_repr(self):
+        # type: () -> None
         self.assertEquals("LID('urn:nasa:pds:bundle:collection:product')",
                           repr(LID('urn:nasa:pds:bundle:collection:product')))
 
     def test_to_browse_lid(self):
+        # type: () -> None
         data_coll_lid = LID('urn:nasa:pds:bundle:data_collection_raw')
         browse_coll_lid = LID('urn:nasa:pds:bundle:browse_collection_raw')
         self.assertEquals(browse_coll_lid, data_coll_lid.to_browse_lid())

@@ -6,6 +6,7 @@ class LID(object):
     """Representation of a PDS4 LID."""
 
     def __init__(self, str):
+        # type: (unicode) -> None
         """
         Create a LID object from a string, raising an exception if
         the LID string is malformed.
@@ -45,18 +46,22 @@ class LID(object):
         return 'LID(%r)' % self.lid
 
     def is_product_lid(self):
+        # type: () -> bool
         """Return True iff the LID is a product LID."""
         return self.product_id is not None
 
     def is_collection_lid(self):
+        # type: () -> bool
         """Return True iff the LID is a collection LID."""
         return self.collection_id is not None and self.product_id is None
 
     def is_bundle_lid(self):
+        # type: () -> bool
         """Return True iff the LID is a bundle LID."""
         return self.bundle_id is not None and self.collection_id is None
 
     def parent_lid(self):
+        # type: () -> LID
         """
         Return a LID object for the object's parent.  Throw an error
         iff the object is a bundle LID.
@@ -69,6 +74,7 @@ class LID(object):
             return LID(':'.join(parts[:-1]))
 
     def to_browse_lid(self):
+        # type: () -> LID
         """
         Convert a LID within a data collection into the corresponding
         LID in the browse collection.

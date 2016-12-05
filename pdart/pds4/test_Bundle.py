@@ -8,6 +8,7 @@ from pdart.pds4.LID import LID
 
 class TestBundle(unittest.TestCase):
     def test_init(self):
+        # type: () -> None
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle')
         b = Bundle(arch, lid)
@@ -22,6 +23,7 @@ class TestBundle(unittest.TestCase):
             pass
 
     def test_absolute_filepath(self):
+        # type: () -> None
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle')
         b = Bundle(arch, lid)
@@ -29,18 +31,21 @@ class TestBundle(unittest.TestCase):
                           b.absolute_filepath())
 
     def test_collections(self):
+        # type: () -> None
         arch = get_any_archive()
         bundle = list(arch.bundles())[0]
         for c in bundle.collections():
             self.assertEquals(bundle, c.bundle())
 
     def test_products(self):
+        # type: () -> None
         arch = get_any_archive()
         bundle = list(arch.bundles())[0]
         for p in bundle.products():
             self.assertEquals(bundle, p.bundle())
 
     def test_proposal_id(self):
+        # type: () -> None
         arch = get_any_archive()
         bundle = list(arch.bundles())[0]
         self.assertEquals(bundle.lid.bundle_id,

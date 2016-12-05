@@ -10,6 +10,7 @@ class HstFilename(object):
     """
 
     def __init__(self, filename):
+        # type: (unicode) -> None
         self.filename = filename
         assert len(os.path.basename(filename)) > 6, \
             'Filename must be at least six characters long'
@@ -24,9 +25,11 @@ class HstFilename(object):
         return 'HstFilename(%r)' % self.filename
 
     def _basename(self):
+        # type: () -> unicode
         return os.path.basename(self.filename)
 
     def instrument_name(self):
+        # type: () -> unicode
         """
         Return the instrument name determined by the first character
         of the filename.
@@ -45,6 +48,7 @@ class HstFilename(object):
             raise Exception('First char of filename must be i, j, or u.')
 
     def hst_internal_proposal_id(self):
+        # type: () -> unicode
         """
         Return the HST proposal ID determined by the three characters
         after the first of the filename.
@@ -52,6 +56,7 @@ class HstFilename(object):
         return self._basename()[1:4].lower()
 
     def suffix(self):
+        # type: () -> unicode
         """
         Return the suffix of the filename, that is all characters
         after the first underscore up to the period before the 'fits'
@@ -61,6 +66,7 @@ class HstFilename(object):
                         self._basename()).group(1)
 
     def visit(self):
+        # type: () -> unicode
         """
         Return the visit id determined by the two characters after the
         first four of the filename.

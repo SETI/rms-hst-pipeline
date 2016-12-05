@@ -11,21 +11,27 @@ from pdart.pds4.Collection import Collection
 from pdart.pds4.Component import *
 from pdart.pds4.LID import *
 
+import pdart.pds4.Archive  # for mypy
+import pdart.pds4.Product  # for mypy
+from typing import Iterator  # for mypy
+
 
 class Bundle(Component):
     """A PDS4 Bundle."""
 
     DIRECTORY_PATTERN = r'\Ahst_([0-9]{5})\Z'
+    # type: str
     """
     A regexp pattern for bundle directory names, used to validate
     directory names or to extract proposal ids.
     """
 
     def __init__(self, arch, lid):
+        # type: (pdart.pds4.Archive.Archive, LID) -> None
         """
-        Create a :class:`~pdart.pds4.Bundle` given the
-        :class:`~pdart.pds4.Archive` it lives in and its
-        :class:`~pdart.pds4.LID`.
+        Create a :class:`~pdart.pds4.Bundle.Bundle` given the
+        :class:`~pdart.pds4.Archive.Archive` it lives in and its
+        :class:`~pdart.pds4.LID.LID`.
         """
         assert lid.is_bundle_lid()
         super(Bundle, self).__init__(arch, lid)
@@ -34,25 +40,31 @@ class Bundle(Component):
         return 'Bundle(%r, %r)' % (self.archive, self.lid)
 
     def proposal_id(self):
+        # type: () -> int
         """
-        Return the proposal ID for this :class:`~pdart.pds4.Bundle`.
-        It is calculated from the bundle's :class:`~pdart.pds4.LID`.
+        Return the proposal ID for this
+        :class:`~pdart.pds4.Bundle.Bundle`.  It is calculated from the
+        bundle's :class:`~pdart.pds4.LID.LID`.
         """
         return int(re.match(Bundle.DIRECTORY_PATTERN,
                             self.lid.bundle_id).group(1))
 
     def absolute_filepath(self):
+        # type: () -> unicode
         """Return the absolute filepath to the bundle's directory."""
         return os.path.join(self.archive.root, self.lid.bundle_id)
 
     def label_filepath(self):
+        # type: () -> unicode
         """Return the absolute filepath to the bundle's label."""
         return os.path.join(self.absolute_filepath(), 'bundle.xml')
 
     def collections(self):
+        # type: () -> Iterator[Collection]
         """
-        Generate the collections of this :class:`~pdart.pds4.Bundle`
-        as :class:`~pdart.pds4.Collection` objects.
+        Generate the collections of this
+        :class:`~pdart.pds4.Bundle.Bundle` as
+        :class:`~pdart.pds4.Collection.Collection` objects.
         """
         dir_fp = self.absolute_filepath()
         for subdir in os.listdir(dir_fp):
@@ -62,9 +74,11 @@ class Bundle(Component):
                 yield Collection(self.archive, collection_lid)
 
     def products(self):
+        # type: () -> Iterator[pdart.pds4.Product.Product]
         """
-        Generate the products of this :class:`~pdart.pds4.Bundle` as
-        :class:`~pdart.pds4.Product` objects.
+        Generate the products of this
+        :class:`~pdart.pds4.Bundle.Bundle` as
+        :class:`~pdart.pds4.Product.Product` objects.
         """
         for collection in self.collections():
             for product in collection.products():

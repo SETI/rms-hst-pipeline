@@ -4,6 +4,8 @@ Representation of a file belonging to a
 """
 import os.path
 
+import pdart.pds4.Component  # for mypy
+
 # We only import PSD4 subcomponent modules to avoid circular imports.
 # If you want to import a supercomponent module, do it within a
 # function or method.
@@ -13,6 +15,7 @@ class File(object):
     """A file belonging to an :class:`~pdart.pds4.Component`."""
 
     def __init__(self, comp, basename):
+        # type: (pdart.pds4.Component.Component, unicode) -> None
         """
         Create an File given the :class:`~pdart.pds4.Component` it
         belongs to and the basename (that is, filepath without
@@ -45,6 +48,7 @@ class File(object):
         return 'File(%r, %r)' % (self.basename, self.component)
 
     def full_filepath(self):
+        # type: () -> unicode
         """Return the full, absolute filepath to the file."""
         if self.component.absolute_filepath_is_directory():
             return os.path.join(self.component.absolute_filepath(),

@@ -10,6 +10,7 @@ from pdart.pds4.Archives import *
 
 class TestDatabaseArchive(unittest.TestCase):
     def test_DatabaseArchive(self):
+        # type: () -> None
         # Fails with no file
         with self.assertRaises(Exception):
             DatabaseArchive(None)

@@ -11,6 +11,7 @@ from pdart.pds4.LID import LID
 
 class TestProduct(unittest.TestCase):
     def test_init(self):
+        # type: () -> None
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle:collection:uproduct')
         p = Product(arch, lid)
@@ -25,6 +26,7 @@ class TestProduct(unittest.TestCase):
             pass
 
     def test_absolute_filepath(self):
+        # type: () -> None
         arch = get_any_archive()
         for p in arch.products():
             lid = p.lid
@@ -43,6 +45,7 @@ class TestProduct(unittest.TestCase):
             return
 
     def test_bundle(self):
+        # type: () -> None
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle:collection:uproduct')
         p = Product(arch, lid)
@@ -50,6 +53,7 @@ class TestProduct(unittest.TestCase):
                           p.bundle())
 
     def test_collection(self):
+        # type: () -> None
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle:collection:uproduct')
         p = Product(arch, lid)

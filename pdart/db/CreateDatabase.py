@@ -7,8 +7,11 @@ import sqlite3
 
 from pdart.pds4.Archives import *
 
+import pdart.pds4.Archive  # for mypy
+
 
 def _create_bundles_table(conn, archive):
+    # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
     """Create the bundles table."""
     conn.execute('DROP TABLE IF EXISTS bundles')
     table_creation = """CREATE TABLE bundles (
@@ -26,6 +29,7 @@ def _create_bundles_table(conn, archive):
 
 
 def _create_collections_table(conn, archive):
+    # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
     """Create the collections table."""
     conn.execute('DROP TABLE IF EXISTS collections')
     table_creation = """CREATE TABLE collections (
@@ -60,6 +64,7 @@ def _create_collections_table(conn, archive):
 
 
 def _create_products_table(conn, archive):
+    # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
     """Create the products table."""
     conn.execute('DROP TABLE IF EXISTS products')
     table_creation = """CREATE TABLE products (
@@ -90,6 +95,7 @@ def _create_products_table(conn, archive):
 
 
 def _create_hdus_and_cards_tables(conn, archive):
+    # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
     """Create the hdus and cards tables."""
     def handle_undefined(val):
         """Convert undefined values to None"""
@@ -176,6 +182,7 @@ def _create_hdus_and_cards_tables(conn, archive):
 
 
 def create_database(conn, archive):
+    # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
     """
     Given an open SQLite connection to a fresh database and an
     :class:`~pdart.pds4.Archive`, populate the database with the

@@ -7,6 +7,10 @@ import os.path
 
 from pdart.pds4.LID import *
 
+import pdart.pds4.Archive  # for mypy
+import pdart.pds4.File  # for mypy
+from typing import Iterator  # for mypy
+
 
 class Component(object):
     """
@@ -18,6 +22,7 @@ class Component(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, arch, lid):
+        # type: (pdart.pds4.Archive.Archive, LID) -> None
         """
         Create an :class:`~pdart.pds4.Component` given the
         :class:`~pdart.pds4.Archive` it lives in and its
@@ -37,6 +42,7 @@ class Component(object):
 
     @abc.abstractmethod
     def absolute_filepath(self):
+        # type: () -> unicode
         """
         Return the absolute filepath to the
         :class:`~pdart.pds4.Component`'s directory
@@ -46,12 +52,14 @@ class Component(object):
         pass
 
     def absolute_filepath_is_directory(self):
+        # type: () -> bool
         """
         Return True iff :meth:`absolute_filepath` returns a directory.
         """
         return True
 
     def files(self):
+        # type: () -> Iterator[pdart.pds4.File.File]
         """
         Generate all the files belonging to this
         :class:`~pdart.pds4.Component` as :class:`~pdart.pds4.File`

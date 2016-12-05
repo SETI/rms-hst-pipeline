@@ -5,6 +5,7 @@ from pdart.pds4.VID import *
 
 class TestVID(unittest.TestCase):
     def test_init(self):
+        # type: () -> None
         # sanity-check
         with self.assertRaises(Exception):
             VID(None)
@@ -28,13 +29,16 @@ class TestVID(unittest.TestCase):
         self.assertEqual(14159265, v.minor)
 
     def test_cmp(self):
+        # type: () -> None
         self.assertTrue(VID('2.3') == VID('2.3'))
         self.assertTrue(VID('2.3') != VID('2.4'))
         self.assertTrue(VID('2.3') < VID('3.2'))
         self.assertTrue(VID('2.3') > VID('2.2'))
 
     def test_str(self):
+        # type: () -> None
         self.assertEquals('2.3', str(VID('2.3')))
 
     def test_repr(self):
+        # type: () -> None
         self.assertEquals("VID('2.3')", repr(VID('2.3')))
