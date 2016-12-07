@@ -73,12 +73,17 @@ function from *a* to *b* and *[c]* is a list of *c* s.
 import xml.dom
 import xml.sax
 
-from typing import Any, Callable  # for mypy
+from typing import Any, Callable, Dict, List  # for mypy
 import xml.dom.minidom  # for mypy
 
+_UADict = Dict[unicode, Any]
+NodeBuilder = Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
+FragBuilder = Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]
 
-def interpret_text(txt):
-    # type: (unicode) -> Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
+
+def interpret_text(txt  # type: unicode
+                   ):
+    # type: (...) -> NodeBuilder
     """
     Return a builder function that takes an XML document and returns a
     text node containing the text.
@@ -90,8 +95,9 @@ def interpret_text(txt):
     return builder
 
 
-def interpret_document_template(template):
-    # type: (unicode) -> Callable[[Dict[unicode, Any]], xml.dom.minidom.Document]
+def interpret_document_template(template  # type: unicode
+                                ):
+    # type: (...) -> Callable[[_UADict], xml.dom.minidom.Document]
     """
     Return a builder function that takes a dictionary and returns an
     XML document containing the template text, with any ``<NODE />``
@@ -180,7 +186,7 @@ def interpret_document_template(template):
 
 
 def interpret_template(template):
-    # type: (unicode) -> Callable[[Dict[unicode, Any]], Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]]
+    # type: (unicode) -> Callable[[_UADict], NodeBuilder]
     """
     Return a parameterizing function that takes a dictionary and
     returns an builder function, performing substitution of the
@@ -259,7 +265,7 @@ def interpret_template(template):
 
 
 def combine_nodes_into_fragment(doc_funcs):
-    # type: (List[Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]]) -> Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]
+    # type: (List[NodeBuilder]) -> FragBuilder
     """
     Convert a list of builder functions that take a document and
     return an XML node into a single builder function that takes a
@@ -279,7 +285,7 @@ def combine_nodes_into_fragment(doc_funcs):
 
 
 def combine_fragments_into_fragment(doc_funcs):
-    # type: (List[Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]]) -> Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]
+    # type: (List[FragBuilder]) -> FragBuilder
     """
     Convert a list of builder functions that take a document and
     return an XML fragment (list of nodes) into a single builder

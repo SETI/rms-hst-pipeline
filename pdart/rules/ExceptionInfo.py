@@ -41,29 +41,8 @@ the failures.
 import abc
 import xml.dom
 
-import pdart.rules.ExceptionInfo  # for mypy
-from typing import cast  # for mypy
+from typing import List, cast  # for mypy
 import xml.dom.minidom  # for mypy
-
-
-class CalculationException(Exception):
-    """
-    An :exc:`Exception` carrying
-    :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`
-    """
-
-    def __init__(self, msg, exception_info):
-        # type: (unicode, pdart.rules.ExceptionInfo.ExceptionInfo) -> None
-        assert isinstance(exception_info, ExceptionInfo)
-        Exception.__init__(self, msg)
-        self.exception_info = exception_info
-
-    def __str__(self):
-        return 'CalculationException(%s)' % self.message
-
-    def __repr__(self):
-        return 'CalculationException(%r, %r)' % (self.message,
-                                                 self.exception_info)
 
 
 class ExceptionInfo(object):
@@ -106,6 +85,29 @@ class ExceptionInfo(object):
         pass
 
 
+_EXC_INFOS = List[ExceptionInfo]
+
+
+class CalculationException(Exception):
+    """
+    An :exc:`Exception` carrying
+    :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`
+    """
+
+    def __init__(self, msg, exception_info):
+        # type: (unicode, ExceptionInfo) -> None
+        assert isinstance(exception_info, ExceptionInfo)
+        Exception.__init__(self, msg)
+        self.exception_info = exception_info
+
+    def __str__(self):
+        return 'CalculationException(%s)' % self.message
+
+    def __repr__(self):
+        return 'CalculationException(%r, %r)' % (self.message,
+                                                 self.exception_info)
+
+
 class SingleExceptionInfo(ExceptionInfo):
     """
     A class wrapping a single :exc:`Exception` and its stack trace.
@@ -144,7 +146,8 @@ class GroupedExceptionInfo(ExceptionInfo):
     :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
     """
     def __init__(self, label, exception_infos):
-        # type: (unicode, List[pdart.rules.ExceptionInfo.ExceptionInfo]) -> None
+        # type: (unicode, _EXC_INFOS) -> None
+
         self.label = label
         self.exception_infos = exception_infos
 

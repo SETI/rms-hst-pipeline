@@ -70,7 +70,7 @@ if False:
             tc, DeepReduction())
         runner = \
             pdart.reductions.TypecheckedReduction.TypecheckedReductionRunner(
-            tc, DefaultReductionRunner())
+                tc, DefaultReductionRunner())
         from pdart.pds4.Archives import get_any_archive
         arch = get_any_archive()
 
@@ -182,11 +182,11 @@ if False:
         tr12 = pdart.reductions.CompositeReduction.CompositeReduction(
             [tr1, tr2])
 
-        red = pdart.reductions.TypecheckedReductionTypecheckedReduction(tc12,
-                                                                        tr12)
+        red = pdart.reductions.TypecheckedReduction.TypecheckedReduction(tc12,
+                                                                         tr12)
         runner = \
             pdart.reductions.TypecheckedReduction.TypecheckedReductionRunner(
-            tc12, DefaultReductionRunner())
+                tc12, DefaultReductionRunner())
         from pdart.pds4.Archives import get_any_archive
         arch = get_any_archive()
 

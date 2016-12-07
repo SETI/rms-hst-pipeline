@@ -26,8 +26,10 @@ HST_SCHEMATRON_SCHEMA = './xml/PDS4_HST_%s_0200.sch.xml' % PDS4_SHORT_VERSION
 # type: str
 
 
-def run_subprocess(cmd, stdin=None):
-    # type: (Union[str, Sequence[str]], unicode) -> Tuple[int, unicode, unicode]
+def run_subprocess(cmd,        # type: Union[str, Sequence[str]]
+                   stdin=None  # type: unicode
+                   ):
+    # type: (...) -> Tuple[int, unicode, unicode]
     """
     Run a command in a subprocess.  Command can be either a string
     with the command name, or an array of the command name and its

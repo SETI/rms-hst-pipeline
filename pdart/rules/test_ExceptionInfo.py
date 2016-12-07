@@ -4,15 +4,6 @@ import xml.dom
 from pdart.rules.ExceptionInfo import *
 
 
-def test_ExceptionInfo():
-    # type: () -> None
-    try:
-        ce = CalculationException('<msg>', Exception('foo'))
-        assert False, 'exception not thrown'
-    except AssertionError:
-        pass
-
-
 class TestSingleExceptionInfo(unittest.TestCase):
     def test_to_xml(self):
         # type: () -> None
@@ -33,6 +24,7 @@ class TestGroupedExceptionInfo(unittest.TestCase):
         ses = [SingleExceptionInfo(Exception('test1'), '{stack trace}'),
                SingleExceptionInfo(Exception('test2'), '{stack trace}'),
                SingleExceptionInfo(Exception('test3'), '{stack trace}')]
+        # type: List[ExceptionInfo]
         ge = GroupedExceptionInfo('foo', ses)
         xml_ = ge.to_xml()
         self.assertTrue(isinstance(xml_, xml.dom.minidom.Document))
@@ -42,6 +34,7 @@ class TestGroupedExceptionInfo(unittest.TestCase):
         ses = [SingleExceptionInfo(Exception('test1'), '{stack trace}'),
                SingleExceptionInfo(Exception('test2'), '{stack trace}'),
                SingleExceptionInfo(Exception('test3'), '{stack trace}')]
+        # type: List[ExceptionInfo]
         ge = GroupedExceptionInfo('bar', ses)
         xml_ = ge.to_pretty_xml().split('\n')
         self.assertEquals('<GroupedExceptionInfo>', xml_[1])
