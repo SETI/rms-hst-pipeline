@@ -85,6 +85,7 @@ class CheckHduReduction(Reduction):
 
 
 def test_check_reduction():
+    # type: () -> None
     arch = get_any_archive()
     for red in [CheckBundleReduction(),
                 CheckCollectionReduction(),
@@ -122,6 +123,7 @@ class TestRecursiveReduction(Reduction):
 
 
 def test_reductions():
+    # type: () -> None
     arch = get_any_archive()
     try:
         count = run_reduction(TestRecursiveReduction(), arch)
@@ -133,6 +135,7 @@ def test_reductions():
 
 if False:
     def test_type_documentation():
+        # type: () -> None
         d = {'archive': 'None',
              'bundle': 'None',
              'collection': 'None',

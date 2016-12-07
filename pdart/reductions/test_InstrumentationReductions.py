@@ -1,5 +1,4 @@
 from pdart.reductions.InstrumentationReductions import *
-from pdart.reductions.Reduction import *
 
 
 def test_InstrumentationReductions():

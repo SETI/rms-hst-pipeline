@@ -1,9 +1,11 @@
-from pdart.reductions.CompositeReduction import *
-from pdart.reductions.TypecheckedReduction import *
+from pdart.reductions.Reduction import *
+import pdart.reductions.CompositeReduction
+import pdart.reductions.TypecheckedReduction
 from pdart.rules.ExceptionInfo import *
 
 if False:
     def testSanity():
+        # type: () -> None
         class NoneTypechecks(object):
             def check_is_archive_reduction(self, obj):
                 assert obj is None
@@ -64,8 +66,11 @@ if False:
                 return None
 
         tc = NoneTypechecks()
-        red = TypecheckedReduction(tc, DeepReduction())
-        runner = TypecheckedReductionRunner(tc, DefaultReductionRunner())
+        red = pdart.reductions.TypecheckedReductionTypecheckedReduction(
+            tc, DeepReduction())
+        runner = \
+            pdart.reductions.TypecheckedReduction.TypecheckedReductionRunner(
+            tc, DefaultReductionRunner())
         from pdart.pds4.Archives import get_any_archive
         arch = get_any_archive()
 
@@ -76,12 +81,13 @@ if False:
             raise
 
 
-class ComponentTypechecks(Typechecks):
+class ComponentTypechecks(pdart.reductions.TypecheckedReduction.Typechecks):
     """
     Checks that a Reduction reduces an xxx to the string
     'xxx_reduction_n' where the n is an integer.
     """
     def __init__(self, index):
+        # type: (int) -> None
         assert isinstance(index, int)
         self.index = index
 
@@ -112,6 +118,7 @@ class ComponentTypechecks(Typechecks):
 
 class IndexedReduction(Reduction):
     def __init__(self, index):
+        # type: (int) -> None
         assert isinstance(index, int)
         self.index = index
 
@@ -164,16 +171,22 @@ if False:
 
 if False:
     def test_composite():
+        # type: () -> None
         tc1 = ComponentTypechecks(1)
         tc2 = ComponentTypechecks(2)
-        tc12 = CompositeTypechecks([tc1, tc2])
+        tc12 = pdart.reductions.CompositeReduction.CompositeTypechecks(
+            [tc1, tc2])
 
         tr1 = IndexedReduction(1)
         tr2 = IndexedReduction(2)
-        tr12 = CompositeReduction([tr1, tr2])
+        tr12 = pdart.reductions.CompositeReduction.CompositeReduction(
+            [tr1, tr2])
 
-        red = TypecheckedReduction(tc12, tr12)
-        runner = TypecheckedReductionRunner(tc12, DefaultReductionRunner())
+        red = pdart.reductions.TypecheckedReductionTypecheckedReduction(tc12,
+                                                                        tr12)
+        runner = \
+            pdart.reductions.TypecheckedReduction.TypecheckedReductionRunner(
+            tc12, DefaultReductionRunner())
         from pdart.pds4.Archives import get_any_archive
         arch = get_any_archive()
 
