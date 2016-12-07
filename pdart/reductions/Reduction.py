@@ -269,7 +269,7 @@ class ReductionRunner(object):
         pass
 
 
-class DefaultReductionRunner(object):
+class DefaultReductionRunner(ReductionRunner):
     """
     An algorithm to recursively reduce PDS4 and FITS structures
     according to a :class:`~pdart.reductions.Reduction.Reduction`
