@@ -6,6 +6,7 @@ from pdart.rules.Combinators import *
 class TestCombinators(unittest.TestCase):
 
     def test_normalized_exceptions(self):
+        # type: () -> None
         def explode():
             raise Exception('Boom!')
         explode = normalized_exceptions(explode)
@@ -16,6 +17,7 @@ class TestCombinators(unittest.TestCase):
             pass  # expected
 
     def test_multiple_implementations(self):
+        # type: () -> None
         def failure_func(n):
             def func():
                 """Fail."""
@@ -60,5 +62,6 @@ class TestCombinators(unittest.TestCase):
         self.assertTrue('Succeed.' in mi.__doc__)
 
     def test_parallel_list(self):
+        # type: () -> None
         # TODO
         pass

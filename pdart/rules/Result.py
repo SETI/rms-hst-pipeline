@@ -26,6 +26,8 @@ import abc
 
 import pdart.rules.ExceptionInfo
 
+from typing import Any  # for mypy
+
 
 class Result(object):
     """
@@ -37,6 +39,7 @@ class Result(object):
 
     @abc.abstractmethod
     def is_success(self):
+        # type: () -> bool
         """
         Return True if the Result is a
         :class:`~pdart.rules.Result.Success`.
@@ -44,6 +47,7 @@ class Result(object):
         pass
 
     def is_failure(self):
+        # type: () -> bool
         """
         Return True if the Result is a
         :class:`~pdart.rules.Result.Failure`.
@@ -57,10 +61,12 @@ class Failure(Result):
     :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
     """
     def __init__(self, exception_info):
+        # type: (pdart.rules.ExceptionInfo.ExceptionInfo) -> None
         Result.__init__(self)
         self.exception_info = exception_info
 
     def is_success(self):
+        # type: () -> bool
         return False
 
     def __str__(self):
@@ -73,10 +79,12 @@ class Success(Result):
     the returned value.
     """
     def __init__(self, value):
+        # type: (Any) -> None
         Result.__init__(self)
         self.value = value
 
     def is_success(self):
+        # type: () -> bool
         return True
 
     def __str__(self):

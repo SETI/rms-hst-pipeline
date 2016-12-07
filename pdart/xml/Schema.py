@@ -1,4 +1,4 @@
-"""
+u"""
 Functionality to validate XML against various schemas using external
 programs.
 
@@ -11,14 +11,23 @@ import tempfile
 import xml.dom.minidom
 
 from pdart.xml.Pds4Version import *
+from typing import Sequence, Tuple, Union
 
 PDS_XML_SCHEMA = './xml/PDS4_PDS_%s.xsd.xml' % PDS4_SHORT_VERSION
+# type: str
+
 PDS_SCHEMATRON_SCHEMA = './xml/PDS4_PDS_%s.sch.xml' % PDS4_SHORT_VERSION
+# type: str
+
 HST_XML_SCHEMA = './xml/PDS4_HST_%s_0200.xsd.xml' % PDS4_SHORT_VERSION
+# type: str
+
 HST_SCHEMATRON_SCHEMA = './xml/PDS4_HST_%s_0200.sch.xml' % PDS4_SHORT_VERSION
+# type: str
 
 
 def run_subprocess(cmd, stdin=None):
+    # type: (Union[str, Sequence[str]], unicode) -> Tuple[int, unicode, unicode]
     """
     Run a command in a subprocess.  Command can be either a string
     with the command name, or an array of the command name and its
@@ -45,6 +54,7 @@ def run_subprocess(cmd, stdin=None):
 def _xsd_validator_schema(filepath,
                           stdin=None,
                           schemas=[PDS_XML_SCHEMA, HST_XML_SCHEMA]):
+    # type: (str, unicode, List[str]) -> Tuple[int, unicode, unicode]
     """
     Run XsdValidator.jar on the XML at the filepath (ignored if stdin
     is not None) or on stdin, validating against the schemas.  Returns
@@ -61,6 +71,7 @@ def _xsd_validator_schema(filepath,
 
 
 def _xmllint_schema(filepath, stdin=None, schema=PDS_XML_SCHEMA):
+    # type: (str, unicode, str) -> Tuple[int, unicode, unicode]
     """
     Run xmllint on the XML at the filepath (ignored if stdin is not
     None) or on stdin, validating against the schema.  Returns a
@@ -75,6 +86,7 @@ def _xmllint_schema(filepath, stdin=None, schema=PDS_XML_SCHEMA):
 
 
 def xml_schema_failures(filepath, stdin=None, schema=PDS_XML_SCHEMA):
+    # type: (str, unicode, str) -> unicode
     """
     Run an XML Schema validator on the XML at the filepath (ignored if
     stdin is not None) or in stdin, validating against the schema.
@@ -96,6 +108,7 @@ def xml_schema_failures(filepath, stdin=None, schema=PDS_XML_SCHEMA):
 
 
 def probatron(filepath, schema=PDS_SCHEMATRON_SCHEMA):
+    # type: (str, str) -> Tuple[int, unicode, unicode]
     """
     Run probatron on the XML at the filepath validating against the
     schema.  Returns a triple of exit_code, stderr and stdout.
@@ -107,6 +120,7 @@ def probatron(filepath, schema=PDS_SCHEMATRON_SCHEMA):
 
 
 def probatron_with_stdin(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
+    # type: (str, unicode, str) -> Tuple[int, unicode, unicode]
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
@@ -130,6 +144,7 @@ def probatron_with_stdin(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
 def probatron_with_svrl_result(filepath,
                                stdin=None,
                                schema=PDS_SCHEMATRON_SCHEMA):
+    # type: (str, unicode, str) -> xml.dom.minidom.Document
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns the
@@ -142,10 +157,12 @@ def probatron_with_svrl_result(filepath,
 
 
 def _svrl_failures(svrl):
+    # type: (xml.dom.minidom.Document) -> Sequence[xml.dom.minidom.Node]
     return svrl.documentElement.getElementsByTagName('svrl:failed-assert')
 
 
 def svrl_has_failures(svrl):
+    # type: (xml.dom.minidom.Document) -> bool
     """
     Given an SVRL document, return True iff it contains failures.
     """
@@ -153,6 +170,7 @@ def svrl_has_failures(svrl):
 
 
 def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
+    # type: (str, unicode, str) -> unicode
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns None if
@@ -172,6 +190,7 @@ def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
 
 
 def verify_label_or_raise(label):
+    # type: (str) -> None
     """
     Given the text of a PDS4 label, run XML Schema *and* Schematron
     validations on it.  Raise an exception on failures.

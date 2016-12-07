@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# clean up any old environment
+source deactivate || echo "No environment to deactivate."
+conda remove -n mypy --all || echo "No mypy to remove."
+
+# set up the mypy environment
+conda create -n mypy python=3
+conda install -c stsci pyfits scipy
+cd ~/pdart || (echo "No ~/pdart/" && exit)
+source activate mypy
+python3 -m pip install mypy-lang
+
+# create expanded set of stubs
+mkdir out || echo "out/ already exists"
+stubgen --py2 xml xml.dom xml.dom.minidom xml.etree 
+
+# install it in the typeshed
+MYPY_ENV=~/miniconda2/envs/mypy
+TYPESHED=$MYPY_ENV/lib/mypy/typeshed
+XML=$TYPESHED/stdlib/2/xml
+rm -rf $XML
+mv out/xml $TYPESHED/stdlib/2
+
+    # remove a redundant parent class that fouls MRO
+sed -e 's/class Comment(Childless, CharacterData)/class Comment(CharacterData)/' -i bak $XML/dom/minidom.pyi
+
+    # add a result type to Document.createTextNode
+sed -e 's/def createTextNode(self, data): .../def createTextNode(self, data) -> Text: .../' -i bak $XML/dom/minidom.pyi
+
+    # copy a reexported function up from xml.dom.minidom to xml.dom
+sed -e 's/from typing import Any/from typing import Any, Optional/' -i bak $XML/dom/__init__.pyi
+echo 'def getDOMImplementation(features: Optional[Any] = ...): ...' >> $XML/dom/__init__.pyi
+
+# let me know
+say 'all right now'
+
+# run it
+./run-mypy
+

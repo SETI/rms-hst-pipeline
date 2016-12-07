@@ -6,11 +6,13 @@ from pdart.xml.Templates import *
 
 class TestTemplates(unittest.TestCase):
     def test_interpret_text(self):
+        # type: () -> None
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         txt = interpret_text('foo')(doc)
         self.assertTrue('foo', txt.data)
 
     def test_interpret_document_template(self):
+        # type: () -> None
         body = interpret_document_template('<body/>')
         self.assertEquals('<?xml version="1.0" ?><body/>', body({}).toxml())
 
@@ -21,6 +23,7 @@ class TestTemplates(unittest.TestCase):
             body_with_param({'foo': 'bar'}).toxml())
 
     def test_interpret_template(self):
+        # type: () -> None
         make_body = interpret_document_template(
             '<doc><NODE name="foo"/></doc>')
 

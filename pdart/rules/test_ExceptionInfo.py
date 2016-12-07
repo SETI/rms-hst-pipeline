@@ -5,28 +5,31 @@ from pdart.rules.ExceptionInfo import *
 
 
 def test_ExceptionInfo():
+    # type: () -> None
     try:
         ce = CalculationException('<msg>', Exception('foo'))
-        self.assertFalse(True)
+        assert False, 'exception not thrown'
     except AssertionError:
         pass
 
 
 class TestSingleExceptionInfo(unittest.TestCase):
     def test_to_xml(self):
+        # type: () -> None
         se = SingleExceptionInfo(Exception('test'), '{stack trace}')
         xml_ = se.to_xml()
         self.assertTrue(isinstance(xml_, xml.dom.minidom.Document))
 
     def test_to_pretty_xml(self):
+        # type: () -> None
         se = SingleExceptionInfo(Exception('test'), '{stack trace}')
-        xml_ = se.to_pretty_xml()
-        xml_ = xml_.split('\n')
+        xml_ = se.to_pretty_xml().split('\n')
         self.assertEquals('<SingleExceptionInfo>', xml_[1])
 
 
 class TestGroupedExceptionInfo(unittest.TestCase):
     def test_to_xml(self):
+        # type: () -> None
         ses = [SingleExceptionInfo(Exception('test1'), '{stack trace}'),
                SingleExceptionInfo(Exception('test2'), '{stack trace}'),
                SingleExceptionInfo(Exception('test3'), '{stack trace}')]
@@ -35,11 +38,11 @@ class TestGroupedExceptionInfo(unittest.TestCase):
         self.assertTrue(isinstance(xml_, xml.dom.minidom.Document))
 
     def test_to_pretty_xml(self):
+        # type: () -> None
         ses = [SingleExceptionInfo(Exception('test1'), '{stack trace}'),
                SingleExceptionInfo(Exception('test2'), '{stack trace}'),
                SingleExceptionInfo(Exception('test3'), '{stack trace}')]
         ge = GroupedExceptionInfo('bar', ses)
-        xml_ = ge.to_pretty_xml()
-        xml_ = xml_.split('\n')
+        xml_ = ge.to_pretty_xml().split('\n')
         self.assertEquals('<GroupedExceptionInfo>', xml_[1])
         self.assertEquals('<SingleExceptionInfo>', xml_[2][1:])

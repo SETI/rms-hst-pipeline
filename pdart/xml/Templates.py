@@ -73,8 +73,12 @@ function from *a* to *b* and *[c]* is a list of *c* s.
 import xml.dom
 import xml.sax
 
+from typing import Any, Callable  # for mypy
+import xml.dom.minidom  # for mypy
+
 
 def interpret_text(txt):
+    # type: (unicode) -> Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
     """
     Return a builder function that takes an XML document and returns a
     text node containing the text.
@@ -87,6 +91,7 @@ def interpret_text(txt):
 
 
 def interpret_document_template(template):
+    # type: (unicode) -> Callable[[Dict[unicode, Any]], xml.dom.minidom.Document]
     """
     Return a builder function that takes a dictionary and returns an
     XML document containing the template text, with any ``<NODE />``
@@ -175,6 +180,7 @@ def interpret_document_template(template):
 
 
 def interpret_template(template):
+    # type: (unicode) -> Callable[[Dict[unicode, Any]], Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]]
     """
     Return a parameterizing function that takes a dictionary and
     returns an builder function, performing substitution of the
@@ -253,6 +259,7 @@ def interpret_template(template):
 
 
 def combine_nodes_into_fragment(doc_funcs):
+    # type: (List[Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]]) -> Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]
     """
     Convert a list of builder functions that take a document and
     return an XML node into a single builder function that takes a
@@ -272,6 +279,7 @@ def combine_nodes_into_fragment(doc_funcs):
 
 
 def combine_fragments_into_fragment(doc_funcs):
+    # type: (List[Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]]) -> Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]
     """
     Convert a list of builder functions that take a document and
     return an XML fragment (list of nodes) into a single builder
@@ -295,6 +303,7 @@ def combine_fragments_into_fragment(doc_funcs):
 
 
 _DOC = xml.dom.getDOMImplementation().createDocument(None, None, None)
+# type: xml.dom.minidom.Document
 """
 A constant document used as a throw-away argument to builder functions
 so we can typecheck their results.
@@ -302,6 +311,7 @@ so we can typecheck their results.
 
 
 def is_function(func):
+    # type: (Any) -> bool
     """
     Return True iff the argument is a function.  We approximate this
     by looking tor a ``__call__`` attribute.
@@ -312,6 +322,7 @@ def is_function(func):
 
 
 def is_doc_to_node_function(func):
+    # type: (Any) -> bool
     """
     Return True iff the argument is a builder function that takes an
     XML document and returns an XML node.
@@ -324,6 +335,7 @@ def is_doc_to_node_function(func):
 
 
 def is_list_of_doc_to_node_functions(func_list):
+    # type: (Any) -> bool
     """
     Return True iff the argument is a list of builder functions that
     take an XML document and returns an XML node.
@@ -339,6 +351,7 @@ def is_list_of_doc_to_node_functions(func_list):
 
 
 def is_list_of_doc_to_fragment_functions(func_list):
+    # type: (Any) -> bool
     """
     Return True iff the argument is a list of builder functions that
     take an XML document and returns a list of XML nodes.
@@ -354,6 +367,7 @@ def is_list_of_doc_to_fragment_functions(func_list):
 
 
 def is_doc_to_fragment_function(func):
+    # type: (Any) -> bool
     """
     Return True iff the argument is a builder function that takes an
     XML document and returns a list of XML nodes.

@@ -41,6 +41,10 @@ the failures.
 import abc
 import xml.dom
 
+import pdart.rules.ExceptionInfo  # for mypy
+from typing import cast  # for mypy
+import xml.dom.minidom  # for mypy
+
 
 class CalculationException(Exception):
     """
@@ -49,6 +53,7 @@ class CalculationException(Exception):
     """
 
     def __init__(self, msg, exception_info):
+        # type: (unicode, pdart.rules.ExceptionInfo.ExceptionInfo) -> None
         assert isinstance(exception_info, ExceptionInfo)
         Exception.__init__(self, msg)
         self.exception_info = exception_info
@@ -70,6 +75,7 @@ class ExceptionInfo(object):
     __metaclass__ = abc.ABCMeta
 
     def to_pretty_xml(self):
+        # type: () -> unicode
         """
         Return human-readable XML text for this
         :class:`~pdart.rules.ExceptionInfo.ExceptionInfo.`
@@ -77,10 +83,12 @@ class ExceptionInfo(object):
         return self.to_xml().toprettyxml()
 
     def to_xml(self):
+        # type: () -> xml.dom.minidom.Element
         """
         Return an XML document data structure for this
         :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
         """
+        # type: () -> unicode
         document = xml.dom.getDOMImplementation().createDocument(None,
                                                                  None,
                                                                  None)
@@ -90,6 +98,7 @@ class ExceptionInfo(object):
 
     @abc.abstractmethod
     def to_xml_fragment(self, document):
+        # type: (xml.dom.minidom.Document) -> xml.dom.minidom.Element
         """
         Return an XML data structure for this
         :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
@@ -102,10 +111,12 @@ class SingleExceptionInfo(ExceptionInfo):
     A class wrapping a single :exc:`Exception` and its stack trace.
     """
     def __init__(self, exception, stack_trace):
+        # type: (Exception, str) -> None
         self.exception = exception
         self.stack_trace = stack_trace
 
     def to_xml_fragment(self, document):
+        # type: (xml.dom.minidom.Document) -> xml.dom.minidom.Element
         res = document.createElement('SingleExceptionInfo')
         message = document.createElement('message')
         message_text = document.createTextNode(self.exception.message)
@@ -133,16 +144,19 @@ class GroupedExceptionInfo(ExceptionInfo):
     :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
     """
     def __init__(self, label, exception_infos):
-        assert isinstance(label, str)
+        # type: (unicode, List[pdart.rules.ExceptionInfo.ExceptionInfo]) -> None
         self.label = label
-        assert isinstance(exception_infos, list)
         self.exception_infos = exception_infos
 
     def to_xml_fragment(self, document):
+        # type: (xml.dom.minidom.Document) -> xml.dom.minidom.Element
         res = document.createElement('GroupedExceptionInfo')
-        label = document.createElement('label')
+
+        label_elmt = document.createElement('label')
+
         label_text = document.createTextNode(self.label)
-        label.appendChild(label_text)
+
+        label_elmt.appendChild(label_text)
         for exception_info in self.exception_infos:
             res.appendChild(exception_info.to_xml_fragment(document))
         return res

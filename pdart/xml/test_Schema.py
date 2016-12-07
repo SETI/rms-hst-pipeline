@@ -8,6 +8,7 @@ class TestXmlSchema(unittest.TestCase):
     # well documented as part of my code, so I'm using unittests to
     # explore the behavior of the system.
     def test_run_subprocess(self):
+        # type: () -> None
         exit_code, stderr, stdout = run_subprocess('ls')
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)
@@ -31,6 +32,7 @@ class TestXmlSchema(unittest.TestCase):
         self.assertEquals('', stdout)
 
     def test_run_xml_schema(self):
+        # type: () -> None
         # Correct XML, but doesn't match the schema
         failures = \
             xml_schema_failures('-',
@@ -42,6 +44,7 @@ class TestXmlSchema(unittest.TestCase):
         self.assertIsNone(failures)
 
     def test_run_schematron(self):
+        # type: () -> None
         exit_code, stderr, stdout = probatron('./testfiles/bundle.xml')
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)

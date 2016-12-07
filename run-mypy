@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# export MYPYPATH=~/pdart/stubs
+# echo $MYPYPATH
+mypy --silent-imports --py2 pdart/db pdart/pds4 pdart/rules pdart/xml
