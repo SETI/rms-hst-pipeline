@@ -2,6 +2,9 @@
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
+import xml.dom.minidom  # for mypy
+
+
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
@@ -50,3 +53,4 @@ An interpreted document template to create a label for a RAW browse product.
 
 type: Dict -> Doc
 """
+# type: Dict[str, Any] -> xml.dom.minidom.Document

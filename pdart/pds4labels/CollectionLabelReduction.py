@@ -52,6 +52,7 @@ class CollectionLabelReduction(Reduction):
 
 
 def make_collection_label(collection, verify):
+    # type: (Collection, bool) -> unicode
     """
     Create the label text for this :class:`~pdart.pds4.Collection`.
     If verify is True, verify the label against its XML and Schematron
@@ -62,6 +63,7 @@ def make_collection_label(collection, verify):
 
 
 def make_collection_inventory(collection):
+    # type: (Collection) -> unicode
     """
     Create the inventory text for this
     :class:`~pdart.pds4.Collection`.
@@ -72,6 +74,7 @@ def make_collection_inventory(collection):
 
 
 def make_collection_label_and_inventory(collection):
+    # type: (Collection) -> None
     """
     Create the label and inventory for a collection and write to the disk.
     """

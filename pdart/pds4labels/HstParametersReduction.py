@@ -6,8 +6,11 @@ from pdart.pds4labels.HstParametersXml import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
+from typing import Any, Dict  # for mypy
+
 
 def get_repeat_exposure_count(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return a placeholder integer for the ``<repeat_exposure_count
     />`` XML element, noting the problem.
@@ -16,6 +19,7 @@ def get_repeat_exposure_count(product_id, instrument, header):
 
 
 def get_subarray_flag(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return placeholder text for the ``<subarray_flag />`` XML element,
     noting the problem.
@@ -24,6 +28,7 @@ def get_subarray_flag(product_id, instrument, header):
 
 
 def get_aperture_type(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<aperture_type />`` XML element.
     """
@@ -38,6 +43,7 @@ def get_aperture_type(product_id, instrument, header):
 
 
 def get_bandwidth(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return a float for the ``<bandwidth />`` XML element.
     """
@@ -49,6 +55,7 @@ def get_bandwidth(product_id, instrument, header):
 
 
 def get_center_filter_wavelength(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return a float for the ``<center_filter_wavelength />`` XML element.
     """
@@ -60,6 +67,7 @@ def get_center_filter_wavelength(product_id, instrument, header):
 
 
 def get_detector_id(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<detector_id />`` XML element.
     """
@@ -78,6 +86,7 @@ def get_detector_id(product_id, instrument, header):
 
 
 def get_exposure_duration(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return a float for the ``<exposure_duration />`` XML element.
     """
@@ -88,6 +97,7 @@ def get_exposure_duration(product_id, instrument, header):
 
 
 def get_exposure_type(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<exposure_type />`` XML element.
     """
@@ -98,6 +108,7 @@ def get_exposure_type(product_id, instrument, header):
 
 
 def get_filter_name(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<filter_name />`` XML element.
     """
@@ -131,6 +142,7 @@ def get_filter_name(product_id, instrument, header):
 
 
 def get_fine_guidance_system_lock_type(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<fine_guidance_system_lock_type />`` XML
     element.
@@ -142,6 +154,7 @@ def get_fine_guidance_system_lock_type(product_id, instrument, header):
 
 
 def get_gain_mode_id(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<gain_mode_id />`` XML element.
     """
@@ -155,6 +168,7 @@ def get_gain_mode_id(product_id, instrument, header):
 
 
 def get_hst_pi_name(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<hst_pi_name />`` XML element.
     """
@@ -167,6 +181,7 @@ def get_hst_pi_name(product_id, instrument, header):
 
 
 def get_hst_proposal_id(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<hst_proposal_id />`` XML element.
     """
@@ -177,6 +192,7 @@ def get_hst_proposal_id(product_id, instrument, header):
 
 
 def get_hst_target_name(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<hst_target_name />`` XML element.
     """
@@ -187,6 +203,7 @@ def get_hst_target_name(product_id, instrument, header):
 
 
 def get_instrument_mode_id(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<instrument_mode_id />`` XML element.
     """
@@ -200,6 +217,7 @@ def get_instrument_mode_id(product_id, instrument, header):
 
 
 def get_observation_type(product_id, instrument, header):
+    # type: (unicode, unicode, Dict[str, Any]) -> unicode
     """
     Return text for the ``<observation_type />`` XML element.
     """

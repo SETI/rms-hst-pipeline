@@ -12,8 +12,13 @@ from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 import pdart.add_pds_tools
 import picmaker
 
+from pdart.pds4.Archive import Archive  # for mypy
+import sqlite3  # for mypy
+from typing import cast, Iterable, Tuple  # for mypy
+
 
 def _make_browse_coll_fp(raw_coll_fp):
+    # type: (str) -> str
     """
 u    Given the filepath to the RAW collection, return the filepath to
     its browse collection.
@@ -25,6 +30,7 @@ u    Given the filepath to the RAW collection, return the filepath to
 
 
 def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
+    # type: (str, str, unicode) -> None
     """
     Given a filepath for the destination browse collection, a filepath
     for the source RAW file, and the product's visit code, create the
@@ -46,6 +52,7 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
 
 
 def make_db_browse_product_images(conn, archive):
+    # type: (sqlite3.Connection, Archive) -> None
     """
     Given a database connection and an :class:`~pdart.pds4.Archive`,
     create browse images for all the RAW products.
@@ -55,22 +62,25 @@ def make_db_browse_product_images(conn, archive):
     # implementation.
     with closing(conn.cursor()) as cursor:
         colls = [ccbs for suff in RAW_SUFFIXES
-                 for ccbs in list(cursor.execute(
-                    """SELECT collection, full_filepath, bundle, suffix
+                 for ccbs in list(cast(
+                    Iterable[Tuple[unicode, str, unicode, unicode]],
+                    cursor.execute(
+                        """SELECT collection, full_filepath, bundle, suffix
                        FROM collections
-                       WHERE prefix='data' AND suffix=?""", (suff,)))]
+                       WHERE prefix='data' AND suffix=?""", (suff,))))]
 
         for (c, c_fp, b, suffix) in colls:
             cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',
                            (b,))
             (proposal_id,) = cursor.fetchone()
-            for (p, fp, v) in cursor.execute(
-              """SELECT product, full_filepath, visit
+            for (p, fp, v) in cast(Iterable[Tuple[unicode, str, unicode]],
+                                   cursor.execute(
+                    """SELECT product, full_filepath, visit
                         FROM products
                         WHERE collection=?
                         AND product NOT IN
                             (SELECT product FROM bad_fits_files)""",
-              (c,)):
+                    (c,))):
                 print p
                 browse_coll_fp = _make_browse_coll_fp(c_fp)
                 _make_browse_image(browse_coll_fp, fp, v)

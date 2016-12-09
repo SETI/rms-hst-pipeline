@@ -7,8 +7,11 @@ from pdart.pds4labels.DatabaseCaches import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
+from typing import cast, Iterable  # for mypy
+
 
 def make_db_bundle_label(conn, lid, verify):
+    # type: (sqlite3.Connection, unicode, bool) -> unicode
     """
     Create the label text for the bundle having this
     :class:`~pdart.pds4.LID` using the database connection.  If verify
@@ -23,8 +26,8 @@ def make_db_bundle_label(conn, lid, verify):
         reduced_collections = \
             [make_bundle_entry_member({'lid': collection_lid})
              for (collection_lid,)
-             in cursor.execute(
-                'SELECT collection from collections WHERE bundle=?', (lid,))]
+             in cast(Iterable[Tuple[unicode]], cursor.execute(
+                'SELECT collection from collections WHERE bundle=?', (lid,)))]
 
     label = make_label({
             'lid': lid,

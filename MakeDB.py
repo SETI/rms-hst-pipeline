@@ -14,6 +14,7 @@ if __name__ == '__main__':
     archive_dir = get_any_archive_dir()
     db_filepath = os.path.join(archive_dir, DATABASE_NAME)
     conn = sqlite3.connect(db_filepath)
+    # type: sqlite3.Connection
     try:
         create_database(conn, archive)
     finally:

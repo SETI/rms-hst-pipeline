@@ -14,6 +14,7 @@ from pdart.xml.Pretty import *
 
 
 def _is_raw_data_collection(collection):
+    # type: (Collection) -> bool
     return collection.prefix() == 'data' \
         and collection.suffix() in RAW_SUFFIXES
 

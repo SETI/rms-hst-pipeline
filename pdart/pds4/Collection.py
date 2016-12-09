@@ -72,13 +72,13 @@ class Collection(Component):
                         self.lid.collection_id).group(3)
 
     def absolute_filepath(self):
-        # type: () -> unicode
+        # type: () -> str
         """Return the absolute filepath to the collection's directory."""
         return os.path.join(self.archive.root,
                             self.lid.bundle_id, self.lid.collection_id)
 
     def label_filepath(self):
-        # type: () -> unicode
+        # type: () -> str
         """Return the absolute filepath to the collection's label."""
         collection_fp = self.absolute_filepath()
         name = 'collection_%s.xml' % self.prefix()

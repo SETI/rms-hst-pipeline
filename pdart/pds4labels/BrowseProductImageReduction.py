@@ -13,8 +13,11 @@ from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 import pdart.add_pds_tools
 import picmaker
 
+from typing import AnyStr  # for mypy
+
 
 def ensure_directory(dir):
+    # type: (AnyStr) -> None
     """Make the directory if it doesn't already exist."""
     try:
         os.mkdir(dir)
@@ -24,6 +27,7 @@ def ensure_directory(dir):
 
 
 def _browse_collection_directory(collection):
+    # type: (Collection) -> AnyStr
     """
     Given a :class:`~pdart.pds4.Collection` object, return the
     absolute filepath of its browse collection, creating it if
@@ -35,6 +39,7 @@ def _browse_collection_directory(collection):
 
 
 def is_raw_data_collection(collection):
+    # type: (Collection) -> bool
     """
     Return True iff the :class:`~pdart.pds4.Collection` is a raw data
     collection.

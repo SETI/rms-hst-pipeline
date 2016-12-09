@@ -6,6 +6,8 @@ import sys
 
 from pdart.xml.Templates import *
 
+from xml.dom.minidom import Document
+
 
 hst = interpret_template("""<hst:HST>
 <NODE name="parameters_general"/>
@@ -17,6 +19,7 @@ XML element.
 
 type: Dict -> Node
 """
+# type: Dict[str, Any] -> NodeBuilder
 
 
 parameters_general = interpret_template("""<hst:Parameters_General>
@@ -44,6 +47,7 @@ XML element.
 
 type: Dict -> Node
 """
+# type: Dict[str, Any] -> NodeBuilder
 
 parameters_acs = interpret_template("""<hst:Parameters_ACS>
 <hst:detector_id><NODE name="detector_id" /></hst:detector_id>
@@ -59,6 +63,7 @@ XML element.
 
 type: Dict -> Node
 """
+# type: Dict[str, Any] -> NodeBuilder
 
 parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 <hst:detector_id><NODE name="detector_id" /></hst:detector_id>
@@ -73,6 +78,7 @@ XML element.
 
 type: Dict -> Node
 """
+# type: Dict[str, Any] -> NodeBuilder
 
 parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 <hst:bandwidth><NODE name="bandwidth" /></hst:bandwidth>
@@ -92,32 +98,38 @@ XML element.
 
 type: Dict -> Node
 """
+# type: Dict[str, Any] -> NodeBuilder
 
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
+# type: Callable[[Dict[str, Any]], Document]
 
 
 # Not XML, but placeholder code common to both the database- and the
 # read-and-parse-FITS-file code.
 
 def placeholder(product_id, tag):
+    # type: (unicode, unicode) -> unicode
     """Return placeholder text for an XML tag, noting the problem."""
     note_problem(product_id, tag)
     return '### placeholder for %s ###' % tag
 
 
 def placeholder_int(product_id, tag):
+    # type: (unicode, unicode) -> unicode
     """Return a placeholder integer for an XML tag, noting the problem."""
     note_problem(product_id, tag)
     return '0'
 
 
 def placeholder_float(product_id, tag):
+    # type: (unicode, unicode) -> unicode
     """Return a placeholder float for an XML tag, noting the problem."""
     note_problem(product_id, tag)
     return '0.0'
 
 
 def note_problem(product_id, tag):
+    # type: (unicode, unicode) -> None
     """Note use of a placeholder function."""
     if False:
         print ('PROBLEM %s: %s' % (tag, product_id))
@@ -125,11 +137,13 @@ def note_problem(product_id, tag):
 
 
 def known_placeholder(product_id, tag):
+    # type: (Any, unicode) -> unicode
     """Return placeholder text for an XML tag."""
     return '### placeholder for %s ###' % tag
 
 
 def get_targeted_detector_id(product_id, instrument, header):
+    # type: (unicode, unicode, unicode) -> unicode
     """
     Return placeholder text for the ``<targeted_detector_id />`` XML
     element.
@@ -138,6 +152,7 @@ def get_targeted_detector_id(product_id, instrument, header):
 
 
 def get_pc1_flag(product_id, instrument, header):
+    # type: (unicode, unicode, unicode) -> unicode
     """
     Return a placeholder integer for the ``<pc1_flag />`` XML element,
     noting the problem.
@@ -146,6 +161,7 @@ def get_pc1_flag(product_id, instrument, header):
 
 
 def get_wf2_flag(product_id, instrument, header):
+    # type: (unicode, unicode, unicode) -> unicode
     """
     Return a placeholder integer for the ``<wf2_flag />`` XML element,
     noting the problem.
@@ -154,6 +170,7 @@ def get_wf2_flag(product_id, instrument, header):
 
 
 def get_wf3_flag(product_id, instrument, header):
+    # type: (unicode, unicode, unicode) -> unicode
     """
     Return a placeholder integer for the ``<wf3_flag />`` XML element,
     noting the problem.
@@ -162,6 +179,7 @@ def get_wf3_flag(product_id, instrument, header):
 
 
 def get_wf4_flag(product_id, instrument, header):
+    # type: (unicode, unicode, unicode) -> unicode
     """
     Return a placeholder integer for the ``<wf4_flag />`` XML element,
     noting the problem.

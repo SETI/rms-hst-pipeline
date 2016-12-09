@@ -10,8 +10,11 @@ from pdart.pds4labels.DatabaseCaches import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
+from typing import cast, Iterable  # for mypy
+
 
 def make_db_collection_inventory(conn, collection_lid):
+    # type: (sqlite3.Connection, unicode) -> unicode
     """
     Create the collection inventory for the collection having this
     :class:`~pdart.pds4.LID` using the database connection and return
@@ -19,13 +22,15 @@ def make_db_collection_inventory(conn, collection_lid):
     """
     with closing(conn.cursor()) as cursor:
         lines = [u'P,%s\r\n' % str(product)
-                 for (product,) in cursor.execute(
-                'SELECT product FROM products WHERE collection=?',
-                (collection_lid,))]
+                 for (product,) in cast(Iterable[Tuple[unicode]],
+                                        cursor.execute(
+                    'SELECT product FROM products WHERE collection=?',
+                    (collection_lid,)))]
     return ''.join(lines)
 
 
 def make_db_collection_label_and_inventory(conn, lid, verify):
+    # type: (sqlite3.Connection, unicode, bool) -> None
     """
     Create the label and inventory for the collection having this
     :class:`~pdart.pds4.LID` using the database connection, writing
@@ -55,8 +60,8 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
     if verify:
         verify_label_or_raise(label)
 
-    with io.open(inventory_filepath, 'w', newline='') as f:
-        f.write(make_db_collection_inventory(conn, lid))
+    with io.open(inventory_filepath, 'wb', newline='') as f2:
+        f2.write(make_db_collection_inventory(conn, lid))
 
     print 'collection label and inventory for', lid
     sys.stdout.flush()

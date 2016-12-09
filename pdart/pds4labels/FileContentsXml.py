@@ -5,6 +5,10 @@ label.
 """
 from pdart.xml.Templates import *
 
+from typing import Callable
+from xml.dom.minidom import Document, Node
+
+
 # For product labels: produces the fragment of the File node that
 # contains Header and Array_2D_Image elements.
 
@@ -13,6 +17,8 @@ AXIS_NAME_TABLE = {
     1: 'Line',
     2: 'Sample'
     }
+# type: Dict[int, unicode]
+
 
 BITPIX_TABLE = {
     # TODO Verify these
@@ -23,6 +29,7 @@ BITPIX_TABLE = {
     -32: 'IEEE754MSBSingle',
     -62: 'IEEE754MSBDouble'
     }
+# type: Dict[int, unicode]
 
 
 axis_array = interpret_template("""<Axis_Array>
@@ -36,6 +43,7 @@ XML element.
 
 type: Dict -> Node
 """
+# type: (Dict[str, Any]) -> Callable[[Document], Node]
 
 header_contents = interpret_template("""<Header>
 <local_identifier><NODE name="local_identifier"/></local_identifier>
@@ -50,6 +58,7 @@ XML element.
 
 type: Dict -> Node
 """
+# type: (Dict[str, Any]) -> Callable[[Document], Node]
 
 data_1d_contents = interpret_template("""<Array>
 <offset unit="byte"><NODE name="offset" /></offset>
@@ -64,6 +73,7 @@ XML element.
 
 type: Dict -> Node
 """
+# type: (Dict[str, Any]) -> Callable[[Document], Node]
 
 data_2d_contents = interpret_template("""<Array_2D_Image>
 <offset unit="byte"><NODE name="offset" /></offset>
@@ -78,6 +88,7 @@ XML element.
 
 type: Dict -> Node
 """
+# type: (Dict[str, Any]) -> Callable[[Document], Node]
 
 element_array = interpret_template("""<Element_Array>
 <data_type><NODE name="data_type" /></data_type></Element_Array>""")
@@ -87,3 +98,4 @@ XML element.
 
 type: Dict -> Node
 """
+# type: (Dict[str, Any]) -> Callable[[Document], Node]

@@ -4,11 +4,15 @@ things up.
 """
 from contextlib import closing
 
+import sqlite3  # for mypy
+from typing import Any  # for mypy
+
 _last_bundle = None
 _last_bundle_result = None
 
 
 def lookup_bundle(conn, bundle):
+    # type: (sqlite3.Connection, unicode) -> Dict[str, Any]
     """Perform a database lookup on the bundle using a one-item cache."""
     global _last_bundle, _last_bundle_result
     if (bundle != _last_bundle):
@@ -27,6 +31,7 @@ _last_collection_result = None
 
 
 def lookup_collection(conn, collection):
+    # type: (sqlite3.Connection, unicode) -> Dict[str, Any]
     """
     Perform a database lookup on the collection using a one-item
     cache.

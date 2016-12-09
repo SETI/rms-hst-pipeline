@@ -14,9 +14,11 @@ XML element.
 
 type: Dict -> Node
 """
+# type: Dict[str, Any] -> NodeBuilder
 
 
 def _remove_trailing_decimal(str):
+    # type: (str) -> str
     """
     Given a string, remove any trailing zeros and then any trailing
     decimal point and return it.
@@ -31,6 +33,7 @@ def _remove_trailing_decimal(str):
 
 
 def get_placeholder_start_stop_times(*args, **kwargs):
+    # type: (...) -> Dict[str, str]
     """
     Return a placeholder ``<Time_Coordinates />`` XML element.
     """

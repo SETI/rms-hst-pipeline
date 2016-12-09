@@ -2,6 +2,10 @@
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
+from typing import Any, Dict  # for mypy
+import xml.dom.minidom
+
+
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
@@ -57,9 +61,11 @@ An interpreted document template to create a product label.
 
 type: Dict -> Doc
 """
+# type: Dict[str, Any] -> xml.minidom.Document
 
 
 def mk_Investigation_Area_name(proposal_id):
+    # type: (int) -> unicode
     """
     Boilerplate for the text content of a ``<name />`` element in the
     ``<Investigation_Area />`` element.
@@ -68,6 +74,7 @@ def mk_Investigation_Area_name(proposal_id):
 
 
 def mk_Investigation_Area_lidvid(proposal_id):
+    # type: (int) -> unicode
     """
     Boilerplate for the text content of a ``<lidvid />`` element in
     the ``<Investigation_Area />`` element.

@@ -5,8 +5,11 @@ product labels.
 from pdart.rules.Combinators import *
 from pdart.xml.Templates import *
 
+from typing import Tuple  # for mypy
+
 
 def target_identification(target_name, target_type, target_description):
+    # type: (unicode, unicode, unicode) -> NodeBuilder
     """
     Given a target name and target type, return a function that takes
     a document and returns a filled-out ``<Target_Identification />``
@@ -32,7 +35,7 @@ def target_identification(target_name, target_type, target_description):
     return func
 
 
-_approximate_target_table = {
+approximate_target_table = {
     'JUP': ('Jupiter', 'Planet'),
     'SAT': ('Saturn', 'Planet'),
     'URA': ('Uranus', 'Planet'),
@@ -48,8 +51,10 @@ _approximate_target_table = {
     'DIONE': ('Dione', 'Satellite'),
     'IAPETUS': ('Iapetus', 'Satellite')
     }
+# type: Dict[str, Tuple[unicode, unicode]]
 
 
 def get_placeholder_target(*args, **kwargs):
+    # type: (...) -> Tuple[unicode, unicode, unicode]
     """A placeholder triple of target name, type, and description."""
     return ('Magrathea', 'Planet', 'Home of Slartibartfast')

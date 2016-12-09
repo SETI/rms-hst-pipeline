@@ -94,6 +94,7 @@ class ProductLabelReduction(BadFitsFileReduction):
 
 
 def make_product_label(product, verify):
+    # type: (Product, bool) -> unicode
     """
     Create the label text for this :class:`~pdart.pds4.Product`.  If
     the FITS file is bad, raise an exception.  If verify is True,

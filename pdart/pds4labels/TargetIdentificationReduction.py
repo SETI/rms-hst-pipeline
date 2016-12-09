@@ -7,10 +7,15 @@ from pdart.pds4labels.TargetIdentificationXml import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
+from typing import Callable, Tuple  # for mypy
+# TODO stubs for pyfits
+_HeaderUnit = Any  # for mypy
+
 
 def _get_target_from_header_unit(header_unit):
+    # type: (_HeaderUnit) -> Tuple[unicode, unicode, unicode]
     targname = header_unit['TARGNAME']
-    for prefix, (name, type) in _approximate_target_table.iteritems():
+    for prefix, (name, type) in approximate_target_table.iteritems():
         if targname.startswith(prefix):
             return (name, type, 'The %s %s' % (type.lower(), name))
     raise Exception('TARGNAME %s doesn\'t match approximations' % targname)
@@ -19,6 +24,7 @@ def _get_target_from_header_unit(header_unit):
 _get_target = multiple_implementations('_get_target',
                                        _get_target_from_header_unit,
                                        get_placeholder_target)
+# type: Callable[[_HeaderUnit], Tuple[unicode, unicode, unicode]]
 
 
 class TargetIdentificationReduction(Reduction):

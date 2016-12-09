@@ -7,9 +7,18 @@ from pdart.pds4labels.FileContentsXml import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
+from typing import Callable, List  # for mypy
+from xml.dom.minidom import Document, Text  # for mypy
+
+# TODO Make mypy stubs for pyfits
+_HDU = Any
+
 
 def _mk_axis_arrays(hdu, axes):
+    # type: (List[_HDU], int) -> Callable[[Document], List[Text]]
     def mk_axis_array(hdu, i):
+        # type: (_HDU, int) -> Callable[[Document], Text]
+
         axis_name = AXIS_NAME_TABLE[i]
         elements = str(hdu.header['NAXIS%d' % i])
         # TODO Check the semantics of sequence_number

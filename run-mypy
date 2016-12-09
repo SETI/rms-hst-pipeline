@@ -2,8 +2,10 @@
 
 # export MYPYPATH=~/pdart/stubs
 # echo $MYPYPATH
-mypy --silent-imports --py2 pdart/db \
+mypy --silent-imports --py2 \
+    pdart/db \
     pdart/pds4 \
+    pdart/pds4labels \
     pdart/reductions \
     pdart/rules \
     pdart/xml

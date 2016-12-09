@@ -47,6 +47,7 @@ class BundleLabelReduction(Reduction):
 
 
 def make_bundle_label(bundle, verify):
+    # type: (Bundle, bool) -> unicode
     """
     Create the label text for this :class:`Bundle`.  If verify is
     True, verify the label against its XML and Schematron schemas.

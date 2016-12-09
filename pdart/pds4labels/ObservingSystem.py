@@ -27,6 +27,7 @@ XML element.
 
 type: Dict -> (Doc -> Node)
 """
+# type: Dict[str, Any] -> NodeBuilder
 
 
 acs_observing_system = _observing_system({
@@ -40,6 +41,7 @@ XML element.
 
 type: Doc -> Node
 """
+# type: NodeBuilder
 
 wfc3_observing_system = _observing_system({
         'name': 'Hubble Space Telescope Wide Field Camera 3',
@@ -52,6 +54,7 @@ XML element.
 
 type: Doc -> Node
 """
+# type: NodeBuilder
 
 wfpc2_observing_system = _observing_system({
         'name': 'Hubble Space Telescope Wide-Field Planetary Camera 2',
@@ -64,9 +67,11 @@ XML element.
 
 type: Doc -> Node
 """
+# type: NodeBuilder
 
 
 def observing_system(instrument):
+    # type: (str) -> NodeBuilder
     """
     Given an instrument, return an interpreted fragment template to
     create an ``<Observing_System />`` XML element.

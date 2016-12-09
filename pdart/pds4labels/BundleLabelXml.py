@@ -2,6 +2,9 @@
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
+from xml.dom.minidom import Document, Node  # for mypy
+
+
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
@@ -27,6 +30,7 @@ An interpreted document template to create a bundle label.
 
 type: Dict -> Doc
 """
+# type: Dict[str, Any] -> Document
 
 make_bundle_entry_member = interpret_template(
     """<Bundle_Member_Entry>
@@ -41,6 +45,7 @@ An interpreted fragment template to create a ``<Bundle_Member_Entry
 
 type: Dict -> (Doc -> Node)
 """
+# type: Dict[str, Any] -> Callable[[Document], Node]
 
 placeholder_citation_information = interpret_template(
     """<Citation_Information>
@@ -54,3 +59,4 @@ An interpreted fragment template to create a ``<Citation_Information
 
 type: Doc -> Node
 """
+# type: (Document) -> Node

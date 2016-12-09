@@ -9,8 +9,13 @@ from pdart.pds4labels.TimeCoordinatesXml import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
+from typing import Any  # for mypy
+# TODO mypy stubs for pyfits
+_HeaderUnit = Any  # for mypy
+
 
 def _get_start_stop_times_from_header_unit(header_unit):
+    # type: (_HeaderUnit) -> Dict[str, Any]
     date_obs = header_unit['DATE-OBS']
     time_obs = header_unit['TIME-OBS']
     exptime = header_unit['EXPTIME']

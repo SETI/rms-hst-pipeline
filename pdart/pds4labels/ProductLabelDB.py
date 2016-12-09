@@ -13,8 +13,12 @@ from pdart.pds4labels.ProductLabelXml import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
+from typing import Any, Dict, Iterable  # for mypy
+import sqlite3  # for mypy
+
 
 def make_db_product_label(conn, lid, verify):
+    # type: (sqlite3.Connection, unicode, bool) -> unicode
     """
     Create the label text for the product having this
     :class:`~pdart.pds4.LID` using the database connection.  If verify
@@ -68,11 +72,16 @@ def make_db_product_label(conn, lid, verify):
 
 
 def _make_header_dictionary(lid, hdu_index, cursor):
+    # type: (unicode, int, sqlite3.Cursor) -> Dict[str, Any]
     cursor.execute("""SELECT keyword, value FROM cards
                       WHERE product=? AND hdu_index=?""",
                    (lid, hdu_index))
-    return dict(cursor.fetchall())
+
+    # We know that since it's coming from FITS headers, they are pairs
+    # of strings and Anys.
+    return dict(cast(Iterable[Tuple[str, Any]], cursor.fetchall()))
 
 
 def _make_header_dictionaries(lid, hdu_count, cursor):
+    # type: (unicode, int, sqlite3.Cursor) -> List[Dict[str, Any]]
     return [_make_header_dictionary(lid, i, cursor) for i in range(hdu_count)]

@@ -4,6 +4,7 @@ from pdart.xml.Pretty import pretty_print
 
 
 def test_make_product_label():
+    # type: () -> None
     """Create a product label.  Only a smoke test."""
     from pdart.pds4.Archives import get_any_archive
     arch = get_any_archive()

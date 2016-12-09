@@ -76,7 +76,7 @@ import xml.sax
 from typing import Any, Callable, Dict, List  # for mypy
 import xml.dom.minidom  # for mypy
 
-_UADict = Dict[unicode, Any]
+_UADict = Dict[str, Any]
 NodeBuilder = Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
 FragBuilder = Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]
 

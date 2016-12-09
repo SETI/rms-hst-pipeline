@@ -7,8 +7,15 @@ from contextlib import closing
 
 from pdart.pds4labels.FileContentsXml import *
 
+from xml.dom.minidom import Document, Text  # for mypy
+import sqlite3  # for mypy
+from typing import Callable, cast, Dict, Iterable, List, Tuple  # for mypy
+
+FragBuilder = Callable[[Document], List[Text]]  # for mypy
+
 
 def _db_mk_axis_arrays(headers, hdu_index, axes):
+    # type: (List[Dict[str, Any]], int, int) -> FragBuilder
     def mk_axis_array(i):
         axis_name = AXIS_NAME_TABLE[i]
 
@@ -24,6 +31,7 @@ def _db_mk_axis_arrays(headers, hdu_index, axes):
 
 
 def get_db_file_contents(headers, conn, lid):
+    # type: (List[Dict[str, Any]], sqlite3.Connection, unicode) -> FragBuilder
     """
     Given the dictionary of the header fields from a product's FITS
     file, an open connection to the database, and the product's
@@ -32,6 +40,7 @@ def get_db_file_contents(headers, conn, lid):
     elements for the FITS file's HDUs.
     """
     def get_hdu_contents(hdu_index, hdrLoc, datLoc, datSpan):
+        # type: (int, int, int, int) -> FragBuilder
         """
         Return an XML fragment containing the needed ``<Header />``
         and ``<Array />`` or ``<Array_2D_Image />`` elements for the
@@ -78,8 +87,9 @@ def get_db_file_contents(headers, conn, lid):
     with closing(conn.cursor()) as cursor:
         return combine_fragments_into_fragment(
             [get_hdu_contents(*hdu)
-             for hdu in cursor.execute(
-                    """SELECT hdu_index, hdrLoc, datLoc, datSpan
+             for hdu in cast(Iterable[Tuple[int, int, int, int]],
+                             cursor.execute(
+                        """SELECT hdu_index, hdrLoc, datLoc, datSpan
                        FROM hdus WHERE product=?
                        ORDER BY hdu_index ASC""",
-                    (str(lid),))])
+                        (str(lid),)))])
