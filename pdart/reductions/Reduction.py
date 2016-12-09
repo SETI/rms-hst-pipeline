@@ -100,6 +100,24 @@ import pyfits
 
 from pdart.rules.Combinators import parallel_list
 
+from typing import Any, Callable  # for mypy
+from pdart.pds4.Archive import Archive  # for mypy
+from pdart.pds4.Bundle import Bundle  # for mypy
+from pdart.pds4.Collection import Collection  # for mypy
+from pdart.pds4.Product import Product  # for mypy
+from pdart.pds4.File import File  # for mypy
+from pdart.pds4.LID import LID  # for mypy
+
+# TODO Make mypy stubs for pyfits.  Right now, I'm just faking them
+# with these substitutions.
+_HDU = Any
+_HeaderUnit = Any
+_DataUnit = Any
+
+
+# TODO Improve the typing on Reductions.  Right now, we just type them
+# to convert everything into Anys, but using mypy's generics, we ought
+# to be able to give them precise typing.
 
 class Reduction(object):
     """
@@ -107,33 +125,42 @@ class Reduction(object):
     new form.
     """
     def reduce_archive(self, archive_root, get_reduced_bundles):
+        # type: (unicode, Callable[[], List[Any]]) -> Any
         pass
 
     def reduce_bundle(self, archive, lid, get_reduced_collections):
+        # type: (Archive, LID, Callable[[], List[Any]]) -> Any
         pass
 
     def reduce_collection(self, archive, lid, get_reduced_products):
+        # type: (Archive, LID, Callable[[], List[Any]]) -> Any
         pass
 
     def reduce_product(self, archive, lid, get_reduced_fits_files):
+        # type: (Archive, LID, Callable[[], List[Any]]) -> Any
         pass
 
     def reduce_fits_file(self, file, get_reduced_hdus):
+        # type: (File, Callable[[], List[Any]]) -> Any
         pass
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
                    get_reduced_data_unit):
+        # type: (int, _HDU, Callable[[], Any], Callable[[], Any]) -> Any
         pass
 
     def reduce_header_unit(self, n, header_unit):
+        # type: (int, _HeaderUnit) -> Any
         pass
 
     def reduce_data_unit(self, n, data_unit):
+        # type: (int, _DataUnit) -> Any
         pass
 
 
 def reduction_type_documentation(dict):
+    # type: (Dict[str, Any]) -> str
     """
     Return a string showing the types of the methods of Reduction.
     The dictionary argument gives the types of the reductions.
@@ -206,6 +233,7 @@ class ReductionRunner(object):
 
     @abc.abstractmethod
     def run_archive(self, reduction, archive):
+        # type: (Reduction, Archive) -> Any
         """
         Run the :class:`~pdart.reductions.Reduction.Reduction` on an
         :class:`~pdart.pds4.Archive.Archive`.
@@ -214,6 +242,7 @@ class ReductionRunner(object):
 
     @abc.abstractmethod
     def run_bundle(self, reduction, bundle):
+        # type: (Reduction, Bundle) -> Any
         """
         Run the :class:`~pdart.reductions.Reduction.Reduction` on an
         :class:`~pdart.pds4.Bundle.Bundle`.
@@ -222,6 +251,7 @@ class ReductionRunner(object):
 
     @abc.abstractmethod
     def run_collection(self, reduction, collection):
+        # type: (Reduction, Collection) -> Any
         """
         Run the :class:`~pdart.reductions.Reduction.Reduction` on an
         :class:`~pdart.pds4.Collection.Collection`.
@@ -230,6 +260,7 @@ class ReductionRunner(object):
 
     @abc.abstractmethod
     def run_product(self, reduction, product):
+        # type: (Reduction, Product) -> Any
         """
         Run the :class:`~pdart.reductions.Reduction.Reduction` on an
         :class:`~pdart.pds4.Product.Product`.
@@ -238,6 +269,7 @@ class ReductionRunner(object):
 
     @abc.abstractmethod
     def run_fits_file(self, reduction, file):
+        # type: (Reduction, File) -> Any
         """
         Run the :class:`~pdart.reductions.Reduction.Reduction` on an
         FITS file.
@@ -246,6 +278,7 @@ class ReductionRunner(object):
 
     @abc.abstractmethod
     def run_hdu(self, reduction, n, hdu):
+        # type: (Reduction, int, _HDU) -> Any
         """
         Run the :class:`~pdart.reductions.Reduction.Reduction` on an
         HDU within a FITS file.
@@ -254,6 +287,7 @@ class ReductionRunner(object):
 
     @abc.abstractmethod
     def run_header_unit(self, reduction, n, header_unit):
+        # type: (Reduction, int, _HeaderUnit) -> Any
         """
         Run the :class:`~pdart.reductions.Reduction.Reduction` on an
         header unit within a FITS file.
@@ -262,6 +296,7 @@ class ReductionRunner(object):
 
     @abc.abstractmethod
     def run_data_unit(self, reduction, n, data_unit):
+        # type: (Reduction, int, _DataUnit) -> Any
         """
         Run the :class:`~pdart.reductions.Reduction.Reduction` on an
         data unit within a FITS file.
@@ -378,6 +413,7 @@ class DefaultReductionRunner(ReductionRunner):
 
 
 def run_reduction(reduction, archive):
+    # (Reduction, Archive) -> Any
     """
     Run a :class:`~pdart.reductions.Reduction.Reduction` on an
     :class:`~pdart.pds4.Archive.Archive` using the default recursion.

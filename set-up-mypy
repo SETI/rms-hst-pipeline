@@ -13,6 +13,7 @@ python3 -m pip install mypy-lang
 
 # create expanded set of stubs
 mkdir out || echo "out/ already exists"
+    # TODO stubs for pyfits?
 stubgen --py2 xml xml.dom xml.dom.minidom xml.etree 
 
 # install it in the typeshed
@@ -33,7 +34,7 @@ sed -e 's/from typing import Any/from typing import Any, Optional/' -i bak $XML/
 echo 'def getDOMImplementation(features: Optional[Any] = ...): ...' >> $XML/dom/__init__.pyi
 
 # let me know
-say 'all right now'
+say 'mypy is set up'
 
 # run it
 ./run-mypy

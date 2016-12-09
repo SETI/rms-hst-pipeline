@@ -4,8 +4,11 @@ This module provides functionality for composing
 """
 from pdart.reductions.Reduction import *
 
+from typing import Any, Callable, Sequence  # for mypy
+
 
 def indexed2(func):
+    # type: (Callable[[], Sequence[Any]]) -> Callable[[int], Callable[[], Any]]
     """
     A version of :func:`indexed` used for header and data units
     because there is only ever one element in them.  Most of the
@@ -36,6 +39,7 @@ def indexed2(func):
 
 
 def indexed(func):
+    # type: (Callable[[], Sequence[Any]]) -> Callable[[int], Callable[[], Any]]
     """
     Convert a thunk (no-parameter function) returning a tuple into a
     function taking an index and returning a thunk that gives the
