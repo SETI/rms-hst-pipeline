@@ -5,6 +5,8 @@ complete.
 """
 from pdart.tasks.TaskQueue import *
 
+from pdart.tasks.Task import Task  # for mypy
+
 import time
 
 
@@ -16,9 +18,12 @@ class TaskRunner(object):
     """
 
     _MINUTES = 60
+    # type: int
     _DEFAULT_SLEEP_TIME = 10 * _MINUTES
+    # type: float
 
     def __init__(self, capacity):
+        # type: (int) -> None
         """
         Create a TaskRunner with given capacity.  Capacity means how
         many processes will run simultaneously.
@@ -29,6 +34,7 @@ class TaskRunner(object):
         self.SLEEP_TIME = TaskRunner._DEFAULT_SLEEP_TIME
 
     def run_loop(self):
+        # type: () -> None
         """
         Launch up to
         :attr:`~pdart.tasks.TaskRunner.TaskRunner.capacity` tasks in
@@ -46,6 +52,7 @@ class TaskRunner(object):
             self.fill_running_to_capacity()
 
     def prune_by_status(self):
+        # type: () -> None
         """
         Remove tasks that have completed from
         :attr:`~pdart.tasks.TaskRunner.TaskRunner.running_tasks`,
@@ -85,6 +92,7 @@ class TaskRunner(object):
                                           'TIMING_OUT']
 
     def extend_pending(self, tasks):
+        # type: (List[Task]) -> None
         """
         Add the given tasks to the pending list, then launch some if
         not running at full capacity.
@@ -93,6 +101,7 @@ class TaskRunner(object):
         self.fill_running_to_capacity()
 
     def fill_running_to_capacity(self):
+        # type: () -> None
         """
         Launch more pending tasks if not already running at full
         capacity.
@@ -103,6 +112,7 @@ class TaskRunner(object):
         assert self._at_capacity()
 
     def _at_capacity(self):
+        # type: () -> bool
         """
         Return ``True`` iff the task queue is at maximum capacity:
         i.e., either the number of running tasks equals

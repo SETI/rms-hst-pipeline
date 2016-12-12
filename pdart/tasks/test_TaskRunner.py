@@ -3,6 +3,7 @@ from pdart.tasks.NullTask import *
 
 
 def test_TaskRunner():
+    # type: () -> None
     try:
         tr = TaskRunner(-4)
         assert False, "Should have raised exception"
@@ -16,6 +17,7 @@ def test_TaskRunner():
     tr = TaskRunner(4)
     tr.SLEEP_TIME = 10.0 / 1000  # wake up every 10ms instead
     tasks = [NumberedNullTask() for i in xrange(0, 50)]
+    # type: List[Task]
 
     tr.extend_pending(tasks)
     tr.run_loop()  # exits eventually
@@ -41,24 +43,29 @@ class DivideAndConquerTask(NumberedNullTask):
     def to_tuple(self):
         return (self.serial_number, self.units)
 
-    def on_success(self, task_runner):
+    def on_success(self, target):
+        # type: (TaskRunner) -> None
         if self.units > 1:
             new_units = self.units / 2
             left_task = DivideAndConquerTask(new_units)
             right_task = DivideAndConquerTask(new_units)
-            task_runner.extend_pending([left_task, right_task])
+            target.extend_pending([left_task, right_task])
 
-    def on_failure(self, task_runner):
+    def on_failure(self, target):
+        # type: (TaskRunner) -> None
         assert False, 'DivideAndConquer.on_failure()'
 
-    def on_termination(self, task_runner):
+    def on_termination(self, target):
+        # type: (TaskRunner) -> None
         assert False, 'DivideAndConquer.on_termination()'
 
-    def on_timeout(self, task_runner):
+    def on_timeout(self, target):
+        # type: (TaskRunner) -> None
         assert False, 'DivideAndConquer.on_timeout()'
 
 
 def test_DivideAndConquer():
+    # type: () -> None
     """
     Spawns and runs a large number of tasks (is it N^2 / 2?) to test
     the post-completion actions of the task.

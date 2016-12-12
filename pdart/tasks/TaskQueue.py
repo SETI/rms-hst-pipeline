@@ -6,6 +6,9 @@ a part of :class:`~pdart.tasks.TaskRunner.TaskRunner`.
 import collections
 from pdart.tasks.TaskDict import *
 
+from pdart.tasks.Task import Task  # for mypy
+from typing import Sequence
+
 
 class TaskQueue(object):
     """
@@ -18,12 +21,15 @@ class TaskQueue(object):
     in which they're running.
     """
     def __init__(self):
+        # type: () -> None
         """Create an empty task queue."""
         self.pending_tasks = collections.deque()
+        # type: collections.deque[Task]
         self.running_tasks = TaskDict()
         assert not self
 
     def append_pending(self, task):
+        # type: (Task) -> None
         """
         Add a new pending :class:`~pdart.tasks.Task.Task` to the
         queue.  The task must not already be in the queue.
@@ -33,6 +39,7 @@ class TaskQueue(object):
         assert self._tasks_are_disjoint()
 
     def extend_pending(self, tasks):
+        # type: (Sequence[Task]) -> None
         """
         Add a sequence of new pending :class:`~pdart.tasks.Task.Task`
         s to the queue.  None of the tasks may already be in the
@@ -44,6 +51,7 @@ class TaskQueue(object):
         assert self._tasks_are_disjoint()
 
     def is_pending(self, task):
+        # type: (Task) -> bool
         """
         Return ``True`` iff the :class:`~pdart.tasks.Task.Task` is
         pending in the queue.
@@ -51,6 +59,7 @@ class TaskQueue(object):
         return task in self.pending_tasks
 
     def has_pending_tasks(self):
+        # type: () -> bool
         """
         Return ``True`` iff there are :class:`~pdart.tasks.Task.Task`
         s pending in the queue.
@@ -58,15 +67,17 @@ class TaskQueue(object):
         return bool(self.pending_tasks)
 
     def append_running(self, task):
+        # type: (Task) -> None
         """
         Add a new :class:`~pdart.tasks.Task.Task` to run now into the
         queue.  The task must not already be in the queue.
         """
         assert task not in self, ('Duplicate task: %s' % task)
-        self.running_tasks.append(task)
+        self.running_tasks.insert_task(task)
         assert self._tasks_are_disjoint()
 
     def extend_running(self, tasks):
+        # type: (Sequence[Task]) -> None
         """
         Add a sequence of new running :class:`~pdart.tasks.Task.Task`
         s to the queue.  None of the tasks may already be in the
@@ -74,10 +85,11 @@ class TaskQueue(object):
         """
         for task in tasks:
             assert task not in self, ('Duplicate task: %s' % task)
-        self.running_tasks.extend(tasks)
+        self.running_tasks.insert_tasks(tasks)
         assert self._tasks_are_disjoint()
 
     def is_running(self, task):
+        # type: (Task) -> bool
         """
         Return ``True`` iff the :class:`~pdart.tasks.Task.Task` is
         running in the queue.
@@ -85,6 +97,7 @@ class TaskQueue(object):
         return task in self.running_tasks
 
     def has_running_tasks(self):
+        # type: () -> bool
         """
         Return ``True`` iff there are :class:`~pdart.tasks.Task.Task`
         s running in the queue.
@@ -92,6 +105,7 @@ class TaskQueue(object):
         return bool(self.running_tasks)
 
     def run_next_task(self):
+        # type: () -> Task
         """
         Remove the next pending :class:`~pdart.tasks.Task.Task`, put
         it into
@@ -108,6 +122,7 @@ class TaskQueue(object):
         return t
 
     def task_finished(self, task):
+        # type: (Task) -> None
         """
         Remove the :class:`~pdart.tasks.Task.Task` from
         :attr:`~pdart.tasks.TaskQueue.TaskQueue.running_tasks`.  The
@@ -119,6 +134,7 @@ class TaskQueue(object):
         assert self._tasks_are_disjoint()
 
     def _tasks_are_disjoint(self):
+        # type: () -> bool
         """
         Return ``True`` iff there are no
         :class:`~pdart.tasks.Task.Task` that are both pending and

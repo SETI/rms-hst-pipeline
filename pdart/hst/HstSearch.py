@@ -4,6 +4,7 @@ Functionality to retrieve HST data from MAST.
 import urllib
 
 _DATA_SET = 'hst'
+# type: str
 
 _QUERY_DEFAULTS = {
     'sci_instrume': 'ACS,WFPC2,WFC3',
@@ -11,9 +12,11 @@ _QUERY_DEFAULTS = {
     'outputformat': 'CSV',
     'resolver': "don'tresolve"
     }
+# type: Dict[str, str]
 
 
 def _make_query_dict(args):
+    # type: (Dict) -> Dict
     """
     Given a dictionary of query arguments for an HST search, combine
     it with default values and return that dictionary.
@@ -24,6 +27,7 @@ def _make_query_dict(args):
 
 
 def _make_url(query_dict):
+    # type: (Dict) -> str
     """
     Given a dictionary of search parameters, return the URL to perform
     the search.
@@ -35,6 +39,7 @@ def _make_url(query_dict):
 
 
 def make_url(**kwargs):
+    # type: (...) -> str
     """
     Given a list of search parameters, return the URL to perform the
     search.
@@ -43,6 +48,7 @@ def make_url(**kwargs):
 
 
 def hst_search(**kwargs):
+    # type: (...) -> str
     """
     Given a list of search parameters, perform an HST search and
     return a filename containing the search results.

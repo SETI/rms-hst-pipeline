@@ -4,8 +4,12 @@
 # echo $MYPYPATH
 mypy --silent-imports --py2 \
     pdart/db \
+    pdart/hst \
     pdart/pds4 \
     pdart/pds4labels \
     pdart/reductions \
     pdart/rules \
+    pdart/tasks \
     pdart/xml
+
+    # TODO Add all the scripts.

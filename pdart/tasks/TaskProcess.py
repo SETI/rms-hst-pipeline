@@ -5,8 +5,11 @@ for the process.
 """
 from pdart.tasks.RawProcess import *
 
+from pdart.tasks.Task import Task  # for mypy
+
 
 def _run_task_action(task):
+    # type: (Task) -> None
     """
     Call the :meth:`~pdart.tasks.Task.Task.run` method of the given
     task.
@@ -22,6 +25,7 @@ class TaskProcess(TimeoutProcess):
     function.
     """
     def __init__(self, task):
+        # type: (Task) -> None
         assert task
         TimeoutProcess.__init__(self, task.deadline_time,
                                 target=_run_task_action, args=(task,))

@@ -4,6 +4,7 @@ from pdart.tasks.NullTask import NullTask
 
 
 def test_TaskQueue():
+    # type: () -> None
     tq = TaskQueue()
     assert not tq
     assert not tq.has_pending_tasks()

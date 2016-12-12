@@ -5,6 +5,7 @@ import pdart.tasks.TaskProcess
 
 
 def test_TaskDict():
+    # type: () -> None
     td = TaskDict()
     t = NumberedNullTask()
     t2 = NumberedNullTask()

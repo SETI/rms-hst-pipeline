@@ -12,10 +12,12 @@ import time
 
 
 def _a_minute_from_now():
+    # type: () -> float
     return time.time() + 60
 
 
 def test_exit_code_to_status():
+    # type: () -> None
     assert exit_code_to_status(None) == 'RUNNING'
     assert exit_code_to_status(0) == 'SUCCEEDED'
     assert exit_code_to_status(-1) == 'TERMINATED'
@@ -23,6 +25,7 @@ def test_exit_code_to_status():
 
 
 def _pass():
+    # type: () -> None
     pass
 
 

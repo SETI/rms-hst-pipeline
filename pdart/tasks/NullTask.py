@@ -15,6 +15,7 @@ class NullTask(pdart.tasks.Task.Task):
     out in a minute and does nothing.  All instances are equal.
     """
     def __init__(self):
+        # type () -> None
         pdart.tasks.Task.Task.__init__(self, _a_minute_from_now())
 
     def __str__(self):
@@ -26,16 +27,16 @@ class NullTask(pdart.tasks.Task.Task):
     def run(self):
         pass
 
-    def on_success(self, task_runnner):
+    def on_success(self, target):
         pass
 
-    def on_failure(self, task_runnner):
+    def on_failure(self, target):
         pass
 
-    def on_termination(self, task_runnner):
+    def on_termination(self, target):
         pass
 
-    def on_timeout(self, task_runnner):
+    def on_timeout(self, target):
         pass
 
 
@@ -49,6 +50,7 @@ class NumberedNullTask(pdart.tasks.Task.Task):
 
     @classmethod
     def get_serial_number(cls):
+        # type: () -> int
         """Return a new serial number."""
         res = cls.last_serial_number
         cls.last_serial_number = res + 1
@@ -67,14 +69,14 @@ class NumberedNullTask(pdart.tasks.Task.Task):
     def run(self):
         pass
 
-    def on_success(self, task_runnner):
+    def on_success(self, target):
         pass
 
-    def on_failure(self, task_runnner):
+    def on_failure(self, target):
         pass
 
-    def on_termination(self, task_runnner):
+    def on_termination(self, target):
         pass
 
-    def on_timeout(self, task_runnner):
+    def on_timeout(self, target):
         pass

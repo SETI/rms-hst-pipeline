@@ -2,7 +2,8 @@
 Represenation for tasks to be run.
 """
 import abc
-from pdart.tasks.TaskQueue import *
+
+from typing import Any, Tuple  # for mypy
 
 
 class Task(object):
@@ -19,6 +20,7 @@ class Task(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, deadline_time):
+        # type: (float) -> None
         """
         Create a :class:`~pdart.tasks.Task.Task` with the given
         deadline time.  If it's still running past this time, it is
@@ -38,6 +40,7 @@ class Task(object):
 
     @abc.abstractmethod
     def to_tuple(self):
+        # type: () -> Tuple
         """
         Return a tuple of subobjects to be used to test equality and
         to hash.
@@ -69,6 +72,7 @@ class Task(object):
 
     @abc.abstractmethod
     def run(self):
+        # type: () -> None
         """
         Do the work of the task.  This will only be run in the forked
         process.
@@ -76,21 +80,25 @@ class Task(object):
         pass
 
     @abc.abstractmethod
-    def on_success(self, task_runnner):
+    def on_success(self, target):
+        # type: (Any) -> None
         """Do this in the main process after success of the task."""
         pass
 
     @abc.abstractmethod
-    def on_failure(self, task_runnner):
+    def on_failure(self, target):
+        # type: (Any) -> None
         """Do this in the main process after failure of the task."""
         pass
 
     @abc.abstractmethod
-    def on_termination(self, task_runnner):
+    def on_termination(self, target):
+        # type: (Any) -> None
         """Do this in the main process after termination of the task."""
         pass
 
     @abc.abstractmethod
-    def on_timeout(self, task_runnner):
+    def on_timeout(self, target):
+        # type: (Any) -> None
         """Do this in the main process after timeout of the task."""
         pass

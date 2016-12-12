@@ -6,6 +6,9 @@ running.  :class:`~pdart.tasks.TaskDict.TaskDict` is a part of
 """
 import pdart.tasks.TaskProcess
 
+from pdart.tasks.Task import Task  # for mypy
+from typing import Dict, Sequence, Set  # for mypy
+
 
 class TaskDict(dict):
     """
@@ -15,9 +18,11 @@ class TaskDict(dict):
     inserting task keys.
     """
     def __init__(self):
+        # type: () -> None
         pass
 
     def insert_task(self, task):
+        # type: (Task) -> None
         """
         Insert a new task to run into the
         :class:`~pdart.tasks.TaskDict.TaskDict` automatically
@@ -31,6 +36,7 @@ class TaskDict(dict):
         self[task] = pdart.tasks.TaskProcess.TaskProcess(task)
 
     def insert_tasks(self, tasks):
+        # type: (Sequence[Task]) -> None
         """
         Insert a list of new tasks to run into the
         :class:`~pdart.tasks.TaskDict.TaskDict`, automatically
@@ -44,6 +50,7 @@ class TaskDict(dict):
             self.insert_task(task)
 
     def isdisjoint(self, other_tasks):
+        # type: (Set[Task]) -> bool
         """
         Return ``True`` if the set of keys for this dictionary is
         disjoint from the argument.
