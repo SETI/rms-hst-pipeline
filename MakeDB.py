@@ -9,7 +9,8 @@ from pdart.db.CreateDatabase import create_database
 from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
 
-if __name__ == '__main__':
+def run():
+    # type: () -> None
     archive = get_any_archive()
     archive_dir = get_any_archive_dir()
     db_filepath = os.path.join(archive_dir, DATABASE_NAME)
@@ -29,3 +30,6 @@ if __name__ == '__main__':
         for line in conn.iterdump():
             print line
         conn.close()
+
+if __name__ == '__main__':
+    run()

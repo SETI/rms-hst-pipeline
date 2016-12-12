@@ -13,6 +13,7 @@ from pdart.rules.Combinators import *
 
 
 def _make_product_from_filepath(product_filepath):
+    # type: (str) -> Product
     """
     Given a filepath to a FITS product file, return the
     :class:``~pdart.pds4.Product.Product`` object for it.
@@ -31,6 +32,7 @@ def _make_product_from_filepath(product_filepath):
 
 
 def _usage():
+    # type: () -> None
     sys.stderr.write('usage: python MakeLabel.py <product FITS file>\n')
     sys.exit(1)
 
@@ -45,6 +47,7 @@ if __name__ == '__main__':
     product = _make_product_from_filepath(product_filepath)
 
     def run():
+        # type: () -> None
         label = make_product_label(product, False)
         failures = xml_schema_failures(None, label)
         if failures is not None:

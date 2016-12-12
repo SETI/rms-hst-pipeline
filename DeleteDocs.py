@@ -12,7 +12,7 @@ from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
 
-class DeleteDocCollectionsReduction(Reduction):
+class _DeleteDocCollectionsReduction(Reduction):
     """
     Summarizes the archive into ``None``; as a side-effect, deletes
     all document collections.
@@ -29,5 +29,5 @@ class DeleteDocCollectionsReduction(Reduction):
 
 if __name__ == '__main__':
     archive = get_any_archive()
-    reduction = DeleteDocCollectionsReduction()
+    reduction = _DeleteDocCollectionsReduction()
     raise_verbosely(lambda: run_reduction(reduction, archive))

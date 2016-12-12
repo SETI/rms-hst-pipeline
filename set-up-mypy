@@ -14,27 +14,31 @@ python3 -m pip install mypy-lang
 # create expanded set of stubs
 mkdir out || echo "out/ already exists"
     # TODO stubs for pyfits?
-stubgen --py2 xml xml.dom xml.dom.minidom xml.etree 
+stubgen --py2 xml xml.dom xml.dom.minidom xml.etree xml.etree.ElementTree
 
 # install it in the typeshed
 MYPY_ENV=~/miniconda2/envs/mypy
 TYPESHED=$MYPY_ENV/lib/mypy/typeshed
+SQLITE3=$TYPESHED/stdlib/2/sqlite3
 XML=$TYPESHED/stdlib/2/xml
 rm -rf $XML
 mv out/xml $TYPESHED/stdlib/2
 
     # remove a redundant parent class that fouls MRO
-sed -e 's/class Comment(Childless, CharacterData)/class Comment(CharacterData)/' -i bak $XML/dom/minidom.pyi
+sed -e 's/class Comment(Childless, CharacterData)/class Comment(CharacterData)/' -i .bak $XML/dom/minidom.pyi
 
     # add a result type to Document.createTextNode
-sed -e 's/def createTextNode(self, data): .../def createTextNode(self, data) -> Text: .../' -i bak $XML/dom/minidom.pyi
+sed -e 's/def createTextNode(self, data): .../def createTextNode(self, data) -> Text: .../' -i .bak $XML/dom/minidom.pyi
 
     # copy a reexported function up from xml.dom.minidom to xml.dom
-sed -e 's/from typing import Any/from typing import Any, Optional/' -i bak $XML/dom/__init__.pyi
+sed -e 's/from typing import Any/from typing import Any, Optional/' -i .bak $XML/dom/__init__.pyi
 echo 'def getDOMImplementation(features: Optional[Any] = ...): ...' >> $XML/dom/__init__.pyi
 
+    # fix a wrong result type in sqlite3 API
+    sed -e 's/def iterdump(self, \*args, \*\*kwargs) -> None:/def iterdump(self, *args, **kwargs) -> str:/' -i .bak $SQLITE3/dbapi2.pyi
+
 # let me know
-say 'mypy is set up'
+say 'my-py is set up'
 
 # run it
 ./run-mypy

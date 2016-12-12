@@ -10,6 +10,24 @@ mypy --silent-imports --py2 \
     pdart/reductions \
     pdart/rules \
     pdart/tasks \
-    pdart/xml
+    pdart/xml \
+    CheckBadFitsFiles.py \
+    CheckKeywords.py \
+    CheckSuffixes.py \
+    CheckTimes.py \
+    DeleteBrowse.py \
+    DeleteDB.py \
+    DeleteDocs.py \
+    Dev.py \
+    DoHstParams.py \
+    MakeAll.py \
+    MakeDB.py \
+    MakeDocCollections.py \
+    MakeLabel.py \
+    MakeLabels.py \
+    MakeRawBrowse.py \
+    
 
     # TODO Add all the scripts.
+    # CheckParam.py \
+    # GetDoc.py \

@@ -15,12 +15,19 @@ from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
 from pdart.rules.Combinators import *
 
+from typing import cast, Iterable  # for mypy
+
+
 VERIFY = False
+# type: bool
 IN_MEMORY = False
+# type: bool
 CREATE_DB = True
+# type: bool
 
 
 def make_db_labels(conn):
+    # type: (sqlite3.Connection) -> None
     """
     Write labels for the whole archive in hierarchical order to
     increase cache hits for bundles and collections.  NOTE: This
@@ -28,18 +35,21 @@ def make_db_labels(conn):
     having three open cursors.
     """
     with closing(conn.cursor()) as bundle_cursor:
-        for (bundle,) in bundle_cursor.execute('SELECT bundle FROM bundles'):
+        for (bundle,) in cast(Iterable[Tuple[unicode]],
+                              bundle_cursor.execute('SELECT bundle FROM bundles')):
 
             with closing(conn.cursor()) as collection_cursor:
-                for (coll,) in collection_cursor.execute(
+                for (coll,) in cast(Iterable[Tuple[unicode]],
+                                    collection_cursor.execute(
                   'SELECT collection FROM collections WHERE bundle=?',
-                  (bundle,)):
+                  (bundle,))):
 
                     with closing(conn.cursor()) as product_cursor:
-                        for (prod,) in product_cursor.execute(
-                          """SELECT product FROM products WHERE collection=?
+                        for (prod,) in cast(Iterable[Tuple[unicode]],
+                                            product_cursor.execute(
+                                """SELECT product FROM products WHERE collection=?
                            EXCEPT SELECT product FROM bad_fits_files""",
-                          (coll,)):
+                                (coll,))):
 
                             make_db_product_label(conn, prod, VERIFY)
 
@@ -49,26 +59,33 @@ def make_db_labels(conn):
 
 
 def make_db_bundle_labels(conn):
+    # type: (sqlite3.Connection) -> None
     with closing(conn.cursor()) as cursor:
-        for (lid,) in cursor.execute('SELECT bundle FROM bundles'):
+        for (lid,) in cast(Iterable[Tuple[unicode]],
+                           cursor.execute('SELECT bundle FROM bundles')):
             make_db_bundle_label(conn, lid, VERIFY)
 
 
 def make_db_collection_labels_and_inventories(conn):
+    # type: (sqlite3.Connection) -> None
     with closing(conn.cursor()) as cursor:
-        for (lid,) in cursor.execute('SELECT collection FROM collections'):
+        for (lid,) in cast(Iterable[Tuple[unicode]],
+                           cursor.execute(
+                'SELECT collection FROM collections')):
             make_db_collection_label_and_inventory(conn, lid, VERIFY)
 
 
 def make_db_product_labels(conn):
+    # type: (sqlite3.Connection) -> None
     with closing(conn.cursor()) as cursor:
-        for (lid,) in cursor.execute(
+        for (lid,) in cast(Iterable[Tuple[unicode]], cursor.execute(
             """SELECT product FROM products EXCEPT
-               SELECT product FROM bad_fits_files"""):
+               SELECT product FROM bad_fits_files""")):
             make_db_product_label(conn, lid, VERIFY)
 
 
 def get_conn():
+    # type: () -> sqlite3.Connection
     if IN_MEMORY:
         return sqlite3.connect(':memory:')
     else:
@@ -77,6 +94,7 @@ def get_conn():
 
 
 def dev():
+    # type: () -> None
     archive = get_any_archive()
     with closing(get_conn()) as conn:
         if CREATE_DB:

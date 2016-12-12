@@ -11,32 +11,38 @@ import xml.etree.ElementTree
 
 
 def _get_apt_url(proposal_id):
+    # type: (int) -> str
     """Return the URL to get the APT file for the given proposal id."""
     return 'https://www.stsci.edu/hst/phase2-public/%d.apt' % proposal_id
 
 
 def _get_pdf_url(proposal_id):
+    # type: (int) -> str
     """Return the URL to get the PDF file for the given proposal id."""
     return 'https://www.stsci.edu/hst/phase2-public/%d.pdf' % proposal_id
 
 
 def _get_pro_url(proposal_id):
+    # type: (int) -> str
     """Return the URL to get the PRO file for the given proposal id."""
     return 'https://www.stsci.edu/hst/phase2-public/%d.pro' % proposal_id
 
 
 def _get_prop_url(proposal_id):
+    # type: (int) -> str
     """Return the URL to get the PROP file for the given proposal id."""
     return 'https://www.stsci.edu/hst/phase2-public/%d.prop' % proposal_id
 
 
 def _retrieve_doc(url):
+    # type: (unicode) -> str
     """Retrives the text at that URL or raises an exception."""
     resp = urllib2.urlopen(url)
     return resp.read()
 
 
 def _retrieve_apt(proposal_id, docs_dir):
+    # type: (int, unicode) -> None
     """
     Retrieve the APT file for the given proposal id, write it into the
     document directory (creating the directory if necessary), then
@@ -57,12 +63,13 @@ def _retrieve_apt(proposal_id, docs_dir):
     abst = root.find('.//Abstract')
     assert abst is not None
     assert abst.text is not None
-    with open(abstract_fp, 'w') as f:
-        f.write(abst.text)
+    with open(abstract_fp, 'w') as f2:
+        f2.write(abst.text)
     print '# Wrote', abstract_fp
 
 
 def _retrieve_pdf(proposal_id, docs_dir):
+    # type: (int, unicode) -> None
     """
     Retrieve the PDF file for the given proposal id and write it
     into the document directory.
@@ -75,6 +82,7 @@ def _retrieve_pdf(proposal_id, docs_dir):
 
 
 def _retrieve_pro(proposal_id, docs_dir):
+    # type: (int, unicode) -> None
     """
     Retrieve the PRO file for the given proposal id and write it
     into the document directory.
@@ -87,6 +95,7 @@ def _retrieve_pro(proposal_id, docs_dir):
 
 
 def _retrieve_prop(proposal_id, docs_dir):
+    # type: (int, unicode) -> None
     """
     Retrieve the PROP file for the given proposal id and write it into
     the document directory.

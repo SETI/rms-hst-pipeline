@@ -7,16 +7,21 @@ from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
+from typing import Iterable, Set, TypeVar  # for mypy
+T = TypeVar('T')  # for mypy
+
 
 def _unions(sets):
+    # type: (Iterable[Set[T]]) -> Set[T]
     """Union up a list of sets."""
     res = set()
+    # type: Set[T]
     for s in sets:
         res |= s
     return res
 
 
-class CheckSuffixesReduction(Reduction):
+class _CheckSuffixesReduction(Reduction):
     """
     Summarizes an archive into a set of collection suffixes.
     """
@@ -32,7 +37,7 @@ class CheckSuffixesReduction(Reduction):
 
 
 if __name__ == '__main__':
-    reduction = CheckSuffixesReduction()
+    reduction = _CheckSuffixesReduction()
     archive = get_any_archive()
 
     def thunk():

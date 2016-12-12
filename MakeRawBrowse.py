@@ -34,11 +34,13 @@ class _MakeRawBrowseReduction(CompositeReduction):
 
 
 def _get_conn():
+    # type: () -> sqlite3.Connection
     return sqlite3.connect(os.path.join(get_any_archive_dir(),
                                         DATABASE_NAME))
 
 
 def _check_raw_browse(archive):
+    # type: (Archive) -> None
     for b in archive.bundles():
         collections = list(b.collections())
         for c in collections:

@@ -8,19 +8,25 @@ from pdart.pds4.Archives import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
+from typing import Iterable, Set, TypeVar  # for mypy
+T = TypeVar('T')  # for mypy
+
+
 # These are the suffixes in the development archive that have
 # sufficient datetime information: c0m c1m crj d0m drz flt q0m raw
 
 
 def _unions(sets):
-    """Union a list of sets."""
+    # type: (Iterable[Set[T]]) -> Set[T]
+    """Union up a list of sets."""
     res = set()
+    # type: Set[T]
     for s in sets:
         res |= s
     return res
 
 
-class CheckTimesReduction(Reduction):
+class _CheckTimesReduction(Reduction):
     """
     When run on an archive, return a set of LIDs of the products whose
     FITS file contains sufficient datetime information to calculate
@@ -75,7 +81,7 @@ class CheckTimesReduction(Reduction):
 
 
 if __name__ == '__main__':
-    reduction = CheckTimesReduction()
+    reduction = _CheckTimesReduction()
     archive = get_any_archive()
     lids = run_reduction(reduction, archive)
     print 60 * '-'

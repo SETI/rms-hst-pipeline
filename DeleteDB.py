@@ -9,6 +9,7 @@ from pdart.pds4.Archives import *
 
 
 def _check_deletion(archive_dir):
+    # type: (unicode) -> None
     assert not os.path.isfile(os.path.join(archive_dir, DATABASE_NAME))
 
 

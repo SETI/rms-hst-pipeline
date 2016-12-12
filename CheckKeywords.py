@@ -8,13 +8,18 @@ from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
+from typing import Dict, Iterable, TypeVar  # for mypy
+K = TypeVar('K')  # for mypy
+
 
 def _union_dicts(dicts):
+    # type: (Iterable[Dict[K, int]]) -> Dict[K, int]
     """
     Summarize a list of dictionaries from keywords to integers by
     summing the integer values.
     """
     res = {}
+    # type: Dict[K, int]
     for d in dicts:
         for k, v in d.items():
             if k not in res:

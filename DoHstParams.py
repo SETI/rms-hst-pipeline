@@ -11,6 +11,7 @@ from pdart.rules.Combinators import *
 
 
 def make_one_product_label():
+    # type: () -> None
     """Prints a product label for the first RAW product."""
     arch = get_any_archive()
     for b in arch.bundles():

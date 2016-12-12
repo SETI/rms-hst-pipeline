@@ -28,6 +28,7 @@ class DeleteRawBrowseReduction(Reduction):
 
 
 def _check_deletion(archive):
+    # type: (Archive) -> None
     for collection in archive.collections():
         assert collection.prefix() is not "browse"
 

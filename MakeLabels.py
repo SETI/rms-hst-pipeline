@@ -46,6 +46,7 @@ class _MakeLabelsReduction(CompositeReduction):
 
 
 def _has_bad_fits_file(product):
+    # type: (Product) -> bool
     fp = product.absolute_filepath()
     try:
         fits = pyfits.open(fp)
@@ -58,6 +59,7 @@ def _has_bad_fits_file(product):
 
 
 def _check_labels(archive):
+    # type: (Archive) -> None
     for bundle in archive.bundles():
         fp = bundle.label_filepath()
         assert os.path.isfile(fp), fp

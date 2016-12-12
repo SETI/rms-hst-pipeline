@@ -39,9 +39,13 @@ class MakeLabelsReduction(CompositeReduction):
                                      CollectionLabelReduction(),
                                      ProductLabelReduction()])
 
-if __name__ == '__main__':
+def run():
+    # type: () -> None
     archive = get_any_archive()
     reduction = CompositeReduction([LogProductsReduction(),
                                     MakeLabelsReduction(),
                                     MakeRawBrowseReduction()])
     raise_verbosely(lambda: run_reduction(reduction, archive))
+
+if __name__ == '__main__':
+    run()
