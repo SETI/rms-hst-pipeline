@@ -96,28 +96,31 @@ are supposed to be used where.
 import os.path
 
 import abc
+import numpy
 import pyfits
 
 from pdart.rules.Combinators import parallel_list
 
-from typing import Any, Callable  # for mypy
 from pdart.pds4.Archive import Archive  # for mypy
 from pdart.pds4.Bundle import Bundle  # for mypy
 from pdart.pds4.Collection import Collection  # for mypy
 from pdart.pds4.Product import Product  # for mypy
 from pdart.pds4.File import File  # for mypy
 from pdart.pds4.LID import LID  # for mypy
+from typing import Any, Callable, Union  # for mypy
 
-# TODO Make mypy stubs for pyfits.  Right now, I'm just faking them
-# with these substitutions.
-_HDU = Any
-_HeaderUnit = Any
-_DataUnit = Any
+# These are Unions because, for some reason (bugginess?) mypy doesn't
+# recognize the bare type names.
+_HDU = Union[pyfits.FitsHDU]
+_HeaderUnit = Union[pyfits.Header]
+_DataUnit = Union[numpy.ndarray]
 
+# I wish I could provide precise types for Reductions.  But mypy's
+# generics seem to be buggy enough that they don't work.  I tried
+# making Reduction generic, then introduced a type error in a
+# descendant of it in test_Reduction.  Mypy didn't catch the type
+# error.  So I'm leaving these all dynamically typed as Any.  :-(
 
-# TODO Improve the typing on Reductions.  Right now, we just type them
-# to convert everything into Anys, but using mypy's generics, we ought
-# to be able to give them precise typing.
 
 class Reduction(object):
     """
