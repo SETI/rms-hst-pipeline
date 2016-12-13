@@ -39,6 +39,7 @@ class MakeLabelsReduction(CompositeReduction):
                                      CollectionLabelReduction(),
                                      ProductLabelReduction()])
 
+
 def run():
     # type: () -> None
     archive = get_any_archive()

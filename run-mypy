@@ -26,8 +26,9 @@ mypy --silent-imports --py2 \
     MakeLabel.py \
     MakeLabels.py \
     MakeRawBrowse.py \
-    
-
-    # TODO Add all the scripts.
-    # CheckParam.py \
-    # GetDoc.py \
+    SearchDev.py \
+    TestHstParams.py \
+    TestMast.py \
+    ValidateArchive.py \
+    ValidateLabel.py \
+    ValidateLabels.py

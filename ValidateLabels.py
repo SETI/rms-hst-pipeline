@@ -99,6 +99,7 @@ class ValidateLabelsReduction(CompositeReduction):
     Combines previous validation reductions.
     """
     def __init__(self):
+        # type: () -> None
         CompositeReduction.__init__(self, [
                 LogProductsReduction(),
                 CanMakeValidBundleLabelsReduction(),
@@ -106,8 +107,12 @@ class ValidateLabelsReduction(CompositeReduction):
                 CanMakeValidProductLabelsReduction()])
 
 
-if __name__ == '__main__':
+def run():
+    # type: () -> None
     reduction = ValidateLabelsReduction()
     archive = get_any_archive()
     raise_verbosely(lambda: run_reduction(reduction, archive))
     # run_reduction(reduction, archive)
+
+if __name__ == '__main__':
+    run()

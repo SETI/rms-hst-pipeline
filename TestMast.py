@@ -4,6 +4,8 @@ This module is a script to explore querying MAST.
 import csv
 import urllib
 
+from typing import Any, Dict, Iterator, Union  # for mypy
+
 _DATA_SET = 'hst'
 
 _QUERY_DEFAULTS = {
@@ -12,9 +14,11 @@ _QUERY_DEFAULTS = {
     'outputformat': 'CSV',
     'resolver': "don'tresolve"
     }
+# type: Dict[str, str]
 
 
 def _make_url(query_dict):
+    # type: (Dict[str, str]) -> unicode
     params = urllib.urlencode(query_dict)
     url = 'https://archive.stsci.edu/%s/search.php?action=Search&%s' % \
         (_DATA_SET, params)
@@ -22,6 +26,7 @@ def _make_url(query_dict):
 
 
 def query_dicts(query_args):
+    # type: (Dict[str, str]) -> Iterator[Dict[Any, Union[str, int]]]
     """
     Given a dictionary of HST search arguments, return a generator of
     dictionaries, each dictionary containing a single result.
@@ -35,12 +40,13 @@ def query_dicts(query_args):
     with open(filename, 'r') as f:
         reader = csv.DictReader(f)
         # Skip the row containing field types
-        reader.next()
+        reader.__next__()
         for row in reader:
             yield row
 
 
-if __name__ == '__main__':
+def run():
+    # type: () -> None
     query_args = {
         'max_records': '10',
         'verb': '3'
@@ -50,6 +56,9 @@ if __name__ == '__main__':
         print d
         print sorted(d.keys())
         break
+
+if __name__ == '__main__':
+    run()
 
 # Keys for all columns are: ['AEC', 'Apertures', 'Archive Class',
 # 'Archive Date', 'Asn ID', 'Bandwidth', 'Broad Category', 'COSTAR',

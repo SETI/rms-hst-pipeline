@@ -7,7 +7,9 @@ from pdart.hst.HstSearch import *
 # TODO How do I get LIDs for the files? sci_data_set_name
 # TODO How do I get the files?  st_dads is an asynch service.
 
-if __name__ == '__main__':
+
+def run():
+    # type: () -> None
     print 'Hello, from SearchDev!'
     if False:
         columns = 'sci_archive_date,sci_data_set_name,' + \
@@ -25,3 +27,6 @@ if __name__ == '__main__':
     with open(fp, 'r') as f:
         for l in f:
             print l,
+
+if __name__ == '__main__':
+    run()

@@ -12,9 +12,15 @@ from pdart.reductions.CompositeReduction import *
 from pdart.rules.Combinators import *
 
 
+from typing import Iterable, Set, TypeVar  # for mypy
+T = TypeVar('T')  # for mypy
+
+
 def _unions(sets):
-    """Unions a list of sets."""
+    # type: (Iterable[Set[T]]) -> Set[T]
+    """Union a list of sets."""
     res = set()
+    # type: Set[T]
     for s in sets:
         res |= s
     return res

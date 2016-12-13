@@ -9,6 +9,7 @@ from pdart.db.CreateDatabase import create_database
 from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
 
+
 def run():
     # type: () -> None
     archive = get_any_archive()

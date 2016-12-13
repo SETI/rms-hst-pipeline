@@ -36,7 +36,8 @@ def make_db_labels(conn):
     """
     with closing(conn.cursor()) as bundle_cursor:
         for (bundle,) in cast(Iterable[Tuple[unicode]],
-                              bundle_cursor.execute('SELECT bundle FROM bundles')):
+                              bundle_cursor.execute(
+                'SELECT bundle FROM bundles')):
 
             with closing(conn.cursor()) as collection_cursor:
                 for (coll,) in cast(Iterable[Tuple[unicode]],

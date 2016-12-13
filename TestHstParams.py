@@ -9,6 +9,7 @@ from pdart.rules.Combinators import *
 
 
 def get_product():
+    # type: () -> Product
     """
     Return the first product in the archive whose FITS file is
     parseable
@@ -26,8 +27,14 @@ def get_product():
                     except IOError:
                         pass
 
-if __name__ == '__main__':
+
+def run():
+    # type: () -> None
     reduction = HstParametersReduction()
     runner = DefaultReductionRunner()
     p = get_product()
     print raise_verbosely(lambda: runner.run_product(reduction, p))
+
+
+if __name__ == '__main__':
+    run()

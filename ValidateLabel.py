@@ -6,7 +6,9 @@ import sys
 
 from pdart.xml.Schema import *
 
-if __name__ == '__main__':
+
+def run():
+    # type: () -> None
     if len(sys.argv) is not 2:
         sys.stderr.write('usage: python ValidateLabel.py <pds4 label>\n')
         sys.exit(1)
@@ -29,3 +31,6 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         sys.exit(0)
+
+if __name__ == '__main__':
+    run()
