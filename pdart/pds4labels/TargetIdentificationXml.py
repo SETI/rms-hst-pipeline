@@ -5,7 +5,7 @@ product labels.
 from pdart.rules.Combinators import *
 from pdart.xml.Templates import *
 
-from typing import Tuple  # for mypy
+from typing import Tuple
 
 
 def target_identification(target_name, target_type, target_description):

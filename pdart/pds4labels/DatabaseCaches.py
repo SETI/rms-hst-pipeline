@@ -4,9 +4,11 @@ things up.
 """
 from contextlib import closing
 
-import sqlite3  # for mypy
-from typing import Any  # for mypy
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    import sqlite3
 
+# globals
 _last_bundle = None
 _last_bundle_result = None
 

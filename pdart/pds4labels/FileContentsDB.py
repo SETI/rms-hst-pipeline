@@ -7,11 +7,12 @@ from contextlib import closing
 
 from pdart.pds4labels.FileContentsXml import *
 
-from xml.dom.minidom import Document, Text  # for mypy
-import sqlite3  # for mypy
-from typing import Callable, cast, Dict, Iterable, List, Tuple  # for mypy
+from typing import Callable, cast, Dict, Iterable, List, Tuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    import sqlite3
+    from xml.dom.minidom import Document, Text
 
-FragBuilder = Callable[[Document], List[Text]]  # for mypy
+    FragBuilder = Callable[[Document], List[Text]]
 
 
 def _db_mk_axis_arrays(headers, hdu_index, axes):

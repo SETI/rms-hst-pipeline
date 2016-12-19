@@ -3,7 +3,7 @@ Represenation for tasks to be run.
 """
 import abc
 
-from typing import Any, Tuple  # for mypy
+from typing import Any, Tuple
 
 
 class Task(object):

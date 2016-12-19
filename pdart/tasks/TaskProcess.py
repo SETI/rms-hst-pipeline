@@ -5,7 +5,9 @@ for the process.
 """
 from pdart.tasks.RawProcess import *
 
-from pdart.tasks.Task import Task  # for mypy
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pdart.tasks.Task import Task
 
 
 def _run_task_action(task):

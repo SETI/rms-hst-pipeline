@@ -6,7 +6,7 @@ from pdart.pds4labels.HstParametersXml import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
-from typing import Any, Dict  # for mypy
+from typing import Any, Dict
 
 
 def get_repeat_exposure_count(product_id, instrument, header):

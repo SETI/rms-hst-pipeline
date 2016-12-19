@@ -9,9 +9,10 @@ from pdart.pds4labels.TimeCoordinatesXml import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
-from typing import Any  # for mypy
-# TODO mypy stubs for pyfits
-_HeaderUnit = Any  # for mypy
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    # TODO mypy stubs for pyfits
+    _HeaderUnit = Any
 
 
 def _get_start_stop_times_from_header_unit(header_unit):

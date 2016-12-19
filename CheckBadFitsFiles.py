@@ -7,8 +7,9 @@ from pdart.pds4.Archives import *
 from pdart.reductions.BadFitsFileReduction import *
 from pdart.rules.Combinators import *
 
-from typing import Iterable, Set, TypeVar  # for mypy
-T = TypeVar('T')  # for mypy
+from typing import Iterable, Set, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    T = TypeVar('T')
 
 
 def _unions(sets):

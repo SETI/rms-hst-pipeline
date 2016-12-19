@@ -13,8 +13,9 @@ from pdart.pds4labels.ProductLabelXml import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
-from typing import Any, Dict, Iterable  # for mypy
-import sqlite3  # for mypy
+from typing import Any, Dict, Iterable, TYPE_CHECKING
+if TYPE_CHECKING:
+    import sqlite3
 
 
 def make_db_product_label(conn, lid, verify):

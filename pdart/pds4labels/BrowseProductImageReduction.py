@@ -13,7 +13,7 @@ from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 import pdart.add_pds_tools
 import picmaker
 
-from typing import AnyStr  # for mypy
+from typing import AnyStr
 
 
 def ensure_directory(dir):

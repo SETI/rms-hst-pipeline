@@ -12,9 +12,10 @@ from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 import pdart.add_pds_tools
 import picmaker
 
-from pdart.pds4.Archive import Archive  # for mypy
-import sqlite3  # for mypy
-from typing import cast, Iterable, Tuple  # for mypy
+from typing import cast, Iterable, Tuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from pdart.pds4.Archive import Archive
+    import sqlite3
 
 
 def _make_browse_coll_fp(raw_coll_fp):

@@ -9,9 +9,10 @@ import re
 from pdart.pds4.Component import *
 from pdart.pds4.LID import *
 
-import pdart.pds4.Bundle  # for mypy
-import pdart.pds4.Product  # for mypy
-from typing import Iterator  # for mypy
+from typing import Iterator, TYPE_CHECKING
+if TYPE_CHECKING:
+    import pdart.pds4.Bundle
+    import pdart.pds4.Product
 
 
 class Collection(Component):

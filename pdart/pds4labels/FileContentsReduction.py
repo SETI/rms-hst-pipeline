@@ -7,11 +7,12 @@ from pdart.pds4labels.FileContentsXml import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
-from typing import Callable, List  # for mypy
-from xml.dom.minidom import Document, Text  # for mypy
+from typing import Callable, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from xml.dom.minidom import Document, Text
 
-# TODO Make mypy stubs for pyfits
-_HDU = Any
+    # TODO Make mypy stubs for pyfits
+    _HDU = Any
 
 
 def _mk_axis_arrays(hdu, axes):

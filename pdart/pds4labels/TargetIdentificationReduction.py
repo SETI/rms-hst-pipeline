@@ -7,9 +7,10 @@ from pdart.pds4labels.TargetIdentificationXml import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
-from typing import Callable, Tuple  # for mypy
-# TODO stubs for pyfits
-_HeaderUnit = Any  # for mypy
+from typing import Callable, Tuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    # TODO stubs for pyfits
+    _HeaderUnit = Any
 
 
 def _get_target_from_header_unit(header_unit):

@@ -11,9 +11,10 @@ from pdart.pds4.Collection import Collection
 from pdart.pds4.Component import *
 from pdart.pds4.LID import *
 
-import pdart.pds4.Archive  # for mypy
-import pdart.pds4.Product  # for mypy
-from typing import Iterator  # for mypy
+from typing import Iterator, TYPE_CHECKING
+if TYPE_CHECKING:
+    import pdart.pds4.Archive
+    import pdart.pds4.Product
 
 
 class Bundle(Component):

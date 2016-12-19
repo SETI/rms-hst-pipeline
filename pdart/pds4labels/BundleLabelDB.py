@@ -7,7 +7,7 @@ from pdart.pds4labels.DatabaseCaches import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
-from typing import cast, Iterable  # for mypy
+from typing import cast, Iterable
 
 
 def make_db_bundle_label(conn, lid, verify):

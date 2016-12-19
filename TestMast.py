@@ -4,7 +4,7 @@ This module is a script to explore querying MAST.
 import csv
 import urllib
 
-from typing import Any, Dict, Iterator, Union  # for mypy
+from typing import Any, Dict, Iterator, Union
 
 _DATA_SET = 'hst'
 

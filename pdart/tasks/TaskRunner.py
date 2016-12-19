@@ -4,10 +4,11 @@ running simultaneously, launching new tasks when the old ones
 complete.
 """
 from pdart.tasks.TaskQueue import *
-
-from pdart.tasks.Task import Task  # for mypy
-
 import time
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pdart.tasks.Task import Task
 
 
 class TaskRunner(object):

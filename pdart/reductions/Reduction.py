@@ -101,19 +101,20 @@ import pyfits
 
 from pdart.rules.Combinators import parallel_list
 
-from pdart.pds4.Archive import Archive  # for mypy
-from pdart.pds4.Bundle import Bundle  # for mypy
-from pdart.pds4.Collection import Collection  # for mypy
-from pdart.pds4.Product import Product  # for mypy
-from pdart.pds4.File import File  # for mypy
-from pdart.pds4.LID import LID  # for mypy
-from typing import Any, Callable, Union  # for mypy
+from typing import Any, Callable, TYPE_CHECKING, Union
+if TYPE_CHECKING:
+    from pdart.pds4.Archive import Archive
+    from pdart.pds4.Bundle import Bundle
+    from pdart.pds4.Collection import Collection
+    from pdart.pds4.Product import Product
+    from pdart.pds4.File import File
+    from pdart.pds4.LID import LID
 
-# These are Unions because, for some reason (bugginess?) mypy doesn't
-# recognize the bare type names.
-_HDU = Union[pyfits.FitsHDU]
-_HeaderUnit = Union[pyfits.Header]
-_DataUnit = Union[numpy.ndarray]
+    # These are Unions because, for some reason (bugginess?) mypy doesn't
+    # recognize the bare type names.
+    _HDU = Union[pyfits.FitsHDU]
+    _HeaderUnit = Union[pyfits.Header]
+    _DataUnit = Union[numpy.ndarray]
 
 # I wish I could provide precise types for Reductions.  But mypy's
 # generics seem to be buggy enough that they don't work.  I tried

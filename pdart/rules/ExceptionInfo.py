@@ -41,8 +41,9 @@ the failures.
 import abc
 import xml.dom
 
-from typing import List, cast  # for mypy
-import xml.dom.minidom  # for mypy
+from typing import cast, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    import xml.dom.minidom
 
 
 class ExceptionInfo(object):

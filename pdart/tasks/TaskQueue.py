@@ -6,8 +6,9 @@ a part of :class:`~pdart.tasks.TaskRunner.TaskRunner`.
 import collections
 from pdart.tasks.TaskDict import *
 
-from pdart.tasks.Task import Task  # for mypy
-from typing import Sequence
+from typing import Sequence, TYPE_CHECKING
+if TYPE_CHECKING:
+    from pdart.tasks.Task import Task
 
 
 class TaskQueue(object):

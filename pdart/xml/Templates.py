@@ -73,12 +73,14 @@ function from *a* to *b* and *[c]* is a list of *c* s.
 import xml.dom
 import xml.sax
 
-from typing import Any, Callable, Dict, List  # for mypy
-import xml.dom.minidom  # for mypy
+from typing import Any, Callable, Dict, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    import xml.dom.minidom
 
-_UADict = Dict[str, Any]
-NodeBuilder = Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
-FragBuilder = Callable[[xml.dom.minidom.Document], List[xml.dom.minidom.Text]]
+    _UADict = Dict[str, Any]
+    NodeBuilder = Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
+    FragBuilder = Callable[[xml.dom.minidom.Document],
+                           List[xml.dom.minidom.Text]]
 
 
 def interpret_text(txt  # type: unicode

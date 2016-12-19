@@ -13,11 +13,12 @@ from pdart.pds4.Component import *
 from pdart.pds4.File import *
 from pdart.pds4.HstFilename import *
 
-import pdart.pds4.Archive  # for mypy
-import pdart.pds4.Bundle  # for mypy
-import pdart.pds4.Collection  # for mypy
-import pdart.pds4.LID  # for mypy
-from typing import Iterator  # for mypy
+from typing import Iterator, TYPE_CHECKING
+if TYPE_CHECKING:
+    import pdart.pds4.Archive
+    import pdart.pds4.Bundle
+    import pdart.pds4.Collection
+    import pdart.pds4.LID
 
 
 def _find_product_file(visit_dir, product_id):

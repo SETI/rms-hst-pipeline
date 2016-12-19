@@ -4,7 +4,7 @@ This module provides functionality for composing
 """
 from pdart.reductions.Reduction import *
 
-from typing import Any, Callable, Sequence  # for mypy
+from typing import Any, Callable, Sequence
 
 
 def indexed2(func):

@@ -7,9 +7,10 @@ import os.path
 
 from pdart.pds4.LID import *
 
-import pdart.pds4.Archive  # for mypy
-import pdart.pds4.File  # for mypy
-from typing import Iterator  # for mypy
+from typing import Iterator, TYPE_CHECKING
+if TYPE_CHECKING:
+    import pdart.pds4.Archive
+    import pdart.pds4.File
 
 
 class Component(object):

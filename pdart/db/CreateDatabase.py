@@ -7,7 +7,9 @@ import sqlite3
 
 from pdart.pds4.Archives import *
 
-import pdart.pds4.Archive  # for mypy
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import pdart.pds4.Archive
 
 
 def _create_bundles_table(conn, archive):

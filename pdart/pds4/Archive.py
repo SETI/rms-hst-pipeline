@@ -6,7 +6,7 @@ from pdart.pds4.Bundle import *
 from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
 from pdart.pds4.LID import *
-from typing import Iterator  # for mypy
+from typing import Iterator
 
 
 class Archive(object):

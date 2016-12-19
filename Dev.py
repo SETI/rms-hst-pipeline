@@ -15,7 +15,7 @@ from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.ProductLabel import *
 from pdart.rules.Combinators import *
 
-from typing import cast, Iterable  # for mypy
+from typing import cast, Iterable
 
 
 VERIFY = False

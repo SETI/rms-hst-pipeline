@@ -26,7 +26,7 @@ import abc
 
 import pdart.rules.ExceptionInfo
 
-from typing import Any  # for mypy
+from typing import Any
 
 
 class Result(object):

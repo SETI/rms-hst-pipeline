@@ -8,8 +8,9 @@ from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
-from typing import Dict, Iterable, TypeVar  # for mypy
-K = TypeVar('K')  # for mypy
+from typing import Dict, Iterable, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    K = TypeVar('K')
 
 
 def _union_dicts(dicts):

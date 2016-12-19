@@ -8,7 +8,9 @@ import julian
 from pdart.pds4labels.TimeCoordinatesXml import *
 from pdart.rules.Combinators import *
 
-from pdart.xml.Templates import NodeBuilder  # for mypy
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pdart.xml.Templates import NodeBuilder
 
 
 def _db_get_start_stop_times_from_headers(headers):

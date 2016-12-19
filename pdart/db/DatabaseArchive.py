@@ -8,7 +8,7 @@ from contextlib import closing
 import os.path
 import sqlite3
 
-from typing import Any, Iterable, Iterator, Tuple  # for mypy
+from typing import Any, Iterable, Iterator, Tuple
 
 
 class DatabaseArchive:

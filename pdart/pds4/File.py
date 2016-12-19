@@ -4,7 +4,9 @@ Representation of a file belonging to a
 """
 import os.path
 
-import pdart.pds4.Component  # for mypy
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import pdart.pds4.Component
 
 # We only import PSD4 subcomponent modules to avoid circular imports.
 # If you want to import a supercomponent module, do it within a

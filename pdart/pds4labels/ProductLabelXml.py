@@ -2,8 +2,9 @@
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
-from typing import Any, Dict  # for mypy
-import xml.dom.minidom
+from typing import Any, Dict, TYPE_CHECKING
+if TYPE_CHECKING:
+    import xml.dom.minidom
 
 
 make_label = interpret_document_template(

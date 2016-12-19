@@ -6,8 +6,9 @@ running.  :class:`~pdart.tasks.TaskDict.TaskDict` is a part of
 """
 import pdart.tasks.TaskProcess
 
-from pdart.tasks.Task import Task  # for mypy
-from typing import Dict, Sequence, Set  # for mypy
+from typing import Dict, Sequence, Set, TYPE_CHECKING
+if TYPE_CHECKING:
+    from pdart.tasks.Task import Task
 
 
 class TaskDict(dict):
