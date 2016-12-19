@@ -5,6 +5,7 @@ import os.path
 import pyfits
 import sqlite3
 
+from pdart.db.TableSchemas import *
 from pdart.pds4.Archives import *
 
 from typing import TYPE_CHECKING
@@ -16,13 +17,7 @@ def _create_bundles_table(conn, archive):
     # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
     """Create the bundles table."""
     conn.execute('DROP TABLE IF EXISTS bundles')
-    table_creation = """CREATE TABLE bundles (
-        bundle VARCHAR PRIMARY KEY NOT NULL,
-        full_filepath VARCHAR NOT NULL,
-        label_filepath VARCHAR NOT NULL,
-        proposal_id INT NOT NULL
-        )"""
-    conn.execute(table_creation)
+    conn.execute(BUNDLES_SCHEMA)
     bs = [(str(b.lid), b.absolute_filepath(),
            b.label_filepath(), b.proposal_id())
           for b in archive.bundles()]
@@ -34,19 +29,7 @@ def _create_collections_table(conn, archive):
     # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
     """Create the collections table."""
     conn.execute('DROP TABLE IF EXISTS collections')
-    table_creation = """CREATE TABLE collections (
-        collection VARCHAR PRIMARY KEY NOT NULL,
-        full_filepath VARCHAR NOT NULL,
-        label_filepath VARCHAR NOT NULL,
-        bundle VARCHAR NOT NULL,
-        prefix VARCHAR NOT NULL,
-        suffix VARCHAR NOT NULL,
-        instrument VARCHAR NOT NULL,
-        inventory_name VARCHAR NOT NULL,
-        inventory_filepath VARCHAR NOT NULL,
-        FOREIGN KEY(bundle) REFERENCES bundles(bundle)
-            );"""
-    conn.execute(table_creation)
+    conn.execute(COLLECTIONS_SCHEMA)
 
     indexing = """CREATE INDEX idx_collections_bundle
                   ON collections(bundle)"""
@@ -69,18 +52,7 @@ def _create_products_table(conn, archive):
     # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
     """Create the products table."""
     conn.execute('DROP TABLE IF EXISTS products')
-    table_creation = """CREATE TABLE products (
-        product VARCHAR PRIMARY KEY NOT NULL,
-        full_filepath VARCHAR NOT NULL,
-        filename VARCHAR NOT NULL,
-        label_filepath VARCHAR NOT NULL,
-        collection VARCHAR NOT NULL,
-        visit VARCHAR NOT NULL,
-        hdu_count INT NOT NULL,
-        product_id VARCHAR NOT NULL,
-        FOREIGN KEY(collection) REFERENCES collections(collection)
-        )"""
-    conn.execute(table_creation)
+    conn.execute(PRODUCTS_SCHEMA)
 
     indexing = """CREATE INDEX idx_products_collection
                   ON products(collection)"""
@@ -111,38 +83,16 @@ def _create_hdus_and_cards_tables(conn, archive):
         return kw
 
     conn.execute('DROP TABLE IF EXISTS bad_fits_files')
-    table_creation = """CREATE TABLE bad_fits_files (
-        product VARCHAR NOT NULL,
-        message VARCHAR NOT NULL,
-        FOREIGN KEY (product) REFERENCES products(product)
-        )"""
-    conn.execute(table_creation)
+    conn.execute(BAD_FITS_FILES_SCHEMA)
 
     conn.execute('DROP TABLE IF EXISTS hdus')
-    table_creation = """CREATE TABLE hdus (
-        product VARCHAR NOT NULL,
-        hdu_index INTEGER NOT NULL,
-        hdrLoc INTEGER NOT NULL,
-        datLoc INTEGER NOT NULL,
-        datSpan INTEGER NOT NULL,
-        FOREIGN KEY (product) REFERENCES products(product),
-        CONSTRAINT hdus_pk PRIMARY KEY (product, hdu_index)
-        )"""
-    conn.execute(table_creation)
+    conn.execute(HDUS_SCHEMA)
 
     indexing = """CREATE INDEX idx_hdus_product ON hdus(product)"""
     conn.execute(indexing)
 
     conn.execute('DROP TABLE IF EXISTS cards')
-    table_creation = """CREATE TABLE cards (
-        keyword VARCHAR NOT NULL,
-        value,
-        product VARCHAR NOT NULL,
-        hdu_index INTEGER NOT NULL,
-        FOREIGN KEY(product) REFERENCES products(product),
-        FOREIGN KEY(product, hdu_index) REFERENCES hdus(product, hdu_index)
-        )"""
-    conn.execute(table_creation)
+    conn.execute(CARDS_SCHEMA)
 
     indexing = """CREATE INDEX idx_cards_product_hdu_index
                   ON cards(product, hdu_index)"""
