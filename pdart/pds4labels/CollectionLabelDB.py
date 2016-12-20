@@ -60,7 +60,7 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
     if verify:
         verify_label_or_raise(label)
 
-    with io.open(inventory_filepath, 'wb', newline='') as f2:
+    with io.open(inventory_filepath, 'w', newline='') as f2:
         f2.write(make_db_collection_inventory(conn, lid))
 
     print 'collection label and inventory for', lid

@@ -57,7 +57,7 @@ if __name__ == '__main__':
     if USE_DATABASE:
         with closing(_get_conn()) as conn:
             if CREATE_DATABASE:
-                create_database(conn, archive)
+                DatabaseCreator(conn, archive).create()
             make_db_browse_product_images(conn, archive)
             make_db_browse_product_labels(conn, archive)
     else:
