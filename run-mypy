@@ -21,6 +21,7 @@ mypy --silent-imports --py2 \
     Dev.py \
     DoHstParams.py \
     MakeAll.py \
+    MakeBundleDBs.py \
     MakeDB.py \
     MakeDocCollections.py \
     MakeLabel.py \
