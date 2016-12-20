@@ -1,6 +1,7 @@
 """
 This module creates a SQLite database from an archive.
 """
+import abc
 import os.path
 import pyfits
 import sqlite3
@@ -14,10 +15,11 @@ if TYPE_CHECKING:
 
 
 class DatabaseCreator(object):
-    def __init__(self, conn, archive):
-        # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
-        self.conn = conn
-        self.archive = archive
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self):
+        self.conn = None
+        # type: sqlite3.Connection
 
     def create(self):
         """
@@ -89,6 +91,37 @@ class DatabaseCreator(object):
         self.conn.execute(indexing)
         self.populate_hdus_and_cards_tables()
         self.conn.commit()
+
+    @abc.abstractmethod
+    def populate_bundles_table(self):
+        # type: () -> None
+        pass
+
+    @abc.abstractmethod
+    def populate_collections_table(self):
+        # type: () -> None
+        pass
+
+    @abc.abstractmethod
+    def populate_products_table(self):
+        # type: () -> None
+        pass
+
+    @abc.abstractmethod
+    def populate_hdus_and_cards_tables(self):
+        # type: () -> None
+        pass
+
+
+class ArchiveDatabaseCreator(DatabaseCreator):
+    def __init__(self, conn, archive):
+        # type: (sqlite3.Connection, pdart.pds4.Archive.Archive) -> None
+        DatabaseCreator.__init__(self)
+        self.conn = conn
+        self.archive = archive
+
+    def get_conn(self):
+        return self.conn
 
     def populate_bundles_table(self):
         # type: () -> None

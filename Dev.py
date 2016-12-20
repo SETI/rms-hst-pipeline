@@ -7,7 +7,7 @@ from contextlib import closing
 import os.path
 import sqlite3
 
-from pdart.db.CreateDatabase import DatabaseCreator
+from pdart.db.CreateDatabase import ArchiveDatabaseCreator
 from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
@@ -99,7 +99,7 @@ def dev():
     archive = get_any_archive()
     with closing(get_conn()) as conn:
         if CREATE_DB:
-            DatabaseCreator(conn, archive).create()
+            ArchiveDatabaseCreator(conn, archive).create()
         # It seems to run about the same, building labels
         # hierarchically or by type.
         if True:

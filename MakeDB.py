@@ -5,7 +5,7 @@ SQLite database.
 import os.path
 import sqlite3
 
-from pdart.db.CreateDatabase import DatabaseCreator
+from pdart.db.CreateDatabase import ArchiveDatabaseCreator
 from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
 
@@ -18,7 +18,7 @@ def run():
     conn = sqlite3.connect(db_filepath)
     # type: sqlite3.Connection
     try:
-        DatabaseCreator(conn, archive).create()
+        ArchiveDatabaseCreator(conn, archive).create()
     finally:
         conn.close()
 
