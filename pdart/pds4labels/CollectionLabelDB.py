@@ -7,6 +7,7 @@ import sys
 
 from pdart.pds4labels.CollectionLabelXml import *
 from pdart.pds4labels.DatabaseCaches import *
+from pdart.pds4labels.DBCalls import get_collection_products_db
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
@@ -22,10 +23,8 @@ def make_db_collection_inventory(conn, collection_lid):
     """
     with closing(conn.cursor()) as cursor:
         lines = [u'P,%s\r\n' % str(product)
-                 for (product,) in cast(Iterable[Tuple[unicode]],
-                                        cursor.execute(
-                    'SELECT product FROM products WHERE collection=?',
-                    (collection_lid,)))]
+                 for (product,)
+                 in get_collection_products_db(cursor, collection_lid)]
     return ''.join(lines)
 
 

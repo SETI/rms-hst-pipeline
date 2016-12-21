@@ -12,6 +12,7 @@ from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
+from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.ProductLabel import *
 from pdart.rules.Combinators import *
 
@@ -35,22 +36,16 @@ def make_db_labels(conn):
     having three open cursors.
     """
     with closing(conn.cursor()) as bundle_cursor:
-        for (bundle,) in cast(Iterable[Tuple[unicode]],
-                              bundle_cursor.execute(
-                'SELECT bundle FROM bundles')):
+        for (bundle,) in get_all_bundles(bundle_cursor):
 
             with closing(conn.cursor()) as collection_cursor:
-                for (coll,) in cast(Iterable[Tuple[unicode]],
-                                    collection_cursor.execute(
-                  'SELECT collection FROM collections WHERE bundle=?',
-                  (bundle,))):
+                for (coll,) in get_bundle_collections_db(collection_cursor,
+                                                         bundle):
 
                     with closing(conn.cursor()) as product_cursor:
-                        for (prod,) in cast(Iterable[Tuple[unicode]],
-                                            product_cursor.execute(
-                                """SELECT product FROM products WHERE collection=?
-                           EXCEPT SELECT product FROM bad_fits_files""",
-                                (coll,))):
+                        prod_iter = get_good_collection_products_db(
+                            product_cursor, coll)
+                        for (prod,) in prod_iter:
 
                             make_db_product_label(conn, prod, VERIFY)
 

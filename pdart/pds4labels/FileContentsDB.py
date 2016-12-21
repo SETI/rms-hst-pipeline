@@ -5,6 +5,7 @@ a product label using a SQLite database.
 """
 from contextlib import closing
 
+from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.FileContentsXml import *
 
 from typing import Callable, cast, Dict, Iterable, List, Tuple, TYPE_CHECKING
@@ -88,9 +89,4 @@ def get_db_file_contents(headers, conn, lid):
     with closing(conn.cursor()) as cursor:
         return combine_fragments_into_fragment(
             [get_hdu_contents(*hdu)
-             for hdu in cast(Iterable[Tuple[int, int, int, int]],
-                             cursor.execute(
-                        """SELECT hdu_index, hdrLoc, datLoc, datSpan
-                       FROM hdus WHERE product=?
-                       ORDER BY hdu_index ASC""",
-                        (str(lid),)))])
+             for hdu in get_fits_file_offsets_db(cursor, lid)])

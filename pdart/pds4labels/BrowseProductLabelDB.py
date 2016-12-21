@@ -7,6 +7,7 @@ from contextlib import closing
 from pdart.pds4.LID import *
 from pdart.pds4.Product import *
 from pdart.pds4labels.BrowseProductLabelXml import *
+from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.xml.Pretty import *
 
@@ -26,23 +27,13 @@ def make_db_browse_product_labels(conn, archive):
     # TODO Polish (with SQL joins?).  First, an inefficient
     # implementation.
     with closing(conn.cursor()) as cursor:
-        colls = [cbs for suff in RAW_SUFFIXES for cbs in list(
-                cast(Iterable[Tuple[unicode, unicode, unicode]],
-                     cursor.execute(
-                        """SELECT collection, bundle, suffix FROM collections
-                       WHERE prefix='data' AND suffix=?""", (suff,))))]
+        colls = [cfbs for suff in RAW_SUFFIXES
+                 for cfbs in get_data_collections_info_db(cursor, suff)]
 
-        for (c, b, suffix) in colls:
-            cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',
-                           (b,))
-            (proposal_id,) = cursor.fetchone()
+        for (c, _, b, suffix) in colls:
+            (_, proposal_id) = get_bundle_info_db(cursor, b)
             # print '>>>>', c
-            prods = [p for (p,)
-                     in cast(Iterable[Tuple[unicode]], cursor.execute(
-                        """SELECT product FROM products WHERE collection=?
-                       EXCEPT SELECT product FROM bad_fits_files""",
-                        (c,)))]
-            for p in prods:
+            for (p,) in get_good_collection_products_db(cursor, c):
                 lid = LID(p)
                 product = Product(archive, lid)
                 browse_product = product.browse_product()

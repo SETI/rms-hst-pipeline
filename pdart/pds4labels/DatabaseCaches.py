@@ -4,6 +4,8 @@ things up.
 """
 from contextlib import closing
 
+from pdart.pds4labels.DBCalls import get_bundle_info_db, get_collection_info_db
+
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import sqlite3
@@ -19,10 +21,7 @@ def lookup_bundle(conn, bundle):
     global _last_bundle, _last_bundle_result
     if (bundle != _last_bundle):
         with closing(conn.cursor()) as cursor:
-            cursor.execute("""SELECT label_filepath, proposal_id
-                              FROM bundles WHERE bundle=?""",
-                           (bundle,))
-            (label_filepath, proposal_id) = cursor.fetchone()
+            (label_filepath, proposal_id) = get_bundle_info_db(cursor, bundle)
         _last_bundle = bundle
         _last_bundle_result = {'label_filepath': label_filepath,
                                'proposal_id': proposal_id}
@@ -41,12 +40,9 @@ def lookup_collection(conn, collection):
     global _last_collection, _last_collection_result
     if (collection != _last_collection):
         with closing(conn.cursor()) as cursor:
-            cursor.execute("""SELECT bundle, instrument, inventory_filepath,
-                              inventory_name, label_filepath, prefix, suffix
-                              FROM collections WHERE collection=?""",
-                           (collection,))
             (bundle, instrument, inventory_filepath, inventory_name,
-             label_filepath, prefix, suffix) = cursor.fetchone()
+             label_filepath, prefix, suffix) = \
+             get_collection_info_db(cursor, collection)
         _last_collection = collection
         _last_collection_result = {'bundle': bundle,
                                    'instrument': instrument,

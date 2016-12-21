@@ -4,6 +4,7 @@ import sys
 
 from pdart.pds4labels.BundleLabelXml import *
 from pdart.pds4labels.DatabaseCaches import *
+from pdart.pds4labels.DBCalls import get_bundle_collections_db
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
@@ -26,8 +27,7 @@ def make_db_bundle_label(conn, lid, verify):
         reduced_collections = \
             [make_bundle_entry_member({'lid': collection_lid})
              for (collection_lid,)
-             in cast(Iterable[Tuple[unicode]], cursor.execute(
-                'SELECT collection from collections WHERE bundle=?', (lid,)))]
+             in get_bundle_collections_db(cursor, lid)]
 
     label = make_label({
             'lid': lid,

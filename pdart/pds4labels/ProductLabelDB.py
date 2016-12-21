@@ -4,6 +4,7 @@ Functionality to build a product label using a SQLite database.
 from contextlib import closing
 
 from pdart.pds4labels.DatabaseCaches import *
+from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.FileContentsDB import *
 from pdart.pds4labels.HstParametersDB import *
 from pdart.pds4labels.ObservingSystem import *
@@ -27,13 +28,8 @@ def make_db_product_label(conn, lid, verify):
     Raise an exception if either fails.
     """
     with closing(conn.cursor()) as cursor:
-        cursor.execute(
-            """SELECT filename, label_filepath, collection,
-                      product_id, hdu_count
-               FROM products WHERE product=?""",
-            (lid,))
         (file_name, label_fp, collection,
-         product_id, hdu_count) = cursor.fetchone()
+         product_id, hdu_count) = get_product_info_db(cursor, lid)
 
         d = lookup_collection(conn, collection)
         bundle = d['bundle']
@@ -74,13 +70,7 @@ def make_db_product_label(conn, lid, verify):
 
 def _make_header_dictionary(lid, hdu_index, cursor):
     # type: (unicode, int, sqlite3.Cursor) -> Dict[str, Any]
-    cursor.execute("""SELECT keyword, value FROM cards
-                      WHERE product=? AND hdu_index=?""",
-                   (lid, hdu_index))
-
-    # We know that since it's coming from FITS headers, they are pairs
-    # of strings and Anys.
-    return dict(cast(Iterable[Tuple[str, Any]], cursor.fetchall()))
+    return dict(get_fits_headers_db(cursor, lid, hdu_index))
 
 
 def _make_header_dictionaries(lid, hdu_count, cursor):

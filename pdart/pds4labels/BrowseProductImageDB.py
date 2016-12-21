@@ -7,6 +7,7 @@ import os.path
 
 from pdart.pds4.LID import *
 from pdart.pds4labels.BrowseProductImageReduction import ensure_directory
+from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 import pdart.add_pds_tools
@@ -63,25 +64,12 @@ def make_db_browse_product_images(conn, archive):
     # implementation.
     with closing(conn.cursor()) as cursor:
         colls = [ccbs for suff in RAW_SUFFIXES
-                 for ccbs in list(cast(
-                    Iterable[Tuple[unicode, str, unicode, unicode]],
-                    cursor.execute(
-                        """SELECT collection, full_filepath, bundle, suffix
-                       FROM collections
-                       WHERE prefix='data' AND suffix=?""", (suff,))))]
+                 for ccbs in get_data_collections_info_db(cursor, suff)]
 
         for (c, c_fp, b, suffix) in colls:
-            cursor.execute('SELECT proposal_id FROM bundles WHERE bundle=?',
-                           (b,))
-            (proposal_id,) = cursor.fetchone()
-            for (p, fp, v) in cast(Iterable[Tuple[unicode, str, unicode]],
-                                   cursor.execute(
-                    """SELECT product, full_filepath, visit
-                        FROM products
-                        WHERE collection=?
-                        AND product NOT IN
-                            (SELECT product FROM bad_fits_files)""",
-                    (c,))):
+            (_, proposal_id) = get_bundle_info_db(cursor, b)
+            for (p, fp, v) \
+                    in get_good_collection_products_with_info_db(cursor, c):
                 print p
                 browse_coll_fp = _make_browse_coll_fp(c_fp)
                 _make_browse_image(browse_coll_fp, fp, v)
