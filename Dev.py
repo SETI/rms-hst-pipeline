@@ -17,8 +17,7 @@ from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.ProductLabel import *
 from pdart.rules.Combinators import *
 
-from typing import cast, Iterable
-
+from typing import cast, Iterable, TYPE_CHECKING
 
 VERIFY = False
 # type: bool
@@ -28,33 +27,46 @@ CREATE_DB = True
 # type: bool
 
 
-def make_db_labels(archive):
-    # type: (Archive) -> None
-    """
-    Write labels for the whole archive in hierarchical order to
-    increase cache hits for bundles and collections.  NOTE: This
-    doesn't seem to run any faster, perhaps because of extra cost to
-    having three open cursors.
-    """
-    for bundle_obj in archive.bundles():
-        bundle = bundle_obj.lid.lid
-        database_fp = os.path.join(bundle_obj.absolute_filepath(),
-                                   DATABASE_NAME)
-        with closing(sqlite3.connect(database_fp)) as conn:
-            with closing(conn.cursor()) as collection_cursor:
-                for (coll,) in get_bundle_collections_db(collection_cursor,
-                                                         bundle):
+class ArchiveRecursion(object):
+    def run(self, archive):
+        # type: (Archive) -> None
+        for bundle in archive.bundles():
+            database_fp = os.path.join(bundle.absolute_filepath(),
+                                       DATABASE_NAME)
+            with closing(sqlite3.connect(database_fp)) as conn:
+                with closing(conn.cursor()) as collection_cursor:
+                    for (coll,) in get_bundle_collections_db(collection_cursor,
+                                                             bundle.lid.lid):
+                        with closing(conn.cursor()) as product_cursor:
+                            prod_iter = get_good_collection_products_db(
+                                product_cursor, coll)
+                            for (prod,) in prod_iter:
+                                self.handle_product(conn, prod)
+                        self.handle_collection(conn, coll)
+                self.handle_bundle(conn, bundle.lid.lid)
 
-                    with closing(conn.cursor()) as product_cursor:
-                        prod_iter = get_good_collection_products_db(
-                            product_cursor, coll)
-                        for (prod,) in prod_iter:
+    def handle_bundle(self, conn, bundle_lid):
+        # type: (sqlite3.Connection, unicode) -> int
+        pass
 
-                            make_db_product_label(conn, prod, VERIFY)
+    def handle_collection(self, conn, collection_lid):
+        # type: (sqlite3.Connection, unicode) -> int
+        pass
 
-                    make_db_collection_label_and_inventory(conn, coll, VERIFY)
+    def handle_product(self, conn, product_lid):
+        # type: (sqlite3.Connection, unicode) -> int
+        pass
 
-            make_db_bundle_label(conn, bundle, VERIFY)
+
+class LabelCreationRecursion(ArchiveRecursion):
+    def handle_bundle(self, conn, bundle_lid):
+        make_db_bundle_label(conn, bundle_lid, VERIFY)
+
+    def handle_collection(self, conn, collection_lid):
+        make_db_collection_label_and_inventory(conn, collection_lid, VERIFY)
+
+    def handle_product(self, conn, product_lid):
+        make_db_product_label(conn, product_lid, VERIFY)
 
 
 def dev():
@@ -64,7 +76,7 @@ def dev():
     if CREATE_DB:
         BundleDatabaseCreator(archive).create()
 
-    make_db_labels(archive)
+    LabelCreationRecursion().run(archive)
 
 
 if __name__ == '__main__':
