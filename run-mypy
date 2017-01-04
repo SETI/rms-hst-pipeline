@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# export MYPYPATH=~/pdart/stubs
-# echo $MYPYPATH
+source activate mypy
 mypy --silent-imports --py2 \
     pdart/db \
     pdart/hst \
