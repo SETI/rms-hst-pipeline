@@ -2,6 +2,7 @@
 
 # This script builds API documentation (similar to JavaDocs).  It also
 # automatically opens the main index page.
+source activate pdart
 
 rm -rf apidocs
 sphinx-apidoc -A 'The PDART Team' -V '0.0.1' -F -e -o apidocs ../pdart

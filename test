@@ -1,4 +1,5 @@
 #!/bin/bash
+source activate pdart
 echo starting tests at `date "+%Y-%m-%d %H:%M"`
 py.test
 echo finished tests at `date "+%Y-%m-%d %H:%M"`

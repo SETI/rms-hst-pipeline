@@ -1,2 +1,3 @@
 #! /bin/bash
+source activate pdart
 pep8 *.py pdart/*.py pdart/*/*.py

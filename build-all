@@ -1,4 +1,5 @@
 #! /bin/bash
+source activate pdart
 date
 rm -rf _build
 ./DeleteLabels
