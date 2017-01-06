@@ -3,6 +3,7 @@ from sqlite3 import Cursor
 from typing import Any, cast, Iterable, Tuple, TYPE_CHECKING
 
 # shorthand types for type signatures and casting
+_Tuple3 = Tuple[str, unicode, unicode]
 _Tuple4 = Tuple[unicode, str, unicode, unicode]
 _Tuple5 = Tuple[unicode, unicode, unicode, unicode, int]
 _Tuple7 = Tuple[unicode, unicode, str, unicode, str, unicode, unicode]
@@ -53,6 +54,19 @@ def get_collection_info_db(cursor, lid):
                       FROM collections WHERE collection=?""",
                    (lid,))
     return cast(_Tuple7, cursor.fetchone())
+
+
+def get_data_collection_info_by_suffix_db(cursor, collection_lid, suffix):
+    # type: (Cursor, unicode, unicode) -> Iterable[_Tuple3]
+    """Given a collection LID and a suffix, returns the (collection,
+    full_filepath, bundle, suffix) tuple for any data collection with
+    that suffix"""
+    return cast(Iterable[_Tuple3],
+                cursor.execute(
+            """SELECT full_filepath, bundle, suffix
+               FROM collections
+               WHERE collection=? AND prefix='data' AND suffix=?""",
+            (collection_lid, suffix)))
 
 
 def get_data_collections_info_db(cursor, suffix):

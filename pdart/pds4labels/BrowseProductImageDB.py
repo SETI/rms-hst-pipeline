@@ -72,3 +72,29 @@ def make_db_browse_product_images(conn):
                 print p
                 browse_coll_fp = _make_browse_coll_fp(c_fp)
                 _make_browse_image(browse_coll_fp, fp, v)
+
+
+def make_db_collection_browse_product_images(conn, collection):
+    # type: (sqlite3.Connection, unicode) -> None
+    """
+    Given a connection to a bundle's database and a collection LID,
+    create browse images for all the RAW products in that collection.
+    """
+
+    # TODO Polish (with SQL joins?).  First, an inefficient
+    # implementation.
+    with closing(conn.cursor()) as cursor:
+        colls = [cbs for suff in RAW_SUFFIXES
+                 for cbs
+                 in get_data_collection_info_by_suffix_db(cursor,
+                                                          collection,
+                                                          suff)]
+
+        for (c_fp, b, suffix) in colls:
+            (_, proposal_id) = get_bundle_info_db(cursor, b)
+            for (p, fp, v) \
+                    in get_good_collection_products_with_info_db(cursor,
+                                                                 collection):
+                print p
+                browse_coll_fp = _make_browse_coll_fp(c_fp)
+                _make_browse_image(browse_coll_fp, fp, v)

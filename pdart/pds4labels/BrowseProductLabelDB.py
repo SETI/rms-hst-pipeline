@@ -54,3 +54,45 @@ def make_db_browse_product_labels(conn, archive):
 
                 with open(label_fp, 'w') as f:
                     f.write(label)
+
+
+def make_db_collection_browse_product_labels(conn, collection, archive):
+    # type: (sqlite3.Connection, unicode, Archive) -> None
+    """
+    Given a database connection, a collection LID, and an
+    :class:`~pdart.pds4.Archive`, create PDS4 labels for the browse
+    products in that collection.
+    """
+
+    # TODO Polish (with SQL joins?).  First, an inefficient
+    # implementation.
+    with closing(conn.cursor()) as cursor:
+        colls = [fbs for suff in RAW_SUFFIXES
+                 for fbs in get_data_collection_info_by_suffix_db(cursor,
+                                                                  collection,
+                                                                  suff)]
+
+        for (_, b, suffix) in colls:
+            (_, proposal_id) = get_bundle_info_db(cursor, b)
+            # print '>>>>', c
+            for (p,) in get_good_collection_products_db(cursor, collection):
+                lid = LID(p)
+                product = Product(archive, lid)
+                browse_product = product.browse_product()
+                browse_file_name = lid.product_id + '.jpg'
+                browse_image_file = list(browse_product.files())[0]
+                object_length = os.path.getsize(
+                    browse_image_file.full_filepath())
+                label = make_label({
+                        'proposal_id': str(proposal_id),
+                        'suffix': suffix,
+                        'browse_lid': str(browse_product.lid),
+                        'data_lid': str(lid),
+                        'browse_file_name': browse_file_name,
+                        'object_length': str(object_length)
+                        }).toxml()
+
+                label_fp = browse_product.label_filepath()
+
+                with open(label_fp, 'w') as f:
+                    f.write(label)
