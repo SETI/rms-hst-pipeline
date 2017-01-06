@@ -41,13 +41,25 @@ def check_browse_collection(needed, archive, conn, collection_lid):
     if needed:
         assert browse_coll_exists, \
             '%s was needed but not created' % browse_coll
-        # further checks
 
-        # TODO Check that an image product and its label was created for
-        # each product with a good FITS file.
+        # Check that for each product with a good FITS file, a browse
+        # image product and its label was created.
+        with closing(conn.cursor()) as cursor:
+            for (prod_id,) in get_all_good_collection_products(cursor,
+                                                               collection_lid):
+                prod = Product(archive, LID(prod_id))
+                image_prod = prod.browse_product().absolute_filepath()
+                assert os.path.isfile(image_prod), \
+                    'browse image %s for %s was not created' % (image_prod,
+                                                                prod_id)
+                image_label = prod.browse_product().label_filepath()
+                assert os.path.isfile(image_label), \
+                    'browse label %s for %s was not created' % (image_prod,
+                                                                prod_id)
 
         if False:
-            # Add tests once we're creating these.  (It's test-first
+            # Include these tests once we're creating the collection
+            # label and inventory files.  (Look: I'm doing test-first
             # development!)
             inv_fp = browse_coll.inventory_filepath()
             assert os.path.isfile(inv_fp), 'no browse inventory at %s' % inv_fp
@@ -73,7 +85,7 @@ def make_db_browse_collection_and_label(archive, conn, collection_lid):
     needed = needs_browse_collection(collection_lid)
     if needed:
         # create the products
-        make_db_collection_browse_product_images(conn, collection_lid)
+        make_db_collection_browse_product_images(archive, conn, collection_lid)
         make_db_collection_browse_product_labels(archive, conn, collection_lid)
         # TODO create the label and inventory
         print ('#### TODO: Would build browse collection label ' +

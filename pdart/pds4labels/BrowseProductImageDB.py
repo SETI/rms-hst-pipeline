@@ -4,8 +4,10 @@ database.
 """
 from contextlib import closing
 import os.path
+import sys
 
 from pdart.pds4.LID import *
+from pdart.pds4.Product import *
 from pdart.pds4labels.BrowseProductImageReduction import ensure_directory
 from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
@@ -16,6 +18,7 @@ import picmaker
 from typing import cast, Iterable, Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     import sqlite3
+    from pdart.pds4.Archive import Archive
 
 
 def _make_browse_coll_fp(raw_coll_fp):
@@ -52,8 +55,8 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
                           percentiles=(1, 99))
 
 
-def make_db_browse_product_images(conn):
-    # type: (sqlite3.Connection) -> None
+def make_db_browse_product_images(archive, conn):
+    # type: (Archive, sqlite3.Connection) -> None
     """
     Given a connection to a bundle's database, create browse images
     for all the RAW products in the bundle.
@@ -69,13 +72,16 @@ def make_db_browse_product_images(conn):
             (_, proposal_id) = get_bundle_info_db(cursor, b)
             for (p, fp, v) \
                     in get_good_collection_products_with_info_db(cursor, c):
-                print p
+                print 'browse product image(s) for', \
+                    Product(archive, LID(p)).browse_product().lid
+                sys.stdout.flush()
+
                 browse_coll_fp = _make_browse_coll_fp(c_fp)
                 _make_browse_image(browse_coll_fp, fp, v)
 
 
-def make_db_collection_browse_product_images(conn, collection):
-    # type: (sqlite3.Connection, unicode) -> None
+def make_db_collection_browse_product_images(archive, conn, collection):
+    # type: (Archive, sqlite3.Connection, unicode) -> None
     """
     Given a connection to a bundle's database and a collection LID,
     create browse images for all the RAW products in that collection.
@@ -95,6 +101,8 @@ def make_db_collection_browse_product_images(conn, collection):
             for (p, fp, v) \
                     in get_good_collection_products_with_info_db(cursor,
                                                                  collection):
-                print p
+                print 'browse product image(s) for', \
+                    Product(archive, LID(p)).browse_product().lid
+                sys.stdout.flush()
                 browse_coll_fp = _make_browse_coll_fp(c_fp)
                 _make_browse_image(browse_coll_fp, fp, v)

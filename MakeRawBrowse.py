@@ -58,8 +58,8 @@ if __name__ == '__main__':
         with closing(_get_conn()) as conn:
             if CREATE_DATABASE:
                 ArchiveDatabaseCreator(conn, archive).create()
-            make_db_browse_product_images(conn)
-            make_db_browse_product_labels(conn, archive)
+            make_db_browse_product_images(archive, conn)
+            make_db_browse_product_labels(archive, conn)
     else:
         reduction = CompositeReduction([LogCollectionsReduction(),
                                         _MakeRawBrowseReduction()])

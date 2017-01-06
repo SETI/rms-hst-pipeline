@@ -21,11 +21,13 @@ def get_all_collections(cursor):
                 cursor.execute('SELECT collection FROM collections'))
 
 
-def get_all_good_products(cursor):
-    # type: (Cursor) -> Iterable[Tuple[unicode]]
+def get_all_good_collection_products(cursor, collection):
+    # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
-                cursor.execute("""SELECT product FROM products EXCEPT
-                                  SELECT product FROM bad_fits_file"""))
+                cursor.execute("""SELECT product FROM products
+                                  WHERE collection=? EXCEPT
+                                  SELECT product FROM bad_fits_files""",
+                               (collection,)))
 
 
 def get_bundle_info_db(cursor, lid):

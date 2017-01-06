@@ -3,6 +3,7 @@ Functionality to build a raw browse product label using a SQLite
 database.
 """
 from contextlib import closing
+import sys
 
 from pdart.pds4.LID import *
 from pdart.pds4.Product import *
@@ -17,8 +18,8 @@ if TYPE_CHECKING:
     import sqlite3
 
 
-def make_db_browse_product_labels(conn, archive):
-    # type: (sqlite3.Connection, Archive) -> None
+def make_db_browse_product_labels(archive, conn):
+    # type: (Archive, sqlite3.Connection) -> None
     """
     Given a database connection and an :class:`~pdart.pds4.Archive`,
     create PDS4 labels for the browse products.
@@ -54,6 +55,9 @@ def make_db_browse_product_labels(conn, archive):
 
                 with open(label_fp, 'w') as f:
                     f.write(label)
+
+                print 'browse product label for', browse_product.lid
+                sys.stdout.flush()
 
 
 def make_db_collection_browse_product_labels(archive, conn, collection):
@@ -96,3 +100,6 @@ def make_db_collection_browse_product_labels(archive, conn, collection):
 
                 with open(label_fp, 'w') as f:
                     f.write(label)
+
+                print 'browse product label for', browse_product.lid
+                sys.stdout.flush()
