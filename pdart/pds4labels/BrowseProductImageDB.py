@@ -15,7 +15,6 @@ import picmaker
 
 from typing import cast, Iterable, Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from pdart.pds4.Archive import Archive
     import sqlite3
 
 
@@ -53,11 +52,11 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
                           percentiles=(1, 99))
 
 
-def make_db_browse_product_images(conn, archive):
-    # type: (sqlite3.Connection, Archive) -> None
+def make_db_browse_product_images(conn):
+    # type: (sqlite3.Connection) -> None
     """
-    Given a database connection and an :class:`~pdart.pds4.Archive`,
-    create browse images for all the RAW products.
+    Given a connection to a bundle's database, create browse images
+    for all the RAW products in the bundle.
     """
 
     # TODO Polish (with SQL joins?).  First, an inefficient
