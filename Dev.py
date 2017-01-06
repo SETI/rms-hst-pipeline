@@ -41,31 +41,31 @@ class ArchiveRecursion(object):
                             prod_iter = get_good_collection_products_db(
                                 product_cursor, coll)
                             for (prod,) in prod_iter:
-                                self.handle_product(conn, prod)
-                        self.handle_collection(conn, coll)
-                self.handle_bundle(conn, bundle.lid.lid)
+                                self.handle_product(archive, conn, prod)
+                        self.handle_collection(archive, conn, coll)
+                self.handle_bundle(archive, conn, bundle.lid.lid)
 
-    def handle_bundle(self, conn, bundle_lid):
-        # type: (sqlite3.Connection, unicode) -> int
+    def handle_bundle(self, archive, conn, bundle_lid):
+        # type: (Archive, sqlite3.Connection, unicode) -> int
         pass
 
-    def handle_collection(self, conn, collection_lid):
-        # type: (sqlite3.Connection, unicode) -> int
+    def handle_collection(self, archive, conn, collection_lid):
+        # type: (Archive, sqlite3.Connection, unicode) -> int
         pass
 
-    def handle_product(self, conn, product_lid):
-        # type: (sqlite3.Connection, unicode) -> int
+    def handle_product(self, archive, conn, product_lid):
+        # type: (Archive, sqlite3.Connection, unicode) -> int
         pass
 
 
 class LabelCreationRecursion(ArchiveRecursion):
-    def handle_bundle(self, conn, bundle_lid):
+    def handle_bundle(self, archive, conn, bundle_lid):
         make_db_bundle_label(conn, bundle_lid, VERIFY)
 
-    def handle_collection(self, conn, collection_lid):
+    def handle_collection(self, archive, conn, collection_lid):
         make_db_collection_label_and_inventory(conn, collection_lid, VERIFY)
 
-    def handle_product(self, conn, product_lid):
+    def handle_product(self, archive, conn, product_lid):
         make_db_product_label(conn, product_lid, VERIFY)
 
 
