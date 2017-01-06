@@ -56,12 +56,12 @@ def make_db_browse_product_labels(conn, archive):
                     f.write(label)
 
 
-def make_db_collection_browse_product_labels(conn, collection, archive):
-    # type: (sqlite3.Connection, unicode, Archive) -> None
+def make_db_collection_browse_product_labels(archive, conn, collection):
+    # type: (Archive, sqlite3.Connection, unicode) -> None
     """
-    Given a database connection, a collection LID, and an
-    :class:`~pdart.pds4.Archive`, create PDS4 labels for the browse
-    products in that collection.
+    Given an :class:`~pdart.pds4.Archive`, a bundle's database
+    connection, and a collection LID, create PDS4 labels for the
+    browse products in that collection.
     """
 
     # TODO Polish (with SQL joins?).  First, an inefficient
