@@ -57,14 +57,15 @@ def check_browse_collection(needed, archive, conn, collection_lid):
                     'browse label %s for %s was not created' % (image_prod,
                                                                 prod_id)
 
+        label_fp = browse_coll.label_filepath()
+        assert os.path.isfile(label_fp), \
+            'no browse collection label at %s' % label_fp
         if False:
             # Include these tests once we're creating the collection
             # label and inventory files.  (Look: I'm doing test-first
             # development!)
             inv_fp = browse_coll.inventory_filepath()
             assert os.path.isfile(inv_fp), 'no browse inventory at %s' % inv_fp
-            label_fp = browse_coll.label_filepath()
-            assert os.path.isfile(label_fp), 'no browse label at %s' % label_fp
         # TODO Any more tests?
     else:
         assert not browse_coll_exists, "%s exists but shouldn't" % browse_coll
@@ -87,7 +88,7 @@ def make_db_browse_collection_and_label(archive, conn, collection_lid):
         # create the products
         make_db_collection_browse_product_images(archive, conn, collection_lid)
         make_db_collection_browse_product_labels(archive, conn, collection_lid)
-        # TODO create the label and inventory
+        # TODO create the *collection* label and inventory
         print ('#### TODO: Would build browse collection label ' +
                'and inventory for %s' % collection_lid)
     check_browse_collection(needed, archive, conn, collection_lid)

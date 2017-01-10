@@ -21,6 +21,21 @@ def get_all_collections(cursor):
                 cursor.execute('SELECT collection FROM collections'))
 
 
+def get_all_browse_collections(cursor):
+    # type: (Cursor) -> Iterable[Tuple[unicode]]
+    return cast(Iterable[Tuple[unicode]],
+                cursor.execute(
+            "SELECT collection FROM collections WHERE prefix='browse'"))
+
+
+def get_all_browse_products(cursor):
+    # type: (Cursor) -> Iterable[Tuple[unicode]]
+    return cast(Iterable[Tuple[unicode]],
+                cursor.execute(
+            """SELECT product FROM products WHERE collection IN
+               (SELECT collection FROM collections WHERE prefix='browse')"""))
+
+
 def get_all_good_collection_products(cursor, collection):
     # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
@@ -141,3 +156,11 @@ def get_fits_headers_db(cursor, lid, hdu_index):
                 cursor.execute("""SELECT keyword, value FROM cards
                                   WHERE product=? AND hdu_index=?""",
                                (lid, hdu_index)))
+
+
+def delete_browse_products_and_collections(cursor):
+    # type: (Cursor) -> None
+    cursor.execute("""DELETE FROM products WHERE collection IN
+                      (SELECT collection FROM collections
+                       WHERE prefix='browse')""")
+    cursor.execute("""DELETE FROM collections WHERE prefix='browse'""")
