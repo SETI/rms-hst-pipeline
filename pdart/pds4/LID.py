@@ -82,7 +82,7 @@ class LID(object):
         assert self.collection_id, 'to_browse_lid(): Can\'t call on bundle LID'
         collection_id_parts = self.collection_id.split('_')
         assert collection_id_parts[0] == 'data', \
-            'to_browse_lid: Only legal within data_ collections'
+            'to_browse_lid: Only legal within data_ collections; had %s' % self
         collection_id_parts[0] = 'browse'
         browse_collection_id = '_'.join(collection_id_parts)
 

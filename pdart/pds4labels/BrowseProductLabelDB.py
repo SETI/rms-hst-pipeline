@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 def make_db_browse_product_labels(archive, conn):
     # type: (Archive, sqlite3.Connection) -> None
     """
-    Given a database connection and an :class:`~pdart.pds4.Archive`,
+    Given an :class:`~pdart.pds4.Archive` and a database connection,
     create PDS4 labels for the browse products.
     """
 

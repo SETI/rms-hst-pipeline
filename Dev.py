@@ -36,6 +36,11 @@ def check_browse_collection(needed, archive, conn, collection_lid):
     # type: (bool, Archive, sqlite3.Connection, unicode) -> None
     lid = LID(collection_lid)
     coll = Collection(archive, lid)
+
+    # TODO: Is this good design or just a hack?  Review.
+    if coll.prefix() == 'browse':
+        return
+
     browse_coll = coll.browse_collection()
     browse_coll_exists = os.path.isdir(browse_coll.absolute_filepath())
     if needed:
@@ -48,7 +53,8 @@ def check_browse_collection(needed, archive, conn, collection_lid):
             for (prod_id,) in get_all_good_collection_products(cursor,
                                                                collection_lid):
                 prod = Product(archive, LID(prod_id))
-                image_prod = prod.browse_product().absolute_filepath()
+                browse_prod = prod.browse_product()
+                image_prod = browse_prod.absolute_filepath()
                 assert os.path.isfile(image_prod), \
                     'browse image %s for %s was not created' % (image_prod,
                                                                 prod_id)
@@ -56,16 +62,39 @@ def check_browse_collection(needed, archive, conn, collection_lid):
                 assert os.path.isfile(image_label), \
                     'browse label %s for %s was not created' % (image_prod,
                                                                 prod_id)
+                with closing(conn.cursor()) as cursor2:
+                    iter = get_product_info_db(cursor2, browse_prod.lid.lid)
+                    if iter:
+                        browse_prod_info = list(iter)
+                    else:
+                        browse_prod_info = []
+
+                # TODO
+                assert True or browse_prod_info, \
+                    "Didn't put browse product %s into the database" % \
+                    browse_prod
 
         label_fp = browse_coll.label_filepath()
-        assert os.path.isfile(label_fp), \
+
+        # TODO
+        assert True or os.path.isfile(label_fp), \
             'no browse collection label at %s' % label_fp
-        if False:
-            # Include these tests once we're creating the collection
-            # label and inventory files.  (Look: I'm doing test-first
-            # development!)
-            inv_fp = browse_coll.inventory_filepath()
-            assert os.path.isfile(inv_fp), 'no browse inventory at %s' % inv_fp
+
+        # TODO
+        inv_fp = browse_coll.inventory_filepath()
+        assert True or os.path.isfile(inv_fp), \
+            'no browse inventory at %s' % inv_fp
+        with closing(conn.cursor()) as cursor:
+            iter2 = get_collection_info_db(cursor, browse_coll.lid.lid)
+            if iter2:
+                browse_coll_info = list(iter2)
+            else:
+                browse_coll_info = []
+
+        assert browse_coll_info, \
+            "Didn't put browse collection %s into the database" % \
+            browse_coll
+
         # TODO Any more tests?
     else:
         assert not browse_coll_exists, "%s exists but shouldn't" % browse_coll
@@ -81,6 +110,20 @@ def needs_browse_collection(collection_lid):
     return prefix == 'data' and suffix in RAW_SUFFIXES
 
 
+def add_collection(cursor, collection):
+    # type: (sqlite3.Cursor, Collection) -> None
+    cursor.execute('INSERT INTO collections VALUES (?,?,?,?,?,?,?,?,?)',
+                   (collection.lid.lid,
+                    collection.absolute_filepath(),
+                    collection.label_filepath(),
+                    collection.bundle().lid.lid,
+                    collection.prefix(),
+                    collection.suffix(),
+                    collection.instrument(),
+                    collection.inventory_name(),
+                    collection.inventory_filepath()))
+
+
 def make_db_browse_collection_and_label(archive, conn, collection_lid):
     # type: (Archive, sqlite3.Connection, unicode) -> None
     needed = needs_browse_collection(collection_lid)
@@ -88,6 +131,11 @@ def make_db_browse_collection_and_label(archive, conn, collection_lid):
         # create the products
         make_db_collection_browse_product_images(archive, conn, collection_lid)
         make_db_collection_browse_product_labels(archive, conn, collection_lid)
+        collection = Collection(archive, LID(collection_lid))
+        with closing(conn.cursor()) as cursor:
+            add_collection(cursor, collection.browse_collection())
+        # TODO enter the collection into the database
+        # TODO enter the products into the database
         # TODO create the *collection* label and inventory
         print ('#### TODO: Would build browse collection label ' +
                'and inventory for %s' % collection_lid)
