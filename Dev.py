@@ -74,13 +74,11 @@ def check_browse_collection(needed, archive, conn, collection_lid):
                     browse_prod
 
         label_fp = browse_coll.label_filepath()
-        # TODO
-        assert True or os.path.isfile(label_fp), \
+        assert os.path.isfile(label_fp), \
             'no browse collection label at %s' % label_fp
 
         inv_fp = browse_coll.inventory_filepath()
-        # TODO
-        assert True or os.path.isfile(inv_fp), \
+        assert os.path.isfile(inv_fp), \
             'no browse inventory at %s' % inv_fp
 
         with closing(conn.cursor()) as cursor:
@@ -131,11 +129,12 @@ def make_db_browse_collection_and_label(archive, conn, collection_lid):
         make_db_collection_browse_product_images(archive, conn, collection_lid)
         make_db_collection_browse_product_labels(archive, conn, collection_lid)
         collection = Collection(archive, LID(collection_lid))
+        browse_collection = collection.browse_collection()
         with closing(conn.cursor()) as cursor:
-            add_collection(cursor, collection.browse_collection())
-        # TODO enter the collection into the database
-        # TODO enter the products into the database
-        # TODO create the *collection* label and inventory
+            add_collection(cursor, browse_collection)
+        make_db_collection_label_and_inventory(
+            conn, browse_collection.lid.lid, False)
+
         print ('#### TODO: Would build browse collection label ' +
                'and inventory for %s' % collection_lid)
     check_browse_collection(needed, archive, conn, collection_lid)

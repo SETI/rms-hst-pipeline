@@ -72,7 +72,7 @@ def make_db_browse_product_images(archive, conn):
             (_, proposal_id) = get_bundle_info_db(cursor, b)
             for (p, fp, v) \
                     in get_good_collection_products_with_info_db(cursor, c):
-                print 'browse product image(s) for', \
+                print 'browse product images for', \
                     Product(archive, LID(p)).browse_product().lid
                 sys.stdout.flush()
 
@@ -102,7 +102,7 @@ def make_db_collection_browse_product_images(archive, conn, collection):
                     in get_good_collection_products_with_info_db(cursor,
                                                                  collection):
                 browse_prod = Product(archive, LID(p)).browse_product()
-                print 'browse product image(s) for', browse_prod.lid
+                print 'browse product images for', browse_prod.lid
                 sys.stdout.flush()
                 browse_coll_fp = _make_browse_coll_fp(c_fp)
                 _make_browse_image(browse_coll_fp, fp, v)
