@@ -69,21 +69,20 @@ def check_browse_collection(needed, archive, conn, collection_lid):
                     else:
                         browse_prod_info = []
 
-                # TODO
-                assert True or browse_prod_info, \
+                assert browse_prod_info, \
                     "Didn't put browse product %s into the database" % \
                     browse_prod
 
         label_fp = browse_coll.label_filepath()
-
         # TODO
         assert True or os.path.isfile(label_fp), \
             'no browse collection label at %s' % label_fp
 
-        # TODO
         inv_fp = browse_coll.inventory_filepath()
+        # TODO
         assert True or os.path.isfile(inv_fp), \
             'no browse inventory at %s' % inv_fp
+
         with closing(conn.cursor()) as cursor:
             iter2 = get_collection_info_db(cursor, browse_coll.lid.lid)
             if iter2:

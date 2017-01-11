@@ -101,8 +101,25 @@ def make_db_collection_browse_product_images(archive, conn, collection):
             for (p, fp, v) \
                     in get_good_collection_products_with_info_db(cursor,
                                                                  collection):
-                print 'browse product image(s) for', \
-                    Product(archive, LID(p)).browse_product().lid
+                browse_prod = Product(archive, LID(p)).browse_product()
+                print 'browse product image(s) for', browse_prod.lid
                 sys.stdout.flush()
                 browse_coll_fp = _make_browse_coll_fp(c_fp)
                 _make_browse_image(browse_coll_fp, fp, v)
+                with closing(conn.cursor()) as cursor2:
+                    add_product(cursor2, browse_prod)
+
+
+def add_product(cursor, product):
+    # type: (sqlite3.Cursor, Product) -> None
+    cursor.execute('INSERT INTO products VALUES (?,?,?,?,?,?,0,?)',
+                   (product.lid.lid,
+                    product.absolute_filepath(),
+                    os.path.basename(product.absolute_filepath()),
+                    product.label_filepath(),
+                    product.collection().lid.lid,
+                    product.visit(),
+                    product.lid.product_id))
+
+# TODO Note the similarities between add_xxx and the code we
+# originally populate the tables with.
