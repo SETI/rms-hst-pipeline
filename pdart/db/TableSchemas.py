@@ -1,3 +1,15 @@
+from pdart.pds4.Bundle import *
+from pdart.pds4.Collection import *
+from pdart.pds4.Product import *
+
+from typing import Tuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    _CONN_TUPLE = \
+        Tuple[str, str, str, str, unicode, unicode, unicode, unicode, unicode]
+    _PROD_TUPLE = \
+        Tuple[str, unicode, unicode, unicode, str, unicode, unicode]
+
+
 BUNDLES_SCHEMA = """CREATE TABLE bundles (
         bundle VARCHAR PRIMARY KEY NOT NULL,
         full_filepath VARCHAR NOT NULL,
@@ -5,6 +17,17 @@ BUNDLES_SCHEMA = """CREATE TABLE bundles (
         proposal_id INT NOT NULL
         )"""
 # type: str
+
+BUNDLES_SQL = 'INSERT INTO bundles VALUES (?,?,?,?)'
+# type: str
+
+
+def bundle_tuple(bundle):
+    # type: (Bundle) -> Tuple[str, unicode, unicode, int]
+    return (str(bundle.lid),
+            bundle.absolute_filepath(),
+            bundle.label_filepath(),
+            bundle.proposal_id())
 
 COLLECTIONS_SCHEMA = """CREATE TABLE collections (
         collection VARCHAR PRIMARY KEY NOT NULL,
@@ -20,6 +43,22 @@ COLLECTIONS_SCHEMA = """CREATE TABLE collections (
             );"""
 # type: str
 
+COLLECTIONS_SQL = 'INSERT INTO collections VALUES (?,?,?,?,?,?,?,?,?)'
+# type: str
+
+
+def collection_tuple(collection):
+    # type: (Collection) -> _CONN_TUPLE
+    return (str(collection.lid),
+            collection.absolute_filepath(),
+            collection.label_filepath(),
+            str(collection.bundle().lid),
+            collection.prefix(),
+            collection.suffix(),
+            collection.instrument(),
+            collection.inventory_name(),
+            collection.inventory_filepath())
+
 PRODUCTS_SCHEMA = """CREATE TABLE products (
         product VARCHAR PRIMARY KEY NOT NULL,
         full_filepath VARCHAR NOT NULL,
@@ -33,11 +72,29 @@ PRODUCTS_SCHEMA = """CREATE TABLE products (
         )"""
 # type: str
 
+PRODUCTS_SQL = 'INSERT INTO products VALUES (?,?,?,?,?,?,0,?)'
+# type: str
+
+
+def product_tuple(product):
+    # type: (Product) -> _PROD_TUPLE
+    return (str(product.lid),
+            product.absolute_filepath(),
+            os.path.basename(product.absolute_filepath()),
+            product.label_filepath(),
+            str(product.collection().lid),
+            product.visit(),
+            product.lid.product_id)
+
+
 BAD_FITS_FILES_SCHEMA = """CREATE TABLE bad_fits_files (
         product VARCHAR NOT NULL,
         message VARCHAR NOT NULL,
         FOREIGN KEY (product) REFERENCES products(product)
         )"""
+# type: str
+
+BAD_FITS_FILES_SQL = 'INSERT INTO bad_fits_files VALUES (?,?)'
 # type: str
 
 HDUS_SCHEMA = """CREATE TABLE hdus (
@@ -51,6 +108,9 @@ HDUS_SCHEMA = """CREATE TABLE hdus (
         )"""
 # type: str
 
+HDUS_SQL = 'INSERT INTO hdus VALUES (?, ?, ?, ?, ?)'
+# type: str
+
 CARDS_SCHEMA = """CREATE TABLE cards (
         keyword VARCHAR NOT NULL,
         value,
@@ -59,4 +119,7 @@ CARDS_SCHEMA = """CREATE TABLE cards (
         FOREIGN KEY(product) REFERENCES products(product),
         FOREIGN KEY(product, hdu_index) REFERENCES hdus(product, hdu_index)
         )"""
+# type: str
+
+CARDS_SQL = 'INSERT INTO cards VALUES (?, ?, ?, ?)'
 # type: str

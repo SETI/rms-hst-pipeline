@@ -6,6 +6,7 @@ from contextlib import closing
 import os.path
 import sys
 
+from pdart.db.TableSchemas import *
 from pdart.pds4.LID import *
 from pdart.pds4.Product import *
 from pdart.pds4labels.BrowseProductImageReduction import ensure_directory
@@ -112,14 +113,4 @@ def make_db_collection_browse_product_images(archive, conn, collection):
 
 def add_product(cursor, product):
     # type: (sqlite3.Cursor, Product) -> None
-    cursor.execute('INSERT INTO products VALUES (?,?,?,?,?,?,0,?)',
-                   (product.lid.lid,
-                    product.absolute_filepath(),
-                    os.path.basename(product.absolute_filepath()),
-                    product.label_filepath(),
-                    product.collection().lid.lid,
-                    product.visit(),
-                    product.lid.product_id))
-
-# TODO Note the similarities between add_xxx and the code we
-# originally populate the tables with.
+    cursor.execute(PRODUCTS_SQL, product_tuple(product))

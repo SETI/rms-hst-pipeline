@@ -9,6 +9,7 @@ import sqlite3
 
 from pdart.db.CreateBundleDatabase import BundleDatabaseCreator
 from pdart.db.DatabaseName import DATABASE_NAME
+from pdart.db.TableSchemas import *
 from pdart.pds4.Archive import Archive
 from pdart.pds4.Archives import *
 from pdart.pds4.Collection import Collection
@@ -109,16 +110,7 @@ def needs_browse_collection(collection_lid):
 
 def add_collection(cursor, collection):
     # type: (sqlite3.Cursor, Collection) -> None
-    cursor.execute('INSERT INTO collections VALUES (?,?,?,?,?,?,?,?,?)',
-                   (collection.lid.lid,
-                    collection.absolute_filepath(),
-                    collection.label_filepath(),
-                    collection.bundle().lid.lid,
-                    collection.prefix(),
-                    collection.suffix(),
-                    collection.instrument(),
-                    collection.inventory_name(),
-                    collection.inventory_filepath()))
+    cursor.execute(COLLECTIONS_SQL, collection_tuple(collection))
 
 
 def make_db_browse_collection_and_label(archive, conn, collection_lid):
@@ -134,9 +126,6 @@ def make_db_browse_collection_and_label(archive, conn, collection_lid):
             add_collection(cursor, browse_collection)
         make_db_collection_label_and_inventory(
             conn, browse_collection.lid.lid, False)
-
-        print ('#### TODO: Would build browse collection label ' +
-               'and inventory for %s' % collection_lid)
     check_browse_collection(needed, archive, conn, collection_lid)
 
 

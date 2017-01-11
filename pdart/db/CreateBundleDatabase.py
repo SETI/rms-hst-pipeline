@@ -20,9 +20,7 @@ def _create_bundles_table(conn, bundle):
     """Create the bundles table."""
     conn.execute('DROP TABLE IF EXISTS bundles')
     conn.execute(BUNDLES_SCHEMA)
-    b = (str(bundle.lid), bundle.absolute_filepath(),
-         bundle.label_filepath(), bundle.proposal_id())
-    conn.execute('INSERT INTO bundles VALUES (?,?,?,?)', b)
+    conn.execute(BUNDLES_SQL, bundle_tuple(bundle))
     conn.commit()
 
 
@@ -73,29 +71,19 @@ class BundleDatabaseCreator(DatabaseCreator):
 
     def populate_bundles_table(self):
         # type: () -> None
-        b = (str(self.bundle.lid), self.bundle.absolute_filepath(),
-             self.bundle.label_filepath(), self.bundle.proposal_id())
-        self.conn.execute('INSERT INTO bundles VALUES (?,?,?,?)', b)
+        self.conn.execute(BUNDLES_SQL, bundle_tuple(self.bundle))
 
     def populate_collections_table(self):
         # type: () -> None
-        cs = [(str(c.lid), c.absolute_filepath(), c.label_filepath(),
-               str(self.bundle.lid), c.prefix(), c.suffix(), c.instrument(),
-               c.inventory_name(), c.inventory_filepath())
-              for c in self.bundle.collections()]
-        self.conn.executemany(
-            'INSERT INTO collections VALUES (?,?,?,?,?,?,?,?,?)', cs)
+        cs = [collection_tuple(c) for c in self.bundle.collections()]
+        self.conn.executemany(COLLECTIONS_SQL, cs)
 
     def populate_products_table(self):
         # type: () -> None
-        ps = [(str(p.lid), p.absolute_filepath(),
-               os.path.basename(p.absolute_filepath()),
-               p.label_filepath(), str(c.lid),
-               p.visit(), p.lid.product_id)
+        ps = [product_tuple(p)
               for c in self.bundle.collections()
               for p in c.products()]
-        self.conn.executemany(
-            'INSERT INTO products VALUES (?,?,?,?,?,?,0,?)', ps)
+        self.conn.executemany(PRODUCTS_SQL, ps)
 
     def populate_hdus_and_cards_tables(self):
         # type: () -> None
@@ -123,7 +111,7 @@ class BundleDatabaseCreator(DatabaseCreator):
                     for (hdu_index, hdu) in enumerate(fits):
                         fileinfo = hdu.fileinfo()
                         self.conn.execute(
-                            'INSERT INTO hdus VALUES (?, ?, ?, ?, ?)',
+                            HDUS_SQL,
                             (product_lid,
                              hdu_index,
                              fileinfo['hdrLoc'],
@@ -136,10 +124,8 @@ class BundleDatabaseCreator(DatabaseCreator):
                                hdu_index)
                               for card in header.cards
                               if desired_keyword(card.keyword)]
-                        self.conn.executemany(
-                            'INSERT INTO cards VALUES (?, ?, ?, ?)', cs)
+                        self.conn.executemany(CARDS_SQL, cs)
                 finally:
                     fits.close()
             except IOError as e:
-                self.conn.execute('INSERT INTO bad_fits_files VALUES (?,?)',
-                                  (str(p.lid), str(e)))
+                self.conn.execute(BAD_FITS_FILES_SQL, (str(p.lid), str(e)))
