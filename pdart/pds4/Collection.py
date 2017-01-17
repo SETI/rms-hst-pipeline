@@ -59,8 +59,14 @@ class Collection(Component):
 
         'data' and 'browse' are some possible results.
         """
-        return re.match(Collection.DIRECTORY_PATTERN,
-                        self.lid.collection_id).group(1)
+        match = re.match(Collection.DIRECTORY_PATTERN,
+                         self.lid.collection_id)
+        # hack for document collections, which have no prefix or
+        # suffix
+        if match:
+            return match.group(1)
+        else:
+            return None
 
     def suffix(self):
         # type: () -> unicode
@@ -69,8 +75,14 @@ class Collection(Component):
         :class:`~pdart.pds4.Collection`.  It is calculated from the
         collection's :class:`~pdart.pds4.LID`.
         """
-        return re.match(Collection.DIRECTORY_PATTERN,
-                        self.lid.collection_id).group(3)
+        match = re.match(Collection.DIRECTORY_PATTERN,
+                         self.lid.collection_id)
+        # hack for document collections, which have no prefix or
+        # suffix
+        if match:
+            return match.group(3)
+        else:
+            return None
 
     def absolute_filepath(self):
         # type: () -> str
@@ -82,13 +94,27 @@ class Collection(Component):
         # type: () -> str
         """Return the absolute filepath to the collection's label."""
         collection_fp = self.absolute_filepath()
-        name = 'collection_%s.xml' % self.prefix()
+
+        # hack for document collections, which have no prefix or
+        # suffix
+        pref = self.prefix()
+        if pref:
+            name = 'collection_%s.xml' % self.prefix()
+        else:
+            name = 'collection.xml'
         return os.path.join(collection_fp, name)
 
     def inventory_name(self):
         # type: () -> unicode
         """Return the filename of the collection's inventory."""
-        return 'collection_%s.csv' % self.prefix()
+
+        # hack for document collections, which have no prefix or
+        # suffix
+        pref = self.prefix()
+        if pref:
+            return 'collection_%s.csv' % self.prefix()
+        else:
+            return 'collections.csv'
 
     def inventory_filepath(self):
         # type: () -> unicode

@@ -4,8 +4,12 @@ and product labels, and collection inventories.  Uses the bundle
 databases.
 """
 from contextlib import closing
+import glob
+import os
 import os.path
 import sqlite3
+import urllib2
+import xml.etree.ElementTree
 
 from pdart.db.CreateBundleDatabase import BundleDatabaseCreator
 from pdart.db.DatabaseName import DATABASE_NAME
@@ -31,6 +35,104 @@ IN_MEMORY = False
 # type: bool
 CREATE_DB = False
 # type: bool
+
+DOCUMENT = 'document'
+# type: unicode
+
+
+def _get_apt_url(proposal_id):
+    # type: (int) -> str
+    """Return the URL to get the APT file for the given proposal id."""
+    return 'https://www.stsci.edu/hst/phase2-public/%d.apt' % proposal_id
+
+
+def _get_pdf_url(proposal_id):
+    # type: (int) -> str
+    """Return the URL to get the PDF file for the given proposal id."""
+    return 'https://www.stsci.edu/hst/phase2-public/%d.pdf' % proposal_id
+
+
+def _get_pro_url(proposal_id):
+    # type: (int) -> str
+    """Return the URL to get the PRO file for the given proposal id."""
+    return 'https://www.stsci.edu/hst/phase2-public/%d.pro' % proposal_id
+
+
+def _get_prop_url(proposal_id):
+    # type: (int) -> str
+    """Return the URL to get the PROP file for the given proposal id."""
+    return 'https://www.stsci.edu/hst/phase2-public/%d.prop' % proposal_id
+
+
+def _retrieve_doc(url):
+    # type: (unicode) -> str
+    """Retrives the text at that URL or raises an exception."""
+    resp = urllib2.urlopen(url)
+    return resp.read()
+
+
+def _retrieve_apt(proposal_id, docs_fp):
+    # type: (int, unicode) -> None
+    """
+    Retrieve the APT file for the given proposal id, write it into the
+    document directory (creating the directory if necessary), then
+    extract the abstract from it and write the abstract into the
+    document directory
+    """
+    apt_xml = _retrieve_doc(_get_apt_url(proposal_id))
+    apt_fp = os.path.join(docs_fp, 'phase2.apt')
+    with open(apt_fp, 'w') as f:
+        f.write(apt_xml)
+    print '# Wrote', apt_fp
+
+    abstract_fp = os.path.join(docs_fp, 'abstract.txt')
+    root = xml.etree.ElementTree.parse(apt_fp).getroot()
+    assert root is not None
+    abst = root.find('.//Abstract')
+    assert abst is not None
+    assert abst.text is not None
+    with open(abstract_fp, 'w') as f2:
+        f2.write(abst.text)
+    print '# Wrote', abstract_fp
+
+
+def _retrieve_pdf(proposal_id, docs_fp):
+    # type: (int, unicode) -> None
+    """
+    Retrieve the PDF file for the given proposal id and write it
+    into the document directory.
+    """
+    pdf_txt = _retrieve_doc(_get_pdf_url(proposal_id))
+    pdf_fp = os.path.join(docs_fp, 'phase2.txt')
+    with open(pdf_fp, 'w') as f:
+        f.write(pdf_txt)
+    print '# Wrote', pdf_fp
+
+
+def _retrieve_pro(proposal_id, docs_fp):
+    # type: (int, unicode) -> None
+    """
+    Retrieve the PRO file for the given proposal id and write it
+    into the document directory.
+    """
+    pro_txt = _retrieve_doc(_get_pro_url(proposal_id))
+    pro_fp = os.path.join(docs_fp, 'phase2.txt')
+    with open(pro_fp, 'w') as f:
+        f.write(pro_txt)
+    print '# Wrote', pro_fp
+
+
+def _retrieve_prop(proposal_id, docs_fp):
+    # type: (int, unicode) -> None
+    """
+    Retrieve the PROP file for the given proposal id and write it into
+    the document directory.
+    """
+    prop_txt = _retrieve_doc(_get_prop_url(proposal_id))
+    prop_fp = os.path.join(docs_fp, 'phase2.txt')
+    with open(prop_fp, 'w') as f:
+        f.write(prop_txt)
+    print '# Wrote', prop_fp
 
 
 def check_browse_collection(needed, archive, conn, collection_lid):
@@ -129,10 +231,63 @@ def make_db_browse_collection_and_label(archive, conn, collection_lid):
     check_browse_collection(needed, archive, conn, collection_lid)
 
 
-def make_db_documentation_collection_and_label(conn, collection_lid):
-    # type: (sqlite3.Connection, unicode) -> None
-    print ('**** TODO: Would build documentation collection for %s'
-           % collection_lid)
+def check_document_collection(archive, conn, bundle_lid):
+    # type: (Archive, sqlite3.Connection, unicode) -> None
+    bundle = Bundle(archive, LID(bundle_lid))
+    docs_fp = os.path.join(bundle.absolute_filepath(), DOCUMENT)
+    assert os.path.isdir(docs_fp), \
+        'document collection directory not at %s' % docs_fp
+
+    files = glob.glob(docs_fp + '/*')
+    print "files =", files
+    assert files, 'no files in ' + docs_fp
+
+    doc_coll = Collection(archive, LID('%s:%s' % (bundle_lid, DOCUMENT)))
+    inv_fp = doc_coll.inventory_filepath()
+
+    # TODO Implement this assertion
+    assert True or os.path.isfile(inv_fp), \
+        'no document collection inventory at %s' % inv_fp
+    label_fp = doc_coll.label_filepath()
+
+    # TODO Implement this assertion
+    assert True or os.path.isfile(label_fp), \
+        'no document collection label at %s' % label_fp
+
+    # TODO Check for products and collection in database
+
+
+def _get_document(proposal_id, docs_fp):
+    # type: (int, unicode) -> None
+    # TODO You're trying alternatives here.  Rewrite to use tasks.
+    try:
+        _retrieve_apt(proposal_id, docs_fp)
+        _retrieve_pdf(proposal_id, docs_fp)
+        _retrieve_pro(proposal_id, docs_fp)
+        # TODO Create the phase2.pdf file
+    except urllib2.HTTPError as e:
+        print e
+        try:
+            _retrieve_prop(proposal_id, docs_fp)
+        except urllib2.HTTPError as e2:
+            print e2
+
+
+def make_db_document_collection_and_label(archive, conn, bundle_lid):
+    # type: (Archive, sqlite3.Connection, unicode) -> None
+    print ('**** In progress: Building document collection ' +
+           'for %s:document' % bundle_lid)
+    bundle = Bundle(archive, LID(bundle_lid))
+    docs_fp = os.path.join(bundle.absolute_filepath(), DOCUMENT)
+    os.mkdir(docs_fp)
+
+    # TODO Put products, product labels, collection label, inventory
+    # into filesystem
+    _get_document(bundle.proposal_id(), docs_fp)
+
+    # TODO Insert products and collection into database
+
+    check_document_collection(archive, conn, bundle_lid)
 
 
 class ArchiveRecursion(object):
@@ -194,12 +349,22 @@ class FullCreationRecursion(LabelCreationRecursion):
         # type: () -> None
         LabelCreationRecursion.__init__(self)
 
+    def handle_bundle(self, archive, conn, bundle_lid):
+        # type: (Archive, sqlite3.Connection, unicode) -> None
+        LabelCreationRecursion.handle_bundle(self, archive,
+                                             conn, bundle_lid)
+
+        # Here we build the document collection for the bundle
+        make_db_document_collection_and_label(archive, conn, bundle_lid)
+
     def handle_collection(self, archive, conn, collection_lid):
         # type: (Archive, sqlite3.Connection, unicode) -> None
         LabelCreationRecursion.handle_collection(self, archive,
                                                  conn, collection_lid)
+
+        # Here we build the sibling browse collection to the data
+        # collection
         make_db_browse_collection_and_label(archive, conn, collection_lid)
-        make_db_documentation_collection_and_label(conn, collection_lid)
 
 
 def dev():
