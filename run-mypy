@@ -23,6 +23,7 @@ mypy --silent-imports --py2 \
     MakeBundleDBs.py \
     MakeDB.py \
     MakeDocCollections.py \
+    MakeDocLabel.py \
     MakeLabel.py \
     MakeLabels.py \
     MakeRawBrowse.py \
