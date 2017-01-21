@@ -10,6 +10,7 @@ from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.Bundle import Bundle
 from pdart.pds4.LID import LID
+from pdart.pds4labels.DBCalls import *
 from pdart.rules.Combinators import *
 from pdart.xml.Pds4Version import *
 from pdart.xml.Pretty import *
@@ -19,6 +20,52 @@ from pdart.xml.Templates import *
 from typing import Any, Dict, Iterable, TYPE_CHECKING
 if TYPE_CHECKING:
     import xml.dom.minidom
+
+    _UADict = Dict[str, Any]
+    NodeBuilder = Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
+
+_make_file = interpret_template('<file_name><NODE name="file_name" />\
+</file_name>')
+# type: Callable[[_UADict], NodeBuilder]
+
+_make_document_standard_id = interpret_template('<document_standard_id>\
+<NODE name="document_standard_id" />\
+</document_standard_id>')
+# type: Callable[[_UADict], NodeBuilder]
+
+
+def _make_document_file_entry(file_name, document_standard_id):
+    return combine_nodes_into_fragment([
+        _make_file({'file_name': file_name}),
+        _make_document_standard_id({
+                'document_standard_id': document_standard_id})
+        ])
+
+
+_make_document_edition = interpret_template(
+    """<Document_Edition>
+            <edition_name><NODE name="edition_name" /></edition_name>
+            <language><NODE name="language" /></language>
+            <files><NODE name="files" /></files>
+            <Document_File>
+            <FRAGMENT name="document_file_entries" />
+            </Document_File>
+        </Document_Edition>""")
+# type: Callable[[_UADict], NodeBuilder]
+
+
+def make_document_edition(edition_name, file_stds):
+    # type: (str, List[Tuple[str, str]]) -> NodeBuilder
+    nodes = [_make_document_file_entry(file_name, document_standard_id)
+             for (file_name, document_standard_id) in file_stds]
+    # type: List[NodeBuilder]
+
+    return _make_document_edition({
+            'edition_name': edition_name,
+            'language': 'English',
+            'files': len(file_stds),
+            'document_file_entries': combine_nodes_into_fragment(nodes)})
+
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -32,7 +79,7 @@ make_label = interpret_document_template(
         xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
                             http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd">
     <Identification_Area>
-    <logical_identifier><NODE name="lid" /></logical_identifier>
+    <logical_identifier><NODE name="product_lid" /></logical_identifier>
     <version_id>0.1</version_id>
     <title><NODE name="title" /></title>
     <information_model_version>%s</information_model_version>
@@ -45,7 +92,7 @@ make_label = interpret_document_template(
     </Identification_Area>
     <Reference_List>
         <Internal_Reference>
-            <lid_reference>urn:nasa:pds:hst_05167</lid_reference>
+            <lid_reference><NODE name="bundle_lid" /></lid_reference>
             <reference_type>document_to_investigation</reference_type>
         </Internal_Reference>
     </Reference_List>
@@ -56,8 +103,7 @@ make_label = interpret_document_template(
             <language><NODE name="language" /></language>
             <files>1</files>
             <Document_File>
-                <file_name>phase2.txt</file_name>
-                <document_standard_id>7-Bit ASCII Text</document_standard_id>
+                <FRAGMENT name="document_file_entry" />
             </Document_File>
         </Document_Edition>
     </Document>
@@ -66,15 +112,15 @@ make_label = interpret_document_template(
 # type: Callable[[Dict[str, Any]], Document]
 
 
-def get_all_good_bundle_products(cursor, bundle):
-    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode]]
-    return cast(Iterable[Tuple[unicode]],
-                cursor.execute("""SELECT product FROM products
-                                  WHERE collection IN
-                                  (SELECT collection from collections
-                                   WHERE bundle=?) /*EXCEPT
-                                  SELECT product FROM bad_fits_files*/""",
-                               (bundle,)))
+def make_proposal_description(proposal_id):
+    # type: (int) -> unicode
+    proposal_title = '{{proposal_title}}'  # TODO
+    pi = '{{pi_name}}'  # TODOnnnn
+    yr = '{{proposal_year}}'  # TODO
+
+    return 'This document provides a summary of the observation ' + \
+        'plan for HST proposal %d, %s, PI %s, %s.' % \
+        (proposal_id, proposal_title, pi, yr)
 
 
 if __name__ == '__main__':
@@ -89,41 +135,27 @@ if __name__ == '__main__':
             print label
             raise Exception('Schematron validation errors: ' + failures)
 
-    # TODO I need to look at the FITS files for more data.
-    # Unfortunately, all the FITS files for this bundle are bad.  So I
-    # need to try another one.
-
     arch = get_any_archive()
-    bundle = Bundle(arch, LID('urn:nasa:pds:hst_05167'))
-    database_fp = os.path.join(bundle.absolute_filepath(),
-                               DATABASE_NAME)
-    with closing(sqlite3.connect(database_fp)) as conn:
-        with closing(conn.cursor()) as cursor:
-            for p in get_all_good_bundle_products(cursor, bundle.lid.lid):
-                print p
+    bundle = Bundle(arch, LID('urn:nasa:pds:hst_14334'))
 
-    # /Users/spaceman/Desktop/Archive/hst_05167/document/phase2.txt
-    proposal = 5167
+    proposal_id = bundle.proposal_id()
+    description = make_proposal_description(proposal_id)
 
-    title = 'Jovian Auroral Ly-Alpha Profile:Cycle 4'
-    pi = 'L. Trafton'
-    yr = 1995
-    description = 'This document provides a summary of the observation ' + \
-        'plan for HST proposal %d, %s, PI %s, %d.' % \
-        (proposal, title, pi, yr)
-
-    title = 'Summary of the observation plan for HST proposal %d' % proposal
-    today = date.today().isoformat()
+    title = 'Summary of the observation plan for HST proposal %d' % proposal_id
 
     label = make_label({
-            'lid': 'urn:nasa:pds:hst_05167:document:phase2',
+            'bundle_lid': bundle.lid.lid,
+            'product_lid': bundle.lid.lid + ':document:phase2',
             'title': title,
             'description': description,
             'publication_year': 2000,  # TODO
-            'publication_date': today,
-            'author_list': 'TODO: Galilei, Galileo',
-            'edition_name': 'TODO: use the product version',
-            'language': 'English'
+            'publication_date': date.today().isoformat(),
+            'author_list': '{{author_list}}',  # TODO
+            'edition_name': '0.0',  # TODO
+            'language': 'English',
+            'document_file_entry': _make_document_file_entry(
+                'phase2.txt',
+                '7-Bit ASCII Text')
             })
     pretty_label = pretty_print(label.toxml())
     print pretty_label

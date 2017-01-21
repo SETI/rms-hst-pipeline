@@ -36,6 +36,17 @@ def get_all_browse_products(cursor):
                (SELECT collection FROM collections WHERE prefix='browse')"""))
 
 
+def get_all_good_bundle_products(cursor, bundle):
+    # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
+    return cast(Iterable[Tuple[unicode]],
+                cursor.execute("""SELECT product FROM products
+                                  WHERE collection IN
+                                  (SELECT collection from collections
+                                   WHERE bundle=?) EXCEPT
+                                  SELECT product FROM bad_fits_files""",
+                               (bundle,)))
+
+
 def get_all_good_collection_products(cursor, collection):
     # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
