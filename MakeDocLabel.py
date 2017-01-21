@@ -16,6 +16,7 @@ from pdart.xml.Pds4Version import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
+from pdart.xml.Templates import _DOC
 
 from typing import Any, Dict, Iterable, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -35,6 +36,7 @@ _make_document_standard_id = interpret_template('<document_standard_id>\
 
 
 def _make_document_file_entry(file_name, document_standard_id):
+    # type: (str, str) -> FragBuilder
     return combine_nodes_into_fragment([
         _make_file({'file_name': file_name}),
         _make_document_standard_id({
@@ -56,15 +58,25 @@ _make_document_edition = interpret_template(
 
 def make_document_edition(edition_name, file_stds):
     # type: (str, List[Tuple[str, str]]) -> NodeBuilder
-    nodes = [_make_document_file_entry(file_name, document_standard_id)
-             for (file_name, document_standard_id) in file_stds]
-    # type: List[NodeBuilder]
+
+    fragments = [_make_document_file_entry(file_name, document_standard_id)
+                 for (file_name, document_standard_id) in file_stds]
+    # type: List[FragBuilder]
 
     return _make_document_edition({
             'edition_name': edition_name,
             'language': 'English',
             'files': len(file_stds),
-            'document_file_entries': combine_nodes_into_fragment(nodes)})
+            'document_file_entries': combine_fragments_into_fragment(fragments)
+            })
+
+
+_make_citation_information = interpret_template("""<Citation_Information>
+<author_list><NODE name="author_list" /></author_list>
+<publication_year><NODE name="publication_year" /></publication_year>
+<description><NODE name="description" /></description>
+</Citation_Information>""")
+# type: Callable[[_UADict], NodeBuilder]
 
 
 make_label = interpret_document_template(
@@ -84,11 +96,7 @@ make_label = interpret_document_template(
     <title><NODE name="title" /></title>
     <information_model_version>%s</information_model_version>
     <product_class>Product_Document</product_class>
-    <Citation_Information>
-        <author_list><NODE name="author_list" /></author_list>
-        <publication_year><NODE name="publication_year" /></publication_year>
-        <description><NODE name="description" /></description>
-    </Citation_Information>
+    <NODE name="Citation_Information" />
     </Identification_Area>
     <Reference_List>
         <Internal_Reference>
@@ -98,14 +106,7 @@ make_label = interpret_document_template(
     </Reference_List>
     <Document>
         <publication_date><NODE name="publication_date" /></publication_date>
-        <Document_Edition>
-            <edition_name><NODE name="edition_name" /></edition_name>
-            <language><NODE name="language" /></language>
-            <files>1</files>
-            <Document_File>
-                <FRAGMENT name="document_file_entry" />
-            </Document_File>
-        </Document_Edition>
+        <NODE name="Document_Edition" />
     </Document>
     </Product_Document>""" %
     (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
@@ -147,15 +148,15 @@ if __name__ == '__main__':
             'bundle_lid': bundle.lid.lid,
             'product_lid': bundle.lid.lid + ':document:phase2',
             'title': title,
-            'description': description,
-            'publication_year': 2000,  # TODO
             'publication_date': date.today().isoformat(),
-            'author_list': '{{author_list}}',  # TODO
-            'edition_name': '0.0',  # TODO
-            'language': 'English',
-            'document_file_entry': _make_document_file_entry(
-                'phase2.txt',
-                '7-Bit ASCII Text')
+            'Citation_Information': _make_citation_information({
+                    'author_list': '{{author_list}}',  # TODO
+                    'publication_year': 2000,  # TODO
+                    'description': description
+                    }),
+            'Document_Edition': make_document_edition(
+                '0.0',
+                [('phase2.txt', '7-Bit ASCII Text')])
             })
     pretty_label = pretty_print(label.toxml())
     print pretty_label
