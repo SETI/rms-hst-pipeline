@@ -11,9 +11,6 @@ from pdart.pds4labels.FileContentsXml import *
 from typing import Callable, cast, Dict, Iterable, List, Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     import sqlite3
-    from xml.dom.minidom import Document, Text
-
-    FragBuilder = Callable[[Document], List[Text]]
 
 
 def _db_mk_axis_arrays(headers, hdu_index, axes):
@@ -55,8 +52,6 @@ def get_db_file_contents(headers, conn, lid):
                                   'offset': offset,
                                   'object_length': object_length})
 
-        assert is_doc_to_node_function(header)
-
         if datSpan:
             bitpix = headers[hdu_index]['BITPIX']
             axes = headers[hdu_index]['NAXIS']
@@ -77,14 +72,11 @@ def get_db_file_contents(headers, conn, lid):
                         'Axis_Arrays': _db_mk_axis_arrays(headers,
                                                           hdu_index, axes)
                         })
-            assert is_doc_to_node_function(data)
             node_functions = [header, data]
         else:
             node_functions = [header]
 
-        res = combine_nodes_into_fragment(node_functions)
-        assert is_doc_to_fragment_function(res)
-        return res
+        return combine_nodes_into_fragment(node_functions)
 
     with closing(conn.cursor()) as cursor:
         return combine_fragments_into_fragment(

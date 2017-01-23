@@ -129,7 +129,7 @@ def interpret_document_template(template):
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
                     else:
-                        assert is_function(param), \
+                        assert _is_function(param), \
                             ('%s is type %s; should be function' %
                              (param_name, type(param)))
                         elmt = param(doc)
@@ -142,7 +142,7 @@ def interpret_document_template(template):
                 elif name == 'FRAGMENT':
                     param_name = attrs['name']
                     param = dictionary[param_name]
-                    assert is_function(param), \
+                    assert _is_function(param), \
                         ('%s is type %s; should be function' %
                          (param_name, type(param)))
                     elmts = param(doc)
@@ -216,7 +216,7 @@ def interpret_template(template):
                         elif type(param) in [int, float]:
                             elmt = doc.createTextNode(str(param))
                         else:
-                            assert is_function(param), \
+                            assert _is_function(param), \
                                 ('%s is type %s; should be function' %
                                  (param_name, type(param)))
                             elmt = param(doc)
@@ -225,7 +225,7 @@ def interpret_template(template):
                     elif name == 'FRAGMENT':
                         param_name = attrs['name']
                         param = dictionary[param_name]
-                        assert is_function(param), \
+                        assert _is_function(param), \
                             ('%s is type %s; should be function' %
                              (param_name, type(param)))
                         elmts = param(doc)
@@ -306,7 +306,7 @@ so we can typecheck their results.
 """
 
 
-def is_function(func):
+def _is_function(func):
     # type: (Any) -> bool
     """
     Return True iff the argument is a function.  We approximate this
@@ -317,7 +317,7 @@ def is_function(func):
     return hasattr(func, '__call__')
 
 
-def is_doc_to_node_function(func):
+def _is_doc_to_node_function(func):
     # type: (Any) -> bool
     """
     Return True iff the argument is a builder function that takes an
@@ -325,44 +325,10 @@ def is_doc_to_node_function(func):
 
     expected argument type: Doc -> Node
     """
-    if not is_function(func):
-        return False
-    return isinstance(func(_DOC), xml.dom.Node)
+    return _is_function(func) and isinstance(func(_DOC), xml.dom.Node)
 
 
-def is_list_of_doc_to_node_functions(func_list):
-    # type: (Any) -> bool
-    """
-    Return True iff the argument is a list of builder functions that
-    take an XML document and returns an XML node.
-
-    expected argument type: [Doc -> Node]
-    """
-    if not isinstance(func_list, list):
-        return False
-    for func in func_list:
-        if not is_doc_to_node_function(func):
-            return False
-    return True
-
-
-def is_list_of_doc_to_fragment_functions(func_list):
-    # type: (Any) -> bool
-    """
-    Return True iff the argument is a list of builder functions that
-    take an XML document and returns a list of XML nodes.
-
-    expected argument type: [Doc -> [Node]]
-    """
-    if not isinstance(func_list, list):
-        return False
-    for func in func_list:
-        if not is_doc_to_fragment_function(func):
-            return False
-    return True
-
-
-def is_doc_to_fragment_function(func):
+def _is_doc_to_fragment_function(func):
     # type: (Any) -> bool
     """
     Return True iff the argument is a builder function that takes an
@@ -370,7 +336,7 @@ def is_doc_to_fragment_function(func):
 
     expected argument type: Doc -> [Node]
     """
-    if not is_function(func):
+    if not _is_function(func):
         return False
     res = func(_DOC)
     if isinstance(res, list):

@@ -53,7 +53,6 @@ class FileContentsReduction(Reduction):
         header = header_contents({'local_identifier': local_identifier,
                                   'offset': offset,
                                   'object_length': object_length})
-        assert is_doc_to_node_function(header)
 
         if fileinfo['datSpan']:
             axes = hdu.header['NAXIS']
@@ -72,11 +71,8 @@ class FileContentsReduction(Reduction):
                         'Element_Array': elmt_arr,
                         'Axis_Arrays': _mk_axis_arrays(hdu, axes)
                         })
-            assert is_doc_to_node_function(data)
             node_functions = [header, data]
         else:
             node_functions = [header]
 
-        res = combine_nodes_into_fragment(node_functions)
-        assert is_doc_to_fragment_function(res)
-        return res
+        return combine_nodes_into_fragment(node_functions)
