@@ -9,12 +9,10 @@ time_coordinates = interpret_template("""<Time_Coordinates>
       <stop_date_time><NODE name="stop_date_time"/></stop_date_time>
     </Time_Coordinates>""")
 """
-An interpreted fragment template to create an ``<Time_Coordinates />``
+An interpreted node builder template to create an ``<Time_Coordinates />``
 XML element.
-
-type: Dict -> Node
 """
-# type: Dict[str, Any] -> NodeBuilder
+# type: NodeBuilderTemplate
 
 
 def _remove_trailing_decimal(str):

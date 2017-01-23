@@ -2,10 +2,6 @@
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import xml.dom.minidom
-
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -60,7 +56,7 @@ images obtained from HST Observing Program \
 """
 An interpreted document template to create a collection label.
 """
-# type: (Dict[str, Any]) -> xml.dom.minidom.Document
+# type: DocTemplate
 
 placeholder_citation_information = interpret_template(
     """<Citation_Information>
@@ -72,4 +68,4 @@ citation_information_description ###</description>
 An interpreted fragment template to create a ``<Citation_Information
 />`` XML element.
 """
-# type: (xml.dom.minidom.Document) -> xml.dom.minidom.Node
+# type: NodeBuilder

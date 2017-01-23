@@ -2,10 +2,6 @@
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from xml.dom.minidom import Document, Node
-
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -29,10 +25,8 @@ make_label = interpret_document_template(
 </Product_Bundle>""" % (PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
 """
 An interpreted document template to create a bundle label.
-
-type: Dict -> Doc
 """
-# type: Dict[str, Any] -> Document
+# type: DocTemplate
 
 make_bundle_entry_member = interpret_template(
     """<Bundle_Member_Entry>
@@ -44,10 +38,8 @@ make_bundle_entry_member = interpret_template(
 """
 An interpreted fragment template to create a ``<Bundle_Member_Entry
 />`` XML element.
-
-type: Dict -> (Doc -> Node)
 """
-# type: Dict[str, Any] -> Callable[[Document], Node]
+# type: NodeBuilderTemplate
 
 placeholder_citation_information = interpret_template(
     """<Citation_Information>
@@ -58,7 +50,5 @@ citation_information_description ###</description>
 """
 An interpreted fragment template to create a ``<Citation_Information
 />`` XML element.
-
-type: Doc -> Node
 """
-# type: (Document) -> Node
+# type: NodeBuilder

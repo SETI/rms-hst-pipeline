@@ -5,9 +5,6 @@ label.
 """
 from pdart.xml.Templates import *
 
-from typing import Callable
-from xml.dom.minidom import Document, Node
-
 
 # For product labels: produces the fragment of the File node that
 # contains Header and Array_2D_Image elements.
@@ -38,12 +35,10 @@ axis_array = interpret_template("""<Axis_Array>
 <sequence_number><NODE name="sequence_number"/></sequence_number>
 </Axis_Array>""")
 """
-An interpreted fragment template to create an ``<Axis_Array />``
+An interpreted node template to create an ``<Axis_Array />``
 XML element.
-
-type: Dict -> Node
 """
-# type: (Dict[str, Any]) -> Callable[[Document], Node]
+# type: NodeBuilderTemplate
 
 header_contents = interpret_template("""<Header>
 <local_identifier><NODE name="local_identifier"/></local_identifier>
@@ -53,12 +48,10 @@ header_contents = interpret_template("""<Header>
 <description>Global FITS Header</description>
 </Header>""")
 """
-An interpreted fragment template to create a ``<Header />``
+An interpreted node template to create a ``<Header />``
 XML element.
-
-type: Dict -> Node
 """
-# type: (Dict[str, Any]) -> Callable[[Document], Node]
+# type: NodeBuilderTemplate
 
 data_1d_contents = interpret_template("""<Array>
 <offset unit="byte"><NODE name="offset" /></offset>
@@ -68,12 +61,10 @@ data_1d_contents = interpret_template("""<Array>
 <FRAGMENT name="Axis_Arrays" />
 </Array>""")
 """
-An interpreted fragment template to create an ``<Array />``
+An interpreted node template to create an ``<Array />``
 XML element.
-
-type: Dict -> Node
 """
-# type: (Dict[str, Any]) -> Callable[[Document], Node]
+# type: NodeBuilderTemplate
 
 data_2d_contents = interpret_template("""<Array_2D_Image>
 <offset unit="byte"><NODE name="offset" /></offset>
@@ -83,19 +74,15 @@ data_2d_contents = interpret_template("""<Array_2D_Image>
 <FRAGMENT name="Axis_Arrays" />
 </Array_2D_Image>""")
 """
-An interpreted fragment template to create an ``<Array_2D_Image />``
+An interpreted node template to create an ``<Array_2D_Image />``
 XML element.
-
-type: Dict -> Node
 """
-# type: (Dict[str, Any]) -> Callable[[Document], Node]
+# type: NodeBuilderTemplate
 
 element_array = interpret_template("""<Element_Array>
 <data_type><NODE name="data_type" /></data_type></Element_Array>""")
 """
-An interpreted fragment template to create an ``<Element_Array />``
+An interpreted node template to create an ``<Element_Array />``
 XML element.
-
-type: Dict -> Node
 """
-# type: (Dict[str, Any]) -> Callable[[Document], Node]
+# type: NodeBuilderTemplate

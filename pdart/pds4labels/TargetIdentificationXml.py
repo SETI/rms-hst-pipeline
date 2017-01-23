@@ -14,8 +14,6 @@ def target_identification(target_name, target_type, target_description):
     Given a target name and target type, return a function that takes
     a document and returns a filled-out ``<Target_Identification />``
     XML node, used in product labels.
-
-    type: Doc -> Node
     """
     func = interpret_template("""<Target_Identification>
         <name><NODE name="name"/></name>

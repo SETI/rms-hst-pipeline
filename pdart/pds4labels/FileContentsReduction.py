@@ -7,18 +7,16 @@ from pdart.pds4labels.FileContentsXml import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
-from typing import Callable, List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
-    from xml.dom.minidom import Document, Text
-
     # TODO Make mypy stubs for pyfits
     _HDU = Any
 
 
 def _mk_axis_arrays(hdu, axes):
-    # type: (List[_HDU], int) -> Callable[[Document], List[Text]]
+    # type: (List[_HDU], int) -> FragBuilder
     def mk_axis_array(hdu, i):
-        # type: (_HDU, int) -> Callable[[Document], Text]
+        # type: (_HDU, int) -> NodeBuilder
 
         axis_name = AXIS_NAME_TABLE[i]
         elements = str(hdu.header['NAXIS%d' % i])

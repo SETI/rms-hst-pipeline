@@ -6,8 +6,6 @@ import sys
 
 from pdart.xml.Templates import *
 
-from xml.dom.minidom import Document
-
 
 hst = interpret_template("""<hst:HST>
 <NODE name="parameters_general"/>
@@ -16,10 +14,8 @@ hst = interpret_template("""<hst:HST>
 """
 An interpreted fragment template to create an ``<hst:HST />``
 XML element.
-
-type: Dict -> Node
 """
-# type: Dict[str, Any] -> NodeBuilder
+# type: NodeBuilderTemplate
 
 
 parameters_general = interpret_template("""<hst:Parameters_General>
@@ -44,8 +40,6 @@ parameters_general = interpret_template("""<hst:Parameters_General>
 """
 An interpreted fragment template to create an ``<hst:Parameters_General />``
 XML element.
-
-type: Dict -> Node
 """
 # type: Dict[str, Any] -> NodeBuilder
 
@@ -60,8 +54,6 @@ parameters_acs = interpret_template("""<hst:Parameters_ACS>
 """
 An interpreted fragment template to create an ``<hst:Parameters_ACS />``
 XML element.
-
-type: Dict -> Node
 """
 # type: Dict[str, Any] -> NodeBuilder
 
@@ -75,8 +67,6 @@ parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 """
 An interpreted fragment template to create an ``<hst:Parameters_WFC3 />``
 XML element.
-
-type: Dict -> Node
 """
 # type: Dict[str, Any] -> NodeBuilder
 
@@ -95,13 +85,11 @@ parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 """
 An interpreted fragment template to create an ``<hst:Parameters_WFPC2 />``
 XML element.
-
-type: Dict -> Node
 """
-# type: Dict[str, Any] -> NodeBuilder
+# type: NodeBuilderTemplate
 
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
-# type: Callable[[Dict[str, Any]], Document]
+# type: DocTemplate
 
 
 # Not XML, but placeholder code common to both the database- and the

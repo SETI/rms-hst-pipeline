@@ -10,7 +10,7 @@ from pdart.rules.Combinators import *
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pdart.xml.Templates import NodeBuilder
+    from pdart.xml.Templates import *
 
 
 def _db_get_start_stop_times_from_headers(headers):

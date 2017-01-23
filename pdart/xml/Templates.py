@@ -75,31 +75,32 @@ import xml.sax
 
 from typing import Any, Callable, Dict, List, TYPE_CHECKING
 if TYPE_CHECKING:
-    import xml.dom.minidom
+    # import xml.dom.minidom
+    from xml.dom.minidom import *
 
-    _UADict = Dict[str, Any]
-    NodeBuilder = Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
-    FragBuilder = Callable[[xml.dom.minidom.Document],
-                           List[xml.dom.minidom.Text]]
+    TemplateDict = Dict[str, Any]
+    Node = Text
+    Frag = List[Text]
+    NodeBuilder = Callable[[Document], Node]
+    FragBuilder = Callable[[Document], Frag]
+    DocTemplate = Callable[[TemplateDict], Document]
+    NodeBuilderTemplate = Callable[[TemplateDict], NodeBuilder]
 
 
-def interpret_text(txt  # type: unicode
-                   ):
-    # type: (...) -> NodeBuilder
+def interpret_text(txt):
+    # type: (str) -> NodeBuilder
     """
     Return a builder function that takes an XML document and returns a
     text node containing the text.
-
-    type: String -> (Doc -> Node)
     """
     def builder(doc):
+        # type: (Document) -> Node
         return doc.createTextNode(txt)
     return builder
 
 
-def interpret_document_template(template  # type: unicode
-                                ):
-    # type: (...) -> Callable[[_UADict], xml.dom.minidom.Document]
+def interpret_document_template(template):
+    # type: (str) -> DocTemplate
     """
     Return a builder function that takes a dictionary and returns an
     XML document containing the template text, with any ``<NODE />``
@@ -107,10 +108,9 @@ def interpret_document_template(template  # type: unicode
     attribute in the dictionary.  ``<NODE />`` elements must evaluate
     to be XML nodes; ``<FRAGMENT />`` elements must evaluate to be an
     XML fragment (a list of XML nodes).
-
-    type: String -> (Dict -> Doc)
     """
     def builder(dictionary):
+        # type: (TemplateDict) -> Document
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         stack = [doc]
 
@@ -188,7 +188,7 @@ def interpret_document_template(template  # type: unicode
 
 
 def interpret_template(template):
-    # type: (unicode) -> Callable[[_UADict], NodeBuilder]
+    # type: (str) -> NodeBuilderTemplate
     """
     Return a parameterizing function that takes a dictionary and
     returns an builder function, performing substitution of the
@@ -196,11 +196,12 @@ def interpret_template(template):
     dictionary, as :func:`interpret_document_template` does.
 
     The returned builder function takes a document and returns XML.
-
-    type: String -> (Dict -> (Doc -> Node))
     """
     def parameterizer(dictionary):
+        # type: (TemplateDict) -> NodeBuilder
+
         def builder(document):
+            # type: (Document) -> Node
             doc = document
             stack = []
 
@@ -272,17 +273,11 @@ def combine_nodes_into_fragment(doc_funcs):
     Convert a list of builder functions that take a document and
     return an XML node into a single builder function that takes a
     document and returns an XML fragment (i.e., list of XML nodes).
-
-    type: [Doc -> Node] -> (Doc -> Fragment)
     """
-    CHECK_TYPES = True
-    if CHECK_TYPES:
-        assert is_list_of_doc_to_node_functions(doc_funcs)
-
     def func(document):
+        # type: (Document) -> Frag
         return [doc_func(document) for doc_func in doc_funcs]
-    if CHECK_TYPES:
-        assert is_doc_to_fragment_function(func)
+
     return func
 
 
@@ -292,26 +287,19 @@ def combine_fragments_into_fragment(doc_funcs):
     Convert a list of builder functions that take a document and
     return an XML fragment (list of nodes) into a single builder
     function that takes a document and returns an XML fragment.
-
-    type: [Doc -> Fragment] -> (Doc -> Fragment)
     """
-    CHECK_TYPES = True
-    if CHECK_TYPES:
-        assert is_list_of_doc_to_fragment_functions(doc_funcs)
-
     def func(document):
+        # type: (Document) -> Frag
         res = []
         for doc_func in doc_funcs:
             res.extend(doc_func(document))
         return res
 
-    if CHECK_TYPES:
-        assert is_doc_to_fragment_function(func)
     return func
 
 
 _DOC = xml.dom.getDOMImplementation().createDocument(None, None, None)
-# type: xml.dom.minidom.Document
+# type: Document
 """
 A constant document used as a throw-away argument to builder functions
 so we can typecheck their results.

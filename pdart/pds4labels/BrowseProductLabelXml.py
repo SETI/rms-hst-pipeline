@@ -2,10 +2,6 @@
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    import xml.dom.minidom
-
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -52,7 +48,5 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
 """
 An interpreted document template to create a label for a RAW browse product.
-
-type: Dict -> Doc
 """
-# type: Callable[[Dict[str, Any]], xml.dom.minidom.Document]
+# type: DocTemplate

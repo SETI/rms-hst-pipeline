@@ -1,30 +1,16 @@
 """
 **SCRIPT:** Build a document product label.
 """
-from contextlib import closing
 from datetime import date
-import sqlite3
-from xml.dom.minidom import Document
 
-from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.Bundle import Bundle
 from pdart.pds4.LID import LID
-from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.DocumentProductLabelXml import *
 from pdart.rules.Combinators import *
-from pdart.xml.Pds4Version import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
-from pdart.xml.Templates import *
-from pdart.xml.Templates import _DOC
 
-from typing import Any, Dict, Iterable, TYPE_CHECKING
-if TYPE_CHECKING:
-    import xml.dom.minidom
-
-    _UADict = Dict[str, Any]
-    NodeBuilder = Callable[[xml.dom.minidom.Document], xml.dom.minidom.Text]
 
 if __name__ == '__main__':
     def run(label):

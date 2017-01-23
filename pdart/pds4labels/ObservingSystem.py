@@ -24,10 +24,8 @@ _observing_system = interpret_template("""<Observing_System>
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
-
-type: Dict -> (Doc -> Node)
 """
-# type: Dict[str, Any] -> NodeBuilder
+# type: NodeBuilderTemplate
 
 
 acs_observing_system = _observing_system({
@@ -38,8 +36,6 @@ acs_observing_system = _observing_system({
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
-
-type: Doc -> Node
 """
 # type: NodeBuilder
 
@@ -51,8 +47,6 @@ wfc3_observing_system = _observing_system({
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
-
-type: Doc -> Node
 """
 # type: NodeBuilder
 
@@ -64,8 +58,6 @@ wfpc2_observing_system = _observing_system({
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
-
-type: Doc -> Node
 """
 # type: NodeBuilder
 
@@ -75,8 +67,6 @@ def observing_system(instrument):
     """
     Given an instrument, return an interpreted fragment template to
     create an ``<Observing_System />`` XML element.
-
-    type: String -> (Doc -> Node)
     """
     return {'acs': acs_observing_system,
             'wfc3': wfc3_observing_system,
