@@ -1,4 +1,4 @@
-"""A document template to create a label for a RAW browse product."""
+"""A document template to create a label for a raw browse product."""
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
@@ -55,4 +55,4 @@ An interpreted document template to create a label for a RAW browse product.
 
 type: Dict -> Doc
 """
-# type: Dict[str, Any] -> xml.dom.minidom.Document
+# type: Callable[[Dict[str, Any]], xml.dom.minidom.Document]
