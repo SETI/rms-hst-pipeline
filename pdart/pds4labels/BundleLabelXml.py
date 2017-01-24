@@ -1,7 +1,8 @@
 """Templates to create a label for a bundle."""
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
-
+from pdart.pds4labels.CitationInformation \
+    import placeholder_citation_information
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -40,15 +41,3 @@ An interpreted fragment template to create a ``<Bundle_Member_Entry
 />`` XML element.
 """
 # type: NodeBuilderTemplate
-
-placeholder_citation_information = interpret_template(
-    """<Citation_Information>
-<publication_year>2000</publication_year>
-<description>### placeholder for \
-citation_information_description ###</description>
-</Citation_Information>""")({})
-"""
-An interpreted fragment template to create a ``<Citation_Information
-/>`` XML element.
-"""
-# type: NodeBuilder

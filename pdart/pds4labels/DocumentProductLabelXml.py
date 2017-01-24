@@ -47,7 +47,7 @@ make_label = interpret_document_template(
 def make_proposal_description(proposal_id):
     # type: (int) -> unicode
     proposal_title = '{{proposal_title}}'  # TODO
-    pi = '{{pi_name}}'  # TODOnnnn
+    pi = '{{pi_name}}'  # TODO
     yr = '{{proposal_year}}'  # TODO
 
     return 'This document provides a summary of the observation ' + \
