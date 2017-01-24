@@ -18,6 +18,13 @@ def placeholder_int(product_id, tag):
     return '0'
 
 
+def placeholder_year(product_id, tag):
+    # type: (unicode, unicode) -> unicode
+    """Return a placeholder year for an XML tag, noting the problem."""
+    note_problem(product_id, tag)
+    return '2000'
+
+
 def placeholder_float(product_id, tag):
     # type: (unicode, unicode) -> unicode
     """Return a placeholder float for an XML tag, noting the problem."""

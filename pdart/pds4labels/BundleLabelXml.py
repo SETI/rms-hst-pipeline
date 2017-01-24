@@ -1,8 +1,6 @@
 """Templates to create a label for a bundle."""
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
-from pdart.pds4labels.CitationInformation \
-    import placeholder_citation_information
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>

@@ -6,6 +6,7 @@ import io
 import sys
 
 from pdart.pds4.Collection import *
+from pdart.pds4labels.CitationInformation import *
 from pdart.pds4labels.CollectionLabelXml import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Pretty import *
@@ -27,10 +28,11 @@ class CollectionLabelReduction(Reduction):
         proposal_id = collection.bundle().proposal_id()
         inventory_name = collection.inventory_name()
 
+        cit_info = make_placeholder_citation_information(str(lid))
         dict = {'lid': interpret_text(str(lid)),
                 'suffix': interpret_text(suffix.upper()),
                 'proposal_id': interpret_text(str(proposal_id)),
-                'Citation_Information': placeholder_citation_information,
+                'Citation_Information': cit_info,
                 'inventory_name': interpret_text(inventory_name)
                 }
         label = make_label(dict).toxml()

@@ -3,6 +3,7 @@ from contextlib import closing
 import sys
 
 from pdart.pds4labels.BundleLabelXml import *
+from pdart.pds4labels.CitationInformation import *
 from pdart.pds4labels.DatabaseCaches import *
 from pdart.pds4labels.DBCalls import get_bundle_collections_db
 from pdart.xml.Pretty import *
@@ -32,7 +33,7 @@ def make_db_bundle_label(conn, lid, verify):
     label = make_label({
             'lid': lid,
             'proposal_id': str(proposal_id),
-            'Citation_Information': placeholder_citation_information,
+            'Citation_Information': make_placeholder_citation_information(lid),
             'Bundle_Member_Entries': combine_nodes_into_fragment(
                 reduced_collections)
             }).toxml()

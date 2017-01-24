@@ -5,6 +5,7 @@ from contextlib import closing
 import io
 import sys
 
+from pdart.pds4labels.CitationInformation import *
 from pdart.pds4labels.CollectionLabelXml import *
 from pdart.pds4labels.DatabaseCaches import *
 from pdart.pds4labels.DBCalls import get_collection_products_db
@@ -48,7 +49,7 @@ def make_db_collection_label_and_inventory(conn, lid, verify):
             'lid': lid,
             'suffix': suffix,
             'proposal_id': str(proposal_id),
-            'Citation_Information': placeholder_citation_information,
+            'Citation_Information': make_placeholder_citation_information(lid),
             'inventory_name': inventory_name
     }).toxml()
     label = pretty_print(label)

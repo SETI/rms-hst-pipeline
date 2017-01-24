@@ -1,6 +1,4 @@
 """Templates to create a label for a collection."""
-from pdart.pds4labels.CitationInformation \
-    import placeholder_citation_information
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 

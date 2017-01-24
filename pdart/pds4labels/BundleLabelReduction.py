@@ -7,6 +7,7 @@ import sys
 from pdart.pds4.Bundle import *
 from pdart.pds4labels.BundleLabelDB import *
 from pdart.pds4labels.BundleLabelXml import *
+from pdart.pds4labels.CitationInformation import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Pretty import *
 
@@ -22,10 +23,11 @@ class BundleLabelReduction(Reduction):
     """
     def reduce_bundle(self, archive, lid, get_reduced_collections):
         reduced_collections = get_reduced_collections()
+        cit_info = make_placeholder_citation_information(str(lid))
         dict = {'lid': interpret_text(str(lid)),
                 'proposal_id': interpret_text(str(Bundle(archive,
                                                          lid).proposal_id())),
-                'Citation_Information': placeholder_citation_information,
+                'Citation_Information': cit_info,
                 'Bundle_Member_Entries':
                     combine_nodes_into_fragment(reduced_collections)
                 }
