@@ -34,11 +34,11 @@ axis_array = interpret_template("""<Axis_Array>
 <elements><NODE name="elements"/></elements>
 <sequence_number><NODE name="sequence_number"/></sequence_number>
 </Axis_Array>""")
+# type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Axis_Array />``
 XML element.
 """
-# type: NodeBuilderTemplate
 
 header_contents = interpret_template("""<Header>
 <local_identifier><NODE name="local_identifier"/></local_identifier>
@@ -47,11 +47,11 @@ header_contents = interpret_template("""<Header>
 <parsing_standard_id>FITS 3.0</parsing_standard_id>
 <description>Global FITS Header</description>
 </Header>""")
+# type: NodeBuilderTemplate
 """
 An interpreted node template to create a ``<Header />``
 XML element.
 """
-# type: NodeBuilderTemplate
 
 data_1d_contents = interpret_template("""<Array>
 <offset unit="byte"><NODE name="offset" /></offset>
@@ -60,11 +60,11 @@ data_1d_contents = interpret_template("""<Array>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
 </Array>""")
+# type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Array />``
 XML element.
 """
-# type: NodeBuilderTemplate
 
 data_2d_contents = interpret_template("""<Array_2D_Image>
 <offset unit="byte"><NODE name="offset" /></offset>
@@ -73,16 +73,16 @@ data_2d_contents = interpret_template("""<Array_2D_Image>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
 </Array_2D_Image>""")
+# type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Array_2D_Image />``
 XML element.
 """
-# type: NodeBuilderTemplate
 
 element_array = interpret_template("""<Element_Array>
 <data_type><NODE name="data_type" /></data_type></Element_Array>""")
+# type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Element_Array />``
 XML element.
 """
-# type: NodeBuilderTemplate

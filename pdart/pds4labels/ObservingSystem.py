@@ -21,11 +21,11 @@ _observing_system = interpret_template("""<Observing_System>
         </Internal_Reference>
       </Observing_System_Component>
     </Observing_System>""")
+# type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
 """
-# type: NodeBuilderTemplate
 
 
 acs_observing_system = _observing_system({
@@ -33,33 +33,33 @@ acs_observing_system = _observing_system({
         'component_name': 'Advanced Camera for Surveys',
         'abbreviation': 'acs'
         })
+# type: NodeBuilder
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
 """
-# type: NodeBuilder
 
 wfc3_observing_system = _observing_system({
         'name': 'Hubble Space Telescope Wide Field Camera 3',
         'component_name': 'Wide Field Camera 3',
         'abbreviation': 'wfc3'
         })
+# type: NodeBuilder
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
 """
-# type: NodeBuilder
 
 wfpc2_observing_system = _observing_system({
         'name': 'Hubble Space Telescope Wide-Field Planetary Camera 2',
         'component_name': 'Wide-Field Planetary Camera 2',
         'abbreviation': 'wfpc2'
         })
+# type: NodeBuilder
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
 """
-# type: NodeBuilder
 
 
 def observing_system(instrument):

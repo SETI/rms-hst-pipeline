@@ -2,8 +2,9 @@ from pdart.pds4.Bundle import *
 from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
 
-from typing import Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Tuple
     _CONN_TUPLE = \
         Tuple[str, str, str, str, unicode, unicode, unicode, unicode, unicode]
     _PROD_TUPLE = \

@@ -89,7 +89,9 @@ import traceback
 from pdart.rules.ExceptionInfo import *
 from pdart.rules.Result import Failure, Success
 
-from typing import List
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import List
 
 
 def _code_to_rcode(func):

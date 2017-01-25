@@ -6,8 +6,9 @@ a part of :class:`~pdart.tasks.TaskRunner.TaskRunner`.
 import collections
 from pdart.tasks.TaskDict import *
 
-from typing import Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Sequence
     from pdart.tasks.Task import Task
 
 

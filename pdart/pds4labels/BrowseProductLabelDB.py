@@ -12,10 +12,11 @@ from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.xml.Pretty import *
 
-from typing import cast, Iterable, Tuple, TYPE_CHECKING
+from typing import Iterable, Tuple
 if TYPE_CHECKING:
-    from pdart.pds4.Archive import Archive
     import sqlite3
+    from typing import Iterable, Tuple
+    from pdart.pds4.Archive import Archive
 
 
 def make_db_browse_product_labels(archive, conn):

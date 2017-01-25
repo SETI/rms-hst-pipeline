@@ -9,14 +9,15 @@ from pdart.pds4labels.TimeCoordinatesXml import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Any
     # TODO mypy stubs for pyfits
     _HeaderUnit = Any
 
 
-def _get_start_stop_times_from_header_unit(header_unit):
-    # type: (_HeaderUnit) -> Dict[str, Any]
+def _get_start_stop_times_from_header_unit(product_id, header_unit):
+    # type: (unicode, _HeaderUnit) -> TemplateDict
     date_obs = header_unit['DATE-OBS']
     time_obs = header_unit['TIME-OBS']
     exptime = header_unit['EXPTIME']
@@ -32,18 +33,22 @@ _get_start_stop_times = multiple_implementations(
     '_get_start_stop_times',
     _get_start_stop_times_from_header_unit,
     get_placeholder_start_stop_times)
+# type: Callable[[unicode, _HeaderUnit], TemplateDict]
 
 
 class TimeCoordinatesReduction(Reduction):
     """Reduce a product to a ``<Time_Coordinates />`` XML template."""
     def reduce_fits_file(self, file, get_reduced_hdus):
-        # returns Doc -> Node
         get_start_stop_times = multiple_implementations(
             'get_start_stop_times',
             lambda: get_reduced_hdus()[0],
-            get_placeholder_start_stop_times)
+            lambda: get_placeholder_start_stop_times(
+               'TimeCoordinatesReduction.reduce_fits_file', None))
+        # type: Callable[[], TemplateDict]
 
-        return time_coordinates(get_start_stop_times())
+        res = time_coordinates(get_start_stop_times())
+        # type: NodeBuilder
+        return res
 
     def reduce_hdu(self, n, hdu,
                    get_reduced_header_unit,
@@ -57,6 +62,6 @@ class TimeCoordinatesReduction(Reduction):
     def reduce_header_unit(self, n, header_unit):
         # returns dict or None
         if n == 0:
-            return _get_start_stop_times(header_unit)
+            return _get_start_stop_times(None, header_unit)
         else:
             pass

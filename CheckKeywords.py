@@ -8,8 +8,9 @@ from pdart.pds4.Collection import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
-from typing import Dict, Iterable, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Dict, Iterable, TypeVar
     K = TypeVar('K')
 
 

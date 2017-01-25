@@ -26,7 +26,9 @@ import abc
 
 import pdart.rules.ExceptionInfo
 
-from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Any
 
 
 class Result(object):

@@ -14,9 +14,11 @@ from pdart.pds4labels.ProductLabelXml import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
-from typing import Any, Dict, Iterable, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import sqlite3
+    from typing import Any, Dict, Iterable
+    from pdart.pds4labels.DBCalls import Headers
 
 
 def make_db_product_label(conn, lid, verify):
@@ -68,11 +70,6 @@ def make_db_product_label(conn, lid, verify):
     return label
 
 
-def _make_header_dictionary(lid, hdu_index, cursor):
-    # type: (unicode, int, sqlite3.Cursor) -> Dict[str, Any]
-    return dict(get_fits_headers_db(cursor, lid, hdu_index))
-
-
 def _make_header_dictionaries(lid, hdu_count, cursor):
-    # type: (unicode, int, sqlite3.Cursor) -> List[Dict[str, Any]]
-    return [_make_header_dictionary(lid, i, cursor) for i in range(hdu_count)]
+    # type: (unicode, int, sqlite3.Cursor) -> Headers
+    return [get_fits_headers_db(cursor, lid, i) for i in range(hdu_count)]

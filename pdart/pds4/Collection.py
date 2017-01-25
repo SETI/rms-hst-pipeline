@@ -9,8 +9,9 @@ import re
 from pdart.pds4.Component import *
 from pdart.pds4.LID import *
 
-from typing import Iterator, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Iterator
     import pdart.pds4.Bundle
     import pdart.pds4.Product
 

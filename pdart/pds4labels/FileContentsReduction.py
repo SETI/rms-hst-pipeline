@@ -7,8 +7,9 @@ from pdart.pds4labels.FileContentsXml import *
 from pdart.reductions.Reduction import *
 from pdart.xml.Templates import *
 
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import List
     # TODO Make mypy stubs for pyfits
     _HDU = Any
 

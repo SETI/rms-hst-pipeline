@@ -9,11 +9,11 @@ hst = interpret_template("""<hst:HST>
 <NODE name="parameters_general"/>
 <NODE name="parameters_instrument"/>
 </hst:HST>""")
+# type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:HST />``
 XML element.
 """
-# type: NodeBuilderTemplate
 
 
 parameters_general = interpret_template("""<hst:Parameters_General>
@@ -35,11 +35,11 @@ parameters_general = interpret_template("""<hst:Parameters_General>
   <hst:moving_target_flag><NODE name="moving_target_flag" />\
 </hst:moving_target_flag>
 </hst:Parameters_General>""")
+# type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_General />``
 XML element.
 """
-# type: Dict[str, Any] -> NodeBuilder
 
 parameters_acs = interpret_template("""<hst:Parameters_ACS>
 <hst:detector_id><NODE name="detector_id" /></hst:detector_id>
@@ -49,11 +49,11 @@ parameters_acs = interpret_template("""<hst:Parameters_ACS>
 </hst:repeat_exposure_count>
 <hst:subarray_flag><NODE name="subarray_flag" /></hst:subarray_flag>
 </hst:Parameters_ACS>""")
+# type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_ACS />``
 XML element.
 """
-# type: Dict[str, Any] -> NodeBuilder
 
 parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 <hst:detector_id><NODE name="detector_id" /></hst:detector_id>
@@ -62,11 +62,11 @@ parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 </hst:repeat_exposure_count>
 <hst:subarray_flag><NODE name="subarray_flag" /></hst:subarray_flag>
 </hst:Parameters_WFC3>""")
+# type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_WFC3 />``
 XML element.
 """
-# type: Dict[str, Any] -> NodeBuilder
 
 parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 <hst:bandwidth><NODE name="bandwidth" /></hst:bandwidth>
@@ -80,11 +80,11 @@ parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 <hst:wf3_flag><NODE name="wf3_flag" /></hst:wf3_flag>
 <hst:wf4_flag><NODE name="wf4_flag" /></hst:wf4_flag>
 </hst:Parameters_WFPC2>""")
+# type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_WFPC2 />``
 XML element.
 """
-# type: NodeBuilderTemplate
 
 wrapper = interpret_document_template("""<NODE name="wrapped" />""")
 # type: DocTemplate

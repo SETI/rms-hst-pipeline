@@ -7,8 +7,9 @@ from pdart.pds4labels.TargetIdentificationXml import *
 from pdart.reductions.Reduction import *
 from pdart.rules.Combinators import *
 
-from typing import Callable, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Callable, Tuple
     # TODO stubs for pyfits
     _HeaderUnit = Any
 

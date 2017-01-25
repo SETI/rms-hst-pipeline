@@ -12,7 +12,9 @@ separately.
 import multiprocessing
 import time
 
-from typing import Callable, Tuple
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Callable, Tuple
 
 
 def exit_code_to_status(exit_code):

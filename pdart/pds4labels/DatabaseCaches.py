@@ -6,17 +6,21 @@ from contextlib import closing
 
 from pdart.pds4labels.DBCalls import get_bundle_info_db, get_collection_info_db
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import sqlite3
+    from typing import Any
+    from pdart.xml.Templates import TemplateDict
 
-# globals
+
 _last_bundle = None
+# type: unicode
 _last_bundle_result = None
+# type: TemplateDict
 
 
 def lookup_bundle(conn, bundle):
-    # type: (sqlite3.Connection, unicode) -> Dict[str, Any]
+    # type: (sqlite3.Connection, unicode) -> TemplateDict
     """Perform a database lookup on the bundle using a one-item cache."""
     global _last_bundle, _last_bundle_result
     if (bundle != _last_bundle):
@@ -28,11 +32,13 @@ def lookup_bundle(conn, bundle):
     return _last_bundle_result
 
 _last_collection = None
+# type: unicode
 _last_collection_result = None
+# type: TemplateDict
 
 
 def lookup_collection(conn, collection):
-    # type: (sqlite3.Connection, unicode) -> Dict[str, Any]
+    # type: (sqlite3.Connection, unicode) -> TemplateDict
     """
     Perform a database lookup on the collection using a one-item
     cache.

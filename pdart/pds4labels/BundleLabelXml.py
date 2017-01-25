@@ -22,10 +22,10 @@ make_label = interpret_document_template(
   </Bundle>
   <FRAGMENT name="Bundle_Member_Entries"/>
 </Product_Bundle>""" % (PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
+# type: DocTemplate
 """
 An interpreted document template to create a bundle label.
 """
-# type: DocTemplate
 
 make_bundle_entry_member = interpret_template(
     """<Bundle_Member_Entry>
@@ -34,8 +34,8 @@ make_bundle_entry_member = interpret_template(
     <reference_type>bundle_has_data_collection</reference_type>
 </Bundle_Member_Entry>"""
     )
+# type: NodeBuilderTemplate
 """
 An interpreted fragment template to create a ``<Bundle_Member_Entry
 />`` XML element.
 """
-# type: NodeBuilderTemplate

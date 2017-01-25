@@ -53,10 +53,10 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
   </File_Area_Observational>
 </Product_Observational>""" %
     (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
+# type: DocTemplate
 """
 An interpreted document template to create a product label.
 """
-# type: DocTemplate
 
 
 def mk_Investigation_Area_name(proposal_id):

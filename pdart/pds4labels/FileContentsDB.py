@@ -8,13 +8,14 @@ from contextlib import closing
 from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.FileContentsXml import *
 
-from typing import Callable, cast, Dict, Iterable, List, Tuple, TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
     import sqlite3
+    from typing import Callable, Dict, Iterable, List, Tuple
 
 
 def _db_mk_axis_arrays(headers, hdu_index, axes):
-    # type: (List[Dict[str, Any]], int, int) -> FragBuilder
+    # type: (Headers, int, int) -> FragBuilder
     def mk_axis_array(i):
         axis_name = AXIS_NAME_TABLE[i]
 
@@ -30,7 +31,7 @@ def _db_mk_axis_arrays(headers, hdu_index, axes):
 
 
 def get_db_file_contents(headers, conn, lid):
-    # type: (List[Dict[str, Any]], sqlite3.Connection, unicode) -> FragBuilder
+    # type: (Headers, sqlite3.Connection, unicode) -> FragBuilder
     """
     Given the dictionary of the header fields from a product's FITS
     file, an open connection to the database, and the product's

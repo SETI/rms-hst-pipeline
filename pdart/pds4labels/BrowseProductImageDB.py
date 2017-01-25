@@ -16,9 +16,10 @@ from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 import pdart.add_pds_tools
 import picmaker
 
-from typing import cast, Iterable, Tuple, TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
     import sqlite3
+    from typing import Iterable, Tuple
     from pdart.pds4.Archive import Archive
 
 

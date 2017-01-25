@@ -1,12 +1,16 @@
 from sqlite3 import Cursor
 
-from typing import Any, cast, Iterable, Tuple, TYPE_CHECKING
+from typing import cast, Iterable, Tuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Any, Dict, List
 
-# shorthand types for type signatures and casting
-_Tuple3 = Tuple[str, unicode, unicode]
-_Tuple4 = Tuple[unicode, str, unicode, unicode]
-_Tuple5 = Tuple[unicode, unicode, unicode, unicode, int]
-_Tuple7 = Tuple[unicode, unicode, str, unicode, str, unicode, unicode]
+    # shorthand types for type signatures and casting
+    _Tuple3 = Tuple[str, unicode, unicode]
+    _Tuple4 = Tuple[unicode, str, unicode, unicode]
+    _Tuple5 = Tuple[unicode, unicode, unicode, unicode, int]
+    _Tuple7 = Tuple[unicode, unicode, str, unicode, str, unicode, unicode]
+    HeaderDict = Dict[str, Any]
+    Headers = List[HeaderDict]
 
 
 def get_all_bundles(cursor):
@@ -158,15 +162,16 @@ def get_fits_file_offsets_db(cursor, lid):
 
 
 def get_fits_headers_db(cursor, lid, hdu_index):
-    # type: (Cursor, unicode, int) -> Iterable[Tuple[str, Any]]
+    # type: (Cursor, unicode, int) -> HeaderDict
     """Returns an Iterable of pairs of keywords and values."""
 
     # We know that since it's coming from FITS headers, they are pairs
     # of strings and Anys.
-    return cast(Iterable[Tuple[str, Any]],
+    iter = cast(Iterable[Tuple[str, Any]],
                 cursor.execute("""SELECT keyword, value FROM cards
                                   WHERE product=? AND hdu_index=?""",
                                (lid, hdu_index)))
+    return dict(iter)
 
 
 def delete_browse_products_and_collections(cursor):

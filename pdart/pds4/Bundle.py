@@ -11,8 +11,9 @@ from pdart.pds4.Collection import Collection
 from pdart.pds4.Component import *
 from pdart.pds4.LID import *
 
-from typing import Iterator, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Iterator
     import pdart.pds4.Archive
     import pdart.pds4.Product
 

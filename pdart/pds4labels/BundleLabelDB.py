@@ -9,7 +9,9 @@ from pdart.pds4labels.DBCalls import get_bundle_collections_db
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
-from typing import cast, Iterable
+from typing import cast, TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Iterable
 
 
 def make_db_bundle_label(conn, lid, verify):

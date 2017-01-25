@@ -41,9 +41,11 @@ the failures.
 import abc
 import xml.dom
 
-from typing import cast, List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import cast, List
     import xml.dom.minidom
+    _EXC_INFOS = List[ExceptionInfo]
 
 
 class ExceptionInfo(object):
@@ -84,9 +86,6 @@ class ExceptionInfo(object):
         :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
         """
         pass
-
-
-_EXC_INFOS = List[ExceptionInfo]
 
 
 class CalculationException(Exception):

@@ -101,8 +101,9 @@ import pyfits
 
 from pdart.rules.Combinators import parallel_list
 
-from typing import Any, Callable, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Any, Callable, Union
     from pdart.pds4.Archive import Archive
     from pdart.pds4.Bundle import Bundle
     from pdart.pds4.Collection import Collection

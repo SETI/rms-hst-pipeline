@@ -27,7 +27,9 @@ from pdart.pds4labels.ProductLabel import *
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.rules.Combinators import *
 
-from typing import cast, Iterable, TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Iterable
 
 VERIFY = False
 # type: bool

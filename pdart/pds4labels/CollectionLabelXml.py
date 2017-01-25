@@ -52,7 +52,7 @@ images obtained from HST Observing Program \
     </Inventory>
   </File_Area_Inventory>
 </Product_Collection>""" % (PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
+# type: DocTemplate
 """
 An interpreted document template to create a collection label.
 """
-# type: DocTemplate

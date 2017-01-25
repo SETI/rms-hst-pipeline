@@ -3,7 +3,9 @@ Represenation for tasks to be run.
 """
 import abc
 
-from typing import Any, Tuple
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Any, Tuple
 
 
 class Task(object):

@@ -6,7 +6,10 @@ from pdart.pds4.Bundle import *
 from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
 from pdart.pds4.LID import *
-from typing import Iterator
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Iterator
 
 
 class Archive(object):

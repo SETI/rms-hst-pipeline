@@ -10,11 +10,12 @@ from pdart.rules.Combinators import *
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from pdart.pds4labels.DBCalls import Headers
     from pdart.xml.Templates import *
 
 
-def _db_get_start_stop_times_from_headers(headers):
-    # type: (List[Dict[str, Any]]) -> Dict[str, str]
+def _db_get_start_stop_times_from_headers(product_id, headers):
+    # type: (unicode, Headers) -> Dict[str, str]
     date_obs = headers[0]['DATE-OBS']
     time_obs = headers[0]['TIME-OBS']
     exptime = headers[0]['EXPTIME']
@@ -32,11 +33,11 @@ _db_get_start_stop_times = multiple_implementations(
     '_db_get_start_stop_times',
     _db_get_start_stop_times_from_headers,
     get_placeholder_start_stop_times)
-# type: Callable[[List[Dict[str, Any]]], Dict[str, str]]
+# type: Callable[[Headers], Dict[str, str]]
 
 
 def get_db_time_coordinates(headers):
-    # type: (List[Dict[str, Any]]) -> NodeBuilder
+    # type: (Headers) -> NodeBuilder
     """
     Create and return a ``<Time_Coordinates />`` XML element for the
     product.

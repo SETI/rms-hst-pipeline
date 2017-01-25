@@ -2,17 +2,22 @@
 Templates to create a ``<Time_Coordinates />`` XML node for product
 labels.
 """
+from pdart.pds4labels.Placeholders import placeholder_time
 from pdart.xml.Templates import *
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pdart.pds4labels.DBCalls import Headers
 
 time_coordinates = interpret_template("""<Time_Coordinates>
       <start_date_time><NODE name="start_date_time"/></start_date_time>
       <stop_date_time><NODE name="stop_date_time"/></stop_date_time>
     </Time_Coordinates>""")
+# type: NodeBuilderTemplate
 """
 An interpreted node builder template to create an ``<Time_Coordinates />``
 XML element.
 """
-# type: NodeBuilderTemplate
 
 
 def _remove_trailing_decimal(str):
@@ -30,12 +35,12 @@ def _remove_trailing_decimal(str):
     return str
 
 
-def get_placeholder_start_stop_times(*args, **kwargs):
-    # type: (...) -> Dict[str, str]
+def get_placeholder_start_stop_times(product_id, headers):
+    # type: (unicode, Headers) -> Dict[unicode, unicode]
     """
     Return a placeholder ``<Time_Coordinates />`` XML element.
     """
-    start_date_time = '2000-01-02Z'
-    stop_date_time = '2000-01-02Z'
+    start_date_time = placeholder_time(product_id, 'Time_Coordinates')
+    stop_date_time = start_date_time
     return {'start_date_time': start_date_time,
             'stop_date_time': stop_date_time}

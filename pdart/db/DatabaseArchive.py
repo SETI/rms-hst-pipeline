@@ -8,7 +8,9 @@ from contextlib import closing
 import os.path
 import sqlite3
 
-from typing import Any, Iterable, Iterator, Tuple
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Any, Iterable, Iterator, Tuple
 
 
 class DatabaseArchive:

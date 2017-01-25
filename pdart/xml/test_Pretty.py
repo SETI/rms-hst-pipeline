@@ -9,6 +9,6 @@ _PP = """<?xml version="1.0"?>
 
 
 def test_pretty_print():
-        # type: () -> None
+    # type: () -> None
     """Mostly a smoketest to force parsing of Pretty."""
     assert pretty_print("<foobar><baz></baz></foobar>") == _PP
