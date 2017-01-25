@@ -31,17 +31,15 @@ if __name__ == '__main__':
 
     title = 'Summary of the observation plan for HST proposal %d' % proposal_id
 
+    lid = bundle.lid.lid
+    prop_id = bundle.proposal_id()
+
     label = make_label({
-            'bundle_lid': bundle.lid.lid,
-            'product_lid': bundle.lid.lid + ':document:phase2',
+            'bundle_lid': lid,
+            'product_lid': lid + ':document:phase2',
             'title': title,
             'publication_date': date.today().isoformat(),
-            'Citation_Information': make_citation_information({
-                    'author_list': '{{author_list}}',  # TODO
-                    'publication_year': 2000,  # TODO
-                    'description': make_proposal_description(
-                        bundle.proposal_id())
-                    }),
+            'Citation_Information': make_citation_information(lid, prop_id),
             'Document_Edition': make_document_edition(
                 '0.0',
                 [('phase2.txt', '7-Bit ASCII Text')])

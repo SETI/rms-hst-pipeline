@@ -1,4 +1,5 @@
 """A document template to create a label for a document product."""
+from pdart.pds4labels.Placeholders import *
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
@@ -45,24 +46,34 @@ make_label = interpret_document_template(
 # ----------------
 # making <Citation_Information>
 # ----------------
-def make_proposal_description(proposal_id):
-    # type: (int) -> unicode
-    proposal_title = '{{proposal_title}}'  # TODO
-    pi = '{{pi_name}}'  # TODO
-    yr = '{{proposal_year}}'  # TODO
+def make_proposal_description(bundle_id, proposal_id):
+    # type: (unicode, int) -> unicode
+    proposal_title = make_placeholder_proposal_title(bundle_id)
+    pi = make_placeholder_pi_name(bundle_id)
+    yr = make_placeholder_proposal_year(bundle_id)
 
     return 'This document provides a summary of the observation ' + \
         'plan for HST proposal %d, %s, PI %s, %s.' % \
         (proposal_id, proposal_title, pi, yr)
 
 
-make_citation_information = interpret_template("""<Citation_Information>
+_citation_information_template = interpret_template("""<Citation_Information>
 <author_list><NODE name="author_list" /></author_list>
 <publication_year><NODE name="publication_year" /></publication_year>
 <description><NODE name="description" /></description>
 </Citation_Information>""")
 # type: NodeBuilderTemplate
 
+
+def make_citation_information(lid, proposal_id):
+    # type: (unicode, int) -> NodeBuilder
+    return _citation_information_template({
+            'author_list': make_placeholder_author_list(lid),
+            'publication_year': make_placeholder_publication_year(lid),
+            'description': make_proposal_description(
+                lid,
+                proposal_id)
+            })
 
 # ----------------
 # making <Document_Edition>
@@ -81,10 +92,10 @@ _make_document_standard_id = interpret_template('<document_standard_id>\
 def _make_document_file_entry(file_name, document_standard_id):
     # type: (str, str) -> FragBuilder
     return combine_nodes_into_fragment([
-        _make_file({'file_name': file_name}),
-        _make_document_standard_id({
-                'document_standard_id': document_standard_id})
-        ])
+            _make_file({'file_name': file_name}),
+            _make_document_standard_id({
+                    'document_standard_id': document_standard_id})
+            ])
 
 
 _make_document_edition = interpret_template(
@@ -112,3 +123,23 @@ def make_document_edition(edition_name, file_stds):
             'files': len(file_stds),
             'document_file_entries': combine_fragments_into_fragment(fragments)
             })
+
+
+def make_placeholder_author_list(bundle_id):
+    return known_placeholder(bundle_id, 'doc product author_list')
+
+
+def make_placeholder_proposal_title(bundle_id):
+    return known_placeholder(bundle_id, 'doc product proposal_title')
+
+
+def make_placeholder_pi_name(bundle_id):
+    return known_placeholder(bundle_id, 'doc product pi_name')
+
+
+def make_placeholder_publication_year(bundle_id):
+    return placeholder_year(bundle_id, 'doc product publication year')
+
+
+def make_placeholder_proposal_year(bundle_id):
+    return placeholder_year(bundle_id, 'doc product proposal year')
