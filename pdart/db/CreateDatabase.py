@@ -71,6 +71,17 @@ class DatabaseCreator(object):
         self.populate_products_table()
         self.conn.commit()
 
+    def create_document_products_table(self):
+        # type: () -> None
+        """Create the document_products table."""
+        self.conn.execute('DROP TABLE IF EXISTS document_products')
+        self.conn.execute(DOCUMENT_PRODUCTS_SCHEMA)
+
+        # No indexing yet
+        # No population yet
+
+        self.conn.commit()
+
     def create_hdus_and_cards_tables(self):
         # type: () -> None
         """Create the hdus and cards tables."""
@@ -128,7 +139,7 @@ class ArchiveDatabaseCreator(DatabaseCreator):
         bs = [(str(b.lid), b.absolute_filepath(),
                b.label_filepath(), b.proposal_id())
               for b in self.archive.bundles()]
-        self.conn.executemany('INSERT INTO bundles VALUES (?,?,?,?)', bs)
+        self.conn.executemany(BUNDLES_SQL, bs)
 
     def populate_collections_table(self):
         # type: () -> None
@@ -137,8 +148,7 @@ class ArchiveDatabaseCreator(DatabaseCreator):
                c.inventory_name(), c.inventory_filepath())
               for b in self.archive.bundles()
               for c in b.collections()]
-        self.conn.executemany(
-            'INSERT INTO collections VALUES (?,?,?,?,?,?,?,?,?)', cs)
+        self.conn.executemany(COLLECTIONS_SQL, cs)
 
     def populate_products_table(self):
         # type: () -> None
@@ -148,8 +158,7 @@ class ArchiveDatabaseCreator(DatabaseCreator):
                p.visit(), p.lid.product_id)
               for c in self.archive.collections()
               for p in c.products()]
-        self.conn.executemany(
-            'INSERT INTO products VALUES (?,?,?,?,?,?,0,?)', ps)
+        self.conn.executemany(PRODUCTS_SQL, ps)
 
     def populate_hdus_and_cards_tables(self):
         # type: () -> None
@@ -177,7 +186,7 @@ class ArchiveDatabaseCreator(DatabaseCreator):
                     for (hdu_index, hdu) in enumerate(fits):
                         fileinfo = hdu.fileinfo()
                         self.conn.execute(
-                            'INSERT INTO hdus VALUES (?, ?, ?, ?, ?)',
+                            HDUS_SQL,
                             (product_lid,
                              hdu_index,
                              fileinfo['hdrLoc'],
@@ -190,10 +199,8 @@ class ArchiveDatabaseCreator(DatabaseCreator):
                                hdu_index)
                               for card in header.cards
                               if desired_keyword(card.keyword)]
-                        self.conn.executemany(
-                            'INSERT INTO cards VALUES (?, ?, ?, ?)', cs)
+                        self.conn.executemany(CARDS_SQL, cs)
                 finally:
                     fits.close()
             except IOError as e:
-                self.conn.execute('INSERT INTO bad_fits_files VALUES (?,?)',
-                                  (str(p.lid), str(e)))
+                self.conn.execute(BAD_FITS_FILES_SQL, (str(p.lid), str(e)))

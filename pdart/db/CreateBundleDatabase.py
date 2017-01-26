@@ -64,6 +64,7 @@ class BundleDatabaseCreator(DatabaseCreator):
                 self.create_bundles_table()
                 self.create_collections_table()
                 self.create_products_table()
+                self.create_document_products_table()
                 self.create_hdus_and_cards_tables()
             finally:
                 self.conn.close()

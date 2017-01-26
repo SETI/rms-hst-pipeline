@@ -124,3 +124,12 @@ CARDS_SCHEMA = """CREATE TABLE cards (
 
 CARDS_SQL = 'INSERT INTO cards VALUES (?, ?, ?, ?)'
 # type: str
+
+DOCUMENT_PRODUCTS_SCHEMA = """CREATE TABLE document_products (
+    product VARCHAR PRIMARY KEY NOT NULL,
+    label_filepath VARCHAR NOT NULL,
+    proposal_id INTEGER NOT NULL)"""
+# type: str
+
+DOCUMENT_PRODUCTS_SQL = 'INSERT INTO document_products VALUES (?,?,?)'
+# type: str

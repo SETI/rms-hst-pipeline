@@ -174,6 +174,15 @@ def get_fits_headers_db(cursor, lid, hdu_index):
     return dict(iter)
 
 
+def get_document_product_info(cursor, lid):
+    # type: (Cursor, unicode) -> Tuple[unicode, int]
+    """Returns (label_filepath, proposal_id)"""
+    cursor.execute("""SELECT label_filepath, proposal_id FROM document_products
+                      WHERE product=?""", (lid,))
+
+    return cast(Tuple[unicode, int], cursor.fetchone())
+
+
 def delete_browse_products_and_collections(cursor):
     # type: (Cursor) -> None
     cursor.execute("""DELETE FROM products WHERE collection IN
