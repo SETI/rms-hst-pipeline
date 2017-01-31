@@ -1,12 +1,12 @@
 from sqlite3 import Cursor
 
 from typing import cast, Iterable, Tuple, TYPE_CHECKING
+_Tuple4 = Tuple[unicode, str, unicode, unicode]
 if TYPE_CHECKING:
     from typing import Any, Dict, List
 
     # shorthand types for type signatures and casting
     _Tuple3 = Tuple[str, unicode, unicode]
-    _Tuple4 = Tuple[unicode, str, unicode, unicode]
     _Tuple5 = Tuple[unicode, unicode, unicode, unicode, int]
     _Tuple7 = Tuple[unicode, unicode, str, unicode, str, unicode, unicode]
     HeaderDict = Dict[str, Any]

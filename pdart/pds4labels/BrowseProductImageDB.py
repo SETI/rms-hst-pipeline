@@ -50,11 +50,11 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
 
     # TODO: WFPC2 gives four images, not one, so we'll have to do
     # something different here.  This probably just builds the first
-    # image.
+    # image.  Add keyword wfpc2=True.
     picmaker.ImagesToPics([raw_full_filepath],
                           target_dir,
-                          filter="None",
-                          percentiles=(1, 99))
+                          filter='None',
+                          percentiles=(0.1, 99.9))
 
 
 def make_db_browse_product_images(archive, conn):
