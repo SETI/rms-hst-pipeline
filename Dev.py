@@ -12,7 +12,6 @@ import urllib2
 import xml.etree.ElementTree
 
 from pdart.db.CreateBundleDatabase import BundleDatabaseCreator
-from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.db.TableSchemas import *
 from pdart.pds4.Archive import Archive
 from pdart.pds4.Archives import *
@@ -301,9 +300,7 @@ class ArchiveRecursion(object):
         """Implements a bottom-up recursion through the archive."""
         # type: (Archive) -> None
         for bundle in archive.bundles():
-            database_fp = os.path.join(bundle.absolute_filepath(),
-                                       DATABASE_NAME)
-            with closing(sqlite3.connect(database_fp)) as conn:
+            with closing(open_bundle_database(bundle)) as conn:
                 with closing(conn.cursor()) as collection_cursor:
                     for (coll,) in get_bundle_collections_db(collection_cursor,
                                                              bundle.lid.lid):

@@ -6,7 +6,6 @@ from contextlib import closing
 import sqlite3
 import shutil
 
-from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
 from pdart.pds4.Bundle import Bundle
 from pdart.pds4.Collection import *
@@ -27,9 +26,7 @@ class DeleteRawBrowseReduction(Reduction):
         get_reduced_collections()
         # remove from the database
         bundle = Bundle(archive, lid)
-        database_fp = os.path.join(bundle.absolute_filepath(),
-                                   DATABASE_NAME)
-        with closing(sqlite3.connect(database_fp)) as conn:
+        with closing(open_bundle_database(bundle)) as conn:
             with closing(conn.cursor()) as cursor:
                 delete_browse_products_and_collections(cursor)
 
@@ -48,9 +45,7 @@ def _check_deletion(archive):
 
     # assert they're not in the database
     for bundle in archive.bundles():
-        database_fp = os.path.join(bundle.absolute_filepath(),
-                                   DATABASE_NAME)
-        with closing(sqlite3.connect(database_fp)) as conn:
+        with closing(open_bundle_database(bundle)) as conn:
             with closing(conn.cursor()) as cursor:
                 colls = list(get_all_browse_collections(cursor))
                 assert not colls, 'Browse collections %s not deleted' % colls

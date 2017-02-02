@@ -1,9 +1,16 @@
-from sqlite3 import Cursor
+from contextlib import closing
+import os.path
+import sqlite3
+
+from pdart.db.DatabaseName import DATABASE_NAME
 
 from typing import cast, Iterable, Tuple, TYPE_CHECKING
 _Tuple4 = Tuple[unicode, str, unicode, unicode]
 if TYPE_CHECKING:
     from typing import Any, Dict, List
+
+    from pdart.pds4.Archive import *
+    from pdart.pds4.Bundle import *
 
     # shorthand types for type signatures and casting
     _Tuple3 = Tuple[str, unicode, unicode]
@@ -13,27 +20,68 @@ if TYPE_CHECKING:
     Headers = List[HeaderDict]
 
 
+def archive_database_filepath(archive):
+    # type: (Archive) -> unicode
+    return os.path.join(archive.root, DATABASE_NAME)
+
+
+def open_archive_database(archive):
+    # type: (Archive) -> sqlite3.Connection
+    return sqlite3.connect(archive_database_filepath(archive))
+
+
+def bundle_database_filepath(bundle):
+    # type: (Bundle) -> unicode
+    return os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
+
+
+def open_bundle_database(bundle):
+    # type: (Bundle) -> sqlite3.Connection
+    return sqlite3.connect(bundle_database_filepath(bundle))
+
+
+def database_table_exists(conn, table):
+    # type: (sqlite3.Connection, str) -> bool
+    with closing(conn.cursor()) as cursor:
+        try:
+            cursor.execute('SELECT count(*) FROM %s' % table)
+            return True
+        except sqlite3.OperationalError:
+            return False
+
+
+def database_is_initialized(conn):
+    # type: (sqlite3.Connection) -> bool
+    all_tables = ['bundles', 'collections', 'products', 'bad_fits_files',
+                  'hdus', 'cards', 'document_products', 'documents']
+    res = True
+    for table in all_tables:
+        if not database_table_exists(conn, table):
+            res = False
+    return res
+
+
 def get_all_bundles(cursor):
-    # type: (Cursor) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute('SELECT bundle FROM bundles'))
 
 
 def get_all_collections(cursor):
-    # type: (Cursor) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute('SELECT collection FROM collections'))
 
 
 def get_all_browse_collections(cursor):
-    # type: (Cursor) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute(
             "SELECT collection FROM collections WHERE prefix='browse'"))
 
 
 def get_all_browse_products(cursor):
-    # type: (Cursor) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute(
             """SELECT product FROM products WHERE collection IN
@@ -41,7 +89,7 @@ def get_all_browse_products(cursor):
 
 
 def get_all_good_bundle_products(cursor, bundle):
-    # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute("""SELECT product FROM products
                                   WHERE collection IN
@@ -52,7 +100,7 @@ def get_all_good_bundle_products(cursor, bundle):
 
 
 def get_all_good_collection_products(cursor, collection):
-    # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute("""SELECT product FROM products
                                   WHERE collection=? EXCEPT
@@ -61,7 +109,7 @@ def get_all_good_collection_products(cursor, collection):
 
 
 def get_bundle_info_db(cursor, lid):
-    # type: (Cursor, unicode) -> Tuple[str, int]
+    # type: (sqlite3.Cursor, unicode) -> Tuple[str, int]
     """Returns (label_filepath, proposal_id)"""
     cursor.execute("""SELECT label_filepath, proposal_id
                       FROM bundles WHERE bundle=?""",
@@ -70,14 +118,14 @@ def get_bundle_info_db(cursor, lid):
 
 
 def get_bundle_collections_db(cursor, lid):
-    # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute(
             'SELECT collection from collections WHERE bundle=?', (lid,)))
 
 
 def get_collection_info_db(cursor, lid):
-    # type: (Cursor, unicode) -> _Tuple7
+    # type: (sqlite3.Cursor, unicode) -> _Tuple7
     """Returns (bundle, instrument, inventory_filepath, inventory_name,
     label_filepath, prefix, suffix)"""
 
@@ -89,7 +137,7 @@ def get_collection_info_db(cursor, lid):
 
 
 def get_data_collection_info_by_suffix_db(cursor, collection_lid, suffix):
-    # type: (Cursor, unicode, unicode) -> Iterable[_Tuple3]
+    # type: (sqlite3.Cursor, unicode, unicode) -> Iterable[_Tuple3]
     """Given a collection LID and a suffix, returns the (collection,
     full_filepath, bundle, suffix) tuple for any data collection with
     that suffix"""
@@ -102,7 +150,7 @@ def get_data_collection_info_by_suffix_db(cursor, collection_lid, suffix):
 
 
 def get_data_collections_info_db(cursor, suffix):
-    # type: (Cursor, unicode) -> Iterable[_Tuple4]
+    # type: (sqlite3.Cursor, unicode) -> Iterable[_Tuple4]
     """Given a suffix, returns a (collection, full_filepath, bundle,
     suffix) tuple for any data collection with that suffix"""
     return cast(Iterable[_Tuple4],
@@ -113,7 +161,7 @@ def get_data_collections_info_db(cursor, suffix):
 
 
 def get_collection_products_db(cursor, lid):
-    # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute(
             'SELECT product FROM products WHERE collection=?',
@@ -121,7 +169,7 @@ def get_collection_products_db(cursor, lid):
 
 
 def get_good_collection_products_db(cursor, lid):
-    # type: (Cursor, unicode) -> Iterable[Tuple[unicode]]
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode]]
     return cast(Iterable[Tuple[unicode]],
                 cursor.execute(
             """SELECT product FROM products WHERE collection=?
@@ -130,7 +178,7 @@ def get_good_collection_products_db(cursor, lid):
 
 
 def get_good_collection_products_with_info_db(cursor, lid):
-    # type: (Cursor, unicode) -> Iterable[Tuple[unicode, str, unicode]]
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode, str, unicode]]
     return cast(Iterable[Tuple[unicode, str, unicode]],
                 cursor.execute(
             """SELECT product, full_filepath, visit FROM products
@@ -140,7 +188,7 @@ def get_good_collection_products_with_info_db(cursor, lid):
 
 
 def get_product_info_db(cursor, lid):
-    # type: (Cursor, unicode) -> _Tuple5
+    # type: (sqlite3.Cursor, unicode) -> _Tuple5
     """Returns (file_name, label_fp, collection, product_id, hdu_count)"""
     cursor.execute(
         """SELECT filename, label_filepath, collection,
@@ -151,7 +199,7 @@ def get_product_info_db(cursor, lid):
 
 
 def get_fits_file_offsets_db(cursor, lid):
-    # type: (Cursor, unicode) -> Iterable[Tuple[int, int, int, int]]
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[int, int, int, int]]
     """Returns an Iterable of tuples (hdu_index, hdrLoc, datLoc, datSpan)"""
     return cast(Iterable[Tuple[int, int, int, int]],
                 cursor.execute(
@@ -162,7 +210,7 @@ def get_fits_file_offsets_db(cursor, lid):
 
 
 def get_fits_headers_db(cursor, lid, hdu_index):
-    # type: (Cursor, unicode, int) -> HeaderDict
+    # type: (sqlite3.Cursor, unicode, int) -> HeaderDict
     """Returns an Iterable of pairs of keywords and values."""
 
     # We know that since it's coming from FITS headers, they are pairs
@@ -175,7 +223,7 @@ def get_fits_headers_db(cursor, lid, hdu_index):
 
 
 def get_document_product_info(cursor, lid):
-    # type: (Cursor, unicode) -> Tuple[unicode, int]
+    # type: (sqlite3.Cursor, unicode) -> Tuple[unicode, int]
     """Returns (label_filepath, proposal_id)"""
     cursor.execute("""SELECT label_filepath, proposal_id FROM document_products
                       WHERE product=?""", (lid,))
@@ -184,7 +232,7 @@ def get_document_product_info(cursor, lid):
 
 
 def delete_browse_products_and_collections(cursor):
-    # type: (Cursor) -> None
+    # type: (sqlite3.Cursor) -> None
     cursor.execute("""DELETE FROM products WHERE collection IN
                       (SELECT collection FROM collections
                        WHERE prefix='browse')""")

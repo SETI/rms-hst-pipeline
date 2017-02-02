@@ -4,8 +4,8 @@
 import os
 import os.path
 
-from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
+from pdart.pds4labels.DBCalls import *
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -14,24 +14,22 @@ if TYPE_CHECKING:
 
 def _check_deletions(archive):
     # type: (Archive) -> None
-    archive_dir = archive.root
-    db_filepath = os.path.join(archive_dir, DATABASE_NAME)
+    db_filepath = archive_database_filepath(archive)
     if os.path.isfile(db_filepath):
         assert not os.path.isfile(db_filepath)
     for bundle in archive.bundles():
-        db_filepath = os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
+        db_filepath = bundle_database_filepath(bundle)
         if os.path.isfile(db_filepath):
             assert not os.path.isfile(db_filepath)
 
 
 if __name__ == '__main__':
     archive = get_any_archive()
-    archive_dir = archive.root
-    db_filepath = os.path.join(archive_dir, DATABASE_NAME)
+    db_filepath = archive_database_filepath(archive)
     if os.path.isfile(db_filepath):
         os.remove(db_filepath)
     for bundle in archive.bundles():
-        db_filepath = os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
+        db_filepath = bundle_database_filepath(bundle)
         if os.path.isfile(db_filepath):
             os.remove(db_filepath)
 

@@ -3,11 +3,10 @@
 SQLite database.
 """
 import os.path
-import sqlite3
 
 from pdart.db.CreateBundleDatabase import BundleDatabaseCreator
-from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
+from pdart.pds4labels.DBCalls import *
 
 
 def run():
@@ -16,8 +15,7 @@ def run():
     BundleDatabaseCreator(archive).create()
 
     for bundle in archive.bundles():
-        bundle_path = bundle.absolute_filepath()
-        db_filepath = os.path.join(bundle_path, DATABASE_NAME)
+        db_filepath = bundle_database_filepath(bundle)
         assert os.path.isfile(db_filepath)  # a wimpy sanity check
 
 if __name__ == '__main__':

@@ -4,7 +4,6 @@ This module creates a SQLite database from a bundle.
 import os.path
 
 from pdart.db.CreateDatabase import DatabaseCreator
-from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.db.TableSchemas import *
 from pdart.pds4.Bundle import Bundle
 import pyfits
@@ -55,10 +54,7 @@ class BundleDatabaseCreator(DatabaseCreator):
         archive's information.
         """
         for b in self.archive.bundles():
-            self.bundle = b
-            bundle_path = self.bundle.absolute_filepath()
-            db_filepath = os.path.join(bundle_path, DATABASE_NAME)
-            self.conn = sqlite3.connect(db_filepath)
+            self.conn = open_bundle_database(self.bundle)
             try:
                 self.conn.execute('PRAGMA foreign_keys = ON;')
                 self.create_bundles_table()

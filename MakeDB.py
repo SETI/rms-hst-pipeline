@@ -6,22 +6,17 @@ import os.path
 import sqlite3
 
 from pdart.db.CreateDatabase import ArchiveDatabaseCreator
-from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.pds4.Archives import *
+from pdart.pds4labels.DBCalls import *
 
 
 def run():
     # type: () -> None
     archive = get_any_archive()
-    archive_dir = get_any_archive_dir()
-    db_filepath = os.path.join(archive_dir, DATABASE_NAME)
-    conn = sqlite3.connect(db_filepath)
-    # type: sqlite3.Connection
-    try:
+    with closing(open_archive_database(archive)) as conn:
         ArchiveDatabaseCreator(conn, archive).create()
-    finally:
-        conn.close()
 
+    db_filepath = archive_database_filepath(archive)
     assert os.path.isfile(db_filepath)  # a wimpy sanity check
 
     # dump it
@@ -30,7 +25,6 @@ def run():
         conn = sqlite3.connect(db_filepath)
         for line in conn.iterdump():
             print line
-        conn.close()
 
 if __name__ == '__main__':
     run()

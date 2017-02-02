@@ -5,11 +5,11 @@ from datetime import date
 import os.path
 import sqlite3
 
-from pdart.db.DatabaseName import DATABASE_NAME
 from pdart.db.TableSchemas import *
 from pdart.pds4.Archives import *
 from pdart.pds4.Bundle import Bundle
 from pdart.pds4.LID import LID
+from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.DocumentProductLabelDB import *
 from pdart.rules.Combinators import *
 from pdart.xml.Pretty import *
@@ -36,8 +36,7 @@ if __name__ == '__main__':
     ensure_directory(document_fp)
     label_fp = os.path.join(document_fp, 'phase2.xml')
 
-    db_filepath = os.path.join(bundle_fp, DATABASE_NAME)
-    with closing(sqlite3.connect(db_filepath)) as conn:
+    with closing(open_bundle_database(bundle)) as conn:
         # We (re-)create the table and populate it with the one needed
         # record.
         conn.execute('DROP TABLE IF EXISTS document_products')
