@@ -128,8 +128,23 @@ CARDS_SQL = 'INSERT INTO cards VALUES (?, ?, ?, ?)'
 DOCUMENT_PRODUCTS_SCHEMA = """CREATE TABLE document_products (
     product VARCHAR PRIMARY KEY NOT NULL,
     label_filepath VARCHAR NOT NULL,
-    proposal_id INTEGER NOT NULL)"""
+    proposal_id INTEGER NOT NULL,
+    proposal_year INTEGER NOT NULL,
+    pi_name VARCHAR NOT NULL,
+    author_list VARCHAR NOT NULL,
+    publication_year INTEGER NOT NULL)"""
 # type: str
 
-DOCUMENT_PRODUCTS_SQL = 'INSERT INTO document_products VALUES (?,?,?)'
+DOCUMENT_PRODUCTS_SQL = 'INSERT INTO document_products VALUES (?,?,?,?,?,?,?)'
+# type: str
+
+DOCUMENTS_SCHEMA = """CREATE TABLE documents (
+    document_name VARCHAR PRIMARY KEY NOT NULL,
+    document_filepath VARCHAR NOT NULL,
+    source_url VARCHAR NOT NULL,
+    product VARCHAR NOT NULL,
+    FOREIGN KEY(product) REFERENCES document_products(product)"""
+# type: str
+
+DOCUMENTS_SQL = 'INSERT INTO documents VALUES (?,?,?,?)'
 # type: str

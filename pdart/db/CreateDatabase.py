@@ -82,6 +82,17 @@ class DatabaseCreator(object):
 
         self.conn.commit()
 
+    def create_documents_table(self):
+        # type: () -> None
+        """Create the document_products table."""
+        self.conn.execute('DROP TABLE IF EXISTS document_products')
+        self.conn.execute(DOCUMENTS_SCHEMA)
+
+        # No indexing yet
+        # No population yet
+
+        self.conn.commit()
+
     def create_hdus_and_cards_tables(self):
         # type: () -> None
         """Create the hdus and cards tables."""
