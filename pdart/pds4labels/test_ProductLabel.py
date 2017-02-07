@@ -1,4 +1,4 @@
-from pdart.pds4labels.ProductLabel import *
+from pdart.pds4labels.FitsProductLabel import *
 from pdart.rules.ExceptionInfo import CalculationException
 from pdart.xml.Pretty import pretty_print
 

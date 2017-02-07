@@ -22,7 +22,7 @@ from pdart.pds4labels.BrowseProductLabelDB import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
 from pdart.pds4labels.DBCalls import *
-from pdart.pds4labels.ProductLabel import *
+from pdart.pds4labels.FitsProductLabel import *
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.rules.Combinators import *
 

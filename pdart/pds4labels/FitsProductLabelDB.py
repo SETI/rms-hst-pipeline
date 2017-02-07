@@ -6,11 +6,11 @@ from contextlib import closing
 from pdart.pds4labels.DatabaseCaches import *
 from pdart.pds4labels.DBCalls import *
 from pdart.pds4labels.FileContentsDB import *
+from pdart.pds4labels.FitsProductLabelXml import *
 from pdart.pds4labels.HstParametersDB import *
 from pdart.pds4labels.ObservingSystem import *
 from pdart.pds4labels.TargetIdentificationDB import *
 from pdart.pds4labels.TimeCoordinatesDB import *
-from pdart.pds4labels.ProductLabelXml import *
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 

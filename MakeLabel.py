@@ -8,7 +8,7 @@ import sys
 from pdart.pds4.Archive import *
 from pdart.pds4.LID import *
 from pdart.pds4.Product import *
-from pdart.pds4labels.ProductLabel import *
+from pdart.pds4labels.FitsProductLabel import *
 from pdart.rules.Combinators import *
 
 

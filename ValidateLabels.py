@@ -8,7 +8,7 @@ saved to disk.
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
-from pdart.pds4labels.ProductLabel import *
+from pdart.pds4labels.FitsProductLabel import *
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.InstrumentationReductions import *
 from pdart.rules.Combinators import *
@@ -43,9 +43,9 @@ class CanMakeValidCollectionLabelsReduction(CollectionLabelReduction):
                 raise Exception('Validation errors: ' + failures)
 
 
-class CanMakeValidProductLabelsReduction(ProductLabelReduction):
+class CanMakeValidProductLabelsReduction(FitsProductLabelReduction):
     """
-    Verifies that within the archive, valid product labels can be
+    Verifies that within the archive, valid FITS product labels can be
     built.
     """
     def reduce_archive(self, archive_root, get_reduced_bundles):

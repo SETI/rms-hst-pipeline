@@ -7,9 +7,9 @@ import sys
 
 from pdart.pds4.Product import *
 from pdart.pds4labels.FileContentsReduction import *
+from pdart.pds4labels.FitsProductLabelXml import *
 from pdart.pds4labels.HstParametersReduction import *
 from pdart.pds4labels.ObservingSystem import *
-from pdart.pds4labels.ProductLabelXml import *
 from pdart.pds4labels.TargetIdentificationReduction import *
 from pdart.pds4labels.TimeCoordinatesReduction import *
 from pdart.reductions.BadFitsFileReduction import *
@@ -19,7 +19,7 @@ from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 
 
-class ProductLabelReduction(BadFitsFileReduction):
+class FitsProductLabelReduction(BadFitsFileReduction):
     """
     Reduce a product to the label of its first (presumably only) FITS
     file, write the label into the archive and return the label.  If
@@ -101,8 +101,8 @@ def make_product_label(product, verify):
     verify the label against its XML and Schematron schemas.  Raise an
     exception if either fails.
     """
-    label = DefaultReductionRunner().run_product(ProductLabelReduction(verify),
-                                                 product)
+    runner = DefaultReductionRunner()
+    label = runner.run_product(FitsProductLabelReduction(verify), product)
     if label is None:
         raise Exception('Bad FITS file')
 

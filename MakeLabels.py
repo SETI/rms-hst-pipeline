@@ -10,13 +10,13 @@ import sys
 from pdart.pds4.Archives import *
 from pdart.pds4labels.BundleLabel import *
 from pdart.pds4labels.CollectionLabel import *
-from pdart.pds4labels.ProductLabel import *
+from pdart.pds4labels.FitsProductLabel import *
 from pdart.reductions.CompositeReduction import *
 from pdart.reductions.InstrumentationReductions import *
 from pdart.rules.Combinators import *
 
 
-class _ProductLabelReductionWithMessage(ProductLabelReduction):
+class _FitsProductLabelReductionWithMessage(FitsProductLabelReduction):
     """
     Summarizes a product into its label (or ``None`` if the FITS file
     cannot be read, noting the problem).
@@ -38,11 +38,12 @@ class _MakeLabelsReduction(CompositeReduction):
     possibly validating them) as a side-effect.
     """
     def __init__(self, verify):
-        CompositeReduction.__init__(self,
-                                    [BundleLabelReduction(verify),
-                                     CollectionLabelReduction(verify),
-                                     _ProductLabelReductionWithMessage(verify)
-                                     ])
+        CompositeReduction.__init__(
+            self,
+            [BundleLabelReduction(verify),
+             CollectionLabelReduction(verify),
+             _FitsProductLabelReductionWithMessage(verify)
+             ])
 
 
 def _has_bad_fits_file(product):

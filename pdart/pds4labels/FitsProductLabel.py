@@ -4,5 +4,5 @@ the original :class:`~pdart.reductions.Reduction.Reduction`
 implementation and the new SQLite implementation.  (The former is
 probably obsolete.)
 """
-from pdart.pds4labels.ProductLabelDB import *
-from pdart.pds4labels.ProductLabelReduction import *
+from pdart.pds4labels.FitsProductLabelDB import *
+from pdart.pds4labels.FitsProductLabelReduction import *
