@@ -5,17 +5,19 @@ import sqlite3
 from pdart.db.DatabaseName import DATABASE_NAME
 
 from typing import cast, Iterable, Tuple, TYPE_CHECKING
+# shorthand types for casting
+_Tuple3 = Tuple[str, unicode, unicode]
 _Tuple4 = Tuple[unicode, str, unicode, unicode]
+_Tuple5 = Tuple[unicode, unicode, unicode, unicode, int]
+_Tuple7 = Tuple[unicode, unicode, str, unicode, str, unicode, unicode]
+
 if TYPE_CHECKING:
     from typing import Any, Dict, List
 
     from pdart.pds4.Archive import *
     from pdart.pds4.Bundle import *
 
-    # shorthand types for type signatures and casting
-    _Tuple3 = Tuple[str, unicode, unicode]
-    _Tuple5 = Tuple[unicode, unicode, unicode, unicode, int]
-    _Tuple7 = Tuple[unicode, unicode, str, unicode, str, unicode, unicode]
+    # shorthand types for type signatures
     HeaderDict = Dict[str, Any]
     Headers = List[HeaderDict]
 
