@@ -14,6 +14,7 @@ mypy --silent-imports --py2 \
     CheckKeywords.py \
     CheckSuffixes.py \
     CheckTimes.py \
+    CompleteArchive.py \
     DeleteBrowse.py \
     DeleteDB.py \
     DeleteDocs.py \
