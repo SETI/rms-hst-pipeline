@@ -6,12 +6,27 @@ from contextlib import closing
 from typing import TYPE_CHECKING
 import sqlite3
 
-from pdart.pds.Archives import get_any_archive
+from pdart.pds4.Archives import get_any_archive
 from pdart.pds4labels.DBCalls import *
 
 if TYPE_CHECKING:
     from pdart.pds4.Archive import Archive
     from pdart.pds4.LID import LID
+
+
+def make_browse_lid(fits_lid):
+    # type: (LID) -> LID
+    pass
+
+
+def make_spice_lid(fits_lid):
+    # type: (LID) -> LID
+    pass
+
+
+def make_documentation_lid(bundle_lid):
+    # type: (LID) -> LID
+    pass
 
 
 def pre_make_fits_database(conn, fits_lid, fits_file):
@@ -300,17 +315,20 @@ def complete_archive(archive):
                         # database?
                         make_fits_label(conn, product.lid, fits_file)
 
-                        make_browse_file(conn, product.lid, fits_file)
-                        make_browse_database(conn, product.lid, fits_file)
-                        make_browse_label(conn, product.lid, fits_file)
+                        browse_lid = make_browse_lid(product.lid)
+                        make_browse_file(conn, browse_lid, fits_file)
+                        make_browse_database(conn, browse_lid, fits_file)
+                        make_browse_label(conn, browse_lid, fits_file)
 
-                        make_spice_file(conn, product.lid, fits_file)
-                        make_spice_database(conn, product.lid, fits_file)
-                        make_spice_label(conn, product.lid, fits_file)
+                        spice_lid = make_spice_lid(product.lid)
+                        make_spice_file(conn, spice_lid, fits_file)
+                        make_spice_database(conn, spice_lid, fits_file)
+                        make_spice_label(conn, spice_lid, fits_file)
 
-            make_documentation_files(conn, bundle.lid)
-            make_documentation_database(conn, bundle.lid)
-            make_documentation_label(conn, bundle.lid)
+            documentation_lid = make_documentation_lid(bundle.lid)
+            make_documentation_files(conn, documentation_lid)
+            make_documentation_database(conn, documentation_lid)
+            make_documentation_label(conn, documentation_lid)
 
             # make_bundle_files()  # Not needed
             make_bundle_database(conn, bundle.lid)
