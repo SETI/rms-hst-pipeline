@@ -1,17 +1,91 @@
 """
-SCRIPT: "Complete" is a verb: we are completing the archive by adding
-labels, browse products, documentation, etc.
+SCRIPT: "Complete" here is a verb: we are completing the archive by
+adding labels, browse products, documentation, collections, bundles,
+etc.
 """
+import abc
 from contextlib import closing
-from typing import TYPE_CHECKING
+import os
 import sqlite3
+from typing import TYPE_CHECKING
 
 from pdart.pds4.Archives import get_any_archive
-from pdart.pds4labels.DBCalls import *
+from pdart.db.CompleteDatabase import *
 
 if TYPE_CHECKING:
     from pdart.pds4.Archive import Archive
     from pdart.pds4.LID import LID
+
+
+class Maker(object):
+    """
+    An abstract class for making things with lots of added checks.
+    """
+    __metaclass = abc.ABCMeta
+
+    @abc.abstractmethod
+    def check_requirements(self):
+        # type: () -> None
+        pass
+
+    @abc.abstractmethod
+    def check_results(self):
+        # type: () -> None
+        pass
+
+    @abc.abstractmethod
+    def make(self):
+        # type: () -> None
+        pass
+
+    def __call__(self):
+        # type: () -> None
+        self.check_requirements()
+        self.make()
+        self.check_results()
+
+
+class FileMaker(Maker):
+    """
+    An abstract class for putting files into a filesystem.
+    """
+    pass
+
+
+class DatabaseRecordMaker(Maker):
+    """
+    An abstract class for making records in a SQLite database.
+    """
+    pass
+
+
+class LabelMaker(Maker):
+    """
+    An abstract class for making PDS4 labels.
+    """
+    pass
+
+
+class FitsDatabaseRecordMaker(DatabaseRecordMaker):
+    def __init__(self, conn, lid, file):
+        # type: (sqlite3.Connection, LID, unicode) -> None
+        self.conn = conn
+        self.lid = lid
+
+    def check_requirements(self):
+        # I think these should vary for different kinds of DBs but
+        # I'll implement them externally for now.
+        assert not exists_database_records_for_fits(self.conn, self.lid), \
+            self.lid
+
+    def check_results(self):
+        assert exists_database_records_for_fits(self.conn, self.lid), self.lid
+        pass
+
+    def make(self):
+        with closing(self.conn.cursor()) as cursor:
+            insert_fits_database_records(cursor, self.lid)
+            print 'Inserted', self.lid
 
 
 def make_browse_lid(fits_lid):
@@ -27,23 +101,6 @@ def make_spice_lid(fits_lid):
 def make_documentation_lid(bundle_lid):
     # type: (LID) -> LID
     pass
-
-
-def pre_make_fits_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def post_make_fits_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def make_fits_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pre_make_fits_database(conn, fits_lid, fits_file)
-    # do something
-    post_make_fits_database(conn, fits_lid, fits_file)
 
 
 def pre_make_fits_label(conn, fits_lid, fits_file):
@@ -297,14 +354,24 @@ def post_complete_archive(archive):
 def complete_archive(archive):
     # type: (Archive) -> None
     # We're working with existing FITS files
+
+    # Set this True if you want to replace the databases with clean
+    # ones.
+    STARTING_CLEAN = True
+
     for bundle in archive.bundles():
+        if STARTING_CLEAN:
+            try:
+                os.remove(bundle_database_filepath(bundle))
+            except OSError:
+                pass
         with closing(open_bundle_database(bundle)) as conn:
             for collection in bundle.collections():
                 make_collection_database(conn, collection.lid)
                 make_collection_inventory_and_label(conn, collection.lid)
                 for product in collection.products():
                     for fits_file in product.files():
-                        make_fits_database(conn, product.lid, fits_file)
+                        FitsDatabaseRecordMaker(conn, product.lid, fits_file)()
 
                         # If we don't need out-of-line information,
                         # (i.e., information from other files), we can
