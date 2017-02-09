@@ -11,7 +11,35 @@ if TYPE_CHECKING:
     from pdart.pds4.LID import LID
 
 
-def exists_database_record_for_fits_in_table(cursor, lid, table_name):
+##############################
+# Database stuff
+##############################
+
+_NEW_DATABASE_NAME = 'complete-database.db'
+# type: str
+
+
+def bundle_database_filepath(bundle):
+    # type: (Bundle) -> unicode
+    return os.path.join(bundle.absolute_filepath(), _NEW_DATABASE_NAME)
+
+
+def open_bundle_database(bundle):
+    # type: (Bundle) -> sqlite3.Connection
+    return sqlite3.connect(bundle_database_filepath(bundle))
+
+
+def init_database(conn):
+    # type: (sqlite3.Connection) -> None
+    with closing(conn.cursor()) as cursor:
+        cursor.execute('PRAGMA foreign_keys=ON;')
+
+
+##############################
+# FITS products stuff
+##############################
+
+def _exists_database_record_for_fits_in_table(cursor, lid, table_name):
     # type: (sqlite3.Cursor, LID, str) -> bool
     VERBOSE = False
     try:
@@ -34,7 +62,7 @@ def exists_database_records_for_fits(conn, lid):
     VERBOSE = False
     with closing(conn.cursor()) as cursor:
         try:
-            f = exists_database_record_for_fits_in_table
+            f = _exists_database_record_for_fits_in_table
             # TODO I should also be checking that product_type in the
             # products table = 'fits'.
             return f(cursor, lid, 'products') and \
@@ -44,26 +72,6 @@ def exists_database_records_for_fits(conn, lid):
             if VERBOSE:
                 print 'threw', str(lid), e
             return False
-
-
-_NEW_DATABASE_NAME = 'complete-database.db'
-# type: str
-
-
-def bundle_database_filepath(bundle):
-    # type: (Bundle) -> unicode
-    return os.path.join(bundle.absolute_filepath(), _NEW_DATABASE_NAME)
-
-
-def open_bundle_database(bundle):
-    # type: (Bundle) -> sqlite3.Connection
-    return sqlite3.connect(bundle_database_filepath(bundle))
-
-
-def init_database(conn):
-    # type: (sqlite3.Connection) -> None
-    with closing(conn.cursor()) as cursor:
-        cursor.execute('PRAGMA foreign_keys=ON;')
 
 
 def insert_fits_database_records(cursor, lid_obj):
