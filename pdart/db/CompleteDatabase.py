@@ -87,3 +87,38 @@ def insert_fits_database_records(cursor, lid_obj):
                       FOREIGN KEY(lid) REFERENCES products(lid));""")
     cursor.execute("INSERT INTO products VALUES(?,'fits');", (lid,))
     cursor.execute('INSERT INTO fits_products VALUES(?);', (lid,))
+
+
+##############################
+# Browse products stuff
+##############################
+
+def exists_database_records_for_browse(conn, lid):
+    # type: (sqlite3.Connection, LID) -> bool
+    VERBOSE = False
+    with closing(conn.cursor()) as cursor:
+        try:
+            cursor.execute('SELECT count(lid) FROM products WHERE lid=?',
+                           (str(lid),))
+            (res,) = cursor.fetchone()
+            if res is 0:
+                if VERBOSE:
+                    print 'Failed for', lid
+                return False
+            return True
+
+        except Exception as e:
+            if VERBOSE:
+                print 'threw', str(lid), e
+            return False
+
+
+def insert_browse_database_records(cursor, lid_obj):
+    # type: (sqlite3.Cursor, LID) -> None
+
+    lid = str(lid_obj)
+    # TODO could combine these
+    cursor.execute("""CREATE TABLE IF NOT EXISTS products (
+                      lid VARCHAR PRIMARY KEY NOT NULL,
+                      product_type VARCHAR NOT NULL);""")
+    cursor.execute("INSERT INTO products VALUES(?,'browse');", (lid,))

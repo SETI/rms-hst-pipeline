@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 def _make_browse_coll_fp(raw_coll_fp):
     # type: (str) -> str
     """
-u    Given the filepath to the RAW collection, return the filepath to
+    Given the filepath to the RAW collection, return the filepath to
     its browse collection.
     """
     # TODO Sloppy implementation: assumes only one 'data'

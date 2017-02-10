@@ -39,3 +39,18 @@ class TestCompleteDatabase(unittest.TestCase):
             insert_fits_database_records(cursor, lid)
             self.assertTrue(exists_database_records_for_fits(
                     self.database_conn, lid))
+
+    def test_insert_browse_database_records(self):
+        """
+        Tests that insert_browse_database_records() does indeed do that
+        (assuming exists_database_records_for_browse() is correctly
+        implemented).
+        """
+        # type: () -> None
+        with closing(self.database_conn.cursor()) as cursor:
+            lid = LID('urn:nasa:pds:bundle:container:browse_product')
+            self.assertFalse(exists_database_records_for_browse(
+                    self.database_conn, lid))
+            insert_browse_database_records(cursor, lid)
+            self.assertTrue(exists_database_records_for_browse(
+                    self.database_conn, lid))

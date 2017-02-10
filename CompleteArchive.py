@@ -1,20 +1,78 @@
-"""
+u"""
 SCRIPT: "Complete" here is a verb: we are completing the archive by
 adding labels, browse products, documentation, collections, bundles,
 etc.
 """
 import abc
 from contextlib import closing
+import io
 import os
+import os.path
+import re
+import shutil
 import sqlite3
 from typing import TYPE_CHECKING
 
-from pdart.pds4.Archives import get_any_archive
 from pdart.db.CompleteDatabase import *
+from pdart.pds4.Archives import get_any_archive
+from pdart.pds4.Product import Product
+from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 if TYPE_CHECKING:
     from pdart.pds4.Archive import Archive
+    from pdart.pds4.File import File
     from pdart.pds4.LID import LID
+
+
+def ensure_dir(dir):
+    if not os.path.isdir(dir):
+        os.makedirs(dir)
+
+
+def label_filepath(archive, lid):
+    # type: (Archive, LID) -> unicode
+    return Product(archive, lid).label_filepath()
+
+
+def browse_image_filepath(archive, fits_lid):
+    # type: (Archive, LID) -> unicode
+    fits_product = Product(archive, fits_lid)
+    visit = fits_product.visit()
+
+    raw_collection_filepath = fits_product.collection().absolute_filepath()
+    # TODO Sloppy implementation: assumes only one 'data'
+    browse_collection_filepath = \
+        'browse'.join(re.split('data', raw_collection_filepath))
+
+    basename = os.path.basename(fits_product.absolute_filepath())
+    basename = os.path.splitext(basename)[0] + '.jpg'
+    target_dir = os.path.join(browse_collection_filepath,
+                              ('visit_%s' % visit))
+    return os.path.join(target_dir, basename)
+
+
+def make_fits_label(cursor, lid):
+    # type: (sqlite3.Cursor, LID) -> unicode
+    return u'Ceci n\u2019est pas une \u00e9tiquette.'
+
+
+def make_browse_label(cursor, lid):
+    # type: (sqlite3.Cursor, LID) -> unicode
+    return u'Ceci n\u2019est pas une \u00e9tiquette \u00e0 feuilleter.'
+
+
+def make_browse_image(archive, cursor, fits_lid, fits_file):
+    # type: (Archive, sqlite3.Cursor, LID, File) -> unicode
+    filepath = browse_image_filepath(archive, fits_lid)
+    ensure_dir(os.path.dirname(filepath))
+    with io.open(filepath, 'w') as file:
+        file.write(u'Ceci n\u2019est pas une image.')
+
+
+def write_label(label, filepath):
+    # type: (unicode, unicode) -> None
+    with io.open(filepath, 'w') as file:
+        file.write(label)
 
 
 class Maker(object):
@@ -52,6 +110,34 @@ class FileMaker(Maker):
     pass
 
 
+class BrowseFileMaker(FileMaker):
+    def __init__(self, archive, conn, fits_lid, browse_lid, fits_file):
+        # type: (Archive, sqlite3.Connection, LID, LID, unicode) -> None
+        self.archive = archive
+        self.conn = conn
+        self.fits_lid = fits_lid
+        self.browse_lid = browse_lid
+        self.fits_file = fits_file
+
+    def check_requirements(self):
+        # make sure the source FITS file exists
+        assert os.path.isfile(self.fits_file.full_filepath())
+        # make sure we're raw
+        comp = self.fits_file.component
+        assert isinstance(comp, Product)
+        assert comp.collection().suffix() in RAW_SUFFIXES
+        # TODO Anything else?
+
+    def check_results(self):
+        assert os.path.isfile(browse_image_filepath(archive, self.fits_lid))
+
+    def make(self):
+        with closing(self.conn.cursor()) as cursor:
+            make_browse_image(self.archive, cursor,
+                              self.fits_lid, self.fits_file)
+            print 'Made browse image', self.browse_lid
+
+
 class DatabaseRecordMaker(Maker):
     """
     An abstract class for making records in a SQLite database.
@@ -64,6 +150,26 @@ class LabelMaker(Maker):
     An abstract class for making PDS4 labels.
     """
     pass
+
+
+class BrowseDatabaseRecordMaker(DatabaseRecordMaker):
+    def __init__(self, conn, lid):
+        # type: (sqlite3.Connection, LID) -> None
+        self.conn = conn
+        self.lid = lid
+
+    def check_requirements(self):
+        assert not exists_database_records_for_browse(self.conn, self.lid), \
+            self.lid
+
+    def check_results(self):
+        assert exists_database_records_for_browse(self.conn, self.lid), \
+            self.lid
+
+    def make(self):
+        with closing(self.conn.cursor()) as cursor:
+            insert_browse_database_records(cursor, self.lid)
+            print 'Inserted', self.lid
 
 
 class FitsDatabaseRecordMaker(DatabaseRecordMaker):
@@ -80,7 +186,6 @@ class FitsDatabaseRecordMaker(DatabaseRecordMaker):
 
     def check_results(self):
         assert exists_database_records_for_fits(self.conn, self.lid), self.lid
-        pass
 
     def make(self):
         with closing(self.conn.cursor()) as cursor:
@@ -88,138 +193,62 @@ class FitsDatabaseRecordMaker(DatabaseRecordMaker):
             print 'Inserted', self.lid
 
 
+class FitsLabelMaker(LabelMaker):
+    def __init__(self, archive, conn, lid, file):
+        # type: (Archive, sqlite3.Connection, LID, unicode) -> None
+        self.archive = archive
+        self.conn = conn
+        self.lid = lid
+
+    def check_requirements(self):
+        assert exists_database_records_for_fits(self.conn, self.lid), self.lid
+
+    def check_results(self):
+        assert os.path.isfile(label_filepath(self.archive, self.lid))
+        # assert verify
+
+    def make(self):
+        with closing(self.conn.cursor()) as cursor:
+            label = make_fits_label(cursor, self.lid)
+            write_label(label, label_filepath(self.archive, self.lid))
+            print 'Made label for', self.lid
+
+
+class BrowseLabelMaker(LabelMaker):
+    def __init__(self, archive, conn, lid, file):
+        # type: (Archive, sqlite3.Connection, LID, unicode) -> None
+        self.archive = archive
+        self.conn = conn
+        self.lid = lid
+
+    def check_requirements(self):
+        assert exists_database_records_for_browse(self.conn, self.lid), \
+            self.lid
+
+    def check_results(self):
+        assert os.path.isfile(label_filepath(self.archive, self.lid))
+        # assert verify
+
+    def make(self):
+        with closing(self.conn.cursor()) as cursor:
+            label = make_browse_label(cursor, self.lid)
+            write_label(label, label_filepath(self.archive, self.lid))
+            print 'Made label for', self.lid
+
+
 def make_browse_lid(fits_lid):
     # type: (LID) -> LID
-    pass
+    return fits_lid.to_browse_lid()
 
 
 def make_spice_lid(fits_lid):
     # type: (LID) -> LID
-    pass
+    assert False, 'unimplemented'
 
 
 def make_documentation_lid(bundle_lid):
     # type: (LID) -> LID
     pass
-
-
-def pre_make_fits_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def post_make_fits_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def make_fits_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pre_make_fits_label(conn, fits_lid, fits_file)
-    # do something
-    post_make_fits_label(conn, fits_lid, fits_file)
-
-
-def pre_make_browse_file(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def post_make_browse_file(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def make_browse_file(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pre_make_browse_file(conn, fits_lid, fits_file)
-    # do something
-    post_make_browse_file(conn, fits_lid, fits_file)
-
-
-def pre_make_browse_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def post_make_browse_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def make_browse_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pre_make_browse_database(conn, fits_lid, fits_file)
-    # do something
-    post_make_browse_database(conn, fits_lid, fits_file)
-
-
-def pre_make_browse_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def post_make_browse_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def make_browse_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pre_make_browse_label(conn, fits_lid, fits_file)
-    # do something
-    post_make_browse_label(conn, fits_lid, fits_file)
-
-
-def pre_make_spice_file(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def post_make_spice_file(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def make_spice_file(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pre_make_spice_file(conn, fits_lid, fits_file)
-    # do something
-    post_make_spice_file(conn, fits_lid, fits_file)
-
-
-def pre_make_spice_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def post_make_spice_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def make_spice_database(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pre_make_spice_database(conn, fits_lid, fits_file)
-    # do something
-    post_make_spice_database(conn, fits_lid, fits_file)
-
-
-def pre_make_spice_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def post_make_spice_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pass
-
-
-def make_spice_label(conn, fits_lid, fits_file):
-    # type: (sqlite3.Connection, LID, unicode) -> None
-    pre_make_spice_label(conn, fits_lid, fits_file)
-    # do something
-    post_make_spice_label(conn, fits_lid, fits_file)
 
 
 def pre_make_documentation_files(conn, bundle_lid):
@@ -351,6 +380,39 @@ def post_complete_archive(archive):
     pass
 
 
+class SpiceFileMaker(FileMaker):
+    def check_requirements(self):
+        assert False, 'unimplemented'
+
+    def check_results(self):
+        assert False, 'unimplemented'
+
+    def make(self):
+        assert False, 'unimplemented'
+
+
+class SpiceDatabaseRecordMaker(DatabaseRecordMaker):
+    def check_requirements(self):
+        assert False, 'unimplemented'
+
+    def check_results(self):
+        assert False, 'unimplemented'
+
+    def make(self):
+        assert False, 'unimplemented'
+
+
+class SpiceLabelMaker(LabelMaker):
+    def check_requirements(self):
+        assert False, 'unimplemented'
+
+    def check_results(self):
+        assert False, 'unimplemented'
+
+    def make(self):
+        assert False, 'unimplemented'
+
+
 def complete_archive(archive):
     # type: (Archive) -> None
     # We're working with existing FITS files
@@ -358,6 +420,10 @@ def complete_archive(archive):
     # Set this True if you want to replace the databases with clean
     # ones.
     STARTING_CLEAN = True
+    if STARTING_CLEAN:
+        for collection in archive.collections():
+            if collection.prefix() == 'browse':
+                shutil.rmtree(collection.absolute_filepath())
 
     for bundle in archive.bundles():
         if STARTING_CLEAN:
@@ -367,30 +433,45 @@ def complete_archive(archive):
                 pass
         with closing(open_bundle_database(bundle)) as conn:
             for collection in bundle.collections():
+                if collection.prefix() == 'data':
+                    for product in collection.products():
+                        for fits_file in product.files():
+                            FitsDatabaseRecordMaker(conn,
+                                                    product.lid,
+                                                    fits_file)()
+
+                            # If we don't need out-of-line information,
+                            # (i.e., information from other files), we can
+                            # build the rest right here.
+
+                            # Do I need the FITS file at all in the
+                            # following calls or can I just run from the
+                            # database?
+                            FitsLabelMaker(archive, conn,
+                                           product.lid, fits_file)()
+
+                            if collection.suffix() in RAW_SUFFIXES:
+                                browse_lid = make_browse_lid(product.lid)
+                                BrowseFileMaker(archive, conn,
+                                                product.lid, browse_lid,
+                                                fits_file)()
+
+                                BrowseDatabaseRecordMaker(conn, browse_lid)()
+                                BrowseLabelMaker(archive, conn,
+                                                 browse_lid, fits_file)()
+
+                            if False:
+                                spice_lid = make_spice_lid(product.lid)
+                                SpiceFileMaker()()
+                                SpiceDatabaseRecordMaker()()
+                                SpiceLabelMaker()()
+
+                # TODO should check here that any new collections were
+                # properly made.  The big loop body is, in effect, a
+                # CollectionFileMaker call.  There's a pre (on what?)
+                # that these collections don't yet exist.
                 make_collection_database(conn, collection.lid)
                 make_collection_inventory_and_label(conn, collection.lid)
-                for product in collection.products():
-                    for fits_file in product.files():
-                        FitsDatabaseRecordMaker(conn, product.lid, fits_file)()
-
-                        # If we don't need out-of-line information,
-                        # (i.e., information from other files), we can
-                        # build the rest right here.
-
-                        # Do I need the FITS file at all in the
-                        # following calls or can I just run from the
-                        # database?
-                        make_fits_label(conn, product.lid, fits_file)
-
-                        browse_lid = make_browse_lid(product.lid)
-                        make_browse_file(conn, browse_lid, fits_file)
-                        make_browse_database(conn, browse_lid, fits_file)
-                        make_browse_label(conn, browse_lid, fits_file)
-
-                        spice_lid = make_spice_lid(product.lid)
-                        make_spice_file(conn, spice_lid, fits_file)
-                        make_spice_database(conn, spice_lid, fits_file)
-                        make_spice_label(conn, spice_lid, fits_file)
 
             documentation_lid = make_documentation_lid(bundle.lid)
             make_documentation_files(conn, documentation_lid)
