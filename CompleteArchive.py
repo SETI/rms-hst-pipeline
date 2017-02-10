@@ -1,4 +1,4 @@
-u"""
+"""
 SCRIPT: "Complete" here is a verb: we are completing the archive by
 adding labels, browse products, documentation, collections, bundles,
 etc.
@@ -16,7 +16,11 @@ from typing import TYPE_CHECKING
 from pdart.db.CompleteDatabase import *
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.Product import Product
+from pdart.pds4labels.FitsProductLabelXml import make_label
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
+from pdart.xml.Pretty import *
+from pdart.xml.Schema import *
+from pdart.xml.Templates import *
 
 if TYPE_CHECKING:
     from pdart.pds4.Archive import Archive
@@ -36,6 +40,7 @@ def label_filepath(archive, lid):
 
 def browse_image_filepath(archive, fits_lid):
     # type: (Archive, LID) -> unicode
+    # TODO refactor
     fits_product = Product(archive, fits_lid)
     visit = fits_product.visit()
 
@@ -53,16 +58,35 @@ def browse_image_filepath(archive, fits_lid):
 
 def make_fits_label(cursor, lid):
     # type: (sqlite3.Cursor, LID) -> unicode
-    return u'Ceci n\u2019est pas une \u00e9tiquette.'
+    info = cursor.execute('SELECT * FROM fits_products WHERE lid=?',
+                          (str(lid),))
+    ian = '#### Investigation_Area_name ####'
+    return unicode(pretty_print(make_label({
+                    'lid': str(lid),
+                    'proposal_id': '#### proposal_id ####',
+                    'suffix': '#### suffix ####',
+                    'file_name': '#### file_name ####',
+                    'file_contents': combine_nodes_into_fragment([
+                            interpret_text('#### file_contents ####')
+                            ]),
+                    'Investigation_Area_name': ian,
+                    'investigation_lidvid': '#### investigation_lidvid ####',
+                    'Observing_System': '#### Observing_System ####',
+                    'Time_Coordinates': '#### Time_Coordinates ####',
+                    'Target_Identification': '#### Target_Identification ####',
+                    'HST': '#### HST ####',
+                    }).toxml()))
 
 
 def make_browse_label(cursor, lid):
     # type: (sqlite3.Cursor, LID) -> unicode
+    # TODO implement
     return u'Ceci n\u2019est pas une \u00e9tiquette \u00e0 feuilleter.'
 
 
 def make_browse_image(archive, cursor, fits_lid, fits_file):
     # type: (Archive, sqlite3.Cursor, LID, File) -> unicode
+    # TODO implement
     filepath = browse_image_filepath(archive, fits_lid)
     ensure_dir(os.path.dirname(filepath))
     with io.open(filepath, 'w') as file:
@@ -163,6 +187,8 @@ class BrowseDatabaseRecordMaker(DatabaseRecordMaker):
             self.lid
 
     def check_results(self):
+        # TODO records need to point up to collection.  That is
+        # necessary because...
         assert exists_database_records_for_browse(self.conn, self.lid), \
             self.lid
 
@@ -193,6 +219,9 @@ class FitsDatabaseRecordMaker(DatabaseRecordMaker):
             print 'Inserted', self.lid
 
 
+VERIFY = False
+
+
 class FitsLabelMaker(LabelMaker):
     def __init__(self, archive, conn, lid, file):
         # type: (Archive, sqlite3.Connection, LID, unicode) -> None
@@ -204,8 +233,10 @@ class FitsLabelMaker(LabelMaker):
         assert exists_database_records_for_fits(self.conn, self.lid), self.lid
 
     def check_results(self):
-        assert os.path.isfile(label_filepath(self.archive, self.lid))
-        # assert verify
+        fp = label_filepath(self.archive, self.lid)
+        assert os.path.isfile(fp)
+        if VERIFY:
+            verify_label_or_raise_fp(fp)
 
     def make(self):
         with closing(self.conn.cursor()) as cursor:
@@ -226,8 +257,10 @@ class BrowseLabelMaker(LabelMaker):
             self.lid
 
     def check_results(self):
-        assert os.path.isfile(label_filepath(self.archive, self.lid))
-        # assert verify
+        fp = label_filepath(self.archive, self.lid)
+        assert os.path.isfile(fp)
+        if VERIFY:
+            verify_label_or_raise_fp(fp)
 
     def make(self):
         with closing(self.conn.cursor()) as cursor:
@@ -372,11 +405,13 @@ def make_bundle_label(conn, bundle_lid):
 
 def pre_complete_archive(archive):
     # type: (Archive) -> None
+    # TODO Interesting idea, but is used nowhere.  Figure this out.
     pass
 
 
 def post_complete_archive(archive):
     # type: (Archive) -> None
+    # TODO Interesting idea, but is used nowhere.  Figure this out.
     pass
 
 

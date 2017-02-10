@@ -122,11 +122,11 @@ def interpret_document_template(template):
                     param = dictionary[param_name]
                     if type(param) in [str, unicode]:
                         elmt = doc.createTextNode(param)
-                        assert isinstance(elmt, xml.dom.Node)
+                        assert isinstance(elmt, xml.dom.Node), param_name
                         stack.append(elmt)
                     elif type(param) in [int, float]:
                         elmt = doc.createTextNode(str(param))
-                        assert isinstance(elmt, xml.dom.Node)
+                        assert isinstance(elmt, xml.dom.Node), param_name
                         stack.append(elmt)
                     else:
                         assert _is_function(param), \
@@ -135,9 +135,9 @@ def interpret_document_template(template):
                         elmt = param(doc)
                         if isinstance(elmt, list):
                             for e in elmt:
-                                assert isinstance(e, xml.dom.Node)
+                                assert isinstance(e, xml.dom.Node), param_name
                         else:
-                            assert isinstance(elmt, xml.dom.Node)
+                            assert isinstance(elmt, xml.dom.Node), param_name
                         stack.append(elmt)
                 elif name == 'FRAGMENT':
                     param_name = attrs['name']
@@ -146,9 +146,9 @@ def interpret_document_template(template):
                         ('%s is type %s; should be function' %
                          (param_name, type(param)))
                     elmts = param(doc)
-                    assert isinstance(elmts, list)
+                    assert isinstance(elmts, list), param_name
                     for elmt in elmts:
-                        assert isinstance(elmt, xml.dom.Node)
+                        assert isinstance(elmt, xml.dom.Node), param_name
                     stack.append(elmts)
                 else:
                     elmt = doc.createElement(name)

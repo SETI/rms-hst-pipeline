@@ -5,6 +5,7 @@ programs.
 :func:`verify_label_or_raise` is the main function used for validating
 PDS4 labels.
 """
+from contextlib import closing
 import os
 import subprocess
 import tempfile
@@ -190,6 +191,13 @@ def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
         return ('\n'.join([f.toxml() for f in failures])).replace('\n', '\\n')
     else:
         return None
+
+
+def verify_label_or_raise_fp(filepath):
+    # type: (str) -> None
+    with closing(open(filepath, 'r')) as f:
+        label = f.read()
+    verify_label_or_raise(label)
 
 
 def verify_label_or_raise(label):

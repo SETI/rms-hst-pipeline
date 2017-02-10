@@ -74,18 +74,39 @@ def exists_database_records_for_fits(conn, lid):
             return False
 
 
+def ensure_collections_table(cursor):
+    # type: (sqlite3.Cursor) -> None
+    cursor.execute("""CREATE TABLE IF NOT EXISTS collections (
+                      lid VARCHAR PRIMARY KEY NOT NULL);""")
+
+
+def ensure_products_table(cursor):
+    # type: (sqlite3.Cursor) -> None
+    cursor.execute("""CREATE TABLE IF NOT EXISTS products (
+                      lid VARCHAR PRIMARY KEY NOT NULL,
+                      collection VARCHAR NOT NULL,
+                      product_type VARCHAR NOT NULL,
+                      FOREIGN KEY(collection) REFERENCES collections(lid));""")
+
+
+def ensure_fits_products_table(cursor):
+    # type: (sqlite3.Cursor) -> None
+    cursor.execute("""CREATE TABLE IF NOT EXISTS fits_products (
+                      lid VARCHAR PRIMARY KEY NOT NULL,
+                      FOREIGN KEY(lid) REFERENCES products(lid));""")
+
+
 def insert_fits_database_records(cursor, lid_obj):
     # type: (sqlite3.Cursor, LID) -> None
 
     lid = str(lid_obj)
+    collection_lid = str(lid_obj.parent_lid())
     # TODO could combine these
-    cursor.execute("""CREATE TABLE IF NOT EXISTS products (
-                      lid VARCHAR PRIMARY KEY NOT NULL,
-                      product_type VARCHAR NOT NULL);""")
-    cursor.execute("""CREATE TABLE IF NOT EXISTS fits_products (
-                      lid VARCHAR PRIMARY KEY NOT NULL,
-                      FOREIGN KEY(lid) REFERENCES products(lid));""")
-    cursor.execute("INSERT INTO products VALUES(?,'fits');", (lid,))
+    ensure_collections_table(cursor)
+    ensure_products_table(cursor)
+    ensure_fits_products_table(cursor)
+    cursor.execute("INSERT INTO products VALUES(?,?,'fits');",
+                   (lid, collection_lid))
     cursor.execute('INSERT INTO fits_products VALUES(?);', (lid,))
 
 
@@ -117,8 +138,8 @@ def insert_browse_database_records(cursor, lid_obj):
     # type: (sqlite3.Cursor, LID) -> None
 
     lid = str(lid_obj)
+    collection_lid = str(lid_obj.parent_lid())
     # TODO could combine these
-    cursor.execute("""CREATE TABLE IF NOT EXISTS products (
-                      lid VARCHAR PRIMARY KEY NOT NULL,
-                      product_type VARCHAR NOT NULL);""")
-    cursor.execute("INSERT INTO products VALUES(?,'browse');", (lid,))
+    ensure_products_table(cursor)
+    cursor.execute("INSERT INTO products VALUES(?,?,'browse');",
+                   (lid, collection_lid))
