@@ -33,13 +33,13 @@ _db_get_start_stop_times = multiple_implementations(
     '_db_get_start_stop_times',
     _db_get_start_stop_times_from_headers,
     get_placeholder_start_stop_times)
-# type: Callable[[Headers], Dict[str, str]]
+# type: Callable[[unicode, Headers], Dict[str, str]]
 
 
-def get_db_time_coordinates(headers):
-    # type: (Headers) -> NodeBuilder
+def get_db_time_coordinates(product_id, headers):
+    # type: (unicode, Headers) -> NodeBuilder
     """
     Create and return a ``<Time_Coordinates />`` XML element for the
     product.
     """
-    return time_coordinates(_db_get_start_stop_times(headers))
+    return time_coordinates(_db_get_start_stop_times(product_id, headers))

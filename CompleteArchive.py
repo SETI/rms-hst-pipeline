@@ -16,8 +16,14 @@ from typing import TYPE_CHECKING
 from pdart.db.CompleteDatabase import *
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.Product import Product
-from pdart.pds4labels.FitsProductLabelXml import make_label
+from pdart.pds4labels.FileContentsDB import *
+from pdart.pds4labels.FitsProductLabelXml import *
+from pdart.pds4labels.HstParametersDB import *
+from pdart.pds4labels.ObservingSystem import observing_system
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
+from pdart.pds4labels.TargetIdentificationDB import *
+from pdart.pds4labels.TimeCoordinatesDB import *
+from pdart.rules.Combinators import raise_verbosely
 from pdart.xml.Pretty import *
 from pdart.xml.Schema import *
 from pdart.xml.Templates import *
@@ -26,6 +32,9 @@ if TYPE_CHECKING:
     from pdart.pds4.Archive import Archive
     from pdart.pds4.File import File
     from pdart.pds4.LID import LID
+
+
+VERIFY_LABELS = True
 
 
 def ensure_dir(dir):
@@ -56,25 +65,44 @@ def browse_image_filepath(archive, fits_lid):
     return os.path.join(target_dir, basename)
 
 
-def make_fits_label(cursor, lid):
-    # type: (sqlite3.Cursor, LID) -> unicode
+def make_fits_label(conn, cursor, lid):
+    # type: (sqlite3.Connection, sqlite3.Cursor, LID) -> unicode
     info = cursor.execute('SELECT * FROM fits_products WHERE lid=?',
                           (str(lid),))
-    ian = '#### Investigation_Area_name ####'
+    # TODO Fix these
+
+    proposal_id = 12345
+    instrument = 'acs'
+    suffix = 'foo'
+    file_name = 'foo.xml'
+    headers = [{}]
+    # type: Headers
+
+    local_identifier = 'hdu_0'
+    offset = '0'
+    object_length = '1'
+    # end TODO
+
+    ian = mk_Investigation_Area_name(proposal_id)
+    ial = mk_Investigation_Area_lidvid(proposal_id)
     return unicode(pretty_print(make_label({
                     'lid': str(lid),
-                    'proposal_id': '#### proposal_id ####',
-                    'suffix': '#### suffix ####',
-                    'file_name': '#### file_name ####',
+                    'proposal_id': proposal_id,
+                    'suffix': suffix,
+                    'file_name': file_name,
                     'file_contents': combine_nodes_into_fragment([
-                            interpret_text('#### file_contents ####')
-                            ]),
+                            header_contents({
+                                    'local_identifier': local_identifier,
+                                    'offset': offset,
+                                    'object_length': object_length})
+                            ]),  # TODO
                     'Investigation_Area_name': ian,
-                    'investigation_lidvid': '#### investigation_lidvid ####',
-                    'Observing_System': '#### Observing_System ####',
-                    'Time_Coordinates': '#### Time_Coordinates ####',
-                    'Target_Identification': '#### Target_Identification ####',
-                    'HST': '#### HST ####',
+                    'investigation_lidvid': ial,
+                    'Observing_System': observing_system(instrument),
+                    'Time_Coordinates': get_db_time_coordinates(str(lid),
+                                                                headers),
+                    'Target_Identification': get_db_target(headers),
+                    'HST': get_db_hst_parameters(headers, instrument, str(lid))
                     }).toxml()))
 
 
@@ -219,9 +247,6 @@ class FitsDatabaseRecordMaker(DatabaseRecordMaker):
             print 'Inserted', self.lid
 
 
-VERIFY = False
-
-
 class FitsLabelMaker(LabelMaker):
     def __init__(self, archive, conn, lid, file):
         # type: (Archive, sqlite3.Connection, LID, unicode) -> None
@@ -235,14 +260,15 @@ class FitsLabelMaker(LabelMaker):
     def check_results(self):
         fp = label_filepath(self.archive, self.lid)
         assert os.path.isfile(fp)
-        if VERIFY:
+        if VERIFY_LABELS:
             verify_label_or_raise_fp(fp)
 
     def make(self):
         with closing(self.conn.cursor()) as cursor:
-            label = make_fits_label(cursor, self.lid)
-            write_label(label, label_filepath(self.archive, self.lid))
-            print 'Made label for', self.lid
+            label = make_fits_label(self.conn, cursor, self.lid)
+            label_fp = label_filepath(self.archive, self.lid)
+            write_label(label, label_fp)
+            print 'Made label for', self.lid, 'at', label_fp
 
 
 class BrowseLabelMaker(LabelMaker):
@@ -259,7 +285,7 @@ class BrowseLabelMaker(LabelMaker):
     def check_results(self):
         fp = label_filepath(self.archive, self.lid)
         assert os.path.isfile(fp)
-        if VERIFY:
+        if VERIFY_LABELS:
             verify_label_or_raise_fp(fp)
 
     def make(self):
@@ -592,4 +618,4 @@ def complete_archive(archive):
 
 if __name__ == '__main__':
     archive = get_any_archive()
-    complete_archive(archive)
+    raise_verbosely(lambda: complete_archive(archive))
