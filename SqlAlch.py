@@ -37,6 +37,16 @@ def open_bundle_database(bundle):
     return sqlite3.connect(bundle_database_filepath(bundle))
 
 
+def add_cards(session, product_lid, hdu_index, header):
+    # type: (Session, unicode, int, Any) -> None
+    cards = [Card(product_lid=product_lid,
+                  hdu_index=hdu_index,
+                  keyword=card.keyword,
+                  value=handle_undefined(card.value))
+             for card in header.cards if card.keyword]
+    session.bulk_save_objects(cards)
+
+
 def run():
     archive = get_any_archive()
     for bundle in archive.bundles():
@@ -61,42 +71,35 @@ def run():
             session.commit()
             if collection.prefix() == 'data':
                 for product in collection.products():
-                        file = list(product.files())[0]
-                        try:
-                            with closing(pyfits.open(
-                                    file.full_filepath())) as fits:
-                                db_fits_product = FitsProduct(
-                                    lid=str(product.lid),
-                                    collection_lid=str(collection.lid),
-                                    fits_filepath=file.full_filepath())
-                                for (n, hdu) in enumerate(fits):
-                                    fileinfo = hdu.fileinfo()
-                                    db_hdu = Hdu(product_lid=str(product.lid),
-                                                 hdu_index=n,
-                                                 hdr_loc=fileinfo['hdrLoc'],
-                                                 dat_loc=fileinfo['datLoc'],
-                                                 dat_span=fileinfo['datSpan'])
-                                    session.add(db_hdu)
-                                    header = hdu.header
-                                    for card in header.cards:
-                                        if card.keyword:
-                                            db_card = Card(
-                                                product_lid=str(product.lid),
-                                                hdu_index=n,
-                                                keyword=card.keyword,
-                                                value=handle_undefined(
-                                                    card.value))
-                                            session.add(db_card)
-                                            session.commit()
-                                session.add(db_fits_product)
-                                # session.commit()
-                        except IOError as e:
-                            db_bad_fits_file = BadFitsFile(
+                    print '    ', product.lid
+                    file = list(product.files())[0]
+                    try:
+                        with closing(pyfits.open(
+                                file.full_filepath())) as fits:
+                            db_fits_product = FitsProduct(
                                 lid=str(product.lid),
-                                filepath=file.full_filepath(),
-                                message=str(e))
-                            session.add(db_bad_fits_file)
-                        session.commit()
+                                collection_lid=str(collection.lid),
+                                fits_filepath=file.full_filepath())
+                            for (n, hdu) in enumerate(fits):
+                                fileinfo = hdu.fileinfo()
+                                db_hdu = Hdu(product_lid=str(product.lid),
+                                             hdu_index=n,
+                                             hdr_loc=fileinfo['hdrLoc'],
+                                             dat_loc=fileinfo['datLoc'],
+                                             dat_span=fileinfo['datSpan'])
+                                session.add(db_hdu)
+                                add_cards(session,
+                                          str(product.lid),
+                                          n,
+                                          hdu.header)
+                            session.add(db_fits_product)
+                    except IOError as e:
+                        db_bad_fits_file = BadFitsFile(
+                            lid=str(product.lid),
+                            filepath=file.full_filepath(),
+                            message=str(e))
+                        session.add(db_bad_fits_file)
+                    session.commit()
         print db_fp
 
 if __name__ == '__main__':
