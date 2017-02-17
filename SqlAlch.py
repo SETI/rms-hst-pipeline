@@ -10,6 +10,10 @@ import sys
 from pdart.pds4.Archives import get_any_archive
 from SqlAlchTables import *
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import sqlite3
+
 
 def handle_undefined(val):
     """Convert undefined values to None"""

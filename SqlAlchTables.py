@@ -1,8 +1,15 @@
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sqlalchemy.engine import *
+    from sqlalchemy.schema import *
+    from sqlalchemy.types import *
 
 Base = declarative_base()
+# type: Any
 
 
 class Bundle(Base):
@@ -116,5 +123,5 @@ Index('idx_cards_product_hdu_index', Card.product_lid, Card.hdu_index)
 
 if __name__ == '__main__':
     db_fp = ':memory:'
-    engine = create_engine('sqlite:///' + db_fp, echo=True)
-    Base.metadata.create_all(engine)
+    eng = create_engine('sqlite:///' + db_fp, echo=True)
+    Base.metadata.create_all(eng)
