@@ -39,7 +39,7 @@ make_label = interpret_document_template(
         <NODE name="Document_Edition" />
     </Document>
     </Product_Document>""" %
-    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
+    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, INFORMATION_MODEL_VERSION))
 # type: DocTemplate
 
 

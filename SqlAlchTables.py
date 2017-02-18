@@ -103,8 +103,8 @@ class Hdu(Base):
     hdr_loc = Column(Integer, nullable=False)
     dat_loc = Column(Integer, nullable=False)
     dat_span = Column(Integer, nullable=False)
-    product = relationship('Product', backref=backref('hdus',
-                                                      order_by=hdu_index))
+    product = relationship('FitsProduct', backref=backref('hdus',
+                                                          order_by=hdu_index))
 
 
 class Card(Base):

@@ -51,7 +51,7 @@ images obtained from HST Observing Program \
       <reference_type>inventory_has_member_product</reference_type>
     </Inventory>
   </File_Area_Inventory>
-</Product_Collection>""" % (PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
+</Product_Collection>""" % (PDS4_SHORT_VERSION, INFORMATION_MODEL_VERSION))
 # type: DocTemplate
 """
 An interpreted document template to create a collection label.

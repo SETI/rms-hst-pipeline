@@ -21,7 +21,7 @@ make_label = interpret_document_template(
     <bundle_type>Archive</bundle_type>
   </Bundle>
   <FRAGMENT name="Bundle_Member_Entries"/>
-</Product_Bundle>""" % (PDS4_SHORT_VERSION, PDS4_LONG_VERSION))
+</Product_Bundle>""" % (PDS4_SHORT_VERSION, INFORMATION_MODEL_VERSION))
 # type: DocTemplate
 """
 An interpreted document template to create a bundle label.

@@ -20,10 +20,12 @@ if TYPE_CHECKING:
 PDS_XML_SCHEMA = './xml/PDS4_PDS_%s.xsd.xml' % PDS4_SHORT_VERSION
 # type: str
 
-PDS_SCHEMATRON_SCHEMA = './xml/PDS4_PDS_%s.sch.xml' % PDS4_SHORT_VERSION
+PDS_SCHEMATRON_SCHEMA = './xml/PDS4_PDS_%s.sch.xml' % 1600 \
+    # PDS4_SHORT_VERSION -- FIXME
 # type: str
 
-HST_XML_SCHEMA = './xml/PDS4_HST_%s_0200.xsd.xml' % PDS4_SHORT_VERSION
+HST_XML_SCHEMA = './xml/PDS4_HST_%s_0200.xsd.xml' % 1600  \
+    # PDS4_SHORT_VERSION -- FIXME
 # type: str
 
 HST_SCHEMATRON_SCHEMA = './xml/PDS4_HST_%s_0200.sch.xml' % PDS4_SHORT_VERSION
