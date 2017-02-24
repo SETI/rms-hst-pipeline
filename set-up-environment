@@ -13,6 +13,9 @@ conda create --name pdart pep8 pil pip psutil pyparsing pytest \
     sphinx sqlalchemy
 source activate pdart
 
+# for debugging
+conda install -c asmeurer pudb=2015.3
+
 # We install pyfits *before* scipy because it uses an earlier version
 # of numpy.  It doesn't complain if its numpy is upgraded; scipy
 # *does* complain if its version of numpy is downgraded.

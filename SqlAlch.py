@@ -59,14 +59,16 @@ def run():
         Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
         session = Session()
-        db_bundle = Bundle(lid=str(bundle.lid))
+        db_bundle = Bundle(lid=str(bundle.lid),
+                           proposal_id=bundle.proposal_id())
         session.add(db_bundle)
         session.commit()
         for collection in bundle.collections():
             db_collection = Collection(lid=str(collection.lid),
                                        bundle_lid=str(bundle.lid),
                                        prefix=collection.prefix(),
-                                       suffix=collection.suffix())
+                                       suffix=collection.suffix(),
+                                       instrument=collection.instrument())
             session.add(db_collection)
             session.commit()
             if collection.prefix() == 'data':

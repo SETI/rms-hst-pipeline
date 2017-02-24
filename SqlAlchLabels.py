@@ -1,21 +1,22 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from typing import cast, TYPE_CHECKING
 
 from pdart.pds4.Archives import get_any_archive
 import pdart.pds4.Bundle
 from pdart.pds4.LID import LID
+from pdart.pds4labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE
 from pdart.xml.Pds4Version import *
 from pdart.xml.Pretty import pretty_print
 from pdart.xml.Schema import verify_label_or_raise
 from pdart.xml.Templates import combine_nodes_into_fragment, \
     interpret_document_template, interpret_template
 
-from SqlAlchTables import Bundle, Collection, Hdu, Product
+from SqlAlchTables import Bundle, Card, Collection, Hdu, lookup_card, Product
 from SqlAlch import bundle_database_filepath
 
-from typing import Any, TYPE_CHECKING
-
 if TYPE_CHECKING:
+    from typing import Any
     from pdart.xml.Templates \
         import DocTemplate, NodeBuilder, NodeBuilderTemplate
     from sqlalchemy.engine import *
@@ -52,12 +53,116 @@ def make_product_observational_label(product):
     # type: (Product) -> str
     label = _product_observational_template({
             'Identification_Area': make_identification_area(product),
-            'Observation_Area': make_observation_area(
-                product.collection.bundle),
+            'Observation_Area': make_observation_area(product.collection),
             'File_Area_Observational': make_file_area_observational(product)
             }).toxml()
-    return pretty_print(label)
+    try:
+        pretty = pretty_print(label)
+    except:
+        print label
+        raise
+    return pretty
 
+
+##############################
+
+_array_template = interpret_template(
+    """<Array>
+<NODE name="offset"/>
+<axes>1</axes>
+<axis_index_order>Last Index Fastest</axis_index_order>
+<NODE name="Element_Array" />
+<FRAGMENT name="Axis_Arrays" />
+</Array>""")
+# type: NodeBuilderTemplate
+
+
+def make_array(hdu):
+    # type: (Hdu) -> NodeBuilder
+    offset = cast(unicode, hdu.dat_loc)
+    return _array_template({
+            'offset': make_offset(offset),
+            'Element_Array': make_element_array(hdu),
+            'Axis_Arrays': _make_axis_arrays(hdu, 1)
+            })
+
+##############################
+
+_array_2d_image_template = interpret_template("""<Array_2D_Image>
+<NODE name="offset" />
+<axes>2</axes>
+<axis_index_order>Last Index Fastest</axis_index_order>
+<NODE name="Element_Array" />
+<FRAGMENT name="Axis_Arrays" />
+</Array_2D_Image>""")
+
+
+def make_array_2d_image(hdu):
+    # type: (Hdu) -> NodeBuilder
+    offset = cast(unicode, hdu.dat_loc)
+    return _array_2d_image_template({
+            'offset': make_offset(offset),
+            'Element_Array': make_element_array(hdu),
+            'Axis_Arrays': _make_axis_arrays(hdu, 2)
+            })
+
+##############################
+
+_axis_array_template = interpret_template(
+    """<Axis_Array>
+<axis_name><NODE name="axis_name" /></axis_name>
+<elements><NODE name="elements"/></elements>
+<sequence_number><NODE name="sequence_number"/></sequence_number>
+</Axis_Array>"""
+)
+
+
+def make_axis_array(hdu, axis_index):
+    # type: (Hdu, int) -> NodeBuilder
+    return _axis_array_template({
+            'axis_name': AXIS_NAME_TABLE[axis_index],
+            'elements': str(lookup_card(hdu, 'NAXIS%d' % axis_index)),
+            'sequence_number': str(axis_index)
+            })
+
+##############################
+
+# TODO this creates a fragment, not an element.  is the break in
+# symmetry proper here?
+
+
+def _make_axis_arrays(hdu, axes):
+    # type (Hdu, axes) -> FragmentBuilder
+    return combine_nodes_into_fragment(
+        [make_axis_array(hdu, i + 1) for i in range(0, axes)]
+        )
+
+##############################
+
+_data_type_template = interpret_template(
+    """<data_type><NODE name="text"/></data_type>"""
+)
+
+
+def make_data_type(text):
+    # type: (unicode) -> NodeBuilder
+    return _data_type_template({
+            'text': text
+            })
+
+##############################
+
+_element_array_template = interpret_template(
+    """<Element_Array><NODE name="data_type"/></Element_Array>"""
+)
+
+
+def make_element_array(hdu):
+    # type: (Hdu) -> NodeBuilder
+    data_type = BITPIX_TABLE[int(lookup_card(hdu, 'BITPIX'))]
+    return _element_array_template({
+            'data_type': make_data_type(data_type)
+            })
 
 ##############################
 
@@ -74,13 +179,15 @@ _header_template = interpret_template(
 
 def make_header(hdu):
     # type: (Hdu) -> NodeBuilder
+    hdu_index = cast(int, hdu.hdu_index)
+    local_identifier = 'hdu_%d' % hdu_index
+    offset = cast(unicode, hdu.hdr_loc)
     return _header_template({
-            'local_identifier': make_local_identifier('hdu_0'),  # TODO
-            'offset': make_offset('0'),  # TODO
-            'object_length': make_object_length('100'),  # TODO
-            'parsing_standard_id': make_parsing_standard_id(
-                'FITS 3.0'),  # TODO
-            'description': make_description('Global FITS Header')  # TODO
+            'local_identifier': make_local_identifier(local_identifier),
+            'offset': make_offset(offset),
+            'object_length': make_object_length(hdu.dat_loc - hdu.hdr_loc),
+            'parsing_standard_id': make_parsing_standard_id('FITS 3.0'),
+            'description': make_description('Global FITS Header')
             })
 
 ##############################
@@ -145,12 +252,13 @@ _observation_area_template = interpret_template(
 # type: NodeBuilderTemplate
 
 
-def make_observation_area(bundle):
-    # type: (Bundle) -> NodeBuilder
+def make_observation_area(collection):
+    # type: (Collection) -> NodeBuilder
+    bundle = collection.bundle
     return _observation_area_template({
             'Time_Coordinates': make_time_coordinates(),
             'Investigation_Area': make_investigation_area(bundle),
-            'Observing_System': make_observing_system(bundle),
+            'Observing_System': make_observing_system(collection),
             'Target_Identification': make_target_identification()
             })
 
@@ -224,18 +332,52 @@ def make_object_length(text):
 
 _file_area_observational_template = interpret_template(
     """<File_Area_Observational><NODE name="File" />
-    <NODE name="Header"/>
+<FRAGMENT name="hdu_content_fragment"/>
     </File_Area_Observational>""")
 # type: NodeBuilderTemplate
 
 
 def make_file_area_observational(product):
     # type: (Product) -> NodeBuilder
+    hdu_content_nodes = []
+    # type: List[NodeBuilder]
+    for hdu in product.hdus:
+        hdu_content_nodes.extend(_make_hdu_content_nodes(hdu))
     return _file_area_observational_template({
-            'File': make_file('foo_bar.fits'),  # TODO
-            'Header': make_header(product.hdus[0])  # TODO
+            'File': make_file(product.fits_filepath),
+            'hdu_content_fragment': combine_nodes_into_fragment(
+                hdu_content_nodes)
             })
 
+
+def _make_hdu_content_nodes(hdu):
+    # type: (Hdu) -> List[NodeBuilder]
+    header_node = make_header(hdu)
+    if 0 + hdu.dat_span:
+        data_node = _make_hdu_data_node(hdu)
+        return [header_node, data_node]
+    else:
+        return [header_node]
+
+
+def _make_hdu_data_node(hdu):
+    # type: (Hdu) -> NodeBuilder
+    axes = int(lookup_card(hdu, 'NAXIS'))
+    assert axes in [1, 2], ('unexpected number of axes = %d' % axes)
+    if axes == 1:
+        return _make_hdu_1d_data_node(hdu)
+    elif axes == 2:
+        return _make_hdu_2d_data_node(hdu)
+
+
+def _make_hdu_1d_data_node(hdu):
+    # type: (Hdu) -> NodeBuilder
+    return make_array(hdu)
+
+
+def _make_hdu_2d_data_node(hdu):
+    # type: (Hdu) -> NodeBuilder
+    return make_array_2d_image(hdu)
 
 ##############################
 
@@ -287,15 +429,9 @@ _internal_reference_template = interpret_template(
 # type: NodeBuilderTemplate
 
 
-def make_internal_reference(bundle):
-    # type: (Bundle) -> NodeBuilder
-    proposal_id = 0  # TODO
-    text = 'urn:nasa:pds:context:investigation:investigation.hst_%d::1.0' % \
-        proposal_id
-    return _internal_reference_template({
-            'lidvid_reference': make_lidvid_reference(text),
-            'reference_type': make_reference_type('data_to_investigation')
-            })
+def make_internal_reference(d):
+    # type: (Dict[str, Any]) -> NodeBuilder
+    return _internal_reference_template(d)
 
 ##############################
 
@@ -310,14 +446,33 @@ _investigation_area_template = interpret_template(
 
 def make_investigation_area(bundle):
     # type: (Bundle) -> NodeBuilder
-    proposal_id = 0  # TODO
+    proposal_id = cast(int, bundle.proposal_id)
+    text = 'urn:nasa:pds:context:investigation:investigation.hst_%d::1.0' % \
+        proposal_id
+    internal_ref = {
+        'lidvid_reference': make_lidvid_reference(text),
+        'reference_type': make_reference_type('data_to_investigation')
+        }
     return _investigation_area_template({
             'name': make_name('HST Observing program %d' %
-                              proposal_id),  # TODO
-            'type': make_type('Individual Investigation'),  # TODO
-            'Internal_Reference': make_internal_reference(bundle),
+                              proposal_id),
+            'type': make_type('Individual Investigation'),
+            'Internal_Reference': make_internal_reference(internal_ref),
             })
 
+
+##############################
+
+_lid_reference_template = interpret_template(
+    """<lid_reference><NODE name="text" /></lid_reference>""")
+# type: NodeBuilderTemplate
+
+
+def make_lid_reference(text):
+    # type: (unicode) -> NodeBuilder
+    return _lid_reference_template({
+            'text': text
+            })
 
 ##############################
 
@@ -336,38 +491,78 @@ def make_lidvid_reference(text):
 
 _observing_system_component_template = interpret_template(
     """<Observing_System_Component>
-    <NODE name="name"/><NODE name="type"/>
-    </Observing_System_Component>""")
+<name><NODE name="name"/></name>
+<type><NODE name="type"/></type>
+<NODE name="Internal_Reference" />
+</Observing_System_Component>"""
+)
+
+
+def make_observing_system_component(hst_or_inst):
+    if hst_or_inst == 'hst':
+        ty = 'Spacecraft'
+        ref_type = 'is_instrument_host'
+    else:
+        ty = 'Instrument'
+        ref_type = 'is_instrument'
+    d = {
+        # TODO The name is wrong, but it works
+        'lidvid_reference': make_lid_reference(
+            _hst_or_instrument_lid[hst_or_inst]),
+        'reference_type': make_reference_type(ref_type)
+        }
+    return _observing_system_component_template({
+            'name': _hst_or_instrument_name[hst_or_inst],
+            'type': ty,
+            'Internal_Reference': make_internal_reference(d)
+            })
 # type: NodeBuilderTemplate
 
+_hst_or_instrument_lid = {
+    'hst': 'urn:nasa:pds:context:instrument_host:spacecraft.hst',
+    'acs': 'urn:nasa:pds:context:instrument:insthost.acs.acs',
+    'wfc3': 'urn:nasa:pds:context:instrument:insthost.acs.wfc3',
+    'wfpc2': 'urn:nasa:pds:context:instrument:insthost.acs.wfpc2'
+    }
+# type: Dict[str, str]
 
-def make_observing_system_component():
-    # type: () -> NodeBuilder
-    return _observing_system_component_template({
-            'name': make_name('Hubble Space Telescope'),  # TODO
-            'type': make_type('Spacecraft')  # TODO
-            })
+_hst_or_instrument_name = {
+    'hst': 'Hubble Space Telescope',
+    'acs': 'Advanced Camera for Surveys',
+    # 'abbreviation': 'urn:nasa:pds:context:instrument_host:inthost.acs'
+    'wfc3': 'Wide Field Camera 3',
+    # 'abbreviation': 'wfc3'
+    'wfpc2': 'Wide-Field Planetary Camera 2',
+    # 'abbreviation': 'wfpc2'
+    }
+# type: Dict[str, str]
 
 ##############################
 
 _observing_system_template = interpret_template(
     """<Observing_System>
-    <NODE name="name"/>
+    <name><NODE name="name"/></name>
     <FRAGMENT name="Observing_System_Component" />
     </Observing_System>""")
 # type: NodeBuilderTemplate
 
 
-def make_observing_system(bundle):
-    # type: (Bundle) -> NodeBuilder
-    # TODO Generalize this
+def make_observing_system(collection):
+    # type: (Collection) -> NodeBuilder
+    inst = cast(str, collection.instrument)
     return _observing_system_template({
-            'name': make_name('FOO'),  # TODO
+            'name': _observing_system_names[inst],
             'Observing_System_Component': combine_nodes_into_fragment([
-                    make_observing_system_component(),
-                    make_observing_system_component()
+                    make_observing_system_component('hst'),
+                    make_observing_system_component(inst)
                     ])
             })
+
+_observing_system_names = {
+    'acs': 'Hubble Space Telescope Advanced Camera for Surveys',
+    'wfc3': 'Hubble Space Telescope Wide Field Camera 3',
+    'wfpc2': 'Hubble Space Telescope Wide-Field Planetary Camera 2'
+}
 
 ##############################
 
@@ -408,10 +603,10 @@ _start_date_time_template = interpret_template(
 # type: NodeBuilderTemplate
 
 
-def make_start_date_time():
-    # type: () -> NodeBuilder
+def make_start_date_time(text):
+    # type: (unicode) -> NodeBuilder
     return _start_date_time_template({
-            'text': '2001-01-01Z'  # TODO
+            'text': text
             })
 
 ##############################
@@ -421,10 +616,10 @@ _stop_date_time_template = interpret_template(
 # type: NodeBuilderTemplate
 
 
-def make_stop_date_time():
-    # type: () -> NodeBuilder
+def make_stop_date_time(text):
+    # type: (unicode) -> NodeBuilder
     return _stop_date_time_template({
-            'text': '2001-01-01Z'  # TODO
+            'text': text
             })
 
 ##############################
@@ -457,10 +652,10 @@ _time_coordinates_template = interpret_template(
 
 def make_time_coordinates():
     # type: () -> NodeBuilder
-    text = '2001-01-01'  # TODO
+    text = '2001-01-01Z'  # TODO
     return _time_coordinates_template({
-            'start_date_time': make_start_date_time(),
-            'stop_date_time': make_stop_date_time()
+            'start_date_time': make_start_date_time(text),
+            'stop_date_time': make_stop_date_time(text)
             })
 
 
@@ -474,8 +669,7 @@ _title_template = interpret_template(
 def make_title(collection):
     # type: (Collection) -> NodeBuilder
     bundle = collection.bundle
-    # TODO
-    proposal_id = 0  # TODO
+    proposal_id = cast(int, bundle.proposal_id)
     title = ('This product contains the %s image obtained by ' +
              'HST Observing Program %d') % (str(collection.suffix).upper(),
                                             proposal_id)

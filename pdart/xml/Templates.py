@@ -261,7 +261,11 @@ def interpret_template(template):
                     node = doc.createTextNode(content)
                     stack[-1].appendChild(node)
 
-            xml.sax.parseString(template, Builder())
+            try:
+                xml.sax.parseString(template, Builder())
+            except:
+                print 'malformed template:', template
+                raise
             return stack[-1]
         return builder
     return parameterizer

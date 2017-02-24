@@ -16,7 +16,8 @@ class Bundle(Base):
     __tablename__ = 'bundles'
 
     lid = Column(String, primary_key=True, nullable=False)
-    # full_filepath, label_filepath, proposal_id
+    proposal_id = Column(Integer, nullable=False)
+    # full_filepath, label_filepath
 
 
 class BadFitsFile(Base):
@@ -37,6 +38,7 @@ class Collection(Base):
                                                     order_by=lid))
     prefix = Column(String, nullable=False)
     suffix = Column(String, nullable=False)
+    instrument = Column(String, nullable=False)
     # full_filepath, label_filepath, instrument,
     # inventory_name, inventory_filepath
 
@@ -119,6 +121,14 @@ class Card(Base):
                                               order_by=id))
 
 Index('idx_cards_product_hdu_index', Card.product_lid, Card.hdu_index)
+
+
+def lookup_card(hdu, keyword):
+    matching_cards = [card for card in hdu.cards if card.keyword == keyword]
+    if matching_cards:
+        return '' + matching_cards[0].value
+    else:
+        return None
 
 
 if __name__ == '__main__':
