@@ -8,6 +8,8 @@ from sqlalchemy.orm import *
 import sys
 
 from pdart.pds4.Archives import get_any_archive
+from pdart.xml.Schema import verify_label_or_raise_fp
+import SqlAlchLabels
 from SqlAlchTables import *
 
 from typing import TYPE_CHECKING
@@ -25,6 +27,9 @@ def handle_undefined(val):
 
 _NEW_DATABASE_NAME = 'sqlalch-database.db'
 # type: str
+
+VERIFY = False
+# type: bool
 
 
 def bundle_database_filepath(bundle):
@@ -60,19 +65,28 @@ def run():
         Session = sessionmaker(bind=engine)
         session = Session()
         db_bundle = Bundle(lid=str(bundle.lid),
-                           proposal_id=bundle.proposal_id())
+                           proposal_id=bundle.proposal_id(),
+                           archive_path=os.path.abspath(archive.root),
+                           full_filepath=bundle.absolute_filepath(),
+                           label_filepath=bundle.label_filepath())
         session.add(db_bundle)
         session.commit()
         for collection in bundle.collections():
-            db_collection = Collection(lid=str(collection.lid),
-                                       bundle_lid=str(bundle.lid),
-                                       prefix=collection.prefix(),
-                                       suffix=collection.suffix(),
-                                       instrument=collection.instrument())
+            db_collection = Collection(
+                lid=str(collection.lid),
+                bundle_lid=str(bundle.lid),
+                prefix=collection.prefix(),
+                suffix=collection.suffix(),
+                instrument=collection.instrument(),
+                full_filepath=collection.absolute_filepath(),
+                label_filepath=collection.label_filepath(),
+                inventory_name=collection.inventory_name(),
+                inventory_filepath=collection.inventory_filepath())
             session.add(db_collection)
             session.commit()
             if collection.prefix() == 'data':
                 for product in collection.products():
+                    db_fits_product = None
                     print '    ', product.lid
                     file = list(product.files())[0]
                     try:
@@ -81,7 +95,9 @@ def run():
                             db_fits_product = FitsProduct(
                                 lid=str(product.lid),
                                 collection_lid=str(collection.lid),
-                                fits_filepath=file.full_filepath())
+                                fits_filepath=file.full_filepath(),
+                                label_filepath=product.label_filepath(),
+                                visit=product.visit())
                             for (n, hdu) in enumerate(fits):
                                 fileinfo = hdu.fileinfo()
                                 db_hdu = Hdu(product_lid=str(product.lid),
@@ -102,6 +118,21 @@ def run():
                             message=str(e))
                         session.add(db_bad_fits_file)
                     session.commit()
+
+                    if db_fits_product:
+                        label = SqlAlchLabels.make_product_observational_label(
+                            db_fits_product)
+                        label_filepath = db_fits_product.label_filepath
+                        with open(label_filepath, 'w') as f:
+                            f.write(label)
+                        try:
+                            if VERIFY:
+                                verify_label_or_raise_fp(label_filepath)
+                            print '    ', 'label:', \
+                                os.path.relpath(label_filepath, archive.root)
+                        except:
+                            print '#### failed on', label_filepath
+                            raise
         print db_fp
 
 if __name__ == '__main__':

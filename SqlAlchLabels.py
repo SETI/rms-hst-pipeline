@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from typing import cast, TYPE_CHECKING
 
 from pdart.pds4.Archives import get_any_archive
-import pdart.pds4.Bundle
+import pdart.pds4.Product
 from pdart.pds4.LID import LID
 from pdart.pds4labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE
 from pdart.xml.Pds4Version import *
@@ -13,7 +13,7 @@ from pdart.xml.Templates import combine_nodes_into_fragment, \
     interpret_document_template, interpret_template
 
 from SqlAlchTables import Bundle, Card, Collection, Hdu, lookup_card, Product
-from SqlAlch import bundle_database_filepath
+import SqlAlch
 
 if TYPE_CHECKING:
     from typing import Any
@@ -23,9 +23,6 @@ if TYPE_CHECKING:
     from sqlalchemy.schema import *
     from sqlalchemy.types import *
 
-
-BUNDLE_LID = 'urn:nasa:pds:hst_14334'
-# type: str
 
 PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_trl:icwy08q3q_trl'
 # type: str
@@ -55,6 +52,70 @@ def make_product_observational_label(product):
             'Identification_Area': make_identification_area(product),
             'Observation_Area': make_observation_area(product.collection),
             'File_Area_Observational': make_file_area_observational(product)
+            }).toxml()
+    try:
+        pretty = pretty_print(label)
+    except:
+        print label
+        raise
+    return pretty
+
+
+##############################
+
+_product_collection_template = interpret_document_template(
+    """<?xml version="1.0"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.sch"
+            schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
+                       xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                           http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.xsd">
+<NODE name="Identification_Area" />
+<NODE name="Collection" />
+<NODE name="File_Area_Inventory" />
+</Product_Collection>
+""")
+# type: DocTemplate
+
+
+def make_product_collection_label(collection):
+    # type: (Collection) -> str
+    label = _product_collection_template({
+            'Identification_Area': '<Identification_Area/>',  # TODO
+            'Collection': make_collection(collection),
+            'File_Area_Inventory': make_file_area_inventory(collection)
+            }).toxml()
+    try:
+        pretty = pretty_print(label)
+    except:
+        print label
+        raise
+    return pretty
+
+
+##############################
+
+_product_bundle_template = interpret_document_template(
+    """<?xml version="1.0"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.sch"
+            schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Bundle xmlns="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
+                       xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                           http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.xsd">
+</Product_Bundle>
+""")
+# type: DocTemplate
+
+
+def make_product_bundle_label(product):
+    # type: (Product) -> str
+    label = _product_bundle_template({
             }).toxml()
     try:
         pretty = pretty_print(label)
@@ -139,6 +200,32 @@ def _make_axis_arrays(hdu, axes):
 
 ##############################
 
+_collection_template = interpret_template(
+    """<Collection><NODE name="collection_type"/></Collection>"""
+)
+
+
+def make_collection(collection):
+    # type: (Collection) -> NodeBuilder
+    return _collection_template({
+            'collection_type': make_collection_type('TODO')  # TODO
+            })
+
+##############################
+
+_collection_type_template = interpret_template(
+    """<collection_type><NODE name="text"/></collection_type>"""
+)
+
+
+def make_collection_type(text):
+    # type: (unicode) -> NodeBuilder
+    return _collection_type_template({
+            'text': text
+            })
+
+##############################
+
 _data_type_template = interpret_template(
     """<data_type><NODE name="text"/></data_type>"""
 )
@@ -147,6 +234,19 @@ _data_type_template = interpret_template(
 def make_data_type(text):
     # type: (unicode) -> NodeBuilder
     return _data_type_template({
+            'text': text
+            })
+
+##############################
+
+_description_template = interpret_template(
+    """<description><NODE name="text"/></description>""")
+# type: NodeBuilderTemplate
+
+
+def make_description(text):
+    # type: (unicode) -> NodeBuilder
+    return _description_template({
             'text': text
             })
 
@@ -304,19 +404,6 @@ def make_local_identifier(text):
 
 ##############################
 
-_description_template = interpret_template(
-    """<description><NODE name="text"/></description>""")
-# type: NodeBuilderTemplate
-
-
-def make_description(text):
-    # type: (unicode) -> NodeBuilder
-    return _description_template({
-            'text': text
-            })
-
-##############################
-
 _object_length_template = interpret_template(
     """<object_length unit="byte"><NODE name="text"/></object_length>""")
 # type: NodeBuilderTemplate
@@ -327,6 +414,18 @@ def make_object_length(text):
     return _object_length_template({
             'text': text
             })
+
+##############################
+
+_file_area_inventory_template = interpret_template(
+    """<File_Area_Inventory></File_Area_Inventory>""")
+# type: NodeBuilderTemplate
+
+
+def make_file_area_inventory(product):
+    # type: (Collection) -> NodeBuilder
+    return _file_area_inventory_template({})
+
 
 ##############################
 
@@ -704,15 +803,37 @@ def make_version_id():
 
 if __name__ == '__main__':
     archive = get_any_archive()
-    bundle = pdart.pds4.Bundle.Bundle(archive, LID(BUNDLE_LID))
-    db_fp = bundle_database_filepath(bundle)
+    product = pdart.pds4.Product.Product(archive, LID(PRODUCT_LID))
+    collection = product.collection()
+    bundle = product.bundle()
+    db_fp = SqlAlch.bundle_database_filepath(bundle)
     print db_fp
     engine = create_engine('sqlite:///' + db_fp)
 
     Session = sessionmaker(bind=engine)
     session = Session()
-    product = session.query(Product).filter_by(lid=PRODUCT_LID).first()
 
-    label = make_product_observational_label(product)
-    print label
-    verify_label_or_raise(label)
+    if False:
+        db_product = session.query(Product).filter_by(lid=PRODUCT_LID).first()
+
+        label = make_product_observational_label(db_product)
+        print label
+        verify_label_or_raise(label)
+
+    if True:
+        COLLECTION_LID = str(collection.lid)
+        db_collection = \
+            session.query(Collection).filter_by(lid=COLLECTION_LID).first()
+
+        label = make_product_collection_label(db_collection)
+        print label
+        verify_label_or_raise(label)
+
+    if False:
+        BUNDLE_LID = str(bundle.lid)
+        db_bundle = \
+            session.query(Bundle).filter_by(lid=BUNDLE_LID).first()
+
+        label = make_product_bundle_label(db_bundle)
+        print label
+        verify_label_or_raise(label)

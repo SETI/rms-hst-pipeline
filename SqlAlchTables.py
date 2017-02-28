@@ -17,7 +17,9 @@ class Bundle(Base):
 
     lid = Column(String, primary_key=True, nullable=False)
     proposal_id = Column(Integer, nullable=False)
-    # full_filepath, label_filepath
+    archive_path = Column(String, nullable=False)
+    full_filepath = Column(String, nullable=False)
+    label_filepath = Column(String, nullable=False)
 
 
 class BadFitsFile(Base):
@@ -39,8 +41,10 @@ class Collection(Base):
     prefix = Column(String, nullable=False)
     suffix = Column(String, nullable=False)
     instrument = Column(String, nullable=False)
-    # full_filepath, label_filepath, instrument,
-    # inventory_name, inventory_filepath
+    full_filepath = Column(String, nullable=False)
+    label_filepath = Column(String, nullable=False)
+    inventory_name = Column(String, nullable=False)
+    inventory_filepath = Column(String, nullable=False)
 
 Index('idx_collections_prefix_suffix', Collection.prefix, Collection.suffix)
 
@@ -51,7 +55,7 @@ class Product(Base):
     lid = Column(String, primary_key=True, nullable=False)
     collection_lid = Column(String, ForeignKey('collections.lid'),
                             nullable=False, index=True)
-
+    label_filepath = Column(String, nullable=False)
     type = Column(String(16), nullable=False)
     collection = relationship('Collection', backref=backref('products',
                                                             order_by=lid))
@@ -67,11 +71,12 @@ class FitsProduct(Product):
     product_lid = Column(String, ForeignKey('products.lid'),
                          primary_key=True, nullable=False)
     fits_filepath = Column(String, nullable=False)
+    visit = Column(String, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'fits_product',
         }
-    # full_filepath, filename, label_filepath, visit, hdu_count
+    # full_filepath, filename, hdu_count
 
 
 class BrowseProduct(Product):
