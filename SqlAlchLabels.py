@@ -23,6 +23,8 @@ if TYPE_CHECKING:
     from sqlalchemy.schema import *
     from sqlalchemy.types import *
 
+    _NB = NodeBuilder  # an abbreviation for long signatures
+
 
 PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_trl:icwy08q3q_trl'
 # type: str
@@ -48,8 +50,32 @@ _product_observational_template = interpret_document_template(
 
 def make_product_observational_label(product):
     # type: (Product) -> str
+
+    logical_identifier = make_logical_identifier(product)
+    version_id = make_version_id()
+
+    bundle = product.collection.bundle
+    proposal_id = cast(int, bundle.proposal_id)
+    text = ('This product contains the %s image obtained by ' +
+            'HST Observing Program %d') % (str(collection.suffix).upper(),
+                                           proposal_id)
+    title = make_title(text)
+
+    information_model_version = make_information_model_version()
+    product_type = str(product.type)
+    if product_type == 'fits_product':
+        text = 'Product_Observational'
+    else:
+        assert False, 'Unimplemented for ' + product_type
+    product_class = make_product_class(text)
+
     label = _product_observational_template({
-            'Identification_Area': make_identification_area(product),
+            'Identification_Area': make_identification_area(
+                logical_identifier,
+                version_id,
+                title,
+                information_model_version,
+                product_class),
             'Observation_Area': make_observation_area(product.collection),
             'File_Area_Observational': make_file_area_observational(product)
             }).toxml()
@@ -83,8 +109,20 @@ _product_collection_template = interpret_document_template(
 
 def make_product_collection_label(collection):
     # type: (Collection) -> str
+
+    logical_identifier = make_logical_identifier(collection)
+    version_id = make_version_id()
+    title = make_title('TODO')  # TODO
+    information_model_version = make_information_model_version()
+    product_class = make_product_class('TODO')  # TODO
+
     label = _product_collection_template({
-            'Identification_Area': '<Identification_Area/>',  # TODO
+            'Identification_Area': make_identification_area(
+                logical_identifier,
+                version_id,
+                title,
+                information_model_version,
+                product_class),
             'Collection': make_collection(collection),
             'File_Area_Inventory': make_file_area_inventory(collection)
             }).toxml()
@@ -208,7 +246,9 @@ _collection_template = interpret_template(
 def make_collection(collection):
     # type: (Collection) -> NodeBuilder
     return _collection_template({
-            'collection_type': make_collection_type('TODO')  # TODO
+            # TODO if this isn't constant, generalize the
+            # implementation
+            'collection_type': make_collection_type('Data')
             })
 
 ##############################
@@ -303,14 +343,22 @@ _identification_area_template = interpret_template(
 # type: NodeBuilderTemplate
 
 
-def make_identification_area(product):
-    # type: (Product) -> NodeBuilder
+def make_identification_area(logical_identifier,
+                             version_id,
+                             title,
+                             information_model_version,
+                             product_class):
+    # type: (_NB, _NB, _NB, _NB, _NB) -> _NB
+
+    # Since make_identification_area() is shared by products and
+    # collections, instead of passing a high-level object, we pass
+    # NodeBuilders for the XML components of <Identification_Area />.
     return _identification_area_template({
-            'logical_identifier': make_logical_identifier(product),
-            'version_id': make_version_id(),
-            'title': make_title(product.collection),
-            'information_model_version': make_information_model_version(),
-            'product_class': make_product_class(product)
+            'logical_identifier': logical_identifier,
+            'version_id': version_id,
+            'title': title,
+            'information_model_version': information_model_version,
+            'product_class': product_class
             })
 
 
@@ -365,66 +413,32 @@ def make_observation_area(collection):
 
 ##############################
 
-_offset_template = interpret_template(
-    """<offset unit="byte"><NODE name="text"/></offset>""")
+_field_delimiter_template = interpret_template(
+    """<field_delimiter><NODE name="text" /></field_delimiter>""")
 # type: NodeBuilderTemplate
 
 
-def make_offset(text):
+def make_field_delimiter(text):
     # type: (unicode) -> NodeBuilder
-    return _offset_template({
+    return _field_delimiter_template({
             'text': text
             })
 
 ##############################
 
-_parsing_standard_id_template = interpret_template(
-    """<parsing_standard_id><NODE name="text" /></parsing_standard_id>""")
+_file_area_inventory_template = interpret_template("""<File_Area_Inventory>
+<NODE name="File"/>
+<NODE name="Inventory"/>
+</File_Area_Inventory>""")
 # type: NodeBuilderTemplate
 
 
-def make_parsing_standard_id(text):
-    # type: (unicode) -> NodeBuilder
-    return _parsing_standard_id_template({
-            'text': text
-            })
-
-##############################
-
-_local_identifier_template = interpret_template(
-    """<local_identifier><NODE name="text"/></local_identifier>""")
-# type: NodeBuilderTemplate
-
-
-def make_local_identifier(text):
-    # type: (unicode) -> NodeBuilder
-    return _local_identifier_template({
-            'text': text
-            })
-
-##############################
-
-_object_length_template = interpret_template(
-    """<object_length unit="byte"><NODE name="text"/></object_length>""")
-# type: NodeBuilderTemplate
-
-
-def make_object_length(text):
-    # type: (unicode) -> NodeBuilder
-    return _object_length_template({
-            'text': text
-            })
-
-##############################
-
-_file_area_inventory_template = interpret_template(
-    """<File_Area_Inventory></File_Area_Inventory>""")
-# type: NodeBuilderTemplate
-
-
-def make_file_area_inventory(product):
+def make_file_area_inventory(collection):
     # type: (Collection) -> NodeBuilder
-    return _file_area_inventory_template({})
+    return _file_area_inventory_template({
+            'File': make_file(collection.inventory_name + ''),  # TODO
+            'Inventory': make_inventory(collection)
+            })
 
 
 ##############################
@@ -534,6 +548,32 @@ def make_internal_reference(d):
 
 ##############################
 
+_inventory_template = interpret_template(
+    """<Inventory>
+<NODE name="offset"/>
+<NODE name="parsing_standard_id"/>
+<NODE name="records"/>
+<NODE name="record_delimiter"/>
+<NODE name="field_delimiter"/>
+<FRAGMENT name="Record_Delimited"/>
+</Inventory>""")
+# type: NodeBuilderTemplate
+
+
+def make_inventory(collection):
+    # type: (Collection) -> NodeBuilder
+    return _inventory_template({
+            'offset': make_offset('0'),
+            'parsing_standard_id': make_parsing_standard_id('PDS DSV 1'),
+            'records': make_records('1'),
+            'record_delimiter': make_record_delimiter(
+                    'Carriage-Return Line-Feed'),
+            'field_delimiter': make_field_delimiter('Comma'),
+            'Record_Delimited': combine_nodes_into_fragment([])  # TODO
+            })
+
+##############################
+
 _investigation_area_template = interpret_template(
     """<Investigation_Area>
     <NODE name="name"/>
@@ -638,6 +678,32 @@ _hst_or_instrument_name = {
 
 ##############################
 
+_local_identifier_template = interpret_template(
+    """<local_identifier><NODE name="text"/></local_identifier>""")
+# type: NodeBuilderTemplate
+
+
+def make_local_identifier(text):
+    # type: (unicode) -> NodeBuilder
+    return _local_identifier_template({
+            'text': text
+            })
+
+##############################
+
+_object_length_template = interpret_template(
+    """<object_length unit="byte"><NODE name="text"/></object_length>""")
+# type: NodeBuilderTemplate
+
+
+def make_object_length(text):
+    # type: (unicode) -> NodeBuilder
+    return _object_length_template({
+            'text': text
+            })
+
+##############################
+
 _observing_system_template = interpret_template(
     """<Observing_System>
     <name><NODE name="name"/></name>
@@ -665,20 +731,66 @@ _observing_system_names = {
 
 ##############################
 
+_offset_template = interpret_template(
+    """<offset unit="byte"><NODE name="text"/></offset>""")
+# type: NodeBuilderTemplate
+
+
+def make_offset(text):
+    # type: (unicode) -> NodeBuilder
+    return _offset_template({
+            'text': text
+            })
+
+##############################
+
+_parsing_standard_id_template = interpret_template(
+    """<parsing_standard_id><NODE name="text" /></parsing_standard_id>""")
+# type: NodeBuilderTemplate
+
+
+def make_parsing_standard_id(text):
+    # type: (unicode) -> NodeBuilder
+    return _parsing_standard_id_template({
+            'text': text
+            })
+
+##############################
+
 _product_class_template = interpret_template(
     """<product_class><NODE name="text"/></product_class>""")
 # type: NodeBuilderTemplate
 
 
-def make_product_class(product):
-    # type: (Product) -> NodeBuilder
-    product_type = str(product.type)
-    if product_type == 'fits_product':
-        text = 'Product_Observational'
-    else:
-        assert False, 'Unimplemented for ' + product_type
-
+def make_product_class(text):
+    # type: (unicode) -> NodeBuilder
     return _product_class_template({
+            'text': text
+            })
+
+##############################
+
+_record_delimiter_template = interpret_template(
+    """<record_delimiter><NODE name="text" /></record_delimiter>""")
+# type: NodeBuilderTemplate
+
+
+def make_record_delimiter(text):
+    # type: (unicode) -> NodeBuilder
+    return _record_delimiter_template({
+            'text': text
+            })
+
+##############################
+
+_records_template = interpret_template(
+    """<records><NODE name="text" /></records>""")
+# type: NodeBuilderTemplate
+
+
+def make_records(text):
+    # type: (unicode) -> NodeBuilder
+    return _records_template({
             'text': text
             })
 
@@ -765,15 +877,10 @@ _title_template = interpret_template(
 # type: NodeBuilderTemplate
 
 
-def make_title(collection):
-    # type: (Collection) -> NodeBuilder
-    bundle = collection.bundle
-    proposal_id = cast(int, bundle.proposal_id)
-    title = ('This product contains the %s image obtained by ' +
-             'HST Observing Program %d') % (str(collection.suffix).upper(),
-                                            proposal_id)
+def make_title(text):
+    # type: (unicode) -> NodeBuilder
     return _title_template({
-            'title': title
+            'title': text
             })
 
 ##############################
@@ -813,7 +920,7 @@ if __name__ == '__main__':
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    if False:
+    if True:
         db_product = session.query(Product).filter_by(lid=PRODUCT_LID).first()
 
         label = make_product_observational_label(db_product)
