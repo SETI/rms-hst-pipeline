@@ -165,14 +165,41 @@ _product_bundle_template = interpret_document_template(
                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                        xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
                            http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.xsd">
+<NODE name="Identification_Area"/>
+<NODE name="Bundle"/>
+<FRAGMENT name="Bundle_Member_Entry"/>
 </Product_Bundle>
 """)
 # type: DocTemplate
 
 
-def make_product_bundle_label(product):
-    # type: (Product) -> str
+def make_product_bundle_label(bundle):
+    # type: (Bundle) -> str
+    logical_identifier = make_logical_identifier(bundle)
+    version_id = make_version_id()
+    title = make_title('TODO')  # TODO
+    information_model_version = make_information_model_version()
+    product_class = make_product_class('Product_Bundle')
+
+    publication_year = '2000'  # TODO
+    description = 'TODO'  # TODO
+
     label = _product_bundle_template({
+            'Identification_Area': make_identification_area(
+                logical_identifier,
+                version_id,
+                title,
+                information_model_version,
+                product_class,
+                combine_nodes_into_fragment([
+                        make_citation_information(publication_year,
+                                                  description)
+                        ])
+                ),
+            'Bundle': make_bundle(bundle),
+            'Bundle_Member_Entry': combine_nodes_into_fragment(
+                [make_bundle_member_entry(coll)
+                 for coll in bundle.collections])
             }).toxml()
     try:
         pretty = pretty_print(label)
@@ -254,6 +281,51 @@ def _make_axis_arrays(hdu, axes):
     return combine_nodes_into_fragment(
         [make_axis_array(hdu, i + 1) for i in range(0, axes)]
         )
+
+##############################
+
+_bundle_template = interpret_template(
+    """<Bundle><NODE name="bundle_type"/></Bundle>"""
+)
+
+
+def make_bundle(bundle):
+    # type: (Bundle) -> NodeBuilder
+    return _bundle_template({
+            'bundle_type': make_bundle_type(bundle)
+            })
+
+##############################
+
+_bundle_member_entry_template = interpret_template(
+    """<Bundle_Member_Entry>
+<NODE name="lid_reference" />
+<NODE name="member_status" />
+<NODE name="reference_type" />
+</Bundle_Member_Entry>"""
+)
+
+
+def make_bundle_member_entry(collection):
+    # type: (Collection) -> NodeBuilder
+    return _bundle_member_entry_template({
+            'lid_reference': make_lid_reference(unicode(collection.lid)),
+            'member_status': make_member_status('Primary'),
+            'reference_type': make_reference_type('bundle_has_data_collection')
+            })
+
+##############################
+
+_bundle_type_template = interpret_template(
+    """<bundle_type><NODE name="bundle_type"/></bundle_type>"""
+)
+
+
+def make_bundle_type(bundle):
+    # type: (Bundle) -> NodeBuilder
+    return _bundle_type_template({
+            'bundle_type': 'Archive'
+            })
 
 ##############################
 
@@ -410,6 +482,8 @@ _logical_identifier_template = interpret_template(
 
 def make_logical_identifier(product):
     # type: (Product) -> NodeBuilder
+
+    # TODO above type is wrong: it's bundle or collection or product.
     return _logical_identifier_template({
             'lid': product.lid
             })
@@ -426,6 +500,19 @@ _maximum_field_length_template = interpret_template(
 def make_maximum_field_length(text):
     # type: (unicode) -> NodeBuilder
     return _maximum_field_length_template({
+            'text': text
+            })
+
+##############################
+
+_member_status_template = interpret_template(
+    """<member_status><NODE name="text" /></member_status>""")
+# type: NodeBuilderTemplate
+
+
+def make_member_status(text):
+    # type: (unicode) -> NodeBuilder
+    return _member_status_template({
             'text': text
             })
 
@@ -1100,6 +1187,8 @@ if __name__ == '__main__':
         print label
         verify_label_or_raise(label)
 
+    # TODO Build inventory
+
     if True:
         COLLECTION_LID = str(collection.lid)
         db_collection = \
@@ -1109,7 +1198,7 @@ if __name__ == '__main__':
         print label
         verify_label_or_raise(label)
 
-    if False:
+    if True:
         BUNDLE_LID = str(bundle.lid)
         db_bundle = \
             session.query(Bundle).filter_by(lid=BUNDLE_LID).first()
