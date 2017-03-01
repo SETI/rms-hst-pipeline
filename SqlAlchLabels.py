@@ -19,7 +19,7 @@ from SqlAlchTables import Bundle, Card, Collection, Hdu, lookup_card, Product
 import SqlAlch
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Dict, Tuple
     from pdart.xml.Templates \
         import DocTemplate, FragBuilder, NodeBuilder, NodeBuilderTemplate
     from sqlalchemy.engine import *
@@ -177,7 +177,11 @@ def make_product_bundle_label(bundle):
     # type: (Bundle) -> str
     logical_identifier = make_logical_identifier(bundle)
     version_id = make_version_id()
-    title = make_title('TODO')  # TODO
+
+    proposal_id = cast(int, bundle.proposal_id)
+    text = "This bundle contains images obtained from " + \
+        "HST Observing Program %d." % proposal_id
+    title = make_title(text)
     information_model_version = make_information_model_version()
     product_class = make_product_class('Product_Bundle')
 
@@ -545,11 +549,13 @@ def make_observation_area(product):
     # type: (Product) -> NodeBuilder
     collection = product.collection
     bundle = collection.bundle
+    targname = lookup_card(product.hdus[0], 'TARGNAME')
+    print '####', targname
     return _observation_area_template({
             'Time_Coordinates': make_time_coordinates(product),
             'Investigation_Area': make_investigation_area(bundle),
             'Observing_System': make_observing_system(collection),
-            'Target_Identification': make_target_identification()
+            'Target_Identification': make_target_identification(targname)
             })
 
 
@@ -1090,16 +1096,47 @@ _target_identification_template = interpret_template(
     """<Target_Identification>
 <NODE name="name"/>
 <NODE name="type"/>
+<NODE name="description"/>
 </Target_Identification>""")
 # type: NodeBuilderTemplate
 
 
-def make_target_identification():
-    # type: () -> NodeBuilder
+def make_target_identification(targname):
+    # type: (unicode) -> NodeBuilder
+    for prefix, (name, type) in _approximate_target_table.iteritems():
+        if targname.startswith(prefix):
+            description = 'The %s %s' % (type.lower(), name)
+            return _target_identification_template({
+                    'name': make_name(name),
+                    'type': make_type(type),
+                    'description': make_description(description)
+                    })
+
+    # TODO remove dummy catch-all
     return _target_identification_template({
-            'name': make_name('Magrathea'),  # TODO
-            'type': make_type('Planet'),  # TODO
+            'name': make_name('Magrathea'),
+            'type': make_type('Planet'),
+            'description': make_description('The planet Magrathea')
             })
+
+
+_approximate_target_table = {
+    'JUP': ('Jupiter', 'Planet'),
+    'SAT': ('Saturn', 'Planet'),
+    'URA': ('Uranus', 'Planet'),
+    'NEP': ('Neptune', 'Planet'),
+    'PLU': ('Pluto', 'Dwarf Planet'),
+    'PLCH': ('Pluto', 'Dwarf Planet'),
+    'IO': ('Io', 'Satellite'),
+    'EUR': ('Europa', 'Satellite'),
+    'GAN': ('Ganymede', 'Satellite'),
+    'CALL': ('Callisto', 'Satellite'),
+    'TITAN': ('Titan', 'Satellite'),
+    'TRIT': ('Triton', 'Satellite'),
+    'DIONE': ('Dione', 'Satellite'),
+    'IAPETUS': ('Iapetus', 'Satellite')
+    }
+# type: Dict[str, Tuple[unicode, unicode]]
 
 
 ##############################
