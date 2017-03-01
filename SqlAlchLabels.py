@@ -1,3 +1,6 @@
+import pdart.add_pds_tools
+import julian
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from typing import cast, TYPE_CHECKING
@@ -18,7 +21,7 @@ import SqlAlch
 if TYPE_CHECKING:
     from typing import Any
     from pdart.xml.Templates \
-        import DocTemplate, NodeBuilder, NodeBuilderTemplate
+        import DocTemplate, FragBuilder, NodeBuilder, NodeBuilderTemplate
     from sqlalchemy.engine import *
     from sqlalchemy.schema import *
     from sqlalchemy.types import *
@@ -54,11 +57,12 @@ def make_product_observational_label(product):
     logical_identifier = make_logical_identifier(product)
     version_id = make_version_id()
 
-    bundle = product.collection.bundle
+    collection = product.collection
+    bundle = collection.bundle
     proposal_id = cast(int, bundle.proposal_id)
     text = ('This product contains the %s image obtained by ' +
-            'HST Observing Program %d') % (str(collection.suffix).upper(),
-                                           proposal_id)
+            'HST Observing Program %d.') % (str(collection.suffix).upper(),
+                                            proposal_id)
     title = make_title(text)
 
     information_model_version = make_information_model_version()
@@ -75,8 +79,9 @@ def make_product_observational_label(product):
                 version_id,
                 title,
                 information_model_version,
-                product_class),
-            'Observation_Area': make_observation_area(product.collection),
+                product_class,
+                combine_nodes_into_fragment([])),
+            'Observation_Area': make_observation_area(product),
             'File_Area_Observational': make_file_area_observational(product)
             }).toxml()
     try:
@@ -112,9 +117,22 @@ def make_product_collection_label(collection):
 
     logical_identifier = make_logical_identifier(collection)
     version_id = make_version_id()
-    title = make_title('TODO')  # TODO
+
+    proposal_id = cast(int, collection.bundle.proposal_id)
+    text = ('This collection contains the %s images obtained by ' +
+            'HST Observing Program %d.') % (str(collection.suffix).upper(),
+                                            proposal_id)
+
+    title = make_title(text)
     information_model_version = make_information_model_version()
-    product_class = make_product_class('TODO')  # TODO
+    product_class = make_product_class('Product_Collection')
+
+    publication_year = '2000'  # TODO
+    description = 'TODO'  # TODO
+    citation_information = combine_nodes_into_fragment([
+            make_citation_information(publication_year,
+                                      description)
+            ])
 
     label = _product_collection_template({
             'Identification_Area': make_identification_area(
@@ -122,7 +140,8 @@ def make_product_collection_label(collection):
                 version_id,
                 title,
                 information_model_version,
-                product_class),
+                product_class,
+                citation_information),
             'Collection': make_collection(collection),
             'File_Area_Inventory': make_file_area_inventory(collection)
             }).toxml()
@@ -231,10 +250,27 @@ def make_axis_array(hdu, axis_index):
 
 
 def _make_axis_arrays(hdu, axes):
-    # type (Hdu, axes) -> FragmentBuilder
+    # type (Hdu, axes) -> FragBuilder
     return combine_nodes_into_fragment(
         [make_axis_array(hdu, i + 1) for i in range(0, axes)]
         )
+
+##############################
+
+_citation_information_template = interpret_template(
+    """<Citation_Information>\
+<NODE name="publication_year"/>\
+<NODE name="description"/>\
+</Citation_Information>"""
+)
+
+
+def make_citation_information(publication_year, description):
+    # type: (unicode, unicode) -> NodeBuilder
+    return _citation_information_template({
+            'publication_year': make_publication_year(publication_year),
+            'description': make_description(description)
+            })
 
 ##############################
 
@@ -339,6 +375,7 @@ _identification_area_template = interpret_template(
 <NODE name="title" />
 <NODE name="information_model_version" />
 <NODE name="product_class" />
+<FRAGMENT name="Citation_Information" />
 </Identification_Area>""")
 # type: NodeBuilderTemplate
 
@@ -347,8 +384,9 @@ def make_identification_area(logical_identifier,
                              version_id,
                              title,
                              information_model_version,
-                             product_class):
-    # type: (_NB, _NB, _NB, _NB, _NB) -> _NB
+                             product_class,
+                             citation_information_fragment):
+    # type: (_NB, _NB, _NB, _NB, _NB, FragBuilder) -> _NB
 
     # Since make_identification_area() is shared by products and
     # collections, instead of passing a high-level object, we pass
@@ -358,7 +396,8 @@ def make_identification_area(logical_identifier,
             'version_id': version_id,
             'title': title,
             'information_model_version': information_model_version,
-            'product_class': product_class
+            'product_class': product_class,
+            'Citation_Information': citation_information_fragment
             })
 
 
@@ -373,6 +412,21 @@ def make_logical_identifier(product):
     # type: (Product) -> NodeBuilder
     return _logical_identifier_template({
             'lid': product.lid
+            })
+
+##############################
+
+_maximum_field_length_template = interpret_template(
+    """<maximum_field_length unit="byte">\
+<NODE name="text" />\
+</maximum_field_length>""")
+# type: NodeBuilderTemplate
+
+
+def make_maximum_field_length(text):
+    # type: (unicode) -> NodeBuilder
+    return _maximum_field_length_template({
+            'text': text
             })
 
 ##############################
@@ -400,16 +454,38 @@ _observation_area_template = interpret_template(
 # type: NodeBuilderTemplate
 
 
-def make_observation_area(collection):
-    # type: (Collection) -> NodeBuilder
+def make_observation_area(product):
+    # type: (Product) -> NodeBuilder
+    collection = product.collection
     bundle = collection.bundle
     return _observation_area_template({
-            'Time_Coordinates': make_time_coordinates(),
+            'Time_Coordinates': make_time_coordinates(product),
             'Investigation_Area': make_investigation_area(bundle),
             'Observing_System': make_observing_system(collection),
             'Target_Identification': make_target_identification()
             })
 
+
+##############################
+
+_field_delimited_template = interpret_template(
+    """<Field_Delimited>
+<NODE name="name" />
+<NODE name="field_number" />
+<NODE name="data_type" />
+<NODE name="maximum_field_length" />
+</Field_Delimited>""")
+# type: NodeBuilderTemplate
+
+
+def make_field_delimited(name, field_number, data_type, maximum_field_length):
+    # type: (_NB, _NB, _NB, _NB) -> NodeBuilder
+    return _field_delimited_template({
+            'name': name,
+            'field_number': field_number,
+            'data_type': data_type,
+            'maximum_field_length': maximum_field_length,
+            })
 
 ##############################
 
@@ -426,6 +502,32 @@ def make_field_delimiter(text):
 
 ##############################
 
+_field_number_template = interpret_template(
+    """<field_number><NODE name="text"/></field_number>""")
+# type: NodeBuilderTemplate
+
+
+def make_field_number(text):
+    # type: (unicode) -> NodeBuilder
+    return _field_number_template({
+            'text': text
+            })
+
+##############################
+
+_fields_template = interpret_template(
+    """<fields><NODE name="text"/></fields>""")
+# type: NodeBuilderTemplate
+
+
+def make_fields(text):
+    # type: (unicode) -> NodeBuilder
+    return _fields_template({
+            'text': text
+            })
+
+##############################
+
 _file_area_inventory_template = interpret_template("""<File_Area_Inventory>
 <NODE name="File"/>
 <NODE name="Inventory"/>
@@ -436,7 +538,7 @@ _file_area_inventory_template = interpret_template("""<File_Area_Inventory>
 def make_file_area_inventory(collection):
     # type: (Collection) -> NodeBuilder
     return _file_area_inventory_template({
-            'File': make_file(collection.inventory_name + ''),  # TODO
+            'File': make_file(cast(unicode, collection.inventory_name)),
             'Inventory': make_inventory(collection)
             })
 
@@ -520,6 +622,19 @@ def make_file_name(text):
 
 ##############################
 
+_groups_template = interpret_template(
+    """<groups><NODE name="text"/></groups>""")
+# type: NodeBuilderTemplate
+
+
+def make_groups(text):
+    # type: (unicode) -> NodeBuilder
+    return _groups_template({
+            'text': text
+            })
+
+##############################
+
 _information_model_version_template = interpret_template(
     """<information_model_version><NODE name="version" />\
 </information_model_version>""")
@@ -555,7 +670,8 @@ _inventory_template = interpret_template(
 <NODE name="records"/>
 <NODE name="record_delimiter"/>
 <NODE name="field_delimiter"/>
-<FRAGMENT name="Record_Delimited"/>
+<NODE name="Record_Delimited"/>
+<NODE name="reference_type"/>
 </Inventory>""")
 # type: NodeBuilderTemplate
 
@@ -569,7 +685,9 @@ def make_inventory(collection):
             'record_delimiter': make_record_delimiter(
                     'Carriage-Return Line-Feed'),
             'field_delimiter': make_field_delimiter('Comma'),
-            'Record_Delimited': combine_nodes_into_fragment([])  # TODO
+            'Record_Delimited': make_record_delimited(),
+            'reference_type': make_reference_type(
+                'inventory_has_member_product')
             })
 
 ##############################
@@ -770,6 +888,52 @@ def make_product_class(text):
 
 ##############################
 
+_publication_year_template = interpret_template(
+    """<publication_year><NODE name="text"/></publication_year>""")
+# type: NodeBuilderTemplate
+
+
+def make_publication_year(text):
+    # type: (unicode) -> NodeBuilder
+    return _publication_year_template({
+            'text': text
+            })
+
+##############################
+
+_record_delimited_template = interpret_template(
+    """<Record_Delimited>
+<NODE name="fields"/>
+<NODE name="groups"/>
+<FRAGMENT name="field_delimited"/>
+</Record_Delimited>""")
+# type: NodeBuilderTemplate
+
+
+def make_record_delimited():
+    # type: () -> NodeBuilder
+    fields = [
+        make_field_delimited(
+            make_name('Member Status'),
+            make_field_number('1'),
+            make_data_type('ASCII_String'),
+            make_maximum_field_length('1')
+            ),
+        make_field_delimited(
+            make_name('LIDVID_LID'),
+            make_field_number('2'),
+            make_data_type('ASCII_LIDVID_LID'),
+            make_maximum_field_length('255')
+            )
+        ]
+    return _record_delimited_template({
+            'fields': make_fields(str(len(fields))),
+            'groups': make_groups('0'),
+            'field_delimited': combine_nodes_into_fragment(fields)
+            })
+
+##############################
+
 _record_delimiter_template = interpret_template(
     """<record_delimiter><NODE name="text" /></record_delimiter>""")
 # type: NodeBuilderTemplate
@@ -861,12 +1025,21 @@ _time_coordinates_template = interpret_template(
 # type: NodeBuilderTemplate
 
 
-def make_time_coordinates():
-    # type: () -> NodeBuilder
-    text = '2001-01-01Z'  # TODO
+def make_time_coordinates(product):
+    # type: (Product) -> NodeBuilder
+    # TODO figure out and remove coersions
+    date_obs = str(lookup_card(product.hdus[0], 'DATE-OBS'))
+    time_obs = str(lookup_card(product.hdus[0], 'TIME-OBS'))
+    exptime = float('' + lookup_card(product.hdus[0], 'EXPTIME'))
+
+    start_date_time = '%sT%sZ' % (date_obs, time_obs)
+    stop_date_time = julian.tai_from_iso(start_date_time) + exptime
+    stop_date_time = julian.iso_from_tai(stop_date_time,
+                                         suffix='Z')
+
     return _time_coordinates_template({
-            'start_date_time': make_start_date_time(text),
-            'stop_date_time': make_stop_date_time(text)
+            'start_date_time': make_start_date_time(start_date_time),
+            'stop_date_time': make_stop_date_time(stop_date_time)
             })
 
 
