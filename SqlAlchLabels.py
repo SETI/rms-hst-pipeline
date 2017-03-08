@@ -1,13 +1,17 @@
 import pdart.add_pds_tools
 import julian
+import picmaker
+
+import os.path
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from typing import cast, TYPE_CHECKING
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import *
 
 from pdart.pds4.Archives import get_any_archive
-import pdart.pds4.Product
+from pdart.pds4.HstFilename import *
 from pdart.pds4.LID import LID
+import pdart.pds4.Product as P
 from pdart.pds4labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE
 from pdart.xml.Pds4Version import *
 from pdart.xml.Pretty import pretty_print
@@ -15,21 +19,52 @@ from pdart.xml.Schema import verify_label_or_raise
 from pdart.xml.Templates import combine_nodes_into_fragment, \
     interpret_document_template, interpret_template
 
-from SqlAlchTables import Bundle, Card, Collection, Hdu, lookup_card, Product
-import SqlAlch
+# import SqlAlch
+from SqlAlchTables import BrowseProduct, Bundle, Collection, lookup_card, \
+   Product
 
+from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Any, Dict, Tuple
+    from typing import Any, Dict, Text, Tuple
+
+    from sqlalchemy.orm import Session, sessionmaker
+
+    import pdart.pds4.Bundle as B
     from pdart.xml.Templates \
         import DocTemplate, FragBuilder, NodeBuilder, NodeBuilderTemplate
-    from sqlalchemy.engine import *
-    from sqlalchemy.schema import *
-    from sqlalchemy.types import *
+
+    from SqlAlchTables import FitsProduct, Hdu
 
     _NB = NodeBuilder  # an abbreviation for long signatures
 
 
-PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_trl:icwy08q3q_trl'
+_NEW_DATABASE_NAME = 'sqlalch-database.db'
+# type: str
+# TODO This is cut-and-pasted from SqlAlch.  Refactor and remove.
+
+
+def bundle_database_filepath(bundle):
+    # type: (B.Bundle) -> unicode
+
+    # TODO This is cut-and-pasted from SqlAlch.  Refactor and remove.
+    return os.path.join(bundle.absolute_filepath(), _NEW_DATABASE_NAME)
+
+
+def ensure_directory(dir):
+    # type: (Text) -> None
+    """Make the directory if it doesn't already exist."""
+
+    # TODO This is cut-and-pasted from
+    # pdart.pds4label.BrowseProductImageReduction.  Refactor and
+    # remove.
+    try:
+        os.mkdir(dir)
+    except OSError:
+        pass
+    assert os.path.isdir(dir), dir
+
+
+PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_raw:icwy08q3q_raw'
 # type: str
 
 
@@ -550,7 +585,6 @@ def make_observation_area(product):
     collection = product.collection
     bundle = collection.bundle
     targname = lookup_card(product.hdus[0], 'TARGNAME')
-    print '####', targname
     return _observation_area_template({
             'Time_Coordinates': make_time_coordinates(product),
             'Investigation_Area': make_investigation_area(bundle),
@@ -1205,24 +1239,73 @@ def make_version_id():
     return _version_id_template({
             })
 
+
+def make_browse_product(fits_product, browse_product):
+    # type: (P.Product, P.Product) -> None
+    file = list(fits_product.files())[0]
+    basename = os.path.basename(file.full_filepath())
+    basename = os.path.splitext(basename)[0] + '.jpg'
+    browse_collection_dir = browse_product.collection().absolute_filepath()
+    ensure_directory(browse_collection_dir)
+
+    visit = HstFilename(basename).visit()
+    target_dir = os.path.join(browse_collection_dir, ('visit_%s' % visit))
+    ensure_directory(target_dir)
+
+    picmaker.ImagesToPics([file.full_filepath()],
+                          target_dir,
+                          filter="None",
+                          percentiles=(1, 99))
+
+
+def make_db_browse_product(session, fits_product, browse_product):
+    # type: (Session, P.Product, P.Product) -> BrowseProduct
+
+    lid = str(browse_product.lid)
+
+    # TODO I'm deleting it here, but just for development.
+    session.query(BrowseProduct).filter_by(product_lid=lid).delete()
+    session.query(Product).filter_by(lid=lid).delete()
+
+    db_browse_product = BrowseProduct(
+        lid=str(browse_product.lid),
+        collection_lid=str(browse_product.collection().lid),
+        label_filepath=browse_product.label_filepath(),
+        browse_filepath=browse_product.absolute_filepath()
+        )
+    session.add(db_browse_product)
+    session.commit()
+    return db_browse_product
+
+
 if __name__ == '__main__':
     archive = get_any_archive()
-    product = pdart.pds4.Product.Product(archive, LID(PRODUCT_LID))
-    collection = product.collection()
-    bundle = product.bundle()
-    db_fp = SqlAlch.bundle_database_filepath(bundle)
+    fits_product = P.Product(archive, LID(PRODUCT_LID))
+    collection = fits_product.collection()
+    bundle = fits_product.bundle()
+    db_fp = bundle_database_filepath(bundle)
     print db_fp
     engine = create_engine('sqlite:///' + db_fp)
 
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session = sessionmaker(bind=engine)()
+    # type: Session
 
     if True:
-        db_product = session.query(Product).filter_by(lid=PRODUCT_LID).first()
+        db_fits_product = \
+            session.query(Product).filter_by(lid=PRODUCT_LID).first()
 
-        label = make_product_observational_label(db_product)
+        label = make_product_observational_label(db_fits_product)
         print label
         verify_label_or_raise(label)
+
+    if True:
+        browse_product = fits_product.browse_product()
+        # three goals:
+        # make browse_product in file system
+        make_browse_product(fits_product, browse_product)
+        # make browse_product in DB
+        make_db_browse_product(session, fits_product, browse_product)
+        # make label in file system
 
     # TODO Build inventory
 
