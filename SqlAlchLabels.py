@@ -19,7 +19,6 @@ from pdart.xml.Schema import verify_label_or_raise
 from pdart.xml.Templates import combine_nodes_into_fragment, \
     interpret_document_template, interpret_template
 
-# import SqlAlch
 from SqlAlchTables import BrowseProduct, Bundle, Collection, lookup_card, \
    Product
 
@@ -30,12 +29,13 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session, sessionmaker
 
     import pdart.pds4.Bundle as B
+    import pdart.pds4.Collection as C
     from pdart.xml.Templates \
         import DocTemplate, FragBuilder, NodeBuilder, NodeBuilderTemplate
 
     from SqlAlchTables import FitsProduct, Hdu
 
-    _NB = NodeBuilder  # an abbreviation for long signatures
+    _NB = NodeBuilder  # an abbreviation used in long signatures
 
 
 _NEW_DATABASE_NAME = 'sqlalch-database.db'
@@ -67,6 +67,63 @@ def ensure_directory(dir):
 PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_raw:icwy08q3q_raw'
 # type: str
 
+
+##############################
+
+_product_browse_template = interpret_document_template(
+    """<?xml version="1.0"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.sch"
+            schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Browse xmlns="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
+                       xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                           http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.xsd">
+<NODE name="Identification_Area" />
+<NODE name="File_Area_Browse" />
+</Product_Browse>""")
+# type: DocTemplate
+
+
+def make_product_browse_label(session, product):
+    # type: (Session, Product) -> str
+    logical_identifier = make_logical_identifier(product)
+    version_id = make_version_id()
+
+    collection = \
+        session.query(Collection).filter_by(lid=product.collection_lid).first()
+    assert collection is not None, str(product)
+
+    bundle = collection.bundle
+    proposal_id = cast(int, bundle.proposal_id)
+    text = ('This product contains a browse image of a %s image obtained by ' +
+            'HST Observing Program %d.') % (str(collection.suffix).upper(),
+                                            proposal_id)
+    title = make_title(text)
+
+    information_model_version = make_information_model_version()
+    product_class = make_product_class('Product_Browse')
+
+    label = _product_browse_template({
+            'Identification_Area': make_identification_area(
+                logical_identifier,
+                version_id,
+                title,
+                information_model_version,
+                product_class,
+                combine_nodes_into_fragment([])),
+            'File_Area_Browse': make_file_area_browse(product)
+            }).toxml()
+    try:
+        pretty = pretty_print(label)
+    except:
+        print label
+        raise
+    return pretty
+
+
+##############################
 
 _product_observational_template = interpret_document_template(
     """<?xml version="1.0"?>
@@ -453,6 +510,39 @@ def make_element_array(hdu):
 
 ##############################
 
+_encoded_image_template = interpret_template(
+    """<Encoded_Image>
+<NODE name="offset"/>
+<NODE name="encoding_standard_id" />
+</Encoded_Image>"""
+)
+
+
+def make_encoded_image(product):
+    # type: (BrowseProduct) -> NodeBuilder
+    object_length = os.path.getsize(cast(unicode, product.browse_filepath))
+    return _encoded_image_template({
+            'offset': make_offset('0'),
+            'object_length': make_object_length(str(object_length)),
+            'encoding_standard_id': make_encoding_standard_id('JPEG')
+            })
+
+##############################
+
+_encoding_standard_id_template = interpret_template(
+    """<encoding_standard_id><NODE name="text"/></encoding_standard_id>"""
+)
+
+
+def make_encoding_standard_id(text):
+    # type: (Text) -> NodeBuilder
+    object_length = '0'
+    return _encoding_standard_id_template({
+            'text': text
+            })
+
+##############################
+
 _header_template = interpret_template(
     """<Header>
 <NODE name="local_identifier"/>
@@ -652,6 +742,23 @@ def make_fields(text):
     return _fields_template({
             'text': text
             })
+
+##############################
+
+_file_area_browse_template = interpret_template("""<File_Area_Browse>
+<NODE name="File"/>
+<NODE name="Encoded_Image"/>
+</File_Area_Browse>""")
+# type: NodeBuilderTemplate
+
+
+def make_file_area_browse(product):
+    # type: (Product) -> NodeBuilder
+    return _file_area_browse_template({
+            'File': make_file(os.path.basename(product.browse_filepath)),
+            'Encoded_Image': make_encoded_image(product)
+            })
+
 
 ##############################
 
@@ -1258,12 +1365,41 @@ def make_browse_product(fits_product, browse_product):
                           percentiles=(1, 99))
 
 
+def make_db_browse_collection(session, browse_collection):
+    # type: (Session, C.Collection) -> Collection
+
+    # TODO Does Collection need to change to a more specific
+    # BrowseCollection type?
+    lid = str(browse_collection.lid)
+
+    # TODO I'm deleting any previous record here, but only during
+    # development.
+    session.query(Collection).filter_by(lid=lid).delete()
+
+    bundle = browse_collection.bundle()
+
+    db_browse_collection = Collection(
+        lid=lid,
+        bundle_lid=str(bundle.lid),
+        prefix=browse_collection.prefix(),
+        suffix=browse_collection.suffix(),
+        instrument=browse_collection.instrument(),
+        full_filepath=browse_collection.absolute_filepath(),
+        label_filepath=browse_collection.label_filepath(),
+        inventory_name=browse_collection.inventory_name(),
+        inventory_filepath=browse_collection.inventory_filepath())
+    session.add(db_browse_collection)
+    session.commit()
+    return db_browse_collection
+
+
 def make_db_browse_product(session, fits_product, browse_product):
     # type: (Session, P.Product, P.Product) -> BrowseProduct
 
     lid = str(browse_product.lid)
 
-    # TODO I'm deleting it here, but just for development.
+    # TODO I'm deleting any previous record here, but only during
+    # development.
     session.query(BrowseProduct).filter_by(product_lid=lid).delete()
     session.query(Product).filter_by(lid=lid).delete()
 
@@ -1275,10 +1411,14 @@ def make_db_browse_product(session, fits_product, browse_product):
         )
     session.add(db_browse_product)
     session.commit()
+
+    db_browse_collection = \
+        make_db_browse_collection(session, browse_product.collection())
+
     return db_browse_product
 
 
-if __name__ == '__main__':
+def run():
     archive = get_any_archive()
     fits_product = P.Product(archive, LID(PRODUCT_LID))
     collection = fits_product.collection()
@@ -1304,8 +1444,13 @@ if __name__ == '__main__':
         # make browse_product in file system
         make_browse_product(fits_product, browse_product)
         # make browse_product in DB
-        make_db_browse_product(session, fits_product, browse_product)
-        # make label in file system
+        db_browse_product = make_db_browse_product(session,
+                                                   fits_product,
+                                                   browse_product)
+        # make label
+        label = make_product_browse_label(session, db_browse_product)
+        print label
+        verify_label_or_raise(label)
 
     # TODO Build inventory
 
@@ -1326,3 +1471,7 @@ if __name__ == '__main__':
         label = make_product_bundle_label(db_bundle)
         print label
         verify_label_or_raise(label)
+
+
+if __name__ == '__main__':
+    run()
