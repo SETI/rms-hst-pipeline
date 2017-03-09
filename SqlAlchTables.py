@@ -21,6 +21,9 @@ class Bundle(Base):
     full_filepath = Column(String, nullable=False)
     label_filepath = Column(String, nullable=False)
 
+    def __repr__(self):
+        return 'Bundle(lid=%s)' % self.lid
+
 
 class BadFitsFile(Base):
     __tablename__ = 'bad_fits_files'
@@ -28,6 +31,9 @@ class BadFitsFile(Base):
     lid = Column(String, primary_key=True, nullable=False)
     filepath = Column(String, nullable=False)
     message = Column(String, nullable=False)
+
+    def __repr__(self):
+        return 'BadFitsFile(lid=%s)' % self.lid
 
 
 class Collection(Base):
@@ -45,6 +51,10 @@ class Collection(Base):
     label_filepath = Column(String, nullable=False)
     inventory_name = Column(String, nullable=False)
     inventory_filepath = Column(String, nullable=False)
+
+    def __repr__(self):
+        return 'Collection(lid=%s)' % self.lid
+
 
 Index('idx_collections_prefix_suffix', Collection.prefix, Collection.suffix)
 
@@ -76,6 +86,11 @@ class FitsProduct(Product):
     __mapper_args__ = {
         'polymorphic_identity': 'fits_product',
         }
+
+    def __repr__(self):
+        return 'FitsProduct(lid=%s, fits_filepath=%s)' % (self.lid,
+                                                          self.fits_filepath)
+
     # full_filepath, filename, hdu_count
 
 
@@ -89,6 +104,10 @@ class BrowseProduct(Product):
         'polymorphic_identity': 'browse_product',
         }
 
+    def __repr__(self):
+        return 'BrowseProduct(lid=%s, fits_filepath=%s)' % \
+            (self.lid, self.browse_filepath)
+
 
 class DocumentProduct(Product):
     __tablename__ = 'document_products'
@@ -99,6 +118,10 @@ class DocumentProduct(Product):
     __mapper_args__ = {
         'polymorphic_identity': 'document_product',
         }
+
+    def __repr__(self):
+        return 'DocumentProduct(lid=%s, fits_filepath=%s)' % \
+            (self.lid, self.document_filepath)
 
 
 class Hdu(Base):
@@ -113,6 +136,10 @@ class Hdu(Base):
     product = relationship('FitsProduct', backref=backref('hdus',
                                                           order_by=hdu_index))
 
+    def __repr__(self):
+        return 'Hdu(product_lid=%s, hdu_index=%d)' % \
+            (self.product_lid, self.hdu_index)
+
 
 class Card(Base):
     __tablename__ = 'cards'
@@ -124,6 +151,11 @@ class Card(Base):
     value = Column(String, nullable=True)
     hdu = relationship('Hdu', backref=backref('cards',
                                               order_by=id))
+
+    def __repr__(self):
+        return 'Card(product_lid=%s, hdu_index=%d, keyword=%s, value=%s)' % \
+            (self.product_lid, self.hdu_index, self.keyword, self.value)
+
 
 Index('idx_cards_product_hdu_index', Card.product_lid, Card.hdu_index)
 
