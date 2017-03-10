@@ -30,8 +30,9 @@ mypy --silent-imports --py2 \
     MakeRawBrowse.py \
     SearchDev.py \
     SqlAlch.py \
-    SqlAlchTables.py \
     SqlAlchLabels.py \
+    SqlAlchTables.py \
+    SqlAlchXml.py \
     TestHstParams.py \
     TestMast.py \
     ValidateArchive.py \
