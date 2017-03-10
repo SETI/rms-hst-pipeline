@@ -73,7 +73,7 @@ _product_browse_template = interpret_document_template(
 
 def make_product_browse_label(session, product):
     # type: (Session, Product) -> str
-    logical_identifier = make_logical_identifier(product)
+    logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()
 
     collection = \
@@ -131,7 +131,7 @@ _product_observational_template = interpret_document_template(
 def make_product_observational_label(product):
     # type: (Product) -> str
 
-    logical_identifier = make_logical_identifier(product)
+    logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()
 
     collection = product.collection
@@ -192,7 +192,7 @@ _product_collection_template = interpret_document_template(
 def make_product_collection_label(collection):
     # type: (Collection) -> str
 
-    logical_identifier = make_logical_identifier(collection)
+    logical_identifier = make_logical_identifier(str(collection.lid))
     version_id = make_version_id()
 
     proposal_id = cast(int, collection.bundle.proposal_id)
@@ -252,7 +252,7 @@ _product_bundle_template = interpret_document_template(
 
 def make_product_bundle_label(bundle):
     # type: (Bundle) -> str
-    logical_identifier = make_logical_identifier(bundle)
+    logical_identifier = make_logical_identifier(str(bundle.lid))
     version_id = make_version_id()
 
     proposal_id = cast(int, bundle.proposal_id)
@@ -288,6 +288,72 @@ def make_product_bundle_label(bundle):
         print label
         raise
     return pretty
+
+
+##############################
+
+_product_document_template = interpret_document_template(
+    """<?xml version="1.0"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.sch"
+            schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Document xmlns="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
+                       xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                           http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.xsd">
+<NODE name="Identification_Area"/>
+<NODE name="Document"/>
+</Product_Document>
+""")
+# type: DocTemplate
+
+
+def make_product_document_label(bundle, product):
+    # type: (B.Bundle, P.Product) -> str
+
+    # TODO We're based for now on pdart.pds4 Bundle and Product, not
+    # the DB versions.  Fix this.
+
+    logical_identifier = make_logical_identifier(str(product.lid))
+    version_id = make_version_id()
+
+    proposal_id = cast(int, bundle.proposal_id())
+    text = "This bundle contains images obtained from " + \
+        "HST Observing Program %d." % proposal_id
+    title = make_title(text)
+    information_model_version = make_information_model_version()
+    product_class = make_product_class('Product_Document')
+
+    publication_date = '2000-01-01'  # TODO
+    publication_year = '2000'  # TODO
+    description = 'TODO'  # TODO
+    files = [('bob', 'PDF')]
+    # type: List[Tuple[Text, Text]]
+
+    label = _product_document_template({
+            'Identification_Area': make_identification_area(
+                logical_identifier,
+                version_id,
+                title,
+                information_model_version,
+                product_class,
+                combine_nodes_into_fragment([
+                        make_citation_information(publication_year,
+                                                  description)
+                        ])
+                ),
+            'Document': make_document(publication_date, files)
+            }).toxml()
+    try:
+        pretty = pretty_print(label)
+    except:
+        print label
+        raise
+    return pretty
+
+
+##############################
 
 
 def make_browse_product(fits_product, browse_product):
@@ -373,7 +439,7 @@ def run():
     session = sessionmaker(bind=engine)()
     # type: Session
 
-    if True:
+    if False:
         db_fits_product = \
             session.query(Product).filter_by(lid=PRODUCT_LID).first()
 
@@ -381,7 +447,7 @@ def run():
         print label
         verify_label_or_raise(label)
 
-    if True:
+    if False:
         browse_product = fits_product.browse_product()
         # three goals:
         # make browse_product in file system
@@ -397,7 +463,7 @@ def run():
 
     # TODO Build inventory
 
-    if True:
+    if False:
         COLLECTION_LID = str(collection.lid)
         db_collection = \
             session.query(Collection).filter_by(lid=COLLECTION_LID).first()
@@ -406,12 +472,20 @@ def run():
         print label
         verify_label_or_raise(label)
 
-    if True:
+    if False:
         BUNDLE_LID = str(bundle.lid)
         db_bundle = \
             session.query(Bundle).filter_by(lid=BUNDLE_LID).first()
 
         label = make_product_bundle_label(db_bundle)
+        print label
+        verify_label_or_raise(label)
+
+    if True:
+        DOCUMENT_PRODUCT_LID = str(bundle.lid) + ":document:phase2"
+        print DOCUMENT_PRODUCT_LID
+        label = make_product_document_label(
+            bundle, P.Product(archive, LID(DOCUMENT_PRODUCT_LID)))
         print label
         verify_label_or_raise(label)
 

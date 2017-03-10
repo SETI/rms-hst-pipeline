@@ -68,7 +68,7 @@ _axis_array_template = interpret_template(
 <elements><NODE name="elements"/></elements>
 <sequence_number><NODE name="sequence_number"/></sequence_number>
 </Axis_Array>"""
-)
+    )
 
 
 def make_axis_array(hdu, axis_index):
@@ -95,7 +95,7 @@ def _make_axis_arrays(hdu, axes):
 
 _bundle_template = interpret_template(
     """<Bundle><NODE name="bundle_type"/></Bundle>"""
-)
+    )
 
 
 def make_bundle(bundle):
@@ -112,7 +112,7 @@ _bundle_member_entry_template = interpret_template(
 <NODE name="member_status" />
 <NODE name="reference_type" />
 </Bundle_Member_Entry>"""
-)
+    )
 
 
 def make_bundle_member_entry(collection):
@@ -127,7 +127,7 @@ def make_bundle_member_entry(collection):
 
 _bundle_type_template = interpret_template(
     """<bundle_type><NODE name="bundle_type"/></bundle_type>"""
-)
+    )
 
 
 def make_bundle_type(bundle):
@@ -143,7 +143,7 @@ _citation_information_template = interpret_template(
 <NODE name="publication_year"/>\
 <NODE name="description"/>\
 </Citation_Information>"""
-)
+    )
 
 
 def make_citation_information(publication_year, description):
@@ -157,7 +157,7 @@ def make_citation_information(publication_year, description):
 
 _collection_template = interpret_template(
     """<Collection><NODE name="collection_type"/></Collection>"""
-)
+    )
 
 
 def make_collection(collection):
@@ -172,7 +172,7 @@ def make_collection(collection):
 
 _collection_type_template = interpret_template(
     """<collection_type><NODE name="text"/></collection_type>"""
-)
+    )
 
 
 def make_collection_type(text):
@@ -185,7 +185,7 @@ def make_collection_type(text):
 
 _data_type_template = interpret_template(
     """<data_type><NODE name="text"/></data_type>"""
-)
+    )
 
 
 def make_data_type(text):
@@ -209,9 +209,97 @@ def make_description(text):
 
 ##############################
 
+_document_template = interpret_template(
+    """<Document>
+<NODE name="publication_date"/>
+<FRAGMENT name="document_edition"/>
+</Document>""")
+# type: NodeBuilderTemplate
+
+
+def make_document(publication_date, files):
+    # type: (unicode, List[Tuple[Text, Text]]) -> NodeBuilder
+    return _document_template({
+            'publication_date': make_publication_date(publication_date),
+            'document_edition': combine_nodes_into_fragment([
+                    make_document_edition('phase2', files)
+                    # TODO Is 'phase2' right?  General enough?
+                    ])
+            })
+
+##############################
+
+_document_edition_template = interpret_template(
+    """<Document_Edition>
+<NODE name="edition_name"/>
+<NODE name="language"/>
+<NODE name="files"/>
+<FRAGMENT name="document_file"/>
+</Document_Edition>""")
+# type: NodeBuilderTemplate
+
+
+def make_document_edition(edition_name, files):
+    # type: (unicode, List[Tuple[unicode, unicode]]) -> NodeBuilder
+    return _document_edition_template({
+            'edition_name': make_edition_name(edition_name),
+            'language': make_language('English'),
+            'files': make_files(str(len(files))),
+            'document_file': combine_nodes_into_fragment([
+                    make_document_file(file_name, std)
+                    for (file_name, std) in files
+                    ])
+            })
+
+##############################
+
+_document_file_template = interpret_template(
+    """<Document_File>
+<NODE name="file_name"/>
+<NODE name="document_standard_id"/>
+</Document_File>""")
+# type: NodeBuilderTemplate
+
+
+def make_document_file(file_name, document_standard_id):
+    # type: (unicode, unicode) -> NodeBuilder
+    doc_std_id = make_document_standard_id(document_standard_id)
+    return _document_file_template({
+            'file_name': make_file_name(file_name),
+            'document_standard_id': doc_std_id
+            })
+
+##############################
+
+_document_standard_id_template = interpret_template(
+    """<document_standard_id><NODE name="text"/></document_standard_id>"""
+    )
+
+
+def make_document_standard_id(text):
+    # type: (Text) -> NodeBuilder
+    return _document_standard_id_template({
+            'text': text
+            })
+
+##############################
+
+_edition_name_template = interpret_template(
+    """<edition_name><NODE name="text"/></edition_name>"""
+    )
+
+
+def make_edition_name(text):
+    # type: (Text) -> NodeBuilder
+    return _edition_name_template({
+            'text': text
+            })
+
+##############################
+
 _element_array_template = interpret_template(
     """<Element_Array><NODE name="data_type"/></Element_Array>"""
-)
+    )
 
 
 def make_element_array(hdu):
@@ -228,7 +316,7 @@ _encoded_image_template = interpret_template(
 <NODE name="offset"/>
 <NODE name="encoding_standard_id" />
 </Encoded_Image>"""
-)
+    )
 
 
 def make_encoded_image(product):
@@ -244,7 +332,7 @@ def make_encoded_image(product):
 
 _encoding_standard_id_template = interpret_template(
     """<encoding_standard_id><NODE name="text"/></encoding_standard_id>"""
-)
+    )
 
 
 def make_encoding_standard_id(text):
@@ -317,17 +405,30 @@ def make_identification_area(logical_identifier,
 
 ##############################
 
+_language_template = interpret_template(
+    """<language><NODE name="text" /></language>""")
+# type: NodeBuilderTemplate
+
+
+def make_language(text):
+    # type: (Text) -> NodeBuilder
+
+    return _language_template({
+            'text': text
+            })
+
+##############################
+
 _logical_identifier_template = interpret_template(
     """<logical_identifier><NODE name="lid" /></logical_identifier>""")
 # type: NodeBuilderTemplate
 
 
-def make_logical_identifier(product):
-    # type: (Product) -> NodeBuilder
+def make_logical_identifier(text):
+    # type: (Text) -> NodeBuilder
 
-    # TODO above type is wrong: it's bundle or collection or product.
     return _logical_identifier_template({
-            'lid': product.lid
+            'lid': text
             })
 
 ##############################
@@ -556,6 +657,19 @@ def make_file(text):
 
 ##############################
 
+_files_template = interpret_template(
+    """<files><NODE name="text"/></files>""")
+# type: NodeBuilderTemplate
+
+
+def make_files(text):
+    # type: (unicode) -> NodeBuilder
+    return _files_template({
+            'text': text
+            })
+
+##############################
+
 _file_name_template = interpret_template(
     """<file_name><NODE name="text"/></file_name>""")
 # type: NodeBuilderTemplate
@@ -630,7 +744,7 @@ def make_inventory(collection):
             'parsing_standard_id': make_parsing_standard_id('PDS DSV 1'),
             'records': make_records('1'),
             'record_delimiter': make_record_delimiter(
-                    'Carriage-Return Line-Feed'),
+                'Carriage-Return Line-Feed'),
             'field_delimiter': make_field_delimiter('Comma'),
             'Record_Delimited': make_record_delimited(),
             'reference_type': make_reference_type(
@@ -699,7 +813,7 @@ _observing_system_component_template = interpret_template(
 <type><NODE name="type"/></type>
 <NODE name="Internal_Reference" />
 </Observing_System_Component>"""
-)
+    )
 
 
 def make_observing_system_component(hst_or_inst):
@@ -792,7 +906,7 @@ _observing_system_names = {
     'acs': 'Hubble Space Telescope Advanced Camera for Surveys',
     'wfc3': 'Hubble Space Telescope Wide Field Camera 3',
     'wfpc2': 'Hubble Space Telescope Wide-Field Planetary Camera 2'
-}
+    }
 
 ##############################
 
@@ -830,6 +944,19 @@ _product_class_template = interpret_template(
 def make_product_class(text):
     # type: (unicode) -> NodeBuilder
     return _product_class_template({
+            'text': text
+            })
+
+##############################
+
+_publication_date_template = interpret_template(
+    """<publication_date><NODE name="text"/></publication_date>""")
+# type: NodeBuilderTemplate
+
+
+def make_publication_date(text):
+    # type: (unicode) -> NodeBuilder
+    return _publication_date_template({
             'text': text
             })
 
