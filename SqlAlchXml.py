@@ -183,6 +183,30 @@ def make_collection_type(text):
 
 ##############################
 
+_context_area_template = interpret_template(
+    """<Context_Area>
+<NODE name="Time_Coordinates"/>
+<NODE name="Investigation_Area"/>
+<NODE name="Observing_System"/>
+<NODE name="Target_Identification"/>
+</Context_Area>"""
+    )
+
+
+def make_context_area(fits_product):
+    # type: (Product) -> NodeBuilder
+    collection = fits_product.collection
+    bundle = collection.bundle
+    targname = lookup_card(fits_product.hdus[0], 'TARGNAME')
+    return _context_area_template({
+            'Time_Coordinates': make_time_coordinates(fits_product),
+            'Investigation_Area': make_investigation_area(bundle),
+            'Observing_System': make_observing_system(collection),
+            'Target_Identification': make_target_identification(targname)
+            })
+
+##############################
+
 _data_type_template = interpret_template(
     """<data_type><NODE name="text"/></data_type>"""
     )
@@ -344,6 +368,20 @@ def make_encoding_standard_id(text):
 
 ##############################
 
+_encoding_type_template = interpret_template(
+    """<encoding_type><NODE name="text"/></encoding_type>"""
+    )
+
+
+def make_encoding_type(text):
+    # type: (Text) -> NodeBuilder
+    object_length = '0'
+    return _encoding_type_template({
+            'text': text
+            })
+
+##############################
+
 _header_template = interpret_template(
     """<Header>
 <NODE name="local_identifier"/>
@@ -402,6 +440,20 @@ def make_identification_area(logical_identifier,
             'Citation_Information': citation_information_fragment
             })
 
+
+##############################
+
+_kernel_type_template = interpret_template(
+    """<kernel_type><NODE name="text" /></kernel_type>""")
+# type: NodeBuilderTemplate
+
+
+def make_kernel_type(text):
+    # type: (Text) -> NodeBuilder
+
+    return _kernel_type_template({
+            'text': text
+            })
 
 ##############################
 
@@ -571,6 +623,25 @@ def make_file_area_browse(product):
     return _file_area_browse_template({
             'File': make_file(os.path.basename(product.browse_filepath)),
             'Encoded_Image': make_encoded_image(product)
+            })
+
+
+##############################
+
+_file_area_spice_kernel_template = interpret_template(
+    """<File_Area_SPICE_Kernel>
+<NODE name="File"/>
+<NODE name="SPICE_Kernel"/>
+</File_Area_SPICE_Kernel>""")
+# type: NodeBuilderTemplate
+
+
+def make_file_area_spice_kernel(file_basename):
+    # type: (unicode) -> NodeBuilder
+    return _file_area_spice_kernel_template({
+            'File': make_file(file_basename),
+            # TODO placeholders below
+            'SPICE_Kernel': make_spice_kernel('CK', 'Binary')
             })
 
 
@@ -1034,6 +1105,18 @@ def make_records(text):
 
 ##############################
 
+_reference_list_template = interpret_template(
+    """<Reference_List></Reference_List>""")
+# type: NodeBuilderTemplate
+
+
+def make_reference_list():
+    # type: () -> NodeBuilder
+    return _reference_list_template({
+            })
+
+##############################
+
 _reference_type_template = interpret_template(
     """<reference_type><NODE name="text" /></reference_type>""")
 # type: NodeBuilderTemplate
@@ -1043,6 +1126,27 @@ def make_reference_type(text):
     # type: (unicode) -> NodeBuilder
     return _reference_type_template({
             'text': text
+            })
+
+##############################
+
+_spice_kernel_template = interpret_template(
+    """<SPICE_Kernel>
+<NODE name="offset"/>
+<NODE name="parsing_standard_id"/>
+<NODE name="kernel_type"/>
+<NODE name="encoding_type"/>
+</SPICE_Kernel>""")
+# type: NodeBuilderTemplate
+
+
+def make_spice_kernel(kernel_type, encoding_type):
+    # type: (unicode, unicode) -> NodeBuilder
+    return _spice_kernel_template({
+            'offset': make_offset('0'),  # TODO Is this right?
+            'parsing_standard_id': make_parsing_standard_id('SPICE'),
+            'kernel_type': make_kernel_type(kernel_type),
+            'encoding_type': make_encoding_type(encoding_type)
             })
 
 ##############################

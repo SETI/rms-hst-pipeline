@@ -12,6 +12,7 @@ from pdart.xml.Pretty import pretty_print
 from pdart.xml.Schema import verify_label_or_raise
 from pdart.xml.Templates import interpret_document_template
 
+from SqlAlchTables import FitsProduct
 from SqlAlchXml import *
 
 from typing import TYPE_CHECKING
@@ -355,6 +356,74 @@ def make_product_document_label(bundle, product):
 
 ##############################
 
+_product_spice_kernel_template = interpret_document_template(
+    """<?xml version="1.0"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.sch"
+            schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_SPICE_Kernel xmlns="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
+                       xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                           http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.xsd">
+<NODE name="Identification_Area"/>
+<NODE name="Context_Area"/>
+<NODE name="Reference_List"/>
+<NODE name="File_Area_SPICE_Kernel"/>
+</Product_SPICE_Kernel>
+""")
+# type: DocTemplate
+
+
+def make_product_spice_kernel_label(bundle, product, fits_product):
+    # type: (B.Bundle, P.Product, Product) -> str
+
+    # TODO We're based for now on pdart.pds4 Bundle and Product, not
+    # the DB versions.  Fix this.
+
+    logical_identifier = make_logical_identifier(str(product.lid))
+    version_id = make_version_id()
+
+    proposal_id = cast(int, bundle.proposal_id())
+    text = "This product contains SPICE kernels for " + \
+        "HST Observing Program %d." % proposal_id  # TODO
+    title = make_title(text)
+    information_model_version = make_information_model_version()
+    product_class = make_product_class('Product_SPICE_Kernel')
+
+    publication_date = '2000-01-01'  # TODO
+    publication_year = '2000'  # TODO
+    description = 'TODO'  # TODO
+    files = [('bob', 'PDF')]
+    # type: List[Tuple[Text, Text]]
+
+    label = _product_spice_kernel_template({
+            'Identification_Area': make_identification_area(
+                logical_identifier,
+                version_id,
+                title,
+                information_model_version,
+                product_class,
+                combine_nodes_into_fragment([
+                        make_citation_information(publication_year,
+                                                  description)
+                        ])
+                ),
+            'Context_Area': make_context_area(fits_product),
+            'Reference_List': make_reference_list(),
+            'File_Area_SPICE_Kernel': make_file_area_spice_kernel('bob')
+            # TODO
+            }).toxml()
+    try:
+        pretty = pretty_print(label)
+    except:
+        print label
+        raise
+    return pretty
+
+
+##############################
+
 
 def make_browse_product(fits_product, browse_product):
     # type: (P.Product, P.Product) -> None
@@ -481,11 +550,25 @@ def run():
         print label
         verify_label_or_raise(label)
 
-    if True:
+    if False:
         DOCUMENT_PRODUCT_LID = str(bundle.lid) + ":document:phase2"
         print DOCUMENT_PRODUCT_LID
         label = make_product_document_label(
             bundle, P.Product(archive, LID(DOCUMENT_PRODUCT_LID)))
+        print label
+        verify_label_or_raise(label)
+
+    if True:
+        SPICE_KERNEL_PRODUCT_LID = str(bundle.lid) + ":spice:kernel"
+        # TODO The LID is legal but wrong, a placeholder
+        print SPICE_KERNEL_PRODUCT_LID
+        fits_product = \
+            session.query(FitsProduct).filter_by(lid=PRODUCT_LID).first()
+        assert fits_product, 'fits_product'
+        label = make_product_spice_kernel_label(
+            bundle,
+            P.Product(archive, LID(SPICE_KERNEL_PRODUCT_LID)),
+            fits_product)
         print label
         verify_label_or_raise(label)
 
