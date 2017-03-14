@@ -12,7 +12,7 @@ from SqlAlchTables import BrowseProduct, Bundle, Collection, Hdu, \
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Any, Text, Tuple
+    from typing import Any, AnyStr, Tuple
     from pdart.xml.Templates import FragBuilder, NodeBuilder, \
         NodeBuilderTemplate
 
@@ -73,9 +73,12 @@ _axis_array_template = interpret_template(
 
 def make_axis_array(hdu, axis_index):
     # type: (Hdu, int) -> NodeBuilder
+    keyword = 'NAXIS%d' % axis_index
+    elements = lookup_card(hdu, keyword)
+    assert elements, keyword
     return _axis_array_template({
             'axis_name': AXIS_NAME_TABLE[axis_index],
-            'elements': str(lookup_card(hdu, 'NAXIS%d' % axis_index)),
+            'elements': str(elements),
             'sequence_number': str(axis_index)
             })
 
@@ -242,7 +245,7 @@ _document_template = interpret_template(
 
 
 def make_document(publication_date, files):
-    # type: (unicode, List[Tuple[Text, Text]]) -> NodeBuilder
+    # type: (unicode, List[Tuple[AnyStr, AnyStr]]) -> NodeBuilder
     return _document_template({
             'publication_date': make_publication_date(publication_date),
             'document_edition': combine_nodes_into_fragment([
@@ -264,7 +267,7 @@ _document_edition_template = interpret_template(
 
 
 def make_document_edition(edition_name, files):
-    # type: (unicode, List[Tuple[unicode, unicode]]) -> NodeBuilder
+    # type: (AnyStr, List[Tuple[AnyStr, AnyStr]]) -> NodeBuilder
     return _document_edition_template({
             'edition_name': make_edition_name(edition_name),
             'language': make_language('English'),
@@ -301,7 +304,7 @@ _document_standard_id_template = interpret_template(
 
 
 def make_document_standard_id(text):
-    # type: (Text) -> NodeBuilder
+    # type: (AnyStr) -> NodeBuilder
     return _document_standard_id_template({
             'text': text
             })
@@ -314,7 +317,7 @@ _edition_name_template = interpret_template(
 
 
 def make_edition_name(text):
-    # type: (Text) -> NodeBuilder
+    # type: (AnyStr) -> NodeBuilder
     return _edition_name_template({
             'text': text
             })
@@ -360,7 +363,7 @@ _encoding_standard_id_template = interpret_template(
 
 
 def make_encoding_standard_id(text):
-    # type: (Text) -> NodeBuilder
+    # type: (AnyStr) -> NodeBuilder
     object_length = '0'
     return _encoding_standard_id_template({
             'text': text
@@ -374,7 +377,7 @@ _encoding_type_template = interpret_template(
 
 
 def make_encoding_type(text):
-    # type: (Text) -> NodeBuilder
+    # type: (AnyStr) -> NodeBuilder
     object_length = '0'
     return _encoding_type_template({
             'text': text
@@ -449,7 +452,7 @@ _kernel_type_template = interpret_template(
 
 
 def make_kernel_type(text):
-    # type: (Text) -> NodeBuilder
+    # type: (AnyStr) -> NodeBuilder
 
     return _kernel_type_template({
             'text': text
@@ -463,7 +466,7 @@ _language_template = interpret_template(
 
 
 def make_language(text):
-    # type: (Text) -> NodeBuilder
+    # type: (AnyStr) -> NodeBuilder
 
     return _language_template({
             'text': text
@@ -477,7 +480,7 @@ _logical_identifier_template = interpret_template(
 
 
 def make_logical_identifier(text):
-    # type: (Text) -> NodeBuilder
+    # type: (AnyStr) -> NodeBuilder
 
     return _logical_identifier_template({
             'lid': text
