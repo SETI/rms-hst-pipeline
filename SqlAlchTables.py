@@ -99,6 +99,7 @@ class BrowseProduct(Product):
     product_lid = Column(String, ForeignKey('products.lid'),
                          primary_key=True, nullable=False)
     browse_filepath = Column(String, nullable=False)
+    object_length = Column(Integer, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'browse_product',

@@ -348,10 +348,10 @@ _encoded_image_template = interpret_template(
 
 def make_encoded_image(product):
     # type: (BrowseProduct) -> NodeBuilder
-    object_length = os.path.getsize(cast(unicode, product.browse_filepath))
     return _encoded_image_template({
             'offset': make_offset('0'),
-            'object_length': make_object_length(str(object_length)),
+            'object_length': make_object_length(
+                str(0 + product.object_length)),
             'encoding_standard_id': make_encoding_standard_id('JPEG')
             })
 

@@ -72,14 +72,10 @@ _product_browse_template = interpret_document_template(
 # type: DocTemplate
 
 
-def make_product_browse_label(session, product):
-    # type: (Session, Product) -> str
+def make_product_browse_label(collection, product):
+    # type: (Collection, Product) -> str
     logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()
-
-    collection = \
-        session.query(Collection).filter_by(lid=product.collection_lid).first()
-    assert collection is not None, str(product)
 
     bundle = collection.bundle
     proposal_id = cast(int, bundle.proposal_id)
@@ -470,7 +466,7 @@ def make_db_browse_collection(session, browse_collection):
 
 
 def make_db_browse_product(session, fits_product, browse_product):
-    # type: (Session, P.Product, P.Product) -> BrowseProduct
+    # type: (Session, P.Product, P.Product) -> Tuple[Collection, BrowseProduct]
 
     lid = str(browse_product.lid)
 
@@ -491,7 +487,7 @@ def make_db_browse_product(session, fits_product, browse_product):
     db_browse_collection = \
         make_db_browse_collection(session, browse_product.collection())
 
-    return db_browse_product
+    return (db_browse_collection, db_browse_product)
 
 
 def run():
@@ -520,11 +516,13 @@ def run():
         # make browse_product in file system
         make_browse_product(fits_product, browse_product)
         # make browse_product in DB
-        db_browse_product = make_db_browse_product(session,
-                                                   fits_product,
-                                                   browse_product)
+        (db_browse_collection,
+         db_browse_product) = make_db_browse_product(session,
+                                                     fits_product,
+                                                     browse_product)
         # make label
-        label = make_product_browse_label(session, db_browse_product)
+        label = make_product_browse_label(db_browse_collection,
+                                          db_browse_product)
         print label
         verify_label_or_raise(label)
 

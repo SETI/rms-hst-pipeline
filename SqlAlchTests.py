@@ -11,16 +11,31 @@ from SqlAlchTables import *
 
 class TestSqlAlch(unittest.TestCase):
     BUNDLE_LID = 'urn:nasa:pds:hst_00666'
-    COLLECTION_LID = 'urn:nasa:pds:hst_00666:data_wfpc2_xxx'
-    COLLECTION_LABEL_FILEPATH = \
+
+    DATA_COLLECTION_LID = 'urn:nasa:pds:hst_00666:data_wfpc2_xxx'
+    DATA_COLLECTION_LABEL_FILEPATH = \
         "/I/don't/exist/hst_00666/data_wfpc2_xxx/collection_data.xml"
-    COLLECTION_INVENTORY_FILEPATH = \
+    DATA_COLLECTION_INVENTORY_FILEPATH = \
         "/I/don't/exist/hst_00666/data_wfpc2_xxx/collection_data.csv"
-    PRODUCT_LID = 'urn:nasa:pds:hst_00666:data_wfpc2_xxx:u2novv01j_xxx'
-    PRODUCT_FITS_FILEPATH = \
+
+    BROWSE_COLLECTION_LID = 'urn:nasa:pds:hst_00666:browse_wfpc2_xxx'
+    BROWSE_COLLECTION_LABEL_FILEPATH = \
+        "/I/don't/exist/hst_00666/browse_wfpc2_xxx/collection_browse.xml"
+    BROWSE_COLLECTION_INVENTORY_FILEPATH = \
+        "/I/don't/exist/hst_00666/browse_wfpc2_xxx/collection_browse.csv"
+
+    DATA_PRODUCT_LID = 'urn:nasa:pds:hst_00666:data_wfpc2_xxx:u2novv01j_xxx'
+    DATA_PRODUCT_FITS_FILEPATH = \
         "/I/don't/exist/hst_00666/data_wfpc2_xxx/visit_vv/u2novv01j_xxx.fits"
-    PRODUCT_LABEL_FILEPATH = \
+    DATA_PRODUCT_LABEL_FILEPATH = \
         "/I/don't/exist/hst_00666/data_wfpc2_xxx/visit_vv/u2novv01j_xxx.xml"
+
+    BROWSE_PRODUCT_LID = \
+        'urn:nasa:pds:hst_00666:browse_wfpc2_xxx:u2novv01j_xxx'
+    BROWSE_PRODUCT_LABEL_FILEPATH = \
+        "/I/don't/exist/hst_00666/browse_wfpc2_xxx/visit_vv/u2novv01j_xxx.xml"
+    BROWSE_PRODUCT_JPG_FILEPATH = \
+        "/I/don't/exist/hst_00666/data_wfpc2_xxx/visit_vv/u2novv01j_xxx.jpg"
 
     def setUp(self):
         # type: () -> None
@@ -41,28 +56,28 @@ class TestSqlAlch(unittest.TestCase):
         self.session.add(self.db_bundle)
 
         self.db_collection = Collection(
-            lid=self.COLLECTION_LID,
+            lid=self.DATA_COLLECTION_LID,
             bundle_lid=self.BUNDLE_LID,
             prefix='data',
             suffix='xxx',
             instrument='wfpc2',
             full_filepath="/I/don't/exist/hst_00666/data_wfpc2_xxx",
-            label_filepath=self.COLLECTION_LABEL_FILEPATH,
+            label_filepath=self.DATA_COLLECTION_LABEL_FILEPATH,
             inventory_name='collection_data.csv',
-            inventory_filepath=self.COLLECTION_INVENTORY_FILEPATH
+            inventory_filepath=self.DATA_COLLECTION_INVENTORY_FILEPATH
             )
         self.session.add(self.db_collection)
 
-        self.db_product = FitsProduct(
-            lid=self.PRODUCT_LID,
-            collection_lid=self.COLLECTION_LID,
-            fits_filepath=self.PRODUCT_FITS_FILEPATH,
-            label_filepath=self.PRODUCT_LABEL_FILEPATH,
+        self.db_fits_product = FitsProduct(
+            lid=self.DATA_PRODUCT_LID,
+            collection_lid=self.DATA_COLLECTION_LID,
+            fits_filepath=self.DATA_PRODUCT_FITS_FILEPATH,
+            label_filepath=self.DATA_PRODUCT_LABEL_FILEPATH,
             visit='vv'
             )
-        self.session.add(self.db_product)
+        self.session.add(self.db_fits_product)
 
-        db_hdu = Hdu(product_lid=self.PRODUCT_LID,
+        db_hdu = Hdu(product_lid=self.DATA_PRODUCT_LID,
                      hdu_index=0,
                      hdr_loc=0,
                      dat_loc=1024,
@@ -78,11 +93,33 @@ class TestSqlAlch(unittest.TestCase):
                  ('NAXIS2', '111'),
                  ('BITPIX', '8')]
         for (k, v) in cards:
-            db_card = Card(product_lid=self.PRODUCT_LID,
+            db_card = Card(product_lid=self.DATA_PRODUCT_LID,
                            hdu_index=0,
                            keyword=k,
                            value=v)
             self.session.add(db_card)
+
+        self.db_browse_collection = Collection(
+            lid=self.BROWSE_COLLECTION_LID,
+            bundle_lid=self.BUNDLE_LID,
+            prefix='browse',
+            suffix='xxx',
+            instrument='wfpc2',
+            full_filepath="/I/don't/exist/hst_00666/browse_wfpc2_xxx",
+            label_filepath=self.BROWSE_COLLECTION_LABEL_FILEPATH,
+            inventory_name='collection_browse.csv',
+            inventory_filepath=self.BROWSE_COLLECTION_INVENTORY_FILEPATH
+            )
+        self.session.add(self.db_browse_collection)
+
+        self.db_browse_product = BrowseProduct(
+            lid=self.BROWSE_PRODUCT_LID,
+            collection_lid=self.BROWSE_COLLECTION_LID,
+            label_filepath=self.BROWSE_PRODUCT_LABEL_FILEPATH,
+            browse_filepath=self.BROWSE_PRODUCT_JPG_FILEPATH,
+            object_length=12345
+            )
+        self.session.add(self.db_browse_product)
 
         self.session.commit()
 
@@ -103,8 +140,13 @@ class TestSqlAlch(unittest.TestCase):
 
     def test_make_product_observational_label(self):
         # type: () -> None
-        label = make_product_observational_label(self.db_product)
-        print label
+        label = make_product_observational_label(self.db_fits_product)
+        verify_label_or_raise(label)
+
+    def test_make_product_browse_label(self):
+        # type: () -> None
+        label = make_product_browse_label(self.db_browse_collection,
+                                          self.db_browse_product)
         verify_label_or_raise(label)
 
 if __name__ == '__main__':
