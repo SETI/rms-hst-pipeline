@@ -29,20 +29,21 @@ class TestProduct(unittest.TestCase):
         # type: () -> None
         arch = get_any_archive()
         for p in arch.products():
-            lid = p.lid
-            visit = p.visit()
+            if not p.is_document_product():
+                lid = p.lid
+                visit = p.visit()
 
-            actual_fp = p.absolute_filepath()
-            expected_fps = [os.path.join(arch.root,
-                                         lid.bundle_id,
-                                         lid.collection_id,
-                                         ('visit_%s' % visit),
-                                         lid.product_id + ext)
-                            for ext in Product.FILE_EXTS]
+                actual_fp = p.absolute_filepath()
+                expected_fps = [os.path.join(arch.root,
+                                             lid.bundle_id,
+                                             lid.collection_id,
+                                             ('visit_%s' % visit),
+                                             lid.product_id + ext)
+                                for ext in Product.FILE_EXTS]
 
-            assert actual_fp in expected_fps
-            # We only check the first product
-            return
+                assert actual_fp in expected_fps
+                # We only check the first product
+                return
 
     def test_bundle(self):
         # type: () -> None
@@ -60,3 +61,24 @@ class TestProduct(unittest.TestCase):
         self.assertEquals(Collection(arch,
                                      LID('urn:nasa:pds:bundle:collection')),
                           p.collection())
+
+    def test_document_product(self):
+        # type: () -> None
+        arch = get_any_archive()
+        lid = LID('urn:nasa:pds:bundle:document:product')
+        p = Product(arch, lid)
+        self.assertEquals(p.absolute_filepath(),
+                          os.path.join(arch.root, 'bundle',
+                                       'document','product'))
+        with self.assertRaises(Exception):
+            p.visit_filepath()
+        with self.assertRaises(Exception):
+            p.visit()
+        self.assertTrue(p.absolute_filepath_is_directory())
+
+    def test_non_document_product(self):
+        # type: () -> None
+        arch = get_any_archive()
+        lid = LID('urn:nasa:pds:bundle:collection:product')
+        p = Product(arch, lid)
+        self.assertFalse(p.absolute_filepath_is_directory())
