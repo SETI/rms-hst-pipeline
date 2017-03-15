@@ -47,7 +47,19 @@ class Product(Component):
     validate visit directory names or to extract visit ids.
     """
 
-    FILE_EXTS = ['.fits', '.jpg']
+    DATA_EXTS = ['.fits']
+    # type: List[unicode]
+    """Currently legal file extensions for data product files."""
+
+    BROWSE_EXTS = ['.jpg']
+    # type: List[unicode]
+    """Currently legal file extensions for browse product files."""
+
+    DOC_EXTS = ['.apt', '.pdf', '.pro', '.prop']
+    # type: List[unicode]
+    """Currently legal file extensions for document product files."""
+
+    FILE_EXTS = DATA_EXTS + BROWSE_EXTS + DOC_EXTS
     # type: List[unicode]
     """Currently legal file extensions for product files."""
 
@@ -62,31 +74,47 @@ class Product(Component):
     def __repr__(self):
         return 'Product(%r, %r)' % (self.archive, self.lid)
 
+    def is_document_product(self):
+        return self.lid.collection_id == 'document'
+
     def absolute_filepath(self):
         # type: () -> unicode
-        """Return the absolute filepath to the product file."""
-        visit_fp = self.visit_filepath()
-        res = _find_product_file(visit_fp, self.lid.product_id)
+        """
+        Return the absolute filepath to the product directory, if this
+        is a document product, otherwise, to the product file.
+        """
+        if self.is_document_product():
+            collection_filepath = self.collection().absolute_filepath()
+            return os.path.join(collection_filepath, self.lid.product_id)
+        else:
+            visit_fp = self.visit_filepath()
+            res = _find_product_file(visit_fp, self.lid.product_id)
 
-        collection_fp = self.collection().absolute_filepath()
-        assert res, ('Couldn\'t find any product files: '
-                     'Product.absolute_filepath(%r) = %r '
-                     'where collection_fp = %r' % (self, res, collection_fp))
-        return res
+            collection_fp = self.collection().absolute_filepath()
+            assert res, ('Couldn\'t find any product files: '
+                         'Product.absolute_filepath(%r) = %r '
+                         'where collection_fp = %r' % (self,
+                                                       res,
+                                                       collection_fp))
+            return res
 
     def label_filepath(self):
         # type: () -> unicode
         """Return the absolute filepath to the product's label."""
-        product_fp = self.absolute_filepath()
-        (dir, product_basename) = os.path.split(product_fp)
-        (root, ext) = os.path.splitext(product_basename)
-        label_basename = root + '.xml'
+        if self.is_document_product():
+            # TODO should it be document.xml or phase2.xml or what?
+            return os.path.join(self.absolute_filepath(), 'document.xml')
+        else:
+            product_fp = self.absolute_filepath()
+            (dir, product_basename) = os.path.split(product_fp)
+            (root, ext) = os.path.splitext(product_basename)
+            label_basename = root + '.xml'
         return os.path.join(dir, label_basename)
 
     def visit_filepath(self):
         # type: () -> unicode
         """Return the absolute filepath to the product's visit directory."""
-        hst_filename = HstFilename(self.lid.product_id)
+        assert not self.is_document_product()
         collection_filepath = self.collection().absolute_filepath()
         visit_segment = 'visit_%s' % self.visit()
         return os.path.join(collection_filepath, visit_segment)
@@ -97,6 +125,7 @@ class Product(Component):
         Return the visit id for this product.  It is calculated from
         the product's filepath.
         """
+        assert not self.is_document_product()
         hst_filename = HstFilename(self.lid.product_id)
         return hst_filename.visit()
 
@@ -107,8 +136,13 @@ class Product(Component):
         :class:`~pdart.pds4.Product.Product` as
         :class:`~pdart.pds4.File.File` objects.
         """
-        basename = os.path.basename(self.absolute_filepath())
-        yield File(self, basename)
+        if self.is_document_product():
+            for basename in os.listdir(self.absolute_filepath()):
+                if os.path.splitext(basename)[1] in Product.DOC_EXTS:
+                    yield File(self, basename)
+        else:
+            basename = os.path.basename(self.absolute_filepath())
+            yield File(self, basename)
 
     def absolute_filepath_is_directory(self):
         # type: () -> bool
@@ -119,7 +153,7 @@ class Product(Component):
         Always False because products' filepaths are to their
         (currently single) file.
         """
-        return False
+        return self.is_document_product()
 
     def collection(self):
         # type: () -> pdart.pds4.Collection.Collection
@@ -138,4 +172,5 @@ class Product(Component):
     def browse_product(self):
         # type: () -> Product
         """Return the browse product object for this product."""
+        assert not self.is_document_product()
         return Product(self.archive, self.lid.to_browse_lid())
