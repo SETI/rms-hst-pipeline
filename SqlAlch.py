@@ -46,7 +46,7 @@ def open_bundle_database(bundle):
     return sqlite3.connect(bundle_database_filepath(bundle))
 
 
-def add_cards(session, product_lid, hdu_index, header):
+def db_add_cards(session, product_lid, hdu_index, header):
     # type: (Session, unicode, int, Any) -> None
     cards = [Card(product_lid=product_lid,
                   hdu_index=hdu_index,
@@ -56,7 +56,7 @@ def add_cards(session, product_lid, hdu_index, header):
     session.bulk_save_objects(cards)
 
 
-def add_bundle(archive, bundle):
+def db_add_bundle(archive, bundle):
     # type: (A.Archive, B.Bundle) -> None
     db_fp = bundle_database_filepath(bundle)
     try:
@@ -75,11 +75,11 @@ def add_bundle(archive, bundle):
     session.add(db_bundle)
     session.commit()
     for collection in bundle.collections():
-        add_collection(session, archive, bundle, collection)
+        db_add_collection(session, archive, bundle, collection)
     print db_fp
 
 
-def add_collection(session, archive, bundle, collection):
+def db_add_collection(session, archive, bundle, collection):
     # type: (Session, A.Archive, B.Bundle, C.Collection) -> None
     db_collection = Collection(
         lid=str(collection.lid),
@@ -95,10 +95,10 @@ def add_collection(session, archive, bundle, collection):
     session.commit()
     if collection.prefix() == 'data':
         for product in collection.products():
-            add_product(session, archive, collection, product)
+            db_add_product(session, archive, collection, product)
 
 
-def add_product(session, archive, collection, product):
+def db_add_product(session, archive, collection, product):
     # type: (Session, A.Archive, C.Collection, P.Product) -> None
     db_fits_product = None
     print '    ', product.lid
@@ -120,10 +120,10 @@ def add_product(session, archive, collection, product):
                              dat_loc=fileinfo['datLoc'],
                              dat_span=fileinfo['datSpan'])
                 session.add(db_hdu)
-                add_cards(session,
-                          str(product.lid),
-                          n,
-                          hdu.header)
+                db_add_cards(session,
+                             str(product.lid),
+                             n,
+                             hdu.header)
             session.add(db_fits_product)
     except IOError as e:
         db_bad_fits_file = BadFitsFile(
@@ -152,7 +152,7 @@ def add_product(session, archive, collection, product):
 def run():
     archive = get_any_archive()
     for bundle in archive.bundles():
-        add_bundle(archive, bundle)
+        db_add_bundle(archive, bundle)
 
 if __name__ == '__main__':
     run()

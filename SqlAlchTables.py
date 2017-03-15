@@ -121,8 +121,16 @@ class DocumentProduct(Product):
         }
 
     def __repr__(self):
-        return 'DocumentProduct(lid=%s, fits_filepath=%s)' % \
-            (self.lid, self.document_filepath)
+        return 'DocumentProduct(lid=%s)' % \
+            (self.lid)
+
+
+class DocumentFile(Base):
+    __tablename__ = 'document_files'
+    product_lid = Column(String,
+                         ForeignKey('document_products.product_lid'),
+                         primary_key=True, nullable=False)
+    file_basename = Column(String, primary_key=True, nullable=False)
 
 
 class Hdu(Base):

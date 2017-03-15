@@ -69,7 +69,7 @@ class TestProduct(unittest.TestCase):
         p = Product(arch, lid)
         self.assertEquals(p.absolute_filepath(),
                           os.path.join(arch.root, 'bundle',
-                                       'document','product'))
+                                       'document', 'product'))
         with self.assertRaises(Exception):
             p.visit_filepath()
         with self.assertRaises(Exception):

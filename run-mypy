@@ -30,6 +30,7 @@ mypy --silent-imports --py2 \
     MakeRawBrowse.py \
     SearchDev.py \
     SqlAlch.py \
+    SqlAlchDocs.py \
     SqlAlchLabels.py \
     SqlAlchTables.py \
     SqlAlchTests.py \
