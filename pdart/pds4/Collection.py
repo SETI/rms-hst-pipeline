@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class Collection(Component):
     """A PDS4 Collection."""
 
-    DIRECTORY_PATTERN = r'\A([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)\Z'
+    DIRECTORY_PATTERN = r'\A(([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)|document)\Z'
     # type: str
 
     """
@@ -49,7 +49,7 @@ class Collection(Component):
         collection's :class:`~pdart.pds4.LID`.
         """
         return re.match(Collection.DIRECTORY_PATTERN,
-                        self.lid.collection_id).group(2)
+                        self.lid.collection_id).group(3)
 
     def prefix(self):
         # type: () -> unicode
@@ -65,7 +65,7 @@ class Collection(Component):
         # hack for document collections, which have no prefix or
         # suffix
         if match:
-            return match.group(1)
+            return match.group(2)
         else:
             return None
 
@@ -81,7 +81,7 @@ class Collection(Component):
         # hack for document collections, which have no prefix or
         # suffix
         if match:
-            return match.group(3)
+            return match.group(4)
         else:
             return None
 
@@ -131,12 +131,17 @@ class Collection(Component):
         from pdart.pds4.Product import Product
 
         dir_fp = self.absolute_filepath()
-        for (dirpath, dirnames, filenames) in os.walk(dir_fp):
-            for filename in filenames:
-                (root, ext) = os.path.splitext(filename)
-                if ext in Product.FILE_EXTS:
-                    product_lid = LID('%s:%s' % (self.lid.lid, root))
-                    yield Product(self.archive, product_lid)
+        if self.lid.collection_id == 'document':
+            for subdir in os.listdir(dir_fp):
+                product_lid = LID('%s:%s' % (self.lid.lid, subdir))
+                yield Product(self.archive, product_lid)
+        else:
+            for (dirpath, dirnames, filenames) in os.walk(dir_fp):
+                for filename in filenames:
+                    (root, ext) = os.path.splitext(filename)
+                    if ext in Product.FILE_EXTS:
+                        product_lid = LID('%s:%s' % (self.lid.lid, root))
+                        yield Product(self.archive, product_lid)
 
     def bundle(self):
         # type: () -> pdart.pds4.Bundle.Bundle

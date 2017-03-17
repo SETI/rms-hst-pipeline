@@ -57,7 +57,10 @@ def populate_document_bundle(bundle):
     collection_fp = os.path.join(bundle_fp, 'document')
 
     # TODO temporarily erasing and rewriting for development
-    shutil.rmtree(collection_fp)
+    try:
+        shutil.rmtree(collection_fp)
+    except:
+        pass
     ensure_directory(collection_fp)
 
     product_fp = os.path.join(collection_fp, 'phase2')
@@ -70,8 +73,8 @@ def run():
     # type: () -> None
     archive = get_any_archive()
     for bundle in archive.bundles():
+        print ('populating %s' % bundle.lid)
         populate_document_bundle(bundle)
-    return
 
     DB_FILEPATH = 'trash_me.db'
     try:
@@ -80,6 +83,13 @@ def run():
         pass
     eng = create_engine('sqlite:///' + DB_FILEPATH)
     Base.metadata.create_all(eng)
+
+    for collection in archive.collections():
+        if collection.lid.collection_id == 'document':
+            print ('%s is a document collection' % collection.lid)
+            for product in collection.products():
+                print ('%s is a document product' % product.lid)
+
 
 if __name__ == '__main__':
     run()

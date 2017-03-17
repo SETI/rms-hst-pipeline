@@ -52,7 +52,8 @@ class TestCollection(unittest.TestCase):
         arch = get_any_archive()
         bundle = list(arch.bundles())[0]
         collection = list(bundle.collections())[0]
+        triple = (collection.prefix(),
+                  collection.instrument(),
+                  collection.suffix())
         self.assertEquals(collection.lid.collection_id,
-                          '%s_%s_%s' % (collection.prefix(),
-                                        collection.instrument(),
-                                        collection.suffix()))
+                          '%s_%s_%s' % triple, str(triple))
