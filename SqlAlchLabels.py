@@ -314,7 +314,7 @@ def make_file_name_std_pair(basename):
     elif ext == '.pro':
         return (basename, '7-Bit ASCII Text')
     elif ext == '.apt':
-        return (basename, 'XML')
+        return (basename, 'UTF-8 Text')
     elif ext == '.pdf':
         return (basename, 'PDF')
     else:

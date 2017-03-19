@@ -144,13 +144,9 @@ def run():
             db_add_document_collection(session, collection)
             for product in collection.products():
                 db_product = db_add_document_product(session, product)
-                # TODO Need to rewrite make_product_doucment_label for
-                # db_product
                 label = make_product_document_label(db_bundle, db_product)
-                print '----------------------------------------'
-                print label
-                # TODO Verify is hanging.  Why?
-                # verify_label_or_raise(label)
+                verify_label_or_raise(label)
+                print 'verified label for', str(product.lid)
 
 if __name__ == '__main__':
     run()
