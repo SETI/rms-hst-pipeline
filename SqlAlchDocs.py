@@ -8,8 +8,9 @@ from sqlalchemy.orm import sessionmaker
 
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.LID import LID
+from pdart.xml.Schema import verify_label_or_raise
 
-from SqlAlchLabels import ensure_directory
+from SqlAlchLabels import ensure_directory, make_product_document_label
 from SqlAlchTables import *
 
 if TYPE_CHECKING:
@@ -74,7 +75,7 @@ def populate_document_bundle(bundle):
 
 
 def db_add_document_collection(session, collection):
-    # type: (Session, C.Collection) -> None
+    # type: (Session, C.Collection) -> Collection
     db_document_collection = Collection(
         lid=str(collection.lid),
         bundle_lid=str(collection.bundle().lid),
@@ -88,10 +89,11 @@ def db_add_document_collection(session, collection):
         )
     session.add(db_document_collection)
     session.commit()
+    return db_document_collection
 
 
 def db_add_document_product(session, product):
-    # type: (Session, P.Product) -> None
+    # type: (Session, P.Product) -> Product
     db_document_product = DocumentProduct(
         lid=str(product.lid),
         document_filepath=product.absolute_filepath(),
@@ -107,6 +109,7 @@ def db_add_document_product(session, product):
         session.add(db_document_file)
 
     session.commit()
+    return db_document_product
 
 
 def run():
@@ -130,8 +133,13 @@ def run():
         if collection.lid.collection_id == 'document':
             db_add_document_collection(session, collection)
             for product in collection.products():
-                db_add_document_product(session, product)
-
+                db_product = db_add_document_product(session, product)
+                # TODO Need to rewrite make_product_doucment_label for
+                # db_product
+                label = make_product_document_label(bundle, product)
+                print '----------------------------------------'
+                print label
+                verify_label_or_raise(label)
 
 if __name__ == '__main__':
     run()

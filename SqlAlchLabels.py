@@ -325,7 +325,7 @@ def make_product_document_label(bundle, product):
     publication_date = '2000-01-01'  # TODO
     publication_year = '2000'  # TODO
     description = 'TODO'  # TODO
-    files = [(u'bob', u'PDF')]
+    files = [(u'bob', u'PDF')]  # TODO
 
     label = _product_document_template({
             'Identification_Area': make_identification_area(
@@ -389,7 +389,7 @@ def make_product_spice_kernel_label(bundle, product, fits_product):
     publication_date = '2000-01-01'  # TODO
     publication_year = '2000'  # TODO
     description = 'TODO'  # TODO
-    files = [('bob', 'PDF')]
+    files = [('bob', 'PDF')]  # TODO
 
     label = _product_spice_kernel_template({
             'Identification_Area': make_identification_area(
