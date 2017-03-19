@@ -131,6 +131,9 @@ class DocumentFile(Base):
                          ForeignKey('document_products.product_lid'),
                          primary_key=True, nullable=False)
     file_basename = Column(String, primary_key=True, nullable=False)
+    bundle = relationship('DocumentProduct',
+                          backref=backref('document_files',
+                                          order_by=file_basename))
 
 
 class Hdu(Base):

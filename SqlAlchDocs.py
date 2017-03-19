@@ -131,15 +131,26 @@ def run():
 
     for collection in archive.collections():
         if collection.lid.collection_id == 'document':
+
+            bundle = collection.bundle()
+            db_bundle = Bundle(lid=str(bundle.lid),
+                               proposal_id=bundle.proposal_id(),
+                               archive_path=os.path.abspath(archive.root),
+                               full_filepath=bundle.absolute_filepath(),
+                               label_filepath=bundle.label_filepath())
+            session.add(db_bundle)
+            session.commit()
+
             db_add_document_collection(session, collection)
             for product in collection.products():
                 db_product = db_add_document_product(session, product)
                 # TODO Need to rewrite make_product_doucment_label for
                 # db_product
-                label = make_product_document_label(bundle, product)
+                label = make_product_document_label(db_bundle, db_product)
                 print '----------------------------------------'
                 print label
-                verify_label_or_raise(label)
+                # TODO Verify is hanging.  Why?
+                # verify_label_or_raise(label)
 
 if __name__ == '__main__':
     run()

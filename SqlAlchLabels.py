@@ -306,16 +306,29 @@ _product_document_template = interpret_document_template(
 # type: DocTemplate
 
 
-def make_product_document_label(bundle, product):
-    # type: (B.Bundle, P.Product) -> str
+def make_file_name_std_pair(basename):
+    # type: (AnyStr) -> Tuple[AnyStr, AnyStr]
+    (root, ext) = os.path.splitext(basename)
+    if ext == '.prop':
+        return (basename, '7-Bit ASCII Text')
+    elif ext == '.pro':
+        return (basename, '7-Bit ASCII Text')
+    elif ext == '.apt':
+        return (basename, 'XML')
+    elif ext == '.pdf':
+        return (basename, 'PDF')
+    else:
+        raise Exception('Unknown document file extension %s in %s' %
+                        (ext, basename))
 
-    # TODO We're based for now on pdart.pds4 Bundle and Product, not
-    # the DB versions.  Fix this.
 
-    logical_identifier = make_logical_identifier(str(product.lid))
+def make_product_document_label(db_bundle, db_product):
+    # type: (Bundle, Product) -> str
+
+    logical_identifier = make_logical_identifier(str(db_product.lid))
     version_id = make_version_id()
 
-    proposal_id = cast(int, bundle.proposal_id())
+    proposal_id = cast(int, 0 + db_bundle.proposal_id)
     text = "This bundle contains images obtained from " + \
         "HST Observing Program %d." % proposal_id
     title = make_title(text)
@@ -325,7 +338,10 @@ def make_product_document_label(bundle, product):
     publication_date = '2000-01-01'  # TODO
     publication_year = '2000'  # TODO
     description = 'TODO'  # TODO
-    files = [(u'bob', u'PDF')]  # TODO
+    short_files = ['' + file.file_basename
+                   for file in db_product.document_files]
+    # This should be tuples of file_name and std
+    files = [make_file_name_std_pair(f) for f in short_files]
 
     label = _product_document_template({
             'Identification_Area': make_identification_area(
