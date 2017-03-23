@@ -75,13 +75,30 @@ def db_add_bundle(archive, bundle):
     session.add(db_bundle)
     session.commit()
     for collection in bundle.collections():
-        db_add_collection(session, archive, bundle, collection)
+        if collection.lid.collection_id == 'document':
+            db_add_document_collection(session, archive, bundle, collection)
+        else:
+            db_add_non_document_collection(session, archive,
+                                           bundle, collection)
     print db_fp
 
 
-def db_add_collection(session, archive, bundle, collection):
+def db_add_document_collection(session, archive, bundle, collection):
     # type: (Session, A.Archive, B.Bundle, C.Collection) -> None
-    db_collection = Collection(
+    db_collection = DocumentCollection(
+        lid=str(collection.lid),
+        bundle_lid=str(bundle.lid),
+        full_filepath=collection.absolute_filepath(),
+        label_filepath=collection.label_filepath(),
+        inventory_name=collection.inventory_name(),
+        inventory_filepath=collection.inventory_filepath())
+    session.add(db_collection)
+    session.commit()
+
+
+def db_add_non_document_collection(session, archive, bundle, collection):
+    # type: (Session, A.Archive, B.Bundle, C.Collection) -> None
+    db_collection = NonDocumentCollection(
         lid=str(collection.lid),
         bundle_lid=str(bundle.lid),
         prefix=collection.prefix(),

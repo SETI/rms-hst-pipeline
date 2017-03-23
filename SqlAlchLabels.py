@@ -12,7 +12,7 @@ from pdart.xml.Pretty import pretty_print
 from pdart.xml.Schema import verify_label_or_raise
 from pdart.xml.Templates import interpret_document_template
 
-from SqlAlchTables import FitsProduct
+from SqlAlchTables import FitsProduct, NonDocumentCollection
 from SqlAlchXml import *
 
 from typing import TYPE_CHECKING
@@ -466,7 +466,7 @@ def make_db_browse_collection(session, browse_collection):
 
     bundle = browse_collection.bundle()
 
-    db_browse_collection = Collection(
+    db_browse_collection = NonDocumentCollection(
         lid=lid,
         bundle_lid=str(bundle.lid),
         prefix=browse_collection.prefix(),

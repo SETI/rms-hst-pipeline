@@ -76,12 +76,9 @@ def populate_document_bundle(bundle):
 
 def db_add_document_collection(session, collection):
     # type: (Session, C.Collection) -> Collection
-    db_document_collection = Collection(
+    db_document_collection = DocumentCollection(
         lid=str(collection.lid),
         bundle_lid=str(collection.bundle().lid),
-        prefix='<dummy>',  # TODO
-        suffix='<dummy>',  # TODO
-        instrument='<dummy>',  # TODO
         full_filepath=collection.absolute_filepath(),
         label_filepath=collection.label_filepath(),
         inventory_name=collection.inventory_name(),

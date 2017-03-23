@@ -4,5 +4,6 @@ python DeleteBrowse.py
 python DeleteDocs.py
 echo starting tests at `date "+%Y-%m-%d %H:%M"`
 py.test
+python SqlAlchTests.py
 echo finished tests at `date "+%Y-%m-%d %H:%M"`
 

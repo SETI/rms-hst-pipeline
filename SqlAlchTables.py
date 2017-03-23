@@ -42,21 +42,53 @@ class Collection(Base):
     lid = Column(String, primary_key=True, nullable=False)
     bundle_lid = Column(String, ForeignKey('bundles.lid'),
                         nullable=False, index=True)
-    bundle = relationship('Bundle', backref=backref('collections',
-                                                    order_by=lid))
-    prefix = Column(String, nullable=False)
-    suffix = Column(String, nullable=False)
-    instrument = Column(String, nullable=False)
     full_filepath = Column(String, nullable=False)
     label_filepath = Column(String, nullable=False)
     inventory_name = Column(String, nullable=False)
     inventory_filepath = Column(String, nullable=False)
+    type = Column(String(24), nullable=False)
+
+    bundle = relationship('Bundle', backref=backref('collections',
+                                                    order_by=lid))
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'collection',
+        'polymorphic_on': type
+        }
+
+
+class DocumentCollection(Collection):
+    __tablename__ = 'document_collections'
+    collection_lid = Column(String, ForeignKey('collections.lid'),
+                            primary_key=True, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'document_collection',
+        }
 
     def __repr__(self):
-        return 'Collection(lid=%s)' % self.lid
+        return 'DocumentCollection(lid=%s)' % self.lid
 
 
-Index('idx_collections_prefix_suffix', Collection.prefix, Collection.suffix)
+class NonDocumentCollection(Collection):
+    __tablename__ = 'non_document_collections'
+    collection_lid = Column(String, ForeignKey('collections.lid'),
+                            primary_key=True, nullable=False)
+    prefix = Column(String, nullable=False)
+    suffix = Column(String, nullable=False)
+    instrument = Column(String, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'non_document_collection',
+        }
+
+    def __repr__(self):
+        return 'NonDocumentCollection(lid=%s)' % self.lid
+
+
+Index('idx_non_document_collections_prefix_suffix',
+      NonDocumentCollection.prefix,
+      NonDocumentCollection.suffix)
 
 
 class Product(Base):
@@ -67,6 +99,7 @@ class Product(Base):
                             nullable=False, index=True)
     label_filepath = Column(String, nullable=False)
     type = Column(String(16), nullable=False)
+
     collection = relationship('Collection', backref=backref('products',
                                                             order_by=lid))
 
@@ -131,6 +164,7 @@ class DocumentFile(Base):
                          ForeignKey('document_products.product_lid'),
                          primary_key=True, nullable=False)
     file_basename = Column(String, primary_key=True, nullable=False)
+
     bundle = relationship('DocumentProduct',
                           backref=backref('document_files',
                                           order_by=file_basename))
@@ -145,6 +179,7 @@ class Hdu(Base):
     hdr_loc = Column(Integer, nullable=False)
     dat_loc = Column(Integer, nullable=False)
     dat_span = Column(Integer, nullable=False)
+
     product = relationship('FitsProduct', backref=backref('hdus',
                                                           order_by=hdu_index))
 
@@ -161,6 +196,7 @@ class Card(Base):
     hdu_index = Column(Integer, ForeignKey('hdus.hdu_index'), nullable=False)
     keyword = Column(String, nullable=False)
     value = Column(String, nullable=True)
+
     hdu = relationship('Hdu', backref=backref('cards',
                                               order_by=id))
 

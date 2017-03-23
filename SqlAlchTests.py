@@ -55,7 +55,7 @@ class TestSqlAlch(unittest.TestCase):
             label_filepath="/I/don't/exist/hst_00666/bundle.xml")
         self.session.add(self.db_bundle)
 
-        self.db_collection = Collection(
+        self.db_collection = NonDocumentCollection(
             lid=self.DATA_COLLECTION_LID,
             bundle_lid=self.BUNDLE_LID,
             prefix='data',
@@ -99,7 +99,7 @@ class TestSqlAlch(unittest.TestCase):
                            value=v)
             self.session.add(db_card)
 
-        self.db_browse_collection = Collection(
+        self.db_browse_collection = NonDocumentCollection(
             lid=self.BROWSE_COLLECTION_LID,
             bundle_lid=self.BUNDLE_LID,
             prefix='browse',
