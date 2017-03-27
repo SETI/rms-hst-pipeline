@@ -7,6 +7,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
 
 from pdart.pds4.Archives import get_any_archive
+import pdart.pds4.Collection as C
 from pdart.pds4.LID import LID
 from pdart.xml.Schema import verify_label_or_raise
 
@@ -18,24 +19,24 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     import pdart.pds4.Bundle as B
-    import pdart.pds4.Collection as C
     import pdart.pds4.Product as P
 
 
 def _retrieve_doc(url, filepath):
-    # type: (unicode, unicode) -> str
+    # type: (unicode, unicode) -> bool
     """Retrieves the text at that URL or raises an exception."""
     try:
         resp = urllib2.urlopen(url)
         contents = resp.read()
         with open(filepath, 'w') as f:
             f.write(contents)
+            return True
     except Exception as e:
-        pass
+        return False
 
 
 def _download_product_documents(proposal_id, product_fp):
-    # type: (int, unicode) -> None
+    # type: (int, unicode) -> bool
     """
     Using the templates, download the documentation files for this
     proposal ID into the product directory.
@@ -47,14 +48,18 @@ def _download_product_documents(proposal_id, product_fp):
         ('https://www.stsci.edu/hst/phase2-public/%d.prop', 'phase2.prop')
         ]
     # type: List[Tuple[unicode, unicode]]
+
+    downloaded_doc = False
+
     for (url_template, basename) in table:
         url = url_template % proposal_id
         filepath = os.path.join(product_fp, basename)
-        _retrieve_doc(url, filepath)
+        downloaded_doc = _retrieve_doc(url, filepath) or downloaded_doc
+    return downloaded_doc
 
 
-def populate_document_bundle(bundle):
-    # type: (B.Bundle) -> None
+def populate_document_collection(bundle):
+    # type: (B.Bundle) -> C.Collection
     """
     Download documentation for the bundle and save in the filesystem.
     """
@@ -71,7 +76,11 @@ def populate_document_bundle(bundle):
     product_fp = os.path.join(collection_fp, 'phase2')
     ensure_directory(product_fp)
     proposal_id = bundle.proposal_id()
-    _download_product_documents(proposal_id, product_fp)
+    if _download_product_documents(proposal_id, product_fp):
+        collection_lid = '%s:document' % str(bundle.lid)
+        return C.Collection(bundle.archive, LID(collection_lid))
+    else:
+        return None
 
 
 def db_add_document_collection(session, collection):
@@ -114,7 +123,7 @@ def run():
     archive = get_any_archive()
     for bundle in archive.bundles():
         print ('populating %s' % bundle.lid)
-        populate_document_bundle(bundle)
+        populate_document_collection(bundle)
 
     DB_FILEPATH = 'trash_me.db'
     try:

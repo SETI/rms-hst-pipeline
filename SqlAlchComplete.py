@@ -1,4 +1,13 @@
-from SqlAlch import *
+from sqlalchemy.orm import Session
+
+from pdart.xml.Schema import verify_label_or_raise
+
+from SqlAlch import db_add_product
+from SqlAlchDocs import db_add_document_collection, \
+    populate_document_collection
+from SqlAlchLabels import make_browse_product, make_db_browse_product, \
+    make_product_browse_label, make_product_bundle_label, \
+    make_product_collection_label
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -8,60 +17,56 @@ if TYPE_CHECKING:
     import pdart.pds4.Product as P
 
 
-def db_add_browse_product(session):
-    # type: (Session) -> None
-    pass
-
-
-def generate_browse_product(fits_product):
-    # type: (Session) -> None
-    pass
-
-
-def generate_document_collection(session, bundle):
-    # type: (Session, B.Bundle) -> None
-    pass
-
-
 def make_bundle_label(session, bundle):
     # type: (Session, B.Bundle) -> None
-    pass
+    assert False
 
 
 def make_collection_label(session, collection):
     # type: (Session, C.Collection) -> None
-    pass
-
-
-def make_product_label(session, product):
-    # type: (Session, P.Product) -> None
-    pass
+    assert False
 
 
 def complete_bundle(session, archive, bundle):
     # type: (Session, A.Archive, B.Bundle) -> None
 
-    # Move FITS info into database
+    # Move FITS info into database and build labels.  TODO: Split
+    # those two pieces of functionality.
     for collection in bundle.collections():
         for product in collection.products():
             db_add_product(session, archive, collection, product)
 
-            # Or do we do this in the database?
+    # Now make browse products
     for product in bundle.products():
-        generate_browse_product(product)
+        browse_product = product.browse_product()
+        make_browse_product(product, browse_product)
+        (db_browse_collection,
+         db_browse_product) = make_db_browse_product(session,
+                                                     product,
+                                                     browse_product)
+        label = make_product_browse_label(db_browse_collection,
+                                          db_browse_product)
+        # TODO Does it get put into the filesystem?
+        verify_label_or_raise(label)
 
-    for product in bundle.products():
-        db_add_browse_product(product)
+    # TODO Repeat the same for SPICE kernels
 
-    for product in bundle.products():
-        make_product_label(session, product)
-
-    # Repeat the same for SPICE kernels
+    # Label the FITS/browse (/SPICE: TODO) collections.
+    for collection in bundle.collections():
+        # TODO Wrong kind of Collection
+        label = ''  # make_product_collection_label(collection)
+        # TODO Does it get put into the filesystem?
+        verify_label_or_raise(label)
 
     # Move documentation into filesystem and database
-    generate_document_collection(session, bundle)
+    doc_collection = populate_document_collection(bundle)
+    if doc_collection:
+        db_document_collection = db_add_document_collection(session,
+                                                            doc_collection)
+        # TODO When do we make labels for the products?
+        make_product_collection_label(db_document_collection)
 
-    for collection in bundle.collections():
-        make_collection_label(session, collection)
-
-    make_bundle_label(session, bundle)
+    # TODO Wrong kind of Bundle
+    label = ''  # make_product_bundle_label(bundle)
+    # TODO Does it get put into the filesystem?
+    verify_label_or_raise(label)
