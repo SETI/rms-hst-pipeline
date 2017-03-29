@@ -1,3 +1,5 @@
+import os.path
+
 import pdart.add_pds_tools
 import picmaker
 
@@ -497,12 +499,15 @@ def make_db_browse_product(session, fits_product, browse_product):
     session.query(BrowseProduct).filter_by(product_lid=lid).delete()
     session.query(Product).filter_by(lid=lid).delete()
 
+    browse_filepath = browse_product.absolute_filepath()
+    object_length = os.path.getsize(browse_filepath)
+
     db_browse_product = BrowseProduct(
         lid=str(browse_product.lid),
         collection_lid=str(browse_product.collection().lid),
         label_filepath=browse_product.label_filepath(),
-        browse_filepath=browse_product.absolute_filepath(),
-        object_length=1  # TODO Wrong!
+        browse_filepath=browse_filepath,
+        object_length=object_length
         )
     session.add(db_browse_product)
     session.commit()
