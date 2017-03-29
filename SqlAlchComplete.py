@@ -51,7 +51,8 @@ def complete_bundle(session, archive, bundle):
     print "completing bundle", bundle
     for collection in bundle.collections():
         print "completing collection", collection
-        db_add_non_document_collection(session, archive, bundle, collection)
+        db_collection = db_add_non_document_collection(session, archive,
+                                                       bundle, collection)
         for product in list(collection.products()):
             print "completing product", product
             db_fits_product = db_add_product(session, archive,
@@ -80,10 +81,9 @@ def complete_bundle(session, archive, bundle):
                 # TODO Repeat the same for SPICE kernels
 
         print "making collection label", collection
-        # TODO Wrong kind of Collection
-        label = ''  # make_product_collection_label(collection)
+        label = make_product_collection_label(db_collection)
         # TODO Does it get put into the filesystem?
-        # verify_label_or_raise(label)
+        verify_label_or_raise(label)
 
     # Move documentation into filesystem and database
     doc_collection = populate_document_collection(bundle)
@@ -101,10 +101,9 @@ def complete_bundle(session, archive, bundle):
         make_product_collection_label(db_doc_collection)
 
     print "making bundle label", bundle
-    # TODO Wrong kind of Bundle
-    label = ''  # make_product_bundle_label(bundle)
+    label = make_product_bundle_label(db_bundle)
     # Does it get put into the filesystem?  No.
-    # verify_label_or_raise(label)
+    verify_label_or_raise(label)
 
 BUNDLE_NAME = 'hst_11536'
 DATABASE_NAME = 'sqlalch-database.db'

@@ -97,7 +97,7 @@ def db_add_document_collection(session, archive, bundle, collection):
 
 
 def db_add_non_document_collection(session, archive, bundle, collection):
-    # type: (Session, A.Archive, B.Bundle, C.Collection) -> None
+    # type: (Session, A.Archive, B.Bundle, C.Collection) -> Collection
     db_collection = NonDocumentCollection(
         lid=str(collection.lid),
         bundle_lid=str(bundle.lid),
@@ -110,7 +110,7 @@ def db_add_non_document_collection(session, archive, bundle, collection):
         inventory_filepath=collection.inventory_filepath())
     session.add(db_collection)
     session.commit()
-    return
+    return db_collection
     # if collection.prefix() == 'data':
     #     for product in collection.products():
     #        db_add_product(session, archive, collection, product)
