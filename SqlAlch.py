@@ -110,13 +110,14 @@ def db_add_non_document_collection(session, archive, bundle, collection):
         inventory_filepath=collection.inventory_filepath())
     session.add(db_collection)
     session.commit()
-    if collection.prefix() == 'data':
-        for product in collection.products():
-            db_add_product(session, archive, collection, product)
+    return
+    # if collection.prefix() == 'data':
+    #     for product in collection.products():
+    #        db_add_product(session, archive, collection, product)
 
 
 def db_add_product(session, archive, collection, product):
-    # type: (Session, A.Archive, C.Collection, P.Product) -> None
+    # type: (Session, A.Archive, C.Collection, P.Product) -> Product
     db_fits_product = None
     print '    ', product.lid
     file = list(product.files())[0]
@@ -148,6 +149,7 @@ def db_add_product(session, archive, collection, product):
             filepath=file.full_filepath(),
             message=str(e))
         session.add(db_bad_fits_file)
+        print 'bad FITS file', str(product.lid)
     session.commit()
 
     if db_fits_product:
@@ -164,6 +166,8 @@ def db_add_product(session, archive, collection, product):
         except:
             print '#### failed on', label_filepath
             raise
+
+    return db_fits_product
 
 
 def run():

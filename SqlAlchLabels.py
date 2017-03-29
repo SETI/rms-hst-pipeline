@@ -12,7 +12,8 @@ from pdart.xml.Pretty import pretty_print
 from pdart.xml.Schema import verify_label_or_raise
 from pdart.xml.Templates import interpret_document_template
 
-from SqlAlchTables import FitsProduct, NonDocumentCollection
+from SqlAlchTables import DocumentCollection, FitsProduct, \
+    NonDocumentCollection
 from SqlAlchXml import *
 
 from typing import TYPE_CHECKING
@@ -193,9 +194,15 @@ def make_product_collection_label(collection):
     version_id = make_version_id()
 
     proposal_id = cast(int, collection.bundle.proposal_id)
-    text = ('This collection contains the %s images obtained by ' +
-            'HST Observing Program %d.') % (str(collection.suffix).upper(),
-                                            proposal_id)
+
+    is_document_collection = isinstance(collection, DocumentCollection)
+    if is_document_collection:
+        text = ('This collection contains documentation for the '
+                'HST Observing Program %d.') % (proposal_id)
+    else:
+        text = ('This collection contains the %s images obtained by ' +
+                'HST Observing Program %d.') % (str(collection.suffix).upper(),
+                                                proposal_id)
 
     title = make_title(text)
     information_model_version = make_information_model_version()
@@ -460,24 +467,23 @@ def make_db_browse_collection(session, browse_collection):
     # BrowseCollection type?
     lid = str(browse_collection.lid)
 
-    # TODO I'm deleting any previous record here, but only during
-    # development.
-    session.query(Collection).filter_by(lid=lid).delete()
+    db_browse_collection = \
+        session.query(NonDocumentCollection).filter_by(lid=lid).first()
 
-    bundle = browse_collection.bundle()
-
-    db_browse_collection = NonDocumentCollection(
-        lid=lid,
-        bundle_lid=str(bundle.lid),
-        prefix=browse_collection.prefix(),
-        suffix=browse_collection.suffix(),
-        instrument=browse_collection.instrument(),
-        full_filepath=browse_collection.absolute_filepath(),
-        label_filepath=browse_collection.label_filepath(),
-        inventory_name=browse_collection.inventory_name(),
-        inventory_filepath=browse_collection.inventory_filepath())
-    session.add(db_browse_collection)
-    session.commit()
+    if not db_browse_collection:
+        bundle = browse_collection.bundle()
+        db_browse_collection = NonDocumentCollection(
+            lid=lid,
+            bundle_lid=str(bundle.lid),
+            prefix=browse_collection.prefix(),
+            suffix=browse_collection.suffix(),
+            instrument=browse_collection.instrument(),
+            full_filepath=browse_collection.absolute_filepath(),
+            label_filepath=browse_collection.label_filepath(),
+            inventory_name=browse_collection.inventory_name(),
+            inventory_filepath=browse_collection.inventory_filepath())
+        session.add(db_browse_collection)
+        session.commit()
     return db_browse_collection
 
 
@@ -495,7 +501,8 @@ def make_db_browse_product(session, fits_product, browse_product):
         lid=str(browse_product.lid),
         collection_lid=str(browse_product.collection().lid),
         label_filepath=browse_product.label_filepath(),
-        browse_filepath=browse_product.absolute_filepath()
+        browse_filepath=browse_product.absolute_filepath(),
+        object_length=1  # TODO Wrong!
         )
     session.add(db_browse_product)
     session.commit()
