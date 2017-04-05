@@ -34,7 +34,6 @@ mypy --silent-imports --py2 \
     SqlAlchDocs.py \
     SqlAlchLabels.py \
     SqlAlchTests.py \
-    SqlAlchXml.py \
     TestHstParams.py \
     TestMast.py \
     ValidateArchive.py \

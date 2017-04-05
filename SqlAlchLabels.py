@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct, \
     NonDocumentCollection
+from pdart.db.SqlAlchXml import *
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
@@ -16,7 +17,6 @@ from pdart.xml.Pretty import pretty_print
 from pdart.xml.Schema import verify_label_or_raise
 from pdart.xml.Templates import interpret_document_template
 
-from SqlAlchXml import *
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

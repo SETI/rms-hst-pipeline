@@ -1,14 +1,17 @@
+"""
+Functions to build individual PDS4 XML elements.
+"""
+
 import pdart.add_pds_tools
 import julian
 
 import os.path
 
+from pdart.db.SqlAlchTables import BrowseProduct, Bundle, Collection, Hdu, \
+    lookup_card, Product
 from pdart.pds4labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE
 from pdart.xml.Templates import combine_nodes_into_fragment, \
     interpret_template
-
-from pdart.db.SqlAlchTables import BrowseProduct, Bundle, Collection, Hdu, \
-    lookup_card, Product
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
