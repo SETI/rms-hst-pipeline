@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
+from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchLabels import make_browse_product, \
     make_db_browse_product, make_product_browse_label, \
     make_product_bundle_label, make_product_collection_label, \
@@ -107,7 +108,6 @@ def complete_bundle(session, archive, bundle):
     verify_label_or_raise(label)
 
 BUNDLE_NAME = 'hst_11536'
-DATABASE_NAME = 'sqlalch-database.db'
 
 
 def reset_bundle(bundle):

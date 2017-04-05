@@ -6,6 +6,7 @@ import picmaker
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct, \
     NonDocumentCollection
 from pdart.db.SqlAlchXml import *
@@ -27,11 +28,6 @@ if TYPE_CHECKING:
     from pdart.xml.Templates import DocTemplate
 
 
-_NEW_DATABASE_NAME = 'sqlalch-database.db'
-# type: str
-# TODO This is cut-and-pasted from SqlAlch.  Refactor and remove.
-
-
 PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_raw:icwy08q3q_raw'
 # type: str
 
@@ -40,7 +36,7 @@ def bundle_database_filepath(bundle):
     # type: (B.Bundle) -> unicode
 
     # TODO This is cut-and-pasted from SqlAlch.  Refactor and remove.
-    return os.path.join(bundle.absolute_filepath(), _NEW_DATABASE_NAME)
+    return os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
 
 
 def ensure_directory(dir):

@@ -8,6 +8,7 @@ from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import *
 
+from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchLabels import make_product_observational_label
 from pdart.db.SqlAlchTables import *
 from pdart.pds4.Archives import get_any_archive
@@ -30,16 +31,13 @@ def handle_undefined(val):
         return val
 
 
-_NEW_DATABASE_NAME = 'sqlalch-database.db'
-# type: str
-
 VERIFY = False
 # type: bool
 
 
 def bundle_database_filepath(bundle):
     # type: (B.Bundle) -> unicode
-    return os.path.join(bundle.absolute_filepath(), _NEW_DATABASE_NAME)
+    return os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
 
 
 def open_bundle_database(bundle):
