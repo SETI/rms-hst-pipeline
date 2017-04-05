@@ -3,10 +3,10 @@ import shutil
 import tempfile
 import unittest
 
+from pdart.db.SqlAlchTables import *
 from pdart.xml.Schema import verify_label_or_raise
 
 from SqlAlchLabels import *
-from SqlAlchTables import *
 
 
 class TestSqlAlch(unittest.TestCase):

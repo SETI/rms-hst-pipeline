@@ -1,3 +1,7 @@
+"""
+Tables used by SqlAlchemy to build a database.  This will replace the
+previous implementation which used raw SQL calls.
+"""
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
@@ -13,6 +17,9 @@ Base = declarative_base()
 
 
 class Bundle(Base):
+    """
+    A database representation of a PDS4 bundle.
+    """
     __tablename__ = 'bundles'
 
     lid = Column(String, primary_key=True, nullable=False)
@@ -26,6 +33,10 @@ class Bundle(Base):
 
 
 class BadFitsFile(Base):
+    """
+    A database entry for a FITS file that cannot be read without
+    errors.
+    """
     __tablename__ = 'bad_fits_files'
 
     lid = Column(String, primary_key=True, nullable=False)
@@ -37,6 +48,9 @@ class BadFitsFile(Base):
 
 
 class Collection(Base):
+    """
+    A database representation of a PDS4 collection.
+    """
     __tablename__ = 'collections'
 
     lid = Column(String, primary_key=True, nullable=False)
@@ -58,6 +72,10 @@ class Collection(Base):
 
 
 class DocumentCollection(Collection):
+    """
+    A database representation of a PDS4 collection containing
+    documents.
+    """
     __tablename__ = 'document_collections'
     collection_lid = Column(String, ForeignKey('collections.lid'),
                             primary_key=True, nullable=False)
@@ -71,6 +89,10 @@ class DocumentCollection(Collection):
 
 
 class NonDocumentCollection(Collection):
+    """
+    A database representation of a PDS4 collection which does not
+    contain documents.
+    """
     __tablename__ = 'non_document_collections'
     collection_lid = Column(String, ForeignKey('collections.lid'),
                             primary_key=True, nullable=False)
@@ -92,6 +114,9 @@ Index('idx_non_document_collections_prefix_suffix',
 
 
 class Product(Base):
+    """
+    A database representation of a PDS4 product.
+    """
     __tablename__ = 'products'
 
     lid = Column(String, primary_key=True, nullable=False)
@@ -110,6 +135,10 @@ class Product(Base):
 
 
 class FitsProduct(Product):
+    """
+    A database representation of a PDS4 observational product
+    consisting of a single FITS file.
+    """
     __tablename__ = 'fits_products'
     product_lid = Column(String, ForeignKey('products.lid'),
                          primary_key=True, nullable=False)
@@ -128,6 +157,10 @@ class FitsProduct(Product):
 
 
 class BrowseProduct(Product):
+    """
+    A database representation of a PDS4 product consisting of browse
+    images.
+    """
     __tablename__ = 'browse_products'
     product_lid = Column(String, ForeignKey('products.lid'),
                          primary_key=True, nullable=False)
@@ -144,6 +177,10 @@ class BrowseProduct(Product):
 
 
 class DocumentProduct(Product):
+    """
+    A database representation of a PDS4 product consisting of
+    documents.
+    """
     __tablename__ = 'document_products'
     product_lid = Column(String, ForeignKey('products.lid'),
                          primary_key=True, nullable=False)
@@ -159,6 +196,10 @@ class DocumentProduct(Product):
 
 
 class DocumentFile(Base):
+    """
+    A database representation of a single document file, part of a
+    document product.
+    """
     __tablename__ = 'document_files'
     product_lid = Column(String,
                          ForeignKey('document_products.product_lid'),
@@ -171,6 +212,9 @@ class DocumentFile(Base):
 
 
 class Hdu(Base):
+    """
+    A database representation of a FITS HDU.
+    """
     __tablename__ = 'hdus'
 
     product_lid = Column(String, ForeignKey('products.lid'),
@@ -189,6 +233,9 @@ class Hdu(Base):
 
 
 class Card(Base):
+    """
+    A database representation of a card within an HDU of a FITS file.
+    """
     __tablename__ = 'cards'
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -209,6 +256,11 @@ Index('idx_cards_product_hdu_index', Card.product_lid, Card.hdu_index)
 
 
 def lookup_card(hdu, keyword):
+    """
+    Look up a card by keyword within an HDU's list of cards.  TODO One
+    should be able to implement this using bracket notation, but I
+    haven't figured out how yet.
+    """
     matching_cards = [card for card in hdu.cards if card.keyword == keyword]
     if matching_cards:
         return '' + matching_cards[0].value

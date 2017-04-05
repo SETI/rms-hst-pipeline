@@ -7,10 +7,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import *
 import sys
 
+from pdart.db.SqlAlchTables import *
 from pdart.pds4.Archives import get_any_archive
 from pdart.xml.Schema import verify_label_or_raise_fp
 import SqlAlchLabels
-from SqlAlchTables import *
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:

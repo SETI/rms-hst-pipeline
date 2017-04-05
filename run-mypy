@@ -33,7 +33,6 @@ mypy --silent-imports --py2 \
     SqlAlchComplete.py \
     SqlAlchDocs.py \
     SqlAlchLabels.py \
-    SqlAlchTables.py \
     SqlAlchTests.py \
     SqlAlchXml.py \
     TestHstParams.py \
