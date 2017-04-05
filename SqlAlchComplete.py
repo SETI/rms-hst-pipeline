@@ -1,10 +1,15 @@
 import os
 import os.path
 import shutil
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
+from pdart.db.SqlAlchLabels import make_browse_product, \
+    make_db_browse_product, make_product_browse_label, \
+    make_product_bundle_label, make_product_collection_label, \
+    make_product_document_label, make_product_observational_label
 from pdart.db.SqlAlchTables import Base, Bundle
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
@@ -13,10 +18,6 @@ from pdart.xml.Schema import verify_label_or_raise
 from SqlAlch import db_add_product, db_add_non_document_collection
 from SqlAlchDocs import db_add_document_collection, db_add_document_product, \
     populate_document_collection
-from SqlAlchLabels import make_browse_product, make_db_browse_product, \
-    make_product_browse_label, make_product_bundle_label, \
-    make_product_collection_label, make_product_document_label, \
-    make_product_observational_label
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:

@@ -2,15 +2,16 @@ from contextlib import closing
 import os
 import os.path
 import pyfits
+import sys
+
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import *
-import sys
 
+from pdart.db.SqlAlchLabels import make_product_observational_label
 from pdart.db.SqlAlchTables import *
 from pdart.pds4.Archives import get_any_archive
 from pdart.xml.Schema import verify_label_or_raise_fp
-import SqlAlchLabels
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -153,8 +154,7 @@ def db_add_product(session, archive, collection, product):
     session.commit()
 
     if db_fits_product:
-        label = SqlAlchLabels.make_product_observational_label(
-            db_fits_product)
+        label = make_product_observational_label(db_fits_product)
         label_filepath = cast(str, db_fits_product.label_filepath)
         with open(label_filepath, 'w') as f:
             f.write(label)

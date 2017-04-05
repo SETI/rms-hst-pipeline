@@ -6,13 +6,14 @@ from typing import TYPE_CHECKING
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
 
+from pdart.db.SqlAlchLabels import ensure_directory, \
+    make_product_document_label
 from pdart.db.SqlAlchTables import *
 from pdart.pds4.Archives import get_any_archive
 import pdart.pds4.Collection as C
 from pdart.pds4.LID import LID
 from pdart.xml.Schema import verify_label_or_raise
 
-from SqlAlchLabels import ensure_directory, make_product_document_label
 
 if TYPE_CHECKING:
     from typing import Tuple
