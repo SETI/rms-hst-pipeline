@@ -4,7 +4,6 @@ import urllib2
 from typing import TYPE_CHECKING
 
 from sqlalchemy import *
-from sqlalchemy.orm import sessionmaker
 
 from pdart.db.SqlAlchLabels import ensure_directory, \
     make_product_document_label
@@ -17,7 +16,6 @@ from pdart.xml.Schema import verify_label_or_raise
 
 if TYPE_CHECKING:
     from typing import Tuple
-    from sqlalchemy.orm import Session
 
     import pdart.pds4.Bundle as B
     import pdart.pds4.Product as P
@@ -131,10 +129,7 @@ def run():
         os.remove(DB_FILEPATH)
     except:
         pass
-    engine = create_engine('sqlite:///' + DB_FILEPATH)
-    Base.metadata.create_all(engine)
-    session = sessionmaker(bind=engine)()
-    # type: Session
+    session = create_database_tables_and_session(DB_FILEPATH)
 
     for collection in archive.collections():
         if collection.lid.collection_id == 'document':

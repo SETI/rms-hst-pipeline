@@ -2,10 +2,6 @@ import os
 import os.path
 import shutil
 
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, sessionmaker
-
 from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchDocs import db_add_document_collection, \
     db_add_document_product, populate_document_collection
@@ -22,6 +18,8 @@ from SqlAlch import db_add_product, db_add_non_document_collection
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
     import pdart.pds4.Archive as A
     import pdart.pds4.Bundle as B
     import pdart.pds4.Collection as C
@@ -137,10 +135,8 @@ def run():
             reset_bundle(bundle)
             db_filepath = os.path.join(bundle.absolute_filepath(),
                                        DATABASE_NAME)
-            engine = create_engine('sqlite:///' + db_filepath)
-            Base.metadata.create_all(engine)
-            session = sessionmaker(bind=engine)()
-            # the 'bundles' db table doesn't exist.  Why???
+
+            session = create_database_tables_and_session(db_filepath)
             complete_bundle(session, archive, bundle)
             session.close()
 

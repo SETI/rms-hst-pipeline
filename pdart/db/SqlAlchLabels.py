@@ -3,12 +3,10 @@ import os.path
 import pdart.add_pds_tools
 import picmaker
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct, \
     NonDocumentCollection
+from pdart.db.SqlAlchUtils import bundle_database_filepath
 from pdart.db.SqlAlchXml import *
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.HstFilename import HstFilename
@@ -23,20 +21,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+    from pdart.db.SqlAlchTables import DocumentProduct
     import pdart.pds4.Bundle as B
     import pdart.pds4.Collection as C
     from pdart.xml.Templates import DocTemplate
 
-
-PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_raw:icwy08q3q_raw'
-# type: str
-
-
-def bundle_database_filepath(bundle):
-    # type: (B.Bundle) -> unicode
-
-    # TODO This is cut-and-pasted from SqlAlch.  Refactor and remove.
-    return os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
+    # a type synonym
+    _BrowseCollectionAndProduct = Tuple[NonDocumentCollection, BrowseProduct]
 
 
 def ensure_directory(dir):
@@ -72,7 +63,7 @@ _product_browse_template = interpret_document_template(
 
 
 def make_product_browse_label(collection, product):
-    # type: (Collection, Product) -> str
+    # type: (Collection, BrowseProduct) -> str
     logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()
 
@@ -125,7 +116,7 @@ _product_observational_template = interpret_document_template(
 
 
 def make_product_observational_label(product):
-    # type: (Product) -> str
+    # type: (FitsProduct) -> str
 
     logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()
@@ -328,7 +319,7 @@ def make_file_name_std_pair(basename):
 
 
 def make_product_document_label(db_bundle, db_product):
-    # type: (Bundle, Product) -> str
+    # type: (Bundle, DocumentProduct) -> str
 
     logical_identifier = make_logical_identifier(str(db_product.lid))
     version_id = make_version_id()
@@ -459,10 +450,8 @@ def make_browse_product(fits_product, browse_product):
 
 
 def make_db_browse_collection(session, browse_collection):
-    # type: (Session, C.Collection) -> Collection
+    # type: (Session, C.Collection) -> NonDocumentCollection
 
-    # TODO Does Collection need to change to a more specific
-    # BrowseCollection type?
     lid = str(browse_collection.lid)
 
     db_browse_collection = \
@@ -486,7 +475,7 @@ def make_db_browse_collection(session, browse_collection):
 
 
 def make_db_browse_product(session, fits_product, browse_product):
-    # type: (Session, P.Product, P.Product) -> Tuple[Collection, BrowseProduct]
+    # type: (Session, P.Product, P.Product) -> _BrowseCollectionAndProduct
 
     lid = str(browse_product.lid)
 
@@ -514,6 +503,10 @@ def make_db_browse_product(session, fits_product, browse_product):
     return (db_browse_collection, db_browse_product)
 
 
+PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_raw:icwy08q3q_raw'
+# type: str
+
+
 def run():
     archive = get_any_archive()
     fits_product = P.Product(archive, LID(PRODUCT_LID))
@@ -521,10 +514,7 @@ def run():
     bundle = fits_product.bundle()
     db_fp = bundle_database_filepath(bundle)
     print db_fp
-    engine = create_engine('sqlite:///' + db_fp)
-
-    session = sessionmaker(bind=engine)()
-    # type: Session
+    session = create_database_tables_and_session(db_fp)
 
     if False:
         db_fits_product = \

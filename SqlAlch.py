@@ -4,13 +4,10 @@ import os.path
 import pyfits
 import sys
 
-from sqlalchemy import *
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import *
-
 from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchLabels import make_product_observational_label
 from pdart.db.SqlAlchTables import *
+from pdart.db.SqlAlchUtils import bundle_database_filepath
 from pdart.pds4.Archives import get_any_archive
 from pdart.xml.Schema import verify_label_or_raise_fp
 
@@ -35,16 +32,6 @@ VERIFY = False
 # type: bool
 
 
-def bundle_database_filepath(bundle):
-    # type: (B.Bundle) -> unicode
-    return os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
-
-
-def open_bundle_database(bundle):
-    # type: (B.Bundle) -> sqlite3.Connection
-    return sqlite3.connect(bundle_database_filepath(bundle))
-
-
 def db_add_cards(session, product_lid, hdu_index, header):
     # type: (Session, unicode, int, Any) -> None
     cards = [Card(product_lid=product_lid,
@@ -62,10 +49,7 @@ def db_add_bundle(archive, bundle):
         os.remove(db_fp)
     except OSError:
         pass
-    engine = create_engine('sqlite:///' + db_fp)
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session = create_database_tables_and_session(db_fp)
     db_bundle = Bundle(lid=str(bundle.lid),
                        proposal_id=bundle.proposal_id(),
                        archive_path=os.path.abspath(archive.root),

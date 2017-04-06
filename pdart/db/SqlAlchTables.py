@@ -4,11 +4,12 @@ previous implementation which used raw SQL calls.
 """
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, relationship, sessionmaker
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import *
+    from sqlalchemy.orm import Session
     from sqlalchemy.schema import *
     from sqlalchemy.types import *
 
@@ -266,6 +267,24 @@ def lookup_card(hdu, keyword):
         return '' + matching_cards[0].value
     else:
         return None
+
+
+def _create_database_tables(db_filepath):
+    # type: (unicode) -> Engine
+    """
+    Given a filepath for a database, create a new database file there
+    containing the tables defined in this file and return the database
+    engine.
+    """
+    engine = create_engine('sqlite:///' + db_filepath)
+    Base.metadata.create_all(engine)
+    return engine
+
+
+def create_database_tables_and_session(db_filepath):
+    # type: (unicode) -> Session
+    engine = _create_database_tables(db_filepath)
+    return sessionmaker(bind=engine)()
 
 
 if __name__ == '__main__':

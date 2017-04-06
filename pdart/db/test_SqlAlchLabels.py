@@ -41,10 +41,7 @@ class TestSqlAlch(unittest.TestCase):
         self.test_dir = tempfile.mkdtemp()
 
         db_filepath = os.path.join(self.test_dir, 'tmp.db')
-        engine = create_engine('sqlite:///' + db_filepath)
-        Base.metadata.create_all(engine)
-        Session = sessionmaker(bind=engine)
-        self.session = Session()
+        self.session = create_database_tables_and_session(db_filepath)
 
         self.db_bundle = Bundle(
             lid=self.BUNDLE_LID,
@@ -129,21 +126,45 @@ class TestSqlAlch(unittest.TestCase):
 
     def test_make_product_bundle_label(self):
         # type: () -> None
+
+        # It requires an argument
+        with self.assertRaises(AttributeError):
+            make_product_bundle_label(None)
+
         label = make_product_bundle_label(self.db_bundle)
         verify_label_or_raise(label)
 
     def test_make_product_collection_label(self):
         # type: () -> None
+
+        # It requires an argument
+        with self.assertRaises(AttributeError):
+            make_product_collection_label(None)
+
         label = make_product_collection_label(self.db_collection)
         verify_label_or_raise(label)
 
     def test_make_product_observational_label(self):
         # type: () -> None
+
+        # It requires an argument
+        with self.assertRaises(AttributeError):
+            make_product_observational_label(None)
+
         label = make_product_observational_label(self.db_fits_product)
         verify_label_or_raise(label)
 
     def test_make_product_browse_label(self):
         # type: () -> None
+
+        # It requires two arguments
+        with self.assertRaises(AttributeError):
+            make_product_browse_label(None, self.db_browse_product)
+        with self.assertRaises(AttributeError):
+            make_product_browse_label(self.db_browse_collection, None)
+        with self.assertRaises(AttributeError):
+            make_product_browse_label(None, None)
+
         label = make_product_browse_label(self.db_browse_collection,
                                           self.db_browse_product)
         verify_label_or_raise(label)
