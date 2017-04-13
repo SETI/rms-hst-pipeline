@@ -62,6 +62,15 @@ _product_browse_template = interpret_document_template(
 # type: DocTemplate
 
 
+def make_and_save_product_browse_label(collection, product):
+    # type: (Collection, BrowseProduct) -> str
+    label = make_product_browse_label(collection, product)
+    label_filepath = str(product.label_filepath)
+    with open(label_filepath, "w") as f:
+        f.write(label)
+    return label
+
+
 def make_product_browse_label(collection, product):
     # type: (Collection, BrowseProduct) -> str
     logical_identifier = make_logical_identifier(str(product.lid))
@@ -113,6 +122,15 @@ _product_observational_template = interpret_document_template(
 </Product_Observational>
 """)
 # type: DocTemplate
+
+
+def make_and_save_product_observational_label(product):
+    # type: (FitsProduct) -> str
+    label = make_product_observational_label(product)
+    label_filepath = str(product.label_filepath)
+    with open(label_filepath, "w") as f:
+        f.write(label)
+    return label
 
 
 def make_product_observational_label(product):
@@ -174,6 +192,16 @@ _product_collection_template = interpret_document_template(
 </Product_Collection>
 """)
 # type: DocTemplate
+
+
+def make_and_save_product_collection_label(collection):
+    # type: (Collection) -> str
+    label = make_product_collection_label(collection)
+    label_filepath = str(collection.label_filepath)
+    with open(label_filepath, "w") as f:
+        f.write(label)
+
+    return label
 
 
 def make_product_collection_label(collection):
@@ -241,6 +269,13 @@ _product_bundle_template = interpret_document_template(
 </Product_Bundle>
 """)
 # type: DocTemplate
+
+
+def make_and_save_product_bundle_label(bundle):
+    # type: (Bundle) -> str
+    label = make_product_bundle_label(bundle)
+    assert False
+    return label
 
 
 def make_product_bundle_label(bundle):
@@ -318,6 +353,15 @@ def make_file_name_std_pair(basename):
                         (ext, basename))
 
 
+def make_and_save_product_document_label(bundle, product):
+    # type: (Bundle, DocumentProduct) -> str
+    label = make_product_document_label(bundle, product)
+    label_filepath = str(product.label_filepath)
+    with open(label_filepath, "w") as f:
+        f.write(label)
+    return label
+
+
 def make_product_document_label(db_bundle, db_product):
     # type: (Bundle, DocumentProduct) -> str
 
@@ -380,6 +424,16 @@ _product_spice_kernel_template = interpret_document_template(
 </Product_SPICE_Kernel>
 """)
 # type: DocTemplate
+
+
+def make_and_save_product_spice_kernel_label(bundle, product, fits_product):
+    # type: (B.Bundle, P.Product, Product) -> str
+    assert False, "ensure this implementation makes sense"
+    label = make_product_spice_kernel_label(bundle, product, fits_product)
+    label_filepath = str(product.label_filepath)
+    with open(label_filepath, "w") as f:
+        f.write(label)
+    return label
 
 
 def make_product_spice_kernel_label(bundle, product, fits_product):

@@ -5,10 +5,10 @@ import pyfits
 import sys
 
 from pdart.db.SqlAlchDBName import DATABASE_NAME
-from pdart.db.SqlAlchLabels import make_product_observational_label
 from pdart.db.SqlAlchTables import *
 from pdart.db.SqlAlchUtils import bundle_database_filepath
 from pdart.pds4.Archives import get_any_archive
+from pdart.pds4labels.SqlAlchLabels import make_product_observational_label
 from pdart.xml.Schema import verify_label_or_raise_fp
 
 from typing import cast, TYPE_CHECKING
@@ -132,7 +132,7 @@ def db_add_product(session, archive, collection, product):
             filepath=file.full_filepath(),
             message=str(e))
         session.add(db_bad_fits_file)
-        print 'bad FITS file', str(product.lid)
+        print 'ERROR: bad FITS file', str(product.lid)
     session.commit()
 
     if db_fits_product:

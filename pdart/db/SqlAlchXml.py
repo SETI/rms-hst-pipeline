@@ -547,6 +547,8 @@ def make_observation_area(product):
     collection = product.collection
     bundle = collection.bundle
     targname = lookup_card(product.hdus[0], 'TARGNAME')
+    if not targname:
+        print 'ERROR: no TARGNAME in', str(product)
     return _observation_area_template({
             'Time_Coordinates': make_time_coordinates(product),
             'Investigation_Area': make_investigation_area(bundle),
@@ -1194,14 +1196,16 @@ _target_identification_template = interpret_template(
 
 def make_target_identification(targname):
     # type: (unicode) -> NodeBuilder
-    for prefix, (name, type) in _approximate_target_table.iteritems():
-        if targname.startswith(prefix):
-            description = 'The %s %s' % (type.lower(), name)
-            return _target_identification_template({
-                    'name': make_name(name),
-                    'type': make_type(type),
-                    'description': make_description(description)
-                    })
+    # TODO Better handle the None
+    if targname:
+        for prefix, (name, type) in _approximate_target_table.iteritems():
+            if targname.startswith(prefix):
+                description = 'The %s %s' % (type.lower(), name)
+                return _target_identification_template({
+                        'name': make_name(name),
+                        'type': make_type(type),
+                        'description': make_description(description)
+                        })
 
     # TODO remove dummy catch-all
     return _target_identification_template({
@@ -1245,17 +1249,27 @@ def make_time_coordinates(product):
     # TODO figure out and remove coersions
     date_obs = str(lookup_card(product.hdus[0], 'DATE-OBS'))
     time_obs = str(lookup_card(product.hdus[0], 'TIME-OBS'))
-    exptime = float('' + lookup_card(product.hdus[0], 'EXPTIME'))
+    exptime_value = lookup_card(product.hdus[0], 'EXPTIME')
+    if date_obs is None or time_obs is None or exptime_value is None:
+        print ('ERROR: make_time_coordinates(%s) missing value: ' +
+               '(date_obs = %s, time_obs = %s, exptime = %s)') % \
+               (str(product.lid), date_obs, time_obs, exptime_value)
+        placeholder_date_time = '2000-01-01T00:00:00Z'
+        return _time_coordinates_template({
+                'start_date_time': make_start_date_time(placeholder_date_time),
+                'stop_date_time': make_stop_date_time(placeholder_date_time)
+                })
+    else:
+        exptime = float(str(exptime_value))
+        start_date_time = '%sT%sZ' % (date_obs, time_obs)
+        stop_date_time = julian.tai_from_iso(start_date_time) + exptime
+        stop_date_time = julian.iso_from_tai(stop_date_time,
+                                             suffix='Z')
 
-    start_date_time = '%sT%sZ' % (date_obs, time_obs)
-    stop_date_time = julian.tai_from_iso(start_date_time) + exptime
-    stop_date_time = julian.iso_from_tai(stop_date_time,
-                                         suffix='Z')
-
-    return _time_coordinates_template({
-            'start_date_time': make_start_date_time(start_date_time),
-            'stop_date_time': make_stop_date_time(stop_date_time)
-            })
+        return _time_coordinates_template({
+                'start_date_time': make_start_date_time(start_date_time),
+                'stop_date_time': make_stop_date_time(stop_date_time)
+                })
 
 
 ##############################
