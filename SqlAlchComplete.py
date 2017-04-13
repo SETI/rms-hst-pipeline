@@ -60,12 +60,10 @@ def generate_browse_product(session, product):
     verify_label_or_raise(label)
 
     # postconditions
-    try:
-        session.query(BrowseProduct).filter_by(
-            lid=str(db_browse_product.lid)).one()
-    except:
-        assert False, 'browse product %s exists in database' % \
-            str(db_browse_product.lid)
+    assert session.query(BrowseProduct).filter_by(
+        lid=str(db_browse_product.lid)).one() is not None, \
+        'browse product %s exists in database' % \
+        str(db_browse_product.lid)
     assert os.path.isfile(str(db_browse_product.browse_filepath)), \
         'browse product file %s exists' % \
         str(db_browse_product.browse_filepath)
@@ -94,12 +92,10 @@ def complete_fits_product(session, archive, collection, product):
         # TODO: generate_spice_kernel_product(session, product)
 
     # postconditions
-    try:
-        session.query(FitsProduct).filter_by(
-            lid=str(db_fits_product.lid)).one()
-    except:
-        assert False, 'FITS product %s exists in database' % \
-            str(db_fits_product.lid)
+    assert session.query(FitsProduct).filter_by(
+        lid=str(db_fits_product.lid)).one() is not None, \
+        'FITS product %s exists in database' % \
+        str(db_fits_product.lid)
     assert os.path.isfile(str(db_fits_product.fits_filepath)), \
         'FITS product file %s exists' % \
         str(db_fits_product.fits_filepath)
@@ -120,12 +116,10 @@ def complete_doc_collection(session, db_bundle, doc_collection):
         verify_label_or_raise(label)
 
         # postconditions
-        try:
-            session.query(DocumentProduct).filter_by(
-                lid=str(db_doc_product.lid)).one()
-        except:
-            assert False, 'Document product %s exists in database' % \
-                str(db_doc_product.lid)
+        assert session.query(DocumentProduct).filter_by(
+            lid=str(db_doc_product.lid)).one() is not None, \
+            'Document product %s exists in database' % \
+            str(db_doc_product.lid)
         assert os.path.isfile(str(db_doc_product.fits_filepath)), \
             'Document product file %s exists' % \
             str(db_doc_product.fits_filepath)
@@ -137,12 +131,10 @@ def complete_doc_collection(session, db_bundle, doc_collection):
     make_and_save_product_collection_label(db_collection)
 
     # postconditions
-    try:
-        session.query(DocumentCollection).filter_by(
-            lid=str(db_collection.lid)).one()
-    except:
-        assert False, 'Document collection %s exists in database' % \
-            str(db_collection.lid)
+    assert session.query(DocumentCollection).filter_by(
+        lid=str(db_collection.lid)).one() is not None, \
+        'Document collection %s exists in database' % \
+        str(db_collection.lid)
     assert os.path.isdir(str(db_collection.full_filepath)), \
         'document collection directory  %s exists' % \
         str(db_collection.fits_filepath)
@@ -170,12 +162,10 @@ def complete_non_doc_collection(session, archive, bundle, collection):
     verify_label_or_raise(label)
 
     # postconditions
-    try:
-        session.query(NonDocumentCollection).filter_by(
-            lid=str(db_collection.lid)).one()
-    except:
-        assert False, 'Non-document collection %s exists in database' % \
-            str(db_collection.lid)
+    assert session.query(NonDocumentCollection).filter_by(
+        lid=str(db_collection.lid)).one() is not None, \
+        'Non-document collection %s exists in database' % \
+        str(db_collection.lid)
     assert os.path.isdir(str(db_collection.full_filepath)), \
         'Non-document collection directory  %s exists' % \
         str(db_collection.fits_filepath)
@@ -217,12 +207,10 @@ def complete_bundle(session, archive, bundle):
     verify_label_or_raise(label)
 
     # postconditions
-    try:
-        session.query(Bundle).filter_by(
-            lid=str(db_bundle.lid)).one()
-    except:
-        assert False, 'Bundle %s exists in database' % \
-            str(db_bundle.lid)
+    assert session.query(Bundle).filter_by(
+        lid=str(db_bundle.lid)).one() is not None, \
+        'Bundle %s exists in database' % \
+        str(db_bundle.lid)
     assert os.path.isdir(str(db_bundle.full_filepath)), \
         'Bundle directory  %s exists' % \
         str(db_bundle.fits_filepath)
