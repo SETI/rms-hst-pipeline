@@ -5,9 +5,9 @@ import shutil
 from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchDocs import db_add_document_collection, \
     db_add_document_product, populate_document_collection
-from pdart.db.SqlAlchTables import Base, Bundle, \
-    create_database_tables_and_session, BrowseProduct, DocumentCollection,\
-    DocumentProduct, FitsProduct, NonDocumentCollection
+from pdart.db.SqlAlchTables import Base, BrowseProduct, Bundle, \
+    Collection, create_database_tables_and_session, DocumentCollection, \
+    DocumentProduct, FitsProduct, NonDocumentCollection, Product
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.pds4labels.SqlAlchLabels import make_browse_product, \
@@ -60,15 +60,7 @@ def generate_browse_product(session, product):
     verify_label_or_raise(label)
 
     # postconditions
-    assert session.query(BrowseProduct).filter_by(
-        lid=str(db_browse_product.lid)).one() is not None, \
-        'browse product %s exists in database' % \
-        str(db_browse_product.lid)
-    assert os.path.isfile(str(db_browse_product.browse_filepath)), \
-        'browse product file %s exists' % \
-        str(db_browse_product.browse_filepath)
-    assert os.path.isfile(str(db_browse_product.label_filepath)), \
-        'label for browse product %s exists' % str(db_browse_product.lid)
+    assert_product_is_complete(session, db_browse_product)
 
     return db_browse_product
 
@@ -92,15 +84,7 @@ def complete_fits_product(session, archive, collection, product):
         # TODO: generate_spice_kernel_product(session, product)
 
     # postconditions
-    assert session.query(FitsProduct).filter_by(
-        lid=str(db_fits_product.lid)).one() is not None, \
-        'FITS product %s exists in database' % \
-        str(db_fits_product.lid)
-    assert os.path.isfile(str(db_fits_product.fits_filepath)), \
-        'FITS product file %s exists' % \
-        str(db_fits_product.fits_filepath)
-    assert os.path.isfile(str(db_fits_product.label_filepath)), \
-        'label for FITS product %s exists' % str(db_fits_product.lid)
+    assert_product_is_complete(session, db_fits_product)
 
     return db_fits_product
 
@@ -116,36 +100,68 @@ def complete_doc_collection(session, db_bundle, doc_collection):
         verify_label_or_raise(label)
 
         # postconditions
-        assert session.query(DocumentProduct).filter_by(
-            lid=str(db_doc_product.lid)).one() is not None, \
-            'Document product %s exists in database' % \
-            str(db_doc_product.lid)
-        assert os.path.isfile(str(db_doc_product.fits_filepath)), \
-            'Document product file %s exists' % \
-            str(db_doc_product.fits_filepath)
-        assert os.path.isfile(str(db_doc_product.label_filepath)), \
-            'label for document product %s exists' % str(db_doc_product.lid)
+        assert_product_is_complete(session, db_doc_product)
 
     print "making collection label", doc_collection
     # TODO inventory
     make_and_save_product_collection_label(db_collection)
 
     # postconditions
-    assert session.query(DocumentCollection).filter_by(
-        lid=str(db_collection.lid)).one() is not None, \
-        'Document collection %s exists in database' % \
-        str(db_collection.lid)
-    assert os.path.isdir(str(db_collection.full_filepath)), \
-        'document collection directory  %s exists' % \
-        str(db_collection.fits_filepath)
-    assert os.path.isfile(str(db_collection.label_filepath)), \
-        'label for document collection %s exists' % str(db_collection.lid)
-    if False:  # TODO inventory
-        assert os.path.isfile(str(db_collection.inventory_filepath)), \
-            'inventory for document collection %s exists' % \
-            str(db_collection.lid)
+    assert_collection_is_complete(session, db_collection)
 
     return db_collection
+
+
+def assert_log(cond, msg):
+    # type: (bool, str) -> None
+    if not cond:
+        print 'ERROR:', msg
+
+
+def assert_collection_is_complete(session, db_collection):
+    # type: (Session, Collection) -> None
+    assert_log(session.query(Collection).filter_by(
+            lid=str(db_collection.lid)).one() is not None,
+               'collection %s exists in database' %
+               str(db_collection.lid))
+    assert_log(os.path.isdir(str(db_collection.full_filepath)),
+               'collection directory %s exists' %
+               str(db_collection.fits_filepath))
+    assert_log(os.path.isfile(str(db_collection.label_filepath)),
+               'label for collection %s exists' % str(db_collection.lid))
+    if False:  # TODO inventory
+        assert_log(os.path.isfile(str(db_collection.inventory_filepath)),
+                   'inventory for collection %s exists' %
+                   str(db_collection.lid))
+    # TODO assert that for each raw collection, there's a browse
+    # collection
+
+
+def assert_product_is_complete(session, db_product):
+    # type: (Session, Product) -> None
+    assert_log(session.query(Product).filter_by(
+            lid=str(db_product.lid)).one() is not None,
+               'product %s exists in database' %
+               str(db_product.lid))
+    assert_log(os.path.isdir(str(db_product.full_filepath)),
+               'product directory %s exists' %
+               str(db_product.fits_filepath))
+    assert_log(os.path.isfile(str(db_product.label_filepath)),
+               'label for product %s exists' % str(db_product.lid))
+
+
+def assert_bundle_is_complete(session, db_bundle):
+    # type: (Session, Bundle) -> None
+    assert_log(session.query(Bundle).filter_by(
+            lid=str(db_bundle.lid)).one() is not None,
+               'bundle %s exists in database' %
+               str(db_bundle.lid))
+    assert_log(os.path.isdir(str(db_bundle.full_filepath)),
+               'bundle directory %s exists' %
+               str(db_bundle.fits_filepath))
+    assert_log(os.path.isfile(str(db_bundle.label_filepath)),
+               'label for bundle %s exists' % str(db_bundle.lid))
+    # TODO assert it has a document collection?
 
 
 def complete_non_doc_collection(session, archive, bundle, collection):
@@ -162,19 +178,7 @@ def complete_non_doc_collection(session, archive, bundle, collection):
     verify_label_or_raise(label)
 
     # postconditions
-    assert session.query(NonDocumentCollection).filter_by(
-        lid=str(db_collection.lid)).one() is not None, \
-        'Non-document collection %s exists in database' % \
-        str(db_collection.lid)
-    assert os.path.isdir(str(db_collection.full_filepath)), \
-        'Non-document collection directory  %s exists' % \
-        str(db_collection.fits_filepath)
-    assert os.path.isfile(str(db_collection.label_filepath)), \
-        'label for non-document collection %s exists' % str(db_collection.lid)
-    if False:  # TODO inventory
-        assert os.path.isfile(str(db_collection.inventory_filepath)), \
-            'inventory for non-document collection %s exists' % \
-            str(db_collection.lid)
+    assert_collection_is_complete(session, db_collection)
 
     return db_collection
 
@@ -207,15 +211,7 @@ def complete_bundle(session, archive, bundle):
     verify_label_or_raise(label)
 
     # postconditions
-    assert session.query(Bundle).filter_by(
-        lid=str(db_bundle.lid)).one() is not None, \
-        'Bundle %s exists in database' % \
-        str(db_bundle.lid)
-    assert os.path.isdir(str(db_bundle.full_filepath)), \
-        'Bundle directory  %s exists' % \
-        str(db_bundle.fits_filepath)
-    assert os.path.isfile(str(db_bundle.label_filepath)), \
-        'label for bundle %s exists' % str(db_bundle.lid)
+    assert_bundle_is_complete(session, db_bundle)
 
     return db_bundle
 
@@ -255,4 +251,8 @@ def run():
             session.close()
 
 if __name__ == '__main__':
-    run()
+    if True:
+        print 'You can\'t run until after you look at the output', \
+            'from the last run.'
+    else:
+        run()
