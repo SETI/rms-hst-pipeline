@@ -9,7 +9,7 @@ def get_full_archive_dir():
     on the multi-terabyte external drive connected to the
     nightly-build machine.
     """
-    return '/Volumes/PDART-3TB'
+    return '/Volumes/PDART-5TB Part One'
 
 
 def get_full_archive():

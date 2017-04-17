@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 source activate pdart
 python DeleteBrowse.py
 python DeleteDocs.py

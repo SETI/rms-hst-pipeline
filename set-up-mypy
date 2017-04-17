@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # clean up any old environment
 source deactivate || echo "No environment to deactivate."

@@ -3,8 +3,9 @@
 """
 
 from contextlib import closing
-import sqlite3
 import shutil
+import sqlite3
+import sys
 
 from pdart.pds4.Archives import *
 from pdart.pds4.Bundle import Bundle
@@ -28,7 +29,11 @@ class DeleteRawBrowseReduction(Reduction):
         bundle = Bundle(archive, lid)
         with closing(open_bundle_database(bundle)) as conn:
             with closing(conn.cursor()) as cursor:
-                delete_browse_products_and_collections(cursor)
+                try:
+                    # TODO handle exceptions better
+                    delete_browse_products_and_collections(cursor)
+                except:
+                    print sys.exc_info()[0]
 
     def reduce_collection(self, archive, lid, get_reduced_products):
         if 'browse_' == lid.collection_id[0:7]:
@@ -47,10 +52,19 @@ def _check_deletion(archive):
     for bundle in archive.bundles():
         with closing(open_bundle_database(bundle)) as conn:
             with closing(conn.cursor()) as cursor:
-                colls = list(get_all_browse_collections(cursor))
-                assert not colls, 'Browse collections %s not deleted' % colls
-                prods = list(get_all_browse_products(cursor))
-                assert not prods, 'Browse products %s not deleted' % prods
+                try:
+                    # TODO handle exceptions better
+                    colls = list(get_all_browse_collections(cursor))
+                    assert not colls, 'Browse collections %s not deleted' % \
+                        colls
+                except:
+                    pass
+                try:
+                    # TODO handle exceptions better
+                    prods = list(get_all_browse_products(cursor))
+                    assert not prods, 'Browse products %s not deleted' % prods
+                except:
+                    pass
 
 
 if __name__ == '__main__':
