@@ -2,3 +2,4 @@
 
 DATABASE_NAME = 'sqlalch-database.db'
 # type: unicode
+"""The name for SqlAlchemy bundle-level databases."""

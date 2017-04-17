@@ -221,9 +221,13 @@ class Hdu(Base):
     product_lid = Column(String, ForeignKey('products.lid'),
                          primary_key=True, nullable=False, index=True)
     hdu_index = Column(Integer, primary_key=True, nullable=False)
+    """The zero-based index of this HDU within its product's FITS file."""
     hdr_loc = Column(Integer, nullable=False)
+    """The starting byte location of the header in the file"""
     dat_loc = Column(Integer, nullable=False)
+    """The starting byte location of the data block in the file"""
     dat_span = Column(Integer, nullable=False)
+    """The data size including padding"""
 
     product = relationship('FitsProduct', backref=backref('hdus',
                                                           order_by=hdu_index))
@@ -283,6 +287,11 @@ def _create_database_tables(db_filepath):
 
 def create_database_tables_and_session(db_filepath):
     # type: (unicode) -> Session
+    """
+    Given a filepath for a database, create a new database file there
+    containing the tables defined in this file, and return a session
+    of the database engine operating on that database.
+    """
     engine = _create_database_tables(db_filepath)
     return sessionmaker(bind=engine)()
 

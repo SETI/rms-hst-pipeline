@@ -23,11 +23,19 @@ def bundle_database_filepath(bundle):
 
 def create_bundle_database_session(bundle):
     # type: (B.Bundle) -> Session
+    """
+    Given a PDS4 :class:`~pdart.pds4.Bundle.Bundle`, create a database
+    session based on the bundle database living at that filepath.
+    """
     db_filepath = bundle_database_filepath(bundle)
     return create_database_session(db_filepath)
 
 
 def create_database_session(db_filepath):
     # type: (unicode) -> Session
+    """
+    Given a filepath for a database, create a session based on the
+    database living there.
+    """
     engine = create_engine('sqlite:///' + db_filepath)
     return sessionmaker(bind=engine)()
