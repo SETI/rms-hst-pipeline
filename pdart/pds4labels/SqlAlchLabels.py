@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     _BrowseCollectionAndProduct = Tuple[NonDocumentCollection, BrowseProduct]
 
 
-def ensure_directory(dir):
+def _ensure_directory(dir):
     # type: (AnyStr) -> None
     """Make the directory if it doesn't already exist."""
 
@@ -64,6 +64,10 @@ _product_browse_template = interpret_document_template(
 
 def make_and_save_product_browse_label(collection, product):
     # type: (Collection, BrowseProduct) -> str
+    """
+    Given the database Collection row and BrowseProduct row, create a
+    product label and save it to the filesystem.
+    """
     label = make_product_browse_label(collection, product)
     label_filepath = str(product.label_filepath)
     with open(label_filepath, "w") as f:
@@ -73,6 +77,10 @@ def make_and_save_product_browse_label(collection, product):
 
 def make_product_browse_label(collection, product):
     # type: (Collection, BrowseProduct) -> str
+    """
+    Given the database Collection row and BrowseProduct row, create a
+    product label and return it.
+    """
     logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()
 
@@ -126,6 +134,10 @@ _product_observational_template = interpret_document_template(
 
 def make_and_save_product_observational_label(product):
     # type: (FitsProduct) -> str
+    """
+    Given the database Collection row and FitsProduct row, create a
+    product label and save it to the filesystem.
+    """
     label = make_product_observational_label(product)
     label_filepath = str(product.label_filepath)
     with open(label_filepath, "w") as f:
@@ -135,6 +147,10 @@ def make_and_save_product_observational_label(product):
 
 def make_product_observational_label(product):
     # type: (FitsProduct) -> str
+    """
+    Given the database Collection row and FitsProduct row, create a
+    product label and return it.
+    """
 
     logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()
@@ -196,6 +212,10 @@ _product_collection_template = interpret_document_template(
 
 def make_and_save_product_collection_label(collection):
     # type: (Collection) -> str
+    """
+    Given the database Collection row, create a collection label and
+    save it to the filesystem.
+    """
     label = make_product_collection_label(collection)
     label_filepath = str(collection.label_filepath)
     with open(label_filepath, "w") as f:
@@ -206,6 +226,10 @@ def make_and_save_product_collection_label(collection):
 
 def make_product_collection_label(collection):
     # type: (Collection) -> str
+    """
+    Given the database Collection row, create a collection label and
+    return it.
+    """
 
     logical_identifier = make_logical_identifier(str(collection.lid))
     version_id = make_version_id()
@@ -273,13 +297,24 @@ _product_bundle_template = interpret_document_template(
 
 def make_and_save_product_bundle_label(bundle):
     # type: (Bundle) -> str
+    """
+    Given the database Bundle row, create a bundle label and save it
+    to the filesystem.
+    """
     label = make_product_bundle_label(bundle)
-    assert False
+    label_filepath = str(bundle.label_filepath)
+    with open(label_filepath, "w") as f:
+        f.write(label)
+
     return label
 
 
 def make_product_bundle_label(bundle):
     # type: (Bundle) -> str
+    """
+    Given the database Collection row, create a collection label and
+    return it.
+    """
     logical_identifier = make_logical_identifier(str(bundle.lid))
     version_id = make_version_id()
 
@@ -337,7 +372,7 @@ _product_document_template = interpret_document_template(
 # type: DocTemplate
 
 
-def make_file_name_std_pair(basename):
+def _make_file_name_std_pair(basename):
     # type: (AnyStr) -> Tuple[AnyStr, AnyStr]
     (root, ext) = os.path.splitext(basename)
     if ext == '.prop':
@@ -355,6 +390,10 @@ def make_file_name_std_pair(basename):
 
 def make_and_save_product_document_label(bundle, product):
     # type: (Bundle, DocumentProduct) -> str
+    """
+    Given the database Bundle row and DocumentProduct row, create a
+    product label and save it to the filesystem.
+    """
     label = make_product_document_label(bundle, product)
     label_filepath = str(product.label_filepath)
     with open(label_filepath, "w") as f:
@@ -364,6 +403,10 @@ def make_and_save_product_document_label(bundle, product):
 
 def make_product_document_label(db_bundle, db_product):
     # type: (Bundle, DocumentProduct) -> str
+    """
+    Given the database Bundle row and DocumentProduct row, create a
+    product label and return it.
+    """
 
     logical_identifier = make_logical_identifier(str(db_product.lid))
     version_id = make_version_id()
@@ -381,7 +424,7 @@ def make_product_document_label(db_bundle, db_product):
     short_files = ['' + file.file_basename
                    for file in db_product.document_files]
     # This should be tuples of file_name and std
-    files = [make_file_name_std_pair(f) for f in short_files]
+    files = [_make_file_name_std_pair(f) for f in short_files]
 
     label = _product_document_template({
             'Identification_Area': make_identification_area(
@@ -428,16 +471,24 @@ _product_spice_kernel_template = interpret_document_template(
 
 def make_and_save_product_spice_kernel_label(bundle, product, fits_product):
     # type: (B.Bundle, P.Product, Product) -> str
+    """
+    Given the Bundle and Product objects and FitsProduct row, create a
+    product label and save it to the filesystem.  TODO unimplemented
+    """
     assert False, "ensure this implementation makes sense"
-    label = make_product_spice_kernel_label(bundle, product, fits_product)
+    label = _make_product_spice_kernel_label(bundle, product, fits_product)
     label_filepath = str(product.label_filepath)
     with open(label_filepath, "w") as f:
         f.write(label)
     return label
 
 
-def make_product_spice_kernel_label(bundle, product, fits_product):
+def _make_product_spice_kernel_label(bundle, product, fits_product):
     # type: (B.Bundle, P.Product, Product) -> str
+    """
+    Given the Bundle and Product objects and FitsProduct row, create a
+    product label and return it.  TODO unimplemented
+    """
 
     # TODO We're based for now on pdart.pds4 Bundle and Product, not
     # the DB versions.  Fix this.
@@ -487,15 +538,19 @@ def make_product_spice_kernel_label(bundle, product, fits_product):
 
 def make_browse_product(fits_product, browse_product):
     # type: (P.Product, P.Product) -> None
+    """
+    Given FITS product and Browse product objects, create images for
+    the browse product and save them to the filesystem.
+    """
     file = list(fits_product.files())[0]
     basename = os.path.basename(file.full_filepath())
     basename = os.path.splitext(basename)[0] + '.jpg'
     browse_collection_dir = browse_product.collection().absolute_filepath()
-    ensure_directory(browse_collection_dir)
+    _ensure_directory(browse_collection_dir)
 
     visit = HstFilename(basename).visit()
     target_dir = os.path.join(browse_collection_dir, ('visit_%s' % visit))
-    ensure_directory(target_dir)
+    _ensure_directory(target_dir)
 
     picmaker.ImagesToPics([file.full_filepath()],
                           target_dir,
@@ -503,7 +558,7 @@ def make_browse_product(fits_product, browse_product):
                           percentiles=(1, 99))
 
 
-def make_db_browse_collection(session, browse_collection):
+def _make_db_browse_collection(session, browse_collection):
     # type: (Session, C.Collection) -> NonDocumentCollection
 
     lid = str(browse_collection.lid)
@@ -530,6 +585,11 @@ def make_db_browse_collection(session, browse_collection):
 
 def make_db_browse_product(session, fits_product, browse_product):
     # type: (Session, P.Product, P.Product) -> _BrowseCollectionAndProduct
+    """
+    Given a SqlAlchemy session and the FITS and browse product
+    objects, create the BrowseCollection and BrowseProduct rows in the
+    database.
+    """
 
     lid = str(browse_product.lid)
 
@@ -552,7 +612,7 @@ def make_db_browse_product(session, fits_product, browse_product):
     session.commit()
 
     db_browse_collection = \
-        make_db_browse_collection(session, browse_product.collection())
+        _make_db_browse_collection(session, browse_product.collection())
 
     return (db_browse_collection, db_browse_product)
 
@@ -561,7 +621,7 @@ PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_raw:icwy08q3q_raw'
 # type: str
 
 
-def run():
+def _run():
     archive = get_any_archive()
     fits_product = P.Product(archive, LID(PRODUCT_LID))
     collection = fits_product.collection()
@@ -638,4 +698,4 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    _run()

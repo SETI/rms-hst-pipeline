@@ -9,16 +9,29 @@ from pdart.db.SqlAlchTables import *
 from pdart.pds4.Archives import get_any_archive
 import pdart.pds4.Collection as C
 from pdart.pds4.LID import LID
-from pdart.pds4labels.SqlAlchLabels import ensure_directory, \
-    make_product_document_label
+from pdart.pds4labels.SqlAlchLabels import make_product_document_label
 from pdart.xml.Schema import verify_label_or_raise
 
 
 if TYPE_CHECKING:
-    from typing import Tuple
+    from typing import AnyStr, Tuple
 
     import pdart.pds4.Bundle as B
     import pdart.pds4.Product as P
+
+
+def _ensure_directory(dir):
+    # type: (AnyStr) -> None
+    """Make the directory if it doesn't already exist."""
+
+    # TODO This is cut-and-pasted from
+    # pdart.pds4label.BrowseProductImageReduction.  Refactor and
+    # remove.
+    try:
+        os.mkdir(dir)
+    except OSError:
+        pass
+    assert os.path.isdir(dir), dir
 
 
 def _retrieve_doc(url, filepath):
@@ -70,10 +83,10 @@ def populate_document_collection(bundle):
         shutil.rmtree(collection_fp)
     except:
         pass
-    ensure_directory(collection_fp)
+    _ensure_directory(collection_fp)
 
     product_fp = os.path.join(collection_fp, 'phase2')
-    ensure_directory(product_fp)
+    _ensure_directory(product_fp)
     proposal_id = bundle.proposal_id()
     if _download_product_documents(proposal_id, product_fp):
         collection_lid = '%s:document' % str(bundle.lid)
