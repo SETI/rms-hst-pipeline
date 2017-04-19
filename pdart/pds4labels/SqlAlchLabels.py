@@ -1,3 +1,7 @@
+"""
+Creation of labels and writing them to the filesystem.  Creation of
+browse products.
+"""
 import os.path
 
 import pdart.add_pds_tools
@@ -305,7 +309,6 @@ def make_and_save_product_bundle_label(bundle):
     label_filepath = str(bundle.label_filepath)
     with open(label_filepath, "w") as f:
         f.write(label)
-
     return label
 
 
@@ -489,9 +492,6 @@ def _make_product_spice_kernel_label(bundle, product, fits_product):
     Given the Bundle and Product objects and FitsProduct row, create a
     product label and return it.  TODO unimplemented
     """
-
-    # TODO We're based for now on pdart.pds4 Bundle and Product, not
-    # the DB versions.  Fix this.
 
     logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()

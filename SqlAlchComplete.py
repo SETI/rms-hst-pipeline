@@ -126,7 +126,7 @@ def assert_collection_is_complete(session, db_collection):
                str(db_collection.lid))
     assert_log(os.path.isdir(str(db_collection.full_filepath)),
                'collection directory %s exists' %
-               str(db_collection.fits_filepath))
+               str(db_collection.full_filepath))
     assert_log(os.path.isfile(str(db_collection.label_filepath)),
                'label for collection %s exists' % str(db_collection.lid))
     if False:  # TODO inventory
@@ -136,18 +136,38 @@ def assert_collection_is_complete(session, db_collection):
     # TODO assert that for each raw collection, there's a browse
     # collection
 
+    print 'Collection %s is complete' % str(db_collection.lid)
+
 
 def assert_product_is_complete(session, db_product):
     # type: (Session, Product) -> None
+    if db_product is None:
+        # it was a bad FITS file
+        return
     assert_log(session.query(Product).filter_by(
             lid=str(db_product.lid)).one() is not None,
                'product %s exists in database' %
                str(db_product.lid))
-    assert_log(os.path.isdir(str(db_product.full_filepath)),
-               'product directory %s exists' %
-               str(db_product.fits_filepath))
+    if isinstance(db_product, FitsProduct):
+        assert_log(os.path.isfile(str(db_product.fits_filepath)),
+                   'product FITS file %s exists' %
+                   str(db_product.fits_filepath))
+    elif isinstance(db_product, BrowseProduct):
+        assert_log(os.path.isfile(str(db_product.browse_filepath)),
+                   'product browse file %s exists' %
+                   str(db_product.browse_filepath))
+    elif isinstance(db_product, DocumentProduct):
+        assert_log(os.path.isdir(str(db_product.document_filepath)),
+                   'product document directory %s exists' %
+                   str(db_product.document_filepath))
+        # TODO Check for files inside
+    else:
+        assert_log(False, 'uncategorized product %s' % str(db_product.lid))
+
     assert_log(os.path.isfile(str(db_product.label_filepath)),
                'label for product %s exists' % str(db_product.lid))
+
+    print 'Product %s is complete' % str(db_product.lid)
 
 
 def assert_bundle_is_complete(session, db_bundle):
@@ -158,10 +178,12 @@ def assert_bundle_is_complete(session, db_bundle):
                str(db_bundle.lid))
     assert_log(os.path.isdir(str(db_bundle.full_filepath)),
                'bundle directory %s exists' %
-               str(db_bundle.fits_filepath))
+               str(db_bundle.full_filepath))
     assert_log(os.path.isfile(str(db_bundle.label_filepath)),
                'label for bundle %s exists' % str(db_bundle.lid))
     # TODO assert it has a document collection?
+
+    print 'Bundle %s is complete' % str(db_bundle.lid)
 
 
 def complete_non_doc_collection(session, archive, bundle, collection):
@@ -227,10 +249,10 @@ def reset_bundle(bundle):
         if file in ['.', '..']:
             pass
         elif file == DATABASE_NAME:
-            print 'removing ', filepath
+            print 'removing', filepath
             os.remove(filepath)
         elif file == 'document' or file.startswith('browse_'):
-            print 'removing dir ', filepath
+            print 'removing directory', filepath
             shutil.rmtree(filepath)
         # will also need for SPICE: TODO
 
@@ -251,8 +273,4 @@ def run():
             session.close()
 
 if __name__ == '__main__':
-    if True:
-        print 'You can\'t run until after you look at the output', \
-            'from the last run.'
-    else:
-        run()
+    run()

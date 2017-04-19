@@ -1,3 +1,6 @@
+"""
+Document information in the database.
+"""
 import os.path
 import shutil
 import urllib2
@@ -97,6 +100,11 @@ def populate_document_collection(bundle):
 
 def db_add_document_collection(session, collection):
     # type: (Session, C.Collection) -> Collection
+    """
+    Given a database session and a Collection object, create a
+    DocumentCollection database row, add it to the database, and
+    return it.
+    """
     db_document_collection = DocumentCollection(
         lid=str(collection.lid),
         bundle_lid=str(collection.bundle().lid),
@@ -112,6 +120,11 @@ def db_add_document_collection(session, collection):
 
 def db_add_document_product(session, product):
     # type: (Session, P.Product) -> Product
+    """
+    Given a database session and a Product object, create a
+    DocumentProduct database row, add it to the database, and return
+    it.
+    """
     db_document_product = DocumentProduct(
         lid=str(product.lid),
         document_filepath=product.absolute_filepath(),
@@ -130,7 +143,7 @@ def db_add_document_product(session, product):
     return db_document_product
 
 
-def run():
+def _run():
     # type: () -> None
     archive = get_any_archive()
     for bundle in archive.bundles():
@@ -164,4 +177,4 @@ def run():
                 print 'verified label for', str(product.lid)
 
 if __name__ == '__main__':
-    run()
+    _run()
