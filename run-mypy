@@ -2,6 +2,7 @@
 
 source activate mypy
 mypy --silent-imports --py2 \
+    pdart/browse \
     pdart/db \
     pdart/hst \
     pdart/pds4 \
