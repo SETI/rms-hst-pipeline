@@ -1,6 +1,9 @@
+import glob
 import os
 import os.path
 import shutil
+import sys
+import xml.etree.ElementTree as ET
 
 from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchDocs import db_add_document_collection, \
@@ -89,8 +92,53 @@ def complete_fits_product(session, archive, collection, product):
     return db_fits_product
 
 
+def _get_apt_files(docs_dir):
+    # type: (unicode) -> List[unicode]
+    old_dir = os.getcwd()
+    try:
+        os.chdir(docs_dir)
+        return [os.path.join(docs_dir, f) for f in glob.glob('*.apt')]
+    except:
+        print "ERROR: %s" % sys.exc_info()[0]
+        raise
+    finally:
+        os.chdir(old_dir)
+
+
+def _extract_apt_info(session, doc_collection):
+    # type: (Session, C.Collection) -> None
+    """
+    If there is an .apt file in the documents collection, extract the
+    information within it to the database and to abstract.txt.
+    """
+    print '#### _extract_apt_info(session, %s)' % doc_collection
+    for product in doc_collection.products():
+        docs_dir = product.absolute_filepath()
+        # this is the directory the set of documentation files lives in
+        apt_files = _get_apt_files(docs_dir)
+        print '#### looked for apt files in', docs_dir
+        if apt_files:
+            print '#### found apt:', apt_files
+            assert len(apt_files) == 1
+            filepath = apt_files[0]
+            tree = ET.parse(filepath)
+            root = tree.getroot()
+            abstract = root.findall('./ProposalInformation/Abstract')[0].text
+            abstract_fp = os.path.join(os.path.dirname(filepath),
+                                       'abstract.txt')
+            with open(abstract_fp, 'w') as f:
+                f.write(abstract)
+            # TODO Need to add abstract.txt to the database
+        else:
+            print '#### found no apt files'
+
+        # TODO See downloads.py in the top directory for other
+        # needed data.
+
+
 def complete_doc_collection(session, db_bundle, doc_collection):
     # type: (Session, Bundle, C.Collection) -> DocumentCollection
+    _extract_apt_info(session, doc_collection)
     db_collection = db_add_document_collection(session,
                                                doc_collection)
     for product in doc_collection.products():
@@ -256,7 +304,7 @@ def reset_bundle(bundle):
             shutil.rmtree(filepath)
         # will also need for SPICE: TODO
 
-    os.system("find %s -name '*.xml' -delete" % bundle_filepath)
+    os.system("find '%s' -name '*.xml' -delete" % bundle_filepath)
 
 
 def run():
