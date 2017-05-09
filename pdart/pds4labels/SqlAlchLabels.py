@@ -2,50 +2,18 @@
 Creation of labels and writing them to the filesystem.  Creation of
 browse products.
 """
-import os.path
 
-import pdart.add_pds_tools
-import picmaker
-
-from pdart.db.SqlAlchDBName import DATABASE_NAME
-from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct, \
-    NonDocumentCollection
-from pdart.db.SqlAlchUtils import bundle_database_filepath
+from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct
 from pdart.db.SqlAlchXml import *
-from pdart.pds4.Archives import get_any_archive
-from pdart.pds4.HstFilename import HstFilename
-from pdart.pds4.LID import LID
 import pdart.pds4.Product as P
 from pdart.xml.Pretty import pretty_print
-from pdart.xml.Schema import verify_label_or_raise
 from pdart.xml.Templates import interpret_document_template
-
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
-
-    from pdart.db.SqlAlchTables import DocumentProduct
     import pdart.pds4.Bundle as B
-    import pdart.pds4.Collection as C
+    from pdart.db.SqlAlchTables import DocumentProduct
     from pdart.xml.Templates import DocTemplate
-
-    # a type synonym
-    _BrowseCollectionAndProduct = Tuple[NonDocumentCollection, BrowseProduct]
-
-
-def _ensure_directory(dir):
-    # type: (AnyStr) -> None
-    """Make the directory if it doesn't already exist."""
-
-    # TODO This is cut-and-pasted from
-    # pdart.pds4label.BrowseProductImageReduction.  Refactor and
-    # remove.
-    try:
-        os.mkdir(dir)
-    except OSError:
-        pass
-    assert os.path.isdir(dir), dir
 
 
 ##############################
@@ -534,87 +502,6 @@ def _make_product_spice_kernel_label(bundle, product, fits_product):
 
 
 ##############################
-
-
-def make_browse_product(fits_product, browse_product):
-    # type: (P.Product, P.Product) -> None
-    """
-    Given FITS product and Browse product objects, create images for
-    the browse product and save them to the filesystem.
-    """
-    file = list(fits_product.files())[0]
-    basename = os.path.basename(file.full_filepath())
-    basename = os.path.splitext(basename)[0] + '.jpg'
-    browse_collection_dir = browse_product.collection().absolute_filepath()
-    _ensure_directory(browse_collection_dir)
-
-    visit = HstFilename(basename).visit()
-    target_dir = os.path.join(browse_collection_dir, ('visit_%s' % visit))
-    _ensure_directory(target_dir)
-
-    picmaker.ImagesToPics([file.full_filepath()],
-                          target_dir,
-                          filter="None",
-                          percentiles=(1, 99))
-
-
-def _make_db_browse_collection(session, browse_collection):
-    # type: (Session, C.Collection) -> NonDocumentCollection
-
-    lid = str(browse_collection.lid)
-
-    db_browse_collection = \
-        session.query(NonDocumentCollection).filter_by(lid=lid).first()
-
-    if not db_browse_collection:
-        bundle = browse_collection.bundle()
-        db_browse_collection = NonDocumentCollection(
-            lid=lid,
-            bundle_lid=str(bundle.lid),
-            prefix=browse_collection.prefix(),
-            suffix=browse_collection.suffix(),
-            instrument=browse_collection.instrument(),
-            full_filepath=browse_collection.absolute_filepath(),
-            label_filepath=browse_collection.label_filepath(),
-            inventory_name=browse_collection.inventory_name(),
-            inventory_filepath=browse_collection.inventory_filepath())
-        session.add(db_browse_collection)
-        session.commit()
-    return db_browse_collection
-
-
-def make_db_browse_product(session, fits_product, browse_product):
-    # type: (Session, P.Product, P.Product) -> _BrowseCollectionAndProduct
-    """
-    Given a SqlAlchemy session and the FITS and browse product
-    objects, create the BrowseCollection and BrowseProduct rows in the
-    database.
-    """
-
-    lid = str(browse_product.lid)
-
-    # TODO I'm deleting any previous record here, but only during
-    # development.
-    session.query(BrowseProduct).filter_by(product_lid=lid).delete()
-    session.query(Product).filter_by(lid=lid).delete()
-
-    browse_filepath = browse_product.absolute_filepath()
-    object_length = os.path.getsize(browse_filepath)
-
-    db_browse_product = BrowseProduct(
-        lid=str(browse_product.lid),
-        collection_lid=str(browse_product.collection().lid),
-        label_filepath=browse_product.label_filepath(),
-        browse_filepath=browse_filepath,
-        object_length=object_length
-        )
-    session.add(db_browse_product)
-    session.commit()
-
-    db_browse_collection = \
-        _make_db_browse_collection(session, browse_product.collection())
-
-    return (db_browse_collection, db_browse_product)
 
 
 PRODUCT_LID = 'urn:nasa:pds:hst_14334:data_wfc3_raw:icwy08q3q_raw'

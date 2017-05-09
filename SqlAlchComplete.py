@@ -5,6 +5,8 @@ import shutil
 import sys
 import xml.etree.ElementTree as ET
 
+from pdart.browse.SqlAlchBrowse \
+    import make_db_browse_product, make_browse_product
 from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchDocs import db_add_document_collection, \
     db_add_document_product, populate_document_collection
@@ -13,8 +15,8 @@ from pdart.db.SqlAlchTables import Base, BrowseProduct, Bundle, \
     DocumentProduct, FitsProduct, NonDocumentCollection, Product
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
-from pdart.pds4labels.SqlAlchLabels import make_browse_product, \
-    make_db_browse_product, make_and_save_product_browse_label, \
+from pdart.pds4labels.SqlAlchLabels \
+    import make_and_save_product_browse_label, \
     make_and_save_product_bundle_label, \
     make_and_save_product_collection_label, \
     make_and_save_product_document_label, \
