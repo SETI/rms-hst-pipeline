@@ -174,3 +174,8 @@ class Product(Component):
         """Return the browse product object for this product."""
         assert not self.is_document_product()
         return Product(self.archive, self.lid.to_browse_lid())
+
+    def first_filepath(self):
+        # type: () -> unicode
+        """Return the full filepath of the first file for this product."""
+        return self.files().next().full_filepath()

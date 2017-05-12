@@ -11,8 +11,9 @@ from pdart.db.SqlAlchDBName import DATABASE_NAME
 from pdart.db.SqlAlchDocs import db_add_document_collection, \
     db_add_document_product, populate_document_collection
 from pdart.db.SqlAlchTables import Base, BrowseProduct, Bundle, \
-    Collection, create_database_tables_and_session, DocumentCollection, \
-    DocumentProduct, FitsProduct, NonDocumentCollection, Product
+    Collection, create_database_tables_and_session, db_bundle_exists, \
+    DocumentCollection, DocumentProduct, FitsProduct, NonDocumentCollection, \
+    Product
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 from pdart.pds4labels.SqlAlchLabels \
@@ -38,6 +39,9 @@ if TYPE_CHECKING:
 
 def db_add_bundle(session, archive, bundle):
     # type: (Session, A.Archive, B.Bundle) -> Bundle
+    """
+    Add a Bundle entry into the database for the bundle.
+    """
     db_bundle = Bundle(lid=str(bundle.lid),
                        proposal_id=bundle.proposal_id(),
                        archive_path=os.path.abspath(archive.root),
@@ -45,6 +49,9 @@ def db_add_bundle(session, archive, bundle):
                        label_filepath=bundle.label_filepath())
     session.add(db_bundle)
     session.commit()
+
+    # POSTCONDITION
+    assert db_bundle_exists(session, bundle)
     return db_bundle
 
 

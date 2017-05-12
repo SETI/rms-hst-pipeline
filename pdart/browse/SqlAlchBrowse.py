@@ -4,8 +4,10 @@ import os.path
 import pdart.add_pds_tools
 import picmaker
 
-from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct, \
-    NonDocumentCollection
+from pdart.db.SqlAlchTables import BrowseProduct, DocumentCollection, \
+    FitsProduct, NonDocumentCollection, Product, db_browse_product_exists, \
+    db_non_document_collection_exists
+
 from pdart.pds4.HstFilename import HstFilename
 
 from typing import AnyStr, Tuple, TYPE_CHECKING
@@ -41,8 +43,11 @@ def make_browse_product(fits_product, browse_product):
     Given FITS product and Browse product objects, create images for
     the browse product and save them to the filesystem.
     """
-    file = list(fits_product.files())[0]
-    basename = os.path.basename(file.full_filepath())
+    # PRECONDITION: the FITS file exists in the filesystem
+    filepath = fits_product.first_filepath()
+    assert os.path.isfile(filepath)
+
+    basename = os.path.basename(filepath)
     basename = os.path.splitext(basename)[0] + '.jpg'
     browse_collection_dir = browse_product.collection().absolute_filepath()
     _ensure_directory(browse_collection_dir)
@@ -51,15 +56,17 @@ def make_browse_product(fits_product, browse_product):
     target_dir = os.path.join(browse_collection_dir, ('visit_%s' % visit))
     _ensure_directory(target_dir)
 
-    picmaker.ImagesToPics([file.full_filepath()],
+    picmaker.ImagesToPics([filepath],
                           target_dir,
                           filter="None",
                           percentiles=(1, 99))
+    # POSTCONDITION: browse file exists in the filesystem
+    browse_filepath = os.path.join(target_dir, basename)
+    assert os.path.isfile(browse_filepath)
 
 
 def _make_db_browse_collection(session, browse_collection):
     # type: (Session, C.Collection) -> NonDocumentCollection
-
     lid = str(browse_collection.lid)
 
     db_browse_collection = \
@@ -79,6 +86,9 @@ def _make_db_browse_collection(session, browse_collection):
             inventory_filepath=browse_collection.inventory_filepath())
         session.add(db_browse_collection)
         session.commit()
+
+    # POSTCONDITION
+    assert db_non_document_collection_exists(session, browse_collection)
     return db_browse_collection
 
 
@@ -89,6 +99,8 @@ def make_db_browse_product(session, fits_product, browse_product):
     objects, create the BrowseCollection and BrowseProduct rows in the
     database.
     """
+    # PRECONDITION: the browse product file exists in the filesystem
+    assert os.path.isfile(browse_product.first_filepath())
 
     lid = str(browse_product.lid)
 
@@ -112,5 +124,10 @@ def make_db_browse_product(session, fits_product, browse_product):
 
     db_browse_collection = \
         _make_db_browse_collection(session, browse_product.collection())
+
+    # POSTCONDITION
+    assert db_browse_product_exists(session, browse_product)
+    assert db_non_document_collection_exists(session,
+                                             browse_product.collection())
 
     return (db_browse_collection, db_browse_product)

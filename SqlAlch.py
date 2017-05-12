@@ -68,6 +68,12 @@ def db_add_bundle(archive, bundle):
 
 def db_add_document_collection(session, archive, bundle, collection):
     # type: (Session, A.Archive, B.Bundle, C.Collection) -> None
+    """
+    Add a DocumentCollection entry into the database for the collection.
+    """
+    # PRECONDITION
+    assert db_bundle_exists(session, bundle)
+
     db_collection = DocumentCollection(
         lid=str(collection.lid),
         bundle_lid=str(bundle.lid),
@@ -77,10 +83,19 @@ def db_add_document_collection(session, archive, bundle, collection):
         inventory_filepath=collection.inventory_filepath())
     session.add(db_collection)
     session.commit()
+    # POSTCONDITION
+    assert db_document_collection_exists(session, collection)
 
 
 def db_add_non_document_collection(session, archive, bundle, collection):
     # type: (Session, A.Archive, B.Bundle, C.Collection) -> Collection
+    """
+    Add a NonDocumentCollection entry into the database for the
+    collection.
+    """
+    # PRECONDITION
+    assert db_bundle_exists(session, bundle)
+
     db_collection = NonDocumentCollection(
         lid=str(collection.lid),
         bundle_lid=str(bundle.lid),
@@ -93,24 +108,36 @@ def db_add_non_document_collection(session, archive, bundle, collection):
         inventory_filepath=collection.inventory_filepath())
     session.add(db_collection)
     session.commit()
-    return db_collection
     # if collection.prefix() == 'data':
     #     for product in collection.products():
     #        db_add_product(session, archive, collection, product)
 
+    # POSTCONDITION
+    assert db_non_document_collection_exists(session, collection)
+    return db_collection
+
 
 def db_add_product(session, archive, collection, product):
     # type: (Session, A.Archive, C.Collection, P.Product) -> Product
-    db_fits_product = None
+    """
+    Add a FitsProduct entry into the database for the Product; if the
+    file cannot be parsed, add a BadFitsFile entry instead.
+    """
+    # PRECONDITIONS
+    assert db_non_document_collection_exists(session, collection)
+    # and the FITS file exists in the filesystem
+    fits_filepath = product.first_filepath()
+    assert os.path.isfile(fits_filepath)
+
     print '    ', product.lid
-    file = list(product.files())[0]
+    db_fits_product = None
     try:
         with closing(pyfits.open(
-                file.full_filepath())) as fits:
+                fits_filepath)) as fits:
             db_fits_product = FitsProduct(
                 lid=str(product.lid),
                 collection_lid=str(collection.lid),
-                fits_filepath=file.full_filepath(),
+                fits_filepath=fits_filepath,
                 label_filepath=product.label_filepath(),
                 visit=product.visit())
             for (n, hdu) in enumerate(fits):
@@ -129,7 +156,7 @@ def db_add_product(session, archive, collection, product):
     except IOError as e:
         db_bad_fits_file = BadFitsFile(
             lid=str(product.lid),
-            filepath=file.full_filepath(),
+            filepath=fits_filepath,
             message=str(e))
         session.add(db_bad_fits_file)
         print 'ERROR: bad FITS file', str(product.lid)
@@ -148,6 +175,10 @@ def db_add_product(session, archive, collection, product):
         except:
             print '#### failed on', label_filepath
             raise
+
+    # POSTCONDITION
+    assert db_fits_product_exists(session, product) or \
+        db_bad_fits_file_exists(session, product)
 
     return db_fits_product
 

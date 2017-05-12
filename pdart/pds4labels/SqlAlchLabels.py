@@ -283,9 +283,14 @@ def make_and_save_product_bundle_label(bundle):
 def make_product_bundle_label(bundle):
     # type: (Bundle) -> str
     """
-    Given the database Collection row, create a collection label and
-    return it.
+    Given the database Bundle row, create a bundle label and return
+    it.
     """
+    # PRECONDITIONS: the bundle exists in the database and entries
+    # exist for all the collections in it.  These are all implied by
+    # the existence of the bundle entry in the database.
+    assert bundle
+
     logical_identifier = make_logical_identifier(str(bundle.lid))
     version_id = make_version_id()
 
@@ -321,6 +326,10 @@ def make_product_bundle_label(bundle):
     except:
         print label
         raise
+
+    # POSTCONDITION
+    assert pretty
+
     return pretty
 
 

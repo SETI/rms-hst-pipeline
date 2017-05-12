@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import *
 
 from pdart.db.SqlAlchTables import *
+from pdart.db.SqlAlchUtils import *
 from pdart.pds4.Archives import get_any_archive
 import pdart.pds4.Collection as C
 from pdart.pds4.LID import LID
@@ -20,6 +21,7 @@ if TYPE_CHECKING:
     from typing import AnyStr, Tuple
 
     import pdart.pds4.Bundle as B
+    import pdart.pds4.Collection as C
     import pdart.pds4.Product as P
 
 
@@ -77,6 +79,8 @@ def populate_document_collection(bundle):
     # type: (B.Bundle) -> C.Collection
     """
     Download documentation for the bundle and save in the filesystem.
+    Return either the collection or None if no documents were
+    downloaded.
     """
     bundle_fp = bundle.absolute_filepath()
     collection_fp = os.path.join(bundle_fp, 'document')
@@ -105,6 +109,7 @@ def db_add_document_collection(session, collection):
     DocumentCollection database row, add it to the database, and
     return it.
     """
+    assert db_bundle_exists(session, collection.bundle())
     db_document_collection = DocumentCollection(
         lid=str(collection.lid),
         bundle_lid=str(collection.bundle().lid),
@@ -115,6 +120,7 @@ def db_add_document_collection(session, collection):
         )
     session.add(db_document_collection)
     session.commit()
+    assert db_collection_exists(session, collection)
     return db_document_collection
 
 
@@ -125,6 +131,13 @@ def db_add_document_product(session, product):
     DocumentProduct database row, add it to the database, and return
     it.
     """
+    # PRECONDITION: the document product exists in the filepath and
+    # has files in it.
+    assert os.path.isdir(product.absolute_filepath())
+    assert list(product.files())
+    # and...
+    assert db_document_collection_exists(session, product.collection())
+
     db_document_product = DocumentProduct(
         lid=str(product.lid),
         document_filepath=product.absolute_filepath(),
@@ -140,6 +153,10 @@ def db_add_document_product(session, product):
         session.add(db_document_file)
 
     session.commit()
+
+    # POSTCONDITION
+    assert db_document_product_exists(session, product)
+
     return db_document_product
 
 

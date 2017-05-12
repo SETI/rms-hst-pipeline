@@ -13,6 +13,11 @@ if TYPE_CHECKING:
     from sqlalchemy.schema import *
     from sqlalchemy.types import *
 
+    import pdart.pds4.Bundle as B
+    import pdart.pds4.Collection as C
+    import pdart.pds4.Product as P
+
+
 Base = declarative_base()
 # type: Any
 
@@ -294,6 +299,67 @@ def create_database_tables_and_session(db_filepath):
     """
     engine = _create_database_tables(db_filepath)
     return sessionmaker(bind=engine)()
+
+
+def db_bundle_exists(session, bundle):
+    # type: (Session, B.Bundle) -> bool
+    res = session.query(Bundle).filter_by(lid=str(bundle.lid)).one_or_none()
+    return res is not None
+
+
+def db_collection_exists(session, collection):
+    # type: (Session, C.Collection) -> bool
+    res = session.query(Collection).filter_by(
+        lid=str(collection.lid)).one_or_none()
+    return res is not None
+
+
+def db_document_collection_exists(session, collection):
+    # type: (Session, C.Collection) -> bool
+    res = session.query(DocumentCollection).filter_by(
+        collection_lid=str(collection.lid)).one_or_none()
+    return res is not None
+
+
+def db_non_document_collection_exists(session, collection):
+    # type: (Session, C.Collection) -> bool
+    res = session.query(NonDocumentCollection).filter_by(
+        collection_lid=str(collection.lid)).one_or_none()
+    return res is not None
+
+
+def db_product_exists(session, product):
+    # type: (Session, P.Product) -> bool
+    res = session.query(Product).filter_by(lid=str(product.lid)).one_or_none()
+    return res is not None
+
+
+def db_fits_product_exists(session, product):
+    # type: (Session, P.Product) -> bool
+    res = session.query(FitsProduct).filter_by(
+        product_lid=str(product.lid)).one_or_none()
+    return res is not None
+
+
+def db_browse_product_exists(session, product):
+    # type: (Session, P.Product) -> bool
+    res = session.query(BrowseProduct).filter_by(
+        product_lid=str(product.lid)).one_or_none()
+    return res is not None
+
+
+def db_document_product_exists(session, product):
+    # type: (Session, P.Product) -> bool
+    res = session.query(DocumentProduct).filter_by(
+        product_lid=str(product.lid)).one_or_none()
+    return res is not None
+
+
+def db_bad_fits_file_exists(session, product):
+    # type: (Session, P.Product) -> bool
+    res = session.query(BadFitsFile).filter_by(
+        lid=str(product.lid)).one_or_none()
+    return res is not None
 
 
 if __name__ == '__main__':
