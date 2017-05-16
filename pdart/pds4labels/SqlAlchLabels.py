@@ -2,6 +2,7 @@
 Creation of labels and writing them to the filesystem.  Creation of
 browse products.
 """
+import os.path
 
 from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct
 from pdart.db.SqlAlchXml import *
@@ -34,26 +35,36 @@ _product_browse_template = interpret_document_template(
 # type: DocTemplate
 
 
-def make_and_save_product_browse_label(collection, product):
+def make_and_save_product_browse_label(collection, browse_product):
     # type: (Collection, BrowseProduct) -> str
     """
     Given the database Collection row and BrowseProduct row, create a
     product label and save it to the filesystem.
     """
-    label = make_product_browse_label(collection, product)
-    label_filepath = str(product.label_filepath)
+    # PRECONDITION
+    assert browse_product
+
+    label = make_product_browse_label(collection, browse_product)
+    label_filepath = str(browse_product.label_filepath)
     with open(label_filepath, "w") as f:
         f.write(label)
+
+    # POSTCONDITION
+    assert os.path.isfile(str(browse_product.label_filepath))
+
     return label
 
 
-def make_product_browse_label(collection, product):
+def make_product_browse_label(collection, browse_product):
     # type: (Collection, BrowseProduct) -> str
     """
     Given the database Collection row and BrowseProduct row, create a
     product label and return it.
     """
-    logical_identifier = make_logical_identifier(str(product.lid))
+    # PRECONDITION
+    assert browse_product
+
+    logical_identifier = make_logical_identifier(str(browse_product.lid))
     version_id = make_version_id()
 
     bundle = collection.bundle
@@ -74,13 +85,17 @@ def make_product_browse_label(collection, product):
                 information_model_version,
                 product_class,
                 combine_nodes_into_fragment([])),
-            'File_Area_Browse': make_file_area_browse(product)
+            'File_Area_Browse': make_file_area_browse(browse_product)
             }).toxml()
     try:
         pretty = pretty_print(label)
     except:
         print label
         raise
+
+    # POSTCONDITION
+    assert label
+
     return pretty
 
 
@@ -104,30 +119,39 @@ _product_observational_template = interpret_document_template(
 # type: DocTemplate
 
 
-def make_and_save_product_observational_label(product):
+def make_and_save_product_observational_label(fits_product):
     # type: (FitsProduct) -> str
     """
     Given the database Collection row and FitsProduct row, create a
     product label and save it to the filesystem.
     """
-    label = make_product_observational_label(product)
-    label_filepath = str(product.label_filepath)
+    # PRECONDITION
+    assert fits_product
+
+    label = make_product_observational_label(fits_product)
+    label_filepath = str(fits_product.label_filepath)
     with open(label_filepath, "w") as f:
         f.write(label)
+
+    # POSTCONDITION
+    assert os.path.isfile(str(fits_product.label_filepath))
+
     return label
 
 
-def make_product_observational_label(product):
+def make_product_observational_label(fits_product):
     # type: (FitsProduct) -> str
     """
     Given the database Collection row and FitsProduct row, create a
     product label and return it.
     """
+    # PRECONDITION: FitsProduct exists
+    assert fits_product
 
-    logical_identifier = make_logical_identifier(str(product.lid))
+    logical_identifier = make_logical_identifier(str(fits_product.lid))
     version_id = make_version_id()
 
-    collection = product.collection
+    collection = fits_product.collection
     bundle = collection.bundle
     proposal_id = cast(int, bundle.proposal_id)
     text = ('This product contains the %s image obtained by ' +
@@ -136,7 +160,7 @@ def make_product_observational_label(product):
     title = make_title(text)
 
     information_model_version = make_information_model_version()
-    product_type = str(product.type)
+    product_type = str(fits_product.type)
     if product_type == 'fits_product':
         text = 'Product_Observational'
     else:
@@ -151,14 +175,19 @@ def make_product_observational_label(product):
                 information_model_version,
                 product_class,
                 combine_nodes_into_fragment([])),
-            'Observation_Area': make_observation_area(product),
-            'File_Area_Observational': make_file_area_observational(product)
+            'Observation_Area': make_observation_area(fits_product),
+            'File_Area_Observational': make_file_area_observational(
+                fits_product)
             }).toxml()
     try:
         pretty = pretty_print(label)
     except:
         print label
         raise
+
+    # POSTCONDITION
+    assert pretty
+
     return pretty
 
 
@@ -368,27 +397,36 @@ def _make_file_name_std_pair(basename):
                         (ext, basename))
 
 
-def make_and_save_product_document_label(bundle, product):
+def make_and_save_product_document_label(bundle, document_product):
     # type: (Bundle, DocumentProduct) -> str
     """
     Given the database Bundle row and DocumentProduct row, create a
     product label and save it to the filesystem.
     """
-    label = make_product_document_label(bundle, product)
-    label_filepath = str(product.label_filepath)
+    # PRECONDITION
+    assert document_product
+
+    label = make_product_document_label(bundle, document_product)
+    label_filepath = str(document_product.label_filepath)
     with open(label_filepath, "w") as f:
         f.write(label)
+
+    # POSTCONDITION
+    assert os.path.isfile(str(document_product.label_filepath))
+
     return label
 
 
-def make_product_document_label(db_bundle, db_product):
+def make_product_document_label(db_bundle, db_document_product):
     # type: (Bundle, DocumentProduct) -> str
     """
     Given the database Bundle row and DocumentProduct row, create a
     product label and return it.
     """
+    # PRECONDITION
+    assert db_document_product
 
-    logical_identifier = make_logical_identifier(str(db_product.lid))
+    logical_identifier = make_logical_identifier(str(db_document_product.lid))
     version_id = make_version_id()
 
     proposal_id = cast(int, 0 + db_bundle.proposal_id)
@@ -402,7 +440,7 @@ def make_product_document_label(db_bundle, db_product):
     publication_year = '2000'  # TODO
     description = 'TODO'  # TODO
     short_files = ['' + file.file_basename
-                   for file in db_product.document_files]
+                   for file in db_document_product.document_files]
     # This should be tuples of file_name and std
     files = [_make_file_name_std_pair(f) for f in short_files]
 
@@ -425,6 +463,10 @@ def make_product_document_label(db_bundle, db_product):
     except:
         print label
         raise
+
+    # POSTCONDITION
+    assert pretty
+
     return pretty
 
 
@@ -455,11 +497,19 @@ def make_and_save_product_spice_kernel_label(bundle, product, fits_product):
     Given the Bundle and Product objects and FitsProduct row, create a
     product label and save it to the filesystem.  TODO unimplemented
     """
-    assert False, "ensure this implementation makes sense"
+    # PRECONDITION
+    assert False, "ensure this implementation makes sense"  # it doesn't
+    # assert spice_kernel exists
+
     label = _make_product_spice_kernel_label(bundle, product, fits_product)
     label_filepath = str(product.label_filepath)
     with open(label_filepath, "w") as f:
         f.write(label)
+
+    # POSTCONDITION
+    assert os.path.isfile(str(product.label_filepath))
+    # TODO looks like the wrong path
+
     return label
 
 
@@ -469,6 +519,9 @@ def _make_product_spice_kernel_label(bundle, product, fits_product):
     Given the Bundle and Product objects and FitsProduct row, create a
     product label and return it.  TODO unimplemented
     """
+    # PRECONDITION
+    assert False, "ensure this implementation makes sense"  # it doesn't
+    # assert spice_kernel exists
 
     logical_identifier = make_logical_identifier(str(product.lid))
     version_id = make_version_id()
@@ -507,6 +560,10 @@ def _make_product_spice_kernel_label(bundle, product, fits_product):
     except:
         print label
         raise
+
+    # POSTCONDITION
+    assert label
+
     return pretty
 
 

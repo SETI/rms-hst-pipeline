@@ -85,8 +85,7 @@ def complete_fits_product(session, archive, collection, product):
     if db_fits_product is not None:
         # i.e., FITS parsing didn't fail and it isn't a
         # bad_fits_file
-        label = make_and_save_product_observational_label(
-            db_fits_product)
+        label = make_and_save_product_observational_label(db_fits_product)
         verify_label_or_raise(label)
 
         # Now make browse products

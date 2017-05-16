@@ -128,7 +128,7 @@ class TestSqlAlch(unittest.TestCase):
         # type: () -> None
 
         # It requires an argument
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AssertionError):
             make_product_bundle_label(None)
 
         label = make_product_bundle_label(self.db_bundle)
@@ -148,7 +148,7 @@ class TestSqlAlch(unittest.TestCase):
         # type: () -> None
 
         # It requires an argument
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AssertionError):
             make_product_observational_label(None)
 
         label = make_product_observational_label(self.db_fits_product)
@@ -160,9 +160,9 @@ class TestSqlAlch(unittest.TestCase):
         # It requires two arguments
         with self.assertRaises(AttributeError):
             make_product_browse_label(None, self.db_browse_product)
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AssertionError):
             make_product_browse_label(self.db_browse_collection, None)
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AssertionError):
             make_product_browse_label(None, None)
 
         label = make_product_browse_label(self.db_browse_collection,
