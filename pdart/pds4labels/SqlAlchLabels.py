@@ -94,7 +94,7 @@ def make_product_browse_label(collection, browse_product):
         raise
 
     # POSTCONDITION
-    assert label
+    assert pretty
 
     return pretty
 
@@ -217,10 +217,19 @@ def make_and_save_product_collection_label(collection):
     Given the database Collection row, create a collection label and
     save it to the filesystem.
     """
+    # PRECONDITION
+    assert collection
+    # assert: that all the collection's products have matching
+    # database entries including FITS, browse, SPICE kernel and
+    # document products.  We can't really check this though.
+
     label = make_product_collection_label(collection)
     label_filepath = str(collection.label_filepath)
     with open(label_filepath, "w") as f:
         f.write(label)
+
+    # POSTCONDITION
+    assert os.path.isfile(str(collection.label_filepath))
 
     return label
 
@@ -231,6 +240,11 @@ def make_product_collection_label(collection):
     Given the database Collection row, create a collection label and
     return it.
     """
+    # PRECONDITION
+    assert collection
+    # assert: that all the collection's products have matching
+    # database entries including FITS, browse, SPICE kernel and
+    # document products.  We can't really check this though.
 
     logical_identifier = make_logical_identifier(str(collection.lid))
     version_id = make_version_id()
@@ -273,6 +287,10 @@ def make_product_collection_label(collection):
     except:
         print label
         raise
+
+    # POSTCONDITION
+    assert pretty
+
     return pretty
 
 
@@ -302,10 +320,17 @@ def make_and_save_product_bundle_label(bundle):
     Given the database Bundle row, create a bundle label and save it
     to the filesystem.
     """
+    # PRECONDITION
+    assert bundle
+
     label = make_product_bundle_label(bundle)
     label_filepath = str(bundle.label_filepath)
     with open(label_filepath, "w") as f:
         f.write(label)
+
+    # POSTCONDITION
+    assert os.path.isfile(str(bundle.label_filepath))
+
     return label
 
 
@@ -315,9 +340,7 @@ def make_product_bundle_label(bundle):
     Given the database Bundle row, create a bundle label and return
     it.
     """
-    # PRECONDITIONS: the bundle exists in the database and entries
-    # exist for all the collections in it.  These are all implied by
-    # the existence of the bundle entry in the database.
+    # PRECONDITIONS
     assert bundle
 
     logical_identifier = make_logical_identifier(str(bundle.lid))
@@ -562,7 +585,7 @@ def _make_product_spice_kernel_label(bundle, product, fits_product):
         raise
 
     # POSTCONDITION
-    assert label
+    assert pretty
 
     return pretty
 
