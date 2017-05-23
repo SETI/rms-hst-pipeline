@@ -1,4 +1,5 @@
 import glob
+import io
 import os
 import os.path
 import shutil
@@ -71,7 +72,7 @@ def generate_browse_product(session, product):
         db_browse_product)
     verify_label_or_raise(label)
 
-    # postconditions
+    # POSTCONDITION
     assert_product_is_complete(session, db_browse_product)
 
     return db_browse_product
@@ -94,7 +95,7 @@ def complete_fits_product(session, archive, collection, product):
 
         # TODO: generate_spice_kernel_product(session, product)
 
-    # postconditions
+    # POSTCONDITION
     assert_product_is_complete(session, db_fits_product)
 
     return db_fits_product
@@ -144,6 +145,42 @@ def _extract_apt_info(session, doc_collection):
         # needed data.
 
 
+def make_product_collection_inventory(db_collection):
+    # type: (Collection) -> unicode
+
+    # PRECONDITION
+    assert db_collection
+
+    product_lids = [str(product.lid) for product in db_collection.products]
+    lines = [u'P,%s\r\n' % lid for lid in product_lids]
+    result = ''.join(lines)
+
+    empty = len(product_lids) == 0
+    assert_log(not empty, "empty collection %s" % str(db_collection.lid))
+
+    # POSTCONDITION
+    assert empty or result
+
+    return result
+
+
+def make_and_save_product_collection_inventory(db_collection):
+    # type: (Collection) -> None
+    """
+    Given the database Collection row, create a collection inventory
+    and save it to the filesystem.
+    """
+    # PRECONDITION
+    assert db_collection
+
+    inventory = make_product_collection_inventory(db_collection)
+    with io.open(str(db_collection.inventory_filepath), 'w', newline='') as f:
+        f.write(unicode(inventory))
+
+    # POSTCONDITION
+    assert os.path.isfile(str(db_collection.inventory_filepath))
+
+
 def complete_doc_collection(session, db_bundle, doc_collection):
     # type: (Session, Bundle, C.Collection) -> DocumentCollection
     _extract_apt_info(session, doc_collection)
@@ -155,14 +192,14 @@ def complete_doc_collection(session, db_bundle, doc_collection):
         label = make_and_save_product_document_label(db_bundle, db_doc_product)
         verify_label_or_raise(label)
 
-        # postconditions
+        # POSTCONDITION
         assert_product_is_complete(session, db_doc_product)
 
     print "making collection label", doc_collection
-    # TODO inventory
+    make_and_save_product_collection_inventory(db_collection)
     make_and_save_product_collection_label(db_collection)
 
-    # postconditions
+    # POSTCONDITION
     assert_collection_is_complete(session, db_collection)
 
     return db_collection
@@ -185,10 +222,9 @@ def assert_collection_is_complete(session, db_collection):
                str(db_collection.full_filepath))
     assert_log(os.path.isfile(str(db_collection.label_filepath)),
                'label for collection %s exists' % str(db_collection.lid))
-    if False:  # TODO inventory
-        assert_log(os.path.isfile(str(db_collection.inventory_filepath)),
-                   'inventory for collection %s exists' %
-                   str(db_collection.lid))
+    assert_log(os.path.isfile(str(db_collection.inventory_filepath)),
+               'inventory for collection %s exists' %
+               str(db_collection.lid))
     # TODO assert that for each raw collection, there's a browse
     # collection
 
@@ -251,11 +287,11 @@ def complete_non_doc_collection(session, archive, bundle, collection):
         complete_fits_product(session, archive, collection, product)
 
     print "making collection label", collection
-    # TODO inventory
+    make_and_save_product_collection_inventory(db_collection)
     label = make_and_save_product_collection_label(db_collection)
     verify_label_or_raise(label)
 
-    # postconditions
+    # POSTCONDITION
     assert_collection_is_complete(session, db_collection)
 
     return db_collection

@@ -42,6 +42,7 @@ def make_and_save_product_browse_label(collection, browse_product):
     product label and save it to the filesystem.
     """
     # PRECONDITION
+    assert collection
     assert browse_product
 
     label = make_product_browse_label(collection, browse_product)
@@ -62,6 +63,7 @@ def make_product_browse_label(collection, browse_product):
     product label and return it.
     """
     # PRECONDITION
+    assert collection
     assert browse_product
 
     logical_identifier = make_logical_identifier(str(browse_product.lid))
