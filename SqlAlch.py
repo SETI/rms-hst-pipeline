@@ -164,7 +164,7 @@ def db_add_product(session, archive, collection, product):
 
     if db_fits_product:
         label = make_product_observational_label(db_fits_product)
-        label_filepath = cast(str, db_fits_product.label_filepath)
+        label_filepath = str(db_fits_product.label_filepath)
         with open(label_filepath, 'w') as f:
             f.write(label)
         try:
