@@ -60,6 +60,7 @@ def generate_browse_product(session, product):
     # type: (Session, P.Product) -> BrowseProduct
     browse_product = product.browse_product()
     print "completing browse product", browse_product
+    sys.stdout.flush()
 
     make_browse_product(product, browse_product)
     (db_browse_collection,
@@ -81,6 +82,8 @@ def generate_browse_product(session, product):
 def complete_fits_product(session, archive, collection, product):
     # type: (Session, A.Archive, C.Collection, P.Product) -> FitsProduct
     print "completing product", product
+    sys.stdout.flush()
+
     db_fits_product = db_add_product(session, archive,
                                      collection, product)
     if db_fits_product is not None:
@@ -229,6 +232,7 @@ def assert_collection_is_complete(session, db_collection):
     # collection
 
     print 'Collection %s is complete' % str(db_collection.lid)
+    sys.stdout.flush()
 
 
 def assert_product_is_complete(session, db_product):
@@ -260,6 +264,7 @@ def assert_product_is_complete(session, db_product):
                'label for product %s exists' % str(db_product.lid))
 
     print 'Product %s is complete' % str(db_product.lid)
+    sys.stdout.flush()
 
 
 def assert_bundle_is_complete(session, db_bundle):
@@ -276,11 +281,14 @@ def assert_bundle_is_complete(session, db_bundle):
     # TODO assert it has a document collection?
 
     print 'Bundle %s is complete' % str(db_bundle.lid)
+    sys.stdout.flush()
 
 
 def complete_non_doc_collection(session, archive, bundle, collection):
     # type: (Session, A.Archive, B.Bundle, C.Collection) -> _NDCollection
     print "completing collection", collection
+    sys.stdout.flush()
+
     db_collection = db_add_non_document_collection(session, archive,
                                                    bundle, collection)
     for product in list(collection.products()):
@@ -308,6 +316,8 @@ def complete_bundle(session, archive, bundle):
     # filesystem and database, and only then build labels.
     db_bundle = db_add_bundle(session, archive, bundle)
     print "completing bundle", bundle
+    sys.stdout.flush()
+
     for collection in bundle.collections():
         db_collection = complete_non_doc_collection(session, archive,
                                                     bundle, collection)
