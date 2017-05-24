@@ -58,50 +58,74 @@ def db_add_bundle(session, archive, bundle):
 
 def generate_browse_product(session, product):
     # type: (Session, P.Product) -> BrowseProduct
-    browse_product = product.browse_product()
-    print "completing browse product", browse_product
+    # PRECONDITION
+    assert product
+
+    print "completing browse product", product.lid
     sys.stdout.flush()
 
-    make_browse_product(product, browse_product)
-    (db_browse_collection,
-     db_browse_product) = make_db_browse_product(
-        session,
-        product,
-        browse_product)
-    label = make_and_save_product_browse_label(
-        db_browse_collection,
-        db_browse_product)
-    verify_label_or_raise(label)
+    try:
+        browse_product = product.browse_product()
+        make_browse_product(product, browse_product)
+        (db_browse_collection,
+         db_browse_product) = make_db_browse_product(
+            session,
+            product,
+            browse_product)
+        label = make_and_save_product_browse_label(
+            db_browse_collection,
+            db_browse_product)
+        verify_label_or_raise(label)
 
-    # POSTCONDITION
-    assert_product_is_complete(session, db_browse_product)
+        # POSTCONDITION
+        assert_product_is_complete(session, db_browse_product)
 
-    return db_browse_product
+        return db_browse_product
+    except:
+        e = sys.exc_info()[0]
+        print "ERROR: completing browse product %s: %s" % \
+            (str(db_browse_product.product_lid), e)
+        sys.stdout.flush()
+        raise
 
 
 def complete_fits_product(session, archive, collection, product):
     # type: (Session, A.Archive, C.Collection, P.Product) -> FitsProduct
-    print "completing product", product
+    # PRECONDITIONS
+    assert archive
+    assert collection
+    assert product
+
+    print "completing product", product.lid
     sys.stdout.flush()
 
-    db_fits_product = db_add_product(session, archive,
-                                     collection, product)
-    if db_fits_product is not None:
-        # i.e., FITS parsing didn't fail and it isn't a
-        # bad_fits_file
-        label = make_and_save_product_observational_label(db_fits_product)
-        verify_label_or_raise(label)
+    try:
+        db_fits_product = db_add_product(session, archive,
+                                         collection, product)
+        if db_fits_product is not None:
+            # i.e., FITS parsing didn't fail and it isn't a
+            # bad_fits_file
+            label = make_and_save_product_observational_label(db_fits_product)
+            verify_label_or_raise(label)
 
-        # Now make browse products
-        if collection.suffix() in RAW_SUFFIXES:
-            generate_browse_product(session, product)
+            # Now make browse products
+            if collection.suffix() in RAW_SUFFIXES:
+                generate_browse_product(session, product)
 
-        # TODO: generate_spice_kernel_product(session, product)
+            # TODO: generate_spice_kernel_product(session, product)
 
-    # POSTCONDITION
-    assert_product_is_complete(session, db_fits_product)
+        # POSTCONDITION
+        assert_product_is_complete(session, db_fits_product)
 
-    return db_fits_product
+        sys.stdout.flush()
+
+        return db_fits_product
+
+    except:
+        e = sys.exc_info()[0]
+        print "ERROR: completing FITS product %s: %s" % (str(product.lid), e)
+        sys.stdout.flush()
+        raise
 
 
 def _get_apt_files(docs_dir):
@@ -186,26 +210,37 @@ def make_and_save_product_collection_inventory(db_collection):
 
 def complete_doc_collection(session, db_bundle, doc_collection):
     # type: (Session, Bundle, C.Collection) -> DocumentCollection
-    _extract_apt_info(session, doc_collection)
-    db_collection = db_add_document_collection(session,
-                                               doc_collection)
-    for product in doc_collection.products():
-        print "making document_product", product
-        db_doc_product = db_add_document_product(session, product)
-        label = make_and_save_product_document_label(db_bundle, db_doc_product)
-        verify_label_or_raise(label)
+    print "completing document collection", doc_collection.lid
+    sys.stdout.flush()
+
+    try:
+        _extract_apt_info(session, doc_collection)
+        db_collection = db_add_document_collection(session,
+                                                   doc_collection)
+        for product in doc_collection.products():
+            print "making document_product", product
+            db_doc_product = db_add_document_product(session, product)
+            label = make_and_save_product_document_label(db_bundle,
+                                                         db_doc_product)
+            verify_label_or_raise(label)
+
+            # POSTCONDITION
+            assert_product_is_complete(session, db_doc_product)
+
+        print "making collection label", doc_collection
+        make_and_save_product_collection_inventory(db_collection)
+        make_and_save_product_collection_label(db_collection)
 
         # POSTCONDITION
-        assert_product_is_complete(session, db_doc_product)
+        assert_collection_is_complete(session, db_collection)
 
-    print "making collection label", doc_collection
-    make_and_save_product_collection_inventory(db_collection)
-    make_and_save_product_collection_label(db_collection)
-
-    # POSTCONDITION
-    assert_collection_is_complete(session, db_collection)
-
-    return db_collection
+        return db_collection
+    except:
+        e = sys.exc_info()[0]
+        print "ERROR: completing document collection %s: %s" % \
+            (str(doc_collection.lid), e)
+        sys.stdout.flush()
+        raise
 
 
 def assert_log(cond, msg):
@@ -289,55 +324,68 @@ def complete_non_doc_collection(session, archive, bundle, collection):
     print "completing collection", collection
     sys.stdout.flush()
 
-    db_collection = db_add_non_document_collection(session, archive,
-                                                   bundle, collection)
-    for product in list(collection.products()):
-        complete_fits_product(session, archive, collection, product)
+    try:
+        db_collection = db_add_non_document_collection(session, archive,
+                                                       bundle, collection)
+        for product in list(collection.products()):
+            complete_fits_product(session, archive, collection, product)
 
-    print "making collection label", collection
-    make_and_save_product_collection_inventory(db_collection)
-    label = make_and_save_product_collection_label(db_collection)
-    verify_label_or_raise(label)
+        print "making collection label", collection
+        make_and_save_product_collection_inventory(db_collection)
+        label = make_and_save_product_collection_label(db_collection)
+        verify_label_or_raise(label)
 
-    # POSTCONDITION
-    assert_collection_is_complete(session, db_collection)
+        # POSTCONDITION
+        assert_collection_is_complete(session, db_collection)
 
-    return db_collection
+        return db_collection
+    except:
+        e = sys.exc_info()[0]
+        print "ERROR: completing collection %s: %s" % (collection.lid, e)
+        sys.stdout.flush()
+        raise
 
 
 def complete_bundle(session, archive, bundle):
     # type: (Session, A.Archive, B.Bundle) -> Bundle
-
-    # Move FITS info into database and build labels.
-
-    # TODO: Since we might use out-of-order information (say, an
-    # observational product might need info from the documents), we
-    # need to split the two pieces of functionality: populate the
-    # filesystem and database, and only then build labels.
-    db_bundle = db_add_bundle(session, archive, bundle)
     print "completing bundle", bundle
     sys.stdout.flush()
 
-    for collection in bundle.collections():
-        db_collection = complete_non_doc_collection(session, archive,
-                                                    bundle, collection)
+    try:
+        # Move FITS info into database and build labels.
 
-    # Move documentation into filesystem and database
-    doc_collection = populate_document_collection(bundle)
-    if doc_collection:
-        print "making document_collection", doc_collection
-        db_doc_collection = complete_doc_collection(session,
-                                                    db_bundle,
-                                                    doc_collection)
+        # TODO: Since we might use out-of-order information (say, an
+        # observational product might need info from the documents), we
+        # need to split the two pieces of functionality: populate the
+        # filesystem and database, and only then build labels.
+        db_bundle = db_add_bundle(session, archive, bundle)
 
-    print "making bundle label", bundle
-    label = make_and_save_product_bundle_label(db_bundle)
-    verify_label_or_raise(label)
+        for collection in bundle.collections():
+            db_collection = complete_non_doc_collection(session, archive,
+                                                        bundle, collection)
 
-    # postconditions
-    assert_bundle_is_complete(session, db_bundle)
+        # Move documentation into filesystem and database
+        doc_collection = populate_document_collection(bundle)
+        if doc_collection:
+            print "making document_collection", doc_collection
+            db_doc_collection = complete_doc_collection(session,
+                                                        db_bundle,
+                                                        doc_collection)
 
-    return db_bundle
+        print "making bundle label", bundle
+        label = make_and_save_product_bundle_label(db_bundle)
+        verify_label_or_raise(label)
+
+        # postconditions
+        assert_bundle_is_complete(session, db_bundle)
+
+        return db_bundle
+    except:
+        e = sys.exc_info()[0]
+        print "ERROR: completing bundle %s: %s" % (str(bundle.lid), e)
+        sys.stdout.flush()
+        raise
+
 
 BUNDLE_NAME = 'hst_11536'
 
