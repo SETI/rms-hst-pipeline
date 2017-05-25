@@ -35,7 +35,35 @@ if TYPE_CHECKING:
     import pdart.pds4.Bundle as B
     import pdart.pds4.Collection as C
     import pdart.pds4.Product as P
+    from pdart.pds4.LID import LID
     _NDCollection = NonDocumentCollection
+
+
+class CompletionLogger(object):
+    """
+    Logs progress messages during completion of components.
+    """
+    def __init__(self, comp, lid):
+        # type: (str, LID) -> None
+        self.comp = comp
+        self.lid = str(lid)
+
+    def __enter__(self):
+        print ">>>> Completing %s %s..." % (self.comp, str(self.lid))
+        sys.stdout.flush()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_value:
+            print "<<<< ERROR completing %s %s: %s." % \
+                (self.comp, str(self.lid), exc_value)
+        else:
+            print "<<<< Completed %s %s." % (self.comp, str(self.lid))
+        sys.stdout.flush()
+
+
+def completion_logging(comp, lid):
+    # type: (str, LID) -> CompletionLogger
+    return CompletionLogger(comp, lid)
 
 
 def db_add_bundle(session, archive, bundle):
@@ -61,10 +89,7 @@ def generate_browse_product(session, product):
     # PRECONDITION
     assert product
 
-    print "completing browse product", product.lid
-    sys.stdout.flush()
-
-    try:
+    with completion_logging("browse product", product.lid):
         browse_product = product.browse_product()
         make_browse_product(product, browse_product)
         (db_browse_collection,
@@ -81,12 +106,6 @@ def generate_browse_product(session, product):
         assert_product_is_complete(session, db_browse_product)
 
         return db_browse_product
-    except:
-        e = sys.exc_info()[0]
-        print "ERROR: completing browse product %s: %s" % \
-            (str(db_browse_product.product_lid), e)
-        sys.stdout.flush()
-        raise
 
 
 def complete_fits_product(session, archive, collection, product):
@@ -96,10 +115,7 @@ def complete_fits_product(session, archive, collection, product):
     assert collection
     assert product
 
-    print "completing product", product.lid
-    sys.stdout.flush()
-
-    try:
+    with completion_logging("FITS product", product.lid):
         db_fits_product = db_add_product(session, archive,
                                          collection, product)
         if db_fits_product is not None:
@@ -120,12 +136,6 @@ def complete_fits_product(session, archive, collection, product):
         sys.stdout.flush()
 
         return db_fits_product
-
-    except:
-        e = sys.exc_info()[0]
-        print "ERROR: completing FITS product %s: %s" % (str(product.lid), e)
-        sys.stdout.flush()
-        raise
 
 
 def _get_apt_files(docs_dir):
@@ -210,10 +220,7 @@ def make_and_save_product_collection_inventory(db_collection):
 
 def complete_doc_collection(session, db_bundle, doc_collection):
     # type: (Session, Bundle, C.Collection) -> DocumentCollection
-    print "completing document collection", doc_collection.lid
-    sys.stdout.flush()
-
-    try:
+    with completion_logging("document collection", doc_collection.lid):
         _extract_apt_info(session, doc_collection)
         db_collection = db_add_document_collection(session,
                                                    doc_collection)
@@ -235,12 +242,6 @@ def complete_doc_collection(session, db_bundle, doc_collection):
         assert_collection_is_complete(session, db_collection)
 
         return db_collection
-    except:
-        e = sys.exc_info()[0]
-        print "ERROR: completing document collection %s: %s" % \
-            (str(doc_collection.lid), e)
-        sys.stdout.flush()
-        raise
 
 
 def assert_log(cond, msg):
@@ -321,10 +322,7 @@ def assert_bundle_is_complete(session, db_bundle):
 
 def complete_non_doc_collection(session, archive, bundle, collection):
     # type: (Session, A.Archive, B.Bundle, C.Collection) -> _NDCollection
-    print "completing collection", collection
-    sys.stdout.flush()
-
-    try:
+    with completion_logging("collection", collection.lid):
         db_collection = db_add_non_document_collection(session, archive,
                                                        bundle, collection)
         for product in list(collection.products()):
@@ -339,19 +337,11 @@ def complete_non_doc_collection(session, archive, bundle, collection):
         assert_collection_is_complete(session, db_collection)
 
         return db_collection
-    except:
-        e = sys.exc_info()[0]
-        print "ERROR: completing collection %s: %s" % (collection.lid, e)
-        sys.stdout.flush()
-        raise
 
 
 def complete_bundle(session, archive, bundle):
     # type: (Session, A.Archive, B.Bundle) -> Bundle
-    print "completing bundle", bundle
-    sys.stdout.flush()
-
-    try:
+    with completion_logging("bundle", bundle.lid):
         # Move FITS info into database and build labels.
 
         # TODO: Since we might use out-of-order information (say, an
@@ -380,11 +370,6 @@ def complete_bundle(session, archive, bundle):
         assert_bundle_is_complete(session, db_bundle)
 
         return db_bundle
-    except:
-        e = sys.exc_info()[0]
-        print "ERROR: completing bundle %s: %s" % (str(bundle.lid), e)
-        sys.stdout.flush()
-        raise
 
 
 BUNDLE_NAME = 'hst_11536'
