@@ -54,7 +54,8 @@ def db_add_bundle(archive, bundle):
                        proposal_id=bundle.proposal_id(),
                        archive_path=os.path.abspath(archive.root),
                        full_filepath=bundle.absolute_filepath(),
-                       label_filepath=bundle.label_filepath())
+                       label_filepath=bundle.label_filepath(),
+                       is_complete=False)
     session.add(db_bundle)
     session.commit()
     for collection in bundle.collections():

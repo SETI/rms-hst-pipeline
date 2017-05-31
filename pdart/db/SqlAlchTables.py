@@ -33,9 +33,11 @@ class Bundle(Base):
     archive_path = Column(String, nullable=False)
     full_filepath = Column(String, nullable=False)
     label_filepath = Column(String, nullable=False)
+    is_complete = Column(Boolean, nullable=False)
 
     def __repr__(self):
-        return 'Bundle(lid=%s)' % self.lid
+        return 'Bundle(lid={0.lid:s},is_complete={0.is_complete})'.format(
+            self)
 
 
 class BadFitsFile(Base):

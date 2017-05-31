@@ -48,7 +48,8 @@ class TestSqlAlch(unittest.TestCase):
             proposal_id=666,
             archive_path="/I/don't/exist",
             full_filepath="/I/don't/exist/hst_00666",
-            label_filepath="/I/don't/exist/hst_00666/bundle.xml")
+            label_filepath="/I/don't/exist/hst_00666/bundle.xml",
+            is_complete=False)
         self.session.add(self.db_bundle)
 
         self.db_collection = NonDocumentCollection(

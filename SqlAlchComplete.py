@@ -27,7 +27,7 @@ from pdart.xml.Schema import verify_label_or_raise
 
 from SqlAlch import db_add_product, db_add_non_document_collection
 
-from typing import cast, TYPE_CHECKING
+from typing import Any, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
@@ -75,7 +75,8 @@ def db_add_bundle(session, archive, bundle):
                        proposal_id=bundle.proposal_id(),
                        archive_path=os.path.abspath(archive.root),
                        full_filepath=bundle.absolute_filepath(),
-                       label_filepath=bundle.label_filepath())
+                       label_filepath=bundle.label_filepath(),
+                       is_complete=False)
     session.add(db_bundle)
     session.commit()
 
@@ -339,40 +340,61 @@ def complete_non_doc_collection(session, archive, bundle, collection):
         return db_collection
 
 
+def db_bundle_is_complete(session, bundle_lid):
+    # type: (Session, str) -> bool
+    res = session.query(Bundle.is_complete).filter_by(
+        lid=bundle_lid).one_or_none()
+    return bool(res)
+
+
+def set_bundle_complete(session, db_bundle):
+    # type: (Session, Any) -> None
+
+    # db_bundle is a Bundle, but assignments/updates use deep magic
+    # that confuses mypy, so we type it as Any instead.
+    db_bundle.is_complete = True
+    session.commit()
+    print '#### complete bundle is', db_bundle
+
+
 def complete_bundle(session, archive, bundle):
     # type: (Session, A.Archive, B.Bundle) -> Bundle
     with completion_logging("bundle", bundle.lid):
-        # Move FITS info into database and build labels.
+        if db_bundle_is_complete(session, str(bundle.lid)):
+            db_bundle = session.query(Bundle).filter_by(
+                lid=str(bundle.lid)).one()
+            # postconditions
+            assert_bundle_is_complete(session, db_bundle)
+        else:
+            # Move FITS info into database and build labels.
 
-        # TODO: Since we might use out-of-order information (say, an
-        # observational product might need info from the documents), we
-        # need to split the two pieces of functionality: populate the
-        # filesystem and database, and only then build labels.
-        db_bundle = db_add_bundle(session, archive, bundle)
+            # TODO: Since we might use out-of-order information (say, an
+            # observational product might need info from the documents), we
+            # need to split the two pieces of functionality: populate the
+            # filesystem and database, and only then build labels.
+            db_bundle = db_add_bundle(session, archive, bundle)
 
-        for collection in bundle.collections():
-            db_collection = complete_non_doc_collection(session, archive,
-                                                        bundle, collection)
+            for collection in bundle.collections():
+                db_collection = complete_non_doc_collection(session, archive,
+                                                            bundle, collection)
 
-        # Move documentation into filesystem and database
-        doc_collection = populate_document_collection(bundle)
-        if doc_collection:
-            print "making document_collection", doc_collection
-            db_doc_collection = complete_doc_collection(session,
-                                                        db_bundle,
-                                                        doc_collection)
+            # Move documentation into filesystem and database
+            doc_collection = populate_document_collection(bundle)
+            if doc_collection:
+                print "making document_collection", doc_collection
+                db_doc_collection = complete_doc_collection(session,
+                                                            db_bundle,
+                                                            doc_collection)
 
-        print "making bundle label", bundle
-        label = make_and_save_product_bundle_label(db_bundle)
-        verify_label_or_raise(label)
+            print "making bundle label", bundle
+            label = make_and_save_product_bundle_label(db_bundle)
+            verify_label_or_raise(label)
 
-        # postconditions
-        assert_bundle_is_complete(session, db_bundle)
+            # postconditions
+            assert_bundle_is_complete(session, db_bundle)
+            set_bundle_complete(session, db_bundle)
 
         return db_bundle
-
-
-BUNDLE_NAME = 'hst_11536'
 
 
 def reset_bundle(bundle):
@@ -394,18 +416,21 @@ def reset_bundle(bundle):
     os.system("find '%s' -name '*.xml' -delete" % bundle_filepath)
 
 
+CLEAN = False
+
+
 def run():
     archive = get_any_archive()
     for bundle in archive.bundles():
-        if True or bundle.lid.bundle_id == BUNDLE_NAME:
-            print bundle.lid
+        print bundle.lid
+        db_filepath = os.path.join(bundle.absolute_filepath(),
+                                   DATABASE_NAME)
+        if CLEAN:
             reset_bundle(bundle)
-            db_filepath = os.path.join(bundle.absolute_filepath(),
-                                       DATABASE_NAME)
 
-            session = create_database_tables_and_session(db_filepath)
-            complete_bundle(session, archive, bundle)
-            session.close()
+        session = create_database_tables_and_session(db_filepath)
+        complete_bundle(session, archive, bundle)
+        session.close()
 
 if __name__ == '__main__':
     run()
