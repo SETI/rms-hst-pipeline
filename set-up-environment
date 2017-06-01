@@ -9,7 +9,7 @@
 ### conda remove --name pdart --all
 
 # Create a minimal environment and activate it.
-conda create --name pdart pep8 pil pip psutil pyparsing pytest \
+conda create --name pdart mock pep8 pil pip psutil pyparsing pytest \
     sphinx sqlalchemy
 source activate pdart
 
