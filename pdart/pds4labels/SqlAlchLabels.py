@@ -2,6 +2,7 @@
 Creation of labels and writing them to the filesystem.  Creation of
 browse products.
 """
+import logging
 import os.path
 
 from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct
@@ -92,7 +93,7 @@ def make_product_browse_label(collection, browse_product):
     try:
         pretty = pretty_print(label)
     except:
-        print label
+        logging.getLogger(__name__).error(label)
         raise
 
     # POSTCONDITION
@@ -184,7 +185,7 @@ def make_product_observational_label(fits_product):
     try:
         pretty = pretty_print(label)
     except:
-        print label
+        logging.getLogger(__name__).error(label)
         raise
 
     # POSTCONDITION
@@ -287,7 +288,7 @@ def make_product_collection_label(collection):
     try:
         pretty = pretty_print(label)
     except:
-        print label
+        logging.getLogger(__name__).error(label)
         raise
 
     # POSTCONDITION
@@ -378,7 +379,7 @@ def make_product_bundle_label(bundle):
     try:
         pretty = pretty_print(label)
     except:
-        print label
+        logging.getLogger(__name__).error(label)
         raise
 
     # POSTCONDITION
@@ -486,7 +487,7 @@ def make_product_document_label(db_bundle, db_document_product):
     try:
         pretty = pretty_print(label)
     except:
-        print label
+        logging.getLogger(__name__).error(label)
         raise
 
     # POSTCONDITION
@@ -583,7 +584,7 @@ def _make_product_spice_kernel_label(bundle, product, fits_product):
     try:
         pretty = pretty_print(label)
     except:
-        print label
+        logging.getLogger(__name__).error(label)
         raise
 
     # POSTCONDITION

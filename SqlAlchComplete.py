@@ -1,5 +1,6 @@
 import glob
 import io
+import logging
 import os
 import os.path
 import shutil
@@ -49,16 +50,17 @@ class CompletionLogger(object):
         self.lid = str(lid)
 
     def __enter__(self):
-        print ">>>> Completing %s %s..." % (self.comp, str(self.lid))
-        sys.stdout.flush()
+        logging.getLogger(__name__).info(
+            '>>>> Completing %s %s...' % (self.comp, str(self.lid)))
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_value:
-            print "<<<< ERROR completing %s %s: %s." % \
-                (self.comp, str(self.lid), exc_value)
+            logging.getLogger(__name__).error(
+                '<<<< ERROR completing %s %s: %s.' %
+                (self.comp, str(self.lid), exc_value))
         else:
-            print "<<<< Completed %s %s." % (self.comp, str(self.lid))
-        sys.stdout.flush()
+            logging.getLogger(__name__).info(
+                '<<<< Completed %s %s.' % (self.comp, str(self.lid)))
 
 
 def completion_logging(comp, lid):
@@ -146,7 +148,7 @@ def _get_apt_files(docs_dir):
         os.chdir(docs_dir)
         return [os.path.join(docs_dir, f) for f in glob.glob('*.apt')]
     except:
-        print "ERROR: %s" % sys.exc_info()[0]
+        logging.getLogger(__name__).error("ERROR: %s" % sys.exc_info()[0])
         raise
     finally:
         os.chdir(old_dir)
@@ -158,14 +160,16 @@ def _extract_apt_info(session, doc_collection):
     If there is an .apt file in the documents collection, extract the
     information within it to the database and to abstract.txt.
     """
-    print '#### _extract_apt_info(session, %s)' % doc_collection
+    logging.getLogger(__name__).info(
+                '#### _extract_apt_info(session, %s)' % doc_collection)
     for product in doc_collection.products():
         docs_dir = product.absolute_filepath()
         # this is the directory the set of documentation files lives in
         apt_files = _get_apt_files(docs_dir)
-        print '#### looked for apt files in', docs_dir
+        logging.getLogger(__name__).info(
+            '#### looked for apt files in', docs_dir)
         if apt_files:
-            print '#### found apt:', apt_files
+            logging.getLogger(__name__).info('#### found apt:', apt_files)
             assert len(apt_files) == 1
             filepath = apt_files[0]
             tree = ET.parse(filepath)
@@ -177,7 +181,7 @@ def _extract_apt_info(session, doc_collection):
                 f.write(abstract)
             # TODO Need to add abstract.txt to the database
         else:
-            print '#### found no apt files'
+            logging.getLogger(__name__).info('#### found no apt files')
 
         # TODO See downloads.py in the top directory for other
         # needed data.
@@ -226,7 +230,8 @@ def complete_doc_collection(session, db_bundle, doc_collection):
         db_collection = db_add_document_collection(session,
                                                    doc_collection)
         for product in doc_collection.products():
-            print "making document_product", product
+            logging.getLogger(__name__).info(
+                "making document_product", product)
             db_doc_product = db_add_document_product(session, product)
             label = make_and_save_product_document_label(db_bundle,
                                                          db_doc_product)
@@ -235,7 +240,8 @@ def complete_doc_collection(session, db_bundle, doc_collection):
             # POSTCONDITION
             assert_product_is_complete(session, db_doc_product)
 
-        print "making collection label", doc_collection
+        logging.getLogger(__name__).info(
+            "making collection label", doc_collection)
         make_and_save_product_collection_inventory(db_collection)
         make_and_save_product_collection_label(db_collection)
 
@@ -248,7 +254,7 @@ def complete_doc_collection(session, db_bundle, doc_collection):
 def assert_log(cond, msg):
     # type: (bool, str) -> None
     if not cond:
-        print 'ERROR:', msg
+        logging.getLogger(__name__).error('ERROR:', msg)
 
 
 def assert_collection_is_complete(session, db_collection):
@@ -268,7 +274,8 @@ def assert_collection_is_complete(session, db_collection):
     # TODO assert that for each raw collection, there's a browse
     # collection
 
-    print 'Collection %s is complete' % str(db_collection.lid)
+    logging.getLogger(__name__).info(
+        'Collection %s is complete' % str(db_collection.lid))
     sys.stdout.flush()
 
 
@@ -300,7 +307,8 @@ def assert_product_is_complete(session, db_product):
     assert_log(os.path.isfile(str(db_product.label_filepath)),
                'label for product %s exists' % str(db_product.lid))
 
-    print 'Product %s is complete' % str(db_product.lid)
+    logging.getLogger(__name__).info(
+        'Product %s is complete' % str(db_product.lid))
     sys.stdout.flush()
 
 
@@ -317,7 +325,8 @@ def assert_bundle_is_complete(session, db_bundle):
                'label for bundle %s exists' % str(db_bundle.lid))
     # TODO assert it has a document collection?
 
-    print 'Bundle %s is complete' % str(db_bundle.lid)
+    logging.getLogger(__name__).info(
+        'Bundle %s is complete' % str(db_bundle.lid))
     sys.stdout.flush()
 
 
@@ -329,7 +338,8 @@ def complete_non_doc_collection(session, archive, bundle, collection):
         for product in list(collection.products()):
             complete_fits_product(session, archive, collection, product)
 
-        print "making collection label", collection
+        logging.getLogger(__name__).info(
+            "making collection label", collection)
         make_and_save_product_collection_inventory(db_collection)
         label = make_and_save_product_collection_label(db_collection)
         verify_label_or_raise(label)
@@ -354,7 +364,7 @@ def set_bundle_complete(session, db_bundle):
     # that confuses mypy, so we type it as Any instead.
     db_bundle.is_complete = True
     session.commit()
-    print '#### complete bundle is', db_bundle
+    logging.getLogger(__name__).info('#### complete bundle is', db_bundle)
 
 
 def complete_bundle(session, archive, bundle):
@@ -381,12 +391,13 @@ def complete_bundle(session, archive, bundle):
             # Move documentation into filesystem and database
             doc_collection = populate_document_collection(bundle)
             if doc_collection:
-                print "making document_collection", doc_collection
+                logging.getLogger(__name__).info("making document_collection",
+                                                 doc_collection)
                 db_doc_collection = complete_doc_collection(session,
                                                             db_bundle,
                                                             doc_collection)
 
-            print "making bundle label", bundle
+            logging.getLogger(__name__).info("making bundle label", bundle)
             label = make_and_save_product_bundle_label(db_bundle)
             verify_label_or_raise(label)
 
@@ -400,16 +411,16 @@ def complete_bundle(session, archive, bundle):
 def reset_bundle(bundle):
     # type: (B.Bundle) -> None
     bundle_filepath = bundle.absolute_filepath()
-    print 'bundle_filepath =', bundle_filepath
+    logging.getLogger(__name__).info('bundle_filepath =', bundle_filepath)
     for file in os.listdir(bundle_filepath):
         filepath = os.path.join(bundle_filepath, file)
         if file in ['.', '..']:
             pass
         elif file == DATABASE_NAME:
-            print 'removing', filepath
+            logging.getLogger(__name__).info('removing', filepath)
             os.remove(filepath)
         elif file == 'document' or file.startswith('browse_'):
-            print 'removing directory', filepath
+            logging.getLogger(__name__).info('removing directory', filepath)
             shutil.rmtree(filepath)
         # will also need for SPICE: TODO
 
@@ -422,7 +433,7 @@ CLEAN = False
 def run():
     archive = get_any_archive()
     for bundle in archive.bundles():
-        print bundle.lid
+        logging.getLogger(__name__).info(bundle.lid)
         db_filepath = os.path.join(bundle.absolute_filepath(),
                                    DATABASE_NAME)
         if CLEAN:
