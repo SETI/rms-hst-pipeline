@@ -136,8 +136,6 @@ def complete_fits_product(session, archive, collection, product):
         # POSTCONDITION
         assert_product_is_complete(session, db_fits_product)
 
-        sys.stdout.flush()
-
         return db_fits_product
 
 
@@ -276,7 +274,6 @@ def assert_collection_is_complete(session, db_collection):
 
     logging.getLogger(__name__).info(
         'Collection %s is complete' % str(db_collection.lid))
-    sys.stdout.flush()
 
 
 def assert_product_is_complete(session, db_product):
@@ -309,7 +306,6 @@ def assert_product_is_complete(session, db_product):
 
     logging.getLogger(__name__).info(
         'Product %s is complete' % str(db_product.lid))
-    sys.stdout.flush()
 
 
 def assert_bundle_is_complete(session, db_bundle):
@@ -327,7 +323,6 @@ def assert_bundle_is_complete(session, db_bundle):
 
     logging.getLogger(__name__).info(
         'Bundle %s is complete' % str(db_bundle.lid))
-    sys.stdout.flush()
 
 
 def complete_non_doc_collection(session, archive, bundle, collection):
