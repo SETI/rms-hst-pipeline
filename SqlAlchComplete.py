@@ -56,7 +56,7 @@ class CompletionLogger(object):
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_value:
             logging.getLogger(__name__).error(
-                '<<<< ERROR completing %s %s: %s.' %
+                '<<<< while completing %s %s: %s.' %
                 (self.comp, str(self.lid), exc_value))
         else:
             logging.getLogger(__name__).info(
@@ -146,7 +146,7 @@ def _get_apt_files(docs_dir):
         os.chdir(docs_dir)
         return [os.path.join(docs_dir, f) for f in glob.glob('*.apt')]
     except:
-        logging.getLogger(__name__).error("ERROR: %s" % sys.exc_info()[0])
+        logging.getLogger(__name__).error("%s" % sys.exc_info()[0])
         raise
     finally:
         os.chdir(old_dir)
@@ -165,9 +165,9 @@ def _extract_apt_info(session, doc_collection):
         # this is the directory the set of documentation files lives in
         apt_files = _get_apt_files(docs_dir)
         logging.getLogger(__name__).info(
-            '#### looked for apt files in', docs_dir)
+            '#### looked for apt files in %s', docs_dir)
         if apt_files:
-            logging.getLogger(__name__).info('#### found apt:', apt_files)
+            logging.getLogger(__name__).info('#### found apt: %s', apt_files)
             assert len(apt_files) == 1
             filepath = apt_files[0]
             tree = ET.parse(filepath)
@@ -229,7 +229,7 @@ def complete_doc_collection(session, db_bundle, doc_collection):
                                                    doc_collection)
         for product in doc_collection.products():
             logging.getLogger(__name__).info(
-                "making document_product", product)
+                "making document_product %s", product)
             db_doc_product = db_add_document_product(session, product)
             label = make_and_save_product_document_label(db_bundle,
                                                          db_doc_product)
@@ -239,7 +239,7 @@ def complete_doc_collection(session, db_bundle, doc_collection):
             assert_product_is_complete(session, db_doc_product)
 
         logging.getLogger(__name__).info(
-            "making collection label", doc_collection)
+            "making collection label %s", doc_collection)
         make_and_save_product_collection_inventory(db_collection)
         make_and_save_product_collection_label(db_collection)
 
@@ -252,7 +252,7 @@ def complete_doc_collection(session, db_bundle, doc_collection):
 def assert_log(cond, msg):
     # type: (bool, str) -> None
     if not cond:
-        logging.getLogger(__name__).error('ERROR:', msg)
+        logging.getLogger(__name__).error('%s', msg)
 
 
 def assert_collection_is_complete(session, db_collection):
@@ -334,7 +334,7 @@ def complete_non_doc_collection(session, archive, bundle, collection):
             complete_fits_product(session, archive, collection, product)
 
         logging.getLogger(__name__).info(
-            "making collection label", collection)
+            "making collection label %s", collection)
         make_and_save_product_collection_inventory(db_collection)
         label = make_and_save_product_collection_label(db_collection)
         verify_label_or_raise(label)
@@ -359,7 +359,7 @@ def set_bundle_complete(session, db_bundle):
     # that confuses mypy, so we type it as Any instead.
     db_bundle.is_complete = True
     session.commit()
-    logging.getLogger(__name__).info('#### complete bundle is', db_bundle)
+    logging.getLogger(__name__).info('#### complete bundle is %s', db_bundle)
 
 
 def complete_bundle(session, archive, bundle):
@@ -386,13 +386,14 @@ def complete_bundle(session, archive, bundle):
             # Move documentation into filesystem and database
             doc_collection = populate_document_collection(bundle)
             if doc_collection:
-                logging.getLogger(__name__).info("making document_collection",
-                                                 doc_collection)
+                logging.getLogger(__name__).info(
+                    "making document_collection %s",
+                    doc_collection)
                 db_doc_collection = complete_doc_collection(session,
                                                             db_bundle,
                                                             doc_collection)
 
-            logging.getLogger(__name__).info("making bundle label", bundle)
+            logging.getLogger(__name__).info("making bundle label %s", bundle)
             label = make_and_save_product_bundle_label(db_bundle)
             verify_label_or_raise(label)
 
@@ -406,16 +407,16 @@ def complete_bundle(session, archive, bundle):
 def reset_bundle(bundle):
     # type: (B.Bundle) -> None
     bundle_filepath = bundle.absolute_filepath()
-    logging.getLogger(__name__).info('bundle_filepath =', bundle_filepath)
+    logging.getLogger(__name__).info('bundle_filepath = %s', bundle_filepath)
     for file in os.listdir(bundle_filepath):
         filepath = os.path.join(bundle_filepath, file)
         if file in ['.', '..']:
             pass
         elif file == DATABASE_NAME:
-            logging.getLogger(__name__).info('removing', filepath)
+            logging.getLogger(__name__).info('removing %s', filepath)
             os.remove(filepath)
         elif file == 'document' or file.startswith('browse_'):
-            logging.getLogger(__name__).info('removing directory', filepath)
+            logging.getLogger(__name__).info('removing directory %s', filepath)
             shutil.rmtree(filepath)
         # will also need for SPICE: TODO
 
@@ -423,20 +424,63 @@ def reset_bundle(bundle):
 
 
 CLEAN = False
+# type: bool
+
+
+def handle_bundle(archive, bundle):
+    # type: (A.Archive, B.Bundle) -> None
+    logging.getLogger(__name__).info(str(bundle.lid))
+    db_filepath = os.path.join(bundle.absolute_filepath(),
+                               DATABASE_NAME)
+    if CLEAN:
+        reset_bundle(bundle)
+
+    session = create_database_tables_and_session(db_filepath)
+    complete_bundle(session, archive, bundle)
+    session.close()
+
+
+def complete_archive_series(archive):
+    # type: (A.Archive) -> None
+    for bundle in archive.bundles():
+        handle_bundle(archive, bundle)
+
+
+def _run(bundle):
+    # type: (B.Bundle) -> None
+    archive = get_any_archive()
+    handle_bundle(archive, bundle)
+
+
+def complete_archive_parallel():
+    # type: () -> None
+    from multiprocessing import Pool
+    thread_pool = Pool()
+
+    archive = get_any_archive()
+    # TODO What of exceptions?  Logging?
+    thread_pool.map(_run, archive.bundles())
+
+    thread_pool.close()
+    thread_pool.join()
+
+
+PARALLEL = True
+# type: bool
 
 
 def run():
-    archive = get_any_archive()
-    for bundle in archive.bundles():
-        logging.getLogger(__name__).info(bundle.lid)
-        db_filepath = os.path.join(bundle.absolute_filepath(),
-                                   DATABASE_NAME)
-        if CLEAN:
-            reset_bundle(bundle)
+    if PARALLEL:
+        complete_archive_parallel()
+    else:
+        archive = get_any_archive()
+        complete_archive_series(archive)
 
-        session = create_database_tables_and_session(db_filepath)
-        complete_bundle(session, archive, bundle)
-        session.close()
 
 if __name__ == '__main__':
+    import logging
+    logging.basicConfig(format='%(asctime)-15s:%(levelname)s: %(message)s')
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
     run()
+    logging.shutdown()

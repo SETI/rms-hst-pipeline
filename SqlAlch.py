@@ -161,8 +161,7 @@ def db_add_product(session, archive, collection, product):
             filepath=fits_filepath,
             message=str(e))
         session.add(db_bad_fits_file)
-        logging.getLogger(__name__).error(
-            'ERROR: bad FITS file', str(product.lid))
+        logging.getLogger(__name__).error('bad FITS file %s', str(product.lid))
     session.commit()
 
     if db_fits_product:
@@ -174,10 +173,10 @@ def db_add_product(session, archive, collection, product):
             if VERIFY:
                 verify_label_or_raise_fp(label_filepath)
             logging.getLogger(__name__).info(
-                'label: %s' % os.path.relpath(label_filepath, archive.root))
+                'label: %s', os.path.relpath(label_filepath, archive.root))
         except:
             logging.getLogger(__name__).error(
-                '#### failed on %s' % label_filepath)
+                '#### failed on %s', label_filepath)
             raise
 
     # POSTCONDITION

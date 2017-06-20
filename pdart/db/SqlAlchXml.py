@@ -550,7 +550,7 @@ def make_observation_area(product):
     targname = lookup_card(product.hdus[0], 'TARGNAME')
     if not targname:
         logging.getLogger(__name__).error(
-            'ERROR: no TARGNAME in', str(product))
+            'no TARGNAME in %s', str(product))
     return _observation_area_template({
             'Time_Coordinates': make_time_coordinates(product),
             'Investigation_Area': make_investigation_area(bundle),
@@ -1254,7 +1254,7 @@ def make_time_coordinates(product):
     exptime_value = lookup_card(product.hdus[0], 'EXPTIME')
     if date_obs is None or time_obs is None or exptime_value is None:
         logging.getLogger(__name__).error(
-            ('ERROR: make_time_coordinates(%s) missing value: ' +
+            ('make_time_coordinates(%s) missing value: ' +
              '(date_obs = %s, time_obs = %s, exptime = %s)') %
             (str(product.lid), date_obs, time_obs, exptime_value))
         placeholder_date_time = '2000-01-01T00:00:00Z'
