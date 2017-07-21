@@ -20,6 +20,7 @@ mypy --silent-imports --py2 \
     DeleteDB.py \
     DeleteDocs.py \
     Dev.py \
+    Filesystem.py \
     MakeBundleDBs.py \
     MakeDB.py \
     MakeDocCollections.py \

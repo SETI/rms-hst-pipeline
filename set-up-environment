@@ -30,6 +30,9 @@ conda install -c bioconda typing
 # removed in the future.
 pip install PyContracts
 
+# Install PyFilesystem.
+pip install fs
+
 # Check for pds-tools.
 if [ ! -d "$HOME/pds-tools" ]; then
     echo
