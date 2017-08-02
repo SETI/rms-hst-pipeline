@@ -4,6 +4,7 @@ source activate mypy
 mypy --silent-imports --py2 \
     pdart/browse \
     pdart/db \
+    pdart/fs \
     pdart/hst \
     pdart/pds4 \
     pdart/pds4labels \
@@ -20,8 +21,6 @@ mypy --silent-imports --py2 \
     DeleteDB.py \
     DeleteDocs.py \
     Dev.py \
-    Filesystem.py \
-    FSEntry.py \
     MakeBundleDBs.py \
     MakeDB.py \
     MakeDocCollections.py \
