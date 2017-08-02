@@ -11,6 +11,15 @@ if TYPE_CHECKING:
     from pdart.fs.DeletionPredicate import DeletionPredicate
 
 
+def _parent_dir(path):
+    if path == '/':
+        return None
+    if path[-1] == '/':
+        path = path[:-1]
+    (parent, basename) = os.path.split(path)
+    return parent
+
+
 class FSWithDeletions(NarrowWrapFS):
     """
     A wrapper around a filesystem and a 'DeletionPredicate' that tells
@@ -40,9 +49,7 @@ class FSWithDeletions(NarrowWrapFS):
                         os.path.join(path, child))]
 
     def makedir(self, path, permissions=None, recreate=False):
-        if len(path) > 1 and path[-1] == '/':
-            path = path[:-1]
-        (parent, basename) = os.path.split(path)
+        parent = _parent_dir(path)
         if self.deletion_predicate.is_deleted(parent):
             raise ResourceNotFound(parent)
         else:
@@ -56,9 +63,7 @@ class FSWithDeletions(NarrowWrapFS):
             raise ResourceNotFound(path)
 
         if mode_obj.writing:
-            if len(path) > 1 and path[-1] == '/':
-                path = path[:-1]
-            (parent, basename) = os.path.split(path)
+            parent = _parent_dir(path)
             if self.deletion_predicate.is_deleted(parent):
                 raise ResourceNotFound(path)
 
