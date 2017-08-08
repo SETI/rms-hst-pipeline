@@ -12,6 +12,7 @@ class NarrowWrapFS(FS):
     """
     def __init__(self, wrap_fs):
         FS.__init__(self)
+        assert wrap_fs, 'filesystem to wrap required'
         self._wrap_fs = wrap_fs
 
     def delegate_fs(self):

@@ -3,21 +3,13 @@ import os.path
 from fs.errors import ResourceNotFound
 from fs.mode import Mode
 from pdart.fs.NarrowWrapFS import NarrowWrapFS
+from pdart.fs.Utils import parent_dir
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from fs.base import FS
     from pdart.fs.DeletionPredicate import DeletionPredicate
-
-
-def _parent_dir(path):
-    if path == '/':
-        return None
-    if path[-1] == '/':
-        path = path[:-1]
-    (parent, basename) = os.path.split(path)
-    return parent
 
 
 class FSWithDeletions(NarrowWrapFS):
@@ -30,14 +22,15 @@ class FSWithDeletions(NarrowWrapFS):
     def __init__(self, fs, del_pred):
         # type: (FS, DeletionPredicate) -> None
         NarrowWrapFS.__init__(self, fs)
+        assert del_pred, 'deletion_predicate required'
         self.deletion_predicate = del_pred
 
-    def getinfo(self, path):
+    def getinfo(self, path, namespaces=None):
         self.check()
         if self.deletion_predicate.is_deleted(path):
             raise ResourceNotFound(path)
         else:
-            return self.delegate_fs().getinfo(path)
+            return self.delegate_fs().getinfo(path, namespaces=namespaces)
 
     def listdir(self, path):
         if self.deletion_predicate.is_deleted(path):
@@ -49,7 +42,7 @@ class FSWithDeletions(NarrowWrapFS):
                         os.path.join(path, child))]
 
     def makedir(self, path, permissions=None, recreate=False):
-        parent = _parent_dir(path)
+        parent = parent_dir(path)
         if self.deletion_predicate.is_deleted(parent):
             raise ResourceNotFound(parent)
         else:
@@ -63,13 +56,13 @@ class FSWithDeletions(NarrowWrapFS):
             raise ResourceNotFound(path)
 
         if mode_obj.writing:
-            parent = _parent_dir(path)
+            parent = parent_dir(path)
             if self.deletion_predicate.is_deleted(parent):
                 raise ResourceNotFound(path)
 
-        self.delegate_fs().openbin(path, mode,
-                                   buffering=buffering,
-                                   **options)
+        return self.delegate_fs().openbin(path, mode,
+                                          buffering=buffering,
+                                          **options)
 
     def remove(self, path):
         self.check()
