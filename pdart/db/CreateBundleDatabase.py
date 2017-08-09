@@ -1,17 +1,18 @@
 """
 This module creates a SQLite database from a bundle.
 """
-import os.path
-
+from pdart.db.CompleteDatabase import open_bundle_database
 from pdart.db.CreateDatabase import DatabaseCreator
-from pdart.db.TableSchemas import *
-from pdart.pds4.Bundle import Bundle
+from pdart.db.TableSchemas import BAD_FITS_FILES_SQL, BUNDLES_SCHEMA, \
+    BUNDLES_SQL, bundle_tuple, CARDS_SQL, COLLECTIONS_SQL, collection_tuple, \
+    HDUS_SQL, PRODUCTS_SQL, product_tuple
 import pyfits
-import sqlite3
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from pdart.db.TableSchemas import Bundle
     import pdart.pd4.Archive
+    import sqlite3
 
 
 def _create_bundles_table(conn, bundle):

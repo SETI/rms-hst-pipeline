@@ -2,16 +2,16 @@
 Tables used by SqlAlchemy to build a database.  This will replace the
 previous implementation which used raw SQL calls.
 """
-from sqlalchemy import *
+from sqlalchemy import Column, ForeignKey, Index
+from sqlalchemy.engine import create_engine, Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship, sessionmaker
-from typing import Any, TYPE_CHECKING
+from sqlalchemy.types import Boolean, Integer, String
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sqlalchemy.engine import *
+    from typing import Any
     from sqlalchemy.orm import Session
-    from sqlalchemy.schema import *
-    from sqlalchemy.types import *
 
     import pdart.pds4.Bundle as B
     import pdart.pds4.Collection as C

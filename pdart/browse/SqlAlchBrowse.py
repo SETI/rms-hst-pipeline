@@ -4,18 +4,18 @@ import os.path
 import pdart.add_pds_tools
 import picmaker
 
-from pdart.db.SqlAlchTables import BrowseProduct, DocumentCollection, \
-    FitsProduct, NonDocumentCollection, Product, db_browse_product_exists, \
+from pdart.db.SqlAlchTables import BrowseProduct, \
+    NonDocumentCollection, Product, db_browse_product_exists, \
     db_non_document_collection_exists
 
 from pdart.pds4.HstFilename import HstFilename
 
-from typing import AnyStr, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
+    from typing import AnyStr, Tuple
     from sqlalchemy.orm import Session
 
-    from pdart.db.SqlAlchTables import BrowseProduct, DocumentProduct, Product
-    import pdart.pds4.Bundle as B
     import pdart.pds4.Collection as C
     import pdart.pds4.Product as P
 

@@ -7,8 +7,6 @@ from pdart.db.SqlAlchDBName import DATABASE_NAME
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import sqlite3
-
     import pdart.pds4.Bundle as B
 
 

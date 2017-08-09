@@ -1,11 +1,8 @@
-from pdart.db.DatabaseArchive import *
+from pdart.db.DatabaseArchive import DatabaseArchive
 
-from contextlib import closing
 import os.path
 import tempfile
 import unittest
-
-from pdart.pds4.Archives import *
 
 
 class TestDatabaseArchive(unittest.TestCase):

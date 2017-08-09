@@ -6,10 +6,10 @@ import shutil
 import urllib2
 from typing import TYPE_CHECKING
 
-from sqlalchemy import *
-
-from pdart.db.SqlAlchTables import *
-from pdart.db.SqlAlchUtils import *
+from pdart.db.SqlAlchTables import Bundle, DocumentCollection, DocumentFile, \
+    DocumentProduct, create_database_tables_and_session, db_bundle_exists, \
+    db_collection_exists, db_document_collection_exists, \
+    db_document_product_exists
 from pdart.pds4.Archives import get_any_archive
 import pdart.pds4.Collection as C
 from pdart.pds4.LID import LID
@@ -19,9 +19,10 @@ from pdart.xml.Schema import verify_label_or_raise
 
 if TYPE_CHECKING:
     from typing import AnyStr, Tuple
+    from sqlalchemy.orm import Session
 
+    from pdart.db.SqlAlchTables import Collection, Product
     import pdart.pds4.Bundle as B
-    import pdart.pds4.Collection as C
     import pdart.pds4.Product as P
 
 
@@ -48,7 +49,7 @@ def _retrieve_doc(url, filepath):
         with open(filepath, 'w') as f:
             f.write(contents)
             return True
-    except Exception as e:
+    except Exception:
         return False
 
 
@@ -192,6 +193,7 @@ def _run():
                 label = make_product_document_label(db_bundle, db_product)
                 verify_label_or_raise(label)
                 print 'verified label for', str(product.lid)
+
 
 if __name__ == '__main__':
     _run()

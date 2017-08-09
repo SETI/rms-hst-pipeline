@@ -8,8 +8,7 @@ import julian
 import logging
 import os.path
 
-from pdart.db.SqlAlchTables import BrowseProduct, Bundle, Collection, Hdu, \
-    lookup_card, Product
+from pdart.db.SqlAlchTables import lookup_card
 from pdart.pds4labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE
 from pdart.xml.Templates import combine_nodes_into_fragment, \
     interpret_template
@@ -17,6 +16,8 @@ from pdart.xml.Templates import combine_nodes_into_fragment, \
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any, AnyStr, Tuple
+    from pdart.db.SqlAlchTables import BrowseProduct, Bundle, Collection, \
+        Hdu, Product
     from pdart.xml.Templates import FragBuilder, NodeBuilder, \
         NodeBuilderTemplate
 

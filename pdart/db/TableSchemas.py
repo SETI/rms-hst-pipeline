@@ -1,10 +1,12 @@
-from pdart.pds4.Bundle import *
-from pdart.pds4.Collection import *
-from pdart.pds4.Product import *
-
+import os.path
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from typing import Tuple
+    from pdart.pds4.Bundle import Bundle
+    from pdart.pds4.Collection import Collection
+    from pdart.pds4.Product import Product
+
     _CONN_TUPLE = \
         Tuple[str, str, str, str, unicode, unicode, unicode, unicode, unicode]
     _PROD_TUPLE = \

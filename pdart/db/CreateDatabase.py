@@ -4,14 +4,16 @@ This module creates a SQLite database from an archive.
 import abc
 import os.path
 import pyfits
-import sqlite3
 
-from pdart.db.TableSchemas import *
-from pdart.pds4.Archives import *
+from pdart.db.TableSchemas import BAD_FITS_FILES_SCHEMA, BAD_FITS_FILES_SQL, \
+    BUNDLES_SCHEMA, BUNDLES_SQL, CARDS_SCHEMA, CARDS_SQL, COLLECTIONS_SCHEMA, \
+    COLLECTIONS_SQL, DOCUMENT_PRODUCTS_SCHEMA, DOCUMENTS_SCHEMA, HDUS_SCHEMA, \
+    HDUS_SQL, PRODUCTS_SCHEMA, PRODUCTS_SQL
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import pdart.pds4.Archive
+    import sqlite3
 
 
 class DatabaseCreator(object):

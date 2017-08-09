@@ -1,4 +1,6 @@
-from pdart.db.CompleteDatabase import *
+from pdart.db.CompleteDatabase import exists_database_records_for_browse, \
+    exists_database_records_for_fits, insert_browse_database_records, \
+    insert_fits_database_records
 
 from contextlib import closing
 import os
@@ -7,7 +9,7 @@ import sqlite3
 import tempfile
 import unittest
 
-from pdart.pds4.LID import *
+from pdart.pds4.LID import LID
 
 
 class TestCompleteDatabase(unittest.TestCase):
