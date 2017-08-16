@@ -32,9 +32,13 @@ _VERSION_ONE = u'v$1'
 
 _VISIT_DIR_PAT = u'visit_*'
 
+_VERSION_DICT = u'version$dict'
+
 ALL_PAT = u'*'
 
 FILE_EXCLUSION_PATS = [u'.DS_Store', '*.db']
+
+_RAW_VERSION_DICT_INFO = {u'basic': {u'name': _VERSION_DICT, u'is_dir': False}}
 
 
 class ArchiveToVersionedFS(ReadOnlyView):
@@ -96,25 +100,25 @@ class ArchiveToVersionedFS(ReadOnlyView):
     def getinfo(self, path, namespaces=None):
         self.check()
 
-        def make_raw_info(name):
+        def make_raw_dir_info(name):
             return {u'basic': {u'name': name, u'is_dir': True}}
 
         parts = iteratepath(path)
         l = len(parts)
         if l == 0:
             # path = /; purely synthetic
-            raw_info = make_raw_info(u'')
+            raw_info = make_raw_dir_info(u'')
         else:
             if not (parts[0] == self._bundle):
                 raise ResourceNotFound(path)
             if l == 1:
                 # path = /b; orig path = /
-                raw_info = make_raw_info(self._bundle)
+                raw_info = make_raw_dir_info(self._bundle)
             elif l == 2:
                 _b, c = parts
                 if _is_version_part(c):
                     # path = b/$n
-                    raw_info = make_raw_info(c)
+                    raw_info = make_raw_dir_info(c)
                 else:
                     # path = b/c; orig path = c
                     with unwrap_errors(path):
@@ -123,23 +127,29 @@ class ArchiveToVersionedFS(ReadOnlyView):
                 _b, c, p = parts
                 if _is_version_part(c):
                     # path = b/$n/file; orig path = /file
-                    with unwrap_errors(path):
-                        raw_info = self._wrap_fs.getinfo(p).raw
+                    if p == _VERSION_DICT:
+                        raw_info = _RAW_VERSION_DICT_INFO
+                    else:
+                        with unwrap_errors(path):
+                            raw_info = self._wrap_fs.getinfo(p).raw
                 elif _is_version_part(p):
                     # path = b/c/$n; orig path = /c
-                    raw_info = make_raw_info(p)
+                    raw_info = make_raw_dir_info(p)
                 else:
                     # path = b/c/p; synthetic
-                    raw_info = make_raw_info(p)
+                    raw_info = make_raw_dir_info(p)
             elif l == 4:
                 _b, c, p, f = parts
                 if _is_version_part(p):
                     # path = b/c/$n/file; orig path /c/file
-                    with unwrap_errors(path):
-                        raw_info = self._wrap_fs.getinfo(join(c, f)).raw
+                    if f == _VERSION_DICT:
+                        raw_info = _RAW_VERSION_DICT_INFO
+                    else:
+                        with unwrap_errors(path):
+                            raw_info = self._wrap_fs.getinfo(join(c, f)).raw
                 elif _is_version_part(f):
                     # path = b/c/p/$n; synthetic
-                    raw_info = make_raw_info(f)
+                    raw_info = make_raw_dir_info(f)
                 else:
                     assert False, 'getinfo(%s) has %d parts' % (path, l)
             elif l == 5:
@@ -157,12 +167,15 @@ class ArchiveToVersionedFS(ReadOnlyView):
 
     def openbin(self, path, mode="r", buffering=-1, **options):
         self.check()
-        # TODO need to raise on writing since we're R/O
+        if check_writable(mode):
+            raise ResourceReadOnly(path)
+        if basename(path) == _VERSION_DICT:
+            assert False, 'openbin(%s) unimplemented for version dicts' % path
         _fs, _path = self._delegate_file_path(path)
         if _fs:
             with unwrap_errors(path):
-                bin_file = _fs.openbin(_path, mode=mode,
-                                       buffering=buffering, **options)
+                return _fs.openbin(_path, mode=mode,
+                                   buffering=buffering, **options)
         else:
             assert False, 'ArchiveToVersionedFS.openbin()'
 
@@ -186,6 +199,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                 if _is_version_part(c):
                     # path = b/$n
                     dir_list = self._get_files(_ROOT)
+                    dir_list.append(_VERSION_DICT)
                 else:
                     # path = b/c
                     dir_list = list(self._get_collection_fits_products(c))
@@ -201,6 +215,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                 elif _is_version_part(p):
                     # path = b/c/$n; orig path = /c
                     dir_list = self._get_files(c)
+                    dir_list.append(_VERSION_DICT)
                 else:
                     # path = b/c/p
                     dir_list = [_VERSION_ONE]
