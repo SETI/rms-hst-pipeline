@@ -1,6 +1,8 @@
 """
 Work on viewing an archive folder as a versioned filesystem.
 """
+import io
+import pickle
 import sys
 import traceback
 from typing import TYPE_CHECKING
@@ -9,6 +11,7 @@ from fs.base import FS
 from fs.errors import InvalidPath, ResourceNotFound
 from fs.error_tools import unwrap_errors
 from fs.info import Info
+from fs.mode import check_writable
 from fs.osfs import OSFS
 from fs.path import abspath, basename, iteratepath, join, normpath
 
@@ -70,26 +73,39 @@ class ArchiveToVersionedFS(ReadOnlyView):
             files=None, dirs=[_VISIT_DIR_PAT],
             exclude_dirs=None, exclude_files=[ALL_PAT])
 
+    def _get_collections(self):
+        return [info.name
+                for info
+                in self._wrap_fs.filterdir(_ROOT,
+                                           files=None,
+                                           dirs=['data_*'],
+                                           exclude_dirs=None,
+                                           exclude_files=[ALL_PAT])]
+
+    def _get_collection_files(self, collection_path):
+        # type: (unicode) -> List[Tuple[unicode, unicode]]
+        return [(visit_info.name, file)
+                for visit_info in self._get_visit_info(collection_path)
+                for file in self._wrap_fs.listdir(join(collection_path,
+                                                       visit_info.name))]
+
     def _get_collection_fits_products(self, collection_path):
-        for visit_info in self._get_visit_info(collection_path):
-            for file in self._wrap_fs.listdir(join(collection_path,
-                                                   visit_info.name)):
-                if file.endswith(u'.fits'):
-                    yield file[:-5]
+        return [file[:-5]
+                for (_, file) in self._get_collection_files(collection_path)
+                if file.endswith(u'.fits')]
 
     def _get_collection_product_files(self, collection_path, product):
-        for visit_info in self._get_visit_info(collection_path):
-            for file in self._wrap_fs.listdir(join(collection_path,
-                                                   visit_info.name)):
-                if file.startswith(product):
-                    yield file
+        return [file
+                for (_, file) in self._get_collection_files(collection_path)
+                if file.startswith(product)]
 
     def _get_product_filepath(self, collection_path, product_file):
-        for visit_info in self._get_visit_info(collection_path):
-            for file in self._wrap_fs.listdir(join(collection_path,
-                                                   visit_info.name)):
-                if file == product_file:
-                    return join(collection_path, visit_info.name, product_file)
+        for (visit, file) in self._get_collection_files(collection_path):
+            if file == product_file:
+                return join(collection_path, visit, product_file)
+        assert False, \
+            '_get_product_filepath(%s, %s) not found' % \
+            (collection_path, product_file)
 
     def _get_files(self, path):
         return [info.name for info in self._wrap_fs.filterdir(
@@ -170,7 +186,32 @@ class ArchiveToVersionedFS(ReadOnlyView):
         if check_writable(mode):
             raise ResourceReadOnly(path)
         if basename(path) == _VERSION_DICT:
-            assert False, 'openbin(%s) unimplemented for version dicts' % path
+            # is it the bundle or the collection?
+            parts = iteratepath(path)
+            if len(parts) == 3:
+                b, vOne, vDict = parts
+                if b == self._bundle and \
+                        vOne == _VERSION_ONE and vDict == _VERSION_DICT:
+                    d = dict((coll, _VERSION_ONE)
+                             for coll in self._get_collections())
+                    bytes = pickle.dumps(d)
+                    return io.BytesIO(bytes)
+                else:
+                    # TODO b/c/v$1 should return ExpectedFile instead
+                    raise ResourceNotFound(path)
+            elif len(parts) == 4:
+                b, c, vOne, vDict = parts
+                if b == self._bundle and \
+                        vOne == _VERSION_ONE and vDict == _VERSION_DICT:
+                    d = dict((prod, _VERSION_ONE)
+                             for prod
+                             in self._get_collection_fits_products(c))
+                    bytes = pickle.dumps(d)
+                    return io.BytesIO(bytes)
+                else:
+                    raise ResourceNotFound(path)
+            else:
+                raise ResourceNotFound(path)
         _fs, _path = self._delegate_file_path(path)
         if _fs:
             with unwrap_errors(path):
@@ -220,14 +261,14 @@ class ArchiveToVersionedFS(ReadOnlyView):
                     # path = b/c/p
                     dir_list = [_VERSION_ONE]
             elif l == 4:
-                b, c, p, v = parts
+                b, c, p, f = parts
                 if _is_version_part(p):
                     # path = b/c/$n/f; orig path /c/f
                     if self._wrap_fs.exists(join(c, f)):
                         raise DirectoryExpected(path)
                     else:
                         raise ResourceNotFound(path)
-                elif _is_version_part(v):
+                elif _is_version_part(f):
                     # path= b/c/p/$i; orig path /c/v*
                     dir_list = list(self._get_collection_product_files(c, p))
                 else:
@@ -237,6 +278,10 @@ class ArchiveToVersionedFS(ReadOnlyView):
             else:
                 assert False, 'listdir(%s) has %d parts' % (path, l)
         return dir_list
+
+    def _get_versions_dict(self, path):
+        bs = self.getbytes(join(path, _VERSION_DICT))
+        return pickle.loads(bs)
 
 
 def test_fs():
@@ -251,4 +296,7 @@ if __name__ == '__main__':
     print "fs.filterdir(u'/hst_14334') = %s" % \
         list(fs.filterdir(u'/hst_14334'))
     fs.tree()
+    # print fs._get_collection_fits_products(u'data_wfc3_raw')
+    print fs._get_versions_dict(u'/hst_14334/v$1')
+    print fs._get_versions_dict(u'/hst_14334/data_wfc3_raw/v$1')
     print fs
