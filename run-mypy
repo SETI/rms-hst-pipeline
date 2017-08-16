@@ -12,6 +12,7 @@ mypy --silent-imports --py2 \
     pdart/rules \
     pdart/tasks \
     pdart/xml \
+    ArchiveToVersionedFS.py \
     CheckBadFitsFiles.py \
     CheckKeywords.py \
     CheckSuffixes.py \
