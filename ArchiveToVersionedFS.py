@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING
 
 from fs.base import FS
 from fs.copy import copy_fs
-from fs.errors import FileExpected, InvalidPath, ResourceNotFound, \
-    ResourceReadOnly
+from fs.errors import DirectoryExpected, FileExpected, InvalidPath, \
+    ResourceNotFound, ResourceReadOnly
 from fs.error_tools import unwrap_errors
 from fs.info import Info
 from fs.mode import check_writable
@@ -75,23 +75,20 @@ class FSPath(object):
                                self._wrap_fs,
                                self._original_path)
 
-    # @abstractmethod
+    @abstractmethod
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
-        assert False, '%s.getinfo(%r) unimplemented' % \
-            (self.__class__.__name__, self._original_path)
+        pass
 
-    # @abstractmethod
+    @abstractmethod
     def listdir(self):
         # type: () -> List[unicode]
-        assert False, '%s.listdir(%r) unimplemented' % \
-            (self.__class__.__name__, self._original_path)
+        pass
 
-    # @abstractmethod
+    @abstractmethod
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
-        assert False, '%s.openbin(%r) unimplemented' % \
-            (self.__class__.__name__, self._original_path)
+        pass
 
 
 # The decision-making for paths is complex and trying to analyse the
@@ -143,6 +140,9 @@ class FSRootPath(FSPath):
 
 
 class FSBundlePath(FSPath):
+    """
+    A path '/bundle'
+    """
     def __init__(self, fs, path, bundle):
         # type: (OSFS, unicode, unicode) -> None
         FSPath.__init__(self, fs, path)
@@ -167,6 +167,9 @@ class FSBundlePath(FSPath):
 
 
 class FSCollectionPath(FSPath):
+    """
+    A path '/bundle/collection'
+    """
     def __init__(self, fs, path, big_fs):
         # type: (OSFS, unicode, ArchiveToVersionedFS) -> None
         FSPath.__init__(self, fs, path)
@@ -184,8 +187,15 @@ class FSCollectionPath(FSPath):
         dir_list.append(_VERSION_ONE)
         return dir_list
 
+    def openbin(self, mode, buffering, **options):
+        # type: (AnyStr, int, **Any) -> Any
+        raise FileExpected(self._original_path)
+
 
 class FSProductPath(FSPath):
+    """
+    A path '/bundle/collection/product'
+    """
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
         FSPath.__init__(self, fs, path)
@@ -198,8 +208,15 @@ class FSProductPath(FSPath):
         # type: () -> List[unicode]
         return [_VERSION_ONE]
 
+    def openbin(self, mode, buffering, **options):
+        # type: (AnyStr, int, **Any) -> Any
+        raise FileExpected(self._original_path)
+
 
 class FSBundleVersionDirPath(FSPath):
+    """
+    A path '/bundle/v$1'
+    """
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
         FSPath.__init__(self, fs, path)
@@ -224,8 +241,15 @@ class FSBundleVersionDirPath(FSPath):
                 for info in infos
                 if info.is_file]
 
+    def openbin(self, mode, buffering, **options):
+        # type: (AnyStr, int, **Any) -> Any
+        raise FileExpected(self._original_path)
+
 
 class FSCollectionVersionDirPath(FSPath):
+    """
+    A path '/bundle/collection/v$1'
+    """
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
         FSPath.__init__(self, fs, path)
@@ -247,8 +271,15 @@ class FSCollectionVersionDirPath(FSPath):
                 for info in infos
                 if info.is_file]
 
+    def openbin(self, mode, buffering, **options):
+        # type: (AnyStr, int, **Any) -> Any
+        raise FileExpected(self._original_path)
+
 
 class FSProductVersionDirPath(FSPath):
+    """
+    A path '/bundle/collection/product/v$1'
+    """
     def __init__(self, fs, path, big_fs):
         # type: (OSFS, unicode, ArchiveToVersionedFS) -> None
         FSPath.__init__(self, fs, path)
@@ -264,9 +295,15 @@ class FSProductVersionDirPath(FSPath):
         b, c, p, v = iteratepath(self._original_path)
         return self._big_fs._get_collection_product_files(join(_ROOT, c), p)
 
+    def openbin(self, mode, buffering, **options):
+        # type: (AnyStr, int, **Any) -> Any
+        raise FileExpected(self._original_path)
+
 
 class FSBundleVersionedFilePath(FSPath):
-    # /bundle/version/file
+    """
+    A path '/bundle/v$1/file'
+    """
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
         FSPath.__init__(self, fs, path)
@@ -275,6 +312,10 @@ class FSBundleVersionedFilePath(FSPath):
         # type: (Tuple) -> Info
         b, v, f = iteratepath(self._original_path)
         return self._wrap_fs.getinfo(join(_ROOT, f), namespaces)
+
+    def listdir(self):
+        # type: () -> List[unicode]
+        raise DirectoryExpected(self._original_path)
 
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
@@ -286,6 +327,9 @@ class FSBundleVersionedFilePath(FSPath):
 
 
 class FSCollectionVersionedFilePath(FSPath):
+    """
+    A path '/bundle/collection/v$1/file'
+    """
     def __init__(self, fs, path, big_fs):
         # type: (OSFS, unicode, ArchiveToVersionedFS) -> None
         FSPath.__init__(self, fs, path)
@@ -296,6 +340,10 @@ class FSCollectionVersionedFilePath(FSPath):
         b, c, v, f = iteratepath(self._original_path)
         return self._wrap_fs.getinfo(join(_ROOT, c, f))
 
+    def listdir(self):
+        # type: () -> List[unicode]
+        raise DirectoryExpected(self._original_path)
+
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
         b, c, v, f = iteratepath(self._original_path)
@@ -304,6 +352,9 @@ class FSCollectionVersionedFilePath(FSPath):
 
 
 class FSProductVersionedFilePath(FSPath):
+    """
+    A path '/bundle/collection/product/v$1/file'
+    """
     def __init__(self, fs, path, big_fs):
         # type: (OSFS, unicode, ArchiveToVersionedFS) -> None
         FSPath.__init__(self, fs, path)
@@ -314,6 +365,10 @@ class FSProductVersionedFilePath(FSPath):
         b, c, p, v, f = iteratepath(self._original_path)
         fp = self._big_fs._get_product_filepath(join(_ROOT, c), f)
         return self._wrap_fs.getinfo(fp)
+
+    def listdir(self):
+        # type: () -> List[unicode]
+        raise DirectoryExpected(self._original_path)
 
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
@@ -642,9 +697,5 @@ if __name__ == '__main__':
     print fs1
     fs1.tree()
 
-    fs2 = TempFS(u'trash_me')
-    if True:
-        try:
-            copy_fs(fs1, fs2)
-        except:
-            traceback.print_exc(file=sys.stdout)
+    fs2 = TempFS(u'trashme')
+    copy_fs(fs1, fs2)
