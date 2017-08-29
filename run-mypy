@@ -12,7 +12,6 @@ mypy --silent-imports --py2 \
     pdart/rules \
     pdart/tasks \
     pdart/xml \
-    ArchiveToVersionedFS.py \
     CheckBadFitsFiles.py \
     CheckKeywords.py \
     CheckSuffixes.py \
@@ -22,6 +21,7 @@ mypy --silent-imports --py2 \
     DeleteDB.py \
     DeleteDocs.py \
     Dev.py \
+    InitialVersionView.py \
     MakeBundleDBs.py \
     MakeDB.py \
     MakeDocCollections.py \

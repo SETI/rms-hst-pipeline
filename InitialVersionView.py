@@ -62,17 +62,17 @@ _RAW_VERSION_DICT_INFO = {u'basic': {u'name': _VERSION_DICT, u'is_dir': False}}
 # type: Dict
 
 
-class FSPath(object):
+class _FSPath(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
-        self._wrap_fs = fs
+        self._legacy_fs = fs
         self._original_path = path
 
     def __str__(self):
         return '%s(%r, %r)' % (self.__class__.__name__,
-                               self._wrap_fs,
+                               self._legacy_fs,
                                self._original_path)
 
     @abstractmethod
@@ -116,38 +116,38 @@ class FSPath(object):
 #           '/hst_14334/data_wfc3_raw/icwy01hdq_raw/v$1/icwy01hdq_raw.fits'
 
 
-class FSDirPath(FSPath):
+class _FSDirPath(_FSPath):
     """
     A path that's a directory.
     """
     def __init__(self, fs, path):
-        FSPath.__init__(self, fs, path)
+        _FSPath.__init__(self, fs, path)
 
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
         raise FileExpected(self._original_path)
 
 
-class FSFilePath(FSPath):
+class _FSFilePath(_FSPath):
     """
     A path that's a file.
     """
     def __init__(self, fs, path):
-        FSPath.__init__(self, fs, path)
+        _FSPath.__init__(self, fs, path)
 
     def listdir(self):
         # type: () -> List[unicode]
         raise DirectoryExpected(self._original_path)
 
 
-class FSRootPath(FSDirPath):
+class _FSRootPath(_FSDirPath):
     """
     The root path '/'
     """
     def __init__(self, fs, path, bundle):
         # type: (OSFS, unicode, unicode) -> None
         assert path == _ROOT
-        FSDirPath.__init__(self, fs, _ROOT)
+        _FSDirPath.__init__(self, fs, _ROOT)
         self._bundle = bundle
 
     def listdir(self):
@@ -159,13 +159,13 @@ class FSRootPath(FSDirPath):
         return Info(_make_raw_dir_info(u''))
 
 
-class FSBundlePath(FSDirPath):
+class _FSBundlePath(_FSDirPath):
     """
     A path '/bundle'
     """
     def __init__(self, fs, path, bundle):
         # type: (OSFS, unicode, unicode) -> None
-        FSDirPath.__init__(self, fs, path)
+        _FSDirPath.__init__(self, fs, path)
         assert path == join(_ROOT, bundle), '%s /= %s' % (path, bundle)
         self._bundle = bundle
 
@@ -176,19 +176,19 @@ class FSBundlePath(FSDirPath):
     def listdir(self):
         # type: () -> List[unicode]
         dir_list = [info.name
-                    for info in self._wrap_fs.scandir(_ROOT)
+                    for info in self._legacy_fs.scandir(_ROOT)
                     if info.is_dir]
         dir_list.append(_VERSION_ONE)
         return dir_list
 
 
-class FSCollectionPath(FSDirPath):
+class _FSCollectionPath(_FSDirPath):
     """
     A path '/bundle/collection'
     """
     def __init__(self, fs, path, big_fs):
-        # type: (OSFS, unicode, ArchiveToVersionedFS) -> None
-        FSDirPath.__init__(self, fs, path)
+        # type: (OSFS, unicode, InitialVersionView) -> None
+        _FSDirPath.__init__(self, fs, path)
         self._big_fs = big_fs
 
     def getinfo(self, namespaces):
@@ -204,13 +204,13 @@ class FSCollectionPath(FSDirPath):
         return dir_list
 
 
-class FSProductPath(FSDirPath):
+class _FSProductPath(_FSDirPath):
     """
     A path '/bundle/collection/product'
     """
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
-        FSDirPath.__init__(self, fs, path)
+        _FSDirPath.__init__(self, fs, path)
 
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
@@ -221,13 +221,13 @@ class FSProductPath(FSDirPath):
         return [_VERSION_ONE]
 
 
-class FSBundleVersionDirPath(FSDirPath):
+class _FSBundleVersionDirPath(_FSDirPath):
     """
     A path '/bundle/v$1'
     """
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
-        FSDirPath.__init__(self, fs, path)
+        _FSDirPath.__init__(self, fs, path)
 
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
@@ -239,7 +239,7 @@ class FSBundleVersionDirPath(FSDirPath):
         # TODO: What if you've got a non-collection dir on the
         # top-level?  Conceptually, it belongs to the bundle.  How do
         # I distinguish?
-        infos = self._wrap_fs.filterdir(
+        infos = self._legacy_fs.filterdir(
             _ROOT,
             files=None,
             dirs=None,
@@ -250,13 +250,13 @@ class FSBundleVersionDirPath(FSDirPath):
                 if info.is_file]
 
 
-class FSCollectionVersionDirPath(FSDirPath):
+class _FSCollectionVersionDirPath(_FSDirPath):
     """
     A path '/bundle/collection/v$1'
     """
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
-        FSDirPath.__init__(self, fs, path)
+        _FSDirPath.__init__(self, fs, path)
 
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
@@ -265,7 +265,7 @@ class FSCollectionVersionDirPath(FSDirPath):
     def listdir(self):
         # type: () -> List[unicode]
         b, c, v = iteratepath(self._original_path)
-        infos = self._wrap_fs.filterdir(
+        infos = self._legacy_fs.filterdir(
             join(_ROOT, c),
             files=None,
             dirs=None,
@@ -276,13 +276,13 @@ class FSCollectionVersionDirPath(FSDirPath):
                 if info.is_file]
 
 
-class FSProductVersionDirPath(FSDirPath):
+class _FSProductVersionDirPath(_FSDirPath):
     """
     A path '/bundle/collection/product/v$1'
     """
     def __init__(self, fs, path, big_fs):
-        # type: (OSFS, unicode, ArchiveToVersionedFS) -> None
-        FSPath.__init__(self, fs, path)
+        # type: (OSFS, unicode, InitialVersionView) -> None
+        _FSPath.__init__(self, fs, path)
         self._big_fs = big_fs
 
     def getinfo(self, namespaces):
@@ -296,78 +296,84 @@ class FSProductVersionDirPath(FSDirPath):
         return self._big_fs._get_collection_product_files(join(_ROOT, c), p)
 
 
-class FSBundleVersionedFilePath(FSFilePath):
+class _FSBundleVersionedFilePath(_FSFilePath):
     """
     A path '/bundle/v$1/file'
     """
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
-        FSFilePath.__init__(self, fs, path)
+        _FSFilePath.__init__(self, fs, path)
 
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
         b, v, f = iteratepath(self._original_path)
-        return self._wrap_fs.getinfo(join(_ROOT, f), namespaces)
+        return self._legacy_fs.getinfo(join(_ROOT, f), namespaces)
 
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
         b, v, f = iteratepath(self._original_path)
-        return self._wrap_fs.openbin(join(_ROOT, f),
-                                     mode,
-                                     buffering,
-                                     **options)
+        return self._legacy_fs.openbin(join(_ROOT, f),
+                                       mode,
+                                       buffering,
+                                       **options)
 
 
-class FSCollectionVersionedFilePath(FSFilePath):
+class _FSCollectionVersionedFilePath(_FSFilePath):
     """
     A path '/bundle/collection/v$1/file'
     """
     def __init__(self, fs, path, big_fs):
-        # type: (OSFS, unicode, ArchiveToVersionedFS) -> None
-        FSFilePath.__init__(self, fs, path)
+        # type: (OSFS, unicode, InitialVersionView) -> None
+        _FSFilePath.__init__(self, fs, path)
         self._big_fs = big_fs
 
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
         b, c, v, f = iteratepath(self._original_path)
-        return self._wrap_fs.getinfo(join(_ROOT, c, f))
+        return self._legacy_fs.getinfo(join(_ROOT, c, f))
 
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
         b, c, v, f = iteratepath(self._original_path)
-        return self._wrap_fs.openbin(join(_ROOT, c, f),
-                                     mode, buffering, **options)
+        return self._legacy_fs.openbin(join(_ROOT, c, f),
+                                       mode, buffering, **options)
 
 
-class FSProductVersionedFilePath(FSFilePath):
+class _FSProductVersionedFilePath(_FSFilePath):
     """
     A path '/bundle/collection/product/v$1/file'
     """
     def __init__(self, fs, path, big_fs):
-        # type: (OSFS, unicode, ArchiveToVersionedFS) -> None
-        FSFilePath.__init__(self, fs, path)
+        # type: (OSFS, unicode, InitialVersionView) -> None
+        _FSFilePath.__init__(self, fs, path)
         self._big_fs = big_fs
 
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
         b, c, p, v, f = iteratepath(self._original_path)
         fp = self._big_fs._get_product_filepath(join(_ROOT, c), f)
-        return self._wrap_fs.getinfo(fp)
+        return self._legacy_fs.getinfo(fp)
 
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
         b, c, p, v, f = iteratepath(self._original_path)
         fp = self._big_fs._get_product_filepath(join(_ROOT, c), f)
-        return self._wrap_fs.openbin(fp, mode, buffering, **options)
+        return self._legacy_fs.openbin(fp, mode, buffering, **options)
 
 
-class ArchiveToVersionedFS(ReadOnlyView):
-    def __init__(self, bundle_dir):
-        # type: (unicode) -> None
-        self._bundle_dir = bundle_dir
-        self._bundle = basename(bundle_dir)
-        self._wrap_fs = OSFS(bundle_dir)
-        ReadOnlyView.__init__(self, self._wrap_fs)
+class InitialVersionView(ReadOnlyView):
+    """
+    Wraps a filesystem in the unversioned legacy directory layout to
+    look like a versioned filesystem with all PDS elements at version
+    1.
+    """
+    def __init__(self, bundle_id, legacy_fs):
+        # type: (unicode, FS) -> None
+        self._bundle = bundle_id
+        self._legacy_fs = legacy_fs
+        # self._bundle = basename(bundle_dir)
+        # self._legacy_fs = OSFS(bundle_dir)
+        ReadOnlyView.__init__(self, self._legacy_fs)
 
     def _delegate_file_path(self, path):
         # type: (unicode) -> Tuple[FS, unicode]
@@ -377,62 +383,65 @@ class ArchiveToVersionedFS(ReadOnlyView):
             parts = iteratepath(path)
             if parts[0] == self._bundle:
                 if parts[1:]:
-                    res = self._wrap_fs, join(*parts[1:])
+                    res = self._legacy_fs, join(*parts[1:])
                 else:
-                    res = self._wrap_fs, _ROOT
+                    res = self._legacy_fs, _ROOT
             else:
                 raise ResourceNotFound(path)
         return res
 
     def _make_fs_path(self, path):
-        # type: (unicode) -> FSPath
+        # type: (unicode) -> _FSPath
         path = abspath(normpath(path))
         parts = iteratepath(path)
         l = len(parts)
         if l == 0:
             # synthetic root path
-            return FSRootPath(self._wrap_fs, _ROOT, self._bundle)
+            return _FSRootPath(self._legacy_fs, _ROOT, self._bundle)
         else:
             if not (parts[0] == self._bundle):
                 # only files in the bundle exist in the filesystem
                 raise ResourceNotFound(path)
             if l == 1:
                 # /bundle
-                return FSBundlePath(self._wrap_fs, path, self._bundle)
+                return _FSBundlePath(self._legacy_fs, path, self._bundle)
             elif l == 2:
                 if _is_version_part(parts[1]):
                     # /bundle/version
-                    return FSBundleVersionDirPath(self._wrap_fs, path)
+                    return _FSBundleVersionDirPath(self._legacy_fs, path)
                 else:
                     # /bundle/collection
-                    return FSCollectionPath(self._wrap_fs, path, self)
+                    return _FSCollectionPath(self._legacy_fs, path, self)
             elif l == 3:
                 if _is_version_part(parts[1]):
                     # /bundle/version/file
-                    return FSBundleVersionedFilePath(self._wrap_fs, path)
+                    return _FSBundleVersionedFilePath(self._legacy_fs, path)
                 elif _is_version_part(parts[2]):
                     # /bundle/collection/version
-                    return FSCollectionVersionDirPath(self._wrap_fs, path)
+                    return _FSCollectionVersionDirPath(self._legacy_fs, path)
                 else:
                     # /bundle/collection/product
-                    return FSProductPath(self._wrap_fs, path)
+                    return _FSProductPath(self._legacy_fs, path)
             elif l == 4:
                 if _is_version_part(parts[2]):
                     # /bundle/collection/version/file
-                    return FSCollectionVersionedFilePath(self._wrap_fs,
-                                                         path, self)
+                    return _FSCollectionVersionedFilePath(self._legacy_fs,
+                                                          path,
+                                                          self)
                 else:
                     # /bundle/collection/product/version
                     assert _is_version_part(parts[3]), path
-                    return FSProductVersionDirPath(self._wrap_fs, path, self)
+                    return _FSProductVersionDirPath(self._legacy_fs,
+                                                    path,
+                                                    self)
             elif l == 5:
                 assert _is_version_part(parts[3])
-                return FSProductVersionedFilePath(self._wrap_fs, path, self)
+                return _FSProductVersionedFilePath(self._legacy_fs, path, self)
             else:
                 assert False, path
 
     def _get_visit_info(self, collection_path):
-        return self._wrap_fs.filterdir(
+        return self._legacy_fs.filterdir(
             collection_path,
             files=None, dirs=[_VISIT_DIR_PAT],
             exclude_dirs=None, exclude_files=[ALL_PAT])
@@ -440,18 +449,18 @@ class ArchiveToVersionedFS(ReadOnlyView):
     def _get_collections(self):
         return [info.name
                 for info
-                in self._wrap_fs.filterdir(_ROOT,
-                                           files=None,
-                                           dirs=['data_*'],
-                                           exclude_dirs=None,
-                                           exclude_files=[ALL_PAT])]
+                in self._legacy_fs.filterdir(_ROOT,
+                                             files=None,
+                                             dirs=['data_*'],
+                                             exclude_dirs=None,
+                                             exclude_files=[ALL_PAT])]
 
     def _get_collection_files(self, collection_path):
         # type: (unicode) -> List[Tuple[unicode, unicode]]
         return [(visit_info.name, file)
                 for visit_info in self._get_visit_info(collection_path)
-                for file in self._wrap_fs.listdir(join(collection_path,
-                                                       visit_info.name))]
+                for file in self._legacy_fs.listdir(join(collection_path,
+                                                         visit_info.name))]
 
     def _get_collection_fits_products(self, collection_path):
         return [file[:-5]
@@ -472,7 +481,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
             (collection_path, product_file)
 
     def _get_files(self, path):
-        return [info.name for info in self._wrap_fs.filterdir(
+        return [info.name for info in self._legacy_fs.filterdir(
                 path,
                 files=None, dirs=None,
                 exclude_dirs=[ALL_PAT], exclude_files=FILE_EXCLUSION_PATS)]
@@ -503,7 +512,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                 else:
                     # path = b/c; orig path = c
                     with unwrap_errors(path):
-                        raw_info = self._wrap_fs.getinfo(c).raw
+                        raw_info = self._legacy_fs.getinfo(c).raw
             elif l == 3:
                 _b, c, p = parts
                 if _is_version_part(c):
@@ -512,7 +521,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                         raw_info = _RAW_VERSION_DICT_INFO
                     else:
                         with unwrap_errors(path):
-                            raw_info = self._wrap_fs.getinfo(p).raw
+                            raw_info = self._legacy_fs.getinfo(p).raw
                 elif _is_version_part(p):
                     # path = b/c/$n; orig path = /c
                     raw_info = _make_raw_dir_info(p)
@@ -527,7 +536,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                         raw_info = _RAW_VERSION_DICT_INFO
                     else:
                         with unwrap_errors(path):
-                            raw_info = self._wrap_fs.getinfo(join(c, f)).raw
+                            raw_info = self._legacy_fs.getinfo(join(c, f)).raw
                 elif _is_version_part(f):
                     # path = b/c/p/$n; synthetic
                     raw_info = _make_raw_dir_info(f)
@@ -541,7 +550,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                 with unwrap_errors(path):
                     filepath = self._get_product_filepath(c, f)
                     with unwrap_errors(path):
-                        raw_info = self._wrap_fs.getinfo(filepath).raw
+                        raw_info = self._legacy_fs.getinfo(filepath).raw
             else:
                 assert False, 'getinfo(%s) has %d parts' % (path, l)
         return Info(raw_info)
@@ -590,7 +599,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                 return _fs.openbin(_path, mode=mode,
                                    buffering=buffering, **options)
         else:
-            assert False, 'ArchiveToVersionedFS.openbin()'
+            assert False, 'InitialVersionView.openbin()'
 
     def listdir(self, path):
         self.check()
@@ -609,7 +618,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
             if l == 1:
                 # path = b
                 dir_list = [info.name
-                            for info in self._wrap_fs.scandir(_ROOT)
+                            for info in self._legacy_fs.scandir(_ROOT)
                             if info.is_dir]
                 dir_list.append(_VERSION_ONE)
             elif l == 2:
@@ -626,7 +635,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                 b, c, p = parts
                 if _is_version_part(c):
                     # path = b/$n/p; orig path = /p
-                    if self._wrap_fs.exists(p):
+                    if self._legacy_fs.exists(p):
                         raise DirectoryExpected(path)
                     else:
                         raise ResourceNotFound(path)
@@ -641,7 +650,7 @@ class ArchiveToVersionedFS(ReadOnlyView):
                 b, c, p, f = parts
                 if _is_version_part(p):
                     # path = b/c/$n/f; orig path /c/f
-                    if self._wrap_fs.exists(join(c, f)):
+                    if self._legacy_fs.exists(join(c, f)):
                         raise DirectoryExpected(path)
                     else:
                         raise ResourceNotFound(path)
@@ -662,11 +671,13 @@ class ArchiveToVersionedFS(ReadOnlyView):
 
 
 def test_fs():
-    return ArchiveToVersionedFS(u'/Users/spaceman/Desktop/Archive/hst_14334')
+    fs = OSFS(u'/Users/spaceman/Desktop/Archive/hst_14334')
+    return InitialVersionView(u'hst_14334', fs)
 
 
 if __name__ == '__main__':
-    fs1 = ArchiveToVersionedFS(u'/Users/spaceman/Desktop/Archive/hst_14334')
+    fs0 = OSFS(u'/Users/spaceman/Desktop/Archive/hst_14334')
+    fs1 = InitialVersionView('hst_14334', fs0)
     # import pudb; pu.db
     if False:
         print "fs1.listdir(u'/hst_14334') = %s" % \
