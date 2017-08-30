@@ -192,7 +192,7 @@ class _FSCollectionPath(_FSDirPath):
     A path '/bundle/collection'
     """
     def __init__(self, fs, path, big_fs):
-        # type: (OSFS, unicode, InitialVersionView) -> None
+        # type: (OSFS, unicode, InitialVersionedView) -> None
         _FSDirPath.__init__(self, fs, path)
         self._big_fs = big_fs
 
@@ -286,7 +286,7 @@ class _FSProductVersionDirPath(_FSDirPath):
     A path '/bundle/collection/product/v$1'
     """
     def __init__(self, fs, path, big_fs):
-        # type: (OSFS, unicode, InitialVersionView) -> None
+        # type: (OSFS, unicode, InitialVersionedView) -> None
         _FSPath.__init__(self, fs, path)
         self._big_fs = big_fs
 
@@ -330,7 +330,7 @@ class _FSCollectionVersionedFilePath(_FSFilePath):
     A path '/bundle/collection/v$1/file'
     """
     def __init__(self, fs, path, big_fs):
-        # type: (OSFS, unicode, InitialVersionView) -> None
+        # type: (OSFS, unicode, InitialVersionedView) -> None
         _FSFilePath.__init__(self, fs, path)
         self._big_fs = big_fs
 
@@ -351,7 +351,7 @@ class _FSProductVersionedFilePath(_FSFilePath):
     A path '/bundle/collection/product/v$1/file'
     """
     def __init__(self, fs, path, big_fs):
-        # type: (OSFS, unicode, InitialVersionView) -> None
+        # type: (OSFS, unicode, InitialVersionedView) -> None
         _FSFilePath.__init__(self, fs, path)
         self._big_fs = big_fs
 
@@ -387,7 +387,7 @@ class _FSSubdirVersionsFile(_FSFilePath):
         return StringIO.StringIO(strSubdirVersions(d))
 
 
-class InitialVersionView(ReadOnlyView):
+class InitialVersionedView(ReadOnlyView):
     """
     Wraps a filesystem in the unversioned legacy directory layout to
     look like a versioned filesystem with all PDS elements at version
@@ -627,7 +627,7 @@ class InitialVersionView(ReadOnlyView):
                 return _fs.openbin(_path, mode=mode,
                                    buffering=buffering, **options)
         else:
-            assert False, 'InitialVersionView.openbin()'
+            assert False, 'InitialVersionedView.openbin()'
 
     def listdir(self, path):
         self.check()
@@ -696,29 +696,3 @@ class InitialVersionView(ReadOnlyView):
     def _get_versions_dict(self, path):
         bs = self.getbytes(join(path, _VERSION_DICT))
         return pickle.loads(bs)
-
-
-def test_fs():
-    fs = OSFS(u'/Users/spaceman/Desktop/Archive/hst_14334')
-    return InitialVersionView(u'hst_14334', fs)
-
-
-if __name__ == '__main__':
-    fs0 = OSFS(u'/Users/spaceman/Desktop/Archive/hst_14334')
-    fs1 = InitialVersionView('hst_14334', fs0)
-    # import pudb; pu.db
-    if False:
-        print "fs1.listdir(u'/hst_14334') = %s" % \
-            list(fs1.listdir(u'/hst_14334'))
-        print "fs1.scandir(u'/hst_14334') = %s" % \
-            list(fs1.scandir(u'/hst_14334'))
-        print "fs1.filterdir(u'/hst_14334') = %s" % \
-            list(fs1.filterdir(u'/hst_14334'))
-        print fs1._get_collection_fits_products(u'data_wfc3_raw')
-        print fs1._get_versions_dict(u'/hst_14334/v$1')
-        print fs1._get_versions_dict(u'/hst_14334/data_wfc3_raw/v$1')
-    print fs1
-    fs1.tree()
-
-    fs2 = TempFS(u'trashme')
-    copy_fs(fs1, fs2)

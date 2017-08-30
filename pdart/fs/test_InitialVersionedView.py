@@ -1,4 +1,4 @@
-from pdart.fs.InitialVersionView import *
+from pdart.fs.InitialVersionedView import *
 from pdart.fs.VersionedViewTestCases import *
 import unittest
 
@@ -23,11 +23,11 @@ _SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
 # type: unicode
 
 
-class TestInitialVersionView(unittest.TestCase):
+class TestInitialVersionedView(unittest.TestCase):
     def setUp(self):
         self.legacy_fs = MemoryFS()
         self.bundle_id = _BUNDLE_ID
-        self.view = InitialVersionView(self.bundle_id, self.legacy_fs)
+        self.view = InitialVersionedView(self.bundle_id, self.legacy_fs)
 
     def test_bare_fs(self):
         """
@@ -134,13 +134,13 @@ class TestInitialVersionView(unittest.TestCase):
         self.assertEquals("", self.view.gettext(PRODUCT_LABEL_FILEPATH))
 
 
-class TestInitialVersionViewAsVersionedView(VersionedViewTestCases,
-                                            unittest.TestCase):
+class TestInitialVersionedViewAsVersionedView(VersionedViewTestCases,
+                                              unittest.TestCase):
     def make_fs(self):
         self.memoryFS = MemoryFS()
         self.memoryFS.makedirs(u'/data_xxx_raw/visit_xx')
         self.memoryFS.touch(u'/data_xxx_raw/visit_xx/u2q9xx01j_raw.fits')
-        return InitialVersionView(_BUNDLE_ID, self.memoryFS)
+        return InitialVersionedView(_BUNDLE_ID, self.memoryFS)
 
     def destroy_fs(self, fs):
         fs.close()
