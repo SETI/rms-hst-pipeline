@@ -28,6 +28,9 @@ if TYPE_CHECKING:
 _ROOT = u'/'
 # type:unicode
 
+_SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
+# type: unicode
+
 
 def _make_raw_dir_info(name):
     # type: (unicode) -> Dict
@@ -247,7 +250,7 @@ class _FSBundleVersionDirPath(_FSDirPath):
             exclude_files=FILE_EXCLUSION_PATS)
         return [info.name
                 for info in infos
-                if info.is_file]
+                if info.is_file] + [_SUBDIR_VERSIONS_FILENAME]
 
 
 class _FSCollectionVersionDirPath(_FSDirPath):
@@ -273,7 +276,7 @@ class _FSCollectionVersionDirPath(_FSDirPath):
             exclude_files=FILE_EXCLUSION_PATS)
         return [info.name
                 for info in infos
-                if info.is_file]
+                if info.is_file] + [_SUBDIR_VERSIONS_FILENAME]
 
 
 class _FSProductVersionDirPath(_FSDirPath):
@@ -293,7 +296,9 @@ class _FSProductVersionDirPath(_FSDirPath):
     def listdir(self):
         # type: () -> List[unicode]
         b, c, p, v = iteratepath(self._original_path)
-        return self._big_fs._get_collection_product_files(join(_ROOT, c), p)
+        c_dir = join(_ROOT, c)
+        return self._big_fs._get_collection_product_files(c_dir, p) + \
+            [_SUBDIR_VERSIONS_FILENAME]
 
 
 class _FSBundleVersionedFilePath(_FSFilePath):
@@ -361,6 +366,18 @@ class _FSProductVersionedFilePath(_FSFilePath):
         return self._legacy_fs.openbin(fp, mode, buffering, **options)
 
 
+class _FSSubdirVersionsFile(_FSFilePath):
+    def __init__(self, fs, path):
+        _FSFilePath.__init__(self, fs, path)
+
+    def getinfo(self, namespaces):
+        return Info({u'basic': {u'name': _SUBDIR_VERSIONS_FILENAME,
+                                u'is_dir': False}})
+
+    def openbin(self, mode, buffering, **options):
+        return None
+
+
 class InitialVersionView(ReadOnlyView):
     """
     Wraps a filesystem in the unversioned legacy directory layout to
@@ -402,6 +419,8 @@ class InitialVersionView(ReadOnlyView):
             if not (parts[0] == self._bundle):
                 # only files in the bundle exist in the filesystem
                 raise ResourceNotFound(path)
+            elif parts[-1] == _SUBDIR_VERSIONS_FILENAME:
+                return _FSSubdirVersionsFile(self._legacy_fs, path)
             if l == 1:
                 # /bundle
                 return _FSBundlePath(self._legacy_fs, path, self._bundle)

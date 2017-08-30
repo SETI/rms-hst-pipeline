@@ -1,4 +1,5 @@
 from pdart.fs.InitialVersionView import *
+from pdart.fs.VersionedViewTestCases import *
 import unittest
 
 from fs.memoryfs import MemoryFS
@@ -8,6 +9,8 @@ _ROOT = u'/'
 _V1 = u'v$1'
 # type: unicode
 _BUNDLE_ID = u'hst_00000'
+# type: unicode
+_SUBDIR_VERSIONS_FILENAME = 'subdir$versions.txt'
 # type: unicode
 
 
@@ -33,7 +36,8 @@ class TestInitialVersionView(unittest.TestCase):
         BUNDLE_DIR_V1 = join(BUNDLE_DIR, _V1)
         self.assertTrue(self.view.exists(BUNDLE_DIR_V1))
         self.assertTrue(self.view.isdir(BUNDLE_DIR_V1))
-        self.assertFalse(self.view.listdir(BUNDLE_DIR_V1))
+        self.assertEqual([_SUBDIR_VERSIONS_FILENAME],
+                         self.view.listdir(BUNDLE_DIR_V1))
 
         # add a label
         BUNDLE_LABEL_FILENAME = u'bundle.xml'
@@ -61,7 +65,8 @@ class TestInitialVersionView(unittest.TestCase):
         COLLECTION_DIR_V1 = join(COLLECTION_DIR, _V1)
         self.assertTrue(self.view.exists(COLLECTION_DIR_V1))
         self.assertTrue(self.view.isdir(COLLECTION_DIR_V1))
-        self.assertFalse(self.view.listdir(COLLECTION_DIR_V1))
+        self.assertEqual([_SUBDIR_VERSIONS_FILENAME],
+                         self.view.listdir(COLLECTION_DIR_V1))
 
         # add a label
         COLLECTION_LABEL_FILENAME = u'collection.xml'
@@ -98,8 +103,8 @@ class TestInitialVersionView(unittest.TestCase):
 
         self.assertTrue(self.view.exists(PRODUCT_DIR_V1))
         self.assertTrue(self.view.isdir(PRODUCT_DIR_V1))
-        self.assertEquals([FITS_FILENAME],
-                          self.view.listdir(PRODUCT_DIR_V1))
+        self.assertEquals(set([FITS_FILENAME, _SUBDIR_VERSIONS_FILENAME]),
+                          set(self.view.listdir(PRODUCT_DIR_V1)))
 
         self.assertTrue(self.view.exists(FITS_FILEPATH))
         self.assertTrue(self.view.isfile(FITS_FILEPATH))
@@ -118,3 +123,16 @@ class TestInitialVersionView(unittest.TestCase):
         self.assertTrue(self.view.exists(PRODUCT_LABEL_FILEPATH))
         self.assertTrue(self.view.isfile(PRODUCT_LABEL_FILEPATH))
         self.assertEquals("", self.view.gettext(PRODUCT_LABEL_FILEPATH))
+
+
+class TestInitialVersionViewAsVersionedView(VersionedViewTestCases,
+                                            unittest.TestCase):
+    def make_fs(self):
+        self.memoryFS = MemoryFS()
+        self.memoryFS.makedirs(u'/data_xxx_raw/visit_xx')
+        self.memoryFS.touch(u'/data_xxx_raw/visit_xx/u2q9xx01j_raw.fits')
+        return InitialVersionView(_BUNDLE_ID, self.memoryFS)
+
+    def destroy_fs(self, fs):
+        fs.close()
+        self.memoryFS.close()
