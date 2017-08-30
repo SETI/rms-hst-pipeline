@@ -16,6 +16,10 @@ _SUBDIR_VERSIONS_FILENAME = 'subdir$versions.txt'
 
 
 class VersionedViewTestCases(object):
+    """
+    A set of test cases that should hold for any VersionedView, that
+    is, any filesystem organized to include versioning.
+    """
     def make_fs(self):
         raise NotImplementedError('implement me')
 
@@ -138,11 +142,33 @@ class VersionedViewTestCases(object):
         SUBDIR_VERSIONS_FILEPATH = join(version_dir,
                                         _SUBDIR_VERSIONS_FILENAME)
         self.assertTrue(self.view.exists(SUBDIR_VERSIONS_FILEPATH))
+        self.assertTrue(self.view.isfile(SUBDIR_VERSIONS_FILEPATH))
+
+        # check that the subdir$versions.txt file is in the right
+        # format
+        self.check_subdir_versions_file(version_dir,
+                                        SUBDIR_VERSIONS_FILEPATH)
 
         # version dirs contain only files
         self.assertFalse(list(self.view.filterdir(version_dir,
                                                   None, None,
                                                   _VERSION_DIRS, _ALL)))
+
+    def check_subdir_versions_file(self,
+                                   version_dir,
+                                   subdir_versions_filepath):
+        with self.view.open(subdir_versions_filepath) as f:
+            # parse file contents
+            for line in f:
+                parts = line.split()
+                self.assertEqual(2, len(parts))
+                subdir_name, version = parts
+
+                # each subdirectory entry must correspond to an
+                # existing subdirectory
+                subdir = join(version_dir, '..', subdir_name, 'v$' + version)
+                self.view.exists(subdir)
+                self.view.isdir(subdir)
 
     def test_has_bundle_dirs(self):
         self.view.isdir(u'/')
@@ -153,8 +179,8 @@ class VersionedViewTestCases(object):
         BUNDLE_DIR = join(u'/', BUNDLE_NAME)
         self.check_bundle_dir(BUNDLE_DIR)
 
-    # We implement unittest.TestCase's methods only to keep mypy
-    # happy.
+    # We implement unittest.TestCase's methods conditionally, only to
+    # keep mypy happy.
     if TYPE_CHECKING:
         def assertTrue(self, cond, msg=None):
             raise NotImplementedError('implement me')

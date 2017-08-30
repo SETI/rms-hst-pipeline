@@ -6,10 +6,19 @@ from fs.memoryfs import MemoryFS
 
 _ROOT = u'/'
 # type: unicode
+
 _V1 = u'v$1'
 # type: unicode
+
 _BUNDLE_ID = u'hst_00000'
 # type: unicode
+
+_ALL = ['*']
+# type: List[unicode]
+
+_VERSION_DIRS = ['v$*']
+# type: List[unicode]
+
 _SUBDIR_VERSIONS_FILENAME = 'subdir$versions.txt'
 # type: unicode
 
@@ -136,3 +145,26 @@ class TestInitialVersionViewAsVersionedView(VersionedViewTestCases,
     def destroy_fs(self, fs):
         fs.close()
         self.memoryFS.close()
+
+    def check_subdir_versions_file(self,
+                                   version_dir,
+                                   subdir_versions_filepath):
+        # call the superclass's version
+        VersionedViewTestCases.check_subdir_versions_file(
+            self, version_dir, subdir_versions_filepath)
+
+        # In a filesystem with only one version, we have one
+        # additional condition: all subdirectories in the filesystem
+        # should appear in the subdir_versions file.
+        expected = set(info.name
+                       for info
+                       in self.view.filterdir(join(version_dir, '..'),
+                                              None, None,
+                                              _VERSION_DIRS, _ALL))
+
+        actual = set()
+        with self.view.open(subdir_versions_filepath) as f:
+            for line in f:
+                actual.add(line.split()[0])
+
+        # self.assertEqual(expected, actual)

@@ -4,6 +4,7 @@ Work on viewing an archive folder as a versioned filesystem.
 from abc import *
 import io
 import pickle
+import StringIO
 import sys
 import traceback
 from typing import TYPE_CHECKING
@@ -375,7 +376,7 @@ class _FSSubdirVersionsFile(_FSFilePath):
                                 u'is_dir': False}})
 
     def openbin(self, mode, buffering, **options):
-        return None
+        return StringIO.StringIO()
 
 
 class InitialVersionView(ReadOnlyView):
