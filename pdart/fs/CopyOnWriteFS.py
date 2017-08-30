@@ -2,11 +2,11 @@ from fs.base import FS
 from fs.copy import copy_file
 import fs.errors
 from fs.mode import Mode
+from fs.path import dirname
 from fs.tempfs import TempFS
 
 from pdart.fs.FSWithDeletions import FSWithDeletions
 from pdart.fs.SetDeletionPredicate import SetDeletionPredicate
-from pdart.fs.Utils import parent_dir
 
 
 class CopyOnWriteFS(FS):
@@ -32,7 +32,7 @@ class CopyOnWriteFS(FS):
         assert path
         if self._readonly_fs.exists(path) and \
                 not self._delta_fs.exists(path):
-            p = parent_dir(path)
+            p = dirname(path)
             self._delta_fs.makedirs(p)
             copy_file(self._readonly_fs, path, self._delta_fs, path)
             self._deletion_predicate.delete(path)

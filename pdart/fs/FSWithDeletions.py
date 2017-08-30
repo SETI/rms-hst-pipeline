@@ -1,9 +1,7 @@
-import os.path
-
 from fs.errors import ResourceNotFound
 from fs.mode import Mode
+from fs.path import dirname, join
 from pdart.fs.NarrowWrapFS import NarrowWrapFS
-from pdart.fs.Utils import parent_dir
 
 from typing import TYPE_CHECKING
 
@@ -39,10 +37,10 @@ class FSWithDeletions(NarrowWrapFS):
             return [child
                     for child in self.delegate_fs().listdir(path)
                     if not self.deletion_predicate.is_deleted(
-                        os.path.join(path, child))]
+                        join(path, child))]
 
     def makedir(self, path, permissions=None, recreate=False):
-        parent = parent_dir(path)
+        parent = dirname(path)
         if self.deletion_predicate.is_deleted(parent):
             raise ResourceNotFound(parent)
         else:
@@ -56,7 +54,7 @@ class FSWithDeletions(NarrowWrapFS):
             raise ResourceNotFound(path)
 
         if mode_obj.writing:
-            parent = parent_dir(path)
+            parent = dirname(path)
             if self.deletion_predicate.is_deleted(parent):
                 raise ResourceNotFound(path)
 
