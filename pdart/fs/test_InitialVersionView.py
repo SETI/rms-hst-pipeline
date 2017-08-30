@@ -147,11 +147,9 @@ class TestInitialVersionViewAsVersionedView(VersionedViewTestCases,
         self.memoryFS.close()
 
     def check_subdir_versions_file(self,
-                                   version_dir,
-                                   subdir_versions_filepath):
-        # call the superclass's version
-        VersionedViewTestCases.check_subdir_versions_file(
-            self, version_dir, subdir_versions_filepath)
+                                   version_dir):
+        # call the superclass's version for standard tests
+        VersionedViewTestCases.check_subdir_versions_file(self, version_dir)
 
         # In a filesystem with only one version, we have one
         # additional condition: all subdirectories in the filesystem
@@ -162,9 +160,6 @@ class TestInitialVersionViewAsVersionedView(VersionedViewTestCases,
                                               None, None,
                                               _VERSION_DIRS, _ALL))
 
-        actual = set()
-        with self.view.open(subdir_versions_filepath) as f:
-            for line in f:
-                actual.add(line.split()[0])
+        actual = set(readSubdirVersions(self.view, version_dir).keys())
 
-        # self.assertEqual(expected, actual)
+        self.assertEqual(expected, actual)

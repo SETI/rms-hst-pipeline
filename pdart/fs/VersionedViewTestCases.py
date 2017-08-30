@@ -2,6 +2,8 @@ import abc
 from typing import TYPE_CHECKING
 from fs.path import join
 
+from pdart.fs.SubdirVersions import readSubdirVersions
+
 if TYPE_CHECKING:
     from typing import List
 
@@ -146,8 +148,7 @@ class VersionedViewTestCases(object):
 
         # check that the subdir$versions.txt file is in the right
         # format
-        self.check_subdir_versions_file(version_dir,
-                                        SUBDIR_VERSIONS_FILEPATH)
+        self.check_subdir_versions_file(version_dir)
 
         # version dirs contain only files
         self.assertFalse(list(self.view.filterdir(version_dir,
@@ -155,20 +156,14 @@ class VersionedViewTestCases(object):
                                                   _VERSION_DIRS, _ALL)))
 
     def check_subdir_versions_file(self,
-                                   version_dir,
-                                   subdir_versions_filepath):
-        with self.view.open(subdir_versions_filepath) as f:
-            # parse file contents
-            for line in f:
-                parts = line.split()
-                self.assertEqual(2, len(parts))
-                subdir_name, version = parts
-
-                # each subdirectory entry must correspond to an
-                # existing subdirectory
-                subdir = join(version_dir, '..', subdir_name, 'v$' + version)
-                self.view.exists(subdir)
-                self.view.isdir(subdir)
+                                   version_dir):
+        d = readSubdirVersions(self.view, version_dir)
+        for subdir_name, version in d.items():
+            # each subdirectory entry must correspond to an
+            # existing subdirectory
+            subdir = join(version_dir, '..', subdir_name, 'v$' + version)
+            self.view.exists(subdir)
+            self.view.isdir(subdir)
 
     def test_has_bundle_dirs(self):
         self.view.isdir(u'/')

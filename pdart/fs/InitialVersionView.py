@@ -21,6 +21,7 @@ from fs.path import abspath, basename, iteratepath, join, normpath
 from fs.tempfs import TempFS
 
 from pdart.fs.ReadOnlyView import ReadOnlyView
+from pdart.fs.SubdirVersions import strSubdirVersions
 
 if TYPE_CHECKING:
     from typing import Any, AnyStr, Tuple
@@ -368,15 +369,22 @@ class _FSProductVersionedFilePath(_FSFilePath):
 
 
 class _FSSubdirVersionsFile(_FSFilePath):
-    def __init__(self, fs, path):
+    def __init__(self, fs, path, big_fs):
         _FSFilePath.__init__(self, fs, path)
+        self._big_fs = big_fs
 
     def getinfo(self, namespaces):
         return Info({u'basic': {u'name': _SUBDIR_VERSIONS_FILENAME,
                                 u'is_dir': False}})
 
     def openbin(self, mode, buffering, **options):
-        return StringIO.StringIO()
+        ABOVE_VERSIONS = join(self._original_path, '..', '..')
+        print '>>>>', ABOVE_VERSIONS
+        d = dict([(info.name, "1")
+                  for info in self._big_fs.filterdir(ABOVE_VERSIONS,
+                                                     None, None,
+                                                     [u'v$*'], [u'*'])])
+        return StringIO.StringIO(strSubdirVersions(d))
 
 
 class InitialVersionView(ReadOnlyView):
@@ -421,7 +429,7 @@ class InitialVersionView(ReadOnlyView):
                 # only files in the bundle exist in the filesystem
                 raise ResourceNotFound(path)
             elif parts[-1] == _SUBDIR_VERSIONS_FILENAME:
-                return _FSSubdirVersionsFile(self._legacy_fs, path)
+                return _FSSubdirVersionsFile(self._legacy_fs, path, self)
             if l == 1:
                 # /bundle
                 return _FSBundlePath(self._legacy_fs, path, self._bundle)
