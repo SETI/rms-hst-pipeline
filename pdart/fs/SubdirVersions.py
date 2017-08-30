@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 def parseSubdirVersions(txt):
     # type: (unicode) -> Dict[unicode, unicode]
     d = {}
-    for n, line in enumerate(txt.split('\n')):
+    for n, line in enumerate(unicode(txt).split('\n')):
         line = line.strip()
         if line:
             fields = line.split(' ')
@@ -21,16 +21,19 @@ def parseSubdirVersions(txt):
 
 def strSubdirVersions(d):
     # type: (Dict[unicode, unicode]) -> unicode
-    return ''.join(['%s %s\n' % (k, v) for k, v in sorted(d.items())])
+    return unicode(''.join(['%s %s\n' % (k, v) for k, v in sorted(d.items())]))
 
 
 def readSubdirVersions(fs, dir):
     # type: (FS, unicode) -> Dict[unicode, unicode]
     SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
-    return parseSubdirVersions(fs.gettext(SUBDIR_VERSIONS_FILEPATH))
+    return parseSubdirVersions(fs.gettext(SUBDIR_VERSIONS_FILEPATH,
+                                          encoding='ascii'))
 
 
 def writeSubdirVersions(fs, dir, d):
     # type: (FS, unicode, Dict[unicode, unicode]) -> None
     SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
-    fs.settext(SUBDIR_VERSIONS_FILEPATH, strSubdirVersions(d))
+    fs.settext(SUBDIR_VERSIONS_FILEPATH,
+               strSubdirVersions(d),
+               encoding='ascii')

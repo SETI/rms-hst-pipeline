@@ -1,5 +1,7 @@
 import unittest
 
+import fs.copy
+from pdart.pds4.Archives import get_any_archive
 from pdart.fs.InitialVersionedView import *
 from pdart.fs.VersionedFS import ROOT
 from pdart.fs.VersionedViewTestCases import *
@@ -123,6 +125,9 @@ class TestInitialVersionedView(unittest.TestCase):
 
 class TestInitialVersionedViewAsVersionedView(VersionedViewTestCases,
                                               unittest.TestCase):
+    # TODO Shouldn't this (and VersionedViewTestCases) be a function
+    # instead of a test case?  I'd like to be able to run it on all
+    # bundles in the archive.
     def make_fs(self):
         self.memoryFS = MemoryFS()
         self.memoryFS.makedirs(u'/data_xxx_raw/visit_xx')
@@ -150,3 +155,19 @@ class TestInitialVersionedViewAsVersionedView(VersionedViewTestCases,
         actual = set(readSubdirVersions(self.view, version_dir).keys())
 
         self.assertEqual(expected, actual)
+
+
+@unittest.skip('takes a long time')
+def test_initial_versioned_view_on_archive():
+    """
+    Run through all the bundles in the archive, view them as
+    versioned filesystems, and try to copy them to another
+    (in-memory) filesystem.  See whether anything breaks.
+    """
+    archive = get_any_archive()
+    for bundle in archive.bundles():
+        print bundle
+        with OSFS(bundle.absolute_filepath()) as osfs:
+            view = InitialVersionedView(bundle.lid.bundle_id, osfs)
+            with MemoryFS() as memoryfs:
+                fs.copy.copy_fs(view, memoryfs)

@@ -3,8 +3,6 @@ Work on viewing an archive folder as a versioned filesystem.
 """
 from abc import *
 import io
-import pickle
-import StringIO
 import sys
 import traceback
 from typing import TYPE_CHECKING
@@ -374,8 +372,8 @@ class _FSSubdirVersionsFile(_FSFilePath):
          subdir_versions_file_infos,
          version_dir_infos) = scan_vfs_dir(self._big_fs, ABOVE_VERSIONS)
 
-        d = dict([(info.name, "1") for info in ordinary_dir_infos])
-        return StringIO.StringIO(strSubdirVersions(d))
+        d = dict([(info.name, u"1") for info in ordinary_dir_infos])
+        return io.BytesIO(strSubdirVersions(d).encode('ascii'))
 
 
 class InitialVersionedView(ReadOnlyView):
