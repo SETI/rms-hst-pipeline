@@ -1,12 +1,9 @@
 from typing import TYPE_CHECKING
 from fs.path import join
 
+from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 if TYPE_CHECKING:
     from fs.base import FS
-
-
-_SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
-# type: unicode
 
 
 def parseSubdirVersions(txt):
@@ -29,11 +26,11 @@ def strSubdirVersions(d):
 
 def readSubdirVersions(fs, dir):
     # type: (FS, unicode) -> Dict[unicode, unicode]
-    SUBDIR_VERSIONS_FILEPATH = join(dir, _SUBDIR_VERSIONS_FILENAME)
+    SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
     return parseSubdirVersions(fs.gettext(SUBDIR_VERSIONS_FILEPATH))
 
 
 def writeSubdirVersions(fs, dir, d):
     # type: (FS, unicode, Dict[unicode, unicode]) -> None
-    SUBDIR_VERSIONS_FILEPATH = join(dir, _SUBDIR_VERSIONS_FILENAME)
+    SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
     fs.settext(SUBDIR_VERSIONS_FILEPATH, strSubdirVersions(d))

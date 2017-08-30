@@ -1,25 +1,13 @@
-from pdart.fs.InitialVersionedView import *
-from pdart.fs.VersionedViewTestCases import *
 import unittest
+
+from pdart.fs.InitialVersionedView import *
+from pdart.fs.VersionedFS import ALL_PATS, ROOT, SUBDIR_VERSIONS_FILENAME, \
+    VERSION_DIR_PATS
+from pdart.fs.VersionedViewTestCases import *
 
 from fs.memoryfs import MemoryFS
 
-_ROOT = u'/'
-# type: unicode
-
-_V1 = u'v$1'
-# type: unicode
-
 _BUNDLE_ID = u'hst_00000'
-# type: unicode
-
-_ALL = [u'*']
-# type: List[unicode]
-
-_VERSION_DIRS = [u'v$*']
-# type: List[unicode]
-
-_SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
 # type: unicode
 
 
@@ -34,26 +22,26 @@ class TestInitialVersionedView(unittest.TestCase):
         Test that the proper hierarchy is synthesized even for an
         empty legacy filesystem.
         """
-        BUNDLE_DIR = join(_ROOT, _BUNDLE_ID)
-        self.assertTrue(self.view.exists(_ROOT))
-        self.assertTrue(self.view.isdir(_ROOT))
-        self.assertEqual([_BUNDLE_ID], self.view.listdir(_ROOT))
+        BUNDLE_DIR = join(ROOT, _BUNDLE_ID)
+        self.assertTrue(self.view.exists(ROOT))
+        self.assertTrue(self.view.isdir(ROOT))
+        self.assertEqual([_BUNDLE_ID], self.view.listdir(ROOT))
         self.assertTrue(self.view.exists(BUNDLE_DIR))
         self.assertTrue(self.view.isdir(BUNDLE_DIR))
-        self.assertEqual([_V1], self.view.listdir(BUNDLE_DIR))
+        self.assertEqual([VERSION_ONE], self.view.listdir(BUNDLE_DIR))
 
-        BUNDLE_DIR_V1 = join(BUNDLE_DIR, _V1)
+        BUNDLE_DIR_V1 = join(BUNDLE_DIR, VERSION_ONE)
         self.assertTrue(self.view.exists(BUNDLE_DIR_V1))
         self.assertTrue(self.view.isdir(BUNDLE_DIR_V1))
-        self.assertEqual([_SUBDIR_VERSIONS_FILENAME],
+        self.assertEqual([SUBDIR_VERSIONS_FILENAME],
                          self.view.listdir(BUNDLE_DIR_V1))
 
         # add a label
         BUNDLE_LABEL_FILENAME = u'bundle.xml'
         self.legacy_fs.touch(BUNDLE_LABEL_FILENAME)
-        BUNDLE_LABEL_FILEPATH = join(_ROOT,
+        BUNDLE_LABEL_FILEPATH = join(ROOT,
                                      _BUNDLE_ID,
-                                     _V1,
+                                     VERSION_ONE,
                                      BUNDLE_LABEL_FILENAME)
         self.assertTrue(self.view.exists(BUNDLE_LABEL_FILEPATH))
         self.assertTrue(self.view.isfile(BUNDLE_LABEL_FILEPATH))
@@ -65,25 +53,25 @@ class TestInitialVersionedView(unittest.TestCase):
         empty collection in a legacy filesystem.
         """
         COLLECTION_ID = u'data_xxx_raw'
-        COLLECTION_DIR = join(_ROOT, _BUNDLE_ID, COLLECTION_ID)
+        COLLECTION_DIR = join(ROOT, _BUNDLE_ID, COLLECTION_ID)
         self.legacy_fs.makedir(COLLECTION_ID)
         self.assertTrue(self.view.exists(COLLECTION_DIR))
         self.assertTrue(self.view.isdir(COLLECTION_DIR))
-        self.assertEqual([_V1], self.view.listdir(COLLECTION_DIR))
+        self.assertEqual([VERSION_ONE], self.view.listdir(COLLECTION_DIR))
 
-        COLLECTION_DIR_V1 = join(COLLECTION_DIR, _V1)
+        COLLECTION_DIR_V1 = join(COLLECTION_DIR, VERSION_ONE)
         self.assertTrue(self.view.exists(COLLECTION_DIR_V1))
         self.assertTrue(self.view.isdir(COLLECTION_DIR_V1))
-        self.assertEqual([_SUBDIR_VERSIONS_FILENAME],
+        self.assertEqual([SUBDIR_VERSIONS_FILENAME],
                          self.view.listdir(COLLECTION_DIR_V1))
 
         # add a label
         COLLECTION_LABEL_FILENAME = u'collection.xml'
         self.legacy_fs.touch(join(COLLECTION_ID, COLLECTION_LABEL_FILENAME))
-        COLLECTION_LABEL_FILEPATH = join(_ROOT,
+        COLLECTION_LABEL_FILEPATH = join(ROOT,
                                          _BUNDLE_ID,
                                          COLLECTION_ID,
-                                         _V1,
+                                         VERSION_ONE,
                                          COLLECTION_LABEL_FILENAME)
         self.assertTrue(self.view.exists(COLLECTION_LABEL_FILEPATH))
         self.assertTrue(self.view.isfile(COLLECTION_LABEL_FILEPATH))
@@ -95,11 +83,11 @@ class TestInitialVersionedView(unittest.TestCase):
         single product in a legacy filesystem.
         """
         COLLECTION_ID = u'data_xxx_raw'
-        COLLECTION_DIR = join(_ROOT, _BUNDLE_ID, COLLECTION_ID)
+        COLLECTION_DIR = join(ROOT, _BUNDLE_ID, COLLECTION_ID)
         VISIT = u'visit_xx'
         PRODUCT_ID = u'u2q9xx01j_raw'
         PRODUCT_DIR = join(COLLECTION_DIR, PRODUCT_ID)
-        PRODUCT_DIR_V1 = join(PRODUCT_DIR, _V1)
+        PRODUCT_DIR_V1 = join(PRODUCT_DIR, VERSION_ONE)
         FITS_FILENAME = PRODUCT_ID + '.fits'
         FITS_FILEPATH = join(PRODUCT_DIR_V1, FITS_FILENAME)
 
@@ -108,11 +96,11 @@ class TestInitialVersionedView(unittest.TestCase):
 
         self.assertTrue(self.view.exists(PRODUCT_DIR))
         self.assertTrue(self.view.isdir(PRODUCT_DIR))
-        self.assertEquals([_V1], self.view.listdir(PRODUCT_DIR))
+        self.assertEquals([VERSION_ONE], self.view.listdir(PRODUCT_DIR))
 
         self.assertTrue(self.view.exists(PRODUCT_DIR_V1))
         self.assertTrue(self.view.isdir(PRODUCT_DIR_V1))
-        self.assertEquals(set([FITS_FILENAME, _SUBDIR_VERSIONS_FILENAME]),
+        self.assertEquals(set([FITS_FILENAME, SUBDIR_VERSIONS_FILENAME]),
                           set(self.view.listdir(PRODUCT_DIR_V1)))
 
         self.assertTrue(self.view.exists(FITS_FILEPATH))
@@ -123,11 +111,11 @@ class TestInitialVersionedView(unittest.TestCase):
         self.legacy_fs.touch(join(COLLECTION_ID,
                                   VISIT,
                                   PRODUCT_LABEL_FILENAME))
-        PRODUCT_LABEL_FILEPATH = join(_ROOT,
+        PRODUCT_LABEL_FILEPATH = join(ROOT,
                                       _BUNDLE_ID,
                                       COLLECTION_ID,
                                       PRODUCT_ID,
-                                      _V1,
+                                      VERSION_ONE,
                                       PRODUCT_LABEL_FILENAME)
         self.assertTrue(self.view.exists(PRODUCT_LABEL_FILEPATH))
         self.assertTrue(self.view.isfile(PRODUCT_LABEL_FILEPATH))
@@ -158,7 +146,7 @@ class TestInitialVersionedViewAsVersionedView(VersionedViewTestCases,
                        for info
                        in self.view.filterdir(join(version_dir, '..'),
                                               None, None,
-                                              _VERSION_DIRS, _ALL))
+                                              VERSION_DIR_PATS, ALL_PATS))
 
         actual = set(readSubdirVersions(self.view, version_dir).keys())
 

@@ -2,10 +2,7 @@ import unittest
 from fs.memoryfs import MemoryFS
 
 from pdart.fs.SubdirVersions import *
-
-
-_SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
-# type: unicode
+from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME
 
 
 class TestSubdirVersions(unittest.TestCase):
@@ -26,13 +23,13 @@ foo 1
 
     def testWriteSubdirVersions(self):
         fs = MemoryFS()
-        writeSubdirVersions(fs, u'/', self.d)
-        self.assertEqual(self.txt, fs.gettext(_SUBDIR_VERSIONS_FILENAME))
+        writeSubdirVersions(fs, ROOT, self.d)
+        self.assertEqual(self.txt, fs.gettext(SUBDIR_VERSIONS_FILENAME))
         fs.close()
 
     def testReadSubdirVersions(self):
         fs = MemoryFS()
-        fs.settext(_SUBDIR_VERSIONS_FILENAME, self.txt)
-        d = readSubdirVersions(fs, u'/')
+        fs.settext(SUBDIR_VERSIONS_FILENAME, self.txt)
+        d = readSubdirVersions(fs, ROOT)
         self.assertEqual(self.d, d)
         fs.close()

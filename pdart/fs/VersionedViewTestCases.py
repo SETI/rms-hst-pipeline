@@ -1,20 +1,13 @@
 import abc
 from typing import TYPE_CHECKING
-from fs.path import join
+from fs.path import basename, join
 
 from pdart.fs.SubdirVersions import readSubdirVersions
+from pdart.fs.VersionedFS import ALL_PATS, ROOT, SUBDIR_VERSIONS_FILENAME, \
+    VERSION_DIR_PATS
 
 if TYPE_CHECKING:
     from typing import List
-
-_ALL = [u'*']
-# type: List[unicode]
-
-_VERSION_DIRS = [u'v$*']
-# type: List[unicode]
-
-_SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
-# type: unicode
 
 
 class VersionedViewTestCases(object):
@@ -41,16 +34,18 @@ class VersionedViewTestCases(object):
         # are version directories and collection directories.
         files = [info.name
                  for info in self.view.filterdir(bundle_dir,
-                                                 _ALL, None,
-                                                 _ALL, None)]
+                                                 ALL_PATS, None,
+                                                 ALL_PATS, None)]
 
         # No files in the bundle dir
         self.assertFalse(files)
 
         bundle_versions = [info.name
                            for info in self.view.filterdir(bundle_dir,
-                                                           None, _VERSION_DIRS,
-                                                           None, _ALL)]
+                                                           None,
+                                                           VERSION_DIR_PATS,
+                                                           None,
+                                                           ALL_PATS)]
         # at least one version dir
         self.assertTrue(len(bundle_versions) >= 1)
 
@@ -58,8 +53,8 @@ class VersionedViewTestCases(object):
         collections = [info.name
                        for info
                        in self.view.filterdir(bundle_dir,
-                                              None, _ALL,
-                                              _VERSION_DIRS, None)]
+                                              None, ALL_PATS,
+                                              VERSION_DIR_PATS, None)]
         self.assertEqual(set(self.view.listdir(bundle_dir)),
                          set(bundle_versions + collections))
 
@@ -78,8 +73,8 @@ class VersionedViewTestCases(object):
         # are version directories and product directories.
         files = [info.name
                  for info in self.view.filterdir(collection_dir,
-                                                 _ALL, None,
-                                                 _ALL, None)]
+                                                 ALL_PATS, None,
+                                                 ALL_PATS, None)]
 
         # No files in the collection dir
         self.assertFalse(files)
@@ -87,16 +82,16 @@ class VersionedViewTestCases(object):
         collection_versions = [info.name
                                for info
                                in self.view.filterdir(collection_dir,
-                                                      None, _VERSION_DIRS,
-                                                      None, _ALL)]
+                                                      None, VERSION_DIR_PATS,
+                                                      None, ALL_PATS)]
         # at least one version dir
         self.assertTrue(len(collection_versions) >= 1)
 
         # version and collection dirs are all
         products = [info.name
                     for info in self.view.filterdir(collection_dir,
-                                                    None, _ALL,
-                                                    _VERSION_DIRS, None)]
+                                                    None, ALL_PATS,
+                                                    VERSION_DIR_PATS, None)]
         self.assertEqual(set(self.view.listdir(collection_dir)),
                          set(collection_versions + products))
 
@@ -115,8 +110,8 @@ class VersionedViewTestCases(object):
         # are version directories and product directories.
         files = [info.name
                  for info in self.view.filterdir(product_dir,
-                                                 _ALL, None,
-                                                 _ALL, None)]
+                                                 ALL_PATS, None,
+                                                 ALL_PATS, None)]
 
         # No files in the product dir
         self.assertFalse(files)
@@ -124,8 +119,8 @@ class VersionedViewTestCases(object):
         product_versions = [info.name
                             for info
                             in self.view.filterdir(product_dir,
-                                                   None, _VERSION_DIRS,
-                                                   None, _ALL)]
+                                                   None, VERSION_DIR_PATS,
+                                                   None, ALL_PATS)]
         # at least one version dir
         self.assertTrue(len(product_versions) >= 1)
 
@@ -140,9 +135,11 @@ class VersionedViewTestCases(object):
     def check_version_dir(self, version_dir):
         # type: (unicode) -> None
 
-        # version dirs contain subdir$versions.txt file
+        assert basename(version_dir)[0:2] == 'v$'
+        # All version dirs must contain a subdir versions file
         SUBDIR_VERSIONS_FILEPATH = join(version_dir,
-                                        _SUBDIR_VERSIONS_FILENAME)
+                                        SUBDIR_VERSIONS_FILENAME)
+
         self.assertTrue(self.view.exists(SUBDIR_VERSIONS_FILEPATH))
         self.assertTrue(self.view.isfile(SUBDIR_VERSIONS_FILEPATH))
 
@@ -153,7 +150,7 @@ class VersionedViewTestCases(object):
         # version dirs contain only files
         self.assertFalse(list(self.view.filterdir(version_dir,
                                                   None, None,
-                                                  _VERSION_DIRS, _ALL)))
+                                                  VERSION_DIR_PATS, ALL_PATS)))
 
     def check_subdir_versions_file(self,
                                    version_dir):
@@ -166,12 +163,12 @@ class VersionedViewTestCases(object):
             self.view.isdir(subdir)
 
     def test_has_bundle_dirs(self):
-        self.view.isdir(u'/')
+        self.view.isdir(ROOT)
         # There is only one directory under root, corresponding to the
         # bundle.
-        self.assertEquals(1, len(self.view.listdir(u'/')))
-        BUNDLE_NAME = self.view.listdir(u'/')[0]
-        BUNDLE_DIR = join(u'/', BUNDLE_NAME)
+        self.assertEquals(1, len(self.view.listdir(ROOT)))
+        BUNDLE_NAME = self.view.listdir(ROOT)[0]
+        BUNDLE_DIR = join(ROOT, BUNDLE_NAME)
         self.check_bundle_dir(BUNDLE_DIR)
 
     # We implement unittest.TestCase's methods conditionally, only to

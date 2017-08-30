@@ -1,0 +1,52 @@
+# TODO Describe a versioned filesystem here.
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List, Tuple
+    from fs.base import FS
+    from fs.info import Info
+
+    _INFOS = List[Info]
+
+ROOT = u'/'
+# type: unicode
+
+SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
+# type: unicode
+
+VERSION_DIR_PATS = [u'v$*']
+# type: List[unicode]
+
+ALL_PATS = [u'*']
+# type: List[unicode]
+
+
+def scan_vfs_dir(fs, dir, namespaces=None):
+    """
+    Returns a 4-tuple of (ordinary-file infos, ordinary-directory
+    infos, subdir-versions-file infos, version-directory infos).  This
+    lets us separate "real" files and dirs from the "bookkeeping"
+    ones.
+    """
+    # type: (FS, unicode, Tuple) -> Tuple[_INFOS, _INFOS, _INFOS, _INFOS]
+    infos = fs.scandir(dir, namespaces=namespaces)
+    file_infos = [info for info in infos if info.is_file]
+    dir_infos = [info for info in infos if info.is_dir]
+
+    ordinary_file_infos = [info
+                           for info in file_infos
+                           if info.name != SUBDIR_VERSIONS_FILENAME]
+    subdir_versions_file_infos = [info
+                                  for info in file_infos
+                                  if info.name == SUBDIR_VERSIONS_FILENAME]
+    ordinary_dir_infos = [info
+                          for info in dir_infos
+                          if info.name[0:2] != 'v$']
+    version_dir_infos = [info
+                         for info in dir_infos
+                         if info.name[0:2] == 'v$']
+    return (ordinary_file_infos,
+            ordinary_dir_infos,
+            subdir_versions_file_infos,
+            version_dir_infos)
