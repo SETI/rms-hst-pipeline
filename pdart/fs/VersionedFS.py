@@ -15,11 +15,8 @@ ROOT = u'/'
 SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
 # type: unicode
 
-VERSION_DIR_PATS = [u'v$*']
-# type: List[unicode]
-
-ALL_PATS = [u'*']
-# type: List[unicode]
+_VERSION_DIR_PREFIX = u'v$'
+# type: unicode
 
 
 def scan_vfs_dir(fs, dir, namespaces=None):
@@ -30,7 +27,7 @@ def scan_vfs_dir(fs, dir, namespaces=None):
     ones.
     """
     # type: (FS, unicode, Tuple) -> Tuple[_INFOS, _INFOS, _INFOS, _INFOS]
-    infos = fs.scandir(dir, namespaces=namespaces)
+    infos = list(fs.scandir(dir, namespaces=namespaces))
     file_infos = [info for info in infos if info.is_file]
     dir_infos = [info for info in infos if info.is_dir]
 
@@ -42,10 +39,10 @@ def scan_vfs_dir(fs, dir, namespaces=None):
                                   if info.name == SUBDIR_VERSIONS_FILENAME]
     ordinary_dir_infos = [info
                           for info in dir_infos
-                          if info.name[0:2] != 'v$']
+                          if info.name[0:2] != _VERSION_DIR_PREFIX]
     version_dir_infos = [info
                          for info in dir_infos
-                         if info.name[0:2] == 'v$']
+                         if info.name[0:2] == _VERSION_DIR_PREFIX]
     return (ordinary_file_infos,
             ordinary_dir_infos,
             subdir_versions_file_infos,

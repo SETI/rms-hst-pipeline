@@ -1,8 +1,7 @@
 import unittest
 
 from pdart.fs.InitialVersionedView import *
-from pdart.fs.VersionedFS import ALL_PATS, ROOT, SUBDIR_VERSIONS_FILENAME, \
-    VERSION_DIR_PATS
+from pdart.fs.VersionedFS import ROOT
 from pdart.fs.VersionedViewTestCases import *
 
 from fs.memoryfs import MemoryFS
@@ -142,11 +141,11 @@ class TestInitialVersionedViewAsVersionedView(VersionedViewTestCases,
         # In a filesystem with only one version, we have one
         # additional condition: all subdirectories in the filesystem
         # should appear in the subdir_versions file.
-        expected = set(info.name
-                       for info
-                       in self.view.filterdir(join(version_dir, '..'),
-                                              None, None,
-                                              VERSION_DIR_PATS, ALL_PATS))
+        (ordinary_file_infos,
+         ordinary_dir_infos,
+         subdir_versions_file_infos,
+         version_dir_infos) = scan_vfs_dir(self.view, join(version_dir, '..'))
+        expected = set(info.name for info in ordinary_dir_infos)
 
         actual = set(readSubdirVersions(self.view, version_dir).keys())
 

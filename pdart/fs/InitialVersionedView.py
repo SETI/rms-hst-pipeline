@@ -22,8 +22,8 @@ from fs.tempfs import TempFS
 
 from pdart.fs.ReadOnlyView import ReadOnlyView
 from pdart.fs.SubdirVersions import strSubdirVersions
-from pdart.fs.VersionedFS import ALL_PATS, ROOT, SUBDIR_VERSIONS_FILENAME, \
-    VERSION_DIR_PATS
+from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME, \
+    scan_vfs_dir
 
 if TYPE_CHECKING:
     from typing import Any, AnyStr, Tuple
@@ -42,6 +42,9 @@ def _is_root(path):
 def _is_version_part(part):
     # type: (unicode) -> bool
     return part.startswith(u'v$')
+
+_ALL_PATS = [u'*']
+# type: List[unicode]
 
 VERSION_ONE = u'v$1'
 # type: unicode
@@ -234,7 +237,7 @@ class _FSBundleVersionDirPath(_FSDirPath):
             ROOT,
             files=None,
             dirs=None,
-            exclude_dirs=ALL_PATS,
+            exclude_dirs=_ALL_PATS,
             exclude_files=FILE_EXCLUSION_PATS)
         return [info.name
                 for info in infos
@@ -260,7 +263,7 @@ class _FSCollectionVersionDirPath(_FSDirPath):
             join(ROOT, c),
             files=None,
             dirs=None,
-            exclude_dirs=ALL_PATS,
+            exclude_dirs=_ALL_PATS,
             exclude_files=FILE_EXCLUSION_PATS)
         return [info.name
                 for info in infos
@@ -365,11 +368,13 @@ class _FSSubdirVersionsFile(_FSFilePath):
 
     def openbin(self, mode, buffering, **options):
         ABOVE_VERSIONS = join(self._original_path, '..', '..')
-        d = dict([(info.name, "1")
-                  for info in self._big_fs.filterdir(ABOVE_VERSIONS,
-                                                     None, None,
-                                                     VERSION_DIR_PATS,
-                                                     ALL_PATS)])
+
+        (ordinary_file_infos,
+         ordinary_dir_infos,
+         subdir_versions_file_infos,
+         version_dir_infos) = scan_vfs_dir(self._big_fs, ABOVE_VERSIONS)
+
+        d = dict([(info.name, "1") for info in ordinary_dir_infos])
         return StringIO.StringIO(strSubdirVersions(d))
 
 
@@ -458,7 +463,7 @@ class InitialVersionedView(ReadOnlyView):
         return self._legacy_fs.filterdir(
             collection_path,
             files=None, dirs=[_VISIT_DIR_PAT],
-            exclude_dirs=None, exclude_files=ALL_PATS)
+            exclude_dirs=None, exclude_files=_ALL_PATS)
 
     def _get_collections(self):
         return [info.name
@@ -467,7 +472,7 @@ class InitialVersionedView(ReadOnlyView):
                                              files=None,
                                              dirs=['data_*'],
                                              exclude_dirs=None,
-                                             exclude_files=ALL_PATS)]
+                                             exclude_files=_ALL_PATS)]
 
     def _get_collection_files(self, collection_path):
         # type: (unicode) -> List[Tuple[unicode, unicode]]
@@ -499,7 +504,7 @@ class InitialVersionedView(ReadOnlyView):
                 path,
                 files=None,
                 dirs=None,
-                exclude_dirs=ALL_PATS,
+                exclude_dirs=_ALL_PATS,
                 exclude_files=FILE_EXCLUSION_PATS)]
 
     def getinfo(self, path, namespaces=None):
