@@ -5,13 +5,13 @@ from fs.path import join
 if TYPE_CHECKING:
     from typing import List
 
-_ALL = ['*']
+_ALL = [u'*']
 # type: List[unicode]
 
-_VERSION_DIRS = ['v$*']
+_VERSION_DIRS = [u'v$*']
 # type: List[unicode]
 
-_SUBDIR_VERSIONS_FILENAME = 'subdir$versions.txt'
+_SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
 # type: unicode
 
 

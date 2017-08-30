@@ -13,13 +13,13 @@ _V1 = u'v$1'
 _BUNDLE_ID = u'hst_00000'
 # type: unicode
 
-_ALL = ['*']
+_ALL = [u'*']
 # type: List[unicode]
 
-_VERSION_DIRS = ['v$*']
+_VERSION_DIRS = [u'v$*']
 # type: List[unicode]
 
-_SUBDIR_VERSIONS_FILENAME = 'subdir$versions.txt'
+_SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
 # type: unicode
 
 
