@@ -4,7 +4,7 @@ import fs.copy
 from pdart.pds4.Archives import get_any_archive
 from pdart.fs.InitialVersionedView import *
 from pdart.fs.VersionedFS import ROOT
-from pdart.fs.VersionedViewTestCases import *
+from pdart.fs.VersionedViewVerifier import *
 
 from fs.memoryfs import MemoryFS
 
@@ -123,25 +123,20 @@ class TestInitialVersionedView(unittest.TestCase):
         self.assertEquals("", self.view.gettext(PRODUCT_LABEL_FILEPATH))
 
 
-class TestInitialVersionedViewAsVersionedView(VersionedViewTestCases,
-                                              unittest.TestCase):
-    # TODO Shouldn't this (and VersionedViewTestCases) be a function
-    # instead of a test case?  I'd like to be able to run it on all
-    # bundles in the archive.
-    def make_fs(self):
-        self.memoryFS = MemoryFS()
-        self.memoryFS.makedirs(u'/data_xxx_raw/visit_xx')
-        self.memoryFS.touch(u'/data_xxx_raw/visit_xx/u2q9xx01j_raw.fits')
-        return InitialVersionedView(_BUNDLE_ID, self.memoryFS)
+def test_initial_versioned_view_as_versioned_view():
+    # type: () -> None
+    with MemoryFS() as memoryFS:
+        memoryFS.makedirs(u'/data_xxx_raw/visit_xx')
+        memoryFS.touch(u'/data_xxx_raw/visit_xx/u2q9xx01j_raw.fits')
+        with InitialVersionedView(_BUNDLE_ID, memoryFS) as fs:
+            InitialVersionedViewVerifier(fs)
 
-    def destroy_fs(self, fs):
-        fs.close()
-        self.memoryFS.close()
 
+class InitialVersionedViewVerifier(VersionedViewVerifier):
     def check_subdir_versions_file(self,
                                    version_dir):
         # call the superclass's version for standard tests
-        VersionedViewTestCases.check_subdir_versions_file(self, version_dir)
+        VersionedViewVerifier.check_subdir_versions_file(self, version_dir)
 
         # In a filesystem with only one version, we have one
         # additional condition: all subdirectories in the filesystem
@@ -160,8 +155,8 @@ class TestInitialVersionedViewAsVersionedView(VersionedViewTestCases,
 @unittest.skip('takes a long time')
 def test_initial_versioned_view_on_archive():
     """
-    Run through all the bundles in the archive, view them as
-    versioned filesystems, and try to copy them to another
+    Run through all the bundles in the archive, view them as versioned
+    filesystems, and try to verify them , then copy them to another
     (in-memory) filesystem.  See whether anything breaks.
     """
     archive = get_any_archive()
@@ -169,5 +164,6 @@ def test_initial_versioned_view_on_archive():
         print bundle
         with OSFS(bundle.absolute_filepath()) as osfs:
             view = InitialVersionedView(bundle.lid.bundle_id, osfs)
+            InitialVersionedViewVerifier(view)
             with MemoryFS() as memoryfs:
                 fs.copy.copy_fs(view, memoryfs)

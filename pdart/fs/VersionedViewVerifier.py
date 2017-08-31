@@ -7,24 +7,23 @@ from pdart.fs.VersionedFS import ROOT, scan_vfs_dir, SUBDIR_VERSIONS_FILENAME
 
 if TYPE_CHECKING:
     from typing import List
+    from fs.base import FS
 
 
-class VersionedViewTestCases(object):
+class VersionedViewException(Exception):
+    def __init__(self, value):
+        Exception.__init__(self, value)
+
+
+class VersionedViewVerifier(object):
     """
-    A set of test cases that should hold for any VersionedView, that
-    is, any filesystem organized to include versioning.
+    Verification for a VersionedView, that is, any filesystem
+    organized to include versioning.
     """
-    def make_fs(self):
-        raise NotImplementedError('implement me')
-
-    def setUp(self):
-        self.view = self.make_fs()
-
-    def destroy_fs(self, fs):
-        fs.close()
-
-    def tearDown(self):
-        self.destroy_fs(self.view)
+    def __init__(self, view):
+        # type: (FS) -> None
+        self.view = view
+        self.test_has_bundle_dirs()
 
     def check_bundle_dir(self, bundle_dir):
         # type: (unicode) -> None
@@ -139,6 +138,7 @@ class VersionedViewTestCases(object):
 
     def check_subdir_versions_file(self,
                                    version_dir):
+        # type: (unicode) -> None
         d = readSubdirVersions(self.view, version_dir)
         for subdir_name, version in d.items():
             # each subdirectory entry must correspond to an
@@ -148,22 +148,29 @@ class VersionedViewTestCases(object):
             self.view.isdir(subdir)
 
     def test_has_bundle_dirs(self):
+        # type: () -> None
         self.view.isdir(ROOT)
         # There is only one directory under root, corresponding to the
         # bundle.
-        self.assertEquals(1, len(self.view.listdir(ROOT)))
+        self.assertEqual(1, len(self.view.listdir(ROOT)))
         BUNDLE_NAME = self.view.listdir(ROOT)[0]
         BUNDLE_DIR = join(ROOT, BUNDLE_NAME)
         self.check_bundle_dir(BUNDLE_DIR)
 
-    # We implement unittest.TestCase's methods conditionally, only to
-    # keep mypy happy.
-    if TYPE_CHECKING:
-        def assertTrue(self, cond, msg=None):
-            raise NotImplementedError('implement me')
+    def assertTrue(self, cond, msg=None):
+        if not cond:
+            raise VersionedViewException(msg)
 
-        def assertFalse(self, cond, msg=None):
-            raise NotImplementedError('implement me')
+    def assertFalse(self, cond, msg=None):
+        if cond:
+            raise VersionedViewException(msg)
 
-        def assertEqual(self, lhs, rhs, msg=None):
-            raise NotImplementedError('implement me')
+    def assertEqual(self, lhs, rhs, msg=None):
+        cond = lhs == rhs
+        if not cond:
+            msg2 = "%s != %s" % (lhs, rhs)
+            if msg:
+                val = (msg, msg2)
+            else:
+                val = msg2
+            raise VersionedViewException(val)
