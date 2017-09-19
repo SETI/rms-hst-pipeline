@@ -390,21 +390,6 @@ class InitialVersionedView(ReadOnlyView):
         # self._legacy_fs = OSFS(bundle_dir)
         ReadOnlyView.__init__(self, self._legacy_fs)
 
-    def _delegate_file_path(self, path):
-        # type: (unicode) -> Tuple[FS, unicode]
-        res = None, None
-        # type: Tuple[FS, unicode]
-        if not _is_root(path):
-            parts = iteratepath(path)
-            if parts[0] == self._bundle:
-                if parts[1:]:
-                    res = self._legacy_fs, join(*parts[1:])
-                else:
-                    res = self._legacy_fs, ROOT
-            else:
-                raise ResourceNotFound(path)
-        return res
-
     def _make_fs_path(self, path):
         # type: (unicode) -> _FSPath
         path = abspath(normpath(path))
