@@ -136,12 +136,19 @@ class _FSBundleFile(_FSFilePath):
 
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
-        return self._legacy_fs.openbin(mode, buffering, **options)
+        return self._legacy_fs.openbin(self._legacy_path, mode,
+                                       buffering, **options)
 
 
 class _FSCollectionPath(_FSDirPath):
-    def __init__(self, fs, path):
+    """
+    A path '/bundle/collection'
+    """
+    def __init__(self, fs, path, legacy_dirpath):
         _FSDirPath.__init__(self, fs, path)
+        # legacy_dirpath is /bundle/collection/v$n
+        assert len(iteratepath(legacy_dirpath)) == 3
+        self._legacy_dirpath = legacy_dirpath
 
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
@@ -149,7 +156,60 @@ class _FSCollectionPath(_FSDirPath):
 
     def listdir(self):
         # type: () -> List[unicode]
-        assert False
+        parts = iteratepath(self._original_path)
+        assert len(parts) == 2, self._original_path
+
+        files = [info.name
+                 for info in self._legacy_fs.scandir(self._legacy_dirpath)
+                 if info.is_file and not info.name == SUBDIR_VERSIONS_FILENAME]
+        versions = readSubdirVersions(self._legacy_fs, self._legacy_dirpath)
+        dirs = versions.keys()
+        return files + dirs
+
+
+class _FSProductPath(_FSDirPath):
+    """
+    A path '/bundle/collection/product'
+    """
+    def __init__(self, fs, path, legacy_dirpath):
+        _FSDirPath.__init__(self, fs, path)
+        # legacy_dirpath is /bundle/collection/product/v$n
+        assert len(iteratepath(legacy_dirpath)) == 4
+        self._legacy_dirpath = legacy_dirpath
+
+    def getinfo(self, namespaces):
+        # type: (Tuple) -> Info
+        return Info(_make_raw_dir_info(basename(self._original_path)))
+
+    def listdir(self):
+        # type: () -> List[unicode]
+        parts = iteratepath(self._original_path)
+        assert len(parts) == 3, self._original_path
+
+        files = [info.name
+                 for info in self._legacy_fs.scandir(self._legacy_dirpath)
+                 if info.is_file and not info.name == SUBDIR_VERSIONS_FILENAME]
+        versions = readSubdirVersions(self._legacy_fs, self._legacy_dirpath)
+        dirs = versions.keys()
+        return files + dirs
+
+
+class _FSCollectionFile(_FSFilePath):
+    """
+    A path '/bundle/collection/file'
+    """
+    def __init__(self, fs, path, legacy_path):
+        assert len(iteratepath(path)) == 3
+        _FSFilePath.__init__(self, fs, path)
+        self._legacy_path = legacy_path
+
+    def getinfo(self, namespaces):
+        return self._legacy_fs.getinfo(self._legacy_path)
+
+    def openbin(self, mode, buffering, **options):
+        # type: (AnyStr, int, **Any) -> Any
+        return self._legacy_fs.openbin(self._legacy_path, mode,
+                                       buffering, **options)
 
 
 class VersionView(ReadOnlyView):
@@ -187,9 +247,11 @@ class VersionView(ReadOnlyView):
                 legacy_path_if_file = join(BUNDLE_DIRPATH,
                                            basename(path))
                 if self._legacy_fs.exists(legacy_path_if_file):
+                    # /bundle/file
                     return _FSBundleFile(self._legacy_fs, path,
                                          legacy_path_if_file)
 
+                # /bundle/collection
                 legacy_bundle_dirpath = join(ROOT, self._bundle_id,
                                              u'v$%s' % self._version_id)
 
@@ -205,7 +267,49 @@ class VersionView(ReadOnlyView):
 
                 assert self._legacy_fs.exists(legacy_collection_dirpath), \
                     legacy_collection_dirpath
-                return _FSCollectionPath(self._legacy_fs, path)
+                return _FSCollectionPath(self._legacy_fs, path,
+                                         legacy_collection_dirpath)
+            elif l == 3:
+                # /bundle/collection/product or /bundle/collection/file
+                legacy_bundle_dirpath = join(ROOT, self._bundle_id,
+                                             u'v$%s' % self._version_id)
+
+                bundleSubdirVersions = readSubdirVersions(
+                    self._legacy_fs,
+                    legacy_bundle_dirpath)
+                try:
+                    collection_version = bundleSubdirVersions[parts[1]]
+                except KeyError:
+                    raise ResourceNotFound(path)
+                COLLECTION_DIRPATH = join(ROOT, self._bundle_id,
+                                          parts[1], collection_version)
+
+                legacy_path_if_file = join(COLLECTION_DIRPATH,
+                                           basename(path))
+                if self._legacy_fs.exists(legacy_path_if_file):
+                    # /bundle/collection/file
+                    return _FSCollectionFile(self._legacy_fs, path,
+                                             legacy_path_if_file)
+                # /bundle/collection/product
+                legacy_collection_dirpath = join(ROOT, self._bundle_id,
+                                                 parts[1],
+                                                 collection_version)
+                assert self._legacy_fs.exists(legacy_collection_dirpath), \
+                    legacy_collection_dirpath
+
+                collectionSubdirVersions = readSubdirVersions(
+                    self._legacy_fs,
+                    legacy_collection_dirpath)
+                try:
+                    product_version = collectionSubdirVersions[parts[2]]
+                except KeyError:
+                    raise ResourceNotFound(path)
+                legacy_product_dirpath = join(ROOT, self._bundle_id,
+                                              parts[1], parts[2],
+                                              product_version)
+
+                return _FSProductPath(self._legacy_fs, path,
+                                      legacy_product_dirpath)
             else:
                 assert False, '_make_fs_path(%r) unimplemented' % path
 

@@ -76,7 +76,6 @@ class TestVersionView(unittest.TestCase):
         self.assertTrue(self.version_view.exists(
                 join(ROOT, _BUNDLE_ID, u'bundle.xml')))
 
-    @unittest.skip('not done yet')
     def test_collection_dir(self):
         # type: () -> None
         COLLECTION_DIR = join(ROOT, _BUNDLE_ID, _COLLECTION_ID)
@@ -85,11 +84,12 @@ class TestVersionView(unittest.TestCase):
         self.assertEqual([_PRODUCT_ID],
                          self.version_view.listdir(COLLECTION_DIR))
 
-        # test that files appear
+        # test that files don't appear when wrong version
         self.versioned_fs.touch(join(COLLECTION_DIR, u'v$1',
                                      u'collection.xml'))
         self.assertFalse(self.version_view.exists(join(COLLECTION_DIR,
                                                        u'collection.xml')))
+        # test that files do appear when right version
         self.versioned_fs.touch(join(COLLECTION_DIR, u'v$2',
                                      u'collection.xml'))
         self.assertTrue(self.version_view.exists(
