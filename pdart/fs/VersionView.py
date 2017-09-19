@@ -111,9 +111,9 @@ class _FSBundlePath(_FSDirPath):
 
     def listdir(self):
         # type: () -> List[unicode]
-        legacy_dirpath = join(u'/',
+        legacy_dirpath = join(ROOT,
                               self._bundle_id,
-                              'v%s' % self._bundle_version)
+                              'v$%s' % self._bundle_version)
         files = [info.name
                  for info in self._legacy_fs.scandir(legacy_dirpath)
                  if info.is_file and not info.name == SUBDIR_VERSIONS_FILENAME]
@@ -139,13 +139,26 @@ class _FSBundleFile(_FSFilePath):
         return self._legacy_fs.openbin(mode, buffering, **options)
 
 
+class _FSCollectionPath(_FSDirPath):
+    def __init__(self, fs, path):
+        _FSDirPath.__init__(self, fs, path)
+
+    def getinfo(self, namespaces):
+        # type: (Tuple) -> Info
+        return Info(_make_raw_dir_info(basename(self._original_path)))
+
+    def listdir(self):
+        # type: () -> List[unicode]
+        assert False
+
+
 class VersionView(ReadOnlyView):
     def __init__(self, bundle_lidvid, wrap_fs):
         # type: (unicode, FS) -> None
         bundle_lid, self._version_id = bundle_lidvid.split(u'::')[-2:]
         self._bundle_id = bundle_lid.split(u':')[-1]
-        assert wrap_fs.exists(join(u'/', self._bundle_id,
-                                   u'v%s' % self._version_id))
+        assert wrap_fs.exists(join(ROOT, self._bundle_id,
+                                   u'v$%s' % self._version_id))
         self._legacy_fs = wrap_fs
         ReadOnlyView.__init__(self, self._legacy_fs)
 
@@ -168,11 +181,31 @@ class VersionView(ReadOnlyView):
                                      self._bundle_id,
                                      self._version_id)
             elif l == 2:
-                # /bundle/file
-                return _FSBundleFile(self._legacy_fs, path,
-                                     join(u'/', self._bundle_id,
-                                          u'v%s' % self._version_id,
-                                          basename(path)))
+                # /bundle/collection or /bundle/file
+                BUNDLE_DIRPATH = join(ROOT, self._bundle_id,
+                                      u'v$%s' % self._version_id)
+                legacy_path_if_file = join(BUNDLE_DIRPATH,
+                                           basename(path))
+                if self._legacy_fs.exists(legacy_path_if_file):
+                    return _FSBundleFile(self._legacy_fs, path,
+                                         legacy_path_if_file)
+
+                legacy_bundle_dirpath = join(ROOT, self._bundle_id,
+                                             u'v$%s' % self._version_id)
+
+                subdirVersions = readSubdirVersions(self._legacy_fs,
+                                                    legacy_bundle_dirpath)
+                try:
+                    collection_version = subdirVersions[basename(path)]
+                except KeyError:
+                    raise ResourceNotFound(path)
+
+                legacy_collection_dirpath = join(ROOT, parts[0], parts[1],
+                                                 collection_version)
+
+                assert self._legacy_fs.exists(legacy_collection_dirpath), \
+                    legacy_collection_dirpath
+                return _FSCollectionPath(self._legacy_fs, path)
             else:
                 assert False, '_make_fs_path(%r) unimplemented' % path
 

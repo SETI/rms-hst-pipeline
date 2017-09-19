@@ -16,27 +16,27 @@ _PRODUCT_ID = u'u2q9xx01j_raw'
 class TestVersionView(unittest.TestCase):
     def setUp(self):
         self.versioned_fs = MemoryFS()
-        self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v1'))
+        self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v$1'))
         writeSubdirVersions(self.versioned_fs,
-                            join(ROOT, _BUNDLE_ID, u'v1'), {})
+                            join(ROOT, _BUNDLE_ID, u'v$1'), {})
 
-        self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v2'))
+        self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v$2'))
 
-        self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v3'))
+        self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v$3'))
         writeSubdirVersions(self.versioned_fs,
-                            join(ROOT, _BUNDLE_ID, u'v3'),
-                            {_COLLECTION_ID: u'v2'})
+                            join(ROOT, _BUNDLE_ID, u'v$3'),
+                            {_COLLECTION_ID: u'v$2'})
 
         self.versioned_fs.makedirs(
-                join(ROOT, _BUNDLE_ID, _COLLECTION_ID, 'v1'))
+                join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$1'))
         self.versioned_fs.makedirs(
-                join(ROOT, _BUNDLE_ID, _COLLECTION_ID, 'v2'))
+                join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$2'))
         writeSubdirVersions(self.versioned_fs,
-                            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, 'v2'),
-                            {_PRODUCT_ID: u'v1'})
+                            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$2'),
+                            {_PRODUCT_ID: u'v$1'})
 
         self.versioned_fs.makedirs(
-            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, _PRODUCT_ID, u'v1'))
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, _PRODUCT_ID, u'v$1'))
 
         self.version_view = VersionView(u'urn:nasa:pds:hst_00000::3',
                                         self.versioned_fs)
@@ -59,13 +59,38 @@ class TestVersionView(unittest.TestCase):
         BUNDLE_DIR = join(ROOT, _BUNDLE_ID)
         self.assertTrue(self.version_view.exists(BUNDLE_DIR))
         self.assertTrue(self.version_view.isdir(BUNDLE_DIR))
-        self.assertEqual([u'data_xxx_raw'],
+        self.assertEqual([_COLLECTION_ID],
                          self.version_view.listdir(BUNDLE_DIR))
 
-        # test that files appear
-        self.versioned_fs.touch(join(ROOT, _BUNDLE_ID, u'v1', u'bundle.xml'))
+        # test that collections appear
+        self.assertTrue(self.version_view.exists(
+                join(ROOT, _BUNDLE_ID, _COLLECTION_ID)))
+
+        # test that files don't appear when wrong version
+        self.versioned_fs.touch(join(ROOT, _BUNDLE_ID, u'v$1', u'bundle.xml'))
         self.assertFalse(self.version_view.exists(
                 join(ROOT, _BUNDLE_ID, u'bundle.xml')))
-        self.versioned_fs.touch(join(ROOT, _BUNDLE_ID, u'v3', u'bundle.xml'))
+
+        # test that files do appear when right version
+        self.versioned_fs.touch(join(ROOT, _BUNDLE_ID, u'v$3', u'bundle.xml'))
         self.assertTrue(self.version_view.exists(
                 join(ROOT, _BUNDLE_ID, u'bundle.xml')))
+
+    @unittest.skip('not done yet')
+    def test_collection_dir(self):
+        # type: () -> None
+        COLLECTION_DIR = join(ROOT, _BUNDLE_ID, _COLLECTION_ID)
+        self.assertTrue(self.version_view.exists(COLLECTION_DIR))
+        self.assertTrue(self.version_view.isdir(COLLECTION_DIR))
+        self.assertEqual([_PRODUCT_ID],
+                         self.version_view.listdir(COLLECTION_DIR))
+
+        # test that files appear
+        self.versioned_fs.touch(join(COLLECTION_DIR, u'v$1',
+                                     u'collection.xml'))
+        self.assertFalse(self.version_view.exists(join(COLLECTION_DIR,
+                                                       u'collection.xml')))
+        self.versioned_fs.touch(join(COLLECTION_DIR, u'v$2',
+                                     u'collection.xml'))
+        self.assertTrue(self.version_view.exists(
+                join(COLLECTION_DIR, u'collection.xml')))
