@@ -249,7 +249,10 @@ class VersionView(ReadOnlyView):
     def _legacy_collection_dir(self, collection_id):
         subdirVersions = readSubdirVersions(self._legacy_fs,
                                             self._legacy_bundle_dir())
-        collection_version = subdirVersions[collection_id]
+        try:
+            collection_version = subdirVersions[collection_id]
+        except KeyError:
+            raise ResourceNotFound(join(ROOT, self._bundle_id, collection_id))
         return join(ROOT, self._bundle_id, collection_id,
                     _to_version_dirname(collection_version))
 
@@ -257,7 +260,12 @@ class VersionView(ReadOnlyView):
         subdirVersions = readSubdirVersions(
             self._legacy_fs,
             self._legacy_collection_dir(collection_id))
-        product_version = subdirVersions[product_id]
+        try:
+            product_version = subdirVersions[product_id]
+        except KeyError:
+            raise ResourceNotFound(join(ROOT, self._bundle_id,
+                                        collection_id, product_id))
+
         return join(ROOT,
                     self._bundle_id, collection_id,
                     product_id,
@@ -283,100 +291,37 @@ class VersionView(ReadOnlyView):
                                      self._version_id)
             elif l == 2:
                 # /bundle/collection or /bundle/file
-                BUNDLE_DIRPATH = join(ROOT, self._bundle_id,
-                                      _to_version_dirname(self._version_id))
-                legacy_path_if_file = join(BUNDLE_DIRPATH,
-                                           basename(path))
-                if self._legacy_fs.exists(legacy_path_if_file):
-                    # /bundle/file
-                    return _FSBundleFile(self._legacy_fs, path,
-                                         legacy_path_if_file)
-
-                # /bundle/collection
-                legacy_bundle_dirpath = join(
-                    ROOT, self._bundle_id,
-                    _to_version_dirname(self._version_id))
-
-                subdirVersions = readSubdirVersions(self._legacy_fs,
-                                                    legacy_bundle_dirpath)
                 try:
-                    collection_version = subdirVersions[basename(path)]
-                except KeyError:
-                    raise ResourceNotFound(path)
-
-                legacy_collection_dirpath = join(
-                    ROOT, parts[0], parts[1],
-                    _to_version_dirname(collection_version))
-
-                assert self._legacy_fs.exists(legacy_collection_dirpath), \
-                    legacy_collection_dirpath
-                return _FSCollectionPath(self._legacy_fs, path,
-                                         legacy_collection_dirpath)
+                    legacy_collection_dirpath = self._legacy_collection_dir(
+                        parts[1])
+                    return _FSCollectionPath(self._legacy_fs, path,
+                                             legacy_collection_dirpath)
+                except ResourceNotFound:
+                    legacy_bundle_file_path = join(self._legacy_bundle_dir(),
+                                                   parts[1])
+                    return _FSBundleFile(self._legacy_fs, path,
+                                         legacy_bundle_file_path)
             elif l == 3:
                 # /bundle/collection/product or /bundle/collection/file
-                legacy_bundle_dirpath = join(
-                    ROOT, self._bundle_id,
-                    _to_version_dirname(self._version_id))
-
-                bundleSubdirVersions = readSubdirVersions(
-                    self._legacy_fs,
-                    legacy_bundle_dirpath)
                 try:
-                    collection_version = bundleSubdirVersions[parts[1]]
-                except KeyError:
-                    raise ResourceNotFound(path)
-                COLLECTION_DIRPATH = join(ROOT, self._bundle_id,
-                                          parts[1], collection_version)
-
-                legacy_path_if_file = join(COLLECTION_DIRPATH,
-                                           basename(path))
-                if self._legacy_fs.exists(legacy_path_if_file):
-                    # /bundle/collection/file
+                    legacy_product_dirpath = self._legacy_product_dir(
+                        parts[1], parts[2])
+                    return _FSProductPath(self._legacy_fs, path,
+                                          legacy_product_dirpath)
+                except ResourceNotFound:
+                    legacy_collection_file_path = join(
+                        self._legacy_collection_dir(parts[1]),
+                        parts[2])
                     return _FSCollectionFile(self._legacy_fs, path,
-                                             legacy_path_if_file)
-                # /bundle/collection/product
-                legacy_collection_dirpath = join(
-                    ROOT, self._bundle_id, parts[1],
-                    _to_version_dirname(collection_version))
-                assert self._legacy_fs.exists(legacy_collection_dirpath), \
-                    legacy_collection_dirpath
+                                             legacy_collection_file_path)
 
-                collectionSubdirVersions = readSubdirVersions(
-                    self._legacy_fs,
-                    legacy_collection_dirpath)
-                try:
-                    product_version = collectionSubdirVersions[parts[2]]
-                except KeyError:
-                    raise ResourceNotFound(path)
-                legacy_product_dirpath = join(
-                    ROOT, self._bundle_id, parts[1], parts[2],
-                    _to_version_dirname(product_version))
-
-                return _FSProductPath(self._legacy_fs, path,
-                                      legacy_product_dirpath)
             elif len(parts) == 4:
                 # /bundle/collection/product/file
                 legacy_prod_dir = self._legacy_product_dir(parts[1],
                                                            parts[2])
-                if True:
-                    legacy_path_as_file = join(legacy_prod_dir, parts[3])
-                    return _FSProductFile(self._legacy_fs, path,
-                                          legacy_path_as_file)
-
-                # TODO delete all of this?
-                legacy_bundle_dirpath = join(
-                    ROOT, self._bundle_id,
-                    _to_version_dirname(self._version_id))
-
-                bundleSubdirVersions = readSubdirVersions(
-                    self._legacy_fs,
-                    legacy_bundle_dirpath)
-                try:
-                    collection_version = bundleSubdirVersions[parts[1]]
-                except KeyError:
-                    raise ResourceNotFound(path)
-                assert False, path
-
+                legacy_path_as_file = join(legacy_prod_dir, parts[3])
+                return _FSProductFile(self._legacy_fs, path,
+                                      legacy_path_as_file)
             else:
                 assert False, '_make_fs_path(%r) unimplemented' % path
 
@@ -399,3 +344,12 @@ class VersionView(ReadOnlyView):
 
         fs_path = self._make_fs_path(path)
         return fs_path.listdir()
+
+
+def layered():
+    from fs.osfs import OSFS
+    from pdart.fs.InitialVersionedView import InitialVersionedView
+    osfs = OSFS('/Users/spaceman/Desktop/Archive/hst_11972')
+    ivv = InitialVersionedView('hst_11972', osfs)
+    vv = VersionView('urn:nasa:pds:hst_11972::1', ivv)
+    return vv

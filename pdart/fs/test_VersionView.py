@@ -109,10 +109,11 @@ class TestVersionView(unittest.TestCase):
         # test that files do appear when right version
         self.versioned_fs.touch(join(COLLECTION_DIR, u'v$2',
                                      u'collection.xml'))
-        if False:
-            print '****', self.version_view.listdir(COLLECTION_DIR)
-            self.assertTrue(self.version_view.exists(
-                    join(COLLECTION_DIR, u'collection.xml')))
+        print '****', self.version_view.listdir(COLLECTION_DIR)
+        print '****', self.version_view.getinfo(join(COLLECTION_DIR,
+                                                     u'collection.xml'))
+        self.assertTrue(self.version_view.exists(
+                join(COLLECTION_DIR, u'collection.xml')))
 
     def test_product_dir(self):
         # type: () -> None
