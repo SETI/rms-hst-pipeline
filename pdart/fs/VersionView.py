@@ -22,6 +22,10 @@ def _make_raw_dir_info(name):
     return {u'basic': {u'name': name, u'is_dir': True}}
 
 
+def _to_version_dirname(n):
+    return 'v$' + n
+
+
 class _FSPath(object):
     __metaclass__ = ABCMeta
 
@@ -113,7 +117,7 @@ class _FSBundlePath(_FSDirPath):
         # type: () -> List[unicode]
         legacy_dirpath = join(ROOT,
                               self._bundle_id,
-                              'v$%s' % self._bundle_version)
+                              _to_version_dirname(self._bundle_version))
         files = [info.name
                  for info in self._legacy_fs.scandir(legacy_dirpath)
                  if info.is_file and not info.name == SUBDIR_VERSIONS_FILENAME]
@@ -234,18 +238,20 @@ class VersionView(ReadOnlyView):
         bundle_lid, self._version_id = bundle_lidvid.split(u'::')[-2:]
         self._bundle_id = bundle_lid.split(u':')[-1]
         assert wrap_fs.exists(join(ROOT, self._bundle_id,
-                                   u'v$%s' % self._version_id))
+                                   _to_version_dirname(self._version_id)))
         self._legacy_fs = wrap_fs
         ReadOnlyView.__init__(self, self._legacy_fs)
 
     def _legacy_bundle_dir(self):
-        return join(ROOT, self._bundle_id, u'v$%s' % self._version_id)
+        return join(ROOT, self._bundle_id,
+                    _to_version_dirname(self._version_id))
 
     def _legacy_collection_dir(self, collection_id):
         subdirVersions = readSubdirVersions(self._legacy_fs,
                                             self._legacy_bundle_dir())
         collection_version = subdirVersions[collection_id]
-        return join(ROOT, self._bundle_id, collection_id, collection_version)
+        return join(ROOT, self._bundle_id, collection_id,
+                    _to_version_dirname(collection_version))
 
     def _legacy_product_dir(self, collection_id, product_id):
         subdirVersions = readSubdirVersions(
@@ -254,7 +260,8 @@ class VersionView(ReadOnlyView):
         product_version = subdirVersions[product_id]
         return join(ROOT,
                     self._bundle_id, collection_id,
-                    product_id, product_version)
+                    product_id,
+                    _to_version_dirname(product_version))
 
     def _make_fs_path(self, path):
         # type: (unicode) -> _FSPath
@@ -277,7 +284,7 @@ class VersionView(ReadOnlyView):
             elif l == 2:
                 # /bundle/collection or /bundle/file
                 BUNDLE_DIRPATH = join(ROOT, self._bundle_id,
-                                      u'v$%s' % self._version_id)
+                                      _to_version_dirname(self._version_id))
                 legacy_path_if_file = join(BUNDLE_DIRPATH,
                                            basename(path))
                 if self._legacy_fs.exists(legacy_path_if_file):
@@ -286,8 +293,9 @@ class VersionView(ReadOnlyView):
                                          legacy_path_if_file)
 
                 # /bundle/collection
-                legacy_bundle_dirpath = join(ROOT, self._bundle_id,
-                                             u'v$%s' % self._version_id)
+                legacy_bundle_dirpath = join(
+                    ROOT, self._bundle_id,
+                    _to_version_dirname(self._version_id))
 
                 subdirVersions = readSubdirVersions(self._legacy_fs,
                                                     legacy_bundle_dirpath)
@@ -296,8 +304,9 @@ class VersionView(ReadOnlyView):
                 except KeyError:
                     raise ResourceNotFound(path)
 
-                legacy_collection_dirpath = join(ROOT, parts[0], parts[1],
-                                                 collection_version)
+                legacy_collection_dirpath = join(
+                    ROOT, parts[0], parts[1],
+                    _to_version_dirname(collection_version))
 
                 assert self._legacy_fs.exists(legacy_collection_dirpath), \
                     legacy_collection_dirpath
@@ -305,8 +314,9 @@ class VersionView(ReadOnlyView):
                                          legacy_collection_dirpath)
             elif l == 3:
                 # /bundle/collection/product or /bundle/collection/file
-                legacy_bundle_dirpath = join(ROOT, self._bundle_id,
-                                             u'v$%s' % self._version_id)
+                legacy_bundle_dirpath = join(
+                    ROOT, self._bundle_id,
+                    _to_version_dirname(self._version_id))
 
                 bundleSubdirVersions = readSubdirVersions(
                     self._legacy_fs,
@@ -325,9 +335,9 @@ class VersionView(ReadOnlyView):
                     return _FSCollectionFile(self._legacy_fs, path,
                                              legacy_path_if_file)
                 # /bundle/collection/product
-                legacy_collection_dirpath = join(ROOT, self._bundle_id,
-                                                 parts[1],
-                                                 collection_version)
+                legacy_collection_dirpath = join(
+                    ROOT, self._bundle_id, parts[1],
+                    _to_version_dirname(collection_version))
                 assert self._legacy_fs.exists(legacy_collection_dirpath), \
                     legacy_collection_dirpath
 
@@ -338,9 +348,9 @@ class VersionView(ReadOnlyView):
                     product_version = collectionSubdirVersions[parts[2]]
                 except KeyError:
                     raise ResourceNotFound(path)
-                legacy_product_dirpath = join(ROOT, self._bundle_id,
-                                              parts[1], parts[2],
-                                              product_version)
+                legacy_product_dirpath = join(
+                    ROOT, self._bundle_id, parts[1], parts[2],
+                    _to_version_dirname(product_version))
 
                 return _FSProductPath(self._legacy_fs, path,
                                       legacy_product_dirpath)
@@ -354,8 +364,9 @@ class VersionView(ReadOnlyView):
                                           legacy_path_as_file)
 
                 # TODO delete all of this?
-                legacy_bundle_dirpath = join(ROOT, self._bundle_id,
-                                             u'v$%s' % self._version_id)
+                legacy_bundle_dirpath = join(
+                    ROOT, self._bundle_id,
+                    _to_version_dirname(self._version_id))
 
                 bundleSubdirVersions = readSubdirVersions(
                     self._legacy_fs,

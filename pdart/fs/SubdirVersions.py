@@ -1,9 +1,12 @@
+import re
 from typing import TYPE_CHECKING
 from fs.path import join
 
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 if TYPE_CHECKING:
     from fs.base import FS
+
+_versionRE = re.compile('^[0-9\.]+$')
 
 
 def parseSubdirVersions(txt):
@@ -15,12 +18,15 @@ def parseSubdirVersions(txt):
             fields = line.split(' ')
             assert len(fields) is 2, "line #%d = %r" % (n, line)
             # TODO assert format of each field
+            assert _versionRE.match(str(fields[1]))
             d[fields[0]] = fields[1]
     return d
 
 
 def strSubdirVersions(d):
     # type: (Dict[unicode, unicode]) -> unicode
+    for v in d.itervalues():
+        assert _versionRE.match(str(v))
     return unicode(''.join(['%s %s\n' % (k, v) for k, v in sorted(d.items())]))
 
 
