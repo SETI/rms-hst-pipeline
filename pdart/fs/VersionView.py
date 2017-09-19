@@ -189,9 +189,7 @@ class _FSProductPath(_FSDirPath):
         files = [info.name
                  for info in self._legacy_fs.scandir(self._legacy_dirpath)
                  if info.is_file and not info.name == SUBDIR_VERSIONS_FILENAME]
-        versions = readSubdirVersions(self._legacy_fs, self._legacy_dirpath)
-        dirs = versions.keys()
-        return files + dirs
+        return files
 
 
 class _FSCollectionFile(_FSFilePath):
@@ -200,6 +198,24 @@ class _FSCollectionFile(_FSFilePath):
     """
     def __init__(self, fs, path, legacy_path):
         assert len(iteratepath(path)) == 3
+        _FSFilePath.__init__(self, fs, path)
+        self._legacy_path = legacy_path
+
+    def getinfo(self, namespaces):
+        return self._legacy_fs.getinfo(self._legacy_path)
+
+    def openbin(self, mode, buffering, **options):
+        # type: (AnyStr, int, **Any) -> Any
+        return self._legacy_fs.openbin(self._legacy_path, mode,
+                                       buffering, **options)
+
+
+class _FSProductFile(_FSFilePath):
+    """
+    A path '/bundle/collection/product/file'
+    """
+    def __init__(self, fs, path, legacy_path):
+        assert len(iteratepath(path)) == 4
         _FSFilePath.__init__(self, fs, path)
         self._legacy_path = legacy_path
 
@@ -221,6 +237,24 @@ class VersionView(ReadOnlyView):
                                    u'v$%s' % self._version_id))
         self._legacy_fs = wrap_fs
         ReadOnlyView.__init__(self, self._legacy_fs)
+
+    def _legacy_bundle_dir(self):
+        return join(ROOT, self._bundle_id, u'v$%s' % self._version_id)
+
+    def _legacy_collection_dir(self, collection_id):
+        subdirVersions = readSubdirVersions(self._legacy_fs,
+                                            self._legacy_bundle_dir())
+        collection_version = subdirVersions[collection_id]
+        return join(ROOT, self._bundle_id, collection_id, collection_version)
+
+    def _legacy_product_dir(self, collection_id, product_id):
+        subdirVersions = readSubdirVersions(
+            self._legacy_fs,
+            self._legacy_collection_dir(collection_id))
+        product_version = subdirVersions[product_id]
+        return join(ROOT,
+                    self._bundle_id, collection_id,
+                    product_id, product_version)
 
     def _make_fs_path(self, path):
         # type: (unicode) -> _FSPath
@@ -310,6 +344,28 @@ class VersionView(ReadOnlyView):
 
                 return _FSProductPath(self._legacy_fs, path,
                                       legacy_product_dirpath)
+            elif len(parts) == 4:
+                # /bundle/collection/product/file
+                legacy_prod_dir = self._legacy_product_dir(parts[1],
+                                                           parts[2])
+                if True:
+                    legacy_path_as_file = join(legacy_prod_dir, parts[3])
+                    return _FSProductFile(self._legacy_fs, path,
+                                          legacy_path_as_file)
+
+                # TODO delete all of this?
+                legacy_bundle_dirpath = join(ROOT, self._bundle_id,
+                                             u'v$%s' % self._version_id)
+
+                bundleSubdirVersions = readSubdirVersions(
+                    self._legacy_fs,
+                    legacy_bundle_dirpath)
+                try:
+                    collection_version = bundleSubdirVersions[parts[1]]
+                except KeyError:
+                    raise ResourceNotFound(path)
+                assert False, path
+
             else:
                 assert False, '_make_fs_path(%r) unimplemented' % path
 
