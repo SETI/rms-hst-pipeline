@@ -150,3 +150,26 @@ class TestVersionView(unittest.TestCase):
         self.assertEqual(PRODUCT_DIR,
                          self.version_view._legacy_product_dir(_COLLECTION_ID,
                                                                _PRODUCT_ID))
+
+
+@unittest.skip('takes a long time')
+def test_version_view_on_archive():
+    """
+    Run through all the bundles in the archive, view them as versioned
+    filesystems, and try to verify them , then copy them to another
+    (in-memory) filesystem.  See whether anything breaks.
+    """
+    import fs.copy
+    from fs.memoryfs import MemoryFS
+    from fs.osfs import OSFS
+    from pdart.fs.InitialVersionedView import InitialVersionedView
+    from pdart.pds4.Archives import get_any_archive
+
+    archive = get_any_archive()
+    for bundle in archive.bundles():
+        print bundle
+        with OSFS(bundle.absolute_filepath()) as osfs:
+            ivv = InitialVersionedView(bundle.lid.bundle_id, osfs)
+            vv = VersionView(str(bundle.lid) + '::1', ivv)
+            with MemoryFS() as memoryfs:
+                fs.copy.copy_fs(vv, memoryfs)
