@@ -2,8 +2,9 @@
 Functionality to build a product label using a
 :class:`~pdart.reductions.Reduction.Reduction`.
 """
-import os.path
 import sys
+
+from fs.path import basename
 
 from pdart.pds4.Product import *
 from pdart.pds4labels.FileContentsReduction import *
@@ -48,7 +49,7 @@ class FitsProductLabelReduction(BadFitsFileReduction):
     def reduce_product(self, archive, lid, get_reduced_fits_files):
         # string
         product = Product(archive, lid)
-        file_name = os.path.basename(product.absolute_filepath())
+        file_name = basename(product.absolute_filepath())
 
         instrument = product.collection().instrument()
         suffix = product.collection().suffix()

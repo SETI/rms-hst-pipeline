@@ -3,6 +3,7 @@ Functionality to build a raw browse product label using a SQLite
 database.
 """
 from contextlib import closing
+from os.path import getsize
 import sys
 
 from pdart.pds4.LID import *
@@ -41,7 +42,7 @@ def make_db_browse_product_labels(archive, conn):
                 browse_product = product.browse_product()
                 browse_file_name = lid.product_id + '.jpg'
                 browse_image_file = list(browse_product.files())[0]
-                object_length = os.path.getsize(
+                object_length = getsize(
                     browse_image_file.full_filepath())
                 label = make_label({
                         'proposal_id': str(proposal_id),
@@ -86,7 +87,7 @@ def make_db_collection_browse_product_labels(archive, conn, collection):
                 browse_product = product.browse_product()
                 browse_file_name = lid.product_id + '.jpg'
                 browse_image_file = list(browse_product.files())[0]
-                object_length = os.path.getsize(
+                object_length = getsize(
                     browse_image_file.full_filepath())
                 label = make_label({
                         'proposal_id': str(proposal_id),

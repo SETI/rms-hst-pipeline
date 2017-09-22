@@ -2,7 +2,7 @@
 Functionality to build a RAW browse product label using a
 :class:`~pdart.reductions.Reduction.Reduction`.
 """
-import os.path
+from os.path import getsize
 
 from pdart.pds4.LID import *
 from pdart.pds4.Collection import *
@@ -46,7 +46,7 @@ class BrowseProductLabelReduction(Reduction):
 
             browse_product = product.browse_product()
             browse_image_file = list(browse_product.files())[0]
-            object_length = os.path.getsize(browse_image_file.full_filepath())
+            object_length = getsize(browse_image_file.full_filepath())
 
             browse_file_name = lid.product_id + '.jpg'
 

@@ -2,8 +2,9 @@
 This module creates a SQLite database from an archive.
 """
 import abc
-import os.path
 import pyfits
+
+from fs.path import basename
 
 from pdart.db.TableSchemas import BAD_FITS_FILES_SCHEMA, BAD_FITS_FILES_SQL, \
     BUNDLES_SCHEMA, BUNDLES_SQL, CARDS_SCHEMA, CARDS_SQL, COLLECTIONS_SCHEMA, \
@@ -166,7 +167,7 @@ class ArchiveDatabaseCreator(DatabaseCreator):
     def populate_products_table(self):
         # type: () -> None
         ps = [(str(p.lid), p.absolute_filepath(),
-               os.path.basename(p.absolute_filepath()),
+               basename(p.absolute_filepath()),
                p.label_filepath(), str(c.lid),
                p.visit(), p.lid.product_id)
               for c in self.archive.collections()

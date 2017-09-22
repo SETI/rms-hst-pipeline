@@ -1,5 +1,7 @@
-import os
-import os.path
+from os import mkdir
+from os.path import getsize, isdir, isfile
+
+from fs.path import basename, join, splitext
 
 import pdart.add_pds_tools
 import picmaker
@@ -31,10 +33,10 @@ def _ensure_directory(dir):
     # pdart.pds4label.BrowseProductImageReduction.  Refactor and
     # remove.
     try:
-        os.mkdir(dir)
+        mkdir(dir)
     except OSError:
         pass
-    assert os.path.isdir(dir), dir
+    assert isdir(dir), dir
 
 
 def make_browse_product(fits_product, browse_product):
@@ -45,15 +47,15 @@ def make_browse_product(fits_product, browse_product):
     """
     # PRECONDITION: the FITS file exists in the filesystem
     filepath = fits_product.first_filepath()
-    assert os.path.isfile(filepath)
+    assert isfile(filepath)
 
-    basename = os.path.basename(filepath)
-    basename = os.path.splitext(basename)[0] + '.jpg'
+    basename = basename(filepath)
+    basename = splitext(basename)[0] + '.jpg'
     browse_collection_dir = browse_product.collection().absolute_filepath()
     _ensure_directory(browse_collection_dir)
 
     visit = HstFilename(basename).visit()
-    target_dir = os.path.join(browse_collection_dir, ('visit_%s' % visit))
+    target_dir = join(browse_collection_dir, ('visit_%s' % visit))
     _ensure_directory(target_dir)
 
     picmaker.ImagesToPics([filepath],
@@ -61,8 +63,8 @@ def make_browse_product(fits_product, browse_product):
                           filter="None",
                           percentiles=(1, 99))
     # POSTCONDITION: browse file exists in the filesystem
-    browse_filepath = os.path.join(target_dir, basename)
-    assert os.path.isfile(browse_filepath)
+    browse_filepath = join(target_dir, basename)
+    assert isfile(browse_filepath)
 
 
 def _make_db_browse_collection(session, browse_collection):
@@ -100,7 +102,7 @@ def make_db_browse_product(session, fits_product, browse_product):
     database.
     """
     # PRECONDITION: the browse product file exists in the filesystem
-    assert os.path.isfile(browse_product.first_filepath())
+    assert isfile(browse_product.first_filepath())
 
     lid = str(browse_product.lid)
 
@@ -110,7 +112,7 @@ def make_db_browse_product(session, fits_product, browse_product):
     session.query(Product).filter_by(lid=lid).delete()
 
     browse_filepath = browse_product.absolute_filepath()
-    object_length = os.path.getsize(browse_filepath)
+    object_length = getsize(browse_filepath)
 
     db_browse_product = BrowseProduct(
         lid=str(browse_product.lid),

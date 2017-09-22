@@ -1,5 +1,6 @@
-import os.path
 from typing import TYPE_CHECKING
+
+from fs.path import basename
 
 if TYPE_CHECKING:
     from typing import Tuple
@@ -83,7 +84,7 @@ def product_tuple(product):
     # type: (Product) -> _PROD_TUPLE
     return (str(product.lid),
             product.absolute_filepath(),
-            os.path.basename(product.absolute_filepath()),
+            basename(product.absolute_filepath()),
             product.label_filepath(),
             str(product.collection().lid),
             product.visit(),

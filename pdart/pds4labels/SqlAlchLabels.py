@@ -3,7 +3,9 @@ Creation of labels and writing them to the filesystem.  Creation of
 browse products.
 """
 import logging
-import os.path
+from os.path import isfile
+
+from fs.path import splitext
 
 from pdart.db.SqlAlchTables import DocumentCollection, FitsProduct
 from pdart.db.SqlAlchXml import *
@@ -52,7 +54,7 @@ def make_and_save_product_browse_label(collection, browse_product):
         f.write(label)
 
     # POSTCONDITION
-    assert os.path.isfile(str(browse_product.label_filepath))
+    assert isfile(str(browse_product.label_filepath))
 
     return label
 
@@ -137,7 +139,7 @@ def make_and_save_product_observational_label(fits_product):
         f.write(label)
 
     # POSTCONDITION
-    assert os.path.isfile(str(fits_product.label_filepath))
+    assert isfile(str(fits_product.label_filepath))
 
     return label
 
@@ -232,7 +234,7 @@ def make_and_save_product_collection_label(collection):
         f.write(label)
 
     # POSTCONDITION
-    assert os.path.isfile(str(collection.label_filepath))
+    assert isfile(str(collection.label_filepath))
 
     return label
 
@@ -332,7 +334,7 @@ def make_and_save_product_bundle_label(bundle):
         f.write(label)
 
     # POSTCONDITION
-    assert os.path.isfile(str(bundle.label_filepath))
+    assert isfile(str(bundle.label_filepath))
 
     return label
 
@@ -409,7 +411,7 @@ _product_document_template = interpret_document_template(
 
 def _make_file_name_std_pair(basename):
     # type: (AnyStr) -> Tuple[AnyStr, AnyStr]
-    (root, ext) = os.path.splitext(basename)
+    (root, ext) = splitext(basename)
     if ext == '.prop':
         return (basename, '7-Bit ASCII Text')
     elif ext == '.pro':
@@ -438,7 +440,7 @@ def make_and_save_product_document_label(bundle, document_product):
         f.write(label)
 
     # POSTCONDITION
-    assert os.path.isfile(str(document_product.label_filepath))
+    assert isfile(str(document_product.label_filepath))
 
     return label
 
@@ -533,7 +535,7 @@ def make_and_save_product_spice_kernel_label(bundle, product, fits_product):
         f.write(label)
 
     # POSTCONDITION
-    assert os.path.isfile(str(product.label_filepath))
+    assert isfile(str(product.label_filepath))
     # TODO looks like the wrong path
 
     return label

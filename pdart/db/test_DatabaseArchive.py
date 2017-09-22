@@ -1,8 +1,9 @@
 from pdart.db.DatabaseArchive import DatabaseArchive
 
-import os.path
 import tempfile
 import unittest
+
+from fs.path import dirname
 
 
 class TestDatabaseArchive(unittest.TestCase):
@@ -20,4 +21,4 @@ class TestDatabaseArchive(unittest.TestCase):
         self.assertFalse(da.is_open())
 
         # Verify archive_dir
-        self.assertEquals(os.path.dirname(filepath), da.archive_dir)
+        self.assertEquals(dirname(filepath), da.archive_dir)

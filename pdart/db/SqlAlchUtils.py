@@ -1,4 +1,4 @@
-import os.path
+from fs.path import join
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -16,7 +16,7 @@ def bundle_database_filepath(bundle):
     Given a PDS4 :class:`~pdart.pds4.Bundle.Bundle`, create the
     filepath for the bundle's database.
     """
-    return os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
+    return join(bundle.absolute_filepath(), DATABASE_NAME)
 
 
 def create_bundle_database_session(bundle):

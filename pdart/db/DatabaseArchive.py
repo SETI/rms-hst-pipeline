@@ -5,8 +5,9 @@ connection.
 *This module is currently unused (as of 2016-08-24).*
 """
 from contextlib import closing
-import os.path
 import sqlite3
+
+from fs.path import dirname
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -25,7 +26,7 @@ class DatabaseArchive:
         it.  Note that the database will be created if no file exists
         at the filepath.
         """
-        self.archive_dir = os.path.dirname(database_filepath)
+        self.archive_dir = dirname(database_filepath)
         self.database_filepath = database_filepath
         self.connection = sqlite3.connect(database_filepath)
 

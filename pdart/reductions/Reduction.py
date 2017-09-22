@@ -93,9 +93,8 @@ keep things straight.  :func:`reduction_type_documentation` can be
 used to produce a documentation string to remind the user what types
 are supposed to be used where.
 """
-import os.path
-
 import abc
+from fs.path import splitext
 import numpy
 import pyfits
 
@@ -378,7 +377,7 @@ class DefaultReductionRunner(ReductionRunner):
     def run_fits_file(self, reduction, file):
         def get_reduced_hdus():
             filepath = file.full_filepath()
-            if os.path.splitext(filepath)[1] == '.fits':
+            if splitext(filepath)[1] == '.fits':
                 fits = pyfits.open(filepath)
 
                 def build_thunk(n, hdu):

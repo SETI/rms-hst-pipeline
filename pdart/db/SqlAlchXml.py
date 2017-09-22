@@ -6,7 +6,8 @@ import pdart.add_pds_tools
 import julian
 
 import logging
-import os.path
+
+from fs.path import basename
 
 from pdart.db.SqlAlchTables import lookup_card
 from pdart.pds4labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE
@@ -632,7 +633,7 @@ _file_area_browse_template = interpret_template("""<File_Area_Browse>
 def make_file_area_browse(product):
     # type: (Product) -> NodeBuilder
     return _file_area_browse_template({
-            'File': make_file(os.path.basename(product.browse_filepath)),
+            'File': make_file(basename(product.browse_filepath)),
             'Encoded_Image': make_encoded_image(product)
             })
 

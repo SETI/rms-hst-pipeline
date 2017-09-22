@@ -2,9 +2,10 @@
 TODO Document this and add tests.
 """
 from contextlib import closing
-import os.path
 import sqlite3
 from typing import TYPE_CHECKING
+
+from fs.path import join
 
 if TYPE_CHECKING:
     from pdart.pds4.Bundle import Bundle
@@ -21,7 +22,7 @@ _NEW_DATABASE_NAME = 'complete-database.db'
 
 def bundle_database_filepath(bundle):
     # type: (Bundle) -> unicode
-    return os.path.join(bundle.absolute_filepath(), _NEW_DATABASE_NAME)
+    return join(bundle.absolute_filepath(), _NEW_DATABASE_NAME)
 
 
 def open_bundle_database(bundle):

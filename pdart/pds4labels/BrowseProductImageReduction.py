@@ -2,8 +2,10 @@
 Functionality to build a raw browse product image using a
 :class:`~pdart.reductions.Reduction.Reduction`.
 """
-import os
-import os.path
+from os import mkdir
+from os.path import isdir
+
+from fs.path import basename, join, splitext
 
 from pdart.pds4.Collection import *
 from pdart.pds4.Product import *
@@ -22,10 +24,10 @@ def ensure_directory(dir):
     # type: (AnyStr) -> None
     """Make the directory if it doesn't already exist."""
     try:
-        os.mkdir(dir)
+        mkdir(dir)
     except OSError:
         pass
-    assert os.path.isdir(dir), dir
+    assert isdir(dir), dir
 
 
 def _browse_collection_directory(collection):
@@ -77,10 +79,10 @@ class BrowseProductImageReduction(Reduction):
         collection = file.component.collection()
         if is_raw_data_collection(collection):
             try:
-                basename = os.path.basename(file.full_filepath())
-                basename = os.path.splitext(basename)[0] + '.jpg'
+                basename = basename(file.full_filepath())
+                basename = splitext(basename)[0] + '.jpg'
                 visit = HstFilename(basename).visit()
-                target_dir = os.path.join(
+                target_dir = join(
                     _browse_collection_directory(collection),
                     ('visit_%s' % visit))
 

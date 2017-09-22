@@ -1,7 +1,8 @@
-import os.path
 import shutil
 import tempfile
 import unittest
+
+from fs.path import join
 
 from pdart.db.SqlAlchTables import *
 from pdart.pds4labels.SqlAlchLabels import *
@@ -40,7 +41,7 @@ class TestSqlAlch(unittest.TestCase):
         # type: () -> None
         self.test_dir = tempfile.mkdtemp()
 
-        db_filepath = os.path.join(self.test_dir, 'tmp.db')
+        db_filepath = join(self.test_dir, 'tmp.db')
         self.session = create_database_tables_and_session(db_filepath)
 
         self.db_bundle = Bundle(

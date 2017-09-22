@@ -3,11 +3,12 @@ from pdart.db.CompleteDatabase import exists_database_records_for_browse, \
     insert_fits_database_records
 
 from contextlib import closing
-import os
-import os.path
+from os import remove
 import sqlite3
 import tempfile
 import unittest
+
+from fs.path import join
 
 from pdart.pds4.LID import LID
 
@@ -15,7 +16,7 @@ from pdart.pds4.LID import LID
 class TestCompleteDatabase(unittest.TestCase):
     def setUp(self):
         # type: () -> None
-        self.db_name = os.path.join(tempfile.gettempdir(), 'test.db')
+        self.db_name = join(tempfile.gettempdir(), 'test.db')
         self.database_conn = sqlite3.connect(self.db_name)
 
     def tearDown(self):
@@ -23,7 +24,7 @@ class TestCompleteDatabase(unittest.TestCase):
         if self.database_conn:
             self.database_conn.close()
             try:
-                os.remove(self.db_name)
+                remove(self.db_name)
             except OSError:
                 pass
 

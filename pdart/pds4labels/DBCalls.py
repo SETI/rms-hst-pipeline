@@ -1,6 +1,7 @@
 from contextlib import closing
-import os.path
 import sqlite3
+
+from fs.path import join
 
 from pdart.db.DatabaseName import DATABASE_NAME
 
@@ -24,7 +25,7 @@ if TYPE_CHECKING:
 
 def archive_database_filepath(archive):
     # type: (Archive) -> unicode
-    return os.path.join(archive.root, DATABASE_NAME)
+    return join(archive.root, DATABASE_NAME)
 
 
 def open_archive_database(archive):
@@ -34,7 +35,7 @@ def open_archive_database(archive):
 
 def bundle_database_filepath(bundle):
     # type: (Bundle) -> unicode
-    return os.path.join(bundle.absolute_filepath(), DATABASE_NAME)
+    return join(bundle.absolute_filepath(), DATABASE_NAME)
 
 
 def open_bundle_database(bundle):

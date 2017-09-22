@@ -33,8 +33,8 @@ class File(object):
                       (comp, basename2))
         self.component = comp
         assert basename2, ('File.__init__() '
-                          'where comp = %r and basename2 = %r' %
-                          (comp, basename2))
+                           'where comp = %r and basename2 = %r' %
+                           (comp, basename2))
         assert basename(basename2) == basename2
         assert splitext(basename2)[1] in Product.FILE_EXTS
         self.basename = basename2

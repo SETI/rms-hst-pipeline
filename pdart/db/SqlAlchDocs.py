@@ -1,10 +1,13 @@
 """
 Document information in the database.
 """
-import os.path
+from os import mkdir, remove
+from os.path import abspath, isdir
 import shutil
 import urllib2
 from typing import TYPE_CHECKING
+
+from fs.path import basename, join
 
 from pdart.db.SqlAlchTables import Bundle, DocumentCollection, DocumentFile, \
     DocumentProduct, create_database_tables_and_session, db_bundle_exists, \
@@ -34,10 +37,10 @@ def _ensure_directory(dir):
     # pdart.pds4label.BrowseProductImageReduction.  Refactor and
     # remove.
     try:
-        os.mkdir(dir)
+        mkdir(dir)
     except OSError:
         pass
-    assert os.path.isdir(dir), dir
+    assert isdir(dir), dir
 
 
 def _retrieve_doc(url, filepath):
@@ -71,7 +74,7 @@ def _download_product_documents(proposal_id, product_fp):
 
     for (url_template, basename) in table:
         url = url_template % proposal_id
-        filepath = os.path.join(product_fp, basename)
+        filepath = join(product_fp, basename)
         downloaded_doc = _retrieve_doc(url, filepath) or downloaded_doc
     return downloaded_doc
 
@@ -84,7 +87,7 @@ def populate_document_collection(bundle):
     downloaded.
     """
     bundle_fp = bundle.absolute_filepath()
-    collection_fp = os.path.join(bundle_fp, 'document')
+    collection_fp = join(bundle_fp, 'document')
 
     # TODO temporarily erasing and rewriting for development
     try:
@@ -93,7 +96,7 @@ def populate_document_collection(bundle):
         pass
     _ensure_directory(collection_fp)
 
-    product_fp = os.path.join(collection_fp, 'phase2')
+    product_fp = join(collection_fp, 'phase2')
     _ensure_directory(product_fp)
     proposal_id = bundle.proposal_id()
     if _download_product_documents(proposal_id, product_fp):
@@ -134,7 +137,7 @@ def db_add_document_product(session, product):
     """
     # PRECONDITION: the document product exists in the filepath and
     # has files in it.
-    assert os.path.isdir(product.absolute_filepath())
+    assert isdir(product.absolute_filepath())
     assert list(product.files())
     # and...
     assert db_document_collection_exists(session, product.collection())
@@ -149,7 +152,7 @@ def db_add_document_product(session, product):
     for file in product.files():
         db_document_file = DocumentFile(
             product_lid=str(product.lid),
-            file_basename=os.path.basename(file.full_filepath())
+            file_basename=basename(file.full_filepath())
             )
         session.add(db_document_file)
 
@@ -170,7 +173,7 @@ def _run():
 
     DB_FILEPATH = 'trash_me.db'
     try:
-        os.remove(DB_FILEPATH)
+        remove(DB_FILEPATH)
     except:
         pass
     session = create_database_tables_and_session(DB_FILEPATH)
@@ -181,7 +184,7 @@ def _run():
             bundle = collection.bundle()
             db_bundle = Bundle(lid=str(bundle.lid),
                                proposal_id=bundle.proposal_id(),
-                               archive_path=os.path.abspath(archive.root),
+                               archive_path=abspath(archive.root),
                                full_filepath=bundle.absolute_filepath(),
                                label_filepath=bundle.label_filepath())
             session.add(db_bundle)

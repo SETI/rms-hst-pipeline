@@ -17,6 +17,7 @@ from pdart.pds4.HstFilename import *
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Iterator
+    from fs.base import FS
     import pdart.pds4.Archive
     import pdart.pds4.Bundle
     import pdart.pds4.Collection
@@ -171,11 +172,12 @@ class Product(Component):
         :class:`~pdart.pds4.File.File` objects.
         """
         if self.is_document_product():
-            for filename in os.listdir(self.absolute_filepath()):
+            root_fs = self.archive.root_fs
+            for filename in root_fs.listdir(self.relative_filepath()):
                 if splitext(filename)[1] in Product.DOC_EXTS:
                     yield File(self, filename)
         else:
-            filename = basename(self.absolute_filepath())
+            filename = basename(self.relative_filepath())
             yield File(self, filename)
 
     def absolute_filepath_is_directory(self):

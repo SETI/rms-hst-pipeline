@@ -3,8 +3,9 @@ Functionality to build a RAW browse product image using a SQLite
 database.
 """
 from contextlib import closing
-import os.path
 import sys
+
+from fs.path import basename, join, splitext
 
 from pdart.db.TableSchemas import *
 from pdart.pds4.LID import *
@@ -42,9 +43,9 @@ def _make_browse_image(browse_coll_fp, raw_full_filepath, visit):
     for the source RAW file, and the product's visit code, create the
     browse image and save it.
     """
-    basename = os.path.basename(raw_full_filepath)
-    basename = os.path.splitext(basename)[0] + '.jpg'
-    target_dir = os.path.join(browse_coll_fp, ('visit_%s' % visit))
+    basename = basename(raw_full_filepath)
+    basename = splitext(basename)[0] + '.jpg'
+    target_dir = join(browse_coll_fp, ('visit_%s' % visit))
 
     ensure_directory(target_dir)
 
