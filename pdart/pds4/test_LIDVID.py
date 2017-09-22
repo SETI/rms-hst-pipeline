@@ -40,5 +40,6 @@ class TestLIDVID(unittest.TestCase):
         self.assertEquals("LIDVID('urn:nasa:pds:b:c:p::1.0')",
                           repr(LIDVID('urn:nasa:pds:b:c:p::1.0')))
 
+
 if __name__ == '__main__':
     unittest.main()

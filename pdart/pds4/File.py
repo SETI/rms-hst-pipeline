@@ -5,8 +5,10 @@ Representation of a file belonging to a
 from fs.path import basename, join, splitext
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     import pdart.pds4.Component
+
 
 # We only import PSD4 subcomponent modules to avoid circular imports.
 # If you want to import a supercomponent module, do it within a
@@ -41,7 +43,7 @@ class File(object):
 
     def __eq__(self, other):
         return self.component == other.component and \
-            self.basename == other.basename
+               self.basename == other.basename
 
     def __str__(self):
         return '%s in %r' % (self.basename, self.component)

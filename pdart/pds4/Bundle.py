@@ -1,7 +1,4 @@
 """Representation of a PDS4 bundle."""
-import re
-
-from fs.path import join
 
 # We only import PDS4 subcomponent modules to avoid circular imports.
 # If you want to import a supercomponent module, do it within a
@@ -11,7 +8,6 @@ from pdart.pds4.Collection import Collection
 from pdart.pds4.Component import *
 from pdart.pds4.LID import *
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Iterator
     import pdart.pds4.Archive

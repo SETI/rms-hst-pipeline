@@ -1,20 +1,15 @@
 """Representation of a PDS4 product."""
-import re
-import shutil
-import tempfile
-import unittest
 
-from fs.path import basename, join, split, splitext
-
-# We only import PDS4 subcomponent modules to avoid circular imports.
-# If you want to import a supercomponent module, do it within a
-# function or method.
+from fs.path import split
+from typing import TYPE_CHECKING
 
 from pdart.pds4.Component import *
 from pdart.pds4.File import *
 from pdart.pds4.HstFilename import *
 
-from typing import TYPE_CHECKING
+# We only import PDS4 subcomponent modules to avoid circular imports.
+# If you want to import a supercomponent module, do it within a
+# function or method.
 if TYPE_CHECKING:
     from typing import Iterator
     from fs.base import FS

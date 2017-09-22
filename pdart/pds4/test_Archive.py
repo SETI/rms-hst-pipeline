@@ -1,8 +1,8 @@
-from pdart.pds4.Archive import *
-
 import shutil
 import tempfile
 import unittest
+
+from pdart.pds4.Archive import *
 
 
 class TestArchive(unittest.TestCase):
@@ -13,7 +13,7 @@ class TestArchive(unittest.TestCase):
         with self.assertRaises(Exception):
             Archive("I'm/betting/this/directory/doesn't/exist")
 
-        Archive('/')        # guaranteed to exist
+        Archive('/')  # guaranteed to exist
 
         # but try with another directory
         tempdir = tempfile.mkdtemp()

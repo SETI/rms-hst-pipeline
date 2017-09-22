@@ -1,13 +1,10 @@
 import unittest
 
-from fs.path import join
-
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.Bundle import *
 from pdart.pds4.Collection import *
-from pdart.pds4.HstFilename import *
-from pdart.pds4.Product import *
 from pdart.pds4.LID import LID
+from pdart.pds4.Product import *
 
 
 class TestProduct(unittest.TestCase):

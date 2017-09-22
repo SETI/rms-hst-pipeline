@@ -4,10 +4,10 @@ Representation of a PDS4 bundle, collection, or product.
 import abc
 
 from fs.path import join
+from typing import TYPE_CHECKING
 
 from pdart.pds4.LID import *
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Iterator
     import pdart.pds4.Archive

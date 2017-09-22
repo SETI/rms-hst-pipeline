@@ -26,9 +26,9 @@ class TestLID(unittest.TestCase):
             LID('urn:nasa:pdddddds:bundle')
 
         # test length
-        LID('urn:nasa:pds:%s' % ('a'*200))
+        LID('urn:nasa:pds:%s' % ('a' * 200))
         with self.assertRaises(Exception):
-            LID('urn:nasa:pds:%s' % ('a'*250))
+            LID('urn:nasa:pds:%s' % ('a' * 250))
 
         # test characters
         with self.assertRaises(Exception):
@@ -90,4 +90,4 @@ class TestLID(unittest.TestCase):
             'urn:nasa:pds:bundle:browse_collection_raw:data_product')
         self.assertEquals(browse_prod_lid, data_prod_lid.to_browse_lid())
 
-    # TODO Write tests for is_bundle_id, etc.
+        # TODO Write tests for is_bundle_id, etc.
