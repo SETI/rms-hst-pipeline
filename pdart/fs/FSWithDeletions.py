@@ -1,9 +1,9 @@
 from fs.errors import ResourceNotFound
 from fs.mode import Mode
 from fs.path import dirname, join
-from pdart.fs.NarrowWrapFS import NarrowWrapFS
-
 from typing import TYPE_CHECKING
+
+from pdart.fs.NarrowWrapFS import NarrowWrapFS
 
 if TYPE_CHECKING:
     from fs.base import FS
@@ -17,6 +17,7 @@ class FSWithDeletions(NarrowWrapFS):
     allows us to "delete" files from a read-only system.  Intended to
     be used as a base class.
     """
+
     def __init__(self, fs, del_pred):
         # type: (FS, DeletionPredicate) -> None
         NarrowWrapFS.__init__(self, fs)
@@ -36,8 +37,8 @@ class FSWithDeletions(NarrowWrapFS):
         else:
             return [child
                     for child in self.delegate_fs().listdir(path)
-                    if not self.deletion_predicate.is_deleted(
-                        join(path, child))]
+                    if not self.deletion_predicate.is_deleted(join(path,
+                                                                   child))]
 
     def makedir(self, path, permissions=None, recreate=False):
         parent = dirname(path)

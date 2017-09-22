@@ -1,9 +1,11 @@
 from fs.errors import ResourceReadOnly
+
 from pdart.fs.NarrowWrapFS import *
 
 
 class ReadOnlyView(NarrowWrapFS):
     def __init__(self, wrap_fs):
+        # type: (FS) -> None
         NarrowWrapFS.__init__(self, wrap_fs)
 
     def makedir(self, path, permissions=None, recreate=False):

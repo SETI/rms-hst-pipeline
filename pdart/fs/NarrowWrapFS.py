@@ -10,12 +10,15 @@ class NarrowWrapFS(FS):
     efficiency.  If that doesn't work for you, fs.wrapfs.WrapFS might
     be a better choice.
     """
+
     def __init__(self, wrap_fs):
+        # type: (FS) -> None
         FS.__init__(self)
         assert wrap_fs, 'filesystem to wrap required'
         self._wrap_fs = wrap_fs
 
     def delegate_fs(self):
+        # type: () -> FS
         return self._wrap_fs
 
     def getmeta(self, namespace='standard'):

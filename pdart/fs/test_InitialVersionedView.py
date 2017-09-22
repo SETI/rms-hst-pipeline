@@ -1,14 +1,15 @@
 import unittest
 
 import fs.copy
-from pdart.pds4.Archives import get_any_archive
-from pdart.fs.InitialVersionedView import *
-from pdart.fs.VersionedFS import ROOT
-from pdart.fs.VersionedViewVerifier import *
-
 from fs.memoryfs import MemoryFS
 
+from pdart.fs.InitialVersionedView import *
+from pdart.fs.VersionedViewVerifier import *
+from pdart.pds4.Archives import get_any_archive
+
 _BUNDLE_ID = u'hst_00000'
+
+
 # type: unicode
 
 

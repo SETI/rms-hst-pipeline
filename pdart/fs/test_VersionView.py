@@ -1,11 +1,10 @@
-from pdart.fs.VersionView import VersionView
-
 import unittest
 
 from fs.memoryfs import MemoryFS
 from fs.path import join
 
 from pdart.fs.SubdirVersions import writeSubdirVersions
+from pdart.fs.VersionView import VersionView
 from pdart.fs.VersionedFS import ROOT
 
 _BUNDLE_ID = u'hst_00000'
@@ -32,19 +31,19 @@ class TestVersionView(unittest.TestCase):
                             {_COLLECTION_ID: u'2'})
 
         self.versioned_fs.makedirs(
-                join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$0'))
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$0'))
         writeSubdirVersions(self.versioned_fs,
                             join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$0'),
                             {})
 
         self.versioned_fs.makedirs(
-                join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$1'))
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$1'))
         writeSubdirVersions(self.versioned_fs,
                             join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$1'),
                             {})
 
         self.versioned_fs.makedirs(
-                join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$2'))
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$2'))
         writeSubdirVersions(self.versioned_fs,
                             join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$2'),
                             {_PRODUCT_ID: u'1'})
@@ -81,17 +80,17 @@ class TestVersionView(unittest.TestCase):
 
         # test that collections appear
         self.assertTrue(self.version_view.exists(
-                join(ROOT, _BUNDLE_ID, _COLLECTION_ID)))
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID)))
 
         # test that files don't appear when wrong version
         self.versioned_fs.touch(join(ROOT, _BUNDLE_ID, u'v$1', u'bundle.xml'))
         self.assertFalse(self.version_view.exists(
-                join(ROOT, _BUNDLE_ID, u'bundle.xml')))
+            join(ROOT, _BUNDLE_ID, u'bundle.xml')))
 
         # test that files do appear when right version
         self.versioned_fs.touch(join(ROOT, _BUNDLE_ID, u'v$3', u'bundle.xml'))
         self.assertTrue(self.version_view.exists(
-                join(ROOT, _BUNDLE_ID, u'bundle.xml')))
+            join(ROOT, _BUNDLE_ID, u'bundle.xml')))
 
     def test_collection_dir(self):
         # type: () -> None
@@ -113,7 +112,7 @@ class TestVersionView(unittest.TestCase):
         print '****', self.version_view.getinfo(join(COLLECTION_DIR,
                                                      u'collection.xml'))
         self.assertTrue(self.version_view.exists(
-                join(COLLECTION_DIR, u'collection.xml')))
+            join(COLLECTION_DIR, u'collection.xml')))
 
     def test_product_dir(self):
         # type: () -> None
@@ -132,7 +131,7 @@ class TestVersionView(unittest.TestCase):
         self.versioned_fs.touch(join(PRODUCT_DIR, u'v$1',
                                      u'product.xml'))
         self.assertTrue(self.version_view.exists(
-                join(PRODUCT_DIR, u'product.xml')))
+            join(PRODUCT_DIR, u'product.xml')))
 
     def test_legacy_bundle_dir(self):
         BUNDLE_DIR = join(ROOT, _BUNDLE_ID, u'v$3')

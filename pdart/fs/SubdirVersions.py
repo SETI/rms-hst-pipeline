@@ -1,10 +1,13 @@
 import re
-from typing import TYPE_CHECKING
+
 from fs.path import join
+from typing import TYPE_CHECKING
 
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
+
 if TYPE_CHECKING:
     from fs.base import FS
+    from typing import Dict
 
 _versionRE = re.compile('^[0-9\.]+$')
 

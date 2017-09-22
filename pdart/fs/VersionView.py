@@ -1,18 +1,18 @@
 from abc import *
-from typing import TYPE_CHECKING
 
 from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound, \
     ResourceReadOnly
 from fs.info import Info
 from fs.mode import check_writable
 from fs.path import abspath, basename, iteratepath, join, normpath
+from typing import TYPE_CHECKING
 
 from pdart.fs.ReadOnlyView import ReadOnlyView
 from pdart.fs.SubdirVersions import readSubdirVersions
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME
 
 if TYPE_CHECKING:
-    from typing import Any, AnyStr, Tuple
+    from typing import Any, AnyStr, Dict, List, Tuple
     from fs.base import FS
     from fs.osfs import OSFS
 
@@ -59,6 +59,7 @@ class _FSDirPath(_FSPath):
     """
     A path that's a directory.
     """
+
     def __init__(self, fs, path):
         _FSPath.__init__(self, fs, path)
 
@@ -71,6 +72,7 @@ class _FSFilePath(_FSPath):
     """
     A path that's a file
     """
+
     def __init__(self, fs, path):
         _FSPath.__init__(self, fs, path)
 
@@ -83,6 +85,7 @@ class _FSRootPath(_FSDirPath):
     """
     The root path '/'
     """
+
     def __init__(self, fs, path, bundle):
         # type: (OSFS, unicode, unicode) -> None
         assert path == ROOT
@@ -102,6 +105,7 @@ class _FSBundlePath(_FSDirPath):
     """
     A path '/bundle'
     """
+
     def __init__(self, fs, path, bundle, bundle_version):
         # type: (OSFS, unicode, unicode, unicode) -> None
         _FSDirPath.__init__(self, fs, path)
@@ -131,6 +135,7 @@ class _FSBundleFile(_FSFilePath):
     """
     A path '/bundle/file'
     """
+
     def __init__(self, fs, path, legacy_path):
         _FSFilePath.__init__(self, fs, path)
         self._legacy_path = legacy_path
@@ -148,6 +153,7 @@ class _FSCollectionPath(_FSDirPath):
     """
     A path '/bundle/collection'
     """
+
     def __init__(self, fs, path, legacy_dirpath):
         _FSDirPath.__init__(self, fs, path)
         # legacy_dirpath is /bundle/collection/v$n
@@ -175,6 +181,7 @@ class _FSProductPath(_FSDirPath):
     """
     A path '/bundle/collection/product'
     """
+
     def __init__(self, fs, path, legacy_dirpath):
         _FSDirPath.__init__(self, fs, path)
         # legacy_dirpath is /bundle/collection/product/v$n
@@ -200,6 +207,7 @@ class _FSCollectionFile(_FSFilePath):
     """
     A path '/bundle/collection/file'
     """
+
     def __init__(self, fs, path, legacy_path):
         assert len(iteratepath(path)) == 3
         _FSFilePath.__init__(self, fs, path)
@@ -218,6 +226,7 @@ class _FSProductFile(_FSFilePath):
     """
     A path '/bundle/collection/product/file'
     """
+
     def __init__(self, fs, path, legacy_path):
         assert len(iteratepath(path)) == 4
         _FSFilePath.__init__(self, fs, path)

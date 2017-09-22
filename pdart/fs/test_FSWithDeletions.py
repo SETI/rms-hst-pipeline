@@ -1,10 +1,9 @@
 import unittest
 
-from fs.errors import ResourceNotFound
 from fs.tempfs import TempFS
 
-from pdart.fs.FSWithDeletions import *
 from pdart.fs.DeletionPredicate import *
+from pdart.fs.FSWithDeletions import *
 
 
 class TestDeletionPredicate(DeletionPredicate):
@@ -14,7 +13,6 @@ class TestDeletionPredicate(DeletionPredicate):
 
 
 class TestFSWithDeletions(unittest.TestCase):
-
     def setUp(self):
         self.base_fs = TempFS()
         self.base_fs.settext(u'/foo', u'foo')

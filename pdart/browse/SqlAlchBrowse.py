@@ -1,18 +1,14 @@
 from os import mkdir
 from os.path import getsize, isdir, isfile
 
-from fs.path import basename, join, splitext
-
-import pdart.add_pds_tools
 import picmaker
+from fs.path import basename, join, splitext
+from typing import TYPE_CHECKING
 
 from pdart.db.SqlAlchTables import BrowseProduct, \
     NonDocumentCollection, Product, db_browse_product_exists, \
     db_non_document_collection_exists
-
 from pdart.pds4.HstFilename import HstFilename
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import AnyStr, Tuple
@@ -49,12 +45,12 @@ def make_browse_product(fits_product, browse_product):
     filepath = fits_product.first_filepath()
     assert isfile(filepath)
 
-    basename = basename(filepath)
-    basename = splitext(basename)[0] + '.jpg'
+    basename2 = basename(filepath)
+    basename2 = splitext(basename2)[0] + '.jpg'
     browse_collection_dir = browse_product.collection().absolute_filepath()
     _ensure_directory(browse_collection_dir)
 
-    visit = HstFilename(basename).visit()
+    visit = HstFilename(basename2).visit()
     target_dir = join(browse_collection_dir, ('visit_%s' % visit))
     _ensure_directory(target_dir)
 
@@ -63,7 +59,7 @@ def make_browse_product(fits_product, browse_product):
                           filter="None",
                           percentiles=(1, 99))
     # POSTCONDITION: browse file exists in the filesystem
-    browse_filepath = join(target_dir, basename)
+    browse_filepath = join(target_dir, basename2)
     assert isfile(browse_filepath)
 
 
@@ -120,7 +116,7 @@ def make_db_browse_product(session, fits_product, browse_product):
         label_filepath=browse_product.label_filepath(),
         browse_filepath=browse_filepath,
         object_length=object_length
-        )
+    )
     session.add(db_browse_product)
     session.commit()
 

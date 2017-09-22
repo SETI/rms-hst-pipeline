@@ -1,13 +1,11 @@
-import abc
-from typing import TYPE_CHECKING
 from fs.path import basename, join
+from typing import TYPE_CHECKING
 
 from pdart.fs.SubdirVersions import readSubdirVersions
-from pdart.fs.VersionedFS import ROOT, scan_vfs_dir, SUBDIR_VERSIONS_FILENAME
+from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME, scan_vfs_dir
 
 if TYPE_CHECKING:
-    from typing import List
-    from fs.base import FS
+    from pdart.fs.VersionedView import VersionedView
 
 
 class VersionedViewException(Exception):
@@ -20,8 +18,9 @@ class VersionedViewVerifier(object):
     Verification for a VersionedView, that is, any filesystem
     organized to include versioning.
     """
+
     def __init__(self, view):
-        # type: (FS) -> None
+        # type: (VersionedView) -> None
         self.view = view
         self.test_has_bundle_dirs()
 

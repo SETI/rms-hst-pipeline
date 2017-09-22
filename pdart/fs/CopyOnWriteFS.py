@@ -1,6 +1,6 @@
+import fs.errors
 from fs.base import FS
 from fs.copy import copy_file
-import fs.errors
 from fs.mode import Mode
 from fs.path import dirname
 from fs.tempfs import TempFS
@@ -14,7 +14,9 @@ class CopyOnWriteFS(FS):
     Wraps a read-only filesystem and a read/write filesystem.  Any new
     data goes into the read-only system.
     """
+
     def __init__(self, readonly_fs, delta_fs=None):
+        # type: (FS, FS) -> None
         FS.__init__(self)
         self._deletion_predicate = SetDeletionPredicate()
         self._readonly_fs = FSWithDeletions(readonly_fs,
@@ -29,6 +31,7 @@ class CopyOnWriteFS(FS):
         return self._delta_fs.getmeta(namespace=namespace)
 
     def _ensure_path_is_writable(self, path):
+        # type: (unicode) -> None
         assert path
         if self._readonly_fs.exists(path) and \
                 not self._delta_fs.exists(path):

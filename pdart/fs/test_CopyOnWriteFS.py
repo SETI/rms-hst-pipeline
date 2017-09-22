@@ -1,5 +1,5 @@
 import unittest
-from fs.tempfs import TempFS
+
 from fs.test import FSTestCases
 
 from CopyOnWriteFS import *

@@ -1,22 +1,17 @@
 """
 Work on viewing an archive folder as a versioned filesystem.
 """
-from abc import *
 import io
-import sys
-import traceback
-from typing import TYPE_CHECKING
+from abc import *
 
 from fs.base import FS
-from fs.copy import copy_fs
-from fs.errors import DirectoryExpected, FileExpected, InvalidPath, \
-    ResourceNotFound, ResourceReadOnly
-from fs.error_tools import unwrap_errors
+from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound, \
+    ResourceReadOnly
 from fs.info import Info
 from fs.mode import check_writable
 from fs.osfs import OSFS
 from fs.path import abspath, basename, iteratepath, join, normpath
-from fs.tempfs import TempFS
+from typing import TYPE_CHECKING
 
 from pdart.fs.ReadOnlyView import ReadOnlyView
 from pdart.fs.SubdirVersions import strSubdirVersions
@@ -24,7 +19,7 @@ from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME, \
     scan_vfs_dir
 
 if TYPE_CHECKING:
-    from typing import Any, AnyStr, Tuple
+    from typing import Any, AnyStr, List, Tuple
 
 
 def _make_raw_dir_info(name):
@@ -41,6 +36,7 @@ def _is_version_part(part):
     # type: (unicode) -> bool
     return part.startswith(u'v$')
 
+
 _ALL_PATS = [u'*']
 # type: List[unicode]
 
@@ -50,7 +46,9 @@ VERSION_ONE = u'v$1'
 _VISIT_DIR_PAT = u'visit_*'
 # type: unicode
 
-FILE_EXCLUSION_PATS = [u'.DS_Store', '*.db']
+FILE_EXCLUSION_PATS = [u'.DS_Store', u'*.db']
+
+
 # type: List[unicode]
 
 
@@ -112,6 +110,7 @@ class _FSDirPath(_FSPath):
     """
     A path that's a directory.
     """
+
     def __init__(self, fs, path):
         _FSPath.__init__(self, fs, path)
 
@@ -124,6 +123,7 @@ class _FSFilePath(_FSPath):
     """
     A path that's a file.
     """
+
     def __init__(self, fs, path):
         _FSPath.__init__(self, fs, path)
 
@@ -136,6 +136,7 @@ class _FSRootPath(_FSDirPath):
     """
     The root path '/'
     """
+
     def __init__(self, fs, path, bundle):
         # type: (OSFS, unicode, unicode) -> None
         assert path == ROOT
@@ -155,6 +156,7 @@ class _FSBundlePath(_FSDirPath):
     """
     A path '/bundle'
     """
+
     def __init__(self, fs, path, bundle):
         # type: (OSFS, unicode, unicode) -> None
         _FSDirPath.__init__(self, fs, path)
@@ -178,6 +180,7 @@ class _FSCollectionPath(_FSDirPath):
     """
     A path '/bundle/collection'
     """
+
     def __init__(self, fs, path, big_fs):
         # type: (OSFS, unicode, InitialVersionedView) -> None
         _FSDirPath.__init__(self, fs, path)
@@ -191,7 +194,7 @@ class _FSCollectionPath(_FSDirPath):
         # type: () -> List[unicode]
         b, c = iteratepath(self._original_path)
         dir_list = list(self._big_fs._get_collection_fits_products(
-                join(ROOT, c)))
+            join(ROOT, c)))
         dir_list.append(VERSION_ONE)
         return dir_list
 
@@ -200,6 +203,7 @@ class _FSProductPath(_FSDirPath):
     """
     A path '/bundle/collection/product'
     """
+
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
         _FSDirPath.__init__(self, fs, path)
@@ -217,6 +221,7 @@ class _FSBundleVersionDirPath(_FSDirPath):
     """
     A path '/bundle/v$1'
     """
+
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
         _FSDirPath.__init__(self, fs, path)
@@ -246,6 +251,7 @@ class _FSCollectionVersionDirPath(_FSDirPath):
     """
     A path '/bundle/collection/v$1'
     """
+
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
         _FSDirPath.__init__(self, fs, path)
@@ -272,6 +278,7 @@ class _FSProductVersionDirPath(_FSDirPath):
     """
     A path '/bundle/collection/product/v$1'
     """
+
     def __init__(self, fs, path, big_fs):
         # type: (OSFS, unicode, InitialVersionedView) -> None
         _FSPath.__init__(self, fs, path)
@@ -286,14 +293,15 @@ class _FSProductVersionDirPath(_FSDirPath):
         # type: () -> List[unicode]
         b, c, p, v = iteratepath(self._original_path)
         c_dir = join(ROOT, c)
-        return self._big_fs._get_collection_product_files(c_dir, p) + \
-            [SUBDIR_VERSIONS_FILENAME]
+        coll_prod_files = self._big_fs._get_collection_product_files(c_dir, p)
+        return coll_prod_files + [SUBDIR_VERSIONS_FILENAME]
 
 
 class _FSBundleVersionedFilePath(_FSFilePath):
     """
     A path '/bundle/v$1/file'
     """
+
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
         _FSFilePath.__init__(self, fs, path)
@@ -316,6 +324,7 @@ class _FSCollectionVersionedFilePath(_FSFilePath):
     """
     A path '/bundle/collection/v$1/file'
     """
+
     def __init__(self, fs, path, big_fs):
         # type: (OSFS, unicode, InitialVersionedView) -> None
         _FSFilePath.__init__(self, fs, path)
@@ -337,6 +346,7 @@ class _FSProductVersionedFilePath(_FSFilePath):
     """
     A path '/bundle/collection/product/v$1/file'
     """
+
     def __init__(self, fs, path, big_fs):
         # type: (OSFS, unicode, InitialVersionedView) -> None
         _FSFilePath.__init__(self, fs, path)
@@ -382,6 +392,7 @@ class InitialVersionedView(ReadOnlyView):
     look like a versioned filesystem with all PDS elements at version
     1.
     """
+
     def __init__(self, bundle_id, legacy_fs):
         # type: (unicode, FS) -> None
         self._bundle = bundle_id
@@ -484,11 +495,11 @@ class InitialVersionedView(ReadOnlyView):
 
     def _get_files(self, path):
         return [info.name for info in self._legacy_fs.filterdir(
-                path,
-                files=None,
-                dirs=None,
-                exclude_dirs=_ALL_PATS,
-                exclude_files=FILE_EXCLUSION_PATS)]
+            path,
+            files=None,
+            dirs=None,
+            exclude_dirs=_ALL_PATS,
+            exclude_files=FILE_EXCLUSION_PATS)]
 
     def getinfo(self, path, namespaces=None):
         self.check()
