@@ -1,6 +1,7 @@
 """Representation of an archive containing PDS4 bundles."""
-import os.path
 import re
+
+from fs.osfs import OSFS
 
 from pdart.pds4.Bundle import *
 from pdart.pds4.Collection import *
@@ -21,8 +22,8 @@ class Archive(object):
         Create an :class:`~pdart.pds4.Archive` given a filepath to an existing
         directory.
         """
-        assert os.path.exists(root) and os.path.isdir(root)
         self.root = root
+        self.root_fs = OSFS(self.root)
 
     def __eq__(self, other):
         if not isinstance(other, Archive):
@@ -96,7 +97,7 @@ class Archive(object):
     def bundles(self):
         # type: () -> Iterator[Bundle]
         """Generate the bundles stored in this :class:`~pdart.pds4.Archive`."""
-        for subdir in os.listdir(self.root):
+        for subdir in self.root_fs.listdir(u'/'):
             if re.match(Bundle.DIRECTORY_PATTERN, subdir):
                 bundle_lid = LID('urn:nasa:pds:%s' % subdir)
                 yield Bundle(self, bundle_lid)

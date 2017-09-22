@@ -1,7 +1,7 @@
 """Representation of a PDS4 bundle."""
-import os
-import os.path
 import re
+
+from fs.path import join
 
 # We only import PDS4 subcomponent modules to avoid circular imports.
 # If you want to import a supercomponent module, do it within a
@@ -51,15 +51,19 @@ class Bundle(Component):
         return int(re.match(Bundle.DIRECTORY_PATTERN,
                             self.lid.bundle_id).group(1))
 
+    def relative_filepath(self):
+        # type: () -> unicode
+        return self.lid.bundle_id
+
     def absolute_filepath(self):
         # type: () -> unicode
         """Return the absolute filepath to the bundle's directory."""
-        return os.path.join(self.archive.root, self.lid.bundle_id)
+        return self.archive.root_fs.getsyspath(self.relative_filepath())
 
     def label_filepath(self):
         # type: () -> unicode
         """Return the absolute filepath to the bundle's label."""
-        return os.path.join(self.absolute_filepath(), 'bundle.xml')
+        return join(self.absolute_filepath(), 'bundle.xml')
 
     def collections(self):
         # type: () -> Iterator[Collection]
@@ -68,8 +72,7 @@ class Bundle(Component):
         :class:`~pdart.pds4.Bundle.Bundle` as
         :class:`~pdart.pds4.Collection.Collection` objects.
         """
-        dir_fp = self.absolute_filepath()
-        for subdir in os.listdir(dir_fp):
+        for subdir in self.archive.root_fs.listdir(self.lid.bundle_id):
             if re.match(Collection.DIRECTORY_PATTERN,
                         subdir):
                 collection_lid = LID('%s:%s' % (self.lid.lid, subdir))

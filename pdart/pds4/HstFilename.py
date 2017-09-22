@@ -1,6 +1,7 @@
 """Functionality to extract data from HST filenames."""
-import os.path
 import re
+
+from fs.path import basename
 
 
 class HstFilename(object):
@@ -12,11 +13,11 @@ class HstFilename(object):
     def __init__(self, filename):
         # type: (unicode) -> None
         self.filename = filename
-        assert len(os.path.basename(filename)) > 6, \
+        assert len(basename(filename)) > 6, \
             'Filename must be at least six characters long'
-        basename = os.path.basename(filename)
-        assert basename[0].lower() in 'iju', \
-            ('First char of filename %s must be i, j, or u.' % str(basename))
+        basename2 = basename(filename)
+        assert basename2[0].lower() in 'iju', \
+            ('First char of filename %s must be i, j, or u.' % str(basename2))
 
     def __str__(self):
         return self.filename.__str__()
@@ -26,7 +27,7 @@ class HstFilename(object):
 
     def _basename(self):
         # type: () -> unicode
-        return os.path.basename(self.filename)
+        return basename(self.filename)
 
     def instrument_name(self):
         # type: () -> unicode

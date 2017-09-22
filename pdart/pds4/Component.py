@@ -2,8 +2,8 @@
 Representation of a PDS4 bundle, collection, or product.
 """
 import abc
-import os
-import os.path
+
+from fs.path import join
 
 from pdart.pds4.LID import *
 
@@ -53,6 +53,17 @@ class Component(object):
         """
         pass
 
+    @abc.abstractmethod
+    def relative_filepath(self):
+        # type: () -> unicode
+        """
+        Return the relative filepath to the
+        :class:`~pdart.pds4.Component`'s directory
+        (:class:`~pdart.pds4.Bundle`, :class:`~pdart.pds4.Collection`)
+        or file (:class:`~pdart.pds4.Product`).
+        """
+        pass
+
     def absolute_filepath_is_directory(self):
         # type: () -> bool
         """
@@ -68,9 +79,9 @@ class Component(object):
         objects.
         """
         from pdart.pds4.File import File
-        dir = self.absolute_filepath()
-        for basename in os.listdir(dir):
+        dir = self.relative_filepath()
+        for basename in self.archive.root_fs.listdir(dir):
             if basename[0] != '.':
-                file = os.path.join(dir, basename)
-                if os.path.isfile(file):
+                file = join(dir, basename)
+                if self.archive.root_fs.isfile(file):
                     yield File(self, basename)

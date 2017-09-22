@@ -234,6 +234,7 @@ def parallel_list(label, arg_funcs):
     if exception_infos:
         # We failed if any arg_func failed
         exception_info = GroupedExceptionInfo(label, exception_infos)
+        print exception_info
         raise CalculationException(label, exception_info)
     else:
         return results

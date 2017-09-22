@@ -2,7 +2,7 @@
 Representation of a file belonging to a
 :class:`~pdart.pds4.Component`.
 """
-import os.path
+from fs.path import basename, join, splitext
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -16,11 +16,11 @@ if TYPE_CHECKING:
 class File(object):
     """A file belonging to an :class:`~pdart.pds4.Component`."""
 
-    def __init__(self, comp, basename):
+    def __init__(self, comp, basename2):
         # type: (pdart.pds4.Component.Component, unicode) -> None
         """
         Create an File given the :class:`~pdart.pds4.Component` it
-        belongs to and the basename (that is, filepath without
+        belongs to and the basename2 (that is, filepath without
         directory part) for the file.
 
         Note that this assumes that :class:`~pdart.pds4.Product`s
@@ -29,15 +29,15 @@ class File(object):
         from pdart.pds4.Product import Product
 
         assert comp, ('File.__init__() '
-                      'where comp = %r and basename = %r' %
-                      (comp, basename))
+                      'where comp = %r and basename2 = %r' %
+                      (comp, basename2))
         self.component = comp
-        assert basename, ('File.__init__() '
-                          'where comp = %r and basename = %r' %
-                          (comp, basename))
-        assert os.path.basename(basename) == basename
-        assert os.path.splitext(basename)[1] in Product.FILE_EXTS
-        self.basename = basename
+        assert basename2, ('File.__init__() '
+                          'where comp = %r and basename2 = %r' %
+                          (comp, basename2))
+        assert basename(basename2) == basename2
+        assert splitext(basename2)[1] in Product.FILE_EXTS
+        self.basename = basename2
 
     def __eq__(self, other):
         return self.component == other.component and \
@@ -53,7 +53,6 @@ class File(object):
         # type: () -> unicode
         """Return the full, absolute filepath to the file."""
         if self.component.absolute_filepath_is_directory():
-            return os.path.join(self.component.absolute_filepath(),
-                                self.basename)
+            return join(self.component.absolute_filepath(), self.basename)
         else:
             return self.component.absolute_filepath()

@@ -1,5 +1,6 @@
-import os.path
 import unittest
+
+from fs.path import join
 
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.Bundle import *
@@ -34,11 +35,11 @@ class TestProduct(unittest.TestCase):
                 visit = p.visit()
 
                 actual_fp = p.absolute_filepath()
-                expected_fps = [os.path.join(arch.root,
-                                             lid.bundle_id,
-                                             lid.collection_id,
-                                             ('visit_%s' % visit),
-                                             lid.product_id + ext)
+                expected_fps = [join(arch.root,
+                                     lid.bundle_id,
+                                     lid.collection_id,
+                                     ('visit_%s' % visit),
+                                     lid.product_id + ext)
                                 for ext in Product.FILE_EXTS]
 
                 assert actual_fp in expected_fps
@@ -68,8 +69,8 @@ class TestProduct(unittest.TestCase):
         lid = LID('urn:nasa:pds:bundle:document:product')
         p = Product(arch, lid)
         self.assertEquals(p.absolute_filepath(),
-                          os.path.join(arch.root, 'bundle',
-                                       'document', 'product'))
+                          join(arch.root, 'bundle',
+                               'document', 'product'))
         with self.assertRaises(Exception):
             p.visit_filepath()
         with self.assertRaises(Exception):

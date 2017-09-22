@@ -1,5 +1,6 @@
-import os.path
 import unittest
+
+from fs.path import join
 
 from pdart.pds4.Archives import get_any_archive
 from pdart.pds4.Bundle import *
@@ -28,7 +29,7 @@ class TestCollection(unittest.TestCase):
         arch = get_any_archive()
         lid = LID('urn:nasa:pds:bundle:collection')
         c = Collection(arch, lid)
-        self.assertEquals(os.path.join(arch.root, 'bundle', 'collection'),
+        self.assertEquals(join(arch.root, 'bundle', 'collection'),
                           c.absolute_filepath())
 
     def test_bundle(self):

@@ -1,6 +1,7 @@
 """Representation of a PDS4 collection."""
-import os.path
 import re
+
+from fs.path import basename, join, splitext
 
 # We only import PDS4 subcomponent modules to avoid circular imports.
 # If you want to import a supercomponent module, do it within a
@@ -88,8 +89,13 @@ class Collection(Component):
     def absolute_filepath(self):
         # type: () -> str
         """Return the absolute filepath to the collection's directory."""
-        return os.path.join(self.archive.root,
-                            self.lid.bundle_id, self.lid.collection_id)
+        return join(self.archive.root,
+                    self.lid.bundle_id, self.lid.collection_id)
+
+    def relative_filepath(self):
+        # type: () -> str
+        """Return the relative filepath to the collection's directory."""
+        return join(self.lid.bundle_id, self.lid.collection_id)
 
     def label_filepath(self):
         # type: () -> str
@@ -103,7 +109,7 @@ class Collection(Component):
             name = 'collection_%s.xml' % self.prefix()
         else:
             name = 'collection.xml'
-        return os.path.join(collection_fp, name)
+        return join(collection_fp, name)
 
     def inventory_name(self):
         # type: () -> unicode
@@ -120,7 +126,7 @@ class Collection(Component):
     def inventory_filepath(self):
         # type: () -> unicode
         """Return the absolute filepath to the collection's inventory."""
-        return os.path.join(self.absolute_filepath(), self.inventory_name())
+        return join(self.absolute_filepath(), self.inventory_name())
 
     def products(self):
         # type: () -> Iterator[pdart.pds4.Product.Product]
@@ -130,15 +136,18 @@ class Collection(Component):
         """
         from pdart.pds4.Product import Product
 
-        dir_fp = self.absolute_filepath()
+        dir_fp = self.relative_filepath()
         if self.lid.collection_id == 'document':
-            for subdir in os.listdir(dir_fp):
+            for subdir in self.archive.root_fs.listdir(dir_fp):
                 product_lid = LID('%s:%s' % (self.lid.lid, subdir))
                 yield Product(self.archive, product_lid)
         else:
-            for (dirpath, dirnames, filenames) in os.walk(dir_fp):
-                for filename in filenames:
-                    (root, ext) = os.path.splitext(filename)
+            for (dirpath, dirinfos, fileinfos) \
+                    in self.archive.root_fs.walk(dir_fp):
+                # Adding a filter arg to walk() seems to be slower,
+                # as is calling files() instead of walk().
+                for fileinfo in fileinfos:
+                    (root, ext) = splitext(fileinfo.name)
                     if ext in Product.FILE_EXTS:
                         product_lid = LID('%s:%s' % (self.lid.lid, root))
                         yield Product(self.archive, product_lid)

@@ -1,9 +1,10 @@
 """Representation of a PDS4 product."""
-import os.path
 import re
 import shutil
 import tempfile
 import unittest
+
+from fs.path import basename, join, split, splitext
 
 # We only import PDS4 subcomponent modules to avoid circular imports.
 # If you want to import a supercomponent module, do it within a
@@ -22,17 +23,17 @@ if TYPE_CHECKING:
     import pdart.pds4.LID
 
 
-def _find_product_file(visit_dir, product_id):
-    # type: (unicode, unicode) -> unicode
+def _find_product_file(fs, visit_dir, product_id):
+    # type: (FS, unicode, unicode) -> unicode
     """
     Find a file by name in a directory or one of its subdirectories
-    and return the absolute filepath.  Assume the directory path is
-    absolute and that only one file with that name exists under the
+    and return the relative filepath.  Assume the directory path is
+    relative and that only one file with that name exists under the
     directory.  Return None on failure.
     """
     for ext in Product.FILE_EXTS:
-        filepath = os.path.join(visit_dir, product_id + ext)
-        if os.path.isfile(filepath):
+        filepath = join(visit_dir, product_id + ext)
+        if fs.isfile(filepath):
             return filepath
     return None
 
@@ -85,14 +86,39 @@ class Product(Component):
         """
         if self.is_document_product():
             collection_filepath = self.collection().absolute_filepath()
-            return os.path.join(collection_filepath, self.lid.product_id)
+            return join(collection_filepath, self.lid.product_id)
         else:
-            visit_fp = self.visit_filepath()
-            res = _find_product_file(visit_fp, self.lid.product_id)
+            visit_fp = self.relative_visit_filepath()
+            root_fs = self.archive.root_fs
+            rel = _find_product_file(root_fs, visit_fp, self.lid.product_id)
+            res = root_fs.getsyspath(rel)
 
             collection_fp = self.collection().absolute_filepath()
             assert res, ('Couldn\'t find any product files: '
                          'Product.absolute_filepath(%r) = %r '
+                         'where collection_fp = %r' % (self,
+                                                       res,
+                                                       collection_fp))
+            return res
+
+    def relative_filepath(self):
+        # type: () -> unicode
+        """
+        Return the relative filepath to the product directory, if this
+        is a document product, otherwise, to the product file.
+        """
+        if self.is_document_product():
+            collection_filepath = self.collection().relative_filepath()
+            return join(collection_filepath, self.lid.product_id)
+        else:
+            visit_fp = self.relative_visit_filepath()
+            res = _find_product_file(self.archive.root_fs,
+                                     visit_fp,
+                                     self.lid.product_id)
+
+            collection_fp = self.collection().relative_filepath()
+            assert res, ('Couldn\'t find any product files: '
+                         'Product.relative_filepath(%r) = %r '
                          'where collection_fp = %r' % (self,
                                                        res,
                                                        collection_fp))
@@ -103,13 +129,13 @@ class Product(Component):
         """Return the absolute filepath to the product's label."""
         if self.is_document_product():
             # TODO should it be document.xml or phase2.xml or what?
-            return os.path.join(self.absolute_filepath(), 'document.xml')
+            return join(self.absolute_filepath(), 'document.xml')
         else:
             product_fp = self.absolute_filepath()
-            (dir, product_basename) = os.path.split(product_fp)
-            (root, ext) = os.path.splitext(product_basename)
+            (dir, product_basename) = split(product_fp)
+            (root, ext) = splitext(product_basename)
             label_basename = root + '.xml'
-        return os.path.join(dir, label_basename)
+        return join(dir, label_basename)
 
     def visit_filepath(self):
         # type: () -> unicode
@@ -117,7 +143,15 @@ class Product(Component):
         assert not self.is_document_product()
         collection_filepath = self.collection().absolute_filepath()
         visit_segment = 'visit_%s' % self.visit()
-        return os.path.join(collection_filepath, visit_segment)
+        return join(collection_filepath, visit_segment)
+
+    def relative_visit_filepath(self):
+        # type: () -> unicode
+        """Return the relative filepath to the product's visit directory."""
+        assert not self.is_document_product()
+        collection_filepath = self.collection().relative_filepath()
+        visit_segment = 'visit_%s' % self.visit()
+        return join(collection_filepath, visit_segment)
 
     def visit(self):
         # type: () -> unicode
@@ -137,12 +171,12 @@ class Product(Component):
         :class:`~pdart.pds4.File.File` objects.
         """
         if self.is_document_product():
-            for basename in os.listdir(self.absolute_filepath()):
-                if os.path.splitext(basename)[1] in Product.DOC_EXTS:
-                    yield File(self, basename)
+            for filename in os.listdir(self.absolute_filepath()):
+                if splitext(filename)[1] in Product.DOC_EXTS:
+                    yield File(self, filename)
         else:
-            basename = os.path.basename(self.absolute_filepath())
-            yield File(self, basename)
+            filename = basename(self.absolute_filepath())
+            yield File(self, filename)
 
     def absolute_filepath_is_directory(self):
         # type: () -> bool
