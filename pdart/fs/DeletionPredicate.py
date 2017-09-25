@@ -1,10 +1,10 @@
-from abc import ABCMeta, abstractmethod
+import abc
 
 
 class DeletionPredicate(object):
-    __metaclass__ = ABCMeta
+    __metaclass__ = abc.ABCMeta
 
-    @abstractmethod
+    @abc.abstractmethod
     def is_deleted(self, path):
         # type: (unicode) -> bool
         pass

@@ -5,7 +5,7 @@ from pdart.fs.SubdirVersions import readSubdirVersions
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME, scan_vfs_dir
 
 if TYPE_CHECKING:
-    from pdart.fs.VersionedView import VersionedView
+    from pdart.fs.VersionView import VersionView
 
 
 class VersionedViewException(Exception):
@@ -20,7 +20,7 @@ class VersionedViewVerifier(object):
     """
 
     def __init__(self, view):
-        # type: (VersionedView) -> None
+        # type: (VersionView) -> None
         self.view = view
         self.test_has_bundle_dirs()
 
