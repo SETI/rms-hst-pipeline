@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from typing import Set
 
 
-class SetDeletionPredicate(DeletionPredicate):
+class DeletionSet(DeletionPredicate):
     def __init__(self):
         # type: () -> None
         self._deleted_paths = set()

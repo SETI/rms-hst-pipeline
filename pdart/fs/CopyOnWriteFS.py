@@ -7,7 +7,7 @@ from fs.tempfs import TempFS
 from typing import TYPE_CHECKING
 
 from pdart.fs.FSWithDeletions import FSWithDeletions
-from pdart.fs.SetDeletionPredicate import SetDeletionPredicate
+from pdart.fs.DeletionSet import DeletionSet
 
 if TYPE_CHECKING:
     from typing import Set
@@ -45,7 +45,7 @@ class CopyOnWriteFS(FS):
     def __init__(self, readonly_fs, delta_fs=None):
         # type: (FS, FS) -> None
         FS.__init__(self)
-        self._deletion_predicate = SetDeletionPredicate()
+        self._deletion_predicate = DeletionSet()
         self._readonly_fs = FSWithDeletions(readonly_fs,
                                             self._deletion_predicate)
         if not delta_fs:
