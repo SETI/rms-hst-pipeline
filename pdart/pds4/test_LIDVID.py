@@ -19,6 +19,30 @@ class TestLIDVID(unittest.TestCase):
         with self.assertRaises(Exception):
             LIDVID('urn:nasa:pds:ssc01.hirespc.cruise:browse::2.0.0')
 
+    def test_lid(self):
+        self.assertEqual(LID('urn:nasa:pds:b:c:p'),
+                         LIDVID('urn:nasa:pds:b:c:p::666').lid())
+
+    def test_vid(self):
+        self.assertEqual(VID('666'),
+                         LIDVID('urn:nasa:pds:b:c:p::666').vid())
+        self.assertEqual(VID('3.14159'),
+                         LIDVID('urn:nasa:pds:b:c:p::3.14159').vid())
+
+    def test_next_major_lidvid(self):
+        self.assertEqual(LIDVID('urn:nasa:pds:b:c:p::667'),
+                         LIDVID('urn:nasa:pds:b:c:p::666').next_major_lidvid())
+        self.assertEqual(
+            LIDVID('urn:nasa:pds:b:c:p::4'),
+            LIDVID('urn:nasa:pds:b:c:p::3.14159').next_major_lidvid())
+
+    def test_next_minor_lidvid(self):
+        self.assertEqual(LIDVID('urn:nasa:pds:b:c:p::666.1'),
+                         LIDVID('urn:nasa:pds:b:c:p::666').next_minor_lidvid())
+        self.assertEqual(
+            LIDVID('urn:nasa:pds:b:c:p::3.14160'),
+            LIDVID('urn:nasa:pds:b:c:p::3.14159').next_minor_lidvid())
+
     def test_eq(self):
         # type: () -> None
         self.assertTrue(LIDVID('urn:nasa:pds:b:c:p::1.0') ==

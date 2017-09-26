@@ -25,8 +25,17 @@ class TestVID(unittest.TestCase):
 
         # test fields
         v = VID('3.14159265')
-        self.assertEqual(3, v.major)
-        self.assertEqual(14159265, v.minor)
+        self.assertEqual(3, v._major)
+        self.assertEqual(14159265, v._minor)
+
+    def test_next_major_vid(self):
+        # type: () -> None
+        self.assertEqual(VID('3'), VID('2.9').next_major_vid())
+
+    def test_next_minor_vid(self):
+        # type: () -> None
+        self.assertEquals(VID('2.1'), VID('2').next_minor_vid())
+        self.assertEquals(VID('2.10'), VID('2.9').next_minor_vid())
 
     def test_cmp(self):
         # type: () -> None

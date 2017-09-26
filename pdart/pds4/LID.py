@@ -37,7 +37,7 @@ class LID(object):
         self.product_id = ids[5]
 
     def __cmp__(self, other):
-        return cmp(self.lid, other.lid)
+        return cmp(str(self), str(other))
 
     def __str__(self):
         return self.lid
