@@ -16,19 +16,19 @@ if TYPE_CHECKING:
 class Delta(object):
     """
     The changes between two filesystems.  First remove the filepaths given
-    in subtractions, then add the files found in the additions filesystem.
+    in deletions, then add the files found in the additions filesystem.
     """
 
-    def __init__(self, subtractions, additions):
+    def __init__(self, deletions, additions):
         """Create a Delta from the subtractions and additions."""
         # type: (Set[unicode], FS) -> None
-        self._subtractions = subtractions
+        self._deletions = deletions
         self._additions = additions
 
     def subtractions(self):
         """Returns a set of the removed filepaths."""
         # type: () -> Set[unicode]
-        return self._subtractions
+        return self._deletions
 
     def additions(self):
         """Returns a filesystem containing the additions."""
@@ -45,15 +45,15 @@ class CopyOnWriteFS(FS):
     def __init__(self, readonly_fs, delta_fs=None):
         # type: (FS, FS) -> None
         FS.__init__(self)
-        self._deletion_predicate = DeletionSet()
+        self._deletion_set = DeletionSet()
         self._readonly_fs = FSWithDeletions(readonly_fs,
-                                            self._deletion_predicate)
+                                            self._deletion_set)
         if not delta_fs:
             delta_fs = TempFS()
         self._delta_fs = delta_fs
 
     def delta(self):
-        return Delta(self._deletion_predicate.as_set(), self._delta_fs)
+        return Delta(self._deletion_set.as_set(), self._delta_fs)
 
     def normalize(self):
         """Remove all duplicated files."""
@@ -62,7 +62,6 @@ class CopyOnWriteFS(FS):
         # walk all the files in the delta.  If they are the same as the
         # files in the R/O filesystem, delete them and make sure they
         # aren't marked as deleted.
-
         assert False, 'unimplemented'
 
     def getmeta(self, namespace='standard'):
@@ -78,7 +77,7 @@ class CopyOnWriteFS(FS):
             p = dirname(path)
             self._delta_fs.makedirs(p)
             copy_file(self._readonly_fs, path, self._delta_fs, path)
-            self._deletion_predicate.delete(path)
+            self._deletion_set.delete(path)
 
     def getinfo(self, path, namespaces=None):
         self.check()
