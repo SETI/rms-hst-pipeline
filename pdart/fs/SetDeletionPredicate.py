@@ -19,3 +19,12 @@ class SetDeletionPredicate(DeletionPredicate):
     def delete(self, path):
         # type: (unicode) -> None
         self._deleted_paths.add(path)
+
+    def undelete(self, path):
+        # type: (unicode) -> None
+        # raises KeyError in path not in set
+        self._deleted_paths.remove(path)
+
+    def as_set(self):
+        # type: () -> Set[unicode]
+        return self._deleted_paths

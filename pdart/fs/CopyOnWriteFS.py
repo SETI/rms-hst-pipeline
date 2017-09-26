@@ -4,9 +4,36 @@ from fs.copy import copy_file
 from fs.mode import Mode
 from fs.path import dirname
 from fs.tempfs import TempFS
+from typing import TYPE_CHECKING
 
 from pdart.fs.FSWithDeletions import FSWithDeletions
 from pdart.fs.SetDeletionPredicate import SetDeletionPredicate
+
+if TYPE_CHECKING:
+    from typing import Set
+
+
+class Delta(object):
+    """
+    The changes between two filesystems.  First remove the filepaths given
+    in subtractions, then add the files found in the additions filesystem.
+    """
+
+    def __init__(self, subtractions, additions):
+        """Create a Delta from the subtractions and additions."""
+        # type: (Set[unicode], FS) -> None
+        self._subtractions = subtractions
+        self._additions = additions
+
+    def subtractions(self):
+        """Returns a set of the removed filepaths."""
+        # type: () -> Set[unicode]
+        return self._subtractions
+
+    def additions(self):
+        """Returns a filesystem containing the additions."""
+        # type: () -> FS
+        return self._additions
 
 
 class CopyOnWriteFS(FS):
@@ -24,6 +51,19 @@ class CopyOnWriteFS(FS):
         if not delta_fs:
             delta_fs = TempFS()
         self._delta_fs = delta_fs
+
+    def delta(self):
+        return Delta(self._deletion_predicate.as_set(), self._delta_fs)
+
+    def normalize(self):
+        """Remove all duplicated files."""
+        # type: () -> None
+
+        # walk all the files in the delta.  If they are the same as the
+        # files in the R/O filesystem, delete them and make sure they
+        # aren't marked as deleted.
+
+        assert False, 'unimplemented'
 
     def getmeta(self, namespace='standard'):
         # TODO Not quite right to use just the delta's meta.  What
