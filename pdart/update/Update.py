@@ -38,16 +38,3 @@ class ISingleVersionBundleFS(object):
         """Return the LIDVID for the bundle the filesystem holds."""
         # type: () -> LIDVID
         pass
-
-
-class IMultiversionBundleFS(object):
-    __metaclass__ = abc.ABCMeta
-
-    # TODO This and things like the Version file need to go into a
-    # single class down low.  With tests.  I can work on that.
-
-    @abc.abstractmethod
-    def lidvid_to_directory(self, lidvid):
-        """For a given LIDVID, give the directory that contains its files."""
-        # type: (LIDVID) -> unicode
-        pass

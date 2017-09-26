@@ -13,3 +13,5 @@ class TestVersionDirNames(unittest.TestCase):
         self.assertEqual(VID('3.4'), dir_name_to_vid(u'v$3.4'))
         with self.assertRaises(Exception):
             dir_name_to_vid('kaboom')
+        with self.assertRaises(Exception):
+            dir_name_to_vid('v$1.2.3')

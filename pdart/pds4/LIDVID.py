@@ -26,6 +26,21 @@ class LIDVID(object):
         # type: () -> VID
         return self._vid
 
+    def is_product_lidvid(self):
+        # type: () -> bool
+        """Return True iff the LIDVID is a product LIDVID."""
+        return self._lid.is_product_lid()
+
+    def is_collection_lidvid(self):
+        # type: () -> bool
+        """Return True iff the LIDVID is a collection LIDVID."""
+        return self._lid.is_collection_lid()
+
+    def is_bundle_lidvid(self):
+        # type: () -> bool
+        """Return True iff the LIDVID is a bundle LIDVID."""
+        return self._lid.is_bundle_lid()
+
     def next_major_lidvid(self):
         """Return the next major LIDVID."""
         # type: () -> LIDVID
