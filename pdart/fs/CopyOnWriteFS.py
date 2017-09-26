@@ -6,8 +6,8 @@ from fs.path import dirname
 from fs.tempfs import TempFS
 from typing import TYPE_CHECKING
 
-from pdart.fs.ReadOnlyFSWithDeletions import ReadOnlyFSWithDeletions
 from pdart.fs.DeletionSet import DeletionSet
+from pdart.fs.ReadOnlyFSWithDeletions import ReadOnlyFSWithDeletions
 
 if TYPE_CHECKING:
     from typing import Set
@@ -42,27 +42,38 @@ class CopyOnWriteFS(FS):
     data goes into the read-only system.
     """
 
-    def __init__(self, base_fs, delta_fs=None):
+    def __init__(self, base_fs, delta_fs=TempFS()):
         # type: (FS, FS) -> None
         FS.__init__(self)
         self._deletion_set = DeletionSet()
         self._readonly_fs = ReadOnlyFSWithDeletions(base_fs,
                                                     self._deletion_set)
-        if not delta_fs:
-            delta_fs = TempFS()
         self._delta_fs = delta_fs
 
     def delta(self):
         return FSDelta(self._deletion_set.as_set(), self._delta_fs)
 
     def normalize(self):
-        """Remove all duplicated files."""
+        """Remove all unnecessarily duplicated files."""
         # type: () -> None
 
         # walk all the files in the delta.  If they are the same as the
         # files in the R/O filesystem, delete them and make sure they
         # aren't marked as deleted.
-        assert False, 'unimplemented'
+        def files_equal(filepath):
+            readonly_del = self._readonly_fs.delegate_fs()
+            if readonly_del.exists(filepath):
+                bytes_eq = (self._delta_fs.getbytes(filepath) ==
+                            readonly_del.getbytes(filepath))
+                return bytes_eq
+            else:
+                return False
+
+        redundant_files = [filepath for filepath in self._delta_fs.walk.files()
+                           if files_equal(filepath)]
+        for filepath in redundant_files:
+            self._deletion_set.undelete(filepath)
+            self._delta_fs.remove(filepath)
 
     def getmeta(self, namespace='standard'):
         # TODO Not quite right to use just the delta's meta.  What
@@ -75,7 +86,7 @@ class CopyOnWriteFS(FS):
         if self._readonly_fs.exists(path) and \
                 not self._delta_fs.exists(path):
             p = dirname(path)
-            self._delta_fs.makedirs(p)
+            self._delta_fs.makedirs(p, recreate=True)
             copy_file(self._readonly_fs, path, self._delta_fs, path)
             self._deletion_set.delete(path)
 
