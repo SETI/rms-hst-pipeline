@@ -6,7 +6,7 @@ from fs.path import dirname
 from fs.tempfs import TempFS
 from typing import TYPE_CHECKING
 
-from pdart.fs.FSWithDeletions import FSWithDeletions
+from pdart.fs.ReadOnlyFSWithDeletions import ReadOnlyFSWithDeletions
 from pdart.fs.DeletionSet import DeletionSet
 
 if TYPE_CHECKING:
@@ -46,8 +46,8 @@ class CopyOnWriteFS(FS):
         # type: (FS, FS) -> None
         FS.__init__(self)
         self._deletion_set = DeletionSet()
-        self._readonly_fs = FSWithDeletions(readonly_fs,
-                                            self._deletion_set)
+        self._readonly_fs = ReadOnlyFSWithDeletions(readonly_fs,
+                                                    self._deletion_set)
         if not delta_fs:
             delta_fs = TempFS()
         self._delta_fs = delta_fs

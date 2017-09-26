@@ -1,12 +1,10 @@
 from typing import TYPE_CHECKING
 
-from pdart.fs.DeletionPredicate import DeletionPredicate
-
 if TYPE_CHECKING:
     from typing import Set
 
 
-class DeletionSet(DeletionPredicate):
+class DeletionSet(object):
     def __init__(self):
         # type: () -> None
         self._deleted_paths = set()
