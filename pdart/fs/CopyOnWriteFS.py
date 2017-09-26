@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from typing import Set
 
 
-class Delta(object):
+class FSDelta(object):
     """
     The changes between two filesystems.  First remove the filepaths given
     in deletions, then add the files found in the additions filesystem.
@@ -25,7 +25,7 @@ class Delta(object):
         self._deletions = deletions
         self._additions = additions
 
-    def subtractions(self):
+    def deletions(self):
         """Returns a set of the removed filepaths."""
         # type: () -> Set[unicode]
         return self._deletions
@@ -42,18 +42,18 @@ class CopyOnWriteFS(FS):
     data goes into the read-only system.
     """
 
-    def __init__(self, readonly_fs, delta_fs=None):
+    def __init__(self, base_fs, delta_fs=None):
         # type: (FS, FS) -> None
         FS.__init__(self)
         self._deletion_set = DeletionSet()
-        self._readonly_fs = ReadOnlyFSWithDeletions(readonly_fs,
+        self._readonly_fs = ReadOnlyFSWithDeletions(base_fs,
                                                     self._deletion_set)
         if not delta_fs:
             delta_fs = TempFS()
         self._delta_fs = delta_fs
 
     def delta(self):
-        return Delta(self._deletion_set.as_set(), self._delta_fs)
+        return FSDelta(self._deletion_set.as_set(), self._delta_fs)
 
     def normalize(self):
         """Remove all duplicated files."""
