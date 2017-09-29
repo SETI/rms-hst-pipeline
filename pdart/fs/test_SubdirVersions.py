@@ -15,22 +15,22 @@ foo 1
 """
 
     def testParseSubdirVersions(self):
-        self.assertEqual(self.d, parseSubdirVersions(self.txt))
-        self.assertEqual({}, parseSubdirVersions(u''))
+        self.assertEqual(self.d, parse_subdir_versions(self.txt))
+        self.assertEqual({}, parse_subdir_versions(u''))
 
     def testStrSubdirVersions(self):
-        self.assertEqual(self.txt, strSubdirVersions(self.d))
-        self.assertEqual(u'', strSubdirVersions({}))
+        self.assertEqual(self.txt, str_subdir_versions(self.d))
+        self.assertEqual(u'', str_subdir_versions({}))
 
     def testWriteSubdirVersions(self):
         fs = MemoryFS()
-        writeSubdirVersions(fs, ROOT, self.d)
+        write_subdir_versions(fs, ROOT, self.d)
         self.assertEqual(self.txt, fs.gettext(SUBDIR_VERSIONS_FILENAME))
         fs.close()
 
     def testReadSubdirVersions(self):
         fs = MemoryFS()
         fs.settext(SUBDIR_VERSIONS_FILENAME, self.txt)
-        d = readSubdirVersions(fs, ROOT)
+        d = read_subdir_versions(fs, ROOT)
         self.assertEqual(self.d, d)
         fs.close()

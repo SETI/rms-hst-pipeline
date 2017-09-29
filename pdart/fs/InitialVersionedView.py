@@ -14,7 +14,7 @@ from fs.path import abspath, basename, iteratepath, join, normpath
 from typing import TYPE_CHECKING
 
 from pdart.fs.ReadOnlyView import ReadOnlyView
-from pdart.fs.SubdirVersions import strSubdirVersions
+from pdart.fs.SubdirVersions import str_subdir_versions
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME, \
     scan_vfs_dir
 
@@ -383,7 +383,7 @@ class _FSSubdirVersionsFile(_FSFilePath):
          version_dir_infos) = scan_vfs_dir(self._big_fs, ABOVE_VERSIONS)
 
         d = dict([(info.name, u"1") for info in ordinary_dir_infos])
-        return io.BytesIO(strSubdirVersions(d).encode('ascii'))
+        return io.BytesIO(str_subdir_versions(d).encode('ascii'))
 
 
 class InitialVersionedView(ReadOnlyView):

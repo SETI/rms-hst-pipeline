@@ -1,7 +1,7 @@
 from fs.path import basename, join
 from typing import TYPE_CHECKING
 
-from pdart.fs.SubdirVersions import readSubdirVersions
+from pdart.fs.SubdirVersions import read_subdir_versions
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME, scan_vfs_dir
 
 if TYPE_CHECKING:
@@ -138,7 +138,7 @@ class VersionedViewVerifier(object):
     def check_subdir_versions_file(self,
                                    version_dir):
         # type: (unicode) -> None
-        d = readSubdirVersions(self.view, version_dir)
+        d = read_subdir_versions(self.view, version_dir)
         for subdir_name, version in d.items():
             # each subdirectory entry must correspond to an
             # existing subdirectory

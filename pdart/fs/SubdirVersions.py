@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 _versionRE = re.compile('^[0-9\.]+$')
 
 
-def parseSubdirVersions(txt):
+def parse_subdir_versions(txt):
     # type: (unicode) -> Dict[unicode, unicode]
     d = {}
     for n, line in enumerate(unicode(txt).split('\n')):
@@ -26,23 +26,23 @@ def parseSubdirVersions(txt):
     return d
 
 
-def strSubdirVersions(d):
+def str_subdir_versions(d):
     # type: (Dict[unicode, unicode]) -> unicode
     for v in d.itervalues():
         assert _versionRE.match(str(v))
     return unicode(''.join(['%s %s\n' % (k, v) for k, v in sorted(d.items())]))
 
 
-def readSubdirVersions(fs, dir):
+def read_subdir_versions(fs, dir):
     # type: (FS, unicode) -> Dict[unicode, unicode]
     SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
-    return parseSubdirVersions(fs.gettext(SUBDIR_VERSIONS_FILEPATH,
-                                          encoding='ascii'))
+    return parse_subdir_versions(fs.gettext(SUBDIR_VERSIONS_FILEPATH,
+                                            encoding='ascii'))
 
 
-def writeSubdirVersions(fs, dir, d):
+def write_subdir_versions(fs, dir, d):
     # type: (FS, unicode, Dict[unicode, unicode]) -> None
     SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
     fs.settext(SUBDIR_VERSIONS_FILEPATH,
-               strSubdirVersions(d),
+               str_subdir_versions(d),
                encoding='ascii')
