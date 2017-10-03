@@ -6,7 +6,7 @@ from fs.path import join
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.SubdirVersions import write_subdir_versions_to_directory
 # from pdart.fs.SubdirVersions import write_subdir_versions
-from pdart.fs.VersionView import VersionView, VersionView2
+from pdart.fs.VersionView import VersionView, VersionView_old
 from pdart.fs.VersionedFS import ROOT
 from pdart.pds4.LIDVID import LIDVID
 
@@ -27,7 +27,7 @@ _LIDVID_P0 = LIDVID('urn:nasa:pds:hst_00000:data_xxx_raw:u2q9xx01j_raw::0')
 _LIDVID_P1 = LIDVID('urn:nasa:pds:hst_00000:data_xxx_raw:u2q9xx01j_raw::1')
 
 
-class TestVersionView2(unittest.TestCase):
+class TestVersionView(unittest.TestCase):
     def setUp(self):
         memory_fs = MemoryFS()
         self.versioned_fs = MultiversionBundleFS(memory_fs)
@@ -43,8 +43,8 @@ class TestVersionView2(unittest.TestCase):
         self.versioned_fs.make_lidvid_directories(_LIDVID_P0)
         self.versioned_fs.add_subcomponent(_LIDVID_C2, _LIDVID_P1)
 
-        self.version_view = VersionView2(_LIDVID_B3,
-                                         self.versioned_fs)
+        self.version_view = VersionView(_LIDVID_B3,
+                                        self.versioned_fs)
 
     @unittest.skip('fails on purpose; for use while testing')
     def test_init(self):
@@ -56,8 +56,8 @@ class TestVersionView2(unittest.TestCase):
         self.assertEqual(self.version_view._bundle_id, _BUNDLE_ID)
         self.assertEqual(self.version_view._version_id, u'3')
         with self.assertRaises(Exception):
-            VersionView2(LIDVID('urn:nasa:pds:hst_00000::666'),
-                         self.versioned_fs)
+            VersionView(LIDVID('urn:nasa:pds:hst_00000::666'),
+                        self.versioned_fs)
 
     def test_root(self):
         # type: () -> None
@@ -87,8 +87,47 @@ class TestVersionView2(unittest.TestCase):
         self.assertTrue(self.version_view.exists(
             join(ROOT, _BUNDLE_ID, u'bundle.xml')))
 
+    def test_collection_dir(self):
+        # type: () -> None
+        COLLECTION_DIR = join(ROOT, _BUNDLE_ID, _COLLECTION_ID)
 
-class TestVersionView(unittest.TestCase):
+        self.assertTrue(self.version_view.exists(COLLECTION_DIR))
+        self.assertTrue(self.version_view.isdir(COLLECTION_DIR))
+        self.assertEqual([_PRODUCT_ID],
+                         self.version_view.listdir(COLLECTION_DIR))
+
+        # test that files don't appear when wrong version
+        self.versioned_fs.touch(join(COLLECTION_DIR, u'v$1',
+                                     u'collection.xml'))
+        self.assertFalse(self.version_view.exists(join(COLLECTION_DIR,
+                                                       u'collection.xml')))
+        # test that files do appear when right version
+        self.versioned_fs.touch(join(COLLECTION_DIR, u'v$2',
+                                     u'collection.xml'))
+        self.assertTrue(self.version_view.exists(
+            join(COLLECTION_DIR, u'collection.xml')))
+
+    def test_product_dir(self):
+        # type: () -> None
+        PRODUCT_DIR = join(ROOT, _BUNDLE_ID, _COLLECTION_ID, _PRODUCT_ID)
+        self.assertTrue(self.version_view.exists(PRODUCT_DIR))
+        self.assertTrue(self.version_view.isdir(PRODUCT_DIR))
+        self.assertEqual([], self.version_view.listdir(PRODUCT_DIR))
+
+        # test that files don't appear when wrong version
+        self.versioned_fs.touch(join(PRODUCT_DIR, u'v$0',
+                                     u'product.xml'))
+        self.assertFalse(self.version_view.exists(join(PRODUCT_DIR,
+                                                       u'product.xml')))
+
+        # test that files do appear when right version
+        self.versioned_fs.touch(join(PRODUCT_DIR, u'v$1',
+                                     u'product.xml'))
+        self.assertTrue(self.version_view.exists(
+            join(PRODUCT_DIR, u'product.xml')))
+
+
+class TestVersionView_old(unittest.TestCase):
     def setUp(self):
         self.versioned_fs = MemoryFS()
         self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v$0'))
@@ -133,15 +172,15 @@ class TestVersionView(unittest.TestCase):
         self.versioned_fs.makedirs(
             join(ROOT, _BUNDLE_ID, _COLLECTION_ID, _PRODUCT_ID, u'v$1'))
 
-        self.version_view = VersionView(u'urn:nasa:pds:hst_00000::3',
-                                        self.versioned_fs)
+        self.version_view = VersionView_old(u'urn:nasa:pds:hst_00000::3',
+                                            self.versioned_fs)
 
     def test_creation(self):
         # type: () -> None
         self.assertEqual(self.version_view._bundle_id, _BUNDLE_ID)
         self.assertEqual(self.version_view._version_id, u'3')
         with self.assertRaises(Exception):
-            VersionView(u'urn:nasa:pds:hst_00000::666', self.versioned_fs)
+            VersionView_old(u'urn:nasa:pds:hst_00000::666', self.versioned_fs)
 
     def test_root(self):
         # type: () -> None

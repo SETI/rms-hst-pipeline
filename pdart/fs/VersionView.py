@@ -247,7 +247,7 @@ class _FSProductFile(_FSFilePath):
                                        buffering, **options)
 
 
-class VersionView2(ReadOnlyView):
+class VersionView(ReadOnlyView):
     def __init__(self, bundle_lidvid, versioned_view):
         # type: (LIDVID, MultiversionBundleFS) -> None
         assert versioned_view.exists(
@@ -279,11 +279,12 @@ class VersionView2(ReadOnlyView):
                     self._legacy_fs.directory_contents(legacy_path[1])
                 if new_segment in files:
                     return ('f', join(legacy_path[1], new_segment))
-
                 try:
                     version_id = subdir_dict[new_segment]
-                    return ('d', join(dirname(legacy_path[1]),
-                                      version_id_to_dir_name(version_id)))
+                    new_path = join(dirname(legacy_path[1]),
+                                    new_segment,
+                                    version_id_to_dir_name(version_id))
+                    return ('d', new_path)
                 except KeyError:
                     raise ResourceNotFound(path)
 
@@ -322,7 +323,7 @@ class VersionView2(ReadOnlyView):
             assert False, 'VersionView2.openbin() unimplemented'
 
 
-class VersionView(ReadOnlyView):
+class VersionView_old(ReadOnlyView):
     def __init__(self, bundle_lidvid, wrap_fs):
         # type: (unicode, FS) -> None
         bundle_lid, self._version_id = bundle_lidvid.split(u'::')[-2:]
@@ -442,5 +443,5 @@ def layered():
     from pdart.fs.InitialVersionedView import InitialVersionedView
     osfs = OSFS('/Users/spaceman/Desktop/Archive/hst_11972')
     ivv = InitialVersionedView('hst_11972', osfs)
-    vv = VersionView('urn:nasa:pds:hst_11972::1', ivv)
+    vv = VersionView_old('urn:nasa:pds:hst_11972::1', ivv)
     return vv
