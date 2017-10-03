@@ -110,7 +110,7 @@ class MultiversionBundleFS(WrapFS):
                  for info in self.scandir(dir_path)
                  if info.is_file and info.name != SUBDIR_VERSIONS_FILENAME]
         d = read_subdir_versions_from_directory(self, dir_path)
-        return (d, files)
+        return d, files
 
     def current_vid(self, lid):
         """
