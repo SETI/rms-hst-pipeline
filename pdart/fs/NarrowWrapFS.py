@@ -1,3 +1,5 @@
+import abc
+
 from fs.base import FS
 
 
@@ -10,6 +12,7 @@ class NarrowWrapFS(FS):
     efficiency.  If that doesn't work for you, fs.wrapfs.WrapFS might
     be a better choice.
     """
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self, wrap_fs):
         # type: (FS) -> None
@@ -24,32 +27,30 @@ class NarrowWrapFS(FS):
     def getmeta(self, namespace='standard'):
         return self.delegate_fs().getmeta(namespace=namespace)
 
+    @abc.abstractmethod
     def getinfo(self, path, namespaces=None):
-        self.check()
-        return self.delegate_fs().getinfo(path, namespaces=namespaces)
+        pass
 
+    @abc.abstractmethod
     def listdir(self, path):
-        self.check()
-        return self.delegate_fs().listdir(path)
+        pass
 
+    @abc.abstractmethod
     def makedir(self, path, permissions=None, recreate=False):
-        self.check()
-        return self.delegate_fs().makedir(path, permissions=permissions,
-                                          recreate=recreate)
+        pass
 
+    @abc.abstractmethod
     def openbin(self, path, mode="r", buffering=-1, **options):
-        self.check()
-        return self.delegate_fs().openbin(path, mode=mode,
-                                          buffering=buffering, **options)
+        pass
 
+    @abc.abstractmethod
     def remove(self, path):
-        self.check()
-        self.delegate_fs().remove(path)
+        pass
 
+    @abc.abstractmethod
     def removedir(self, path):
-        self.check()
-        self.delegate_fs().removedir(path)
+        pass
 
+    @abc.abstractmethod
     def setinfo(self, path, info):
-        self.check()
-        self.delegate_fs().setinfo(path, info)
+        pass
