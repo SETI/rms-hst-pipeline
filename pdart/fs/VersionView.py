@@ -7,9 +7,12 @@ from fs.mode import check_writable
 from fs.path import abspath, basename, iteratepath, join, normpath
 from typing import TYPE_CHECKING
 
+from pdart.fs.MultiversionBundleFS \
+    import MultiversionBundleFS, lidvid_to_contents_directory_path
 from pdart.fs.ReadOnlyView import ReadOnlyView
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME
+from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
     from typing import Any, AnyStr, Dict, List, Tuple
@@ -241,6 +244,27 @@ class _FSProductFile(_FSFilePath):
         # type: (AnyStr, int, **Any) -> Any
         return self._legacy_fs.openbin(self._legacy_path, mode,
                                        buffering, **options)
+
+
+class VersionView2(ReadOnlyView):
+    def __init__(self, bundle_lidvid, versioned_view):
+        # type: (LIDVID, MultiversionBundleFS) -> None
+        assert versioned_view.exists(
+            lidvid_to_contents_directory_path(bundle_lidvid))
+        self._bundle_lidvid = bundle_lidvid
+        self._bundle_id = bundle_lidvid.lid().bundle_id
+        self._version_id = bundle_lidvid.vid().__str__()
+        self._legacy_fs = versioned_view
+        ReadOnlyView.__init__(self, versioned_view)
+
+    def getinfo(self, path, namespaces=None):
+        assert False, 'VersionView2.getinfo() unimplemented'
+
+    def listdir(self, path):
+        assert False, 'VersionView2.listdir() unimplemented'
+
+    def openbin(self, path, mode="r", buffering=-1, **options):
+        assert False, 'VersionView2.openbin() unimplemented'
 
 
 class VersionView(ReadOnlyView):

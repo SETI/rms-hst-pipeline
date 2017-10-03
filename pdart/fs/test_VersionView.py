@@ -3,13 +3,61 @@ import unittest
 from fs.memoryfs import MemoryFS
 from fs.path import join
 
+from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.SubdirVersions import write_subdir_versions_to_directory
-from pdart.fs.VersionView import VersionView
+# from pdart.fs.SubdirVersions import write_subdir_versions
+from pdart.fs.VersionView import VersionView, VersionView2
 from pdart.fs.VersionedFS import ROOT
+from pdart.pds4.LIDVID import LIDVID
 
 _BUNDLE_ID = u'hst_00000'
 _COLLECTION_ID = u'data_xxx_raw'
 _PRODUCT_ID = u'u2q9xx01j_raw'
+
+_LIDVID_B0 = LIDVID('urn:nasa:pds:hst_00000::0')
+_LIDVID_B1 = LIDVID('urn:nasa:pds:hst_00000::1')
+_LIDVID_B2 = LIDVID('urn:nasa:pds:hst_00000::2')
+_LIDVID_B3 = LIDVID('urn:nasa:pds:hst_00000::3')
+
+_LIDVID_C0 = LIDVID('urn:nasa:pds:hst_00000:data_xxx_raw::0')
+_LIDVID_C1 = LIDVID('urn:nasa:pds:hst_00000:data_xxx_raw::1')
+_LIDVID_C2 = LIDVID('urn:nasa:pds:hst_00000:data_xxx_raw::2')
+
+_LIDVID_P0 = LIDVID('urn:nasa:pds:hst_00000:data_xxx_raw:u2q9xx01j_raw::0')
+_LIDVID_P1 = LIDVID('urn:nasa:pds:hst_00000:data_xxx_raw:u2q9xx01j_raw::1')
+
+
+class TestVersionView2(unittest.TestCase):
+    def setUp(self):
+        memory_fs = MemoryFS()
+        self.versioned_fs = MultiversionBundleFS(memory_fs)
+        self.versioned_fs.make_lidvid_directories(_LIDVID_B0)
+        self.versioned_fs.make_lidvid_directories(_LIDVID_B1)
+        self.versioned_fs.make_lidvid_directories(_LIDVID_B2)
+        self.versioned_fs.make_lidvid_directories(_LIDVID_B3)
+
+        self.versioned_fs.make_lidvid_directories(_LIDVID_C0)
+        self.versioned_fs.make_lidvid_directories(_LIDVID_C1)
+        self.versioned_fs.add_subcomponent(_LIDVID_B3, _LIDVID_C2)
+
+        self.versioned_fs.make_lidvid_directories(_LIDVID_P0)
+        self.versioned_fs.add_subcomponent(_LIDVID_C2, _LIDVID_P1)
+
+        self.version_view = VersionView2(_LIDVID_B3,
+                                         self.versioned_fs)
+
+    @unittest.skip('fails on purpose; for use while testing')
+    def test_init(self):
+        self.versioned_fs.tree()
+        self.assertFalse(True)
+
+    def test_creation(self):
+        # type: () -> None
+        self.assertEqual(self.version_view._bundle_id, _BUNDLE_ID)
+        self.assertEqual(self.version_view._version_id, u'3')
+        with self.assertRaises(Exception):
+            VersionView2(LIDVID('urn:nasa:pds:hst_00000::666'),
+                         self.versioned_fs)
 
 
 class TestVersionView(unittest.TestCase):

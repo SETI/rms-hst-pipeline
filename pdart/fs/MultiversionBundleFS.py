@@ -2,8 +2,8 @@ from fs.path import join
 from fs.wrap import WrapFS
 from typing import TYPE_CHECKING
 
-from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
-    write_subdir_versions_to_directory
+from pdart.fs.SubdirVersions import read_subdir_versions_from_path, \
+    write_subdir_versions_to_path
 from pdart.fs.VersionDirNames \
     import dir_name_to_vid, is_dir_name, vid_to_dir_name
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
@@ -29,7 +29,7 @@ class MultiversionBundleFS(WrapFS):
         self._wrap_fs.makedirs(path, recreate=True)
         dict_path = lidvid_to_subdir_versions_path(lidvid)
         if not self._wrap_fs.exists(dict_path):
-            write_subdir_versions_to_directory(self, dict_path, {})
+            write_subdir_versions_to_path(self, dict_path, {})
 
     def make_lid_directories(self, lid):
         """
@@ -46,7 +46,7 @@ class MultiversionBundleFS(WrapFS):
         """
         # type: (LIDVID) -> Dict[unicode, unicode]
         path = lidvid_to_subdir_versions_path(lidvid)
-        return read_subdir_versions_from_directory(self, path)
+        return read_subdir_versions_from_path(self, path)
 
     def write_lidvid_subdir_versions(self, lidvid, d):
         """
@@ -54,7 +54,7 @@ class MultiversionBundleFS(WrapFS):
         """
         # type: (LIDVID, Dict[unicode, unicode]) -> None
         path = lidvid_to_subdir_versions_path(lidvid)
-        return write_subdir_versions_to_directory(self, path, d)
+        return write_subdir_versions_to_path(self, path, d)
 
     def read_subdirectory_paths(self, lidvid):
         """
