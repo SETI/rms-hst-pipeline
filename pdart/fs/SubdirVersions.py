@@ -33,16 +33,29 @@ def str_subdir_versions(d):
     return unicode(''.join(['%s %s\n' % (k, v) for k, v in sorted(d.items())]))
 
 
-def read_subdir_versions(fs, dir):
+def read_subdir_versions_from_directory(fs, dir):
     # type: (FS, unicode) -> Dict[unicode, unicode]
     SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
     return parse_subdir_versions(fs.gettext(SUBDIR_VERSIONS_FILEPATH,
                                             encoding='ascii'))
 
 
-def write_subdir_versions(fs, dir, d):
+def read_subdir_versions_from_path(fs, path):
+    # type: (FS, unicode) -> Dict[unicode, unicode]
+    return parse_subdir_versions(fs.gettext(path,
+                                            encoding='ascii'))
+
+
+def write_subdir_versions_to_directory(fs, dir, d):
     # type: (FS, unicode, Dict[unicode, unicode]) -> None
     SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
     fs.settext(SUBDIR_VERSIONS_FILEPATH,
+               str_subdir_versions(d),
+               encoding='ascii')
+
+
+def write_subdir_versions_to_path(fs, path, d):
+    # type: (FS, unicode, Dict[unicode, unicode]) -> None
+    fs.settext(path,
                str_subdir_versions(d),
                encoding='ascii')

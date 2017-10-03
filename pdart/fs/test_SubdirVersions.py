@@ -24,13 +24,13 @@ foo 1
 
     def testWriteSubdirVersions(self):
         fs = MemoryFS()
-        write_subdir_versions(fs, ROOT, self.d)
+        write_subdir_versions_to_directory(fs, ROOT, self.d)
         self.assertEqual(self.txt, fs.gettext(SUBDIR_VERSIONS_FILENAME))
         fs.close()
 
     def testReadSubdirVersions(self):
         fs = MemoryFS()
         fs.settext(SUBDIR_VERSIONS_FILENAME, self.txt)
-        d = read_subdir_versions(fs, ROOT)
+        d = read_subdir_versions_from_directory(fs, ROOT)
         self.assertEqual(self.d, d)
         fs.close()

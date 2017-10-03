@@ -8,7 +8,7 @@ from fs.path import abspath, basename, iteratepath, join, normpath
 from typing import TYPE_CHECKING
 
 from pdart.fs.ReadOnlyView import ReadOnlyView
-from pdart.fs.SubdirVersions import read_subdir_versions
+from pdart.fs.SubdirVersions import read_subdir_versions_from_directory
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME
 
 if TYPE_CHECKING:
@@ -125,7 +125,8 @@ class _FSBundlePath(_FSDirPath):
         files = [info.name
                  for info in self._legacy_fs.scandir(legacy_dirpath)
                  if info.is_file and not info.name == SUBDIR_VERSIONS_FILENAME]
-        versions = read_subdir_versions(self._legacy_fs, legacy_dirpath)
+        versions = read_subdir_versions_from_directory(self._legacy_fs,
+                                                       legacy_dirpath)
         dirs = versions.keys()
         # TODO maybe assert that they're disjoint
         return files + dirs
@@ -172,7 +173,8 @@ class _FSCollectionPath(_FSDirPath):
         files = [info.name
                  for info in self._legacy_fs.scandir(self._legacy_dirpath)
                  if info.is_file and not info.name == SUBDIR_VERSIONS_FILENAME]
-        versions = read_subdir_versions(self._legacy_fs, self._legacy_dirpath)
+        versions = read_subdir_versions_from_directory(self._legacy_fs,
+                                                       self._legacy_dirpath)
         dirs = versions.keys()
         return files + dirs
 
@@ -256,8 +258,9 @@ class VersionView(ReadOnlyView):
                     _to_version_dirname(self._version_id))
 
     def _legacy_collection_dir(self, collection_id):
-        subdirVersions = read_subdir_versions(self._legacy_fs,
-                                              self._legacy_bundle_dir())
+        subdirVersions = read_subdir_versions_from_directory(
+            self._legacy_fs,
+            self._legacy_bundle_dir())
         try:
             collection_version = subdirVersions[collection_id]
         except KeyError:
@@ -266,7 +269,7 @@ class VersionView(ReadOnlyView):
                     _to_version_dirname(collection_version))
 
     def _legacy_product_dir(self, collection_id, product_id):
-        subdirVersions = read_subdir_versions(
+        subdirVersions = read_subdir_versions_from_directory(
             self._legacy_fs,
             self._legacy_collection_dir(collection_id))
         try:

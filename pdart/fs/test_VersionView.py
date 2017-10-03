@@ -3,7 +3,7 @@ import unittest
 from fs.memoryfs import MemoryFS
 from fs.path import join
 
-from pdart.fs.SubdirVersions import write_subdir_versions
+from pdart.fs.SubdirVersions import write_subdir_versions_to_directory
 from pdart.fs.VersionView import VersionView
 from pdart.fs.VersionedFS import ROOT
 
@@ -16,37 +16,40 @@ class TestVersionView(unittest.TestCase):
     def setUp(self):
         self.versioned_fs = MemoryFS()
         self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v$0'))
-        write_subdir_versions(self.versioned_fs,
-                              join(ROOT, _BUNDLE_ID, u'v$0'), {})
+        write_subdir_versions_to_directory(self.versioned_fs,
+                                           join(ROOT, _BUNDLE_ID, u'v$0'), {})
 
         self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v$1'))
-        write_subdir_versions(self.versioned_fs,
-                              join(ROOT, _BUNDLE_ID, u'v$1'), {})
+        write_subdir_versions_to_directory(self.versioned_fs,
+                                           join(ROOT, _BUNDLE_ID, u'v$1'), {})
 
         self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v$2'))
 
         self.versioned_fs.makedirs(join(ROOT, _BUNDLE_ID, u'v$3'))
-        write_subdir_versions(self.versioned_fs,
-                              join(ROOT, _BUNDLE_ID, u'v$3'),
-                              {_COLLECTION_ID: u'2'})
+        write_subdir_versions_to_directory(self.versioned_fs,
+                                           join(ROOT, _BUNDLE_ID, u'v$3'),
+                                           {_COLLECTION_ID: u'2'})
 
         self.versioned_fs.makedirs(
             join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$0'))
-        write_subdir_versions(self.versioned_fs,
-                              join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$0'),
-                              {})
+        write_subdir_versions_to_directory(
+            self.versioned_fs,
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$0'),
+            {})
 
         self.versioned_fs.makedirs(
             join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$1'))
-        write_subdir_versions(self.versioned_fs,
-                              join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$1'),
-                              {})
+        write_subdir_versions_to_directory(
+            self.versioned_fs,
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$1'),
+            {})
 
         self.versioned_fs.makedirs(
             join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$2'))
-        write_subdir_versions(self.versioned_fs,
-                              join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$2'),
-                              {_PRODUCT_ID: u'1'})
+        write_subdir_versions_to_directory(
+            self.versioned_fs,
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID, u'v$2'),
+            {_PRODUCT_ID: u'1'})
 
         self.versioned_fs.makedirs(
             join(ROOT, _BUNDLE_ID, _COLLECTION_ID, _PRODUCT_ID, u'v$0'))

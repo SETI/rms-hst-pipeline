@@ -148,7 +148,8 @@ class InitialVersionedViewVerifier(VersionedViewVerifier):
          version_dir_infos) = scan_vfs_dir(self.view, join(version_dir, '..'))
         expected = set(info.name for info in ordinary_dir_infos)
 
-        actual = set(read_subdir_versions(self.view, version_dir).keys())
+        actual = set(read_subdir_versions_from_directory(
+            self.view, version_dir).keys())
 
         self.assertEqual(expected, actual)
 
