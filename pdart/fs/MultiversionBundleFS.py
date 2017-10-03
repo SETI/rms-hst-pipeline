@@ -2,7 +2,8 @@ from fs.path import join
 from fs.wrap import WrapFS
 from typing import TYPE_CHECKING
 
-from pdart.fs.SubdirVersions import read_subdir_versions_from_path, \
+from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
+    read_subdir_versions_from_path, \
     write_subdir_versions_to_path
 from pdart.fs.VersionDirNames \
     import dir_name_to_vid, is_dir_name, vid_to_dir_name
@@ -10,7 +11,7 @@ from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
-    from typing import Dict
+    from typing import Dict, List, Tuple
     from pdart.pds4.LIDVID import LIDVID
     from pdart.pds4.LID import LID
 
@@ -102,6 +103,14 @@ class MultiversionBundleFS(WrapFS):
 
         return {dir_name: make_subcomp_lidvid(dir_name, version)
                 for dir_name, version in d.items()}
+
+    def directory_contents(self, dir_path):
+        # type: (unicode) -> Tuple[Dict[unicode, unicode], List[unicode]]
+        files = [info.name
+                 for info in self.scandir(dir_path)
+                 if info.is_file and info.name != SUBDIR_VERSIONS_FILENAME]
+        d = read_subdir_versions_from_directory(self, dir_path)
+        return (d, files)
 
     def current_vid(self, lid):
         """

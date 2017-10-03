@@ -59,6 +59,34 @@ class TestVersionView2(unittest.TestCase):
             VersionView2(LIDVID('urn:nasa:pds:hst_00000::666'),
                          self.versioned_fs)
 
+    def test_root(self):
+        # type: () -> None
+        self.assertTrue(self.version_view.exists(ROOT))
+        self.assertTrue(self.version_view.isdir(ROOT))
+        self.assertEqual([_BUNDLE_ID], self.version_view.listdir(ROOT))
+
+    def test_bundle_dir(self):
+        # type: () -> None
+        BUNDLE_DIR = join(ROOT, _BUNDLE_ID)
+        self.assertTrue(self.version_view.exists(BUNDLE_DIR))
+        self.assertTrue(self.version_view.isdir(BUNDLE_DIR))
+        self.assertEqual([_COLLECTION_ID],
+                         self.version_view.listdir(BUNDLE_DIR))
+
+        # test that collections appear
+        self.assertTrue(self.version_view.exists(
+            join(ROOT, _BUNDLE_ID, _COLLECTION_ID)))
+
+        # test that files don't appear when wrong version
+        self.versioned_fs.touch(join(ROOT, _BUNDLE_ID, u'v$1', u'bundle.xml'))
+        self.assertFalse(self.version_view.exists(
+            join(ROOT, _BUNDLE_ID, u'bundle.xml')))
+
+        # test that files do appear when right version
+        self.versioned_fs.touch(join(ROOT, _BUNDLE_ID, u'v$3', u'bundle.xml'))
+        self.assertTrue(self.version_view.exists(
+            join(ROOT, _BUNDLE_ID, u'bundle.xml')))
+
 
 class TestVersionView(unittest.TestCase):
     def setUp(self):

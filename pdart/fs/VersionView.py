@@ -4,13 +4,14 @@ from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound, \
     ResourceReadOnly
 from fs.info import Info
 from fs.mode import check_writable
-from fs.path import abspath, basename, iteratepath, join, normpath
+from fs.path import abspath, basename, dirname, iteratepath, join, normpath
 from typing import TYPE_CHECKING
 
 from pdart.fs.MultiversionBundleFS \
     import MultiversionBundleFS, lidvid_to_contents_directory_path
 from pdart.fs.ReadOnlyView import ReadOnlyView
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory
+from pdart.fs.VersionDirNames import version_id_to_dir_name
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME
 from pdart.pds4.LIDVID import LIDVID
 
@@ -257,14 +258,68 @@ class VersionView2(ReadOnlyView):
         self._legacy_fs = versioned_view
         ReadOnlyView.__init__(self, versioned_view)
 
+    def _to_legacy_path(self, path):
+        # type: (unicode) -> Tuple[str, unicode]
+        path = abspath(normpath(path))
+
+        def add_path_segment(legacy_path, new_segment):
+            # type: (Tuple[str,unicode], unicode) -> Tuple[str,unicode]
+            if legacy_path == ('r', u'/'):
+                if new_segment == self._bundle_id:
+                    return ('d',
+                            join(u'/',
+                                 self._bundle_id,
+                                 version_id_to_dir_name(self._version_id)))
+                else:
+                    raise ResourceNotFound(path)
+            elif legacy_path[0] == 'f':
+                return DirectoryExpected(path)
+            else:
+                subdir_dict, files = \
+                    self._legacy_fs.directory_contents(legacy_path[1])
+                if new_segment in files:
+                    return ('f', join(legacy_path[1], new_segment))
+
+                try:
+                    version_id = subdir_dict[new_segment]
+                    return ('d', join(dirname(legacy_path[1]),
+                                      version_id_to_dir_name(version_id)))
+                except KeyError:
+                    raise ResourceNotFound(path)
+
+        return reduce(add_path_segment, iteratepath(path), ('r', u'/'))
+
     def getinfo(self, path, namespaces=None):
-        assert False, 'VersionView2.getinfo() unimplemented'
+        type, legacy_path = self._to_legacy_path(path)
+        if type == 'd':
+            return Info(_make_raw_dir_info(basename(path)))
+        elif type == 'f':
+            return self._legacy_fs.getinfo(legacy_path, namespaces=namespaces)
+        elif type == 'r':
+            return Info(_make_raw_dir_info(u'/'))
+        assert False, 'uncaught case: %s' % type
 
     def listdir(self, path):
-        assert False, 'VersionView2.listdir() unimplemented'
+        type, legacy_path = self._to_legacy_path(path)
+        if type == 'd':
+            dirs, files = self._legacy_fs.directory_contents(legacy_path)
+            return dirs.keys() + files
+        elif type == 'f':
+            assert False, 'listdir(%s) => %s: %s' % (path, type, legacy_path)
+        elif type == 'r':
+            return [self._bundle_id]
+        else:
+            assert False, 'VersionView2.listdir() unimplemented'
+            # return self._legacy_fs.listdir(legacy_path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
-        assert False, 'VersionView2.openbin() unimplemented'
+        type, legacy_path = self._to_legacy_path(path)
+        if type == 'f':
+            assert False, 'openbin(%s) => %s: %s' % (path, type, legacy_path)
+        elif type in ['d', 'r']:
+            raise FileExpected(self.path)
+        else:
+            assert False, 'VersionView2.openbin() unimplemented'
 
 
 class VersionView(ReadOnlyView):

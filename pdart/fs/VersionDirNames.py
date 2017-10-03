@@ -10,6 +10,11 @@ def vid_to_dir_name(vid):
     return 'v$%s' % str(vid)
 
 
+def version_id_to_dir_name(version_id):
+    # type: (unicode) -> unicode
+    return 'v$%s' % version_id
+
+
 def dir_name_to_vid(dir_name):
     # type: (unicode) -> VID
     assert is_dir_name(dir_name), '%s is not a dir_name' % dir_name
