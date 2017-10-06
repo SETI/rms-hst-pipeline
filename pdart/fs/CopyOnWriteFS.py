@@ -61,7 +61,10 @@ class CopyOnWriteFS(FS):
 
     def _remove_empty_dirs(self):
         # type: () -> None
-        pass
+        delta_fs = self._delta_fs
+        for dir_path in delta_fs.walk.dirs(search='depth'):
+            if not delta_fs.listdir(dir_path):
+                delta_fs.removedir(dir_path)
 
     def _remove_duplicates(self):
         """Remove all unnecessarily duplicated files."""

@@ -70,4 +70,10 @@ class TestCopyOnWriteFS(FSTestCases, unittest.TestCase):
         self.assertTrue(delta.additions().exists(FOO_BAZ_PATH))
 
     def test_remove_empty_dirs(self):
-        pass
+        self.fs.makedirs(u'/a/b/c/d')
+        self.fs.makedirs(u'/a/e/f/g')
+        self.fs.touch(u'/a/e/f/foo.txt')
+        self.fs.normalize()
+        self.assertFalse(self.cow_delta_fs.exists(u'/a/b'))
+        self.assertFalse(self.cow_delta_fs.exists(u'/a/e/f/g'))
+        self.assertTrue(self.cow_delta_fs.exists(u'/a/e/f/foo.txt'))
