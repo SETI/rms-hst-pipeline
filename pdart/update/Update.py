@@ -2,7 +2,8 @@ import abc
 
 from typing import TYPE_CHECKING
 
-from pdart.fs.CopyOnWriteFS import CopyOnWriteFS
+from pdart.fs.CopyOnWriteFS import CopyOnWriteFS, FSDelta
+from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.VersionView import VersionView
 
 if TYPE_CHECKING:
@@ -10,9 +11,11 @@ if TYPE_CHECKING:
     from fs.base import FS
     from pdart.pds4.LIDVID import LIDVID
 
+    _UPDATE_FUNC = Callable[[CopyOnWriteFS], None]
+
 
 def update_bundle(versioned_fs, is_major, update):
-    # type: (FS, bool, Callable[[CopyOnWriteFS], None]) -> None
+    # type: (MultiversionBundleFS, bool, _UPDATE_FUNC) -> None
     last_bundle_lidvid = versioned_fs.get_last_bundle_lidvid()
     version_view = VersionView(last_bundle_lidvid, versioned_fs)
 
@@ -20,13 +23,13 @@ def update_bundle(versioned_fs, is_major, update):
     update(cow_fs)
     cow_fs.normalize()
 
-    delta = cow_fs.delta
+    delta = cow_fs.delta()
 
     apply_delta(versioned_fs, is_major, delta)
 
 
 def apply_delta(versioned_fs, is_major, delta):
-    # type: (FS, bool, Delta) -> None
+    # type: (FS, bool, FSDelta) -> None
     assert False, 'apply_delta unimplemented'
 
 
