@@ -51,10 +51,21 @@ class CopyOnWriteFS(FS):
         self._delta_fs = delta_fs
 
     def delta(self):
+        # type: () -> FSDelta
         return FSDelta(self._deletion_set.as_set(), self._delta_fs)
 
     def normalize(self):
+        # type: () -> None
+        self._remove_duplicates()
+        self._remove_empty_dirs()
+
+    def _remove_empty_dirs(self):
+        # type: () -> None
+        pass
+
+    def _remove_duplicates(self):
         """Remove all unnecessarily duplicated files."""
+
         # type: () -> None
 
         # walk all the files in the delta.  If they are the same as the

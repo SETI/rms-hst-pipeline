@@ -21,7 +21,7 @@ def update_bundle(versioned_fs, is_major, update):
 
     cow_fs = CopyOnWriteFS(version_view)
     update(cow_fs)
-    cow_fs.normalize()
+    cow_fs._remove_duplicates()
 
     delta = cow_fs.delta()
 

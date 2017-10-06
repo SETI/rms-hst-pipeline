@@ -1,17 +1,20 @@
 import unittest
 
+from fs.tempfs import TempFS
 from fs.test import FSTestCases
 
-from CopyOnWriteFS import *
+from pdart.fs.CopyOnWriteFS import CopyOnWriteFS
 
 
 class TestCopyOnWriteFS(FSTestCases, unittest.TestCase):
     def make_fs(self):
+        # type: () -> CopyOnWriteFS
         self.cow_base_fs = TempFS()
         self.cow_delta_fs = TempFS()
         return CopyOnWriteFS(self.cow_base_fs, self.cow_delta_fs)
 
     def test_fs_delta(self):
+        # type: () -> None
         delta = self.fs.delta()
         self.assertTrue(delta)
         self.assertIs(self.cow_delta_fs, delta.additions())
@@ -32,7 +35,9 @@ class TestCopyOnWriteFS(FSTestCases, unittest.TestCase):
         self.assertFalse(self.cow_base_fs.exists(BAR_PATH))
         self.assertTrue(delta.additions().exists(BAR_PATH))
 
-    def test_normalize(self):
+    def test_remove_duplicates(self):
+        # type: () -> None
+
         # set the files in the base
         self.cow_base_fs.makedir(u'/foo')
         FOO_BAR_PATH = u'/foo/bar.txt'
@@ -63,3 +68,6 @@ class TestCopyOnWriteFS(FSTestCases, unittest.TestCase):
         self.assertEqual(set([FOO_BAZ_PATH]), delta.deletions())
         self.assertFalse(delta.additions().exists(FOO_BAR_PATH))
         self.assertTrue(delta.additions().exists(FOO_BAZ_PATH))
+
+    def test_remove_empty_dirs(self):
+        pass
