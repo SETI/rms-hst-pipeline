@@ -77,3 +77,35 @@ class TestCopyOnWriteFS(FSTestCases, unittest.TestCase):
         self.assertFalse(self.cow_delta_fs.exists(u'/a/b'))
         self.assertFalse(self.cow_delta_fs.exists(u'/a/e/f/g'))
         self.assertTrue(self.cow_delta_fs.exists(u'/a/e/f/foo.txt'))
+
+    def test_directories(self):
+        # set the files in the base
+        self.cow_base_fs.makedir(u'/foo')
+        FOO_BAR_PATH = u'/foo/bar.txt'
+        FOO_BAZ_PATH = u'/foo/baz.txt'
+        self.cow_base_fs.settext(FOO_BAR_PATH, u'BAR!')
+        self.cow_base_fs.settext(FOO_BAZ_PATH, u'BAZ!')
+
+        # lowercase, then re-uppercase BAR.
+        self.fs.settext(FOO_BAR_PATH, u'bar!')
+        self.assertEqual(u'bar!', self.fs.gettext(FOO_BAR_PATH))
+        self.fs.settext(FOO_BAR_PATH, u'BAR!')
+        self.assertEqual(u'BAR!', self.fs.gettext(FOO_BAR_PATH))
+
+        # just lowercase BAZ.
+        self.fs.settext(FOO_BAZ_PATH, u'baz!')
+        self.assertEqual(u'baz!', self.fs.gettext(FOO_BAZ_PATH))
+
+        # something in the root directory
+        self.fs.touch(u'/quux.txt')
+
+        # make some empty dirs
+        self.fs.makedirs(u'/a/b/c/d')
+        self.fs.makedirs(u'/a/e/f/g')
+        self.fs.touch(u'/a/e/f/foo.txt')
+
+        self.fs.normalize()
+
+        fs_delta = self.fs.delta()
+        expected = {u'/foo', u'/a/e/f', u'/a/e', u'/a', u'/'}
+        self.assertEqual(expected, fs_delta.directories())

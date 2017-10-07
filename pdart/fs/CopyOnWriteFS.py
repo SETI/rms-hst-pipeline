@@ -35,6 +35,12 @@ class FSDelta(object):
         # type: () -> FS
         return self._additions
 
+    def directories(self):
+        # type: () -> Set[unicode]
+        deletion_dirs = [dirname(f) for f in list(self._deletions)]
+        addition_dirs = list(self._additions.walk.dirs())
+        return set(deletion_dirs + addition_dirs + [u'/'])
+
 
 class CopyOnWriteFS(FS):
     """
