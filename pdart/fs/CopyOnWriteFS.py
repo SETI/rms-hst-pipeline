@@ -2,7 +2,7 @@ import fs.errors
 from fs.base import FS
 from fs.copy import copy_file
 from fs.mode import Mode
-from fs.path import dirname
+from fs.path import dirname, recursepath
 from fs.tempfs import TempFS
 from typing import TYPE_CHECKING
 
@@ -37,9 +37,13 @@ class FSDelta(object):
 
     def directories(self):
         # type: () -> Set[unicode]
-        deletion_dirs = [dirname(f) for f in list(self._deletions)]
+        deletion_dirs = [d for f in list(self._deletions)
+                         for d in recursepath(dirname(f))]
         addition_dirs = list(self._additions.walk.dirs())
-        return set(deletion_dirs + addition_dirs + [u'/'])
+        result = set(deletion_dirs + addition_dirs)
+        if result:
+            result.add(u'/')
+        return result
 
 
 class CopyOnWriteFS(FS):
@@ -103,11 +107,16 @@ class CopyOnWriteFS(FS):
     def _ensure_path_is_writable(self, path):
         # type: (unicode) -> None
         assert path
+        parent = dirname(path)
+
+        if self._readonly_fs.exists(parent) and \
+                not self._delta_fs.exists(parent):
+            self._delta_fs.makedirs(parent, recreate=True)
+
         if self._readonly_fs.exists(path) and \
                 not self._delta_fs.exists(path):
-            p = dirname(path)
-            self._delta_fs.makedirs(p, recreate=True)
             copy_file(self._readonly_fs, path, self._delta_fs, path)
+            self._deletion_set.delete(path)
             self._deletion_set.delete(path)
 
     def getinfo(self, path, namespaces=None):

@@ -30,6 +30,10 @@ def update_bundle(versioned_fs, is_major, update):
 
 def apply_delta(versioned_fs, is_major, delta):
     # type: (FS, bool, FSDelta) -> None
+    dirs = delta.directories()
+    if not dirs:
+        return
+
     assert False, 'apply_delta unimplemented'
 
 

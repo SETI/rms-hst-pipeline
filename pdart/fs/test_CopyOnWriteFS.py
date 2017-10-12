@@ -78,7 +78,31 @@ class TestCopyOnWriteFS(FSTestCases, unittest.TestCase):
         self.assertFalse(self.cow_delta_fs.exists(u'/a/e/f/g'))
         self.assertTrue(self.cow_delta_fs.exists(u'/a/e/f/foo.txt'))
 
-    def test_directories(self):
+    def test_directories_empty_case(self):
+        self.fs.normalize()
+        self.assertFalse(self.fs.delta().directories())
+
+    def test_directories_deletion_case(self):
+        self.cow_base_fs.makedirs(u'/foo/bar/baz')
+        self.cow_base_fs.touch(u'/foo/bar/baz/quux.txt')
+
+        self.fs.remove(u'/foo/bar/baz/quux.txt')
+        self.fs.touch(u'/foo/bar/baz/quux.txt')
+        self.fs.normalize()
+        self.assertFalse(self.fs.delta().directories())
+
+    def test_directories_deletion_case2(self):
+        self.cow_base_fs.makedirs(u'/foo/bar/baz')
+        self.cow_base_fs.touch(u'/foo/bar/baz/quux.txt')
+
+        self.fs.remove(u'/foo/bar/baz/quux.txt')
+        self.fs.touch(u'/foo/bar/baz/quux.txt')
+        self.fs.touch(u'/foo/bar/baz/quux2.txt')
+        self.fs.normalize()
+        self.assertEqual({u'/', u'/foo', u'/foo/bar', u'/foo/bar/baz'},
+                         self.fs.delta().directories())
+
+    def test_directories_multiple_cases(self):
         # set the files in the base
         self.cow_base_fs.makedir(u'/foo')
         FOO_BAR_PATH = u'/foo/bar.txt'
