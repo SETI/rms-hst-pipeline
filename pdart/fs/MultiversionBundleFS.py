@@ -3,8 +3,7 @@ from fs.wrap import WrapFS
 from typing import TYPE_CHECKING
 
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
-    read_subdir_versions_from_path, \
-    write_subdir_versions_to_path
+    read_subdir_versions_from_path, write_subdir_versions_to_path
 from pdart.fs.VersionDirNames \
     import dir_name_to_vid, is_dir_name, vid_to_dir_name
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
@@ -17,6 +16,11 @@ if TYPE_CHECKING:
 
 
 class MultiversionBundleFS(WrapFS):
+    """
+    Adds some utility functions to a fs.base.FS and denotes that it contains
+    multiple versions of bundles in our format.  TODO Specify the format.
+    """
+
     def __init__(self, wrap_fs):
         WrapFS.__init__(self, wrap_fs)
 

@@ -36,6 +36,20 @@ class LID(object):
         self.collection_id = ids[4]
         self.product_id = ids[5]
 
+    @staticmethod
+    def create_from_parts(parts):
+        # type: (List[unicode]) -> LID
+        l = len(parts)
+        assert l in [1, 2, 3]
+        if l == 1:
+            return LID('urn:nasa:pds:%s' % parts[0])
+        elif l == 2:
+            b, c = parts
+            return LID('urn:nasa:pds:%s:%s' % (b, c))
+        else:
+            b, c, p = parts
+            return LID('urn:nasa:pds:%s:%s:%s' % (b, c, p))
+
     def __cmp__(self, other):
         return cmp(str(self), str(other))
 

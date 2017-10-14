@@ -8,7 +8,6 @@ from pdart.fs.VersionView import VersionView
 
 if TYPE_CHECKING:
     from typing import Callable
-    from fs.base import FS
     from pdart.pds4.LIDVID import LIDVID
 
     _UPDATE_FUNC = Callable[[CopyOnWriteFS], None]
@@ -29,12 +28,37 @@ def update_bundle(versioned_fs, is_major, update):
 
 
 def apply_delta(versioned_fs, is_major, delta):
-    # type: (FS, bool, FSDelta) -> None
+    # type: (MultiversionBundleFS, bool, FSDelta) -> None
     dirs = delta.directories()
     if not dirs:
         return
 
-    assert False, 'apply_delta unimplemented'
+    # Note that these directories are from an unversioned view.
+    create_new_version_directories(versioned_fs, is_major, dirs)
+    populate_new_version_directories(versioned_fs, is_major, dirs, delta)
+    assert False, 'apply_delta() unimplemented'
+
+
+def create_new_version_directories(versioned_fs, is_major, dirs):
+    # type: (MultiversionBundleFS, bool, List[unicode]) -> None
+
+    # Note that these directories are from an unversioned view.
+    for dir in dirs:
+        lid = dir_to_lid(dir)
+
+    assert False, 'create_new_version_directories() unimplemented'
+
+
+def populate_new_version_directories(versioned_fs, is_major, dirs, delta):
+    # type: (MultiversionBundleFS, bool, List[unicode], FSDelta) -> None
+
+    # Note that these directories are from an unversioned view.
+    assert False, 'populate_new_version_directories() unimplemented'
+
+
+def dir_to_lid(lid):
+    # type: (LID)-> unicode
+    assert False, 'dir_to_lid() unimplemented'
 
 
 class ISingleVersionBundleFS(object):

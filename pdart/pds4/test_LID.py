@@ -91,3 +91,24 @@ class TestLID(unittest.TestCase):
         self.assertEquals(browse_prod_lid, data_prod_lid.to_browse_lid())
 
         # TODO Write tests for is_bundle_id, etc.
+
+    def test_create_lid_from_parts(self):
+        # type: () -> None
+        parts = []
+        # type: List[unicode]
+        with self.assertRaises(AssertionError):
+            LID.create_from_parts(parts)
+
+        parts = [u'b']
+        self.assertEqual(LID('urn:nasa:pds:b'), LID.create_from_parts(parts))
+
+        parts = [u'b', u'c']
+        self.assertEqual(LID('urn:nasa:pds:b:c'), LID.create_from_parts(parts))
+
+        parts = [u'b', u'c', u'p']
+        self.assertEqual(LID('urn:nasa:pds:b:c:p'),
+                         LID.create_from_parts(parts))
+
+        parts = [u'b', u'c', u'p', u'x']
+        with self.assertRaises(AssertionError):
+            LID.create_from_parts(parts)
