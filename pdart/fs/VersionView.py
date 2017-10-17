@@ -1,13 +1,15 @@
 from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound
 from fs.info import Info
-from fs.path import abspath, basename, dirname, iteratepath, join, normpath
-from typing import TYPE_CHECKING
+from fs.path import abspath, basename, dirname, iteratepath, normpath
 
 from pdart.fs.MultiversionBundleFS \
     import MultiversionBundleFS, lidvid_to_contents_directory_path
 from pdart.fs.ReadOnlyView import ReadOnlyView
-from pdart.fs.VersionDirNames import version_id_to_dir_name
+from pdart.fs.SubdirVersions import *
+from pdart.fs.VersionDirNames import version_id_to_dir_name, vid_to_dir_name
+from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
     from typing import Dict, Tuple
@@ -20,14 +22,22 @@ def _make_raw_dir_info(name):
 
 
 class VersionView(ReadOnlyView):
+    """
+    A view into a MultiversionBundleFS that exposes only a single version of
+    the bundle and its components.
+    """
+
     def __init__(self, bundle_lidvid, versioned_view):
         # type: (LIDVID, MultiversionBundleFS) -> None
+        assert bundle_lidvid.lid().is_bundle_lid()
         assert versioned_view.exists(
             lidvid_to_contents_directory_path(bundle_lidvid))
         self._bundle_lidvid = bundle_lidvid
         self._bundle_id = bundle_lidvid.lid().bundle_id
         self._version_id = bundle_lidvid.vid().__str__()
         self._legacy_fs = versioned_view
+        self._lid_to_vid_dict = None
+        # type: Dict[str, VID]
         ReadOnlyView.__init__(self, versioned_view)
 
     def _to_legacy_path(self, path):
@@ -93,6 +103,40 @@ class VersionView(ReadOnlyView):
             raise FileExpected(self.path)
         else:
             assert False, 'uncaught case: %s' % type
+
+    def lid_to_vid(self, lid):
+        """
+        Returns the VID of a LID that appears in the VersionView.
+        """
+        # type: (LID) -> VID
+        if not self._lid_to_vid_dict:
+            # Initialize the dictionary.
+            d = dict()
+            bundle_lidvid = self._bundle_lidvid
+            bundle_lid = bundle_lidvid.lid()
+            bundle_vid = bundle_lidvid.vid()
+            # TODO Only string keys?
+            d[str(bundle_lid)] = bundle_vid
+            bundle_subdirs = read_subdir_versions_from_directory(
+                self._legacy_fs,
+                join(u'/', bundle_lid.bundle_id, vid_to_dir_name(bundle_vid)))
+            for coll_id, coll_vid in bundle_subdirs.items():
+                collection_lid = '%s:%s' % (bundle_lid, coll_id)
+                d[str(collection_lid)] = VID(coll_vid)
+                collection_subdirs = read_subdir_versions_from_directory(
+                    self._legacy_fs,
+                    join(u'/', bundle_lid.bundle_id,
+                         coll_id, vid_to_dir_name(VID(coll_vid))))
+                for prod_id, prod_vid in collection_subdirs.items():
+                    product_lid = '%s:%s' % (collection_lid, prod_id)
+                    d[str(product_lid)] = VID(prod_vid)
+            self._lid_to_vid_dict = d
+
+        return self._lid_to_vid_dict[str(lid)]
+
+    @staticmethod
+    def directory_to_lid(dir):
+        return LID.create_from_parts(iteratepath(dir))
 
 
 def layered():

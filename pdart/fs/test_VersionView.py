@@ -7,7 +7,9 @@ from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 # from pdart.fs.SubdirVersions import write_subdir_versions
 from pdart.fs.VersionView import VersionView
 from pdart.fs.VersionedFS import ROOT
+from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.VID import VID
 
 _BUNDLE_ID = u'hst_00000'
 _COLLECTION_ID = u'data_xxx_raw'
@@ -125,13 +127,44 @@ class TestVersionView(unittest.TestCase):
         self.assertTrue(self.version_view.exists(
             join(PRODUCT_DIR, u'product.xml')))
 
+    def test_directory_to_lid(self):
+        # type: () -> None
+        with self.assertRaises(AssertionError):
+            VersionView.directory_to_lid(u'/')
+        self.assertEqual(LID('urn:nasa:pds:b'),
+                         VersionView.directory_to_lid(u'/b'))
+        self.assertEqual(LID('urn:nasa:pds:b:c'),
+                         VersionView.directory_to_lid(u'/b/c/'))
+        self.assertEqual(LID('urn:nasa:pds:b:c:p'),
+                         VersionView.directory_to_lid(u'/b/c/p'))
+
+        # what if wrong kind of directory?  i.e., from MultiversionBundleFS?
+        with self.assertRaises(AssertionError):
+            VersionView.directory_to_lid(u'/b/c/v$23')
+
+    def test_lid_to_vid(self):
+        with self.assertRaises(KeyError):
+            self.version_view.lid_to_vid(LID(u'urn:nasa:pds:b'))
+        self.versioned_fs.tree()
+        self.assertEqual(
+            VID('3'),
+            self.version_view.lid_to_vid(LID(u'urn:nasa:pds:hst_00000')))
+        self.assertEqual(
+            VID('2'),
+            self.version_view.lid_to_vid(
+                LID(u'urn:nasa:pds:hst_00000:data_xxx_raw')))
+        self.assertEqual(
+            VID('1'),
+            self.version_view.lid_to_vid(
+                LID(u'urn:nasa:pds:hst_00000:data_xxx_raw:u2q9xx01j_raw')))
+
 
 @unittest.skip('takes a long time')
 def test_version_view_on_archive():
     # type: () -> None
     """
     Run through all the bundles in the archive, view them as versioned
-    filesystems, and try to verify them , then copy them to another
+    filesystems, and try to verify them, then copy them to another
     (in-memory) filesystem.  See whether anything breaks.
     """
     import fs.copy
