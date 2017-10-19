@@ -19,6 +19,15 @@ class TestLIDVID(unittest.TestCase):
         with self.assertRaises(Exception):
             LIDVID('urn:nasa:pds:ssc01.hirespc.cruise:browse::2.0.0')
 
+    def test_create_from_lid_and_vid(self):
+        # type: () -> None
+        lid = LID('urn:nasa:pds:ssc01.hirespc.cruise:browse')
+        vid = VID('2.5')
+        lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
+        self.assertEqual(
+            LIDVID('urn:nasa:pds:ssc01.hirespc.cruise:browse::2.5'),
+            LIDVID.create_from_lid_and_vid(lid, vid))
+
     def test_lid(self):
         self.assertEqual(LID('urn:nasa:pds:b:c:p'),
                          LIDVID('urn:nasa:pds:b:c:p::666').lid())

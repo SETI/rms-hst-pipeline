@@ -18,6 +18,11 @@ class LIDVID(object):
         self._lid = LID(segs[0])
         self._vid = VID(segs[1])
 
+    @staticmethod
+    def create_from_lid_and_vid(lid, vid):
+        # type: (LID, VID) -> LIDVID
+        return LIDVID('%s::%s' % (str(lid), str(vid)))
+
     def lid(self):
         # type: () -> LID
         return self._lid
