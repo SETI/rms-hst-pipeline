@@ -2,7 +2,8 @@ import abc
 
 from typing import TYPE_CHECKING
 
-from pdart.fs.CopyOnWriteFS import CopyOnWriteFS, FSDelta
+from pdart.fs.CopyOnWriteFS import CopyOnWriteFS
+from pdart.fs.LidToDirName import lid_to_dir_name
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.VersionView import VersionView
 
@@ -13,52 +14,50 @@ if TYPE_CHECKING:
     _UPDATE_FUNC = Callable[[CopyOnWriteFS], None]
 
 
-def update_bundle(versioned_fs, is_major, update):
+def update_bundle(multiversioned_fs, is_major, update):
     # type: (MultiversionBundleFS, bool, _UPDATE_FUNC) -> None
-    last_bundle_lidvid = versioned_fs.get_last_bundle_lidvid()
-    version_view = VersionView(last_bundle_lidvid, versioned_fs)
+    last_bundle_lidvid = multiversioned_fs.get_last_bundle_lidvid()
+    last_version_view = VersionView(last_bundle_lidvid, multiversioned_fs)
 
-    cow_fs = CopyOnWriteFS(version_view)
+    cow_fs = CopyOnWriteFS(last_version_view)
     update(cow_fs)
     cow_fs._remove_duplicates()
 
     delta = cow_fs.delta()
 
-    apply_delta(versioned_fs, is_major, delta)
-
-
-def apply_delta(versioned_fs, is_major, delta):
-    # type: (MultiversionBundleFS, bool, FSDelta) -> None
     dirs = delta.directories()
     if not dirs:
         return
 
     # Note that these directories are from an unversioned view.
-    create_new_version_directories(versioned_fs, is_major, dirs)
-    populate_new_version_directories(versioned_fs, is_major, dirs, delta)
+    lidvids = map(lambda (d): multiversioned_fs.directory_to_lidvids(d), dirs)
+    if is_major:
+        new_lidvids = map(lambda (lv): lv.next_major_lidvid(), lidvids)
+    else:
+        new_lidvids = map(lambda (lv): lv.next_minor_lidvid(), lidvids)
+    for new_lidvid in new_lidvids:
+        multiversioned_fs.make_lidvid_directories(new_lidvid)
+
+    old_and_new_lidvids = zip(lidvids, new_lidvids)
+    old_to_new_lidvids = dict(old_and_new_lidvids)
+
+    new_bundle_lidvid = old_to_new_lidvids[last_bundle_lidvid]
+    new_version_view = VersionView(new_bundle_lidvid, multiversioned_fs)
+
+    for (old_lidvid, new_lidvid) in old_and_new_lidvids:
+        old_dir = lid_to_dir_name(old_lidvid.LID)
+        new_dir = lid_to_dir_name(new_lidvid.LID)
+        copy_selected_files(last_version_view, old_dir,
+                            new_version_view, new_dir)
+
+    # add labels and other metadata
+
     assert False, 'apply_delta() unimplemented'
 
 
-def create_new_version_directories(versioned_fs, is_major, dirs):
-    # type: (MultiversionBundleFS, bool, List[unicode]) -> None
-
-    # Note that these directories are from an unversioned view.
-    for dir in dirs:
-        lid = dir_to_lid(dir)
-
-    assert False, 'create_new_version_directories() unimplemented'
-
-
-def populate_new_version_directories(versioned_fs, is_major, dirs, delta):
-    # type: (MultiversionBundleFS, bool, List[unicode], FSDelta) -> None
-
-    # Note that these directories are from an unversioned view.
-    assert False, 'populate_new_version_directories() unimplemented'
-
-
-def dir_to_lid(lid):
-    # type: (LID)-> unicode
-    assert False, 'dir_to_lid() unimplemented'
+def copy_selected_files(old_dir, new_dir):
+    # type: (VersionView, unicode, VersionView, unicode) -> None
+    assert False, 'copy_some_files() unimplemented'
 
 
 class ISingleVersionBundleFS(object):

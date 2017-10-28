@@ -30,6 +30,7 @@ _LIDVID_P1 = LIDVID('urn:nasa:pds:hst_00000:data_xxx_raw:u2q9xx01j_raw::1')
 
 class TestVersionView(unittest.TestCase):
     def setUp(self):
+        # type: () -> None
         memory_fs = MemoryFS()
         self.versioned_fs = MultiversionBundleFS(memory_fs)
         self.versioned_fs.make_lidvid_directories(_LIDVID_B0)
@@ -49,6 +50,7 @@ class TestVersionView(unittest.TestCase):
 
     @unittest.skip('fails on purpose; for use while testing')
     def test_init(self):
+        # type: () -> None
         self.versioned_fs.tree()
         self.assertFalse(True)
 

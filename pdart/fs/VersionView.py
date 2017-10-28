@@ -134,6 +134,12 @@ class VersionView(ReadOnlyView):
 
         return self._lid_to_vid_dict[str(lid)]
 
+    def directory_to_lidvid(self, dir):
+        # type: (unicode) -> LIDVID
+        lid = VersionView.directory_to_lid(dir)
+        vid = self.lid_to_vid(lid)
+        return LIDVID.create_from_lid_and_vid(lid, vid)
+
     @staticmethod
     def directory_to_lid(dir):
         return LID.create_from_parts(iteratepath(dir))
