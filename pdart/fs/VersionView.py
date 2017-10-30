@@ -1,5 +1,6 @@
 from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound
 from fs.info import Info
+from fs.mode import Mode
 from fs.path import abspath, basename, dirname, iteratepath, normpath
 
 from pdart.fs.MultiversionBundleFS \
@@ -40,8 +41,9 @@ class VersionView(ReadOnlyView):
         # type: Dict[str, VID]
         ReadOnlyView.__init__(self, versioned_view)
 
-    def _to_legacy_path(self, path):
-        # type: (unicode) -> Tuple[str, unicode]
+    def _to_legacy_path(self, path, writing):
+        # type: (unicode, bool) -> Tuple[str, unicode]
+        assert False, 'need to use writing'
         path = abspath(normpath(path))
 
         def add_path_segment(legacy_path, new_segment):
@@ -73,7 +75,7 @@ class VersionView(ReadOnlyView):
         return reduce(add_path_segment, iteratepath(path), ('r', u'/'))
 
     def getinfo(self, path, namespaces=None):
-        type, legacy_path = self._to_legacy_path(path)
+        type, legacy_path = self._to_legacy_path(path, False)
         if type == 'd':
             return Info(_make_raw_dir_info(basename(path)))
         elif type == 'f':
@@ -83,7 +85,7 @@ class VersionView(ReadOnlyView):
         assert False, 'uncaught case: %s' % type
 
     def listdir(self, path):
-        type, legacy_path = self._to_legacy_path(path)
+        type, legacy_path = self._to_legacy_path(path, False)
         if type == 'd':
             dirs, files = self._legacy_fs.directory_contents(legacy_path)
             return dirs.keys() + files
@@ -95,7 +97,8 @@ class VersionView(ReadOnlyView):
             assert False, 'uncaught case: %s' % type
 
     def openbin(self, path, mode="r", buffering=-1, **options):
-        type, legacy_path = self._to_legacy_path(path)
+        writing = Mode(mode).writing
+        type, legacy_path = self._to_legacy_path(path, writing)
         if type == 'f':
             return self._legacy_fs.openbin(
                 legacy_path, mode=mode, buffering=buffering, **options)
