@@ -1,4 +1,4 @@
-from fs.path import join
+from fs.path import iteratepath, join
 from fs.wrap import WrapFS
 from typing import TYPE_CHECKING
 
@@ -7,6 +7,8 @@ from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
 from pdart.fs.VersionDirNames \
     import dir_name_to_vid, is_dir_name, vid_to_dir_name
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
+from pdart.pds4.LID import LID
+from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
@@ -33,7 +35,8 @@ class MultiversionBundleFS(WrapFS):
         path = lidvid_to_contents_directory_path(lidvid)
         self._wrap_fs.makedirs(path, recreate=True)
         dict_path = lidvid_to_subdir_versions_path(lidvid)
-        if not self._wrap_fs.exists(dict_path):
+        is_product = lidvid.lid().product_id is not None
+        if not is_product and not self._wrap_fs.exists(dict_path):
             write_subdir_versions_to_path(self, dict_path, {})
 
     def make_lid_directories(self, lid):
@@ -113,7 +116,12 @@ class MultiversionBundleFS(WrapFS):
         files = [info.name
                  for info in self.scandir(dir_path)
                  if info.is_file and info.name != SUBDIR_VERSIONS_FILENAME]
-        d = read_subdir_versions_from_directory(self, dir_path)
+        if len(iteratepath(dir_path)) >= 4:
+            # if we're a versioned product dir: /b/c/p/v$n
+            d = {}
+            # type: Dict[unicode, unicode]
+        else:
+            d = read_subdir_versions_from_directory(self, dir_path)
         return d, files
 
     def current_vid(self, lid):
@@ -137,6 +145,15 @@ class MultiversionBundleFS(WrapFS):
         MultiversionBundleFS.
         """
         pass
+
+    def current_bundle_lidvid(self):
+        # type: () -> LIDVID
+        root_contents = self.listdir(u'/')
+        assert len(root_contents) == 1
+        bundle_id = root_contents[0]
+        lid = LID('urn:nasa:pds:' + bundle_id)
+        vid = self.current_vid(lid)
+        return LIDVID.create_from_lid_and_vid(lid, vid)
 
 
 def lidvid_to_subdir_versions_path(lidvid):

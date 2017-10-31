@@ -1,7 +1,7 @@
 from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound
 from fs.info import Info
 from fs.mode import Mode
-from fs.path import abspath, basename, dirname, iteratepath, normpath
+from fs.path import abspath, basename, dirname, iteratepath, normpath, split
 
 from pdart.fs.MultiversionBundleFS \
     import MultiversionBundleFS, lidvid_to_contents_directory_path
@@ -43,11 +43,11 @@ class VersionView(ReadOnlyView):
 
     def _to_legacy_path(self, path, writing):
         # type: (unicode, bool) -> Tuple[str, unicode]
-        assert False, 'need to use writing'
         path = abspath(normpath(path))
 
         def add_path_segment(legacy_path, new_segment):
             # type: (Tuple[str,unicode], unicode) -> Tuple[str,unicode]
+            print "add_path_segment(%s, %s)" % (legacy_path, new_segment)
             if legacy_path == ('r', u'/'):
                 if new_segment == self._bundle_id:
                     return ('d',
@@ -58,21 +58,44 @@ class VersionView(ReadOnlyView):
                     raise ResourceNotFound(path)
             elif legacy_path[0] == 'f':
                 return DirectoryExpected(path)
-            else:
+            elif legacy_path[0] == 'd':
+                # 'd' path: legacy path is a directory
                 subdir_dict, files = \
                     self._legacy_fs.directory_contents(legacy_path[1])
                 if new_segment in files:
                     return ('f', join(legacy_path[1], new_segment))
                 try:
                     version_id = subdir_dict[new_segment]
-                    new_path = join(dirname(legacy_path[1]),
-                                    new_segment,
-                                    version_id_to_dir_name(version_id))
-                    return ('d', new_path)
                 except KeyError:
-                    raise ResourceNotFound(path)
+                    if writing:
+                        version_id = '1'
+                    else:
+                        raise ResourceNotFound(path)
+                new_path = join(dirname(legacy_path[1]),
+                                new_segment,
+                                version_id_to_dir_name(version_id))
+                return ('d', new_path)
+            else:
+                raise Exception('unexpected branch: legacy_path == %s' %
+                                str(legacy_path))
 
-        return reduce(add_path_segment, iteratepath(path), ('r', u'/'))
+        def build_path(path):
+            # type: (unicode) -> Tuple[str, unicode]
+            return reduce(add_path_segment, iteratepath(path), ('r', u'/'))
+
+        if writing:
+            # Don't require the last segment to exist.  Just calculate
+            # its parent directory and add the possibly non-existent filename
+            # to it.
+            (parent, file) = split(path)
+            (file_type, legacy_parent) = build_path(parent)
+            if file_type == 'd':
+                # TODO Should check I'm not overwriting a directory.
+                return ('f', join(legacy_parent, file))
+            else:
+                raise DirectoryExpected(parent)
+        else:
+            return build_path(path)
 
     def getinfo(self, path, namespaces=None):
         type, legacy_path = self._to_legacy_path(path, False)
@@ -103,7 +126,7 @@ class VersionView(ReadOnlyView):
             return self._legacy_fs.openbin(
                 legacy_path, mode=mode, buffering=buffering, **options)
         elif type in ['d', 'r']:
-            raise FileExpected(self.path)
+            raise FileExpected(path)
         else:
             assert False, 'uncaught case: %s' % type
 

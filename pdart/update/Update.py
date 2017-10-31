@@ -14,9 +14,8 @@ if TYPE_CHECKING:
     _UPDATE_FUNC = Callable[[CopyOnWriteFS], None]
 
 
-def update_bundle(multiversioned_fs, is_major, update):
-    # type: (MultiversionBundleFS, bool, _UPDATE_FUNC) -> None
-    last_bundle_lidvid = multiversioned_fs.get_last_bundle_lidvid()
+def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
+    # type: (MultiversionBundleFS, LIDVID, bool, _UPDATE_FUNC) -> None
     last_version_view = VersionView(last_bundle_lidvid, multiversioned_fs)
 
     cow_fs = CopyOnWriteFS(last_version_view)
@@ -51,7 +50,6 @@ def update_bundle(multiversioned_fs, is_major, update):
                             new_version_view, new_dir)
 
     # add labels and other metadata
-
     assert False, 'apply_delta() unimplemented'
 
 
