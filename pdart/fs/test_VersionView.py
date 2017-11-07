@@ -4,7 +4,6 @@ from fs.memoryfs import MemoryFS
 from fs.path import join
 
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
-# from pdart.fs.SubdirVersions import write_subdir_versions
 from pdart.fs.VersionView import VersionView
 from pdart.fs.VersionedFS import ROOT
 from pdart.pds4.LID import LID

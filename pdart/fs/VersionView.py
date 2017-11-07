@@ -1,13 +1,13 @@
 from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound
 from fs.info import Info
 from fs.mode import Mode
-from fs.path import abspath, basename, dirname, iteratepath, normpath, split
+from fs.path import abspath, basename, iteratepath, normpath, split
 
+from pdart.fs.DirUtils import lidvid_to_dir
 from pdart.fs.ISingleVersionBundleFS import ISingleVersionBundleFS
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.ReadOnlyView import ReadOnlyView
 from pdart.fs.SubdirVersions import *
-from pdart.fs.DirUtils import lidvid_to_dir, _vid_to_dir_part
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -15,11 +15,6 @@ from pdart.pds4.VID import VID
 if TYPE_CHECKING:
     from typing import Dict, Tuple
     from fs.osfs import OSFS
-
-
-def _version_id_to_dir_name(version_id):
-    # type: (unicode) -> unicode
-    return 'v$%s' % version_id
 
 
 def _make_raw_dir_info(name):
@@ -54,10 +49,7 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
             print "add_path_segment(%s, %s)" % (legacy_path, new_segment)
             if legacy_path == ('r', u'/'):
                 if new_segment == self._bundle_id:
-                    return ('d',
-                            join(u'/',
-                                 self._bundle_id,
-                                 _version_id_to_dir_name(self._version_id)))
+                    return ('d', lidvid_to_dir(self._bundle_lidvid))
                 else:
                     raise ResourceNotFound(path)
             elif legacy_path[0] == 'f':
@@ -75,10 +67,11 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
                         version_id = '1'
                     else:
                         raise ResourceNotFound(path)
-                new_path = join(dirname(legacy_path[1]),
-                                new_segment,
-                                _version_id_to_dir_name(version_id))
-                return ('d', new_path)
+                parts = iteratepath(legacy_path[1])
+                parts[-1] = new_segment
+                lid = LID.create_from_parts(parts)
+                lidvid = LIDVID.create_from_lid_and_vid(lid, VID(version_id))
+                return ('d', lidvid_to_dir(lidvid))
             else:
                 raise Exception('unexpected branch: legacy_path == %s' %
                                 str(legacy_path))
@@ -152,14 +145,17 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
             d[str(bundle_lid)] = bundle_vid
             bundle_subdirs = read_subdir_versions_from_directory(
                 self._legacy_fs,
-                join(u'/', bundle_lid.bundle_id, _vid_to_dir_part(bundle_vid)))
+                lidvid_to_dir(bundle_lidvid))
             for coll_id, coll_vid in bundle_subdirs.items():
                 collection_lid = '%s:%s' % (bundle_lid, coll_id)
                 d[str(collection_lid)] = VID(coll_vid)
+                coll_lid = LID.create_from_parts([bundle_lid.bundle_id,
+                                                  coll_id])
+                coll_lidvid = LIDVID.create_from_lid_and_vid(coll_lid,
+                                                             VID(coll_vid))
                 collection_subdirs = read_subdir_versions_from_directory(
-                    self._legacy_fs,
-                    join(u'/', bundle_lid.bundle_id,
-                         coll_id, _vid_to_dir_part(VID(coll_vid))))
+                    self._legacy_fs, lidvid_to_dir(coll_lidvid))
+
                 for prod_id, prod_vid in collection_subdirs.items():
                     product_lid = '%s:%s' % (collection_lid, prod_id)
                     d[str(product_lid)] = VID(prod_vid)
