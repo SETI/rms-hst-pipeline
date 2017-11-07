@@ -6,16 +6,15 @@ from pdart.fs.CopyOnWriteFS import CopyOnWriteVersionView
 from pdart.fs.DirUtils import lid_to_dir, lidvid_to_dir
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.VersionView import VersionView
+from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
     from typing import Callable
-    from pdart.pds4.LIDVID import LIDVID
-
-    # from pdart.pds4.VID import VID
 
     # some type aliases
     _COWVV = CopyOnWriteVersionView
-    _FILENAME_FILTER = Callable[[unicode], bool]
+    FILENAME_FILTER = Callable[[unicode], bool]
     _MBFS = MultiversionBundleFS
     _UPDATE_FUNC = Callable[[CopyOnWriteVersionView], None]
     _LIDVID_INCR = Callable[[LIDVID], LIDVID]
@@ -49,14 +48,14 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
 
     cow_fs = CopyOnWriteVersionView(last_version_view)
     update(cow_fs)
-    cow_fs._remove_duplicates()
+    cow_fs.normalize()
 
     delta = cow_fs.delta()
 
     # Note that these directories are from a single-version view.
     dirs = delta.directories()
     if not dirs:
-        return
+        return cow_fs
 
     incr_lidvid = lidvid_incrementor(is_major)
 
@@ -78,8 +77,12 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
 
     def copy_directory_at(path):
         # type: (unicode) -> None
-        old_lidvid = cow_fs.directory_to_lidvid(path)
-        new_lidvid = incr_lidvid(old_lidvid)
+        try:
+            old_lidvid = cow_fs.directory_to_lidvid(path)
+            new_lidvid = incr_lidvid(old_lidvid)
+        except KeyError:
+            old_lid = cow_fs.directory_to_lid(path)
+            new_lidvid = LIDVID.create_from_lid_and_vid(old_lid, VID("1"))
         if path not in dirs:
             # it was not changed, but we need to include it as a child
             multiversioned_fs.add_subcomponent(new_parent_lidvid(new_lidvid),
@@ -100,8 +103,8 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
         if is_fits_file(path):
             # this is the version-less path
             cow_fs_path = path
-            dir, base = split(cow_fs_path)
-            old_lidvid = cow_fs.directory_to_lidvid(dir)
+            path_dir, base = split(cow_fs_path)
+            old_lidvid = cow_fs.directory_to_lidvid(path_dir)
             new_lidvid = incr_lidvid(old_lidvid)
             multiversioned_fs_path = join(lidvid_to_dir(new_lidvid), base)
             copy_file(cow_fs, path, multiversioned_fs, multiversioned_fs_path)

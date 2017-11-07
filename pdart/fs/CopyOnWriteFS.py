@@ -56,12 +56,14 @@ class CopyOnWriteFS(FS):
     data goes into the read-only system.
     """
 
-    def __init__(self, base_fs, delta_fs=TempFS()):
+    def __init__(self, base_fs, delta_fs=None):
         # type: (FS, FS) -> None
         FS.__init__(self)
         self._deletion_set = DeletionSet()
         self._readonly_fs = ReadOnlyFSWithDeletions(base_fs,
                                                     self._deletion_set)
+        if not delta_fs:
+            delta_fs = TempFS()
         self._delta_fs = delta_fs
 
     def delta(self):
@@ -151,6 +153,10 @@ class CopyOnWriteFS(FS):
         else:
             # TODO Is this right?  The SubFS is physically on the
             # delta filesystem, but conceptually on self.
+            parent_dir = dirname(path)
+            if self.exists(parent_dir) and \
+                    not self._delta_fs.exists(parent_dir):
+                self._delta_fs.makedirs(parent_dir)
             return self._delta_fs.makedir(path,
                                           permissions=permissions,
                                           recreate=recreate)
@@ -204,7 +210,7 @@ class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
     A CopyOnWriteFS that wraps a VersionView, so is itself a VersionView too.
     """
 
-    def __init__(self, version_view, delta_fs=TempFS()):
+    def __init__(self, version_view, delta_fs=None):
         # type: (VersionView, FS) -> None
         CopyOnWriteFS.__init__(self, version_view, delta_fs)
         self._version_view = version_view
