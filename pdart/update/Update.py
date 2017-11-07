@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from pdart.fs.CopyOnWriteFS import CopyOnWriteVersionView
-from pdart.fs.LidToDirName import lid_to_dir_name
+from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.VersionView import VersionView
 
@@ -42,8 +42,8 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
     new_version_view = VersionView(new_bundle_lidvid, multiversioned_fs)
 
     for (old_lidvid, new_lidvid) in old_and_new_lidvids:
-        old_dir = lid_to_dir_name(old_lidvid.LID)
-        new_dir = lid_to_dir_name(new_lidvid.LID)
+        old_dir = lid_to_dir(old_lidvid.LID)
+        new_dir = lid_to_dir(new_lidvid.LID)
         copy_selected_files(last_version_view, old_dir,
                             new_version_view, new_dir)
 

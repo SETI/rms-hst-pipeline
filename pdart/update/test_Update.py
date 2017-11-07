@@ -3,7 +3,7 @@ import unittest
 from fs.path import join
 from fs.tempfs import TempFS
 
-from pdart.fs.LidToDirName import lid_to_dir_name
+from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.VersionView import VersionView
 from pdart.pds4.LIDVID import LIDVID
@@ -26,7 +26,7 @@ class Test_Update(unittest.TestCase):
         # <<< end write empty tree
 
         vv = VersionView(bundle_lidvid, mvfs)
-        vv.touch(join(lid_to_dir_name(product_lidvid.lid()), "foo.fits"))
+        vv.touch(join(lid_to_dir(product_lidvid.lid()), "foo.fits"))
 
         self.multiversioned_fs = mvfs
 
