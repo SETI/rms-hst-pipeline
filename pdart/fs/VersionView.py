@@ -4,11 +4,10 @@ from fs.mode import Mode
 from fs.path import abspath, basename, dirname, iteratepath, normpath, split
 
 from pdart.fs.ISingleVersionBundleFS import ISingleVersionBundleFS
-from pdart.fs.MultiversionBundleFS \
-    import MultiversionBundleFS, lidvid_to_contents_directory_path
+from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.ReadOnlyView import ReadOnlyView
 from pdart.fs.SubdirVersions import *
-from pdart.fs.DirUtils import _vid_to_dir_part
+from pdart.fs.DirUtils import lidvid_to_dir, _vid_to_dir_part
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -37,8 +36,7 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
     def __init__(self, bundle_lidvid, versioned_view):
         # type: (LIDVID, MultiversionBundleFS) -> None
         assert bundle_lidvid.lid().is_bundle_lid()
-        assert versioned_view.exists(
-            lidvid_to_contents_directory_path(bundle_lidvid))
+        assert versioned_view.exists(lidvid_to_dir(bundle_lidvid))
         self._bundle_lidvid = bundle_lidvid
         self._bundle_id = bundle_lidvid.lid().bundle_id
         self._version_id = bundle_lidvid.vid().__str__()

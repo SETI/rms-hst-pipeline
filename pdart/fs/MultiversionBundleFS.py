@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
     read_subdir_versions_from_path, write_subdir_versions_to_path
-from pdart.fs.DirUtils import _dir_part_to_vid, _is_dir_part, _vid_to_dir_part
+from pdart.fs.DirUtils import _dir_part_to_vid, _is_dir_part, lid_to_dir, \
+    lidvid_to_dir, _vid_to_dir_part
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -31,7 +32,7 @@ class MultiversionBundleFS(WrapFS):
         subdir_versions file if none exists for this LID version.
         """
         # type: (LIDVID) -> None
-        path = lidvid_to_contents_directory_path(lidvid)
+        path = lidvid_to_dir(lidvid)
         self._wrap_fs.makedirs(path, recreate=True)
         dict_path = lidvid_to_subdir_versions_path(lidvid)
         is_product = lidvid.lid().product_id is not None
@@ -43,7 +44,7 @@ class MultiversionBundleFS(WrapFS):
         Create the directory for this LID.
         """
         # type: (LID) -> None
-        path = lid_to_versions_directory_path(lid)
+        path = lid_to_dir(lid)
         self._wrap_fs.makedirs(path, recreate=True)
 
     def read_lidvid_subdir_versions(self, lidvid):
@@ -71,7 +72,7 @@ class MultiversionBundleFS(WrapFS):
         # type: (LIDVID) -> Dict[unicode, unicode]
         d = self.read_lidvid_subdir_versions(lidvid)
         lid = lidvid.lid()
-        base_dir = lid_to_versions_directory_path(lid)
+        base_dir = lid_to_dir(lid)
 
         def make_version_subdir(dir_name, version):
             return join(base_dir, dir_name, _vid_to_dir_part(VID(version)))
@@ -128,7 +129,7 @@ class MultiversionBundleFS(WrapFS):
         For a given LID, find the current (latest) VID in the filesystem.
         """
         # type: (LID) -> VID
-        path = lid_to_versions_directory_path(lid)
+        path = lid_to_dir(lid)
         vids = [_dir_part_to_vid(dir_name)
                 for dir_name in self.listdir(path)
                 if _is_dir_part(dir_name)]
@@ -161,35 +162,5 @@ def lidvid_to_subdir_versions_path(lidvid):
     indicating its subdirectories.
     """
     # type: (LIDVID) -> unicode
-    return join(lidvid_to_contents_directory_path(lidvid),
+    return join(lidvid_to_dir(lidvid),
                 SUBDIR_VERSIONS_FILENAME)
-
-
-def lidvid_to_contents_directory_path(lidvid):
-    # type: (LIDVID) -> unicode
-    """
-    For a given LIDVID, give the directory path that contains its
-    files.
-    """
-    lid = lidvid.lid()
-    vid = lidvid.vid()
-    return join(lid_to_versions_directory_path(lid),
-                _vid_to_dir_part(vid))
-
-
-def lid_to_versions_directory_path(lid):
-    """
-    For a given LID, give the directory path that contains its
-    version directories.
-    """
-    # type: (LID) -> unicode
-    if lid.is_bundle_lid():
-        return join(u'/', lid.bundle_id)
-    elif lid.is_collection_lid():
-        return join(u'/', lid.bundle_id,
-                    lid.collection_id)
-    elif lid.is_product_lid():
-        return join(u'/', lid.bundle_id, lid.collection_id, lid.product_id)
-    else:
-        assert False, \
-            "can't categorize %s as bundle, collection or product" % lid

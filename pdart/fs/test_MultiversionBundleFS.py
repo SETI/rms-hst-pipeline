@@ -13,30 +13,6 @@ class TestMultiversionBundleFS(unittest.TestCase):
         # type: () -> None
         self.fs = MultiversionBundleFS(MemoryFS())
 
-    def test_lid_to_versions_directory_path(self):
-        # type: () -> None
-        self.assertEqual(u'/b',
-                         lid_to_versions_directory_path(
-                             LID('urn:nasa:pds:b')))
-        self.assertEqual(u'/b/c',
-                         lid_to_versions_directory_path(
-                             LID('urn:nasa:pds:b:c')))
-        self.assertEqual(u'/b/c/p',
-                         lid_to_versions_directory_path(
-                             LID('urn:nasa:pds:b:c:p')))
-
-    def test_lidvid_to_contents_directory_path(self):
-        # type: () -> None
-        self.assertEqual(u'/b/v$1',
-                         lidvid_to_contents_directory_path(
-                             LIDVID('urn:nasa:pds:b::1')))
-        self.assertEqual(u'/b/c/v$2',
-                         lidvid_to_contents_directory_path(
-                             LIDVID('urn:nasa:pds:b:c::2')))
-        self.assertEqual(u'/b/c/p/v$3',
-                         lidvid_to_contents_directory_path(
-                             LIDVID('urn:nasa:pds:b:c:p::3')))
-
     def test_lidvid_to_subdir_versions_path(self):
         # type: () -> None
         self.assertEqual(u'/b/v$3/subdir$versions.txt',
