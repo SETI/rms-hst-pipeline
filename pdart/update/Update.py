@@ -53,4 +53,4 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
 
 def copy_selected_files(old_dir, new_dir):
     # type: (VersionView, unicode, VersionView, unicode) -> None
-    assert False, 'copy_some_files() unimplemented'
+    assert False, "unimplemented"
