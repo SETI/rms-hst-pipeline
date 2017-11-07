@@ -8,7 +8,7 @@ from pdart.fs.MultiversionBundleFS \
     import MultiversionBundleFS, lidvid_to_contents_directory_path
 from pdart.fs.ReadOnlyView import ReadOnlyView
 from pdart.fs.SubdirVersions import *
-from pdart.fs.VersionDirNames import version_id_to_dir_name, vid_to_dir_name
+from pdart.fs.DirUtils import _vid_to_dir_part
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -16,6 +16,11 @@ from pdart.pds4.VID import VID
 if TYPE_CHECKING:
     from typing import Dict, Tuple
     from fs.osfs import OSFS
+
+
+def _version_id_to_dir_name(version_id):
+    # type: (unicode) -> unicode
+    return 'v$%s' % version_id
 
 
 def _make_raw_dir_info(name):
@@ -54,7 +59,7 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
                     return ('d',
                             join(u'/',
                                  self._bundle_id,
-                                 version_id_to_dir_name(self._version_id)))
+                                 _version_id_to_dir_name(self._version_id)))
                 else:
                     raise ResourceNotFound(path)
             elif legacy_path[0] == 'f':
@@ -74,7 +79,7 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
                         raise ResourceNotFound(path)
                 new_path = join(dirname(legacy_path[1]),
                                 new_segment,
-                                version_id_to_dir_name(version_id))
+                                _version_id_to_dir_name(version_id))
                 return ('d', new_path)
             else:
                 raise Exception('unexpected branch: legacy_path == %s' %
@@ -149,14 +154,14 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
             d[str(bundle_lid)] = bundle_vid
             bundle_subdirs = read_subdir_versions_from_directory(
                 self._legacy_fs,
-                join(u'/', bundle_lid.bundle_id, vid_to_dir_name(bundle_vid)))
+                join(u'/', bundle_lid.bundle_id, _vid_to_dir_part(bundle_vid)))
             for coll_id, coll_vid in bundle_subdirs.items():
                 collection_lid = '%s:%s' % (bundle_lid, coll_id)
                 d[str(collection_lid)] = VID(coll_vid)
                 collection_subdirs = read_subdir_versions_from_directory(
                     self._legacy_fs,
                     join(u'/', bundle_lid.bundle_id,
-                         coll_id, vid_to_dir_name(VID(coll_vid))))
+                         coll_id, _vid_to_dir_part(VID(coll_vid))))
                 for prod_id, prod_vid in collection_subdirs.items():
                     product_lid = '%s:%s' % (collection_lid, prod_id)
                     d[str(product_lid)] = VID(prod_vid)

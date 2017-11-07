@@ -12,11 +12,6 @@ def vid_to_dir_name(vid):
     # return 'v$%s' % str(vid)
 
 
-def version_id_to_dir_name(version_id):
-    # type: (unicode) -> unicode
-    return 'v$%s' % version_id
-
-
 def dir_name_to_vid(dir_name):
     # type: (unicode) -> VID
     return pdart.fs.DirUtils._dir_part_to_vid(dir_name)

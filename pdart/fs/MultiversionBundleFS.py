@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING
 
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
     read_subdir_versions_from_path, write_subdir_versions_to_path
-from pdart.fs.VersionDirNames \
-    import dir_name_to_vid, is_dir_name, vid_to_dir_name
+from pdart.fs.DirUtils import _dir_part_to_vid, _is_dir_part, _vid_to_dir_part
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -75,7 +74,7 @@ class MultiversionBundleFS(WrapFS):
         base_dir = lid_to_versions_directory_path(lid)
 
         def make_version_subdir(dir_name, version):
-            return join(base_dir, dir_name, vid_to_dir_name(VID(version)))
+            return join(base_dir, dir_name, _vid_to_dir_part(VID(version)))
 
         return {dir_name: make_version_subdir(dir_name, version)
                 for dir_name, version in d.items()}
@@ -130,9 +129,9 @@ class MultiversionBundleFS(WrapFS):
         """
         # type: (LID) -> VID
         path = lid_to_versions_directory_path(lid)
-        vids = [dir_name_to_vid(dir_name)
+        vids = [_dir_part_to_vid(dir_name)
                 for dir_name in self.listdir(path)
-                if is_dir_name(dir_name)]
+                if _is_dir_part(dir_name)]
         if not vids:
             return VID('0')
         else:
@@ -175,7 +174,7 @@ def lidvid_to_contents_directory_path(lidvid):
     lid = lidvid.lid()
     vid = lidvid.vid()
     return join(lid_to_versions_directory_path(lid),
-                vid_to_dir_name(vid))
+                _vid_to_dir_part(vid))
 
 
 def lid_to_versions_directory_path(lid):
