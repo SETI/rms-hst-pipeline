@@ -3,6 +3,7 @@ from fs.info import Info
 from fs.mode import Mode
 from fs.path import abspath, basename, dirname, iteratepath, normpath, split
 
+from pdart.fs.ISingleVersionBundleFS import ISingleVersionBundleFS
 from pdart.fs.MultiversionBundleFS \
     import MultiversionBundleFS, lidvid_to_contents_directory_path
 from pdart.fs.ReadOnlyView import ReadOnlyView
@@ -22,7 +23,7 @@ def _make_raw_dir_info(name):
     return {u'basic': {u'name': name, u'is_dir': True}}
 
 
-class VersionView(ReadOnlyView):
+class VersionView(ReadOnlyView, ISingleVersionBundleFS):
     """
     A view into a MultiversionBundleFS that exposes only a single version of
     the bundle and its components.
@@ -130,6 +131,9 @@ class VersionView(ReadOnlyView):
         else:
             assert False, 'uncaught case: %s' % type
 
+    def bundle_lidvid(self):
+        return self._bundle_lidvid
+
     def lid_to_vid(self, lid):
         """
         Returns the VID of a LID that appears in the VersionView.
@@ -159,16 +163,6 @@ class VersionView(ReadOnlyView):
             self._lid_to_vid_dict = d
 
         return self._lid_to_vid_dict[str(lid)]
-
-    def directory_to_lidvid(self, dir):
-        # type: (unicode) -> LIDVID
-        lid = VersionView.directory_to_lid(dir)
-        vid = self.lid_to_vid(lid)
-        return LIDVID.create_from_lid_and_vid(lid, vid)
-
-    @staticmethod
-    def directory_to_lid(dir):
-        return LID.create_from_parts(iteratepath(dir))
 
 
 def layered():

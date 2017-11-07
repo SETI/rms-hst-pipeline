@@ -7,10 +7,14 @@ from fs.tempfs import TempFS
 from typing import TYPE_CHECKING
 
 from pdart.fs.DeletionSet import DeletionSet
+from pdart.fs.ISingleVersionBundleFS import ISingleVersionBundleFS
 from pdart.fs.ReadOnlyFSWithDeletions import ReadOnlyFSWithDeletions
 
 if TYPE_CHECKING:
     from typing import Set
+    from pdart.fs.VersionView import VersionView
+    from pdart.pds4.LID import LID
+    from pdart.pds4.VID import VID
 
 
 class FSDelta(object):
@@ -193,3 +197,23 @@ class CopyOnWriteFS(FS):
         self.check()
         self._ensure_path_is_writable(path)
         self._delta_fs.setinfo(path, info)
+
+
+class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
+    """
+    A CopyOnWriteFS that wraps a VersionView, so is itself a VersionView too.
+    """
+
+    def __init__(self, version_view, delta_fs=TempFS()):
+        # type: (VersionView, FS) -> None
+        CopyOnWriteFS.__init__(self, version_view, delta_fs)
+        self._version_view = version_view
+
+    def bundle_lidvid(self):
+        """Return the LIDVID for the bundle the filesystem holds."""
+        # type: () -> LIDVID
+        return self._version_view.bundle_lidvid()
+
+    def lid_to_vid(self, lid):
+        # type: (LID) -> VID
+        return self._version_view.lid_to_vid(lid)

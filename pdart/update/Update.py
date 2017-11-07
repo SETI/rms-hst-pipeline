@@ -1,8 +1,6 @@
-import abc
-
 from typing import TYPE_CHECKING
 
-from pdart.fs.CopyOnWriteFS import CopyOnWriteFS
+from pdart.fs.CopyOnWriteFS import CopyOnWriteVersionView
 from pdart.fs.LidToDirName import lid_to_dir_name
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.VersionView import VersionView
@@ -11,14 +9,14 @@ if TYPE_CHECKING:
     from typing import Callable
     from pdart.pds4.LIDVID import LIDVID
 
-    _UPDATE_FUNC = Callable[[CopyOnWriteFS], None]
+    _UPDATE_FUNC = Callable[[CopyOnWriteVersionView], None]
 
 
 def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
     # type: (MultiversionBundleFS, LIDVID, bool, _UPDATE_FUNC) -> None
     last_version_view = VersionView(last_bundle_lidvid, multiversioned_fs)
 
-    cow_fs = CopyOnWriteFS(last_version_view)
+    cow_fs = CopyOnWriteVersionView(last_version_view)
     update(cow_fs)
     cow_fs._remove_duplicates()
 
@@ -56,13 +54,3 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
 def copy_selected_files(old_dir, new_dir):
     # type: (VersionView, unicode, VersionView, unicode) -> None
     assert False, 'copy_some_files() unimplemented'
-
-
-class ISingleVersionBundleFS(object):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def bundle_lidvid(self):
-        """Return the LIDVID for the bundle the filesystem holds."""
-        # type: () -> LIDVID
-        pass
