@@ -2,10 +2,11 @@ from fs.path import iteratepath, join
 from fs.wrap import WrapFS
 from typing import TYPE_CHECKING
 
+from pdart.fs.DirUtils import _dir_part_to_vid, _is_dir_part, \
+    _vid_to_dir_part, \
+    lid_to_dir, lidvid_to_dir
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
     read_subdir_versions_from_path, write_subdir_versions_to_path
-from pdart.fs.DirUtils import _dir_part_to_vid, _is_dir_part, lid_to_dir, \
-    lidvid_to_dir, _vid_to_dir_part
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -13,8 +14,6 @@ from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
     from typing import Dict, List, Tuple
-    from pdart.pds4.LIDVID import LIDVID
-    from pdart.pds4.LID import LID
 
 
 class MultiversionBundleFS(WrapFS):
@@ -28,13 +27,14 @@ class MultiversionBundleFS(WrapFS):
 
     def make_lidvid_directories(self, lidvid):
         """
-        Create the contents directory and create an empty
-        subdir_versions file if none exists for this LID version.
+        Create the contents directory and create an empty subdir_versions
+        file if none exists for this LID version.  If it already exists,
+        do nothing.
         """
         # type: (LIDVID) -> None
         path = lidvid_to_dir(lidvid)
         self._wrap_fs.makedirs(path, recreate=True)
-        dict_path = lidvid_to_subdir_versions_path(lidvid)
+        dict_path = _lidvid_to_subdir_versions_path(lidvid)
         is_product = lidvid.lid().product_id is not None
         if not is_product and not self._wrap_fs.exists(dict_path):
             write_subdir_versions_to_path(self, dict_path, {})
@@ -53,7 +53,7 @@ class MultiversionBundleFS(WrapFS):
         in the subdir_versions file.
         """
         # type: (LIDVID) -> Dict[unicode, unicode]
-        path = lidvid_to_subdir_versions_path(lidvid)
+        path = _lidvid_to_subdir_versions_path(lidvid)
         return read_subdir_versions_from_path(self, path)
 
     def write_lidvid_subdir_versions(self, lidvid, d):
@@ -61,7 +61,7 @@ class MultiversionBundleFS(WrapFS):
         For a given LIDVID, write a dictionary into the subdir_versions file.
         """
         # type: (LIDVID, Dict[unicode, unicode]) -> None
-        path = lidvid_to_subdir_versions_path(lidvid)
+        path = _lidvid_to_subdir_versions_path(lidvid)
         return write_subdir_versions_to_path(self, path, d)
 
     def read_subdirectory_paths(self, lidvid):
@@ -144,6 +144,7 @@ class MultiversionBundleFS(WrapFS):
         Validate that the filesystem follows the rules for a
         MultiversionBundleFS.
         """
+        # TODO implement this
         pass
 
     def current_bundle_lidvid(self):
@@ -156,7 +157,7 @@ class MultiversionBundleFS(WrapFS):
         return LIDVID.create_from_lid_and_vid(lid, vid)
 
 
-def lidvid_to_subdir_versions_path(lidvid):
+def _lidvid_to_subdir_versions_path(lidvid):
     """
     For a given LIDVID, give the path to the subdir_versions file
     indicating its subdirectories.
