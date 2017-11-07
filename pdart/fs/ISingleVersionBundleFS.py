@@ -4,9 +4,9 @@ from fs.path import iteratepath
 from typing import TYPE_CHECKING
 
 from pdart.pds4.LID import LID
+from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
-    from pdart.pds4.LIDVID import LIDVID
     from pdart.pds4.VID import VID
 
 

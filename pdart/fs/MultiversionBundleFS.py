@@ -82,8 +82,8 @@ class MultiversionBundleFS(WrapFS):
 
     def add_subcomponent(self, parent_lidvid, child_lidvid):
         """
-        Add directories for the child component to the parent
-        component, including the subdir_versions dictionary.
+        Add the child as a child of the parent, and create directories if
+        necessary.
         """
         # type: (LIDVID, LIDVID) -> None
         child_lid = child_lidvid.lid()

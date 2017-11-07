@@ -46,7 +46,6 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
 
         def add_path_segment(legacy_path, new_segment):
             # type: (Tuple[str,unicode], unicode) -> Tuple[str,unicode]
-            print "add_path_segment(%s, %s)" % (legacy_path, new_segment)
             if legacy_path == ('r', u'/'):
                 if new_segment == self._bundle_id:
                     return ('d', lidvid_to_dir(self._bundle_lidvid))
