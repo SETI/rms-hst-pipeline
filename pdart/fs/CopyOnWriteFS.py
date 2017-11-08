@@ -9,12 +9,12 @@ from typing import TYPE_CHECKING
 from pdart.fs.DeletionSet import DeletionSet
 from pdart.fs.ISingleVersionBundleFS import ISingleVersionBundleFS
 from pdart.fs.ReadOnlyFSWithDeletions import ReadOnlyFSWithDeletions
+from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
     from typing import Set
     from pdart.fs.VersionView import VersionView
     from pdart.pds4.LID import LID
-    from pdart.pds4.VID import VID
 
 
 class FSDelta(object):
@@ -222,4 +222,7 @@ class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
 
     def lid_to_vid(self, lid):
         # type: (LID) -> VID
-        return self._version_view.lid_to_vid(lid)
+        try:
+            return self._version_view.lid_to_vid(lid)
+        except KeyError:
+            return VID('0')

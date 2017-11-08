@@ -243,7 +243,6 @@ class Test_Update(unittest.TestCase):
         new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)
 
-    @unittest.skip('under development and failing')
     def test_update_bundle_with_collection_addition(self):
         # type: () -> None
         def update(fs):

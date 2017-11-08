@@ -7,7 +7,6 @@ from pdart.fs.DirUtils import lid_to_dir, lidvid_to_dir
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.VersionView import VersionView
 from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
     from typing import Callable
@@ -77,12 +76,11 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
 
     def copy_directory_at(path):
         # type: (unicode) -> None
-        try:
-            old_lidvid = cow_fs.directory_to_lidvid(path)
-            new_lidvid = incr_lidvid(old_lidvid)
-        except KeyError:
-            old_lid = cow_fs.directory_to_lid(path)
-            new_lidvid = LIDVID.create_from_lid_and_vid(old_lid, VID("1"))
+        old_lidvid = cow_fs.directory_to_lidvid(path)
+        new_lidvid = incr_lidvid(old_lidvid)
+
+        # TODO Rethink and clarify the semantics of dirs.  They play
+        # multiple roles.
         if path not in dirs:
             # it was not changed, but we need to include it as a child
             multiversioned_fs.add_subcomponent(new_parent_lidvid(new_lidvid),
@@ -102,8 +100,7 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
         # type: (unicode) -> None
         if is_fits_file(path):
             # this is the version-less path
-            cow_fs_path = path
-            path_dir, base = split(cow_fs_path)
+            path_dir, base = split(path)
             old_lidvid = cow_fs.directory_to_lidvid(path_dir)
             new_lidvid = incr_lidvid(old_lidvid)
             multiversioned_fs_path = join(lidvid_to_dir(new_lidvid), base)
