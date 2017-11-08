@@ -58,7 +58,7 @@ def dir_to_lidvid(dir):
     lid_parts = parts[0:-1]
     vid_part = parts[-1]
     lid = LID.create_from_parts(lid_parts)
-    vid = _dir_part_to_vid(vid_part)
+    vid = dir_part_to_vid(vid_part)
     return LIDVID.create_from_lid_and_vid(lid, vid)
 
 
@@ -70,7 +70,7 @@ def _vid_to_dir_part(vid):
     return 'v$%s' % str(vid)
 
 
-def _dir_part_to_vid(dir_part):
+def dir_part_to_vid(dir_part):
     """
     Convert a directory name to a VID.  Raise on errors.
     """

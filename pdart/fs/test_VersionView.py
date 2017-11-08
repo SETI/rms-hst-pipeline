@@ -144,7 +144,7 @@ class TestVersionView(unittest.TestCase):
             VersionView.directory_to_lid(u'/b/c/v$23')
 
     def test_lid_to_vid(self):
-        with self.assertRaises(KeyError):
+        with self.assertRaises(Exception):
             self.version_view.lid_to_vid(LID(u'urn:nasa:pds:b'))
         self.versioned_fs.tree()
         self.assertEqual(

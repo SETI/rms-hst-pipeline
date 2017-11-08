@@ -2,7 +2,7 @@ from fs.path import iteratepath, join
 from fs.wrap import WrapFS
 from typing import TYPE_CHECKING
 
-from pdart.fs.DirUtils import _dir_part_to_vid, _is_dir_part, \
+from pdart.fs.DirUtils import dir_part_to_vid, _is_dir_part, \
     _vid_to_dir_part, \
     lid_to_dir, lidvid_to_dir
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
@@ -130,7 +130,7 @@ class MultiversionBundleFS(WrapFS):
         """
         # type: (LID) -> VID
         path = lid_to_dir(lid)
-        vids = [_dir_part_to_vid(dir_name)
+        vids = [dir_part_to_vid(dir_name)
                 for dir_name in self.listdir(path)
                 if _is_dir_part(dir_name)]
         if not vids:
