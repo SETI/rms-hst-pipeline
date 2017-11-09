@@ -27,6 +27,7 @@ mypy --silent-imports --py2 \
     MakeDocLabel.py \
     MakeLabel.py \
     MakeLabels.py \
+    MakeNewArchive.py \
     MakeRawBrowse.py \
     SearchDev.py \
     SqlAlch.py \
