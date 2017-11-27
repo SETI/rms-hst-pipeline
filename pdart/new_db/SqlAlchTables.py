@@ -20,19 +20,111 @@ class Bundle(Base):
     lidvid = Column(String, primary_key=True, nullable=False)
 
 
+############################################################
+
 class Collection(Base):
     __tablename__ = 'collections'
     lidvid = Column(String, primary_key=True, nullable=False)
     bundle_lid = Column(String, ForeignKey('bundles.lidvid'),
                         nullable=False, index=True)
+    type = Column(String(24), nullable=False)
+    __mapper_args__ = {
+        'polymorphic_identity': 'collection',
+        'polymorphic_on': type
+    }
 
+
+class DocumentCollection(Collection):
+    __tablename__ = 'document_collections'
+    collection_lidvid = Column(String, ForeignKey('collections.lidvid'),
+                               primary_key=True, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'document_collection',
+    }
+
+
+class NonDocumentCollection(Collection):
+    __tablename__ = 'non_document_collections'
+    collection_lidvid = Column(String, ForeignKey('collections.lidvid'),
+                               primary_key=True, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'non_document_collection',
+    }
+
+
+############################################################
 
 class Product(Base):
     __tablename__ = 'products'
     lidvid = Column(String, primary_key=True, nullable=False)
-    collection_lid = Column(String, ForeignKey('collections.lidvid'),
-                            nullable=False, index=True)
+    collection_lidvid = Column(String, ForeignKey('collections.lidvid'),
+                               nullable=False, index=True)
+    type = Column(String(16), nullable=False)
 
+    __mapper_args__ = {
+        'polymorphic_identity': 'product',
+        'polymorphic_on': type
+    }
+
+
+class FitsProduct(Product):
+    """
+    A database representation of a PDS4 observational product
+    consisting of a single FITS file.
+    """
+    __tablename__ = 'fits_products'
+    product_lidvid = Column(String, ForeignKey('products.lidvid'),
+                            primary_key=True, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'fits_product',
+    }
+
+
+class BrowseProduct(Product):
+    """
+    A database representation of a PDS4 product consisting of browse
+    images.
+    """
+    __tablename__ = 'browse_products'
+    product_lidvid = Column(String, ForeignKey('products.lidvid'),
+                            primary_key=True, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'browse_product',
+    }
+
+
+class DocumentProduct(Product):
+    """
+    A database representation of a PDS4 product consisting of
+    documents.
+    """
+    __tablename__ = 'document_products'
+    product_lidvid = Column(String, ForeignKey('products.lidvid'),
+                            primary_key=True, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'document_product',
+    }
+
+
+############################################################
+
+class DocumentFile(Base):
+    """
+    A database representation of a single document file, part of a
+    document product.
+    """
+    __tablename__ = 'document_files'
+    product_lidvid = Column(String,
+                            ForeignKey('document_products.product_lidvid'),
+                            primary_key=True, nullable=False)
+
+
+############################################################
 
 class Hdu(Base):
     """
@@ -62,7 +154,8 @@ class Card(Base):
     __tablename__ = 'cards'
 
     id = Column(Integer, primary_key=True, nullable=False)
-    product_lidvid = Column(String, ForeignKey('products.lidvid'), nullable=False)
+    product_lidvid = Column(String, ForeignKey('products.lidvid'),
+                            nullable=False)
     hdu_index = Column(Integer, ForeignKey('hdus.hdu_index'), nullable=False)
     keyword = Column(String, nullable=False)
     value = Column(String, nullable=True)

@@ -8,25 +8,22 @@ from pdart.new_db.SqlAlchTables import Base
 if TYPE_CHECKING:
     from typing import Set
 
-_TABLES = {'bundles', 'collections', 'products', 'hdus',
-           'cards'}  # type: Set[str]
+_TABLES = {'bundles',
+           'collections', 'document_collections', 'non_document_collections',
+           'products', 'browse_products', 'document_products', 'fits_products',
+           'document_files', 'hdus', 'cards'}  # type: Set[str]
 
 
 class Test_BundleDB(unittest.TestCase):
     def setUp(self):
         # type: () -> None
-        (_, self.db_os_filepath) = tempfile.mkstemp(suffix='.db')
-        self.db = BundleDB(self.db_os_filepath)
-
-    def tearDown(self):
-        # type: () -> None
-        os.remove(self.db_os_filepath)
+        self.db = BundleDB.create_database_in_memory()
+        self.db.create_tables()
 
     def test_BundleDB(self):
         # type: () -> None
-        db = BundleDB(self.db_os_filepath)
+        db = self.db
         self.assertTrue(db.is_open())
-        db.create_tables()
         metadata = Base.metadata
         self.assertEqual(set(metadata.tables.keys()), _TABLES)
         db.close()
