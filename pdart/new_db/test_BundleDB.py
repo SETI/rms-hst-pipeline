@@ -6,9 +6,10 @@ from pdart.new_db.BundleDB import *
 from pdart.new_db.SqlAlchTables import Base
 
 if TYPE_CHECKING:
-    from typing import List
+    from typing import Set
 
-_TABLES = ['bundles']  # type: List[str]
+_TABLES = {'bundles', 'collections', 'products', 'hdus',
+           'cards'}  # type: Set[str]
 
 
 class Test_BundleDB(unittest.TestCase):
@@ -27,6 +28,6 @@ class Test_BundleDB(unittest.TestCase):
         self.assertTrue(db.is_open())
         db.create_tables()
         metadata = Base.metadata
-        self.assertEqual(metadata.tables.keys(), _TABLES)
+        self.assertEqual(set(metadata.tables.keys()), _TABLES)
         db.close()
         self.assertFalse(db.is_open())
