@@ -6,6 +6,7 @@ mypy --silent-imports --py2 \
     pdart/db \
     pdart/fs \
     pdart/hst \
+    pdart/new_db \
     pdart/pds4 \
     pdart/pds4labels \
     pdart/reductions \
