@@ -40,36 +40,42 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
         self.assertTrue(self.db.bundle_exists(bundle_lidvid))
 
-    def test_upsert_collection(self):
+    def test_upsert_non_document_collection(self):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:b::1.1'
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = 'urn:nasa:pds:b:c::1.8'
-        self.assertFalse(self.db.collection_exists(collection_lidvid))
+        self.assertFalse(
+            self.db.non_document_collection_exists(collection_lidvid))
 
-        self.db.create_collection(collection_lidvid, bundle_lidvid)
-        self.assertTrue(self.db.collection_exists(collection_lidvid))
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+        self.assertTrue(
+            self.db.non_document_collection_exists(collection_lidvid))
 
-        self.db.create_collection(collection_lidvid, bundle_lidvid)
-        self.assertTrue(self.db.collection_exists(collection_lidvid))
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+        self.assertTrue(
+            self.db.non_document_collection_exists(collection_lidvid))
 
-    def test_upsert_product(self):
+    def test_upsert_fits_product(self):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:b::1.1'
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = 'urn:nasa:pds:b:c::1.8'
-        self.db.create_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
 
         product_lidvid = 'urn:nasa:pds:b:c:p::8.1'
-        self.assertFalse(self.db.product_exists(product_lidvid))
+        self.assertFalse(self.db.fits_product_exists(product_lidvid))
 
-        self.db.create_product(product_lidvid, collection_lidvid)
-        self.assertTrue(self.db.product_exists(product_lidvid))
+        self.db.create_fits_product(product_lidvid, collection_lidvid)
+        self.assertTrue(self.db.fits_product_exists(product_lidvid))
 
-        self.db.create_product(product_lidvid, collection_lidvid)
-        self.assertTrue(self.db.product_exists(product_lidvid))
+        self.db.create_fits_product(product_lidvid, collection_lidvid)
+        self.assertTrue(self.db.fits_product_exists(product_lidvid))
 
     def test_exploratory(self):
         # type: () -> None
