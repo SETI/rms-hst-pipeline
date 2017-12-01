@@ -25,8 +25,8 @@ class Bundle(Base):
 class Collection(Base):
     __tablename__ = 'collections'
     lidvid = Column(String, primary_key=True, nullable=False)
-    bundle_lid = Column(String, ForeignKey('bundles.lidvid'),
-                        nullable=False, index=True)
+    bundle_lidvid = Column(String, ForeignKey('bundles.lidvid'),
+                           nullable=False, index=True)
     type = Column(String(24), nullable=False)
     __mapper_args__ = {
         'polymorphic_identity': 'collection',

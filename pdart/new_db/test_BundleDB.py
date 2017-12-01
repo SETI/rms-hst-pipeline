@@ -1,5 +1,3 @@
-import os
-import tempfile
 import unittest
 
 from pdart.new_db.BundleDB import *
@@ -28,3 +26,53 @@ class Test_BundleDB(unittest.TestCase):
         self.assertEqual(set(metadata.tables.keys()), _TABLES)
         db.close()
         self.assertFalse(db.is_open())
+
+    def test_upsert_bundle(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:b::1.1'
+        self.assertTrue(self.db.session.query(Bundle).filter(
+            Bundle.lidvid == bundle_lidvid).count() == 0)
+        self.assertFalse(self.db.bundle_exists(bundle_lidvid))
+        self.db.create_bundle(bundle_lidvid)
+        self.assertTrue(self.db.session.query(Bundle).filter(
+            Bundle.lidvid == bundle_lidvid).count() == 1)
+        self.assertTrue(self.db.bundle_exists(bundle_lidvid))
+        self.db.create_bundle(bundle_lidvid)
+        self.assertTrue(self.db.bundle_exists(bundle_lidvid))
+
+    def test_upsert_collection(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:b::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        collection_lidvid = 'urn:nasa:pds:b:c::1.8'
+        self.assertFalse(self.db.collection_exists(collection_lidvid))
+
+        self.db.create_collection(collection_lidvid, bundle_lidvid)
+        self.assertTrue(self.db.collection_exists(collection_lidvid))
+
+        self.db.create_collection(collection_lidvid, bundle_lidvid)
+        self.assertTrue(self.db.collection_exists(collection_lidvid))
+
+    def test_upsert_product(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:b::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        collection_lidvid = 'urn:nasa:pds:b:c::1.8'
+        self.db.create_collection(collection_lidvid, bundle_lidvid)
+
+        product_lidvid = 'urn:nasa:pds:b:c:p::8.1'
+        self.assertFalse(self.db.product_exists(product_lidvid))
+
+        self.db.create_product(product_lidvid, collection_lidvid)
+        self.assertTrue(self.db.product_exists(product_lidvid))
+
+        self.db.create_product(product_lidvid, collection_lidvid)
+        self.assertTrue(self.db.product_exists(product_lidvid))
+
+    def test_exploratory(self):
+        # type: () -> None
+        # what happens if you create tables twice?
+        self.db.create_tables()
+        # no exception, at least
