@@ -9,7 +9,8 @@ if TYPE_CHECKING:
 _TABLES = {'bundles',
            'collections', 'document_collections', 'non_document_collections',
            'products', 'browse_products', 'document_products', 'fits_products',
-           'document_files', 'hdus', 'cards'}  # type: Set[str]
+           'fits_files', 'bad_fits_files',
+           'hdus', 'cards'}  # type: Set[str]
 
 
 class Test_BundleDB(unittest.TestCase):
@@ -27,7 +28,7 @@ class Test_BundleDB(unittest.TestCase):
         db.close()
         self.assertFalse(db.is_open())
 
-    def test_upsert_bundle(self):
+    def test_create_bundle(self):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:b::1.1'
         self.assertTrue(self.db.session.query(Bundle).filter(
@@ -40,7 +41,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
         self.assertTrue(self.db.bundle_exists(bundle_lidvid))
 
-    def test_upsert_non_document_collection(self):
+    def test_create_non_document_collection(self):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:b::1.1'
         self.db.create_bundle(bundle_lidvid)
@@ -59,7 +60,7 @@ class Test_BundleDB(unittest.TestCase):
         self.assertTrue(
             self.db.non_document_collection_exists(collection_lidvid))
 
-    def test_upsert_fits_product(self):
+    def test_create_fits_product(self):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:b::1.1'
         self.db.create_bundle(bundle_lidvid)
@@ -76,6 +77,27 @@ class Test_BundleDB(unittest.TestCase):
 
         self.db.create_fits_product(product_lidvid, collection_lidvid)
         self.assertTrue(self.db.fits_product_exists(product_lidvid))
+
+    def test_create_fits_file(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:b::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        collection_lidvid = 'urn:nasa:pds:b:c::1.8'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        product_lidvid = 'urn:nasa:pds:b:c:p::8.1'
+        self.db.create_fits_product(product_lidvid, collection_lidvid)
+
+        basename = 'file.fits'
+        self.assertFalse(self.db.fits_file_exists(basename, product_lidvid))
+
+        self.db.create_fits_file(basename, product_lidvid)
+        self.assertTrue(self.db.fits_file_exists(basename, product_lidvid))
+
+        self.db.create_fits_file(basename, product_lidvid)
+        self.assertTrue(self.db.fits_file_exists(basename, product_lidvid))
 
     def test_exploratory(self):
         # type: () -> None

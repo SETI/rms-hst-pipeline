@@ -1,4 +1,3 @@
-import abc
 from sqlalchemy import Column, ForeignKey, Index, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
@@ -114,15 +113,44 @@ class DocumentProduct(Product):
 
 ############################################################
 
-class DocumentFile(Base):
+# class File(Base):
+#    """
+#    A database representation of a single file that belongs to a
+#    product.
+#    """
+#    __tablename__ = 'files'
+#    product_lidvid = Column(String,
+#                            ForeignKey('products.lidvid'),
+#                            primary_key=True, nullable=False)
+#    filename = Column(String, nullable=False)
+#    type = Column(String(16), nullable=False)
+#
+#    __mapper_args__ = {
+#        'polymorphic_identity': 'file',
+#        'polymorphic_on': type
+#    }
+
+class FitsFile(Base):
     """
-    A database representation of a single document file, part of a
-    document product.
+    A database representation of a FITS file belonging to a product.
     """
-    __tablename__ = 'document_files'
-    product_lidvid = Column(String,
-                            ForeignKey('document_products.product_lidvid'),
+    __tablename__ = 'fits_files'
+    product_lidvid = Column(String, ForeignKey('products.lidvid'),
                             primary_key=True, nullable=False)
+    basename = Column(String, nullable=False)
+
+
+class BadFitsFile(Base):
+    """
+    A database representation of a FITS file belonging to a product
+    that could not be read.
+    """
+    __tablename__ = 'bad_fits_files'
+
+    product_lidvid = Column(String, ForeignKey('products.lidvid'),
+                            primary_key=True, nullable=False)
+    basename = Column(String, nullable=False)
+    exception_message = Column(String, nullable=False)
 
 
 ############################################################

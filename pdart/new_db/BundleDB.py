@@ -79,6 +79,36 @@ class BundleDB(object):
             exists().where(
                 FitsProduct.product_lidvid == product_lidvid)).scalar()
 
+    #    def file_exists(self, filename, product_lidvid):
+    #        # type: (unicode) -> bool
+    #        """
+    #        Returns True iff a file with the given LIDVID exists in the
+    #        database.
+    #        """
+    #        return self.session.query(
+    #            exists().where(File.filename == filename).
+    #                where(File.product_lidvid == product_lidvid)).scalar()
+
+    def fits_file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a FITS file with the given LIDVID exists in
+        the database.
+        """
+        return self.session.query(
+            exists().where(FitsFile.basename == basename).where(
+                FitsFile.product_lidvid == product_lidvid)).scalar()
+
+    def bad_fits_file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a bad FITS file record with the given LIDVID
+        exists in the database.
+        """
+        return self.session.query(
+            exists().where(FitsFile.basename == basename).where(
+                FitsFile.product_lidvid == product_lidvid)).scalar()
+
     def create_bundle(self, bundle_lidvid):
         # type: (str) -> None
         """
@@ -94,6 +124,7 @@ class BundleDB(object):
         Create a non_document_collection with this LIDVID if none exists.
         """
         LIDVID(collection_lidvid)
+        LIDVID(bundle_lidvid)
         if self.collection_exists(collection_lidvid):
             if self.non_document_collection_exists(collection_lidvid):
                 pass
@@ -114,6 +145,7 @@ class BundleDB(object):
         Create a product with this LIDVID if none exists.
         """
         LIDVID(product_lidvid)
+        LIDVID(collection_lidvid)
         if self.product_exists(product_lidvid):
             if self.fits_product_exists(product_lidvid):
                 pass
@@ -125,6 +157,34 @@ class BundleDB(object):
             self.session.add(
                 FitsProduct(lidvid=product_lidvid,
                             collection_lidvid=collection_lidvid))
+
+    def create_fits_file(self, basename, product_lidvid):
+        # type: (str, str) -> None
+        """
+        Create a FITS file with this basename belonging to the product
+        if none exists.
+        """
+        LIDVID(product_lidvid)
+        if self.fits_file_exists(basename, product_lidvid):
+            pass
+        else:
+            self.session.add(
+                FitsFile(basename=basename,
+                         product_lidvid=product_lidvid))
+
+    def create_bads_fits_file(self, basename, product_lidvid):
+        # type: (str, str) -> None
+        """
+        Create a bad FITS file record with this basename belonging to
+        the product if none exists.
+        """
+        LIDVID(product_lidvid)
+        if self.fits_file_exists(basename, product_lidvid):
+            pass
+        else:
+            self.session.add(
+                FitsFile(basename=basename,
+                         product_lidvid=product_lidvid))
 
     def close(self):
         # type: () -> None
