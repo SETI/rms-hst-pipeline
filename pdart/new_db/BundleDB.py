@@ -116,8 +116,20 @@ class BundleDB(object):
         """
         return self.session.query(
             exists().where(
-                Product.lidvid == product_lidvid).where(
+                Hdu.product_lidvid == product_lidvid).where(
                 Hdu.hdu_index == index)).scalar()
+
+    def card_exists(self, keyword, hdu_index, product_lidvid):
+        # type: (str, int, unicode) -> bool
+        """
+        Returns True iff there is a card with the given keyword in
+        the n-th HDU of the FITS file for that product.
+        """
+        return self.session.query(
+            exists().where(
+                Card.product_lidvid == product_lidvid).where(
+                Card.hdu_index == hdu_index).where(
+                Card.keyword == keyword)).scalar()
 
     def create_bundle(self, bundle_lidvid):
         # type: (str) -> None

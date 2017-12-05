@@ -25,15 +25,24 @@ class Test_FitsFileDB(unittest.TestCase):
         populate_from_fits_file(self.db,
                                 os_filepath,
                                 fits_product_lidvid)
-        self.assertTrue(self.db.fits_file_exists(basename(os_filepath),
+
+        file_basename = basename(os_filepath)
+
+        self.assertTrue(self.db.fits_file_exists(file_basename,
                                                  fits_product_lidvid))
 
-        self.assertFalse(self.db.bad_fits_file_exists(basename(os_filepath),
+        self.assertFalse(self.db.bad_fits_file_exists(file_basename,
                                                       fits_product_lidvid))
 
+        # test that we got some HDUS
         self.assertTrue(self.db.hdu_exists(0,
-                                           basename(os_filepath),
-                                           fits_product_lidvid) or True)
+                                           file_basename,
+                                           fits_product_lidvid))
+
+        # test that we got some cards
+        self.assertTrue(self.db.card_exists('BITPIX',
+                                            0,
+                                            fits_product_lidvid))
 
     def test_populate_from_bad_fits_file(self):
         # type: () -> None
