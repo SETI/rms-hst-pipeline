@@ -4,10 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from pdart.new_db.SqlAlchTables import *
 from pdart.pds4.LIDVID import LIDVID
 
-_BUNDLE_DB_NAME = 'bundle$database.db'
+_BUNDLE_DB_NAME = 'bundle$database.db'  # type: unicode
 
-
-# type: unicode
 
 class BundleDB(object):
     def __init__(self, url):
@@ -31,7 +29,7 @@ class BundleDB(object):
         create_tables(self.engine)
 
     def bundle_exists(self, bundle_lidvid):
-        # type: (unicode) -> bool
+        # type: (str) -> bool
         """
         Returns True iff a bundle with the given LIDVID exists in the database.
         """
@@ -39,7 +37,7 @@ class BundleDB(object):
             exists().where(Bundle.lidvid == bundle_lidvid)).scalar()
 
     def collection_exists(self, collection_lidvid):
-        # type: (unicode) -> bool
+        # type: (str) -> bool
 
         """
         Returns True iff a collection with the given LIDVID exists in the
@@ -49,7 +47,7 @@ class BundleDB(object):
             exists().where(Collection.lidvid == collection_lidvid)).scalar()
 
     def non_document_collection_exists(self, collection_lidvid):
-        # type: (unicode) -> bool
+        # type: (str) -> bool
 
         """
         Returns True iff a non-document collection with the given
@@ -61,7 +59,7 @@ class BundleDB(object):
                 collection_lidvid)).scalar()
 
     def product_exists(self, product_lidvid):
-        # type: (unicode) -> bool
+        # type: (str) -> bool
         """
         Returns True iff a product with the given LIDVID exists in the
         database.
@@ -70,7 +68,7 @@ class BundleDB(object):
             exists().where(Product.lidvid == product_lidvid)).scalar()
 
     def fits_product_exists(self, product_lidvid):
-        # type: (unicode) -> bool
+        # type: (str) -> bool
         """
         Returns True iff a FITS product with the given LIDVID exists in the
         database.
@@ -79,15 +77,15 @@ class BundleDB(object):
             exists().where(
                 FitsProduct.product_lidvid == product_lidvid)).scalar()
 
-    #    def file_exists(self, filename, product_lidvid):
-    #        # type: (unicode) -> bool
-    #        """
-    #        Returns True iff a file with the given LIDVID exists in the
-    #        database.
-    #        """
-    #        return self.session.query(
-    #            exists().where(File.filename == filename).
-    #                where(File.product_lidvid == product_lidvid)).scalar()
+    def file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a file with the given LIDVID exists in the
+        database.
+        """
+        return self.session.query(
+            exists().where(File.basename == basename).where(
+                File.product_lidvid == product_lidvid)).scalar()
 
     def fits_file_exists(self, basename, product_lidvid):
         # type: (unicode, str) -> bool
@@ -97,7 +95,8 @@ class BundleDB(object):
         """
         return self.session.query(
             exists().where(FitsFile.basename == basename).where(
-                FitsFile.product_lidvid == product_lidvid)).scalar()
+                FitsFile.product_lidvid == product_lidvid).where(
+                File.type == 'fits_file')).scalar()
 
     def bad_fits_file_exists(self, basename, product_lidvid):
         # type: (unicode, str) -> bool
@@ -106,8 +105,19 @@ class BundleDB(object):
         exists in the database.
         """
         return self.session.query(
-            exists().where(FitsFile.basename == basename).where(
-                FitsFile.product_lidvid == product_lidvid)).scalar()
+            exists().where(BadFitsFile.basename == basename).where(
+                BadFitsFile.product_lidvid == product_lidvid).where(
+                File.type == 'bad_fits_file')).scalar()
+
+    def hdu_exists(self, index, basename, product_lidvid):
+        # type: (int, unicode, str) -> bool
+        """
+        Returns True iff the n-th HDU for that FITS file exists
+        """
+        return self.session.query(
+            exists().where(
+                Product.lidvid == product_lidvid).where(
+                Hdu.hdu_index == index)).scalar()
 
     def create_bundle(self, bundle_lidvid):
         # type: (str) -> None
@@ -159,7 +169,7 @@ class BundleDB(object):
                             collection_lidvid=collection_lidvid))
 
     def create_fits_file(self, basename, product_lidvid):
-        # type: (str, str) -> None
+        # type: (unicode, str) -> None
         """
         Create a FITS file with this basename belonging to the product
         if none exists.
@@ -172,8 +182,9 @@ class BundleDB(object):
                 FitsFile(basename=basename,
                          product_lidvid=product_lidvid))
 
-    def create_bads_fits_file(self, basename, product_lidvid):
-        # type: (str, str) -> None
+    def create_bad_fits_file(self, basename, product_lidvid,
+                             exception_message):
+        # type: (unicode, str, str) -> None
         """
         Create a bad FITS file record with this basename belonging to
         the product if none exists.
@@ -183,8 +194,9 @@ class BundleDB(object):
             pass
         else:
             self.session.add(
-                FitsFile(basename=basename,
-                         product_lidvid=product_lidvid))
+                BadFitsFile(basename=basename,
+                            product_lidvid=product_lidvid,
+                            exception_message=exception_message))
 
     def close(self):
         # type: () -> None
