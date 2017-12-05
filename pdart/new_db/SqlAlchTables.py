@@ -24,10 +24,12 @@ class Bundle(Base):
 
 class Collection(Base):
     __tablename__ = 'collections'
+
     lidvid = Column(String, primary_key=True, nullable=False)
     bundle_lidvid = Column(String, ForeignKey('bundles.lidvid'),
                            nullable=False, index=True)
     type = Column(String(24), nullable=False)
+
     __mapper_args__ = {
         'polymorphic_identity': 'collection',
         'polymorphic_on': type
@@ -36,6 +38,7 @@ class Collection(Base):
 
 class DocumentCollection(Collection):
     __tablename__ = 'document_collections'
+
     collection_lidvid = Column(String, ForeignKey('collections.lidvid'),
                                primary_key=True, nullable=False)
 
@@ -46,6 +49,7 @@ class DocumentCollection(Collection):
 
 class NonDocumentCollection(Collection):
     __tablename__ = 'non_document_collections'
+
     collection_lidvid = Column(String, ForeignKey('collections.lidvid'),
                                primary_key=True, nullable=False)
 
@@ -58,6 +62,7 @@ class NonDocumentCollection(Collection):
 
 class Product(Base):
     __tablename__ = 'products'
+
     lidvid = Column(String, primary_key=True, nullable=False)
     collection_lidvid = Column(String, ForeignKey('collections.lidvid'),
                                nullable=False, index=True)
@@ -75,6 +80,7 @@ class FitsProduct(Product):
     consisting of a single FITS file.
     """
     __tablename__ = 'fits_products'
+
     product_lidvid = Column(String, ForeignKey('products.lidvid'),
                             primary_key=True, nullable=False)
 
@@ -89,6 +95,7 @@ class BrowseProduct(Product):
     images.
     """
     __tablename__ = 'browse_products'
+
     product_lidvid = Column(String, ForeignKey('products.lidvid'),
                             primary_key=True, nullable=False)
 
@@ -103,6 +110,7 @@ class DocumentProduct(Product):
     documents.
     """
     __tablename__ = 'document_products'
+
     product_lidvid = Column(String, ForeignKey('products.lidvid'),
                             primary_key=True, nullable=False)
 
@@ -113,47 +121,70 @@ class DocumentProduct(Product):
 
 ############################################################
 
-# class File(Base):
-#    """
-#    A database representation of a single file that belongs to a
-#    product.
-#    """
-#    __tablename__ = 'files'
-#    product_lidvid = Column(String,
-#                            ForeignKey('products.lidvid'),
-#                            primary_key=True, nullable=False)
-#    filename = Column(String, nullable=False)
-#    type = Column(String(16), nullable=False)
-#
-#    __mapper_args__ = {
-#        'polymorphic_identity': 'file',
-#        'polymorphic_on': type
-#    }
+class File(Base):
+    """
+    A database representation of a single file that belongs to a
+    product.
+    """
+    __tablename__ = 'files'
 
-class FitsFile(Base):
+    id = Column(Integer, primary_key=True, nullable=False)
+    product_lidvid = Column(String,
+                            ForeignKey('products.lidvid'),
+                            nullable=False)
+    basename = Column(String, nullable=False)
+    type = Column(String(16), nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'file',
+        'polymorphic_on': type
+    }
+
+
+class FitsFile(File):
     """
     A database representation of a FITS file belonging to a product.
     """
     __tablename__ = 'fits_files'
-    product_lidvid = Column(String, ForeignKey('products.lidvid'),
-                            primary_key=True, nullable=False)
-    basename = Column(String, nullable=False)
+
+    file_id = Column(Integer, ForeignKey('files.id'), nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'fits_file'
+    }
 
 
-class BadFitsFile(Base):
+class BadFitsFile(File):
     """
     A database representation of a FITS file belonging to a product
     that could not be read.
     """
     __tablename__ = 'bad_fits_files'
 
-    product_lidvid = Column(String, ForeignKey('products.lidvid'),
-                            primary_key=True, nullable=False)
-    basename = Column(String, nullable=False)
+    file_id = Column(Integer, ForeignKey('files.id'), nullable=False)
     exception_message = Column(String, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'bad_fits_file'
+    }
+
+
+class DocumentFile(File):
+    """
+    A database representation of a document file belonging to a
+    product.
+    """
+    __tablename__ = 'document_files'
+
+    file_id = Column(Integer, ForeignKey('files.id'), nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'document_file'
+    }
 
 
 ############################################################
+
 
 class Hdu(Base):
     """

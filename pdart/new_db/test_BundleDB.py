@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 _TABLES = {'bundles',
            'collections', 'document_collections', 'non_document_collections',
            'products', 'browse_products', 'document_products', 'fits_products',
-           'fits_files', 'bad_fits_files',
+           'files', 'fits_files', 'bad_fits_files', 'document_files',
            'hdus', 'cards'}  # type: Set[str]
 
 
