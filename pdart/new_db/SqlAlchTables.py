@@ -1,4 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Index, Integer, String
+from sqlalchemy import Column, ForeignKey, Index, Integer, String, \
+    UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
 from typing import TYPE_CHECKING
@@ -135,6 +136,9 @@ class File(Base):
     basename = Column(String, nullable=False)
     type = Column(String(16), nullable=False)
 
+    __table_args__ = (
+        UniqueConstraint('product_lidvid', 'basename'),
+    )
     __mapper_args__ = {
         'polymorphic_identity': 'file',
         'polymorphic_on': type
