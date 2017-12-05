@@ -16,7 +16,7 @@ _TABLES = {'bundles',
 class Test_BundleDB(unittest.TestCase):
     def setUp(self):
         # type: () -> None
-        self.db = BundleDB.create_database_in_memory()
+        self.db = create_bundle_db_in_memory()
         self.db.create_tables()
 
     def test_BundleDB(self):

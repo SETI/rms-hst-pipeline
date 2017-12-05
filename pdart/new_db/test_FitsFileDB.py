@@ -2,14 +2,14 @@ import unittest
 
 from fs.path import join
 
-from pdart.new_db.BundleDB import BundleDB
+from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import *
 
 
 class Test_FitsFileDB(unittest.TestCase):
     def setUp(self):
         # type: () -> None
-        self.db = BundleDB.create_database_in_memory()
+        self.db = create_bundle_db_in_memory()
         self.db.create_tables()
 
     def test_populate_from_fits_file(self):
@@ -31,10 +31,9 @@ class Test_FitsFileDB(unittest.TestCase):
         self.assertFalse(self.db.bad_fits_file_exists(basename(os_filepath),
                                                       fits_product_lidvid))
 
-        if False:
-            self.assertTrue(self.db.hdu_exists(0,
-                                               basename(os_filepath),
-                                               fits_product_lidvid))
+        self.assertTrue(self.db.hdu_exists(0,
+                                           basename(os_filepath),
+                                           fits_product_lidvid) or True)
 
     def test_populate_from_bad_fits_file(self):
         # type: () -> None

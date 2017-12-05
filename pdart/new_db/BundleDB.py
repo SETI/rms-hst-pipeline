@@ -7,22 +7,22 @@ from pdart.pds4.LIDVID import LIDVID
 _BUNDLE_DB_NAME = 'bundle$database.db'  # type: unicode
 
 
+def create_bundle_db_from_os_filepath(os_filepath):
+    # type: (unicode) -> BundleDB
+    return BundleDB('sqlite:///' + os_filepath)
+
+
+def create_bundle_db_in_memory():
+    # type: () -> BundleDB
+    return BundleDB('sqlite:///')
+
+
 class BundleDB(object):
     def __init__(self, url):
         # type: (unicode) -> None
         self.url = url
         self.engine = create_engine(url)
         self.session = sessionmaker(bind=self.engine)()
-
-    @staticmethod
-    def create_database_from_os_filepath(os_filepath):
-        # type: (unicode) -> BundleDB
-        return BundleDB('sqlite:///' + os_filepath)
-
-    @staticmethod
-    def create_database_in_memory():
-        # type: () -> BundleDB
-        return BundleDB('sqlite:///')
 
     def create_tables(self):
         # type: () -> None
