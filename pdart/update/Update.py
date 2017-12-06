@@ -49,6 +49,9 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
     update(cow_fs)
     cow_fs.normalize()
 
+    # TODO I also need to remove derived files (like labels) and
+    # regenerate them.
+
     delta = cow_fs.delta()
 
     # Note that these directories are from a single-version view.
