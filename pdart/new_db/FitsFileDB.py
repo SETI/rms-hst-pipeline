@@ -7,6 +7,7 @@ from pdart.new_db.SqlAlchTables import Card, Hdu
 if TYPE_CHECKING:
     from typing import Any, Dict
     from pdart.new_db.BundleDB import BundleDB
+    from sqlalchemy.orm import Session
 
     # unfortunately untyped
     _PYFITS_OBJ = Any
@@ -21,7 +22,7 @@ def populate_from_fits_file(db, os_filepath, fits_product_lidvid):
         fits = pyfits.open(os_filepath)
 
         try:
-            db.create_fits_file(file_basename, fits_product_lidvid)
+            db.create_fits_file(file_basename, fits_product_lidvid, len(fits))
             _populate_hdus_and_cards(db,
                                      fits,
                                      file_basename,
@@ -41,7 +42,6 @@ def _populate_hdus_and_cards(db,
 
     def create_hdu_dict(index, hdu):
         # type: (int, _PYFITS_HDU) -> Dict
-        print '>>>> index = %d' % index
         fileinfo = hdu.fileinfo()
         return {'product_lidvid': fits_product_lidvid,
                 'hdu_index': index,
@@ -80,3 +80,16 @@ def _populate_hdus_and_cards(db,
                   for card in hdu.header.cards
                   if desired_keyword(card.keyword)]
     db.session.bulk_insert_mappings(Card, card_dicts)
+    db.session.commit()
+
+
+def card_dictionaries(session, fits_product_lidvid, hdu_count):
+    # type: (Session, unicode, int) -> List[Dict[str, Any]]
+    def card_dictionary(index):
+        # type: (int) -> Dict[str, Any]
+        cards = session.query(Card).filter(
+            Card.product_lidvid == fits_product_lidvid).filter(
+            Card.hdu_index == index)
+        return {card.keyword: card.value for card in cards}
+
+    return [card_dictionary(i) for i in range(hdu_count)]

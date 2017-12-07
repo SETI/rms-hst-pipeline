@@ -4,6 +4,7 @@ from fs.path import join
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import *
+from pdart.new_db.SqlAlchTables import File, FitsFile
 
 
 class Test_FitsFileDB(unittest.TestCase):
@@ -60,3 +61,33 @@ class Test_FitsFileDB(unittest.TestCase):
 
         self.assertTrue(self.db.bad_fits_file_exists(basename(os_filepath),
                                                      fits_product_lidvid))
+
+    def test_card_dictionaries(self):
+        # type: () -> None
+        archive = '/Users/spaceman/Desktop/Archive'
+
+        fits_product_lidvid = \
+            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2'
+        os_filepath = join(
+            archive,
+            'hst_09059/data_acs_raw/visit_01/j6gp01lzq_raw.fits')
+
+        populate_from_fits_file(self.db,
+                                os_filepath,
+                                fits_product_lidvid)
+
+        file_basename = basename(os_filepath)
+
+        fits_file = self.db.session.query(FitsFile).filter(
+            File.product_lidvid == fits_product_lidvid).filter(
+            File.basename == file_basename).one()
+
+        hdu_count = fits_file.hdu_count
+
+        card_dicts = card_dictionaries(self.db.session,
+                                       fits_product_lidvid,
+                                       hdu_count)
+
+        self.assertTrue(card_dicts)
+        self.assertEquals(4, len(card_dicts))
+        self.assertEquals(16, int(card_dicts[0]['BITPIX']))

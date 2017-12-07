@@ -151,7 +151,9 @@ class FitsFile(File):
     """
     __tablename__ = 'fits_files'
 
-    file_id = Column(Integer, ForeignKey('files.id'), nullable=False)
+    file_id = Column(Integer, ForeignKey('files.id'),
+                     primary_key=True, nullable=False)
+    hdu_count = Column(Integer, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'fits_file'
@@ -165,7 +167,8 @@ class BadFitsFile(File):
     """
     __tablename__ = 'bad_fits_files'
 
-    file_id = Column(Integer, ForeignKey('files.id'), nullable=False)
+    file_id = Column(Integer, ForeignKey('files.id'),
+                     primary_key=True, nullable=False)
     exception_message = Column(String, nullable=False)
 
     __mapper_args__ = {
@@ -180,7 +183,8 @@ class DocumentFile(File):
     """
     __tablename__ = 'document_files'
 
-    file_id = Column(Integer, ForeignKey('files.id'), nullable=False)
+    file_id = Column(Integer, ForeignKey('files.id'),
+                     primary_key=True, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'document_file'

@@ -24,6 +24,10 @@ class BundleDB(object):
         self.engine = create_engine(url)
         self.session = sessionmaker(bind=self.engine)()
 
+    def dump(self):
+        for line in self.engine.raw_connection().iterdump():
+            print line
+
     def create_tables(self):
         # type: () -> None
         create_tables(self.engine)
@@ -180,8 +184,8 @@ class BundleDB(object):
                 FitsProduct(lidvid=product_lidvid,
                             collection_lidvid=collection_lidvid))
 
-    def create_fits_file(self, basename, product_lidvid):
-        # type: (unicode, str) -> None
+    def create_fits_file(self, basename, product_lidvid, hdu_count):
+        # type: (unicode, str, int) -> None
         """
         Create a FITS file with this basename belonging to the product
         if none exists.
@@ -192,7 +196,10 @@ class BundleDB(object):
         else:
             self.session.add(
                 FitsFile(basename=basename,
-                         product_lidvid=product_lidvid))
+                         product_lidvid=product_lidvid,
+                         hdu_count=hdu_count))
+            self.session.commit()
+            assert self.fits_file_exists(basename, product_lidvid)
 
     def create_bad_fits_file(self, basename, product_lidvid,
                              exception_message):

@@ -93,10 +93,10 @@ class Test_BundleDB(unittest.TestCase):
         basename = 'file.fits'
         self.assertFalse(self.db.fits_file_exists(basename, product_lidvid))
 
-        self.db.create_fits_file(basename, product_lidvid)
+        self.db.create_fits_file(basename, product_lidvid, 1)
         self.assertTrue(self.db.fits_file_exists(basename, product_lidvid))
 
-        self.db.create_fits_file(basename, product_lidvid)
+        self.db.create_fits_file(basename, product_lidvid, 1)
         self.assertTrue(self.db.fits_file_exists(basename, product_lidvid))
 
     def test_exploratory(self):
