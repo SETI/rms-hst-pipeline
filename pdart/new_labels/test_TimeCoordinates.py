@@ -5,31 +5,26 @@ from fs.path import basename, join
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import card_dictionaries, populate_from_fits_file
 from pdart.new_db.SqlAlchTables import File, FitsFile
-from pdart.new_labels.TargetIdentification import *
+from pdart.new_labels.TimeCoordinates import *
 from pdart.xml.Pretty import pretty_print
 
 
-class Test_TargetIdentification(unittest.TestCase):
+class Test_TimeCoordinates(unittest.TestCase):
     def test_get_default_target(self):
         card_dicts = None
-        nb = get_target(card_dicts)
+        nb = get_time_coordinates(None, card_dicts)
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str = nb(doc).toxml()
         str = pretty_print(str)
         expected = """<?xml version="1.0"?>
-<Target_Identification>
-  <name>Magrathea</name>
-  <type>Planet</type>
-  <description>Home of Slartibartfast</description>
-  <Internal_Reference>
-    <lid_reference>urn:nasa:pds:context:target:magrathea.planet</lid_reference>
-    <reference_type>data_to_target</reference_type>
-  </Internal_Reference>
-</Target_Identification>
+<Time_Coordinates>
+  <start_date_time>2000-01-02Z</start_date_time>
+  <stop_date_time>2000-01-02Z</stop_date_time>
+</Time_Coordinates>
 """
         self.assertEqual(expected, str)
 
-    def test_get_target(self):
+    def test_get_time_coordinates(self):
         # type: () -> None
         db = create_bundle_db_in_memory()
         db.create_tables()
@@ -57,19 +52,15 @@ class Test_TargetIdentification(unittest.TestCase):
                                        fits_product_lidvid,
                                        hdu_count)
 
-        nb = get_target(card_dicts)
+        nb = get_time_coordinates(fits_product_lidvid, card_dicts)
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str = nb(doc).toxml()
         str = pretty_print(str)
+
         expected = """<?xml version="1.0"?>
-<Target_Identification>
-  <name>Uranus</name>
-  <type>Planet</type>
-  <description>The planet Uranus</description>
-  <Internal_Reference>
-    <lid_reference>urn:nasa:pds:context:target:uranus.planet</lid_reference>
-    <reference_type>data_to_target</reference_type>
-  </Internal_Reference>
-</Target_Identification>
+<Time_Coordinates>
+  <start_date_time>2012-09-27T20:23:28Z</start_date_time>
+  <stop_date_time>2012-09-27T20:27:58Z</stop_date_time>
+</Time_Coordinates>
 """
         self.assertEqual(expected, str)
