@@ -91,3 +91,21 @@ class Test_FitsFileDB(unittest.TestCase):
         self.assertTrue(card_dicts)
         self.assertEquals(4, len(card_dicts))
         self.assertEquals(16, int(card_dicts[0]['BITPIX']))
+
+    def test_file_offsets(self):
+        # type: () -> None
+        archive = '/Users/spaceman/Desktop/Archive'
+
+        fits_product_lidvid = \
+            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2'
+        os_filepath = join(
+            archive,
+            'hst_09059/data_acs_raw/visit_01/j6gp01lzq_raw.fits')
+
+        populate_from_fits_file(self.db,
+                                os_filepath,
+                                fits_product_lidvid)
+
+        offsets = file_offsets(self.db.session, fits_product_lidvid)
+        self.assertEqual(4, len(offsets))
+
