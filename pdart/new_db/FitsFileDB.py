@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from pdart.new_db.SqlAlchTables import Card, Hdu
 
 if TYPE_CHECKING:
-    from typing import Any, Dict
+    from typing import Any, Dict, Tuple
     from pdart.new_db.BundleDB import BundleDB
     from sqlalchemy.orm import Session
 
@@ -93,3 +93,12 @@ def card_dictionaries(session, fits_product_lidvid, hdu_count):
         return {card.keyword: card.value for card in cards}
 
     return [card_dictionary(i) for i in range(hdu_count)]
+
+
+def file_offsets(session, fits_product_lidvid):
+    # type: (Session, unicode) -> List[Tuple[int, int, int, int]]
+    hdus = session.query(Hdu).filter(
+        Hdu.product_lidvid == fits_product_lidvid).order_by(
+        Hdu.hdu_index)
+    return [(hdu.hdu_index, hdu.hdr_loc, hdu.dat_loc, hdu.dat_span)
+            for hdu in hdus]

@@ -5,7 +5,6 @@ label.
 """
 from pdart.xml.Templates import *
 
-
 # For product labels: produces the fragment of the File node that
 # contains Header and Array_2D_Image elements.
 
@@ -13,7 +12,7 @@ from pdart.xml.Templates import *
 AXIS_NAME_TABLE = {
     1: 'Line',
     2: 'Sample'
-    }
+}
 # type: Dict[int, unicode]
 
 
@@ -25,7 +24,7 @@ BITPIX_TABLE = {
     64: 'SignedMSB8',
     -32: 'IEEE754MSBSingle',
     -62: 'IEEE754MSBDouble'
-    }
+}
 # type: Dict[int, unicode]
 
 
