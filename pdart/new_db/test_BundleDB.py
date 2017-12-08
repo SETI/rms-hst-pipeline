@@ -46,7 +46,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
 
-        collection_lidvid = 'urn:nasa:pds:hst_99999:c::1.8'
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.8'
         self.assertFalse(
             self.db.non_document_collection_exists(collection_lidvid))
 
@@ -65,11 +65,11 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
 
-        collection_lidvid = 'urn:nasa:pds:hst_99999:c::1.8'
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.8'
         self.db.create_non_document_collection(collection_lidvid,
                                                bundle_lidvid)
 
-        product_lidvid = 'urn:nasa:pds:hst_99999:c:p::8.1'
+        product_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw:p::8.1'
         self.assertFalse(self.db.fits_product_exists(product_lidvid))
 
         self.db.create_fits_product(product_lidvid, collection_lidvid)
@@ -83,11 +83,11 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
 
-        collection_lidvid = 'urn:nasa:pds:hst_99999:c::1.8'
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.8'
         self.db.create_non_document_collection(collection_lidvid,
                                                bundle_lidvid)
 
-        product_lidvid = 'urn:nasa:pds:hst_99999:c:p::8.1'
+        product_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw:p::8.1'
         self.db.create_fits_product(product_lidvid, collection_lidvid)
 
         basename = 'file.fits'

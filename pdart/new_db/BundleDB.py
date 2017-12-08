@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
 
 import pdart.pds4.Bundle
+import pdart.pds4.Collection
 from pdart.new_db.SqlAlchTables import *
 from pdart.pds4.LIDVID import LIDVID
 
@@ -18,6 +19,27 @@ def create_bundle_db_from_os_filepath(os_filepath):
 def create_bundle_db_in_memory():
     # type: () -> BundleDB
     return BundleDB('sqlite:///')
+
+
+def _lidvid_to_proposal_id(bundle_lidvid):
+    lid = LIDVID(bundle_lidvid).lid()
+    bundle_id = lid.bundle_id
+    return int(re.match(pdart.pds4.Bundle.Bundle.DIRECTORY_PATTERN,
+                        bundle_id).group(1))
+
+
+def _lidvid_to_instrument(nondoc_collection_lidvid):
+    lid = LIDVID(nondoc_collection_lidvid).lid()
+    collection_id = lid.collection_id
+    return re.match(pdart.pds4.Collection.Collection.DIRECTORY_PATTERN,
+                    collection_id).group(3)
+
+
+def _lidvid_to_suffix(nondoc_collection_lidvid):
+    lid = LIDVID(nondoc_collection_lidvid).lid()
+    collection_id = lid.collection_id
+    return re.match(pdart.pds4.Collection.Collection.DIRECTORY_PATTERN,
+                    collection_id).group(4)
 
 
 class BundleDB(object):
@@ -144,15 +166,9 @@ class BundleDB(object):
         Create a bundle with this LIDVID if none exists.
         """
 
-        def lidvid_to_proposal_id(lidvid):
-            lid = LIDVID(lidvid).lid()
-            bundle_id = lid.bundle_id
-            return int(re.match(pdart.pds4.Bundle.Bundle.DIRECTORY_PATTERN,
-                                bundle_id).group(1))
-
         LIDVID(bundle_lidvid)
         if not self.bundle_exists(bundle_lidvid):
-            proposal_id = lidvid_to_proposal_id(bundle_lidvid)
+            proposal_id = _lidvid_to_proposal_id(bundle_lidvid)
             self.session.add(Bundle(lidvid=bundle_lidvid,
                                     proposal_id=proposal_id))
             self.session.commit()
@@ -172,11 +188,15 @@ class BundleDB(object):
                     'non-non-document-collection with LIDVID %s already exists'
                     % collection_lidvid)
         else:
+            instrument = _lidvid_to_instrument(collection_lidvid)
+            suffix = _lidvid_to_suffix(collection_lidvid)
             self.session.add(
                 NonDocumentCollection(
                     lidvid=collection_lidvid,
                     collection_lidvid=collection_lidvid,
-                    bundle_lidvid=bundle_lidvid))
+                    bundle_lidvid=bundle_lidvid,
+                    instrument=instrument,
+                    suffix=suffix))
             self.session.commit()
 
     def create_fits_product(self, product_lidvid, collection_lidvid):

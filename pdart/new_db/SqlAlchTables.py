@@ -54,6 +54,9 @@ class NonDocumentCollection(Collection):
 
     collection_lidvid = Column(String, ForeignKey('collections.lidvid'),
                                primary_key=True, nullable=False)
+    # eight is overkill, but that's fine
+    instrument = Column(String(8), nullable=False)
+    suffix = Column(String(8), nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'non_document_collection',
