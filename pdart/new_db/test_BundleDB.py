@@ -30,7 +30,7 @@ class Test_BundleDB(unittest.TestCase):
 
     def test_create_bundle(self):
         # type: () -> None
-        bundle_lidvid = 'urn:nasa:pds:b::1.1'
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.assertTrue(self.db.session.query(Bundle).filter(
             Bundle.lidvid == bundle_lidvid).count() == 0)
         self.assertFalse(self.db.bundle_exists(bundle_lidvid))
@@ -43,10 +43,10 @@ class Test_BundleDB(unittest.TestCase):
 
     def test_create_non_document_collection(self):
         # type: () -> None
-        bundle_lidvid = 'urn:nasa:pds:b::1.1'
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
 
-        collection_lidvid = 'urn:nasa:pds:b:c::1.8'
+        collection_lidvid = 'urn:nasa:pds:hst_99999:c::1.8'
         self.assertFalse(
             self.db.non_document_collection_exists(collection_lidvid))
 
@@ -62,14 +62,14 @@ class Test_BundleDB(unittest.TestCase):
 
     def test_create_fits_product(self):
         # type: () -> None
-        bundle_lidvid = 'urn:nasa:pds:b::1.1'
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
 
-        collection_lidvid = 'urn:nasa:pds:b:c::1.8'
+        collection_lidvid = 'urn:nasa:pds:hst_99999:c::1.8'
         self.db.create_non_document_collection(collection_lidvid,
                                                bundle_lidvid)
 
-        product_lidvid = 'urn:nasa:pds:b:c:p::8.1'
+        product_lidvid = 'urn:nasa:pds:hst_99999:c:p::8.1'
         self.assertFalse(self.db.fits_product_exists(product_lidvid))
 
         self.db.create_fits_product(product_lidvid, collection_lidvid)
@@ -80,14 +80,14 @@ class Test_BundleDB(unittest.TestCase):
 
     def test_create_fits_file(self):
         # type: () -> None
-        bundle_lidvid = 'urn:nasa:pds:b::1.1'
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
 
-        collection_lidvid = 'urn:nasa:pds:b:c::1.8'
+        collection_lidvid = 'urn:nasa:pds:hst_99999:c::1.8'
         self.db.create_non_document_collection(collection_lidvid,
                                                bundle_lidvid)
 
-        product_lidvid = 'urn:nasa:pds:b:c:p::8.1'
+        product_lidvid = 'urn:nasa:pds:hst_99999:c:p::8.1'
         self.db.create_fits_product(product_lidvid, collection_lidvid)
 
         basename = 'file.fits'

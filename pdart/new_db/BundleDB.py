@@ -1,6 +1,9 @@
+import re
+
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
 
+import pdart.pds4.Bundle
 from pdart.new_db.SqlAlchTables import *
 from pdart.pds4.LIDVID import LIDVID
 
@@ -140,9 +143,19 @@ class BundleDB(object):
         """
         Create a bundle with this LIDVID if none exists.
         """
+
+        def lidvid_to_proposal_id(lidvid):
+            lid = LIDVID(lidvid).lid()
+            bundle_id = lid.bundle_id
+            return int(re.match(pdart.pds4.Bundle.Bundle.DIRECTORY_PATTERN,
+                                bundle_id).group(1))
+
         LIDVID(bundle_lidvid)
         if not self.bundle_exists(bundle_lidvid):
-            self.session.add(Bundle(lidvid=bundle_lidvid))
+            proposal_id = lidvid_to_proposal_id(bundle_lidvid)
+            self.session.add(Bundle(lidvid=bundle_lidvid,
+                                    proposal_id=proposal_id))
+            self.session.commit()
 
     def create_non_document_collection(self, collection_lidvid, bundle_lidvid):
         # type: (str, str) -> None
@@ -164,6 +177,7 @@ class BundleDB(object):
                     lidvid=collection_lidvid,
                     collection_lidvid=collection_lidvid,
                     bundle_lidvid=bundle_lidvid))
+            self.session.commit()
 
     def create_fits_product(self, product_lidvid, collection_lidvid):
         # type: (str, str) -> None
@@ -183,6 +197,7 @@ class BundleDB(object):
             self.session.add(
                 FitsProduct(lidvid=product_lidvid,
                             collection_lidvid=collection_lidvid))
+            self.session.commit()
 
     def create_fits_file(self, basename, product_lidvid, hdu_count):
         # type: (unicode, str, int) -> None
@@ -216,6 +231,7 @@ class BundleDB(object):
                 BadFitsFile(basename=basename,
                             product_lidvid=product_lidvid,
                             exception_message=exception_message))
+            self.session.commit()
 
     def close(self):
         # type: () -> None

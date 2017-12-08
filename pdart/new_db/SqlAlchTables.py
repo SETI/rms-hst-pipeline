@@ -19,6 +19,7 @@ def create_tables(engine):
 class Bundle(Base):
     __tablename__ = 'bundles'
     lidvid = Column(String, primary_key=True, nullable=False)
+    proposal_id = Column(Integer, nullable=False)
 
 
 ############################################################
