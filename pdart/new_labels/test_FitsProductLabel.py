@@ -23,8 +23,20 @@ class Test_FitsProductLabel(unittest.TestCase):
         self.db.create_tables()
         archive = '/Users/spaceman/Desktop/Archive'
 
+        bundle_lidvid = \
+            'urn:nasa:pds:hst_13012::123'
+        self.db.create_bundle(bundle_lidvid)
+
+        collection_lidvid = \
+            'urn:nasa:pds:hst_13012:data_acs_raw::3.14159'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
         fits_product_lidvid = \
             'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2'
+        self.db.create_fits_product(fits_product_lidvid,
+                                    collection_lidvid)
+
         os_filepath = join(
             archive,
             'hst_13012/data_acs_raw/visit_04/jbz504eoq_raw.fits')
@@ -48,6 +60,7 @@ class Test_FitsProductLabel(unittest.TestCase):
         str = make_fits_product_label(self.db,
                                       card_dicts,
                                       fits_product_lidvid,
+                                      file_basename,
                                       True)
         str = pretty_print(str)
         self.assertEqual(_expected, str)

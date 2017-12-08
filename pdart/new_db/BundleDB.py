@@ -253,6 +253,21 @@ class BundleDB(object):
                             exception_message=exception_message))
             self.session.commit()
 
+    def get_bundle(self, lidvid):
+        # type: (unicode) -> Bundle
+        return self.session.query(Bundle).filter(
+            Bundle.lidvid == lidvid).one()
+
+    def get_collection(self, lidvid):
+        # type: (unicode) -> Collection
+        return self.session.query(Collection).filter(
+            Collection.lidvid == lidvid).one()
+
+    def get_product(self, lidvid):
+        # type: (unicode) -> Product
+        return self.session.query(Product).filter(
+            Product.lidvid == lidvid).one()
+
     def close(self):
         # type: () -> None
         """

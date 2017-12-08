@@ -41,6 +41,42 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
         self.assertTrue(self.db.bundle_exists(bundle_lidvid))
 
+    def test_get_bundle(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        bundle = self.db.get_bundle(bundle_lidvid)
+        self.assertEqual(bundle_lidvid, bundle.lidvid)
+        self.assertEqual(99999, bundle.proposal_id)
+
+    def test_get_collection(self):
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.8'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        collection = self.db.get_collection(collection_lidvid)
+        self.assertEqual(NonDocumentCollection, type(collection))
+        self.assertEqual('acs', collection.instrument)
+        self.assertEqual('raw', collection.suffix)
+
+    def test_get_product(self):
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.8'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        product_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw:p::8.1'
+        self.db.create_fits_product(product_lidvid, collection_lidvid)
+
+        product = self.db.get_product(product_lidvid)
+        self.assertEqual(product_lidvid, product.lidvid)
+        self.assertEqual(collection_lidvid, product.collection_lidvid)
+
     def test_create_non_document_collection(self):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
