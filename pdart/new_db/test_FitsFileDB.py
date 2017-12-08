@@ -108,4 +108,3 @@ class Test_FitsFileDB(unittest.TestCase):
 
         offsets = file_offsets(self.db.session, fits_product_lidvid)
         self.assertEqual(4, len(offsets))
-
