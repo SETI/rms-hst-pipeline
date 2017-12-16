@@ -106,6 +106,16 @@ class BundleDB(object):
             exists().where(
                 FitsProduct.product_lidvid == product_lidvid)).scalar()
 
+    def browse_product_exists(self, product_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff a browse product with the given LIDVID exists
+        in the database.
+        """
+        return self.session.query(
+            exists().where(
+                BrowseProduct.product_lidvid == product_lidvid)).scalar()
+
     def file_exists(self, basename, product_lidvid):
         # type: (unicode, str) -> bool
         """
@@ -115,6 +125,17 @@ class BundleDB(object):
         return self.session.query(
             exists().where(File.basename == basename).where(
                 File.product_lidvid == product_lidvid)).scalar()
+
+    def browse_file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a browse file with the given LIDVID exists in
+        the database.
+        """
+        return self.session.query(
+            exists().where(BrowseFile.basename == basename).where(
+                BrowseFile.product_lidvid == product_lidvid).where(
+                File.type == 'browse_file')).scalar()
 
     def fits_file_exists(self, basename, product_lidvid):
         # type: (unicode, str) -> bool
@@ -252,6 +273,43 @@ class BundleDB(object):
                             product_lidvid=product_lidvid,
                             exception_message=exception_message))
             self.session.commit()
+
+    def create_browse_product(self, product_lidvid, collection_lidvid):
+        # type: (str, str) -> None
+        """
+        Create a product with this LIDVID if none exists.
+        """
+        LIDVID(product_lidvid)
+        LIDVID(collection_lidvid)
+        if self.product_exists(product_lidvid):
+            if self.browse_product_exists(product_lidvid):
+                pass
+            else:
+                raise Exception(
+                    'non-BROWSE product with LIDVID %s already exists' %
+                    product_lidvid)
+        else:
+            self.session.add(
+                BrowseProduct(lidvid=product_lidvid,
+                              collection_lidvid=collection_lidvid))
+            self.session.commit()
+
+    def create_browse_file(self, basename, product_lidvid, byte_size):
+        # type: (unicode, str, int) -> None
+        """
+        Create a BROWSE file with this basename belonging to the product
+        if none exists.
+        """
+        LIDVID(product_lidvid)
+        if self.browse_file_exists(basename, product_lidvid):
+            pass
+        else:
+            self.session.add(
+                BrowseFile(basename=basename,
+                           product_lidvid=product_lidvid,
+                           byte_size=byte_size))
+            self.session.commit()
+            assert self.browse_file_exists(basename, product_lidvid)
 
     def get_bundle(self, lidvid):
         # type: (unicode) -> Bundle

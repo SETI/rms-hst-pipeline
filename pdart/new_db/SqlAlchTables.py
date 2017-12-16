@@ -180,6 +180,21 @@ class BadFitsFile(File):
     }
 
 
+class BrowseFile(File):
+    """
+    A database representation of a browse file belonging to a browse product.
+    """
+    __tablename__ = 'browse_files'
+
+    file_id = Column(Integer, ForeignKey('files.id'),
+                     primary_key=True, nullable=False)
+    byte_size = Column(Integer, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'browse_file'
+    }
+
+
 class DocumentFile(File):
     """
     A database representation of a document file belonging to a
