@@ -5,16 +5,19 @@ programs.
 :func:`verify_label_or_raise` is the main function used for validating
 PDS4 labels.
 """
-from contextlib import closing
 import os
 import subprocess
 import tempfile
 import xml.dom.minidom
+from contextlib import closing
+
+from typing import TYPE_CHECKING
 
 from pdart.xml.Pds4Version import *
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from typing import Sequence, Tuple, Union
+
     _Cmd = Union[str, Sequence[str]]
 
 PDS_XML_SCHEMA = './xml/PDS4_PDS_%s.xsd.xml' % PDS4_SHORT_VERSION
@@ -24,11 +27,13 @@ PDS_SCHEMATRON_SCHEMA = './xml/PDS4_PDS_%s.sch.xml' % 1600 \
     # PDS4_SHORT_VERSION -- FIXME
 # type: str
 
-HST_XML_SCHEMA = './xml/PDS4_HST_%s_0200.xsd.xml' % 1600  \
+HST_XML_SCHEMA = './xml/PDS4_HST_%s_0200.xsd.xml' % 1600 \
     # PDS4_SHORT_VERSION -- FIXME
 # type: str
 
 HST_SCHEMATRON_SCHEMA = './xml/PDS4_HST_%s_0200.sch.xml' % PDS4_SHORT_VERSION
+
+
 # type: str
 
 
@@ -196,14 +201,14 @@ def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
 
 
 def verify_label_or_raise_fp(filepath):
-    # type: (str) -> None
+    # type: (unicode) -> None
     with closing(open(filepath, 'r')) as f:
         label = f.read()
     verify_label_or_raise(label)
 
 
 def verify_label_or_raise(label):
-    # type: (str) -> None
+    # type: (unicode) -> None
     """
     Given the text of a PDS4 label, run XML Schema *and* Schematron
     validations on it.  Raise an exception on failures.
@@ -224,5 +229,5 @@ def verify_label_or_raise(label):
             t = int(time.time() * 1000)
             fp = 'tmp%d.xml' % t
             with open(fp, 'w') as f:
-                f.write(label)
+                f.write(label.encode('utf-8'))
         raise

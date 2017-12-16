@@ -8,8 +8,7 @@ from pdart.new_labels.ObservingSystem import observing_system
 from pdart.new_labels.TargetIdentification import get_target
 from pdart.new_labels.TimeCoordinates import get_time_coordinates
 from pdart.pds4.LIDVID import LIDVID
-from pdart.xml.Pretty import pretty_print
-from pdart.xml.Schema import verify_label_or_raise
+from pdart.xml.Pretty import pretty_and_verify
 
 if TYPE_CHECKING:
     from typing import Any, Dict, List
@@ -53,11 +52,3 @@ def make_fits_product_label(bundle_db, card_dicts, product_lidvid,
     }).toxml()
 
     return pretty_and_verify(label, verify)
-
-
-def pretty_and_verify(label, verify):
-    # type: (unicode) -> unicode
-    label = pretty_print(label)
-    if verify:
-        verify_label_or_raise(label)
-    return label
