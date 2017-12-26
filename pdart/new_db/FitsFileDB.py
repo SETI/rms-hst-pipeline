@@ -9,13 +9,13 @@ if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
     from sqlalchemy.orm import Session
 
-    # unfortunately untyped
+    # unfortunately, untyped
     _PYFITS_OBJ = Any
     _PYFITS_HDU = Any
     _PYFITS_CARD = Any
 
 
-def populate_from_fits_file(db, os_filepath, fits_product_lidvid):
+def populate_database_from_fits_file(db, os_filepath, fits_product_lidvid):
     # type: (BundleDB, str, str) -> None
     file_basename = basename(os_filepath)
     try:

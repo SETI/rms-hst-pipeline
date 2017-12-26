@@ -3,7 +3,8 @@ import unittest
 from fs.path import basename, join
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
-from pdart.new_db.FitsFileDB import card_dictionaries, populate_from_fits_file
+from pdart.new_db.FitsFileDB import card_dictionaries, \
+    populate_database_from_fits_file
 from pdart.new_db.SqlAlchTables import File, FitsFile
 from pdart.new_labels.HstParameters import *
 from pdart.xml.Pretty import pretty_print
@@ -26,9 +27,9 @@ class Test_HstParameters(unittest.TestCase):
             archive,
             'hst_13012/data_acs_raw/visit_04/jbz504eoq_raw.fits')
 
-        populate_from_fits_file(db,
-                                os_filepath,
-                                fits_product_lidvid)
+        populate_database_from_fits_file(db,
+                                         os_filepath,
+                                         fits_product_lidvid)
 
         file_basename = basename(os_filepath)
 
