@@ -297,7 +297,7 @@ class BundleDB(object):
     def create_browse_file(self, basename, product_lidvid, byte_size):
         # type: (unicode, str, int) -> None
         """
-        Create a BROWSE file with this basename belonging to the product
+        Create a browse file with this basename belonging to the product
         if none exists.
         """
         LIDVID(product_lidvid)
@@ -312,19 +312,25 @@ class BundleDB(object):
             assert self.browse_file_exists(basename, product_lidvid)
 
     def get_bundle(self, lidvid):
-        # type: (unicode) -> Bundle
+        # type: (str) -> Bundle
         return self.session.query(Bundle).filter(
             Bundle.lidvid == lidvid).one()
 
     def get_collection(self, lidvid):
-        # type: (unicode) -> Collection
+        # type: (str) -> Collection
         return self.session.query(Collection).filter(
             Collection.lidvid == lidvid).one()
 
     def get_product(self, lidvid):
-        # type: (unicode) -> Product
+        # type: (str) -> Product
         return self.session.query(Product).filter(
             Product.lidvid == lidvid).one()
+
+    def get_file(self, product_lidvid, basename):
+        # type: (str, unicode) -> File
+        return self.session.query(File).filter(
+            File.product_lidvid == product_lidvid,
+            File.basename == basename).one()
 
     def close(self):
         # type: () -> None
