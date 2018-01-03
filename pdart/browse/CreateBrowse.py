@@ -1,6 +1,12 @@
 from typing import TYPE_CHECKING
 
+from fs.path import join
+import pdart.add_pds_tools
+import picmaker
+
+from pdart.fs.DirUtils import lid_to_dir
 from pdart.new_db.BrowseFileDB import populate_database_from_browse_file
+from pdart.pds4.LID import LID
 
 if TYPE_CHECKING:
     from fs.base import FS
@@ -10,7 +16,9 @@ if TYPE_CHECKING:
 def create_browse_file_from_fits_file_and_populate_database(
         fs, db, fits_product_lid, collection_lidvid):
     # type: (FS, BundleDB, str, str) -> int
-    create_browse_file_from_fits_file(fs, fits_product_lid)
+    browse_product_lid = _create_browse_product_lid(fits_product_lid)
+    create_browse_directory(fs, browse_product_lid)
+    create_browse_file_from_fits_file(fs, fits_product_lid, browse_product_lid)
     browse_product_lidvid = None  # type: str
     basename = None  # type: unicode
     byte_size = None  # type: int
@@ -19,6 +27,25 @@ def create_browse_file_from_fits_file_and_populate_database(
     return 0  # TODO fix this
 
 
-def create_browse_file_from_fits_file(fs, fits_product_lid):
-    # type: (FS, str) -> bool
-    return False
+def create_browse_directory(fs, browse_product_lid):
+    # type: (FS, str) -> None
+    browse_dir = lid_to_dir(LID(browse_product_lid))
+    fs.makedirs(browse_dir, None, True)
+
+
+def create_browse_file_from_fits_file(fs, fits_product_lid,
+                                      browse_product_lid):
+    # type: (FS, str, str) -> None
+    fits_basename = LID(fits_product_lid).product_id + '.fits'
+    fits_filepath = join(lid_to_dir(LID(fits_product_lid)),
+                         fits_basename)
+    browse_product_dir = lid_to_dir(LID(browse_product_lid))
+    picmaker.ImagesToPics([fs.getsyspath(fits_filepath)],
+                          fs.getsyspath(browse_product_dir),
+                          filter="None",
+                          percentiles=(1, 99))
+
+
+def _create_browse_product_lid(fits_product_lid):
+    # type: (str) -> str
+    return str(LID(fits_product_lid).to_browse_lid())
