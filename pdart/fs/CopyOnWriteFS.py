@@ -204,6 +204,15 @@ class CopyOnWriteFS(FS):
         self._ensure_path_is_writable(path)
         self._delta_fs.setinfo(path, info)
 
+    def getsyspath(self, path):
+        self.check()
+        if self._delta_fs.exists(path):
+            return self._delta_fs.getsyspath(path)
+        elif self._readonly_fs.exists(path):
+            return self._readonly_fs.getsyspath(path)
+        else:
+            return self._delta_fs.getsyspath(path)
+
 
 class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
     """

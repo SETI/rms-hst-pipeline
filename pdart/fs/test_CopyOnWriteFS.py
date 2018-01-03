@@ -13,6 +13,43 @@ class TestCopyOnWriteFS(FSTestCases, unittest.TestCase):
         self.cow_delta_fs = TempFS()
         return CopyOnWriteFS(self.cow_base_fs, self.cow_delta_fs)
 
+    def test_getsyspath(self):
+        # type: () -> None
+        FOO_PATH = u'/foo.txt'
+
+        self.cow_base_fs.settext(FOO_PATH, u'foo')
+
+        # the file exists in the base_fs
+        self.assertEqual(self.cow_base_fs.getsyspath(FOO_PATH),
+                         self.fs.getsyspath(FOO_PATH))
+
+        # then we overwrite it; it now exists in the delta_fs
+        self.fs.settext(FOO_PATH, u'bar')
+        self.assertEqual(self.cow_delta_fs.getsyspath(FOO_PATH),
+                         self.fs.getsyspath(FOO_PATH))
+
+        # now we delete it; any new changes would go into the delta_fs
+        self.fs.remove(FOO_PATH)
+        self.assertEqual(self.cow_delta_fs.getsyspath(FOO_PATH),
+                         self.fs.getsyspath(FOO_PATH))
+
+        BAR_PATH = u'/bar.txt'
+        self.cow_base_fs.settext(BAR_PATH, u'bar')
+
+        # the file exists in the base_fs
+        self.assertEqual(self.cow_base_fs.getsyspath(BAR_PATH),
+                         self.fs.getsyspath(BAR_PATH))
+
+        # now we delete it; any new changes would go into the delta_fs
+        self.fs.remove(BAR_PATH)
+        self.assertEqual(self.cow_delta_fs.getsyspath(BAR_PATH),
+                         self.fs.getsyspath(BAR_PATH))
+
+        FOOBAR_PATH = u'/foobar.txt'
+        # file never existed; any new changes would go into the delta_fs
+        self.assertEqual(self.cow_delta_fs.getsyspath(FOOBAR_PATH),
+                         self.fs.getsyspath(FOOBAR_PATH))
+
     def test_fs_delta(self):
         # type: () -> None
         delta = self.fs.delta()

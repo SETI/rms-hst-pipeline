@@ -128,3 +128,9 @@ class TestReadOnlyFSWithDeletions(unittest.TestCase):
         # exists; writing
         with self.assertRaises(ResourceReadOnly):
             self.fs.setinfo(u'/bar', {})
+
+    def test_getsyspath(self):
+        for path in [u'/', u'/foo', u'/bar', u'dirs/foo', u'dirs/bar',
+                     u'dirs/bar/baz/', u'/i/dont/exist']:
+            self.assertEquals(self.base_fs.getsyspath(path),
+                              self.fs.getsyspath(path))

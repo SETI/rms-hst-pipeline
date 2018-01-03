@@ -96,3 +96,7 @@ class ReadOnlyFSWithDeletions(NarrowWrapFS):
             raise ResourceNotFound(path)
         else:
             raise ResourceReadOnly(path)
+
+    def getsyspath(self, path):
+        self.check()
+        return self.delegate_fs().getsyspath(path)
