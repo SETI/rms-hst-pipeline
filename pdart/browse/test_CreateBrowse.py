@@ -10,8 +10,10 @@ from pdart.new_db.BundleDB import create_bundle_db_in_memory
 
 _FITS_PRODUCT_LID = 'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw'
 _BROWSE_PRODUCT_LID = 'urn:nasa:pds:hst_09059:browse_acs_raw:j6gp01lzq_raw'
+_BROWSE_PRODUCT_LIDVID = _BROWSE_PRODUCT_LID + '::2.7'
 _BROWSE_FILE_PATH = u'/hst_09059/browse_acs_raw/j6gp01lzq_raw' \
                     u'/j6gp01lzq_raw.jpg'
+_BROWSE_COLLECTION_LIDVID = 'urn:nasa:pds:hst_09059:browse_acs_raw::3.56'
 
 
 class Test_CreateBrowse(unittest.TestCase):
@@ -28,6 +30,17 @@ class Test_CreateBrowse(unittest.TestCase):
 
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
+
+    def test_populate_database_from_browse_product(self):
+        populate_database_from_browse_product(self.db, _BROWSE_FILE_PATH,
+                                              234567, _BROWSE_PRODUCT_LIDVID,
+                                              _BROWSE_COLLECTION_LIDVID)
+        file_basename = basename(_BROWSE_FILE_PATH)
+        self.assertTrue(self.db.browse_file_exists(file_basename,
+                                                   _BROWSE_PRODUCT_LIDVID))
+        self.assertTrue(self.db.browse_product_exists(_BROWSE_PRODUCT_LIDVID))
+        self.assertEqual(234567, self.db.get_file(_BROWSE_PRODUCT_LIDVID,
+                                                  file_basename).byte_size)
 
     def test_create_browse_directory(self):
         create_browse_directory(self.fs, _BROWSE_PRODUCT_LID)

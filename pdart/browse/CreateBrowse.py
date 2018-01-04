@@ -1,22 +1,31 @@
+import pdart.add_pds_tools
+import picmaker  # need to precede this with 'import pdart.add_pds_tools'
+
+from fs.path import basename, join
 from typing import TYPE_CHECKING
 
-from fs.path import join
-import pdart.add_pds_tools
-import picmaker
-
 from pdart.fs.DirUtils import lid_to_dir
-from pdart.new_db.BrowseFileDB import populate_database_from_browse_file
 from pdart.pds4.LID import LID
 
 if TYPE_CHECKING:
     from fs.base import FS
     from pdart.new_db.BundleDB import BundleDB
 
+
 # TODO Think this over.  Creation of browse products and population of
 # the database need to happen at different times.  Creation of browse
 # products happens on a single-version filesystem.  You can't populate
 # the database until you've got a multi-version view, becaue you need
 # LIDVIDs, not just LIDs.
+
+
+def populate_database_from_browse_product(db, os_filepath, byte_size,
+                                          browse_product_lidvid,
+                                          collection_lidvid):
+    # type: (BundleDB, unicode, int, str, str) -> None
+    file_basename = basename(os_filepath)
+    db.create_browse_product(browse_product_lidvid, collection_lidvid)
+    db.create_browse_file(file_basename, browse_product_lidvid, byte_size)
 
 
 def create_browse_directory(fs, browse_product_lid):

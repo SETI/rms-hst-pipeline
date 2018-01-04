@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def populate_database_from_fits_file(db, os_filepath, fits_product_lidvid):
-    # type: (BundleDB, str, str) -> None
+    # type: (BundleDB, unicode, str) -> None
     file_basename = basename(os_filepath)
     try:
         fits = pyfits.open(os_filepath)
