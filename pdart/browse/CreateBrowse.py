@@ -12,19 +12,11 @@ if TYPE_CHECKING:
     from fs.base import FS
     from pdart.new_db.BundleDB import BundleDB
 
-
-def create_browse_file_from_fits_file_and_populate_database(
-        fs, db, fits_product_lid, collection_lidvid):
-    # type: (FS, BundleDB, str, str) -> int
-    browse_product_lid = _create_browse_product_lid(fits_product_lid)
-    create_browse_directory(fs, browse_product_lid)
-    create_browse_file_from_fits_file(fs, fits_product_lid, browse_product_lid)
-    browse_product_lidvid = None  # type: str
-    basename = None  # type: unicode
-    byte_size = None  # type: int
-    populate_database_from_browse_file(
-        db, browse_product_lidvid, collection_lidvid, basename, byte_size)
-    return 0  # TODO fix this
+# TODO Think this over.  Creation of browse products and population of
+# the database need to happen at different times.  Creation of browse
+# products happens on a single-version filesystem.  You can't populate
+# the database until you've got a multi-version view, becaue you need
+# LIDVIDs, not just LIDs.
 
 
 def create_browse_directory(fs, browse_product_lid):

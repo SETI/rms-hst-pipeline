@@ -52,13 +52,3 @@ class Test_CreateBrowse(unittest.TestCase):
         create_browse_file_from_fits_file(self.fs, _FITS_PRODUCT_LID,
                                           _BROWSE_PRODUCT_LID)
         self.assertTrue(self.fs.exists(_BROWSE_FILE_PATH))
-
-    @unittest.skip('under construction')
-    def test_create_browse_file_from_fits_file_and_populate_database(self):
-        # type: () -> None
-        self.assertTrue(
-            create_browse_file_from_fits_file_and_populate_database(
-                self.fs,
-                self.db,
-                None,
-                None))
