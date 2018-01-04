@@ -34,7 +34,7 @@ class Test_FitsProductLabel(unittest.TestCase):
                                                bundle_lidvid)
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2'
+            'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2.13'
         self.db.create_fits_product(fits_product_lidvid,
                                     collection_lidvid)
 
@@ -84,7 +84,7 @@ _expected = '\n'.join(['<?xml version="1.0"?>',
                        '  <Identification_Area>',
                        '    <logical_identifier>urn:nasa:pds:hst_13012'
                        ':data_acs_raw:jbz504eoq_raw</logical_identifier>',
-                       '    <version_id>0.1</version_id>',
+                       '    <version_id>2.13</version_id>',
                        '    <title>This collection contains the raw image '
                        'obtained the HST Observing Program 13012.</title>',
                        '    '

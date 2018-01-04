@@ -1,10 +1,6 @@
-import re
-
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.BrowseProductLabelXml import make_label
-from pdart.pds4.Collection import Collection
-from pdart.pds4.LIDVID import LIDVID
 from pdart.xml.Pretty import pretty_and_verify
 
 if TYPE_CHECKING:
@@ -23,21 +19,27 @@ def make_browse_product_label(bundle_db,
     browse_product = bundle_db.get_product(browse_product_lidvid)
 
     browse_collection_lidvid = browse_product.collection_lidvid
-    collection_id = LIDVID(browse_collection_lidvid).lid().collection_id
-    match = re.match(Collection.DIRECTORY_PATTERN, collection_id)
-    suffix = match.group(4)
+    browse_collection = bundle_db.get_collection(browse_collection_lidvid)
 
     bundle = bundle_db.get_bundle()
+
+    # TODO These two functions want to be utility functions elsewhere.
+    from pdart.pds4.LIDVID import LIDVID
 
     def lidvid_to_lid(lidvid):
         # type: (str) -> str
         return str(LIDVID(lidvid).lid())
 
+    def lidvid_to_vid(lidvid):
+        # type: (str) -> str
+        return str(LIDVID(lidvid).vid())
+
     label = make_label({
         'proposal_id': bundle.proposal_id,
-        'suffix': suffix,
+        'suffix': browse_collection.suffix,
         'browse_lid': lidvid_to_lid(browse_product_lidvid),
-        'data_lid': lidvid_to_lid(fits_product_lidvid),
+        'browse_vid': lidvid_to_vid(browse_product_lidvid),
+        'data_lidvid': fits_product_lidvid,
         'browse_file_name': file_basename,
         'object_length': browse_file.byte_size
     }).toxml()

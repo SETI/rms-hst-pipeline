@@ -13,7 +13,7 @@ make_label = interpret_document_template(
    xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd">
   <Identification_Area>
     <logical_identifier><NODE name="browse_lid" /></logical_identifier>
-    <version_id>0.1</version_id>
+    <version_id><NODE name="browse_vid" /></version_id>
     <title>This product contains a browse image of a <NODE name="suffix" /> \
 image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
@@ -29,7 +29,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
   </Identification_Area>
   <Reference_List>
     <Internal_Reference>
-      <lid_reference><NODE name="data_lid" /></lid_reference>
+      <lidvid_reference><NODE name="data_lidvid" /></lidvid_reference>
       <reference_type>browse_to_data</reference_type>
     </Internal_Reference>
   </Reference_List>

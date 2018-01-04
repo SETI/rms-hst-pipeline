@@ -23,8 +23,6 @@ def make_fits_product_label(bundle_db, card_dicts, product_lidvid,
     bundle database.  If verify is True, verify the label against its
     XML and Schematron schemas.  Raise an exception if either fails.
     """
-    lidvid = LIDVID(product_lidvid)
-
     product = bundle_db.get_product(product_lidvid)
     collection_lidvid = product.collection_lidvid
 
@@ -37,8 +35,20 @@ def make_fits_product_label(bundle_db, card_dicts, product_lidvid,
     assert bundle.lidvid == bundle_lidvid
     proposal_id = bundle.proposal_id
 
+    # TODO These two functions want to be utility functions elsewhere.
+    from pdart.pds4.LIDVID import LIDVID
+
+    def lidvid_to_lid(lidvid):
+        # type: (str) -> str
+        return str(LIDVID(lidvid).lid())
+
+    def lidvid_to_vid(lidvid):
+        # type: (str) -> str
+        return str(LIDVID(lidvid).vid())
+
     label = make_label({
-        'lid': str(lidvid.lid()),
+        'lid': lidvid_to_lid(product_lidvid),
+        'vid': lidvid_to_vid(product_lidvid),
         'proposal_id': str(proposal_id),
         'suffix': suffix,
         'file_name': file_basename,

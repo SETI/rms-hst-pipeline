@@ -37,12 +37,12 @@ class Test_BrowseProductLabel(unittest.TestCase):
                                                bundle_lidvid)
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2'
+            'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2.1'
         self.db.create_browse_product(fits_product_lidvid,
                                       fits_collection_lidvid)
 
         browse_product_lidvid = \
-            'urn:nasa:pds:hst_13012:browse_acs_raw:jbz504eoq_raw::2'
+            'urn:nasa:pds:hst_13012:browse_acs_raw:jbz504eoq_raw::2.1'
         self.db.create_browse_product(browse_product_lidvid,
                                       browse_collection_lidvid)
 
@@ -82,7 +82,7 @@ _expected = '\n'.join([
     '  <Identification_Area>',
     '    <logical_identifier>urn:nasa:pds:hst_13012:browse_acs_raw'
     ':jbz504eoq_raw</logical_identifier>',
-    '    <version_id>0.1</version_id>',
+    '    <version_id>2.1</version_id>',
     '    <title>This product contains a browse image of a raw image obtained '
     'the HST Observing Program 13012.</title>',
     '    <information_model_version>1.6.0.0</information_model_version>',
@@ -98,8 +98,9 @@ _expected = '\n'.join([
     '  </Identification_Area>',
     '  <Reference_List>',
     '    <Internal_Reference>',
-    '      <lid_reference>urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw'
-    '</lid_reference>',
+    '      <lidvid_reference>urn:nasa:pds:hst_13012:data_acs_raw'
+    ':jbz504eoq_raw::2.1'
+    '</lidvid_reference>',
     '      <reference_type>browse_to_data</reference_type>',
     '    </Internal_Reference>',
     '  </Reference_List>',

@@ -15,7 +15,7 @@ make_label = interpret_document_template(
                        http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd">
   <Identification_Area>
     <logical_identifier><NODE name="lid" /></logical_identifier>
-    <version_id>0.1</version_id>
+    <version_id><NODE name="vid" /></version_id>
     <title>This collection contains the <NODE name="suffix" /> \
 image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
