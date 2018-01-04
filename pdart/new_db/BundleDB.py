@@ -311,10 +311,9 @@ class BundleDB(object):
             self.session.commit()
             assert self.browse_file_exists(basename, product_lidvid)
 
-    def get_bundle(self, lidvid):
-        # type: (str) -> Bundle
-        return self.session.query(Bundle).filter(
-            Bundle.lidvid == lidvid).one()
+    def get_bundle(self):
+        # type: () -> Bundle
+        return self.session.query(Bundle).one()
 
     def get_collection(self, lidvid):
         # type: (str) -> Collection

@@ -46,7 +46,7 @@ class Test_BundleDB(unittest.TestCase):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
-        bundle = self.db.get_bundle(bundle_lidvid)
+        bundle = self.db.get_bundle()
         self.assertEqual(bundle_lidvid, bundle.lidvid)
         self.assertEqual(99999, bundle.proposal_id)
 

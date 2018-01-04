@@ -33,7 +33,8 @@ def make_fits_product_label(bundle_db, card_dicts, product_lidvid,
     suffix = collection.suffix
     bundle_lidvid = collection.bundle_lidvid
 
-    bundle = bundle_db.get_bundle(bundle_lidvid)
+    bundle = bundle_db.get_bundle()
+    assert bundle.lidvid == bundle_lidvid
     proposal_id = bundle.proposal_id
 
     label = make_label({
