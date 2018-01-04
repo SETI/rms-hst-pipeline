@@ -64,9 +64,7 @@ class Test_BrowseProductLabel(unittest.TestCase):
         str = make_browse_product_label(self.db,
                                         fits_product_lidvid,
                                         browse_product_lidvid,
-                                        browse_collection_lidvid,
                                         file_basename,
-                                        5492356,
                                         True)
         str = pretty_print(str)
         print str
