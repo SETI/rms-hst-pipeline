@@ -7,7 +7,6 @@ from pdart.new_db.SqlAlchTables import Card, Hdu
 if TYPE_CHECKING:
     from typing import Any, Dict, Tuple
     from pdart.new_db.BundleDB import BundleDB
-    from sqlalchemy.orm import Session
 
     # unfortunately, untyped
     _PYFITS_OBJ = Any
@@ -89,10 +88,6 @@ def get_card_dictionaries(bundle_db, fits_product_lidvid, file_basename):
                                            file_basename)
 
 
-def file_offsets(session, fits_product_lidvid):
-    # type: (Session, unicode) -> List[Tuple[int, int, int, int]]
-    hdus = session.query(Hdu).filter(
-        Hdu.product_lidvid == fits_product_lidvid).order_by(
-        Hdu.hdu_index)
-    return [(hdu.hdu_index, hdu.hdr_loc, hdu.dat_loc, hdu.dat_span)
-            for hdu in hdus]
+def get_file_offsets(bundle_db, fits_product_lidvid):
+    # type: (BundleDB, unicode) -> List[Tuple[int, int, int, int]]
+    return bundle_db.get_file_offsets(fits_product_lidvid)

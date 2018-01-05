@@ -4,7 +4,6 @@ from fs.path import basename, join
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
-from pdart.new_db.SqlAlchTables import File, FitsFile
 from pdart.new_labels.FileContents import *
 from pdart.xml.Pretty import pretty_print
 
@@ -31,7 +30,7 @@ class Test_FileContents(unittest.TestCase):
         card_dicts = db.get_card_dictionaries(fits_product_lidvid,
                                               file_basename)
 
-        fb = get_file_contents(db.session, card_dicts, fits_product_lidvid)
+        fb = get_file_contents(db, card_dicts, fits_product_lidvid)
         doc = _fragment_wrapper({'frag': fb})
         str = doc.toxml()
         str = pretty_print(str)
@@ -87,6 +86,7 @@ class Test_FileContents(unittest.TestCase):
 </Wrapper>
 """
         self.assertEquals(expected, str)
+
 
 _fragment_wrapper = interpret_document_template(
     """<Wrapper><FRAGMENT name="frag" /></Wrapper>""")

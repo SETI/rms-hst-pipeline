@@ -4,7 +4,6 @@ from fs.path import join
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import *
-from pdart.new_db.SqlAlchTables import File, FitsFile
 
 
 class Test_FitsFileDB(unittest.TestCase):
@@ -100,5 +99,5 @@ class Test_FitsFileDB(unittest.TestCase):
                                          os_filepath,
                                          fits_product_lidvid)
 
-        offsets = file_offsets(self.db.session, fits_product_lidvid)
+        offsets = get_file_offsets(self.db, fits_product_lidvid)
         self.assertEqual(4, len(offsets))

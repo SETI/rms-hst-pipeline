@@ -4,14 +4,11 @@ Functionality to build the XML fragment containing the needed
 a product label using a SQLite database.
 """
 
-from typing import TYPE_CHECKING
-
-from pdart.new_db.FitsFileDB import file_offsets
+from pdart.new_db.FitsFileDB import get_file_offsets
 from pdart.new_labels.FileContentsXml import *
 
 if TYPE_CHECKING:
-    import sqlite3
-    from typing import Any, Callable, Dict, Iterable, List, Tuple
+    from typing import Any, Callable, Dict, List
 
 
 def _mk_axis_arrays(card_dicts, hdu_index, axes):
@@ -30,8 +27,8 @@ def _mk_axis_arrays(card_dicts, hdu_index, axes):
         [mk_axis_array(i + 1) for i in range(0, axes)])
 
 
-def get_file_contents(session, card_dicts, fits_product_lidvid):
-    # type: (Session, List[Dict[str, Any]], unicode) -> FragBuilder
+def get_file_contents(bundle_db, card_dicts, fits_product_lidvid):
+    # type: (BundleDB, List[Dict[str, Any]], unicode) -> FragBuilder
     """
     Given the dictionary of the header fields from a product's FITS
     file, an open connection to the database, and the product's
@@ -82,4 +79,4 @@ def get_file_contents(session, card_dicts, fits_product_lidvid):
 
     return combine_fragments_into_fragment(
         [get_hdu_contents(*hdu)
-         for hdu in file_offsets(session, fits_product_lidvid)])
+         for hdu in get_file_offsets(bundle_db, fits_product_lidvid)])

@@ -1,4 +1,5 @@
 import re
+from typing import TYPE_CHECKING
 
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
@@ -7,6 +8,9 @@ import pdart.pds4.Bundle
 import pdart.pds4.Collection
 from pdart.new_db.SqlAlchTables import *
 from pdart.pds4.LIDVID import LIDVID
+
+if TYPE_CHECKING:
+    from typing import Dict, List, Tuple
 
 _BUNDLE_DB_NAME = 'bundle$database.db'  # type: unicode
 
@@ -388,6 +392,14 @@ class BundleDB(object):
 
         file = self.get_file(fits_product_lidvid, basename)
         return [get_card_dictionary(i) for i in range(file.hdu_count)]
+
+    def get_file_offsets(self, fits_product_lidvid):
+        # type: (unicode) -> List[Tuple[int, int, int, int]]
+        hdus = self.session.query(Hdu).filter(
+            Hdu.product_lidvid == fits_product_lidvid).order_by(
+            Hdu.hdu_index)
+        return [(hdu.hdu_index, hdu.hdr_loc, hdu.dat_loc, hdu.dat_span)
+                for hdu in hdus]
 
     def close(self):
         # type: () -> None
