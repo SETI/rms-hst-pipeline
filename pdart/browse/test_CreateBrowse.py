@@ -1,7 +1,7 @@
 import unittest
 
 from fs.osfs import OSFS
-from fs.path import dirname, join
+from fs.path import dirname
 from fs.tempfs import TempFS
 
 from pdart.browse.CreateBrowse import *
@@ -9,6 +9,10 @@ from pdart.fs.CopyOnWriteFS import CopyOnWriteFS
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 
 _FITS_PRODUCT_LID = 'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw'
+_FITS_PRODUCT_LIDVID = _FITS_PRODUCT_LID + '::1.6'
+_FITS_FILE_PATH = u'/hst_09059/data_acs_raw/j6gp01lzq_raw' \
+                  u'/j6gp01lzq_raw.fits'
+_FITS_COLLECTION_LIDVID = 'urn:nasa:pds:hst_09059:data_acs_raw::6.12'
 _BROWSE_PRODUCT_LID = 'urn:nasa:pds:hst_09059:browse_acs_raw:j6gp01lzq_raw'
 _BROWSE_PRODUCT_LIDVID = _BROWSE_PRODUCT_LID + '::2.7'
 _BROWSE_FILE_PATH = u'/hst_09059/browse_acs_raw/j6gp01lzq_raw' \
@@ -32,8 +36,14 @@ class Test_CreateBrowse(unittest.TestCase):
         self.db.create_tables()
 
     def test_populate_database_from_browse_product(self):
+        # type: () -> None
+
+        self.db.create_fits_product(_FITS_PRODUCT_LIDVID,
+                                    _FITS_COLLECTION_LIDVID)
+
         populate_database_from_browse_product(self.db, _BROWSE_FILE_PATH,
                                               234567, _BROWSE_PRODUCT_LIDVID,
+                                              _FITS_PRODUCT_LIDVID,
                                               _BROWSE_COLLECTION_LIDVID)
         file_basename = basename(_BROWSE_FILE_PATH)
         self.assertTrue(self.db.browse_file_exists(file_basename,

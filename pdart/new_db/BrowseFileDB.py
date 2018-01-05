@@ -5,7 +5,10 @@ if TYPE_CHECKING:
 
 
 def populate_database_from_browse_file(
-        db, browse_product_lidvid, collection_lidvid, basename, byte_size):
-    # type: (BundleDB, str, str, unicode, int) -> None
-    db.create_browse_product(browse_product_lidvid, collection_lidvid)
+        db, browse_product_lidvid, fits_product_lidvid, collection_lidvid,
+        basename, byte_size):
+    # type: (BundleDB, str, str, str, unicode, int) -> None
+    db.create_browse_product(browse_product_lidvid,
+                             fits_product_lidvid,
+                             collection_lidvid)
     db.create_browse_file(basename, browse_product_lidvid, byte_size)

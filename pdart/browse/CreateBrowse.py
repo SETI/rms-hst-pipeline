@@ -1,9 +1,8 @@
-import pdart.add_pds_tools
-import picmaker  # need to precede this with 'import pdart.add_pds_tools'
-
 from fs.path import basename, join
 from typing import TYPE_CHECKING
 
+import pdart.add_pds_tools
+import picmaker  # need to precede this with 'import pdart.add_pds_tools'
 from pdart.fs.DirUtils import lid_to_dir
 from pdart.pds4.LID import LID
 
@@ -21,10 +20,12 @@ if TYPE_CHECKING:
 
 def populate_database_from_browse_product(db, os_filepath, byte_size,
                                           browse_product_lidvid,
+                                          fits_product_lidvid,
                                           collection_lidvid):
-    # type: (BundleDB, unicode, int, str, str) -> None
+    # type: (BundleDB, unicode, int, str, str, str) -> None
     file_basename = basename(os_filepath)
-    db.create_browse_product(browse_product_lidvid, collection_lidvid)
+    db.create_browse_product(browse_product_lidvid, fits_product_lidvid,
+                             collection_lidvid)
     db.create_browse_file(file_basename, browse_product_lidvid, byte_size)
 
 

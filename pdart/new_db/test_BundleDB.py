@@ -141,39 +141,63 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
 
-        collection_lidvid = 'urn:nasa:pds:hst_99999:browse_acs_raw::1.8'
-        self.db.create_non_document_collection(collection_lidvid,
+        data_collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.8'
+        self.db.create_non_document_collection(data_collection_lidvid,
                                                bundle_lidvid)
 
-        product_lidvid = 'urn:nasa:pds:hst_99999:browse_acs_raw:p::8.1'
-        self.assertFalse(self.db.browse_product_exists(product_lidvid))
+        browse_collection_lidvid = 'urn:nasa:pds:hst_99999:browse_acs_raw::1.8'
+        self.db.create_non_document_collection(browse_collection_lidvid,
+                                               bundle_lidvid)
 
-        self.db.create_browse_product(product_lidvid, collection_lidvid)
-        self.assertTrue(self.db.browse_product_exists(product_lidvid))
+        fits_product_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw:p::8.1'
+        self.db.create_fits_product(fits_product_lidvid,
+                                    data_collection_lidvid)
 
-        self.db.create_browse_product(product_lidvid, collection_lidvid)
-        self.assertTrue(self.db.browse_product_exists(product_lidvid))
+        browse_product_lidvid = 'urn:nasa:pds:hst_99999:browse_acs_raw:p::8.1'
+        self.assertFalse(self.db.browse_product_exists(browse_product_lidvid))
+
+        self.db.create_browse_product(browse_product_lidvid,
+                                      fits_product_lidvid,
+                                      browse_collection_lidvid)
+        self.assertTrue(self.db.browse_product_exists(browse_product_lidvid))
+
+        self.db.create_browse_product(browse_product_lidvid,
+                                      fits_product_lidvid,
+                                      browse_collection_lidvid)
+        self.assertTrue(self.db.browse_product_exists(browse_product_lidvid))
 
     def test_create_browse_file(self):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
         self.db.create_bundle(bundle_lidvid)
 
-        collection_lidvid = 'urn:nasa:pds:hst_99999:browse_acs_raw::1.8'
-        self.db.create_non_document_collection(collection_lidvid,
+        data_collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.8'
+        self.db.create_non_document_collection(data_collection_lidvid,
                                                bundle_lidvid)
 
-        product_lidvid = 'urn:nasa:pds:hst_99999:browse_acs_raw:p::8.1'
-        self.db.create_browse_product(product_lidvid, collection_lidvid)
+        browse_collection_lidvid = 'urn:nasa:pds:hst_99999:browse_acs_raw::1.8'
+        self.db.create_non_document_collection(browse_collection_lidvid,
+                                               bundle_lidvid)
+
+        fits_product_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw:p::8.1'
+        self.db.create_fits_product(fits_product_lidvid,
+                                    data_collection_lidvid)
+        browse_product_lidvid = 'urn:nasa:pds:hst_99999:browse_acs_raw:p::8.1'
+        self.db.create_browse_product(browse_product_lidvid,
+                                      fits_product_lidvid,
+                                      browse_collection_lidvid)
 
         basename = 'file.jpg'
-        self.assertFalse(self.db.browse_file_exists(basename, product_lidvid))
+        self.assertFalse(
+            self.db.browse_file_exists(basename, browse_product_lidvid))
 
-        self.db.create_browse_file(basename, product_lidvid, 1)
-        self.assertTrue(self.db.browse_file_exists(basename, product_lidvid))
+        self.db.create_browse_file(basename, browse_product_lidvid, 1)
+        self.assertTrue(
+            self.db.browse_file_exists(basename, browse_product_lidvid))
 
-        self.db.create_browse_file(basename, product_lidvid, 1)
-        self.assertTrue(self.db.browse_file_exists(basename, product_lidvid))
+        self.db.create_browse_file(basename, browse_product_lidvid, 1)
+        self.assertTrue(
+            self.db.browse_file_exists(basename, browse_product_lidvid))
 
     def test_exploratory(self):
         # type: () -> None

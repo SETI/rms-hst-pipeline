@@ -10,11 +10,11 @@ if TYPE_CHECKING:
 def make_browse_product_label(bundle_db,
                               fits_product_lidvid,
                               browse_product_lidvid,
-                              file_basename,
+                              browse_file_basename,
                               verify):
     # type: (BundleDB, str, str, unicode, bool) -> unicode
     browse_file = bundle_db.get_file(browse_product_lidvid,
-                                     file_basename)
+                                     browse_file_basename)
 
     browse_product = bundle_db.get_product(browse_product_lidvid)
 
@@ -40,7 +40,7 @@ def make_browse_product_label(bundle_db,
         'browse_lid': lidvid_to_lid(browse_product_lidvid),
         'browse_vid': lidvid_to_vid(browse_product_lidvid),
         'data_lidvid': fits_product_lidvid,
-        'browse_file_name': file_basename,
+        'browse_file_name': browse_file_basename,
         'object_length': browse_file.byte_size
     }).toxml()
 

@@ -274,24 +274,36 @@ class BundleDB(object):
                             exception_message=exception_message))
             self.session.commit()
 
-    def create_browse_product(self, product_lidvid, collection_lidvid):
-        # type: (str, str) -> None
+    def create_browse_product(self, browse_product_lidvid,
+                              fits_product_lidvid, collection_lidvid):
+        # type: (str, str, str) -> None
         """
         Create a product with this LIDVID if none exists.
         """
-        LIDVID(product_lidvid)
+        LIDVID(browse_product_lidvid)
+        LIDVID(fits_product_lidvid)
         LIDVID(collection_lidvid)
-        if self.product_exists(product_lidvid):
-            if self.browse_product_exists(product_lidvid):
+        if self.product_exists(fits_product_lidvid):
+            if not self.fits_product_exists(fits_product_lidvid):
+                raise Exception('product %s is not a FITS product' %
+                                fits_product_lidvid)
+        else:
+            raise Exception('FITS product %s must exist before building '
+                            'browse product %s' % (fits_product_lidvid,
+                                                   browse_product_lidvid))
+
+        if self.product_exists(browse_product_lidvid):
+            if self.browse_product_exists(browse_product_lidvid):
                 pass
             else:
                 raise Exception(
-                    'non-BROWSE product with LIDVID %s already exists' %
-                    product_lidvid)
+                    'non-browse product with LIDVID %s already exists' %
+                    browse_product_lidvid)
         else:
             self.session.add(
-                BrowseProduct(lidvid=product_lidvid,
-                              collection_lidvid=collection_lidvid))
+                BrowseProduct(lidvid=browse_product_lidvid,
+                              collection_lidvid=collection_lidvid,
+                              fits_product_lidvid=fits_product_lidvid))
             self.session.commit()
 
     def create_browse_file(self, basename, product_lidvid, byte_size):

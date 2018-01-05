@@ -38,12 +38,13 @@ class Test_BrowseProductLabel(unittest.TestCase):
 
         fits_product_lidvid = \
             'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2.1'
-        self.db.create_browse_product(fits_product_lidvid,
-                                      fits_collection_lidvid)
+        self.db.create_fits_product(fits_product_lidvid,
+                                    fits_collection_lidvid)
 
         browse_product_lidvid = \
             'urn:nasa:pds:hst_13012:browse_acs_raw:jbz504eoq_raw::2.1'
         self.db.create_browse_product(browse_product_lidvid,
+                                      fits_product_lidvid,
                                       browse_collection_lidvid)
 
         os_filepath = join(
@@ -53,6 +54,7 @@ class Test_BrowseProductLabel(unittest.TestCase):
 
         populate_database_from_browse_file(self.db,
                                            browse_product_lidvid,
+                                           fits_product_lidvid,
                                            browse_collection_lidvid,
                                            file_basename,
                                            5492356)

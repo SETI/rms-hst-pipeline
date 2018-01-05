@@ -103,6 +103,9 @@ class BrowseProduct(Product):
 
     product_lidvid = Column(String, ForeignKey('products.lidvid'),
                             primary_key=True, nullable=False)
+    fits_product_lidvid = Column(String,
+                                 ForeignKey('fits_products.product_lidvid'),
+                                 nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'browse_product',

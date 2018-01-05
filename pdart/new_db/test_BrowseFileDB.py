@@ -4,7 +4,6 @@ from fs.path import join
 
 from pdart.new_db.BrowseFileDB import *
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
-from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.new_db.SqlAlchTables import BrowseFile
 
 
@@ -20,23 +19,25 @@ class Test_BrowseFileDB(unittest.TestCase):
 
         fits_product_lidvid = \
             'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2'
+        fits_collection_lidvid = \
+            'urn:nasa:pds:hst_09059:data_acs_raw::2'
         os_filepath = join(
             archive,
             'hst_09059/data_acs_raw/visit_01/j6gp01lzq_raw.fits')
 
-        populate_database_from_fits_file(self.db,
-                                         os_filepath,
-                                         fits_product_lidvid)
+        self.db.create_fits_product(fits_product_lidvid,
+                                    fits_collection_lidvid)
 
         browse_product_lidvid = \
             'urn:nasa:pds:hst_09059:browse_acs_raw:j6gp01lzq_raw::2'
-        collection_lidvid = \
+        browse_collection_lidvid = \
             'urn:nasa:pds:hst_09059:browse_acs_raw::1.6'
         browse_basename = 'j6gp01lzq_raw.jpg'
         byte_size = 12347
         populate_database_from_browse_file(self.db,
                                            browse_product_lidvid,
-                                           collection_lidvid,
+                                           fits_product_lidvid,
+                                           browse_collection_lidvid,
                                            browse_basename,
                                            byte_size)
         self.assertTrue(self.db.browse_file_exists(browse_basename,
