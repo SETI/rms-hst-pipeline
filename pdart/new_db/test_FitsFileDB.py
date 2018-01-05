@@ -62,7 +62,7 @@ class Test_FitsFileDB(unittest.TestCase):
         self.assertTrue(self.db.bad_fits_file_exists(basename(os_filepath),
                                                      fits_product_lidvid))
 
-    def test_card_dictionaries(self):
+    def test_get_card_dictionaries(self):
         # type: () -> None
         archive = '/Users/spaceman/Desktop/Archive'
 
@@ -78,15 +78,9 @@ class Test_FitsFileDB(unittest.TestCase):
 
         file_basename = basename(os_filepath)
 
-        fits_file = self.db.session.query(FitsFile).filter(
-            File.product_lidvid == fits_product_lidvid).filter(
-            File.basename == file_basename).one()
-
-        hdu_count = fits_file.hdu_count
-
-        card_dicts = card_dictionaries(self.db.session,
-                                       fits_product_lidvid,
-                                       hdu_count)
+        card_dicts = get_card_dictionaries(self.db,
+                                           fits_product_lidvid,
+                                           file_basename)
 
         self.assertTrue(card_dicts)
         self.assertEquals(4, len(card_dicts))

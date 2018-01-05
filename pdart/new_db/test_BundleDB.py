@@ -218,6 +218,17 @@ class Test_BundleDB(unittest.TestCase):
         self.assertTrue(
             self.db.browse_file_exists(basename, browse_product_lidvid))
 
+    def test_get_card_dictionaries(self):
+        # type: () -> None
+
+        # We don't test the functionality of get_card_dictionaries()
+        # here, since we'd first need to populate the database with
+        # the contents of the FITS file and that machinery is in
+        # FitsFileDB.  So the real testing happens there.  I leave
+        # this empty test as the equivalent of a "this page left
+        # intentionally blank" message.
+        pass
+
     def test_exploratory(self):
         # type: () -> None
         # what happens if you create tables twice?

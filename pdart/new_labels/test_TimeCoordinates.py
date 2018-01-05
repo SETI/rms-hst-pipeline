@@ -3,8 +3,7 @@ import unittest
 from fs.path import basename, join
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
-from pdart.new_db.FitsFileDB import card_dictionaries, \
-    populate_database_from_fits_file
+from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.new_db.SqlAlchTables import File, FitsFile
 from pdart.new_labels.TimeCoordinates import *
 from pdart.xml.Pretty import pretty_print
@@ -43,15 +42,8 @@ class Test_TimeCoordinates(unittest.TestCase):
 
         file_basename = basename(os_filepath)
 
-        fits_file = db.session.query(FitsFile).filter(
-            File.product_lidvid == fits_product_lidvid).filter(
-            File.basename == file_basename).one()
-
-        hdu_count = fits_file.hdu_count
-
-        card_dicts = card_dictionaries(db.session,
-                                       fits_product_lidvid,
-                                       hdu_count)
+        card_dicts = db.get_card_dictionaries(fits_product_lidvid,
+                                              file_basename)
 
         nb = get_time_coordinates(fits_product_lidvid, card_dicts)
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)

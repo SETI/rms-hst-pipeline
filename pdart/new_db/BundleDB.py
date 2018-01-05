@@ -376,6 +376,19 @@ class BundleDB(object):
             File.product_lidvid == product_lidvid,
             File.basename == basename).one()
 
+    def get_card_dictionaries(self, fits_product_lidvid, basename):
+        # type: (str, unicode) -> List[Dict[str, Any]]
+
+        def get_card_dictionary(index):
+            # type: (int) -> Dict[str, Any]
+            cards = self.session.query(Card).filter(
+                Card.product_lidvid == fits_product_lidvid).filter(
+                Card.hdu_index == index)
+            return {card.keyword: card.value for card in cards}
+
+        file = self.get_file(fits_product_lidvid, basename)
+        return [get_card_dictionary(i) for i in range(file.hdu_count)]
+
     def close(self):
         # type: () -> None
         """

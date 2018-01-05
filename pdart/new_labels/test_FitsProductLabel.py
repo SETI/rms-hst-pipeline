@@ -3,8 +3,7 @@ import unittest
 from fs.path import basename, join
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
-from pdart.new_db.FitsFileDB import card_dictionaries, \
-    populate_database_from_fits_file
+from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.new_db.SqlAlchTables import File, FitsFile
 from pdart.new_labels.FitsProductLabel import *
 from pdart.xml.Pretty import pretty_print
@@ -44,15 +43,8 @@ class Test_FitsProductLabel(unittest.TestCase):
 
         file_basename = basename(os_filepath)
 
-        fits_file = self.db.session.query(FitsFile).filter(
-            File.product_lidvid == fits_product_lidvid).filter(
-            File.basename == file_basename).one()
-
-        hdu_count = fits_file.hdu_count
-
-        card_dicts = card_dictionaries(self.db.session,
-                                       fits_product_lidvid,
-                                       hdu_count)
+        card_dicts = self.db.get_card_dictionaries(fits_product_lidvid,
+                                                   file_basename)
 
         str = make_fits_product_label(self.db,
                                       card_dicts,

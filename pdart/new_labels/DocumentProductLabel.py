@@ -39,38 +39,3 @@ def make_document_product_label(bundle_db, document_product_lidvid, verify):
                 [('phase2.txt', '7-Bit ASCII Text')])
             }).toxml()
     return pretty_and_verify(label, verify)
-
-
-#     product_lid = bundle_lid + ':document:phase2'
-#     with closing(conn.cursor()) as cursor:
-#         # get some unknown info
-#         (label_fp, proposal_id) = get_document_product_info(cursor,
-#                                                             product_lid)
-#         pass
-#
-#     title = 'Summary of the observation plan for HST proposal %d' % \
-# proposal_id
-#
-#     label = make_label({
-#             'bundle_lid': bundle_lid,
-#             'product_lid': product_lid,
-#             'title': title,
-#             'publication_date': date.today().isoformat(),
-#             'Citation_Information': make_citation_information(bundle_lid,
-#                                                               proposal_id),
-#             'Document_Edition': make_document_edition(
-#                 '0.0',
-#                 [('phase2.txt', '7-Bit ASCII Text')])
-#             }).toxml()
-#     label = pretty_print(label)
-#
-#     with open(label_fp, 'w') as f:
-#         f.write(label)
-#
-#     print 'product label for', product_lid
-#     sys.stdout.flush()
-#
-#     if verify:
-#         verify_label_or_raise(label)
-#
-#     return label

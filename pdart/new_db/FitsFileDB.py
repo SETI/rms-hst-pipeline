@@ -83,16 +83,10 @@ def _populate_hdus_and_cards(db,
     db.session.commit()
 
 
-def card_dictionaries(session, fits_product_lidvid, hdu_count):
-    # type: (Session, unicode, int) -> List[Dict[str, Any]]
-    def card_dictionary(index):
-        # type: (int) -> Dict[str, Any]
-        cards = session.query(Card).filter(
-            Card.product_lidvid == fits_product_lidvid).filter(
-            Card.hdu_index == index)
-        return {card.keyword: card.value for card in cards}
-
-    return [card_dictionary(i) for i in range(hdu_count)]
+def get_card_dictionaries(bundle_db, fits_product_lidvid, file_basename):
+    # type: (BundleDB, str, unicode) -> List[Dict[str, Any]]
+    return bundle_db.get_card_dictionaries(fits_product_lidvid,
+                                           file_basename)
 
 
 def file_offsets(session, fits_product_lidvid):
