@@ -7,7 +7,7 @@ from pdart.new_labels.HstParameters import get_hst_parameters
 from pdart.new_labels.ObservingSystem import observing_system
 from pdart.new_labels.TargetIdentification import get_target
 from pdart.new_labels.TimeCoordinates import get_time_coordinates
-from pdart.pds4.LIDVID import LIDVID
+from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
 if TYPE_CHECKING:
@@ -34,17 +34,6 @@ def make_fits_product_label(bundle_db, card_dicts, product_lidvid,
     bundle = bundle_db.get_bundle()
     assert bundle.lidvid == bundle_lidvid
     proposal_id = bundle.proposal_id
-
-    # TODO These two functions want to be utility functions elsewhere.
-    from pdart.pds4.LIDVID import LIDVID
-
-    def lidvid_to_lid(lidvid):
-        # type: (str) -> str
-        return str(LIDVID(lidvid).lid())
-
-    def lidvid_to_vid(lidvid):
-        # type: (str) -> str
-        return str(LIDVID(lidvid).vid())
 
     label = make_label({
         'lid': lidvid_to_lid(product_lidvid),

@@ -50,23 +50,21 @@ class Test_BrowseProductLabel(unittest.TestCase):
         os_filepath = join(
             archive,
             'hst_13012/browse_acs_raw/visit_04/jbz504eoq_raw.jpg')
-        file_basename = basename(os_filepath)
+        browse_file_basename = basename(os_filepath)
 
         populate_database_from_browse_file(self.db,
                                            browse_product_lidvid,
                                            fits_product_lidvid,
                                            browse_collection_lidvid,
-                                           file_basename,
+                                           browse_file_basename,
                                            5492356)
 
-        browse_file = self.db.get_file(browse_product_lidvid, file_basename)
+        browse_file = self.db.get_file(browse_product_lidvid,
+                                       browse_file_basename)
 
-        # TODO Should I be making from raw ingredients or from the database?
-        # And should I have two collections?
         str = make_browse_product_label(self.db,
-                                        fits_product_lidvid,
                                         browse_product_lidvid,
-                                        file_basename,
+                                        browse_file_basename,
                                         True)
         str = pretty_print(str)
         print str
