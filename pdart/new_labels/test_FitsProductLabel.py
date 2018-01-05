@@ -14,14 +14,10 @@ class Test_FitsProductLabel(unittest.TestCase):
     def setUp(self):
         # type: () -> None
         self.db = create_bundle_db_in_memory()
-
-    def tearDown(self):
-        # type: () -> None
-        pass
+        self.db.create_tables()
 
     def test_make_fits_product_label(self):
         # type: () -> None
-        self.db.create_tables()
         archive = '/Users/spaceman/Desktop/Archive'
 
         bundle_lidvid = \
