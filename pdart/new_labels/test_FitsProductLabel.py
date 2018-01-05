@@ -43,11 +43,7 @@ class Test_FitsProductLabel(unittest.TestCase):
 
         file_basename = basename(os_filepath)
 
-        card_dicts = self.db.get_card_dictionaries(fits_product_lidvid,
-                                                   file_basename)
-
         str = make_fits_product_label(self.db,
-                                      card_dicts,
                                       fits_product_lidvid,
                                       file_basename,
                                       True)

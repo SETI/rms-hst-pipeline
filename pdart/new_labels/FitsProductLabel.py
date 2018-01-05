@@ -15,14 +15,15 @@ if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
 
 
-def make_fits_product_label(bundle_db, card_dicts, product_lidvid,
+def make_fits_product_label(bundle_db, product_lidvid,
                             file_basename, verify):
-    # type: (BundleDB, List[Dict[str, Any]], string, unicode, bool) -> unicode
+    # type: (BundleDB, string, unicode, bool) -> unicode
     """
     Create the label text for the product having this LIDVID using the
     bundle database.  If verify is True, verify the label against its
     XML and Schematron schemas.  Raise an exception if either fails.
     """
+    card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
     product = bundle_db.get_product(product_lidvid)
     collection_lidvid = product.collection_lidvid
 
