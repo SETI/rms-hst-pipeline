@@ -75,6 +75,18 @@ class BundleDB(object):
         return self.session.query(
             exists().where(Collection.lidvid == collection_lidvid)).scalar()
 
+    def document_collection_exists(self, collection_lidvid):
+        # type: (str) -> bool
+
+        """
+        Returns True iff a document collection with the given LIDVID
+        exists in the database.
+        """
+        return self.session.query(
+            exists().where(
+                DocumentCollection.collection_lidvid ==
+                collection_lidvid)).scalar()
+
     def non_document_collection_exists(self, collection_lidvid):
         # type: (str) -> bool
 
@@ -194,6 +206,27 @@ class BundleDB(object):
                                     proposal_id=proposal_id))
             self.session.commit()
 
+    def create_document_collection(self, collection_lidvid, bundle_lidvid):
+        # type: (str, str) -> None
+        """
+        Create a document_collection with this LIDVID if none exists.
+        """
+        LIDVID(collection_lidvid)
+        LIDVID(bundle_lidvid)
+        if self.collection_exists(collection_lidvid):
+            if self.document_collection_exists(collection_lidvid):
+                pass
+            else:
+                raise Exception(
+                    'non-document-collection with LIDVID %s already exists'
+                    % collection_lidvid)
+        else:
+            self.session.add(
+                DocumentCollection(
+                    lidvid=collection_lidvid,
+                    bundle_lidvid=bundle_lidvid))
+            self.session.commit()
+
     def create_non_document_collection(self, collection_lidvid, bundle_lidvid):
         # type: (str, str) -> None
         """
@@ -206,7 +239,7 @@ class BundleDB(object):
                 pass
             else:
                 raise Exception(
-                    'non-non-document-collection with LIDVID %s already exists'
+                    'document-collection with LIDVID %s already exists'
                     % collection_lidvid)
         else:
             instrument = _lidvid_to_instrument(collection_lidvid)

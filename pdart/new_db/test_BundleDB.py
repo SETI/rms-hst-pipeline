@@ -97,6 +97,25 @@ class Test_BundleDB(unittest.TestCase):
         self.assertTrue(
             self.db.non_document_collection_exists(collection_lidvid))
 
+    def test_create_document_collection(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        collection_lidvid = 'urn:nasa:pds:hst_99999:document::1.8'
+        self.assertFalse(
+            self.db.document_collection_exists(collection_lidvid))
+
+        self.db.create_document_collection(collection_lidvid,
+                                           bundle_lidvid)
+        self.assertTrue(
+            self.db.document_collection_exists(collection_lidvid))
+
+        self.db.create_document_collection(collection_lidvid,
+                                           bundle_lidvid)
+        self.assertTrue(
+            self.db.document_collection_exists(collection_lidvid))
+
     def test_create_fits_product(self):
         # type: () -> None
         bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
