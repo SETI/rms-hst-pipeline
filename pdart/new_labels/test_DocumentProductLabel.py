@@ -66,7 +66,7 @@ _expected = '\n'.join([
     '    </Internal_Reference>',
     '  </Reference_List>',
     '  <Document>',
-    '    <publication_date>2018-01-05</publication_date>',
+    '    <publication_date>2018-01-06</publication_date>',
     '    <Document_Edition>',
     '      <edition_name>0.0</edition_name>',
     '      <language>English</language>',
