@@ -16,7 +16,6 @@ class Test_CollectionLabel(unittest.TestCase):
         self.db.create_non_document_collection(_COLLECTION_LIDVID,
                                                _BUNDLE_LIDVID)
 
-    @unittest.skip('under construction')
     def test_make_collection_inventory(self):
         # type: () -> None
         inventory = make_collection_inventory(self.db,
@@ -59,7 +58,7 @@ _expected_label = '\n'.join([
     '  </Collection>',
     '  <File_Area_Inventory>',
     '    <File>',
-    '      <file_name>collection.csv</file_name>',
+    '      <file_name>collection_data.csv</file_name>',
     '    </File>',
     '    <Inventory>',
     '      <offset unit="byte">0</offset>',

@@ -56,6 +56,7 @@ class NonDocumentCollection(Collection):
                                primary_key=True, nullable=False)
     # eight is overkill, but that's fine
     instrument = Column(String(8), nullable=False)
+    prefix = Column(String(8), nullable=False)
     suffix = Column(String(8), nullable=False)
 
     __mapper_args__ = {

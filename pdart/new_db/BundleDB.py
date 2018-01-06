@@ -1,5 +1,4 @@
 import re
-from typing import TYPE_CHECKING
 
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
@@ -37,6 +36,13 @@ def _lidvid_to_instrument(nondoc_collection_lidvid):
     collection_id = lid.collection_id
     return re.match(pdart.pds4.Collection.Collection.DIRECTORY_PATTERN,
                     collection_id).group(3)
+
+
+def _lidvid_to_prefix(nondoc_collection_lidvid):
+    lid = LIDVID(nondoc_collection_lidvid).lid()
+    collection_id = lid.collection_id
+    return re.match(pdart.pds4.Collection.Collection.DIRECTORY_PATTERN,
+                    collection_id).group(2)
 
 
 def _lidvid_to_suffix(nondoc_collection_lidvid):
@@ -247,6 +253,7 @@ class BundleDB(object):
                     % collection_lidvid)
         else:
             instrument = _lidvid_to_instrument(collection_lidvid)
+            prefix = _lidvid_to_prefix(collection_lidvid)
             suffix = _lidvid_to_suffix(collection_lidvid)
             self.session.add(
                 NonDocumentCollection(
@@ -254,6 +261,7 @@ class BundleDB(object):
                     collection_lidvid=collection_lidvid,
                     bundle_lidvid=bundle_lidvid,
                     instrument=instrument,
+                    prefix=prefix,
                     suffix=suffix))
             self.session.commit()
 
@@ -373,6 +381,11 @@ class BundleDB(object):
         # type: (str) -> Product
         return self.session.query(Product).filter(
             Product.lidvid == lidvid).one()
+
+    def get_collection_products(self, collection_lidvid):
+        # TODO What is the type for this?  type: (str) -> List[Product]?
+        return self.session.query(Product).filter(
+            Product.collection_lidvid == collection_lidvid)
 
     def get_file(self, product_lidvid, basename):
         # type: (str, unicode) -> File
