@@ -25,7 +25,8 @@ class Test_DocumentProductLabel(unittest.TestCase):
 
         str = make_document_product_label(self.db,
                                           document_product_lidvid,
-                                          True)
+                                          True,
+                                          '2017-02-31')
         str = pretty_print(str)
         print str
         self.assertEqual(_expected, str)
@@ -66,7 +67,7 @@ _expected = '\n'.join([
     '    </Internal_Reference>',
     '  </Reference_List>',
     '  <Document>',
-    '    <publication_date>2018-01-06</publication_date>',
+    '    <publication_date>2017-02-31</publication_date>',
     '    <Document_Edition>',
     '      <edition_name>0.0</edition_name>',
     '      <language>English</language>',

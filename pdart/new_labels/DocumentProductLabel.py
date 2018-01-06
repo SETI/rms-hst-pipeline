@@ -1,5 +1,4 @@
 from datetime import date
-from typing import TYPE_CHECKING
 
 from pdart.new_labels.DocumentProductLabelXml import *
 from pdart.new_labels.Utils import lidvid_to_lid
@@ -11,7 +10,8 @@ if TYPE_CHECKING:
 
 def make_document_product_label(bundle_db,
                                 document_product_lidvid,
-                                verify):
+                                verify,
+                                publication_date=None):
     # type: (BundleDB, str, bool) -> unicode
     """
     Create the label text for the document product in the bundle
@@ -19,19 +19,20 @@ def make_document_product_label(bundle_db,
     connection.  If verify is True, verify the label against its XML
     and Schematron schemas.  Raise an exception if either fails.
     """
-    # TODO Should we be using LIDVIDs instead of LIDs?
+    # TODO We should be using LIDVIDs instead of LIDs.
     bundle = bundle_db.get_bundle()
     bundle_lid = lidvid_to_lid(bundle.lidvid)
     proposal_id = bundle.proposal_id
     title = 'Summary of the observation plan for HST proposal %d' % proposal_id
 
     product_lid = lidvid_to_lid(document_product_lidvid)
+    publication_date = publication_date or date.today().isoformat()
 
     label = make_label({
         'bundle_lid': bundle_lid,
         'product_lid': product_lid,
         'title': title,
-        'publication_date': date.today().isoformat(),
+        'publication_date': publication_date,
         'Citation_Information': make_citation_information(bundle_lid,
                                                           proposal_id),
         'Document_Edition': make_document_edition(
