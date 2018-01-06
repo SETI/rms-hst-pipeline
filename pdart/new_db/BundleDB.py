@@ -377,6 +377,11 @@ class BundleDB(object):
         return self.session.query(Collection).filter(
             Collection.lidvid == lidvid).one()
 
+    def get_bundle_collections(self, bundle_lidvid):
+        # TODO What is the type for this?  type: (str) -> Collection
+        return self.session.query(Collection).filter(
+            Collection.bundle_lidvid == bundle_lidvid)
+
     def get_product(self, lidvid):
         # type: (str) -> Product
         return self.session.query(Product).filter(

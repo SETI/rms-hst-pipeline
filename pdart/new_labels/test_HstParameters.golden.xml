@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<hst:HST>
+  <hst:Parameters_General>
+    <hst:stsci_group_id>### placeholder for stsci_group_id ###</hst:stsci_group_id>
+    <hst:hst_proposal_id>13012</hst:hst_proposal_id>
+    <hst:hst_pi_name>Lamy, Laurent </hst:hst_pi_name>
+    <hst:hst_target_name>URANUS</hst:hst_target_name>
+    <hst:aperture_type>SBC</hst:aperture_type>
+    <hst:exposure_duration>270.0</hst:exposure_duration>
+    <hst:exposure_type>NORMAL</hst:exposure_type>
+    <hst:filter_name>F165LP+N/A</hst:filter_name>
+    <hst:fine_guidance_system_lock_type>FINE</hst:fine_guidance_system_lock_type>
+    <hst:gyroscope_mode>### placeholder for gyroscope_mode ###</hst:gyroscope_mode>
+    <hst:instrument_mode_id>ACCUM</hst:instrument_mode_id>
+    <hst:moving_target_flag>true</hst:moving_target_flag>
+  </hst:Parameters_General>
+  <hst:Parameters_ACS>
+    <hst:detector_id>SBC</hst:detector_id>
+    <hst:gain_mode_id>### placeholder for gain_mode_id ###</hst:gain_mode_id>
+    <hst:observation_type>IMAGING</hst:observation_type>
+    <hst:repeat_exposure_count>0</hst:repeat_exposure_count>
+    <hst:subarray_flag>### placeholder for subarray_flag ###</hst:subarray_flag>
+  </hst:Parameters_ACS>
+</hst:HST>
