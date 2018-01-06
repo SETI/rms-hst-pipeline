@@ -1,10 +1,8 @@
 """Functionality to build a bundle label using a SQLite database."""
 
-from typing import TYPE_CHECKING
-
 from pdart.new_labels.BundleLabelXml import *
 from pdart.new_labels.CitationInformation import *
-from pdart.new_labels.Utils import lidvid_to_lid
+from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
 if TYPE_CHECKING:
@@ -20,17 +18,19 @@ def make_bundle_label(bundle_db, verify):
     Raise an exception if either fails.
     """
     bundle = bundle_db.get_bundle()
-    lid = lidvid_to_lid(bundle.lidvid)
+    bundle_lid = lidvid_to_lid(bundle.lidvid)  # Only used in placeholder
     proposal_id = bundle.proposal_id
     reduced_collections = [
-        make_bundle_entry_member({'lid': lidvid_to_lid(collection.lidvid)})
+        make_bundle_entry_member({'collection_lidvid': collection.lidvid})
         for collection
         in bundle_db.get_bundle_collections(bundle.lidvid)]
 
     label = make_label({
-        'lid': lid,
+        'bundle_lid': lidvid_to_lid(bundle.lidvid),
+        'bundle_vid': lidvid_to_vid(bundle.lidvid),
         'proposal_id': str(proposal_id),
-        'Citation_Information': make_placeholder_citation_information(lid),
+        'Citation_Information': make_placeholder_citation_information(
+            bundle_lid),
         'Bundle_Member_Entries': combine_nodes_into_fragment(
             reduced_collections)
     }).toxml()
