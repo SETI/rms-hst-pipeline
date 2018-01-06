@@ -1,13 +1,12 @@
 """A document template to create a label for a document product."""
+
 from pdart.pds4labels.Placeholders import *
 from pdart.xml.Pds4Version import *
 from pdart.xml.Templates import *
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any, Callable, Dict, Tuple
     from xml.dom.minidom import Document
-
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -22,7 +21,7 @@ make_label = interpret_document_template(
                             http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd">
     <Identification_Area>
     <logical_identifier><NODE name="product_lid" /></logical_identifier>
-    <version_id>0.1</version_id>
+    <version_id><NODE name="product_vid" /></version_id>
     <title><NODE name="title" /></title>
     <information_model_version>%s</information_model_version>
     <product_class>Product_Document</product_class>
@@ -30,7 +29,7 @@ make_label = interpret_document_template(
     </Identification_Area>
     <Reference_List>
         <Internal_Reference>
-            <lid_reference><NODE name="bundle_lid" /></lid_reference>
+            <lidvid_reference><NODE name="bundle_lidvid" /></lidvid_reference>
             <reference_type>document_to_investigation</reference_type>
         </Internal_Reference>
     </Reference_List>
@@ -40,6 +39,8 @@ make_label = interpret_document_template(
     </Document>
     </Product_Document>""" %
     (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, INFORMATION_MODEL_VERSION))
+
+
 # type: DocTemplate
 
 
@@ -53,8 +54,8 @@ def make_proposal_description(bundle_id, proposal_id):
     yr = make_placeholder_proposal_year(bundle_id)
 
     return 'This document provides a summary of the observation ' + \
-        'plan for HST proposal %d, %s, PI %s, %s.' % \
-        (proposal_id, proposal_title, pi, yr)
+           'plan for HST proposal %d, %s, PI %s, %s.' % \
+           (proposal_id, proposal_title, pi, yr)
 
 
 _citation_information_template = interpret_template("""<Citation_Information>
@@ -62,18 +63,21 @@ _citation_information_template = interpret_template("""<Citation_Information>
 <publication_year><NODE name="publication_year" /></publication_year>
 <description><NODE name="description" /></description>
 </Citation_Information>""")
+
+
 # type: NodeBuilderTemplate
 
 
 def make_citation_information(lid, proposal_id):
     # type: (unicode, int) -> NodeBuilder
     return _citation_information_template({
-            'author_list': make_placeholder_author_list(lid),
-            'publication_year': make_placeholder_publication_year(lid),
-            'description': make_proposal_description(
-                lid,
-                proposal_id)
-            })
+        'author_list': make_placeholder_author_list(lid),
+        'publication_year': make_placeholder_publication_year(lid),
+        'description': make_proposal_description(
+            lid,
+            proposal_id)
+    })
+
 
 # ----------------
 # making <Document_Edition>
@@ -86,16 +90,18 @@ _make_file = interpret_template('<file_name><NODE name="file_name" />\
 _make_document_standard_id = interpret_template('<document_standard_id>\
 <NODE name="document_standard_id" />\
 </document_standard_id>')
+
+
 # type: NodeBuilderTemplate
 
 
 def _make_document_file_entry(file_name, document_standard_id):
     # type: (str, str) -> FragBuilder
     return combine_nodes_into_fragment([
-            _make_file({'file_name': file_name}),
-            _make_document_standard_id({
-                    'document_standard_id': document_standard_id})
-            ])
+        _make_file({'file_name': file_name}),
+        _make_document_standard_id({
+            'document_standard_id': document_standard_id})
+    ])
 
 
 _make_document_edition = interpret_template(
@@ -107,6 +113,8 @@ _make_document_edition = interpret_template(
             <FRAGMENT name="document_file_entries" />
             </Document_File>
         </Document_Edition>""")
+
+
 # type: NodeBuilderTemplate
 
 
@@ -118,11 +126,11 @@ def make_document_edition(edition_name, file_stds):
     # type: List[FragBuilder]
 
     return _make_document_edition({
-            'edition_name': edition_name,
-            'language': 'English',
-            'files': len(file_stds),
-            'document_file_entries': combine_fragments_into_fragment(fragments)
-            })
+        'edition_name': edition_name,
+        'language': 'English',
+        'files': len(file_stds),
+        'document_file_entries': combine_fragments_into_fragment(fragments)
+    })
 
 
 def make_placeholder_author_list(bundle_id):

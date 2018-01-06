@@ -13,19 +13,20 @@ class Test_DocumentProductLabel(unittest.TestCase):
 
     def test_make_document_product_label(self):
         # type: () -> None
-        bundle_lidvid = 'urn:nasa:pds:hst_13012::1'
-        self.db.create_bundle('urn:nasa:pds:hst_13012::1')
+        bundle_lidvid = 'urn:nasa:pds:hst_13012::1.0'
+        self.db.create_bundle('urn:nasa:pds:hst_13012::1.0')
 
         collection_lidvid = \
             'urn:nasa:pds:hst_13012:document::3.14159'
         self.db.create_document_collection(collection_lidvid,
                                            bundle_lidvid)
 
-        document_product_lidvid = 'urn:nasa:pds:hst_13012:document:phase2::1'
+        document_product_lidvid = 'urn:nasa:pds:hst_13012:document:phase2::1.0'
 
-        str = make_document_product_label(self.db,
-                                          document_product_lidvid,
-                                          True,
-                                          '2017-02-31')
+        label = make_document_product_label(self.db,
+                                            document_product_lidvid,
+                                            True,
+                                            '2017-02-31')
+
         expected = golden_file_contents('test_DocumentProductLabel.golden.xml')
-        self.assertEqual(expected, str)
+        self.assertEqual(expected, label)
