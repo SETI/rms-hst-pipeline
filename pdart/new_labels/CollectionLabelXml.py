@@ -9,8 +9,8 @@ make_label = interpret_document_template(
 <Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1"
                     xmlns:pds="http://pds.nasa.gov/pds4/pds/v1">
   <Identification_Area>
-    <logical_identifier><NODE name="lid"/></logical_identifier>
-    <version_id>0.1</version_id>
+    <logical_identifier><NODE name="collection_lid" /></logical_identifier>
+    <version_id><NODE name="collection_vid" /></version_id>
     <title>This collection contains the <NODE name="suffix"/> \
 images obtained from HST Observing Program \
 <NODE name="proposal_id"/>.</title>
