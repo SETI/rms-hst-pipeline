@@ -22,12 +22,12 @@ class Test_Update(unittest.TestCase):
         mvfs = MultiversionBundleFS(TempFS())
 
         # >>> write empty_tree
-        bundle_lidvid = LIDVID('urn:nasa:pds:b::1')
-        collection_lidvid = LIDVID('urn:nasa:pds:b:c::1')
-        collection2_lidvid = LIDVID('urn:nasa:pds:b:c2::1')
-        product_lidvid = LIDVID('urn:nasa:pds:b:c:p::1')
-        product2_lidvid = LIDVID('urn:nasa:pds:b:c:p2::1')
-        product3_lidvid = LIDVID('urn:nasa:pds:b:c2:p3::1')
+        bundle_lidvid = LIDVID('urn:nasa:pds:b::1.0')
+        collection_lidvid = LIDVID('urn:nasa:pds:b:c::1.0')
+        collection2_lidvid = LIDVID('urn:nasa:pds:b:c2::1.0')
+        product_lidvid = LIDVID('urn:nasa:pds:b:c:p::1.0')
+        product2_lidvid = LIDVID('urn:nasa:pds:b:c:p2::1.0')
+        product3_lidvid = LIDVID('urn:nasa:pds:b:c2:p3::1.0')
 
         mvfs.make_lidvid_directories(bundle_lidvid)
         mvfs.add_subcomponent(bundle_lidvid, collection_lidvid)
@@ -201,7 +201,6 @@ class Test_Update(unittest.TestCase):
         new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)
 
-    # @unittest.skip
     def test_update_bundle_with_product_addition(self):
         # type: () -> None
         def update(fs):

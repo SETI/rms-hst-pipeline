@@ -30,11 +30,11 @@ class TestVID(unittest.TestCase):
 
     def test_next_major_vid(self):
         # type: () -> None
-        self.assertEqual(VID('3'), VID('2.9').next_major_vid())
+        self.assertEqual(VID('3.0'), VID('2.9').next_major_vid())
 
     def test_next_minor_vid(self):
         # type: () -> None
-        self.assertEquals(VID('2.1'), VID('2').next_minor_vid())
+        self.assertEquals(VID('2.1'), VID('2.0').next_minor_vid())
         self.assertEquals(VID('2.10'), VID('2.9').next_minor_vid())
 
     def test_cmp(self):

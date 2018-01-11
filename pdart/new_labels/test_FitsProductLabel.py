@@ -19,7 +19,7 @@ class Test_FitsProductLabel(unittest.TestCase):
         archive = '/Users/spaceman/Desktop/Archive'
 
         bundle_lidvid = \
-            'urn:nasa:pds:hst_13012::123'
+            'urn:nasa:pds:hst_13012::123.90201'
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = \

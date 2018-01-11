@@ -36,7 +36,7 @@ class Test_TargetIdentification(unittest.TestCase):
         archive = '/Users/spaceman/Desktop/Archive'
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2'
+            'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2.5'
         os_filepath = join(
             archive,
             'hst_13012/data_acs_raw/visit_04/jbz504eoq_raw.fits')

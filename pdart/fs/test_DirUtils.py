@@ -14,10 +14,10 @@ class test_DirUtils(unittest.TestCase):
         # type: () -> None
         self.assertEqual(u'/b/v$1.5',
                          lidvid_to_dir(LIDVID('urn:nasa:pds:b::1.5')))
-        self.assertEqual(u'/b/c/v$2',
-                         lidvid_to_dir(LIDVID('urn:nasa:pds:b:c::2')))
-        self.assertEqual(u'/b/c/p/v$333',
-                         lidvid_to_dir(LIDVID('urn:nasa:pds:b:c:p::333')))
+        self.assertEqual(u'/b/c/v$2.5',
+                         lidvid_to_dir(LIDVID('urn:nasa:pds:b:c::2.5')))
+        self.assertEqual(u'/b/c/p/v$333.123',
+                         lidvid_to_dir(LIDVID('urn:nasa:pds:b:c:p::333.123')))
 
     def test_dir_to_lid(self):
         # type: () -> None
@@ -29,13 +29,13 @@ class test_DirUtils(unittest.TestCase):
         with self.assertRaises(Exception):
             dir_to_lid(u'/b/c/p/foo.fits')
         with self.assertRaises(Exception):
-            dir_to_lid(u'/v$1')
+            dir_to_lid(u'/v$1.5')
         with self.assertRaises(Exception):
-            dir_to_lid(u'/b/v$1')
+            dir_to_lid(u'/b/v$1.5')
         with self.assertRaises(Exception):
-            dir_to_lid(u'/b/c/v$1')
+            dir_to_lid(u'/b/c/v$1.5')
         with self.assertRaises(Exception):
-            dir_to_lid(u'/b/c/p/v$1')
+            dir_to_lid(u'/b/c/p/v$1.5')
 
     def test_dir_to_lidvid(self):
         # type: () -> None
@@ -45,7 +45,7 @@ class test_DirUtils(unittest.TestCase):
             dir_to_lidvid(u'/b')
         self.assertEqual(LIDVID('urn:nasa:pds:b::1.5'),
                          dir_to_lidvid(u'/b/v$1.5'))
-        self.assertEqual(LIDVID('urn:nasa:pds:b:c::2'),
-                         dir_to_lidvid(u'/b/c/v$2'))
-        self.assertEqual(LIDVID('urn:nasa:pds:b:c:p::333'),
-                         dir_to_lidvid(u'/b/c/p/v$333'))
+        self.assertEqual(LIDVID('urn:nasa:pds:b:c::2.6'),
+                         dir_to_lidvid(u'/b/c/v$2.6'))
+        self.assertEqual(LIDVID('urn:nasa:pds:b:c:p::333.321'),
+                         dir_to_lidvid(u'/b/c/p/v$333.321'))

@@ -18,9 +18,9 @@ class Test_BrowseFileDB(unittest.TestCase):
         archive = '/Users/spaceman/Desktop/Archive'
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2'
+            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2.0'
         fits_collection_lidvid = \
-            'urn:nasa:pds:hst_09059:data_acs_raw::2'
+            'urn:nasa:pds:hst_09059:data_acs_raw::2.0'
         os_filepath = join(
             archive,
             'hst_09059/data_acs_raw/visit_01/j6gp01lzq_raw.fits')
@@ -29,7 +29,7 @@ class Test_BrowseFileDB(unittest.TestCase):
                                     fits_collection_lidvid)
 
         browse_product_lidvid = \
-            'urn:nasa:pds:hst_09059:browse_acs_raw:j6gp01lzq_raw::2'
+            'urn:nasa:pds:hst_09059:browse_acs_raw:j6gp01lzq_raw::2.0'
         browse_collection_lidvid = \
             'urn:nasa:pds:hst_09059:browse_acs_raw::1.6'
         browse_basename = 'j6gp01lzq_raw.jpg'

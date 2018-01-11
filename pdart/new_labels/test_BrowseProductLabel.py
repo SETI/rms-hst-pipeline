@@ -23,7 +23,7 @@ class Test_BrowseProductLabel(unittest.TestCase):
         archive = '/Users/spaceman/Desktop/Archive'
 
         bundle_lidvid = \
-            'urn:nasa:pds:hst_13012::123'
+            'urn:nasa:pds:hst_13012::123.456'
         self.db.create_bundle(bundle_lidvid)
 
         fits_collection_lidvid = \

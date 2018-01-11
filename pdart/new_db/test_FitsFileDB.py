@@ -17,7 +17,7 @@ class Test_FitsFileDB(unittest.TestCase):
         archive = '/Users/spaceman/Desktop/Archive'
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2'
+            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2.0'
         os_filepath = join(
             archive,
             'hst_09059/data_acs_raw/visit_01/j6gp01lzq_raw.fits')
@@ -48,7 +48,7 @@ class Test_FitsFileDB(unittest.TestCase):
         # type: () -> None
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2'
+            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2.0'
         os_filepath = 'j6gp01lzq_raw.fits'
 
         populate_database_from_fits_file(self.db,
@@ -66,7 +66,7 @@ class Test_FitsFileDB(unittest.TestCase):
         archive = '/Users/spaceman/Desktop/Archive'
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2'
+            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2.0'
         os_filepath = join(
             archive,
             'hst_09059/data_acs_raw/visit_01/j6gp01lzq_raw.fits')
@@ -90,7 +90,7 @@ class Test_FitsFileDB(unittest.TestCase):
         archive = '/Users/spaceman/Desktop/Archive'
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2'
+            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2.0'
         os_filepath = join(
             archive,
             'hst_09059/data_acs_raw/visit_01/j6gp01lzq_raw.fits')

@@ -15,18 +15,14 @@ class VID(object):
 
         # Check requirements
         assert len(str) <= 255, 'VID is too long'
-        assert len(vs) in [1, 2], 'VID has too many components'
+        assert len(vs) is 2, ('VID %s does not have two components' % str)
         for v in vs:
             assert re.match('\\A(0|[1-9][0-9]*)\\Z', v), \
                 'VID is non-numeric: %s' % v
 
         self._VID = str
         self._major = int(vs[0])
-
-        if len(vs) == 2:
-            self._minor = int(vs[1])
-        else:
-            self._minor = None
+        self._minor = int(vs[1])
 
     def major(self):
         """Return the major version number."""
@@ -36,12 +32,12 @@ class VID(object):
     def minor(self):
         """Return the minor version number."""
         # type: () -> int
-        return self._minor or 0
+        return self._minor
 
     def next_major_vid(self):
         """Return the next major VID."""
         # type: () -> VID
-        return VID('%d' % (self.major() + 1))
+        return VID('%d.0' % (self.major() + 1))
 
     def next_minor_vid(self):
         """Return the next minor VID."""

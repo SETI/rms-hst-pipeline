@@ -30,40 +30,42 @@ class TestLIDVID(unittest.TestCase):
 
     def test_lid(self):
         self.assertEqual(LID('urn:nasa:pds:b:c:p'),
-                         LIDVID('urn:nasa:pds:b:c:p::666').lid())
+                         LIDVID('urn:nasa:pds:b:c:p::666.666').lid())
 
     def test_vid(self):
-        self.assertEqual(VID('666'),
-                         LIDVID('urn:nasa:pds:b:c:p::666').vid())
+        self.assertEqual(VID('666.0'),
+                         LIDVID('urn:nasa:pds:b:c:p::666.0').vid())
         self.assertEqual(VID('3.14159'),
                          LIDVID('urn:nasa:pds:b:c:p::3.14159').vid())
 
     def test_is_bundle_lidvid(self):
-        self.assertTrue(LIDVID('urn:nasa:pds:b::1').is_bundle_lidvid())
-        self.assertFalse(LIDVID('urn:nasa:pds:b:c::1').is_bundle_lidvid())
-        self.assertFalse(LIDVID('urn:nasa:pds:b:c:p::1').is_bundle_lidvid())
+        self.assertTrue(LIDVID('urn:nasa:pds:b::1.0').is_bundle_lidvid())
+        self.assertFalse(LIDVID('urn:nasa:pds:b:c::1.0').is_bundle_lidvid())
+        self.assertFalse(LIDVID('urn:nasa:pds:b:c:p::1.0').is_bundle_lidvid())
 
     def test_is_collection_lidvid(self):
-        self.assertFalse(LIDVID('urn:nasa:pds:b::1').is_collection_lidvid())
-        self.assertTrue(LIDVID('urn:nasa:pds:b:c::1').is_collection_lidvid())
+        self.assertFalse(LIDVID('urn:nasa:pds:b::1.0').is_collection_lidvid())
+        self.assertTrue(LIDVID('urn:nasa:pds:b:c::1.0').is_collection_lidvid())
         self.assertFalse(
-            LIDVID('urn:nasa:pds:b:c:p::1').is_collection_lidvid())
+            LIDVID('urn:nasa:pds:b:c:p::1.0').is_collection_lidvid())
 
     def test_is_product_lidvid(self):
-        self.assertFalse(LIDVID('urn:nasa:pds:b::1').is_product_lidvid())
-        self.assertFalse(LIDVID('urn:nasa:pds:b:c::1').is_product_lidvid())
-        self.assertTrue(LIDVID('urn:nasa:pds:b:c:p::1').is_product_lidvid())
+        self.assertFalse(LIDVID('urn:nasa:pds:b::1.0').is_product_lidvid())
+        self.assertFalse(LIDVID('urn:nasa:pds:b:c::1.0').is_product_lidvid())
+        self.assertTrue(LIDVID('urn:nasa:pds:b:c:p::1.0').is_product_lidvid())
 
     def test_next_major_lidvid(self):
-        self.assertEqual(LIDVID('urn:nasa:pds:b:c:p::667'),
-                         LIDVID('urn:nasa:pds:b:c:p::666').next_major_lidvid())
         self.assertEqual(
-            LIDVID('urn:nasa:pds:b:c:p::4'),
+            LIDVID('urn:nasa:pds:b:c:p::667.0'),
+            LIDVID('urn:nasa:pds:b:c:p::666.0').next_major_lidvid())
+        self.assertEqual(
+            LIDVID('urn:nasa:pds:b:c:p::4.0'),
             LIDVID('urn:nasa:pds:b:c:p::3.14159').next_major_lidvid())
 
     def test_next_minor_lidvid(self):
-        self.assertEqual(LIDVID('urn:nasa:pds:b:c:p::666.1'),
-                         LIDVID('urn:nasa:pds:b:c:p::666').next_minor_lidvid())
+        self.assertEqual(
+            LIDVID('urn:nasa:pds:b:c:p::666.10'),
+            LIDVID('urn:nasa:pds:b:c:p::666.9').next_minor_lidvid())
         self.assertEqual(
             LIDVID('urn:nasa:pds:b:c:p::3.14160'),
             LIDVID('urn:nasa:pds:b:c:p::3.14159').next_minor_lidvid())
