@@ -21,6 +21,10 @@ class Bundle(Base):
     lidvid = Column(String, primary_key=True, nullable=False)
     proposal_id = Column(Integer, nullable=False)
 
+    def __repr__(self):
+        return 'Bundle(lidvid=%r, proposal_id=%d)' % (
+            self.lidvid, self.proposal_id)
+
 
 ############################################################
 
@@ -48,6 +52,10 @@ class DocumentCollection(Collection):
         'polymorphic_identity': 'document_collection',
     }
 
+    def __repr__(self):
+        return 'DocumentCollection(lidvid=%r, bundle_lidvid=%r)' % (
+            self.lidvid, self.bundle_lidvid)
+
 
 class NonDocumentCollection(Collection):
     __tablename__ = 'non_document_collections'
@@ -62,6 +70,13 @@ class NonDocumentCollection(Collection):
     __mapper_args__ = {
         'polymorphic_identity': 'non_document_collection',
     }
+
+    def __repr__(self):
+        return 'NonDocumentCollection(lidvid=%r, bundle_lidvid=%r, ' \
+               'instrument=%r, prefix=%r, suffix=%r)' % (
+                   self.lidvid, self.bundle_lidvid, self.instrument,
+                   self.prefix,
+                   self.suffix)
 
 
 ############################################################
@@ -94,6 +109,10 @@ class FitsProduct(Product):
         'polymorphic_identity': 'fits_product',
     }
 
+    def __repr__(self):
+        return 'FitsProduct(lidvid=%r, collection_lidvid=%r)' % (
+            self.lidvid, self.collection_lidvid)
+
 
 class BrowseProduct(Product):
     """
@@ -112,6 +131,12 @@ class BrowseProduct(Product):
         'polymorphic_identity': 'browse_product',
     }
 
+    def __repr__(self):
+        return 'BrowseProduct(lidvid=%r, collection_lidvid=%r, ' \
+               'fits_product_lidvid)' % (
+                   self.lidvid, self.collection_lidvid,
+                   self.fits_product_lidvid)
+
 
 class DocumentProduct(Product):
     """
@@ -126,6 +151,10 @@ class DocumentProduct(Product):
     __mapper_args__ = {
         'polymorphic_identity': 'document_product',
     }
+
+    def __repr__(self):
+        return 'DocumentProduct(lidvid=%r, collection_lidvid=%r)' % (
+            self.lidvid, self.collection_lidvid)
 
 
 ############################################################
@@ -146,6 +175,7 @@ class File(Base):
 
     __table_args__ = (
         UniqueConstraint('product_lidvid', 'basename'),
+        Index('idx_product_lidvid_basename', 'product_lidvid', 'basename')
     )
     __mapper_args__ = {
         'polymorphic_identity': 'file',
@@ -167,6 +197,11 @@ class FitsFile(File):
         'polymorphic_identity': 'fits_file'
     }
 
+    def __repr__(self):
+        return 'FitsFile(id=%d, product_lidvid=%r, basename=%r, ' \
+               'hdu_count=%d)' % (
+                   self.id, self.product_lidvid, self.basename, self.hdu_count)
+
 
 class BadFitsFile(File):
     """
@@ -183,6 +218,10 @@ class BadFitsFile(File):
         'polymorphic_identity': 'bad_fits_file'
     }
 
+    def __repr__(self):
+        return 'BadFitsFile(id=%d, product_lidvid=%r, basename=%r)' % (
+            self.id, self.product_lidvid, self.basename)
+
 
 class BrowseFile(File):
     """
@@ -198,6 +237,11 @@ class BrowseFile(File):
         'polymorphic_identity': 'browse_file'
     }
 
+    def __repr__(self):
+        return 'BrowseFile(id=%d, product_lidvid=%r, basename=%r, ' \
+               'byte_size=%d)' % (
+                   self.id, self.product_lidvid, self.basename, self.byte_size)
+
 
 class DocumentFile(File):
     """
@@ -212,6 +256,10 @@ class DocumentFile(File):
     __mapper_args__ = {
         'polymorphic_identity': 'document_file'
     }
+
+    def __repr__(self):
+        return 'DocumentFile(id=%d, product_lidvid=%r, basename=%d)' % (
+            self.id, self.product_lidvid, self.basename)
 
 
 ############################################################
@@ -237,6 +285,11 @@ class Hdu(Base):
     product = relationship('FitsProduct', backref=backref('hdus',
                                                           order_by=hdu_index))
 
+    def __repr__(self):
+        return 'Hdu(product_lid=%r, hdu_index=%d, hdr_loc=%d, dat_loc=%d, ' \
+               'dat_span=%d)' % (
+                   self.product_lid, self.hdu_index, self.keyword, self.value)
+
 
 class Card(Base):
     """
@@ -255,8 +308,10 @@ class Card(Base):
                                               order_by=id))
 
     def __repr__(self):
-        return 'Card(product_lid=%s, hdu_index=%d, keyword=%s, value=%s)' % \
-               (self.product_lid, self.hdu_index, self.keyword, self.value)
+        return 'Card(product_lidvid=%r, hdu_index=%d, keyword=%r, value=%r)' \
+               % (
+                   self.product_lidvid, self.hdu_index, self.keyword,
+                   self.value)
 
 
 Index('idx_cards_product_hdu_index', Card.product_lidvid, Card.hdu_index)
