@@ -44,8 +44,8 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     </Encoded_Image>
   </File_Area_Browse>
 </Product_Browse>""" %
-    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, INFORMATION_MODEL_VERSION))
-# type: DocTemplate
+    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION,
+     INFORMATION_MODEL_VERSION))  # type: DocTemplate
 """
 An interpreted document template to create a label for a RAW browse product.
 """

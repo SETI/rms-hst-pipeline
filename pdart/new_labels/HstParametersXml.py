@@ -84,10 +84,8 @@ An interpreted fragment template to create an ``<hst:Parameters_WFPC2 />``
 XML element.
 """
 
-wrapper = interpret_document_template("""<NODE name="wrapped" />""")
-
-
-# type: DocTemplate
+wrapper = interpret_document_template(
+    """<NODE name="wrapped" />""")  # type: DocTemplate
 
 
 # Not XML, but placeholder code common to both the database- and the

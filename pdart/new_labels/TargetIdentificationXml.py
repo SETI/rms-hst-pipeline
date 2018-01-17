@@ -50,10 +50,7 @@ approximate_target_table = {
     'TRIT': ('Triton', 'Satellite'),
     'DIONE': ('Dione', 'Satellite'),
     'IAPETUS': ('Iapetus', 'Satellite')
-}
-
-
-# type: Dict[str, Tuple[unicode, unicode]]
+}  # type: Dict[str, Tuple[unicode, unicode]]
 
 
 def get_placeholder_target(*args, **kwargs):
