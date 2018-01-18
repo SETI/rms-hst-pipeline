@@ -25,6 +25,8 @@ conda install -c asmeurer pudb=2015.3
 conda install -c stsci pyfits=v3.3.0.git
 conda install scipy
 
+conda install -c astropy astroquery
+
 # This is used only for mypy.
 conda install -c bioconda typing
 
