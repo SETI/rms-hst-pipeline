@@ -26,8 +26,8 @@ def download_file(proposal_id, download, download_fs):
     assert False, 'unimplemented'
 
 
-def update_bundle():
-    # type: () -> None
+def update_bundle(download_fs, cow_fs):
+    # type: (FS, FS) -> None
     pass
 
 
@@ -36,8 +36,8 @@ def set_last_update_datetime(last):
     pass
 
 
-def download_bundle_changes(proposal_id, download_fs):
-    # type: (int, FS) -> None
+def download_bundle_changes(proposal_id, download_fs, cow_fs):
+    # type: (int, FS, FS) -> None
 
     last = get_last_update_datetime()
     while True:
@@ -47,5 +47,5 @@ def download_bundle_changes(proposal_id, download_fs):
             download_file(proposal_id, downloads[0], download_fs)
         else:
             break
-    update_bundle()
+    update_bundle(download_fs, cow_fs)
     set_last_update_datetime(now)

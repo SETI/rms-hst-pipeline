@@ -24,8 +24,20 @@ def get_changed_bundles(last_check_datetime):
     assert False, 'unimplemented'
 
 
-def enqueue_proposal_ids(proposal_ids):
+def update_proposal_ids(new_proposal_ids):
     # type: (List[int]) -> None
+    ids = get_proposal_ids()
+    ids.update(new_proposal_ids)
+    set_proposal_ids(ids)
+
+
+def get_proposal_ids():
+    # type: () -> Set[int]
+    assert False, 'unimplemented'
+
+
+def set_proposal_ids(proposal_ids):
+    # type: (Set[int]) -> None
     assert False, 'unimplemented'
 
 
@@ -37,5 +49,5 @@ def update_download_queue():
     # But that only means they'll get enqueued a second time, since
     # their change date is after 'now'.
     proposal_ids = get_changed_bundles(last)
-    enqueue_proposal_ids(proposal_ids)
+    update_proposal_ids(proposal_ids)
     set_last_check_datetime(now)
