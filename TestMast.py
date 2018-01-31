@@ -42,7 +42,7 @@ def query_dicts(query_args):
     with open(filename, 'r') as f:
         reader = csv.DictReader(f)
         # Skip the row containing field types
-        reader.__next__()
+        # reader.__next__()
         for row in reader:
             yield row
 
