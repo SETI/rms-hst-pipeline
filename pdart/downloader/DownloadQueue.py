@@ -14,9 +14,9 @@ def set_last_check_datetime(last):
     assert False, 'unimplemented'
 
 
-def get_time_now():
+def get_utc_time_now():
     # type: () -> datetime.datetime
-    assert False, 'unimplemented'
+    return datetime.datetime.utcnow()
 
 
 def get_changed_bundles(last_check_datetime):
@@ -44,10 +44,12 @@ def set_proposal_ids(proposal_ids):
 def update_download_queue():
     # type: () -> None
     last = get_last_check_datetime()
-    now = get_time_now()
+    now = get_utc_time_now()
     # There's a race condition right here: new changes could creep in.
     # But that only means they'll get enqueued a second time, since
-    # their change date is after 'now'.
+    # their change date is after 'now'.  Or I could ask for a range
+    # bounded by the variable "now" (not the actual now on the HST
+    # server).
     proposal_ids = get_changed_bundles(last)
     update_proposal_ids(proposal_ids)
     set_last_check_datetime(now)

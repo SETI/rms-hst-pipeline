@@ -1,4 +1,5 @@
 import re
+from typing import TYPE_CHECKING
 
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker

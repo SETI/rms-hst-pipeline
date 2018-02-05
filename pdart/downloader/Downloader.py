@@ -11,9 +11,9 @@ def get_last_update_datetime():
     assert False, 'unimplemented'
 
 
-def get_time_now():
+def get_utc_time_now():
     # type: () -> datetime.datetime
-    assert False, 'unimplemented'
+    return datetime.datetime.utcnow()
 
 
 def downloads_needed(proposal_id, start_time, end_time):
@@ -28,12 +28,12 @@ def download_file(proposal_id, download, download_fs):
 
 def update_bundle(download_fs, cow_fs):
     # type: (FS, FS) -> None
-    pass
+    assert False, 'unimplemented'
 
 
 def set_last_update_datetime(last):
     # type: (datetime.datetime) -> None
-    pass
+    assert False, 'unimplemented'
 
 
 def download_bundle_changes(proposal_id, download_fs, cow_fs):
@@ -41,7 +41,7 @@ def download_bundle_changes(proposal_id, download_fs, cow_fs):
 
     last = get_last_update_datetime()
     while True:
-        now = get_time_now()
+        now = get_utc_time_now()
         downloads = downloads_needed(proposal_id, last, now)
         if downloads:
             download_file(proposal_id, downloads[0], download_fs)
