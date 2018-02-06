@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, String
 from sqlalchemy.ext.declarative import declarative_base
 from typing import TYPE_CHECKING
 
@@ -17,7 +17,7 @@ def create_tables(engine):
 class UpdateDatetime(Base):
     __tablename__ = 'update_datetime'
 
-    proposal_id = Column(Integer, primary_key=True, nullable=False)
+    bundle_id = Column(String, primary_key=True, nullable=False)
     update_datetime = Column(DateTime, nullable=False)
 
     def __repr__(self):
@@ -31,12 +31,12 @@ class CheckDatetime(Base):
     __tablename__ = 'check_datetime'
 
     check_datetime = Column(DateTime, primary_key=True, nullable=False)
-    proposal_ids = Column(String, nullable=False)
+    bundle_ids = Column(String, nullable=False)
 
     def __repr__(self):
         return 'CheckDatetime(%r, %r)' % (self.check_datetime,
-                                          self.proposal_ids)
+                                          self.bundle_ids)
 
     def __str__(self):
         return 'CheckDatetime(%s, %s)' % (self.check_datetime,
-                                          self.proposal_ids)
+                                          self.bundle_ids)

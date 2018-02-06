@@ -9,14 +9,14 @@ if TYPE_CHECKING:
     from typing import Set, Tuple
 
 
-def _string_to_int_set(str):
-    # type: (str) -> Set[int]
-    return set([int(s) for s in str.split()])
+def _string_to_str_set(str):
+    # type: (str) -> Set[str]
+    return set(str.split())
 
 
-def _int_set_to_string(intset):
-    # type: (Set[int]) -> str
-    return ' '.join([str(n) for n in sorted(list(intset))])
+def _str_set_to_string(strset):
+    # type: (Set[str]) -> str
+    return ' '.join(sorted(list(strset)))
 
 
 def create_downloader_db_from_os_filepath(os_filepath):
@@ -40,44 +40,44 @@ class DownloaderDB(object):
         # type: () -> None
         create_tables(self.engine)
 
-    def get_last_update_datetime(self, prop_id):
-        # type: (int) -> datetime.datetime
+    def get_last_update_datetime(self, bundle):
+        # type: (str) -> datetime.datetime
         return self.session.query(
             UpdateDatetime).filter(
-            UpdateDatetime.proposal_id == prop_id).one().update_datetime
+            UpdateDatetime.bundle_id == bundle).one().update_datetime
 
-    def set_last_update_datetime(self, prop_id, last):
-        # type: (int, datetime.datetime) -> None
+    def set_last_update_datetime(self, bundle, last):
+        # type: (str, datetime.datetime) -> None
         if self.session.query(
                 exists().where(
-                    UpdateDatetime.proposal_id == prop_id)).scalar():
+                    UpdateDatetime.bundle_id == bundle)).scalar():
             # No need for locking the row here since I'm not modifying
             # the value, just replacing it.
             self.session.query(
-                UpdateDatetime).update({'proposal_id': prop_id,
+                UpdateDatetime).update({'bundle_id': bundle,
                                         'update_datetime': last})
         else:
-            self.session.add(UpdateDatetime(proposal_id=prop_id,
+            self.session.add(UpdateDatetime(bundle_id=bundle,
                                             update_datetime=last))
 
     def get_last_check(self):
-        # type: () -> Tuple[datetime.datetime, Set[int]]
+        # type: () -> Tuple[datetime.datetime, Set[str]]
         check = self.session.query(
             CheckDatetime).one()
-        return (check.check_datetime, _string_to_int_set(check.proposal_ids))
+        return (check.check_datetime, _string_to_str_set(check.bundle_ids))
 
-    def set_last_check(self, last, prop_id_set):
-        # type: (datetime.datetime, Set[int]) -> None
-        prop_ids = _int_set_to_string(prop_id_set)
+    def set_last_check(self, last, bundle_set):
+        # type: (datetime.datetime, Set[str]) -> None
+        bundles = _str_set_to_string(bundle_set)
         if self.session.query(CheckDatetime).count():
             # No need for locking the row here since I'm not modifying
             # the value, just replacing it.
             self.session.query(
                 CheckDatetime).update({'check_datetime': last,
-                                       'proposal_ids': prop_ids})
+                                       'bundle_ids': bundles})
         else:
             self.session.add(CheckDatetime(check_datetime=last,
-                                           proposal_ids=prop_ids))
+                                           bundle_ids=bundles))
 
     def close(self):
         # type: () -> None

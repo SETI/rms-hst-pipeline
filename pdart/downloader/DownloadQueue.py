@@ -20,24 +20,24 @@ def get_utc_time_now():
 
 
 def get_changed_bundles(last_check_datetime):
-    # type: (datetime.datetime) -> List[int]
+    # type: (datetime.datetime) -> List[str]
     assert False, 'unimplemented'
 
 
-def update_proposal_ids(new_proposal_ids):
-    # type: (List[int]) -> None
-    ids = get_proposal_ids()
-    ids.update(new_proposal_ids)
-    set_proposal_ids(ids)
+def update_bundle_ids(new_bundle_ids):
+    # type: (List[str]) -> None
+    ids = get_bundle_ids()
+    ids.update(new_bundle_ids)
+    set_bundle_ids(ids)
 
 
-def get_proposal_ids():
-    # type: () -> Set[int]
+def get_bundle_ids():
+    # type: () -> Set[str]
     assert False, 'unimplemented'
 
 
-def set_proposal_ids(proposal_ids):
-    # type: (Set[int]) -> None
+def set_bundle_ids(bundle_ids):
+    # type: (Set[str]) -> None
     assert False, 'unimplemented'
 
 
@@ -50,6 +50,6 @@ def update_download_queue():
     # their change date is after 'now'.  Or I could ask for a range
     # bounded by the variable "now" (not the actual now on the HST
     # server).
-    proposal_ids = get_changed_bundles(last)
-    update_proposal_ids(proposal_ids)
+    bundle_ids = get_changed_bundles(last)
+    update_bundle_ids(bundle_ids)
     set_last_check_datetime(now)
