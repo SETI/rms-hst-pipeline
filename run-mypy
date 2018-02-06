@@ -32,6 +32,7 @@ mypy --silent-imports --py2 \
     MakeLabels.py \
     MakeNewArchive.py \
     MakeRawBrowse.py \
+    PopulateDB.py \
     SearchDev.py \
     SqlAlch.py \
     SqlAlchComplete.py \

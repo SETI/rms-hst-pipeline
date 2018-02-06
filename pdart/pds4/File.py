@@ -38,7 +38,7 @@ class File(object):
                            'where comp = %r and basename2 = %r' %
                            (comp, basename2))
         assert basename(basename2) == basename2
-        assert splitext(basename2)[1] in Product.FILE_EXTS
+        assert splitext(basename2)[1] in Product.FILE_EXTS, basename2
         self.basename = basename2
 
     def __eq__(self, other):

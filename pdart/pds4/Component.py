@@ -3,7 +3,7 @@ Representation of a PDS4 bundle, collection, or product.
 """
 import abc
 
-from fs.path import join
+from fs.path import join, splitext
 from typing import TYPE_CHECKING
 
 from pdart.pds4.LID import *

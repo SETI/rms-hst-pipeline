@@ -310,9 +310,9 @@ class Card(Base):
 
     def __repr__(self):
         return ('Card(product_lidvid=%r, hdu_index=%d, ' +
-                'card_index=%d, keyword=%r, value=%r)' % (
+                'card_index=%d, keyword=%r, value=%r)') % (
                    self.product_lidvid, self.hdu_index, self.card_index,
-                   self.keyword, self.value))
+                   self.keyword, self.value)
 
 
 Index('idx_cards_product_hdu_index', Card.product_lidvid, Card.hdu_index)
