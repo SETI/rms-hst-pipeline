@@ -300,6 +300,7 @@ class Card(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     product_lidvid = Column(String, ForeignKey('products.lidvid'),
                             nullable=False)
+    card_index = Column(Integer, nullable=False)
     hdu_index = Column(Integer, ForeignKey('hdus.hdu_index'), nullable=False)
     keyword = Column(String, nullable=False)
     value = Column(String, nullable=True)
@@ -308,10 +309,10 @@ class Card(Base):
                                               order_by=id))
 
     def __repr__(self):
-        return 'Card(product_lidvid=%r, hdu_index=%d, keyword=%r, value=%r)' \
-               % (
-                   self.product_lidvid, self.hdu_index, self.keyword,
-                   self.value)
+        return ('Card(product_lidvid=%r, hdu_index=%d, ' +
+                'card_index=%d, keyword=%r, value=%r)' % (
+                   self.product_lidvid, self.hdu_index, self.card_index,
+                   self.keyword, self.value))
 
 
 Index('idx_cards_product_hdu_index', Card.product_lidvid, Card.hdu_index)

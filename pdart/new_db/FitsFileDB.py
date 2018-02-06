@@ -65,19 +65,19 @@ def _populate_hdus_and_cards(db,
         # For now we want all of them.
         return kw is not None
 
-    def create_card_dict(hdu_index, card):
-        # type: (int, _PYFITS_CARD) -> Dict
+    def create_card_dict(hdu_index, card_index, card):
+        # type: (int, int, _PYFITS_CARD) -> Dict
         return {
             'product_lidvid': fits_product_lidvid,
             'hdu_index': hdu_index,
+            'card_index': card_index,
             'keyword': card.keyword,
             'value': handle_undefined(card.value)
         }
 
-    card_dicts = [create_card_dict(hdu_index, card)
+    card_dicts = [create_card_dict(hdu_index, card_index, card)
                   for hdu_index, hdu in enumerate(pyfits_obj)
-                  for card in hdu.header.cards
-                  if desired_keyword(card.keyword)]
+                  for card_index, card in enumerate(hdu.header.cards)]
     db.session.bulk_insert_mappings(Card, card_dicts)
     db.session.commit()
 
