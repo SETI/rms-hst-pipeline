@@ -92,8 +92,8 @@ def get_all_browse_products(cursor):
 
 
 def get_all_good_bundle_products(cursor, bundle):
-    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode]]
-    return cast(Iterable[Tuple[unicode]],
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[str]]
+    return cast(Iterable[Tuple[str]],
                 cursor.execute("""SELECT product FROM products
                                   WHERE collection IN
                                   (SELECT collection from collections

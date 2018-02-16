@@ -41,7 +41,7 @@ class Collection(Component):
         return 'Collection(%r, %r)' % (self.archive, self.lid)
 
     def instrument(self):
-        # type: () -> unicode
+        # type: () -> str
         """
         Return the instrument for this
         :class:`~pdart.pds4.Collection`.  It is calculated from the
@@ -51,7 +51,7 @@ class Collection(Component):
                         self.lid.collection_id).group(3)
 
     def prefix(self):
-        # type: () -> unicode
+        # type: () -> str
         """
         Return the prefix for FITS files in this
         :class:`~pdart.pds4.Collection`.  It is calculated from the
@@ -69,7 +69,7 @@ class Collection(Component):
             return None
 
     def suffix(self):
-        # type: () -> unicode
+        # type: () -> str
         """
         Return the suffix for FITS files in this
         :class:`~pdart.pds4.Collection`.  It is calculated from the
@@ -117,9 +117,9 @@ class Collection(Component):
         # suffix
         pref = self.prefix()
         if pref:
-            return 'collection_%s.csv' % self.prefix()
+            return u'collection_%s.csv' % self.prefix()
         else:
-            return 'collections.csv'
+            return u'collections.csv'
 
     def inventory_filepath(self):
         # type: () -> unicode

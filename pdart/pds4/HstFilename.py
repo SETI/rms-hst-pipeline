@@ -30,7 +30,7 @@ class HstFilename(object):
         return basename(self.filename)
 
     def instrument_name(self):
-        # type: () -> unicode
+        # type: () -> str
         """
         Return the instrument name determined by the first character
         of the filename.
@@ -49,27 +49,27 @@ class HstFilename(object):
             raise Exception('First char of filename must be i, j, or u.')
 
     def hst_internal_proposal_id(self):
-        # type: () -> unicode
+        # type: () -> str
         """
         Return the HST proposal ID determined by the three characters
         after the first of the filename.
         """
-        return self._basename()[1:4].lower()
+        return str(self._basename()[1:4].lower())
 
     def suffix(self):
-        # type: () -> unicode
+        # type: () -> str
         """
         Return the suffix of the filename, that is all characters
         after the first underscore up to the period before the 'fits'
         extension.
         """
-        return re.match(r'\A[^_]+_([^\.]+)\..*\Z',
-                        self._basename()).group(1)
+        return str(re.match(r'\A[^_]+_([^\.]+)\..*\Z',
+                            self._basename()).group(1))
 
     def visit(self):
-        # type: () -> unicode
+        # type: () -> str
         """
         Return the visit id determined by the two characters after the
         first four of the filename.
         """
-        return self._basename()[4:6].lower()
+        return str(self._basename()[4:6].lower())

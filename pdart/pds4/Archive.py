@@ -39,7 +39,7 @@ class Archive(object):
 
     @staticmethod
     def is_valid_instrument(inst):
-        # type: (unicode) -> bool
+        # type: (str) -> bool
         """Return True iff the argument is a valid instrument name."""
         return inst in ['acs', 'wfc3', 'wfpc2']
 
@@ -51,7 +51,7 @@ class Archive(object):
 
     @staticmethod
     def is_valid_visit(vis):
-        # type: (unicode) -> bool
+        # type: (str) -> bool
         """Return True iff the argument is a valid visit ID."""
         try:
             return re.match(r'\A[a-z0-9][a-z0-9]\Z', vis) is not None
