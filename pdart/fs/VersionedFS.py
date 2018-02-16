@@ -1,5 +1,8 @@
-# TODO Describe a versioned filesystem here.
+"""
+Utility functions for a versioned filesystem.
 
+**TODO:** Further document this.
+"""
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -9,16 +12,11 @@ if TYPE_CHECKING:
 
     _INFOS = List[Info]
 
-ROOT = u'/'
-# type: unicode
+ROOT = u'/'  # type: unicode
 
-SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'
-# type: unicode
+SUBDIR_VERSIONS_FILENAME = u'subdir$versions.txt'  # type: unicode
 
-_VERSION_DIR_PREFIX = u'v$'
-
-
-# type: unicode
+_VERSION_DIR_PREFIX = u'v$'  # type: unicode
 
 
 def scan_vfs_dir(fs, dir, namespaces=None):

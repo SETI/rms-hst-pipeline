@@ -58,7 +58,7 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
                 if new_segment in files:
                     return 'f', join(legacy_path[1], new_segment)
                 try:
-                    version_id = subdir_dict[new_segment]
+                    version_id = subdir_dict[str(new_segment)]
                 except KeyError:
                     if writing:
                         version_id = '1'

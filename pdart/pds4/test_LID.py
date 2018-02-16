@@ -95,20 +95,20 @@ class TestLID(unittest.TestCase):
     def test_create_lid_from_parts(self):
         # type: () -> None
         parts = []
-        # type: List[unicode]
+        # type: List[str]
         with self.assertRaises(AssertionError):
             LID.create_from_parts(parts)
 
-        parts = [u'b']
+        parts = ['b']
         self.assertEqual(LID('urn:nasa:pds:b'), LID.create_from_parts(parts))
 
-        parts = [u'b', u'c']
+        parts = ['b', 'c']
         self.assertEqual(LID('urn:nasa:pds:b:c'), LID.create_from_parts(parts))
 
-        parts = [u'b', u'c', u'p']
+        parts = ['b', 'c', 'p']
         self.assertEqual(LID('urn:nasa:pds:b:c:p'),
                          LID.create_from_parts(parts))
 
-        parts = [u'b', u'c', u'p', u'x']
+        parts = ['b', 'c', 'p', 'x']
         with self.assertRaises(AssertionError):
             LID.create_from_parts(parts)

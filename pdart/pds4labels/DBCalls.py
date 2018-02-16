@@ -172,8 +172,8 @@ def get_collection_products_db(cursor, lid):
 
 
 def get_good_collection_products_db(cursor, lid):
-    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode]]
-    return cast(Iterable[Tuple[unicode]],
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[str]]
+    return cast(Iterable[Tuple[str]],
                 cursor.execute(
             """SELECT product FROM products WHERE collection=?
                EXCEPT SELECT product FROM bad_fits_files""",
@@ -181,8 +181,8 @@ def get_good_collection_products_db(cursor, lid):
 
 
 def get_good_collection_products_with_info_db(cursor, lid):
-    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[unicode, str, unicode]]
-    return cast(Iterable[Tuple[unicode, str, unicode]],
+    # type: (sqlite3.Cursor, unicode) -> Iterable[Tuple[str, str, str]]
+    return cast(Iterable[Tuple[str, str, str]],
                 cursor.execute(
             """SELECT product, full_filepath, visit FROM products
                WHERE collection=?

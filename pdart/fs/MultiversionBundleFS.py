@@ -112,14 +112,14 @@ class MultiversionBundleFS(WrapFS):
                 for dir_name, version in d.items()}
 
     def directory_contents(self, dir_path):
-        # type: (unicode) -> Tuple[Dict[unicode, unicode], List[unicode]]
+        # type: (unicode) -> Tuple[Dict[str, str], List[unicode]]
         files = [info.name
                  for info in self.scandir(dir_path)
                  if info.is_file and info.name != SUBDIR_VERSIONS_FILENAME]
         if len(iteratepath(dir_path)) >= 4:
             # if we're a versioned product dir: /b/c/p/v$n
             d = {}
-            # type: Dict[unicode, unicode]
+            # type: Dict[str, str]
         else:
             d = read_subdir_versions_from_directory(self, dir_path)
         return d, files

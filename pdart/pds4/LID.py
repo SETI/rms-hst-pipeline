@@ -6,7 +6,7 @@ class LID(object):
     """Representation of a PDS4 LID."""
 
     def __init__(self, str):
-        # type: (unicode) -> None
+        # type: (str) -> None
         """
         Create a LID object from a string, raising an exception if
         the LID string is malformed.
@@ -38,7 +38,7 @@ class LID(object):
 
     @staticmethod
     def create_from_parts(parts):
-        # type: (List[unicode]) -> LID
+        # type: (List[str]) -> LID
         l = len(parts)
         assert l in [1, 2, 3]
         if l == 1:
