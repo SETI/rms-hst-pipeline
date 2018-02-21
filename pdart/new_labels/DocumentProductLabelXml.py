@@ -45,11 +45,14 @@ make_label = interpret_document_template(
 # ----------------
 # making <Citation_Information>
 # ----------------
-def make_proposal_description(bundle_id, proposal_id):
+def _make_proposal_description(bundle_id, proposal_id):
     # type: (unicode, int) -> unicode
-    proposal_title = make_placeholder_proposal_title(bundle_id)
-    pi = make_placeholder_pi_name(bundle_id)
-    yr = make_placeholder_proposal_year(bundle_id)
+    """
+    Return a placeholder string the describes the proposal.
+    """
+    proposal_title = _make_placeholder_proposal_title(bundle_id)
+    pi = _make_placeholder_pi_name(bundle_id)
+    yr = _make_placeholder_proposal_year(bundle_id)
 
     return 'This document provides a summary of the observation ' + \
            'plan for HST proposal %d, %s, PI %s, %s.' % \
@@ -68,10 +71,13 @@ _citation_information_template = interpret_template("""<Citation_Information>
 
 def make_citation_information(lid, proposal_id):
     # type: (unicode, int) -> NodeBuilder
+    """
+    Create a ``<Citation_Information />`` element for the proposal ID.
+    """
     return _citation_information_template({
-        'author_list': make_placeholder_author_list(lid),
-        'publication_year': make_placeholder_publication_year(lid),
-        'description': make_proposal_description(
+        'author_list': _make_placeholder_author_list(lid),
+        'publication_year': _make_placeholder_publication_year(lid),
+        'description': _make_proposal_description(
             lid,
             proposal_id)
     })
@@ -131,21 +137,21 @@ def make_document_edition(edition_name, file_stds):
     })
 
 
-def make_placeholder_author_list(bundle_id):
+def _make_placeholder_author_list(bundle_id):
     return known_placeholder(bundle_id, 'doc product author_list')
 
 
-def make_placeholder_proposal_title(bundle_id):
+def _make_placeholder_proposal_title(bundle_id):
     return known_placeholder(bundle_id, 'doc product proposal_title')
 
 
-def make_placeholder_pi_name(bundle_id):
+def _make_placeholder_pi_name(bundle_id):
     return known_placeholder(bundle_id, 'doc product pi_name')
 
 
-def make_placeholder_publication_year(bundle_id):
+def _make_placeholder_publication_year(bundle_id):
     return placeholder_year(bundle_id, 'doc product publication year')
 
 
-def make_placeholder_proposal_year(bundle_id):
+def _make_placeholder_proposal_year(bundle_id):
     return placeholder_year(bundle_id, 'doc product proposal year')

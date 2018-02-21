@@ -10,6 +10,10 @@ if TYPE_CHECKING:
 
 def make_collection_inventory(bundle_db, collection_lidvid):
     # type: (BundleDB, str) -> unicode
+    """
+    Create the inventory text for the collection having this LIDVID
+    using the bundle database.
+    """
     products = bundle_db.get_collection_products(
         collection_lidvid)
     inventory_lines = [u'P,%s\r\n' % product.lidvid

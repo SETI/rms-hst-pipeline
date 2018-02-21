@@ -1,3 +1,6 @@
+"""
+Functionality to create a label for a document product.
+"""
 from datetime import date
 
 from pdart.new_labels.DocumentProductLabelXml import *
@@ -15,7 +18,7 @@ def make_document_product_label(bundle_db,
     # type: (BundleDB, str, bool) -> unicode
     """
     Create the label text for the document product in the bundle
-    having this :class:`~pdart.pds4.LID` using the database
+    having this :class:`~pdart.pds4.LIDVID` using the database
     connection.  If verify is True, verify the label against its XML
     and Schematron schemas.  Raise an exception if either fails.
     """

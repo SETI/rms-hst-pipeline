@@ -1,3 +1,7 @@
+"""
+Functionality to create a label for a data product containing a single
+FITS file.
+"""
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.FileContents import get_file_contents

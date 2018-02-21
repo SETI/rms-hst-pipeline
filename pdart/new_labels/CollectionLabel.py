@@ -19,6 +19,12 @@ if TYPE_CHECKING:
 
 def make_collection_label(bundle_db, collection_lidvid, verify):
     # type: (BundleDB, str, bool) -> unicode
+    """
+    Create the label text for the collection having this LIDVID using
+    the bundle database.  If verify is True, verify the label against
+    its XML and Schematron schemas.  Raise an exception if either
+    fails.
+    """
     collection_lid = lidvid_to_lid(collection_lidvid)
     collection_vid = lidvid_to_vid(collection_lidvid)
     collection = bundle_db.get_collection(collection_lidvid)

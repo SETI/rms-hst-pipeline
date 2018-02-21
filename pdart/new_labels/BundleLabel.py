@@ -12,10 +12,10 @@ if TYPE_CHECKING:
 def make_bundle_label(bundle_db, verify):
     # type: (BundleDB, bool) -> unicode
     """
-    Create the label text for the bundle having this
-    :class:`~pdart.pds4.LID` using the database connection.  If verify
-    is True, verify the label against its XML and Schematron schemas.
-    Raise an exception if either fails.
+    Create the label text for the bundle in the bundle database using
+    the database connection.  If verify is True, verify the label
+    against its XML and Schematron schemas.  Raise an exception if
+    either fails.
     """
     bundle = bundle_db.get_bundle()
     bundle_lid = lidvid_to_lid(bundle.lidvid)  # Only used in placeholder

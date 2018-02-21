@@ -1,3 +1,6 @@
+"""
+Functionality to create a ``<Citation_Information />`` XML element.
+"""
 from pdart.new_labels.Placeholders import *
 from pdart.xml.Templates import *
 
@@ -15,19 +18,30 @@ An interpreted template to create a ``<Citation_Information
 
 def make_placeholder_citation_information(component_id):
     # type: (unicode) -> NodeBuilder
-    pub_year = get_citation_information_publication_year(component_id)
+    """
+    Return a placeholder ``<Citation_Information />`` XML element.
+    """
+    pub_year = _get_citation_information_publication_year(component_id)
     return _placeholder_citation_information({
-        'description': get_citation_information_description(component_id),
+        'description': _get_citation_information_description(component_id),
         'publication_year': pub_year
     })
 
 
-def get_citation_information_description(component_id):
+def _get_citation_information_description(component_id):
     # type: (unicode) -> unicode
+    """
+    Return a placeholder for the description text of a
+    ``<Citation_Information />`` XML element.
+    """
     return known_placeholder(component_id, 'Citation_Information/description')
 
 
-def get_citation_information_publication_year(component_id):
+def _get_citation_information_publication_year(component_id):
     # type: (unicode) -> unicode
+    """
+    Return a placeholder for the publication year of a
+    ``<Citation_Information />`` XML element.
+    """
     return placeholder_year(component_id,
                             'Citation_Information/publication_year')
