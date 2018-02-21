@@ -1,3 +1,6 @@
+"""
+The functionality to update a bundle.
+"""
 from fs.copy import copy_file
 from fs.path import join, split, splitext
 from typing import TYPE_CHECKING
@@ -21,6 +24,10 @@ if TYPE_CHECKING:
 
 def lidvid_incrementor(is_major):
     # type: (bool) ->  _LIDVID_INCR
+    """
+    Return a function that increments a LIDVID.  If is_major is true,
+    the major version will be incremented, else the minor version.
+    """
     def major_increment(lidvid):
         # type: (LIDVID) -> LIDVID
         return lidvid.next_major_lidvid()
@@ -37,12 +44,17 @@ def lidvid_incrementor(is_major):
 
 def is_fits_file(path):
     # type: (unicode) -> bool
+    """Return true if the filepath is to a FITS file."""
     (_, ext) = splitext(path)
     return ext == '.fits'
 
 
 def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
     # type: (MultiversionBundleFS, LIDVID, bool, _UPDATE_FUNC) -> _COWVV
+    """
+    Use the update function (or callable) to update the bundle with
+    the given LIDVID in the filesystem.
+    """
     last_version_view = VersionView(last_bundle_lidvid, multiversioned_fs)
 
     cow_fs = CopyOnWriteVersionView(last_version_view)

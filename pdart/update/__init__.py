@@ -1,5 +1,4 @@
 """
-The pdart.update package contains code for updating PDS4 bundles.
-
-TODO Write more documentation.
+The :mod:`pdart.update` package contains functionality to update PDS4
+bundles.
 """
