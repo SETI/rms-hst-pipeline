@@ -1,3 +1,7 @@
+"""
+A view into a MultiversionBundleFS that exposes only a single version
+of the bundle and its components.
+"""
 from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound
 from fs.info import Info
 from fs.mode import Mode

@@ -1,3 +1,6 @@
+"""
+Functionality to verify a versioned filesystem.
+"""
 from fs.path import basename, join
 from typing import TYPE_CHECKING
 
@@ -26,6 +29,9 @@ class VersionedViewVerifier(object):
 
     def check_bundle_dir(self, bundle_dir):
         # type: (unicode) -> None
+        """
+        Verify a bundle directory.
+        """
 
         # Everything under the bundle dir must also be a dir.  There
         # are version directories and collection directories.
@@ -57,7 +63,9 @@ class VersionedViewVerifier(object):
 
     def check_collection_dir(self, collection_dir):
         # type: (unicode) -> None
-
+        """
+        Verify a collection directory.
+        """
         # Everything under the collection dir must also be a dir.  There
         # are version directories and product directories.
         (ordinary_file_infos,
@@ -89,6 +97,9 @@ class VersionedViewVerifier(object):
 
     def check_product_dir(self, product_dir):
         # type: (unicode) -> None
+        """
+        Verify a product directory.
+        """
 
         # Everything under the product dir must also be a dir.  There
         # are version directories and product directories.
@@ -115,6 +126,9 @@ class VersionedViewVerifier(object):
 
     def check_version_dir(self, version_dir):
         # type: (unicode) -> None
+        """
+        Verify a version directory.
+        """
 
         assert basename(version_dir)[0:2] == 'v$'
         # All version dirs must contain a subdir versions file
@@ -138,6 +152,9 @@ class VersionedViewVerifier(object):
     def check_subdir_versions_file(self,
                                    version_dir):
         # type: (unicode) -> None
+        """
+        Verify a subdir-versions file.
+        """
         d = read_subdir_versions_from_directory(self.view, version_dir)
         for subdir_name, version in d.items():
             # each subdirectory entry must correspond to an
@@ -148,6 +165,10 @@ class VersionedViewVerifier(object):
 
     def test_has_bundle_dirs(self):
         # type: () -> None
+        """
+        Test that the filesystem has a single directory corresponding
+        to the bundle.
+        """
         self.view.isdir(ROOT)
         # There is only one directory under root, corresponding to the
         # bundle.
@@ -157,14 +178,26 @@ class VersionedViewVerifier(object):
         self.check_bundle_dir(BUNDLE_DIR)
 
     def assertTrue(self, cond, msg=None):
+        """
+        Raise an exception with the given message if the first argument
+        is not truthy.
+        """
         if not cond:
             raise VersionedViewException(msg)
 
     def assertFalse(self, cond, msg=None):
+        """
+        Raise an exception with the given message if the first argument
+        is not falsey.
+        """
         if cond:
             raise VersionedViewException(msg)
 
     def assertEqual(self, lhs, rhs, msg=None):
+        """
+        Raise an exception with the given message if the two arguments
+        are not equal.
+        """
         cond = lhs == rhs
         if not cond:
             msg2 = "%s != %s" % (lhs, rhs)

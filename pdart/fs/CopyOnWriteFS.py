@@ -1,3 +1,7 @@
+"""
+A copy-on-write filesystem.  It allows us to separate the original
+data from the new data.
+"""
 import fs.errors
 from fs.base import FS
 from fs.copy import copy_file
@@ -24,23 +28,24 @@ class FSDelta(object):
     """
 
     def __init__(self, deletions, additions):
-        """Create a Delta from the subtractions and additions."""
         # type: (Set[unicode], FS) -> None
+        """Create a Delta from the subtractions and additions."""
         self._deletions = deletions
         self._additions = additions
 
     def deletions(self):
-        """Returns a set of the removed filepaths."""
         # type: () -> Set[unicode]
+        """Returns a set of the removed filepaths."""
         return self._deletions
 
     def additions(self):
-        """Returns a filesystem containing the additions."""
         # type: () -> FS
+        """Returns a filesystem containing the additions."""
         return self._additions
 
     def directories(self):
         # type: () -> Set[unicode]
+        """Returns a set of the directories with changes."""
         deletion_dirs = [d for f in list(self._deletions)
                          for d in recursepath(dirname(f))]
         addition_dirs = list(self._additions.walk.dirs())
@@ -68,23 +73,35 @@ class CopyOnWriteFS(FS):
 
     def delta(self):
         # type: () -> FSDelta
+        """Extract an FSDelta from the filesystem."""
         return FSDelta(self._deletion_set.as_set(), self._delta_fs)
 
     def normalize(self):
         # type: () -> None
+        """
+        Normalize the filesystem by removing redundant changes: remove
+        changes that result only in duplicating a file, and remove
+        empty directories from the read/write filesystem.
+        """
         self._remove_duplicates()
         self._remove_empty_dirs()
 
     def _remove_empty_dirs(self):
         # type: () -> None
+        """
+        Remove empty directories from the read/write filesystem.
+        """
         delta_fs = self._delta_fs
         for dir_path in delta_fs.walk.dirs(search='depth'):
             if not delta_fs.listdir(dir_path):
                 delta_fs.removedir(dir_path)
 
     def _remove_duplicates(self):
-        """Remove all unnecessarily duplicated files."""
-
+        """
+        Remove all unnecessarily duplicated files: files whose
+        contents are the same in both the read-only and the read/write
+        filesystems.
+        """
         # type: () -> None
 
         # walk all the files in the delta.  If they are the same as the
@@ -106,6 +123,9 @@ class CopyOnWriteFS(FS):
             self._delta_fs.remove(filepath)
 
     def getmeta(self, namespace='standard'):
+        """
+        Gets the metadata from the filesystem.
+        """
         # TODO Not quite right to use just the delta's meta.  What
         # about the readonly's?
         return self._delta_fs.getmeta(namespace=namespace)
@@ -230,6 +250,10 @@ class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
         return self._version_view.bundle_lidvid()
 
     def lid_to_vid(self, lid):
+        """
+        Find the VID for the bundle, collection, or product that has
+        the given LID.
+        """
         # type: (LID) -> VID
         try:
             return self._version_view.lid_to_vid(lid)

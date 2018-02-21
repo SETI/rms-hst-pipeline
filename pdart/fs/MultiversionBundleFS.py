@@ -1,3 +1,6 @@
+"""
+A filesystem capable of holding multiple versions of bundles.
+"""
 from fs.path import iteratepath, join
 from fs.wrap import WrapFS
 from typing import TYPE_CHECKING
@@ -19,7 +22,7 @@ if TYPE_CHECKING:
 class MultiversionBundleFS(WrapFS):
     """
     Adds some utility functions to a fs.base.FS and denotes that it contains
-    multiple versions of bundles in our format.  TODO Specify the format.
+    multiple versions of a bundle in our format.  TODO Specify the format.
     """
 
     def __init__(self, wrap_fs):
@@ -113,6 +116,10 @@ class MultiversionBundleFS(WrapFS):
 
     def directory_contents(self, dir_path):
         # type: (unicode) -> Tuple[Dict[str, str], List[unicode]]
+        """
+        Given the path to a directory, return a dictionary of xxx and
+        a list of file names in the directory.
+        """
         files = [info.name
                  for info in self.scandir(dir_path)
                  if info.is_file and info.name != SUBDIR_VERSIONS_FILENAME]
@@ -125,10 +132,10 @@ class MultiversionBundleFS(WrapFS):
         return d, files
 
     def current_vid(self, lid):
+        # type: (LID) -> VID
         """
         For a given LID, find the current (latest) VID in the filesystem.
         """
-        # type: (LID) -> VID
         path = lid_to_dir(lid)
         vids = [dir_part_to_vid(dir_name)
                 for dir_name in self.listdir(path)
@@ -149,6 +156,9 @@ class MultiversionBundleFS(WrapFS):
 
     def current_bundle_lidvid(self):
         # type: () -> LIDVID
+        """
+        Return the LIDVID of the bundle.
+        """
         root_contents = self.listdir(u'/')
         assert len(root_contents) == 1
         bundle_id = root_contents[0]
@@ -158,10 +168,10 @@ class MultiversionBundleFS(WrapFS):
 
 
 def _lidvid_to_subdir_versions_path(lidvid):
+    # type: (LIDVID) -> unicode
     """
     For a given LIDVID, give the path to the subdir_versions file
     indicating its subdirectories.
     """
-    # type: (LIDVID) -> unicode
     return join(lidvid_to_dir(lidvid),
                 SUBDIR_VERSIONS_FILENAME)

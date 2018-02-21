@@ -1,5 +1,7 @@
 """
-Functionality to read and write subdir-version dictionaries.
+Functionality to read and write subdir-version dictionaries.  A
+subdir-version dictionary has keys corresponding to subdirectory
+names, and values corresponding to VIDs.
 """
 import re
 

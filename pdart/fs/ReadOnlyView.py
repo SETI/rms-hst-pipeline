@@ -1,3 +1,6 @@
+"""
+A view on a filesystem to make it read-only.
+"""
 from fs.errors import ResourceReadOnly
 
 from pdart.fs.NarrowWrapFS import *

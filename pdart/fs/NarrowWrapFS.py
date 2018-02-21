@@ -1,3 +1,6 @@
+"""
+A filesystem that delegates essential methods to a wrapped filesystem.
+"""
 import abc
 
 from fs.base import FS

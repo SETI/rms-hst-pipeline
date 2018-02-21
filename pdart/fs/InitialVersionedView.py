@@ -388,9 +388,9 @@ class _FSSubdirVersionsFile(_FSFilePath):
 
 class InitialVersionedView(ReadOnlyView):
     """
-    Wraps a filesystem in the unversioned legacy directory layout to
-    look like a versioned filesystem with all PDS elements at version
-    1.
+    Wraps a filesystem that uses the unversioned legacy directory
+    layout to look like a versioned filesystem with all PDS elements
+    at version 1.
     """
 
     def __init__(self, bundle_id, legacy_fs):

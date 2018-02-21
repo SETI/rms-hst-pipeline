@@ -1,7 +1,7 @@
 """
-Utility functions for a versioned filesystem.
-
-**TODO:** Further document this.
+Utility functions for a versioned filesystem.  Currently, only a
+function to get directory contents in a multiversion filesystem,
+sorted into "real" files and directories and "bookkeeping" ones.
 """
 from typing import TYPE_CHECKING
 

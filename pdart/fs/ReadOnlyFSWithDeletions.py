@@ -1,3 +1,6 @@
+"""
+A (mostly) read-only filesystem from which you can "delete" files.
+"""
 from fs.errors \
     import DirectoryExists, DirectoryNotEmpty, FileExpected, \
     ResourceNotFound, ResourceReadOnly
