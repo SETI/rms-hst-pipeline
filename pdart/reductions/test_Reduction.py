@@ -1,3 +1,5 @@
+import unittest
+
 from pdart.pds4.Archives import *
 from pdart.reductions.Reduction import *
 from pdart.rules.ExceptionInfo import CalculationException
@@ -122,6 +124,7 @@ class TestRecursiveReduction(Reduction):
         return 1
 
 
+@unittest.skip('needs archive')
 def test_reductions():
     # type: () -> None
     arch = get_any_archive()
