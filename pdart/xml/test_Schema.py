@@ -1,4 +1,5 @@
 from pdart.xml.Schema import *
+from pdart.xml.Utils import path_to_testfile
 
 import unittest
 
@@ -40,12 +41,12 @@ class TestXmlSchema(unittest.TestCase):
         self.assertIsNotNone(failures)
 
         # Valid XML according to the schema.
-        failures = xml_schema_failures('./testfiles/bundle.xml')
+        failures = xml_schema_failures(path_to_testfile('bundle.xml'))
         self.assertIsNone(failures)
 
     def test_run_schematron(self):
         # type: () -> None
-        exit_code, stderr, stdout = probatron('./testfiles/bundle.xml')
+        exit_code, stderr, stdout = probatron(path_to_testfile('bundle.xml'))
         self.assertEquals(0, exit_code)
         self.assertEquals('', stderr)
         self.assertNotEquals('', stdout)
@@ -58,12 +59,12 @@ class TestXmlSchema(unittest.TestCase):
         self.assertEquals('', stderr)
         self.assertNotEquals('', stdout)
 
-        svrl = probatron_with_svrl_result('./testfiles/bundle.xml')
+        svrl = probatron_with_svrl_result(path_to_testfile('bundle.xml'))
         self.assertFalse(svrl_has_failures(svrl))
 
-        svrl = probatron_with_svrl_result('./testfiles/bad_bundle.xml')
+        svrl = probatron_with_svrl_result(path_to_testfile('bad_bundle.xml'))
         self.assertTrue(svrl_has_failures(svrl))
 
-        self.assertIsNone(schematron_failures('./testfiles/bundle.xml'))
-        failures = schematron_failures('./testfiles/bad_bundle.xml')
+        self.assertIsNone(schematron_failures(path_to_testfile('bundle.xml')))
+        failures = schematron_failures(path_to_testfile('bad_bundle.xml'))
         self.assertIsNotNone(failures)
