@@ -5,6 +5,7 @@ from fs.path import join
 from pdart.new_db.BrowseFileDB import *
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.SqlAlchTables import BrowseFile
+from pdart.new_db.Utils import path_to_testfile
 
 
 class Test_BrowseFileDB(unittest.TestCase):
@@ -15,15 +16,11 @@ class Test_BrowseFileDB(unittest.TestCase):
 
     def test_populate_database_from_browse_file(self):
         # type: () -> None
-        archive = '/Users/spaceman/Desktop/Archive'
-
         fits_product_lidvid = \
             'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2.0'
         fits_collection_lidvid = \
             'urn:nasa:pds:hst_09059:data_acs_raw::2.0'
-        os_filepath = join(
-            archive,
-            'hst_09059/data_acs_raw/visit_01/j6gp01lzq_raw.fits')
+        os_filepath = path_to_testfile('j6gp01lzq_raw.fits')
 
         self.db.create_fits_product(fits_product_lidvid,
                                     fits_collection_lidvid)
