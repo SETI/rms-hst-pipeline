@@ -1,11 +1,11 @@
 import unittest
 
-from fs.path import basename, join
+from fs.path import basename
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
-from pdart.new_db.SqlAlchTables import File, FitsFile
 from pdart.new_labels.TimeCoordinates import *
+from pdart.new_labels.Utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
 
@@ -28,13 +28,9 @@ class Test_TimeCoordinates(unittest.TestCase):
         # type: () -> None
         db = create_bundle_db_in_memory()
         db.create_tables()
-        archive = '/Users/spaceman/Desktop/Archive'
-
         fits_product_lidvid = \
             'urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2.3'
-        os_filepath = join(
-            archive,
-            'hst_13012/data_acs_raw/visit_04/jbz504eoq_raw.fits')
+        os_filepath = path_to_testfile('jbz504eoq_raw.fits')
 
         populate_database_from_fits_file(db,
                                          os_filepath,

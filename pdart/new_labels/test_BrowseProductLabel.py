@@ -1,7 +1,5 @@
 import unittest
 
-from fs.path import basename, join
-
 from pdart.new_db.BrowseFileDB import populate_database_from_browse_file
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_labels.BrowseProductLabel import *
@@ -20,7 +18,6 @@ class Test_BrowseProductLabel(unittest.TestCase):
     def test_make_browse_product_label(self):
         # type: () -> None
         self.db.create_tables()
-        archive = '/Users/spaceman/Desktop/Archive'
 
         bundle_lidvid = \
             'urn:nasa:pds:hst_13012::123.456'
@@ -47,10 +44,7 @@ class Test_BrowseProductLabel(unittest.TestCase):
                                       fits_product_lidvid,
                                       browse_collection_lidvid)
 
-        os_filepath = join(
-            archive,
-            'hst_13012/browse_acs_raw/visit_04/jbz504eoq_raw.jpg')
-        browse_file_basename = basename(os_filepath)
+        browse_file_basename = 'jbz504eoq_raw.jpg'
 
         populate_database_from_browse_file(self.db,
                                            browse_product_lidvid,

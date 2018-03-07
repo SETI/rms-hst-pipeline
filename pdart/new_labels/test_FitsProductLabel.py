@@ -1,11 +1,11 @@
 import unittest
 
-from fs.path import basename, join
+from fs.path import basename
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.new_labels.FitsProductLabel import *
-from pdart.new_labels.Utils import golden_file_contents
+from pdart.new_labels.Utils import golden_file_contents, path_to_testfile
 
 
 class Test_FitsProductLabel(unittest.TestCase):
@@ -16,7 +16,6 @@ class Test_FitsProductLabel(unittest.TestCase):
 
     def test_make_fits_product_label(self):
         # type: () -> None
-        archive = '/Users/spaceman/Desktop/Archive'
 
         bundle_lidvid = \
             'urn:nasa:pds:hst_13012::123.90201'
@@ -32,9 +31,7 @@ class Test_FitsProductLabel(unittest.TestCase):
         self.db.create_fits_product(fits_product_lidvid,
                                     collection_lidvid)
 
-        os_filepath = join(
-            archive,
-            'hst_13012/data_acs_raw/visit_04/jbz504eoq_raw.fits')
+        os_filepath = path_to_testfile('jbz504eoq_raw.fits')
 
         populate_database_from_fits_file(self.db,
                                          os_filepath,

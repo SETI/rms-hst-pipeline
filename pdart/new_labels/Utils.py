@@ -32,3 +32,9 @@ def golden_file_contents(basename):
     """
     with open(golden_filepath(basename)) as f:
         return f.read()
+
+
+def path_to_testfile(basename):
+    # type: (unicode) -> unicode
+    """Return the path to files needed for testing."""
+    return join(dirname(__file__), 'testfiles', basename)
