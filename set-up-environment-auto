@@ -11,7 +11,7 @@ conda update -y conda
 ### conda remove -y --name pdart --all
 
 # Create a minimal environment and activate it.  
-conda create -y --name pdart mock pil pip psutil pyparsing \
+conda create -y --name pdart mock pil pip psutil pycodestyle pyparsing \
     pytest sphinx sqlalchemy
 
 source activate pdart

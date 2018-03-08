@@ -11,8 +11,7 @@ conda update conda
 ### conda remove --name pdart --all
 
 # Create a minimal environment and activate it.  
-# # TODO Might not need both pep8 and flake.  Check it out.
-conda create --name pdart mock pil pip psutil pyparsing \
+conda create --name pdart mock pil pip psutil pycodestyle pyparsing \
     pytest sphinx sqlalchemy
 
 source activate pdart
