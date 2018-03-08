@@ -28,5 +28,6 @@ def run():
         for l in f:
             print l,
 
+
 if __name__ == '__main__':
     run()

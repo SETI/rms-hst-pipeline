@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
 ##############################
 
+
 _array_template = interpret_template(
     """<Array>
 <NODE name="offset"/>
@@ -33,8 +34,7 @@ _array_template = interpret_template(
 <axis_index_order>Last Index Fastest</axis_index_order>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
-</Array>""")
-# type: NodeBuilderTemplate
+</Array>""")  # type: NodeBuilderTemplate
 
 
 def make_array(hdu):
@@ -48,13 +48,14 @@ def make_array(hdu):
 
 ##############################
 
+
 _array_2d_image_template = interpret_template("""<Array_2D_Image>
 <NODE name="offset" />
 <axes>2</axes>
 <axis_index_order>Last Index Fastest</axis_index_order>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
-</Array_2D_Image>""")
+</Array_2D_Image>""")  # type: NodeBuilderTemplate
 
 
 def make_array_2d_image(hdu):
@@ -67,6 +68,7 @@ def make_array_2d_image(hdu):
             })
 
 ##############################
+
 
 _axis_array_template = interpret_template(
     """<Axis_Array>
@@ -102,6 +104,7 @@ def _make_axis_arrays(hdu, axes):
 
 ##############################
 
+
 _bundle_template = interpret_template(
     """<Bundle><NODE name="bundle_type"/></Bundle>"""
     )
@@ -114,6 +117,7 @@ def make_bundle(bundle):
             })
 
 ##############################
+
 
 _bundle_member_entry_template = interpret_template(
     """<Bundle_Member_Entry>
@@ -134,6 +138,7 @@ def make_bundle_member_entry(collection):
 
 ##############################
 
+
 _bundle_type_template = interpret_template(
     """<bundle_type><NODE name="bundle_type"/></bundle_type>"""
     )
@@ -146,6 +151,7 @@ def make_bundle_type(bundle):
             })
 
 ##############################
+
 
 _citation_information_template = interpret_template(
     """<Citation_Information>\
@@ -164,6 +170,7 @@ def make_citation_information(publication_year, description):
 
 ##############################
 
+
 _collection_template = interpret_template(
     """<Collection><NODE name="collection_type"/></Collection>"""
     )
@@ -179,6 +186,7 @@ def make_collection(collection):
 
 ##############################
 
+
 _collection_type_template = interpret_template(
     """<collection_type><NODE name="text"/></collection_type>"""
     )
@@ -191,6 +199,7 @@ def make_collection_type(text):
             })
 
 ##############################
+
 
 _context_area_template = interpret_template(
     """<Context_Area>
@@ -216,6 +225,7 @@ def make_context_area(fits_product):
 
 ##############################
 
+
 _data_type_template = interpret_template(
     """<data_type><NODE name="text"/></data_type>"""
     )
@@ -229,9 +239,10 @@ def make_data_type(text):
 
 ##############################
 
+
 _description_template = interpret_template(
-    """<description><NODE name="text"/></description>""")
-# type: NodeBuilderTemplate
+    """<description><NODE name="text"/></description>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_description(text):
@@ -242,12 +253,13 @@ def make_description(text):
 
 ##############################
 
+
 _document_template = interpret_template(
     """<Document>
 <NODE name="publication_date"/>
 <FRAGMENT name="document_edition"/>
-</Document>""")
-# type: NodeBuilderTemplate
+</Document>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_document(publication_date, files):
@@ -262,14 +274,15 @@ def make_document(publication_date, files):
 
 ##############################
 
+
 _document_edition_template = interpret_template(
     """<Document_Edition>
 <NODE name="edition_name"/>
 <NODE name="language"/>
 <NODE name="files"/>
 <FRAGMENT name="document_file"/>
-</Document_Edition>""")
-# type: NodeBuilderTemplate
+</Document_Edition>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_document_edition(edition_name, files):
@@ -286,12 +299,13 @@ def make_document_edition(edition_name, files):
 
 ##############################
 
+
 _document_file_template = interpret_template(
     """<Document_File>
 <NODE name="file_name"/>
 <NODE name="document_standard_id"/>
-</Document_File>""")
-# type: NodeBuilderTemplate
+</Document_File>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_document_file(file_name, document_standard_id):
@@ -303,6 +317,7 @@ def make_document_file(file_name, document_standard_id):
             })
 
 ##############################
+
 
 _document_standard_id_template = interpret_template(
     """<document_standard_id><NODE name="text"/></document_standard_id>"""
@@ -317,6 +332,7 @@ def make_document_standard_id(text):
 
 ##############################
 
+
 _edition_name_template = interpret_template(
     """<edition_name><NODE name="text"/></edition_name>"""
     )
@@ -329,6 +345,7 @@ def make_edition_name(text):
             })
 
 ##############################
+
 
 _element_array_template = interpret_template(
     """<Element_Array><NODE name="data_type"/></Element_Array>"""
@@ -343,6 +360,7 @@ def make_element_array(hdu):
             })
 
 ##############################
+
 
 _encoded_image_template = interpret_template(
     """<Encoded_Image>
@@ -363,6 +381,7 @@ def make_encoded_image(product):
 
 ##############################
 
+
 _encoding_standard_id_template = interpret_template(
     """<encoding_standard_id><NODE name="text"/></encoding_standard_id>"""
     )
@@ -376,6 +395,7 @@ def make_encoding_standard_id(text):
             })
 
 ##############################
+
 
 _encoding_type_template = interpret_template(
     """<encoding_type><NODE name="text"/></encoding_type>"""
@@ -391,6 +411,7 @@ def make_encoding_type(text):
 
 ##############################
 
+
 _header_template = interpret_template(
     """<Header>
 <NODE name="local_identifier"/>
@@ -398,8 +419,8 @@ _header_template = interpret_template(
 <NODE name="object_length"/>
 <NODE name="parsing_standard_id"/>
 <NODE name="description"/>
-</Header>""")
-# type: NodeBuilderTemplate
+</Header>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_header(hdu):
@@ -417,6 +438,7 @@ def make_header(hdu):
 
 ##############################
 
+
 _identification_area_template = interpret_template(
     """<Identification_Area>
 <NODE name="logical_identifier" />
@@ -425,8 +447,8 @@ _identification_area_template = interpret_template(
 <NODE name="information_model_version" />
 <NODE name="product_class" />
 <FRAGMENT name="Citation_Information" />
-</Identification_Area>""")
-# type: NodeBuilderTemplate
+</Identification_Area>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_identification_area(logical_identifier,
@@ -452,9 +474,10 @@ def make_identification_area(logical_identifier,
 
 ##############################
 
+
 _kernel_type_template = interpret_template(
-    """<kernel_type><NODE name="text" /></kernel_type>""")
-# type: NodeBuilderTemplate
+    """<kernel_type><NODE name="text" /></kernel_type>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_kernel_type(text):
@@ -466,9 +489,10 @@ def make_kernel_type(text):
 
 ##############################
 
+
 _language_template = interpret_template(
-    """<language><NODE name="text" /></language>""")
-# type: NodeBuilderTemplate
+    """<language><NODE name="text" /></language>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_language(text):
@@ -480,9 +504,10 @@ def make_language(text):
 
 ##############################
 
+
 _logical_identifier_template = interpret_template(
-    """<logical_identifier><NODE name="lid" /></logical_identifier>""")
-# type: NodeBuilderTemplate
+    """<logical_identifier><NODE name="lid" /></logical_identifier>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_logical_identifier(text):
@@ -494,11 +519,12 @@ def make_logical_identifier(text):
 
 ##############################
 
+
 _maximum_field_length_template = interpret_template(
     """<maximum_field_length unit="byte">\
 <NODE name="text" />\
-</maximum_field_length>""")
-# type: NodeBuilderTemplate
+</maximum_field_length>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_maximum_field_length(text):
@@ -509,9 +535,10 @@ def make_maximum_field_length(text):
 
 ##############################
 
+
 _member_status_template = interpret_template(
-    """<member_status><NODE name="text" /></member_status>""")
-# type: NodeBuilderTemplate
+    """<member_status><NODE name="text" /></member_status>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_member_status(text):
@@ -522,9 +549,10 @@ def make_member_status(text):
 
 ##############################
 
+
 _name_template = interpret_template(
-    """<name><NODE name="text" /></name>""")
-# type: NodeBuilderTemplate
+    """<name><NODE name="text" /></name>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_name(text):
@@ -535,14 +563,15 @@ def make_name(text):
 
 ##############################
 
+
 _observation_area_template = interpret_template(
     """<Observation_Area>
 <NODE name="Time_Coordinates" />
 <NODE name="Investigation_Area" />
 <NODE name="Observing_System" />
 <NODE name="Target_Identification" />
-</Observation_Area>""")
-# type: NodeBuilderTemplate
+</Observation_Area>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_observation_area(product):
@@ -563,14 +592,15 @@ def make_observation_area(product):
 
 ##############################
 
+
 _field_delimited_template = interpret_template(
     """<Field_Delimited>
 <NODE name="name" />
 <NODE name="field_number" />
 <NODE name="data_type" />
 <NODE name="maximum_field_length" />
-</Field_Delimited>""")
-# type: NodeBuilderTemplate
+</Field_Delimited>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_field_delimited(name, field_number, data_type, maximum_field_length):
@@ -584,9 +614,10 @@ def make_field_delimited(name, field_number, data_type, maximum_field_length):
 
 ##############################
 
+
 _field_delimiter_template = interpret_template(
-    """<field_delimiter><NODE name="text" /></field_delimiter>""")
-# type: NodeBuilderTemplate
+    """<field_delimiter><NODE name="text" /></field_delimiter>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_field_delimiter(text):
@@ -597,9 +628,10 @@ def make_field_delimiter(text):
 
 ##############################
 
+
 _field_number_template = interpret_template(
-    """<field_number><NODE name="text"/></field_number>""")
-# type: NodeBuilderTemplate
+    """<field_number><NODE name="text"/></field_number>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_field_number(text):
@@ -610,9 +642,10 @@ def make_field_number(text):
 
 ##############################
 
+
 _fields_template = interpret_template(
-    """<fields><NODE name="text"/></fields>""")
-# type: NodeBuilderTemplate
+    """<fields><NODE name="text"/></fields>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_fields(text):
@@ -623,11 +656,13 @@ def make_fields(text):
 
 ##############################
 
-_file_area_browse_template = interpret_template("""<File_Area_Browse>
+
+_file_area_browse_template = interpret_template(
+    """<File_Area_Browse>
 <NODE name="File"/>
 <NODE name="Encoded_Image"/>
-</File_Area_Browse>""")
-# type: NodeBuilderTemplate
+</File_Area_Browse>"""
+)  # type: NodeBuilderTemplate
 
 
 def make_file_area_browse(product):
@@ -640,12 +675,13 @@ def make_file_area_browse(product):
 
 ##############################
 
+
 _file_area_spice_kernel_template = interpret_template(
     """<File_Area_SPICE_Kernel>
 <NODE name="File"/>
 <NODE name="SPICE_Kernel"/>
-</File_Area_SPICE_Kernel>""")
-# type: NodeBuilderTemplate
+</File_Area_SPICE_Kernel>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_file_area_spice_kernel(file_basename):
@@ -659,11 +695,13 @@ def make_file_area_spice_kernel(file_basename):
 
 ##############################
 
-_file_area_inventory_template = interpret_template("""<File_Area_Inventory>
+
+_file_area_inventory_template = interpret_template(
+    """<File_Area_Inventory>
 <NODE name="File"/>
 <NODE name="Inventory"/>
-</File_Area_Inventory>""")
-# type: NodeBuilderTemplate
+</File_Area_Inventory>"""
+)  # type: NodeBuilderTemplate
 
 
 def make_file_area_inventory(collection):
@@ -676,11 +714,12 @@ def make_file_area_inventory(collection):
 
 ##############################
 
+
 _file_area_observational_template = interpret_template(
     """<File_Area_Observational><NODE name="File" />
 <FRAGMENT name="hdu_content_fragment"/>
-    </File_Area_Observational>""")
-# type: NodeBuilderTemplate
+    </File_Area_Observational>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_file_area_observational(product):
@@ -727,9 +766,10 @@ def _make_hdu_2d_data_node(hdu):
 
 ##############################
 
+
 _file_template = interpret_template(
-    """<File><NODE name="file_name"/></File>""")
-# type: NodeBuilderTemplate
+    """<File><NODE name="file_name"/></File>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_file(text):
@@ -740,9 +780,10 @@ def make_file(text):
 
 ##############################
 
+
 _files_template = interpret_template(
-    """<files><NODE name="text"/></files>""")
-# type: NodeBuilderTemplate
+    """<files><NODE name="text"/></files>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_files(text):
@@ -753,9 +794,10 @@ def make_files(text):
 
 ##############################
 
+
 _file_name_template = interpret_template(
-    """<file_name><NODE name="text"/></file_name>""")
-# type: NodeBuilderTemplate
+    """<file_name><NODE name="text"/></file_name>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_file_name(text):
@@ -766,9 +808,10 @@ def make_file_name(text):
 
 ##############################
 
+
 _groups_template = interpret_template(
-    """<groups><NODE name="text"/></groups>""")
-# type: NodeBuilderTemplate
+    """<groups><NODE name="text"/></groups>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_groups(text):
@@ -779,10 +822,11 @@ def make_groups(text):
 
 ##############################
 
+
 _information_model_version_template = interpret_template(
     """<information_model_version><NODE name="version" />\
-</information_model_version>""")
-# type: NodeBuilderTemplate
+</information_model_version>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_information_model_version():
@@ -793,12 +837,13 @@ def make_information_model_version():
 
 ##############################
 
+
 _internal_reference_template = interpret_template(
     """<Internal_Reference>
     <NODE name="lidvid_reference" />
     <NODE name="reference_type" />
-    </Internal_Reference>""")
-# type: NodeBuilderTemplate
+    </Internal_Reference>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_internal_reference(d):
@@ -806,6 +851,7 @@ def make_internal_reference(d):
     return _internal_reference_template(d)
 
 ##############################
+
 
 _inventory_template = interpret_template(
     """<Inventory>
@@ -816,8 +862,8 @@ _inventory_template = interpret_template(
 <NODE name="field_delimiter"/>
 <NODE name="Record_Delimited"/>
 <NODE name="reference_type"/>
-</Inventory>""")
-# type: NodeBuilderTemplate
+</Inventory>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_inventory(collection):
@@ -836,13 +882,14 @@ def make_inventory(collection):
 
 ##############################
 
+
 _investigation_area_template = interpret_template(
     """<Investigation_Area>
     <NODE name="name"/>
     <NODE name="type"/>
     <NODE name="Internal_Reference"/>
-    </Investigation_Area>""")
-# type: NodeBuilderTemplate
+    </Investigation_Area>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_investigation_area(bundle):
@@ -864,9 +911,10 @@ def make_investigation_area(bundle):
 
 ##############################
 
+
 _lid_reference_template = interpret_template(
-    """<lid_reference><NODE name="text" /></lid_reference>""")
-# type: NodeBuilderTemplate
+    """<lid_reference><NODE name="text" /></lid_reference>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_lid_reference(text):
@@ -877,9 +925,10 @@ def make_lid_reference(text):
 
 ##############################
 
+
 _lidvid_reference_template = interpret_template(
-    """<lidvid_reference><NODE name="text" /></lidvid_reference>""")
-# type: NodeBuilderTemplate
+    """<lidvid_reference><NODE name="text" /></lidvid_reference>"""
+)  # type: NodeBuilderTemplate
 
 
 def make_lidvid_reference(text):
@@ -889,6 +938,7 @@ def make_lidvid_reference(text):
             })
 
 ##############################
+
 
 _observing_system_component_template = interpret_template(
     """<Observing_System_Component>
@@ -917,15 +967,15 @@ def make_observing_system_component(hst_or_inst):
             'type': ty,
             'Internal_Reference': make_internal_reference(d)
             })
-# type: NodeBuilderTemplate
+
 
 _hst_or_instrument_lid = {
     'hst': 'urn:nasa:pds:context:instrument_host:spacecraft.hst',
     'acs': 'urn:nasa:pds:context:instrument:insthost.acs.acs',
     'wfc3': 'urn:nasa:pds:context:instrument:insthost.acs.wfc3',
     'wfpc2': 'urn:nasa:pds:context:instrument:insthost.acs.wfpc2'
-    }
-# type: Dict[str, str]
+    }  # type: Dict[str, str]
+
 
 _hst_or_instrument_name = {
     'hst': 'Hubble Space Telescope',
@@ -935,14 +985,14 @@ _hst_or_instrument_name = {
     # 'abbreviation': 'wfc3'
     'wfpc2': 'Wide-Field Planetary Camera 2',
     # 'abbreviation': 'wfpc2'
-    }
-# type: Dict[str, str]
+    }  # type: Dict[str, str]
 
 ##############################
 
+
 _local_identifier_template = interpret_template(
-    """<local_identifier><NODE name="text"/></local_identifier>""")
-# type: NodeBuilderTemplate
+    """<local_identifier><NODE name="text"/></local_identifier>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_local_identifier(text):
@@ -953,9 +1003,10 @@ def make_local_identifier(text):
 
 ##############################
 
+
 _object_length_template = interpret_template(
-    """<object_length unit="byte"><NODE name="text"/></object_length>""")
-# type: NodeBuilderTemplate
+    """<object_length unit="byte"><NODE name="text"/></object_length>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_object_length(text):
@@ -966,12 +1017,13 @@ def make_object_length(text):
 
 ##############################
 
+
 _observing_system_template = interpret_template(
     """<Observing_System>
     <name><NODE name="name"/></name>
     <FRAGMENT name="Observing_System_Component" />
-    </Observing_System>""")
-# type: NodeBuilderTemplate
+    </Observing_System>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_observing_system(collection):
@@ -985,6 +1037,7 @@ def make_observing_system(collection):
                     ])
             })
 
+
 _observing_system_names = {
     'acs': 'Hubble Space Telescope Advanced Camera for Surveys',
     'wfc3': 'Hubble Space Telescope Wide Field Camera 3',
@@ -993,9 +1046,10 @@ _observing_system_names = {
 
 ##############################
 
+
 _offset_template = interpret_template(
-    """<offset unit="byte"><NODE name="text"/></offset>""")
-# type: NodeBuilderTemplate
+    """<offset unit="byte"><NODE name="text"/></offset>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_offset(text):
@@ -1006,9 +1060,10 @@ def make_offset(text):
 
 ##############################
 
+
 _parsing_standard_id_template = interpret_template(
-    """<parsing_standard_id><NODE name="text" /></parsing_standard_id>""")
-# type: NodeBuilderTemplate
+    """<parsing_standard_id><NODE name="text" /></parsing_standard_id>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_parsing_standard_id(text):
@@ -1019,9 +1074,10 @@ def make_parsing_standard_id(text):
 
 ##############################
 
+
 _product_class_template = interpret_template(
-    """<product_class><NODE name="text"/></product_class>""")
-# type: NodeBuilderTemplate
+    """<product_class><NODE name="text"/></product_class>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_product_class(text):
@@ -1032,9 +1088,10 @@ def make_product_class(text):
 
 ##############################
 
+
 _publication_date_template = interpret_template(
-    """<publication_date><NODE name="text"/></publication_date>""")
-# type: NodeBuilderTemplate
+    """<publication_date><NODE name="text"/></publication_date>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_publication_date(text):
@@ -1045,9 +1102,10 @@ def make_publication_date(text):
 
 ##############################
 
+
 _publication_year_template = interpret_template(
-    """<publication_year><NODE name="text"/></publication_year>""")
-# type: NodeBuilderTemplate
+    """<publication_year><NODE name="text"/></publication_year>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_publication_year(text):
@@ -1058,13 +1116,13 @@ def make_publication_year(text):
 
 ##############################
 
+
 _record_delimited_template = interpret_template(
     """<Record_Delimited>
 <NODE name="fields"/>
 <NODE name="groups"/>
 <FRAGMENT name="field_delimited"/>
-</Record_Delimited>""")
-# type: NodeBuilderTemplate
+</Record_Delimited>""")  # type: NodeBuilderTemplate
 
 
 def make_record_delimited():
@@ -1091,9 +1149,10 @@ def make_record_delimited():
 
 ##############################
 
+
 _record_delimiter_template = interpret_template(
-    """<record_delimiter><NODE name="text" /></record_delimiter>""")
-# type: NodeBuilderTemplate
+    """<record_delimiter><NODE name="text" /></record_delimiter>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_record_delimiter(text):
@@ -1104,9 +1163,10 @@ def make_record_delimiter(text):
 
 ##############################
 
+
 _records_template = interpret_template(
-    """<records><NODE name="text" /></records>""")
-# type: NodeBuilderTemplate
+    """<records><NODE name="text" /></records>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_records(text):
@@ -1117,9 +1177,10 @@ def make_records(text):
 
 ##############################
 
+
 _reference_list_template = interpret_template(
-    """<Reference_List></Reference_List>""")
-# type: NodeBuilderTemplate
+    """<Reference_List></Reference_List>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_reference_list():
@@ -1129,9 +1190,10 @@ def make_reference_list():
 
 ##############################
 
+
 _reference_type_template = interpret_template(
-    """<reference_type><NODE name="text" /></reference_type>""")
-# type: NodeBuilderTemplate
+    """<reference_type><NODE name="text" /></reference_type>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_reference_type(text):
@@ -1142,14 +1204,14 @@ def make_reference_type(text):
 
 ##############################
 
+
 _spice_kernel_template = interpret_template(
     """<SPICE_Kernel>
 <NODE name="offset"/>
 <NODE name="parsing_standard_id"/>
 <NODE name="kernel_type"/>
 <NODE name="encoding_type"/>
-</SPICE_Kernel>""")
-# type: NodeBuilderTemplate
+</SPICE_Kernel>""")  # type: NodeBuilderTemplate
 
 
 def make_spice_kernel(kernel_type, encoding_type):
@@ -1163,9 +1225,10 @@ def make_spice_kernel(kernel_type, encoding_type):
 
 ##############################
 
+
 _start_date_time_template = interpret_template(
-    """<start_date_time><NODE name="text"/></start_date_time>""")
-# type: NodeBuilderTemplate
+    """<start_date_time><NODE name="text"/></start_date_time>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_start_date_time(text):
@@ -1176,9 +1239,10 @@ def make_start_date_time(text):
 
 ##############################
 
+
 _stop_date_time_template = interpret_template(
-    """<stop_date_time><NODE name="text"/></stop_date_time>""")
-# type: NodeBuilderTemplate
+    """<stop_date_time><NODE name="text"/></stop_date_time>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_stop_date_time(text):
@@ -1189,13 +1253,13 @@ def make_stop_date_time(text):
 
 ##############################
 
+
 _target_identification_template = interpret_template(
     """<Target_Identification>
 <NODE name="name"/>
 <NODE name="type"/>
 <NODE name="description"/>
-</Target_Identification>""")
-# type: NodeBuilderTemplate
+</Target_Identification>""")  # type: NodeBuilderTemplate
 
 
 def make_target_identification(targname):
@@ -1234,8 +1298,7 @@ _approximate_target_table = {
     'TRIT': ('Triton', 'Satellite'),
     'DIONE': ('Dione', 'Satellite'),
     'IAPETUS': ('Iapetus', 'Satellite')
-    }
-# type: Dict[str, Tuple[unicode, unicode]]
+    }  # type: Dict[str, Tuple[unicode, unicode]]
 
 
 ##############################
@@ -1244,8 +1307,8 @@ _time_coordinates_template = interpret_template(
     """<Time_Coordinates>
 <NODE name="start_date_time"/>
 <NODE name="stop_date_time"/>
-</Time_Coordinates>""")
-# type: NodeBuilderTemplate
+</Time_Coordinates>"""
+)  # type: NodeBuilderTemplate
 
 
 def make_time_coordinates(product):
@@ -1280,8 +1343,8 @@ def make_time_coordinates(product):
 ##############################
 
 _title_template = interpret_template(
-    """<title><NODE name="title" /></title>""")
-# type: NodeBuilderTemplate
+    """<title><NODE name="title" /></title>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_title(text):
@@ -1292,9 +1355,10 @@ def make_title(text):
 
 ##############################
 
+
 _type_template = interpret_template(
-    """<type><NODE name="text" /></type>""")
-# type: NodeBuilderTemplate
+    """<type><NODE name="text" /></type>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_type(text):
@@ -1305,9 +1369,10 @@ def make_type(text):
 
 ##############################
 
+
 _version_id_template = interpret_template(
-    """<version_id>0.1</version_id>""")
-# type: NodeBuilderTemplate
+    """<version_id>0.1</version_id>"""
+    )  # type: NodeBuilderTemplate
 
 
 def make_version_id():

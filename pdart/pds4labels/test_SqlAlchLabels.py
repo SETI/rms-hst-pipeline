@@ -171,5 +171,6 @@ class TestSqlAlch(unittest.TestCase):
                                           self.db_browse_product)
         verify_label_or_raise(label)
 
+
 if __name__ == '__main__':
     unittest.main()

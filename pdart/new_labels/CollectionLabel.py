@@ -32,7 +32,7 @@ def make_collection_label(bundle_db, collection_lidvid, verify):
     proposal_id = bundle_db.get_bundle().proposal_id
     try:
         inventory_name = 'collection_%s.csv' % collection.prefix
-    except:
+    except Exception:
         # Document collections won't have prefixes.
         inventory_name = 'collection.csv'
 

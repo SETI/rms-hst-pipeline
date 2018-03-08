@@ -174,7 +174,7 @@ def db_add_product(session, archive, collection, product):
                 verify_label_or_raise_fp(label_filepath)
             logging.getLogger(__name__).info(
                 'label: %s', os.path.relpath(label_filepath, archive.root))
-        except:
+        except Exception:
             logging.getLogger(__name__).error(
                 '#### failed on %s', label_filepath)
             raise
@@ -190,6 +190,7 @@ def run():
     archive = get_any_archive()
     for bundle in archive.bundles():
         db_add_bundle(archive, bundle)
+
 
 if __name__ == '__main__':
     run()

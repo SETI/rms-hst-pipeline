@@ -9,6 +9,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pdart.pds4labels.DBCalls import Headers
 
+    _CHuu = Callable[[Headers, unicode], unicode]
+    _CHuuu = Callable[[Headers, unicode, unicode], unicode]
+
 
 def get_db_repeat_exposure_count(product_id):
     # type: (unicode) -> unicode
@@ -49,8 +52,7 @@ def _get_db_aperture_type_placeholder(headers, instrument, product_id):
 get_db_aperture_type = multiple_implementations(
     'get_db_aperture_type',
     _get_db_aperture_type,
-    _get_db_aperture_type_placeholder)
-# type: Callable[[Headers, unicode, unicode], unicode]
+    _get_db_aperture_type_placeholder)  # type: _CHuuu
 """
 Return text for the ``<aperture_type />`` XML element.
 """
@@ -71,11 +73,11 @@ def _get_db_bandwidth_placeholder(headers, instrument, product_id):
     # type: (Headers, unicode, unicode) -> unicode
     return placeholder_float(product_id, 'bandwidth')
 
+
 get_db_bandwidth = multiple_implementations(
     'get_db_bandwidth',
     _get_db_bandwidth,
-    _get_db_bandwidth_placeholder)
-# type: Callable[[Headers, unicode, unicode], unicode]
+    _get_db_bandwidth_placeholder)  # type: _CHuuu
 """
 Return a float for the ``<bandwidth />`` XML element.
 """
@@ -98,6 +100,7 @@ def _get_db_center_filter_wavelength_placeholder(headers,
                                                  instrument, product_id):
     # type: (Headers, unicode, unicode) -> unicode
     return placeholder_float(product_id, 'center_filter_wavelength')
+
 
 get_db_center_filter_wavelength = multiple_implementations(
     'get_db_center_filter_wavelength',
@@ -129,6 +132,7 @@ def _get_db_detector_id_placeholder(headers, instrument, product_id):
     # type: (Headers, unicode, unicode) -> unicode
     return placeholder(product_id, 'detector_id')
 
+
 get_db_detector_id = multiple_implementations(
     'get_db_detector_id',
     _get_db_detector_id,
@@ -152,11 +156,11 @@ def _get_db_exposure_duration_placeholder(headers, product_id):
     # type: (Headers, unicode) -> unicode
     return placeholder_float(product_id, 'exposure_duration')
 
+
 get_db_exposure_duration = multiple_implementations(
     'get_db_exposure_duration',
     _get_db_exposure_duration,
-    _get_db_exposure_duration_placeholder)
-# type: Callable[[Headers, unicode], unicode]
+    _get_db_exposure_duration_placeholder)  # type: _CHuu
 """
 Return a float for the ``<exposure_duration />`` XML element.
 """
@@ -175,11 +179,11 @@ def _get_db_exposure_type_placeholder(headers, product_id):
     # type: (Headers, unicode) -> unicode
     return placeholder(product_id, 'exposure_type')
 
+
 get_db_exposure_type = multiple_implementations(
     'get_db_exposure_type',
     _get_db_exposure_type,
-    _get_db_exposure_type_placeholder)
-# type: Callable[[Headers, unicode], unicode]
+    _get_db_exposure_type_placeholder)  # type: _CHuu
 """
 Return text for the ``<exposure_type />`` XML element.
 """
@@ -221,11 +225,11 @@ def _get_db_filter_name_placeholder(headers, instrument, product_id):
     # type: (Headers, unicode, unicode) -> unicode
     return placeholder(product_id, 'filter_name')
 
+
 get_db_filter_name = multiple_implementations(
     'get_db_filter_name',
     _get_db_filter_name,
-    _get_db_filter_name_placeholder)
-# type: Callable[[Headers, unicode, unicode], unicode]
+    _get_db_filter_name_placeholder)  # type: _CHuuu
 """
 Return text for the ``<filter_name />`` XML element.
 """
@@ -242,11 +246,11 @@ def _get_db_fine_guidance_system_lock_type(headers, product_id):
 def _get_db_fine_guidance_system_lock_type_placeholder(headers, product_id):
     return placeholder(product_id, 'fine_guidance_system_lock_type')
 
+
 get_db_fine_guidance_system_lock_type = multiple_implementations(
     'get_db_fine_guidance_system_lock_type',
     _get_db_fine_guidance_system_lock_type,
-    _get_db_fine_guidance_system_lock_type_placeholder)
-# type: Callable[[Headers, unicode], unicode]
+    _get_db_fine_guidance_system_lock_type_placeholder)  # type: _CHuu
 """
 Return text for the ``<fine_guidance_system_lock_type />`` XML element.
 """
@@ -269,11 +273,11 @@ def _get_db_gain_mode_id_placeholder(headers, instrument, product_id):
     # type: (Headers, unicode, unicode) -> unicode
     return placeholder(product_id, 'gain_mode_id')
 
+
 get_db_gain_mode_id = multiple_implementations(
     'get_db_gain_mode_id',
     _get_db_gain_mode_id,
-    _get_db_gain_mode_id_placeholder)
-# type: Callable[[Headers, unicode, unicode], unicode]
+    _get_db_gain_mode_id_placeholder)  # type: _CHuuu
 """
 Return text for the ``<gain_mode_id />`` XML element.
 """
@@ -295,11 +299,11 @@ def _get_db_hst_pi_name_placeholder(headers, product_id):
     # type: (Headers, unicode) -> unicode
     return placeholder(product_id, 'hst_pi_name')
 
+
 get_db_hst_pi_name = multiple_implementations(
     'get_db_hst_pi_name',
     _get_db_hst_pi_name,
-    _get_db_hst_pi_name_placeholder)
-# type: Callable[[Headers, unicode], unicode]
+    _get_db_hst_pi_name_placeholder)  # type: _CHuu
 """
 Return text for the ``<hst_pi_name />`` XML element.
 """
@@ -369,11 +373,11 @@ def _get_db_instrument_mode_id_placeholder(headers, instrument, product_id):
     # type: (Headers, unicode, unicode) -> unicode
     return placeholder(product_id, 'instrument_mode_id')
 
+
 get_db_instrument_mode_id = multiple_implementations(
     'get_db_instrument_mode_id',
     _get_db_instrument_mode_id,
-    _get_db_instrument_mode_id_placeholder)
-# type: Callable[[Headers, unicode, unicode], unicode]
+    _get_db_instrument_mode_id_placeholder)  # type: _CHuuu
 """
 Return text for the ``<instrument_mode_id />`` XML element.
 """

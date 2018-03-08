@@ -1,3 +1,3 @@
 #! /bin/bash -e
 source activate pdart
-pep8 *.py pdart/*.py pdart/*/*.py
+pycodestyle *.py pdart/*.py pdart/*/*.py

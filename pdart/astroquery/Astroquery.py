@@ -30,6 +30,7 @@ def getter_by_column(column_name):
         return set(table[column_name])
     return func
 
+
 get_obsids = getter_by_column(
     'obsid')  # type: Callable[[Table], Set[str]]
 

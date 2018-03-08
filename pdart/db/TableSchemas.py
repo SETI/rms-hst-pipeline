@@ -33,6 +33,7 @@ def bundle_tuple(bundle):
             bundle.label_filepath(),
             bundle.proposal_id())
 
+
 COLLECTIONS_SCHEMA = """CREATE TABLE collections (
         collection VARCHAR PRIMARY KEY NOT NULL,
         full_filepath VARCHAR NOT NULL,
@@ -62,6 +63,7 @@ def collection_tuple(collection):
             collection.instrument(),
             collection.inventory_name(),
             collection.inventory_filepath())
+
 
 PRODUCTS_SCHEMA = """CREATE TABLE products (
         product VARCHAR PRIMARY KEY NOT NULL,

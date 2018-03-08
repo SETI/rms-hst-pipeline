@@ -49,7 +49,7 @@ def get_any_archive():
     """
     try:
         return get_full_archive()
-    except:
+    except Exception:
         return get_mini_archive()
 
 

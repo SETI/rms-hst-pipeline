@@ -77,7 +77,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any, Callable, Dict, List
     from xml.dom.minidom import *
-
     TemplateDict = Dict[str, Any]
     Node = Text
     Frag = List[Text]
@@ -263,7 +262,7 @@ def interpret_template(template):
 
             try:
                 xml.sax.parseString(template, Builder())
-            except:
+            except Exception:
                 print 'malformed template:', template
                 raise
             return stack[-1]

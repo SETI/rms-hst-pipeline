@@ -39,11 +39,11 @@ class LID(object):
     @staticmethod
     def create_from_parts(parts):
         # type: (List[str]) -> LID
-        l = len(parts)
-        assert l in [1, 2, 3]
-        if l == 1:
+        parts_len = len(parts)
+        assert parts_len in [1, 2, 3]
+        if parts_len == 1:
             return LID('urn:nasa:pds:%s' % parts[0])
-        elif l == 2:
+        elif parts_len == 2:
             b, c = parts
             return LID('urn:nasa:pds:%s:%s' % (b, c))
         else:

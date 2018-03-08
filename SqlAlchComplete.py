@@ -145,7 +145,7 @@ def _get_apt_files(docs_dir):
     try:
         os.chdir(docs_dir)
         return [os.path.join(docs_dir, f) for f in glob.glob('*.apt')]
-    except:
+    except Exception:
         logging.getLogger(__name__).error("%s" % sys.exc_info()[0])
         raise
     finally:

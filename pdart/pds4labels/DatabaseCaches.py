@@ -31,10 +31,9 @@ def lookup_bundle(conn, bundle):
                                'proposal_id': proposal_id}
     return _last_bundle_result
 
-_last_collection = None
-# type: unicode
-_last_collection_result = None
-# type: TemplateDict
+
+_last_collection = None  # type: unicode
+_last_collection_result = None  # type: TemplateDict
 
 
 def lookup_collection(conn, collection):

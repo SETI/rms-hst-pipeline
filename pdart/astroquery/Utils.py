@@ -30,10 +30,10 @@ def table_to_list_of_dicts(table):
     A utility function: the tables returned by astroquery are too
     large to be human-readable.
     """
-    l = len(table)
+    table_len = len(table)
 
     def mk_dict(i):
         # type: (int) -> Dict[str, Any]
         return {key: table[key][i] for key in table.colnames}
 
-    return [mk_dict(i) for i in range(l)]
+    return [mk_dict(i) for i in range(table_len)]

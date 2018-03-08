@@ -22,7 +22,7 @@ def wrap_bundle_and_populate_db(bundle):
     db_filepath = join(fp, 'polynesia.db')
     try:
         os.remove(db_filepath)
-    except:
+    except Exception:
         pass
     db = create_bundle_db_from_os_filepath(db_filepath)
 
@@ -58,7 +58,7 @@ def wrap_bundle_and_populate_db(bundle):
         db.close()
         try:
             os.remove(db_filepath)
-        except:
+        except Exception:
             pass
     else:
         db.close()

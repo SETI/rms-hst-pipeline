@@ -55,7 +55,7 @@ class Archive(object):
         """Return True iff the argument is a valid visit ID."""
         try:
             return re.match(r'\A[a-z0-9][a-z0-9]\Z', vis) is not None
-        except:
+        except Exception:
             return False
 
     @staticmethod

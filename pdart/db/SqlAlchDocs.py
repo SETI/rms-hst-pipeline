@@ -92,7 +92,7 @@ def populate_document_collection(bundle):
     # TODO temporarily erasing and rewriting for development
     try:
         shutil.rmtree(collection_fp)
-    except:
+    except Exception:
         pass
     _ensure_directory(collection_fp)
 
@@ -174,7 +174,7 @@ def _run():
     DB_FILEPATH = 'trash_me.db'
     try:
         remove(DB_FILEPATH)
-    except:
+    except Exception:
         pass
     session = create_database_tables_and_session(DB_FILEPATH)
 
