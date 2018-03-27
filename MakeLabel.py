@@ -36,6 +36,7 @@ def _usage():
     sys.stderr.write('usage: python MakeLabel.py <product FITS file>\n')
     sys.exit(1)
 
+
 if __name__ == '__main__':
     if len(sys.argv) is not 2:
         _usage()

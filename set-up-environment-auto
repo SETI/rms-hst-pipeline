@@ -6,30 +6,30 @@
 # Uncomment the following line back in if you want to rebuild the
 # environment from scratch.
 
-conda update conda
+conda update -y conda
 
-### conda remove --name pdart --all
+### conda remove -y --name pdart --all
 
 # Create a minimal environment and activate it.  
-conda create --name pdart mock pil pip psutil pycodestyle pyparsing \
+conda create -y --name pdart mock pil pip psutil pycodestyle pyparsing \
     pytest sphinx sqlalchemy
 
 source activate pdart
 
 # for debugging
-conda install -c asmeurer pudb=2015.3
+conda install -y -c asmeurer pudb=2015.3
 
 # We install pyfits *before* scipy because it uses an earlier version
 # of numpy.  It doesn't complain if its numpy is upgraded; scipy
 # *does* complain if its version of numpy is downgraded.
 
-conda install -c stsci pyfits=v3.3.0.git
-conda install scipy
+conda install -y -c stsci pyfits=v3.3.0.git
+conda install -y scipy
 
-conda install -c astropy astroquery
+conda install -y -c astropy astroquery
 
 # This is used only for mypy.
-conda install -c bioconda typing
+conda install -y -c bioconda typing
 
 # This is used only by pdart.reductions.DbCReduction.  It may be
 # removed in the future.
@@ -37,20 +37,6 @@ pip install PyContracts
 
 # Install PyFilesystem.
 pip install fs
-
-# Check for pds-tools.
-if [ ! -d "$HOME/pds-tools" ]; then
-    echo
-    echo "You do not have a copy of pds-tools in your home directory."
-    echo -n "Download from github? [y/n] "
-    read answer
-    if [ $answer == "y" ]; then
-        git clone "https://github.com/SETI/pds-tools.git" "$HOME/pds-tools"
-    else
-        echo "No?  Then hack add_pds_tools.py to point to it."
-        exit 1
-    fi
-fi
 
 # Run our basic operations (checking for formatting, unit-testing, and
 # building docs) to see if the environment is working.

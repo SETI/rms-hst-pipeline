@@ -7,7 +7,7 @@ def test_TaskRunner():
     try:
         tr = TaskRunner(-4)
         assert False, "Should have raised exception"
-    except:
+    except Exception:
         pass
 
     tr = TaskRunner(4)

@@ -18,5 +18,6 @@ def run():
         db_filepath = bundle_database_filepath(bundle)
         assert os.path.isfile(db_filepath)  # a wimpy sanity check
 
+
 if __name__ == '__main__':
     run()

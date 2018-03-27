@@ -32,7 +32,7 @@ class DeleteRawBrowseReduction(Reduction):
                 try:
                     # TODO handle exceptions better
                     delete_browse_products_and_collections(cursor)
-                except:
+                except Exception:
                     print sys.exc_info()[0]
 
     def reduce_collection(self, archive, lid, get_reduced_products):
@@ -57,13 +57,13 @@ def _check_deletion(archive):
                     colls = list(get_all_browse_collections(cursor))
                     assert not colls, 'Browse collections %s not deleted' % \
                         colls
-                except:
+                except Exception:
                     pass
                 try:
                     # TODO handle exceptions better
                     prods = list(get_all_browse_products(cursor))
                     assert not prods, 'Browse products %s not deleted' % prods
-                except:
+                except Exception:
                     pass
 
 

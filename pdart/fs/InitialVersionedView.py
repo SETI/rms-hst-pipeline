@@ -405,8 +405,8 @@ class InitialVersionedView(ReadOnlyView):
         # type: (unicode) -> _FSPath
         path = abspath(normpath(path))
         parts = iteratepath(path)
-        l = len(parts)
-        if l == 0:
+        parts_len = len(parts)
+        if parts_len == 0:
             # synthetic root path
             return _FSRootPath(self._legacy_fs, ROOT, self._bundle)
         else:
@@ -415,17 +415,17 @@ class InitialVersionedView(ReadOnlyView):
                 raise ResourceNotFound(path)
             elif parts[-1] == SUBDIR_VERSIONS_FILENAME:
                 return _FSSubdirVersionsFile(self._legacy_fs, path, self)
-            if l == 1:
+            if parts_len == 1:
                 # /bundle
                 return _FSBundlePath(self._legacy_fs, path, self._bundle)
-            elif l == 2:
+            elif parts_len == 2:
                 if _is_version_part(parts[1]):
                     # /bundle/version
                     return _FSBundleVersionDirPath(self._legacy_fs, path)
                 else:
                     # /bundle/collection
                     return _FSCollectionPath(self._legacy_fs, path, self)
-            elif l == 3:
+            elif parts_len == 3:
                 if _is_version_part(parts[1]):
                     # /bundle/version/file
                     return _FSBundleVersionedFilePath(self._legacy_fs, path)
@@ -435,7 +435,7 @@ class InitialVersionedView(ReadOnlyView):
                 else:
                     # /bundle/collection/product
                     return _FSProductPath(self._legacy_fs, path)
-            elif l == 4:
+            elif parts_len == 4:
                 if _is_version_part(parts[2]):
                     # /bundle/collection/version/file
                     return _FSCollectionVersionedFilePath(self._legacy_fs,
@@ -447,7 +447,7 @@ class InitialVersionedView(ReadOnlyView):
                     return _FSProductVersionDirPath(self._legacy_fs,
                                                     path,
                                                     self)
-            elif l == 5:
+            elif parts_len == 5:
                 assert _is_version_part(parts[3])
                 return _FSProductVersionedFilePath(self._legacy_fs, path, self)
             else:

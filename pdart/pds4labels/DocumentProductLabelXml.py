@@ -79,14 +79,13 @@ def make_citation_information(lid, proposal_id):
 # making <Document_Edition>
 # ----------------
 
+
 _make_file = interpret_template('<file_name><NODE name="file_name" />\
-</file_name>')
-# type: NodeBuilderTemplate
+</file_name>')  # type: NodeBuilderTemplate
 
 _make_document_standard_id = interpret_template('<document_standard_id>\
 <NODE name="document_standard_id" />\
-</document_standard_id>')
-# type: NodeBuilderTemplate
+</document_standard_id>')  # type: NodeBuilderTemplate
 
 
 def _make_document_file_entry(file_name, document_standard_id):

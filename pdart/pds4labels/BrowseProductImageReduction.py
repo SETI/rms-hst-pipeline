@@ -91,6 +91,6 @@ class BrowseProductImageReduction(Reduction):
                                       target_dir,
                                       filter="None",
                                       percentiles=(1, 99))
-            except:
+            except Exception:
                 print 'Exception in', file
                 raise

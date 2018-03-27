@@ -67,6 +67,7 @@ class CheckKeywordsReduction(Reduction):
         if n == 0:
             return {k: 1 for k in hdu.header.iterkeys() if k != ''}
 
+
 if __name__ == '__main__':
     reduction = CheckKeywordsReduction()
     archive = get_any_archive()

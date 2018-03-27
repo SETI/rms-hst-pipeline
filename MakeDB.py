@@ -26,5 +26,6 @@ def run():
         for line in conn.iterdump():
             print line
 
+
 if __name__ == '__main__':
     run()

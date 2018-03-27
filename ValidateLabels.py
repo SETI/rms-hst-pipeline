@@ -32,6 +32,7 @@ class CanMakeValidCollectionLabelsReduction(CollectionLabelReduction):
     Verifies that within the archive, valid collection labels can be
     built.
     """
+
     def reduce_archive(self, archive_root, get_reduced_bundles):
         get_reduced_bundles()
 
@@ -113,6 +114,7 @@ def run():
     archive = get_any_archive()
     raise_verbosely(lambda: run_reduction(reduction, archive))
     # run_reduction(reduction, archive)
+
 
 if __name__ == '__main__':
     run()

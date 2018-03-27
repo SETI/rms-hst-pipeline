@@ -221,7 +221,7 @@ def verify_label_or_raise(label):
         failures = schematron_failures(None, label)
         if failures is not None:
             raise Exception('Schematron validation errors: ' + failures)
-    except:
+    except Exception:
         # Debugging functionality: write the label to disk.
         PRINT_AND_SAVE_LABEL = False
         if PRINT_AND_SAVE_LABEL:

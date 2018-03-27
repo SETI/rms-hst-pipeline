@@ -94,7 +94,7 @@ def make_product_browse_label(collection, browse_product):
             }).toxml()
     try:
         pretty = pretty_print(label)
-    except:
+    except Exception:
         logging.getLogger(__name__).error(label)
         raise
 
@@ -186,7 +186,7 @@ def make_product_observational_label(fits_product):
             }).toxml()
     try:
         pretty = pretty_print(label)
-    except:
+    except Exception:
         logging.getLogger(__name__).error(label)
         raise
 
@@ -289,7 +289,7 @@ def make_product_collection_label(collection):
             }).toxml()
     try:
         pretty = pretty_print(label)
-    except:
+    except Exception:
         logging.getLogger(__name__).error(label)
         raise
 
@@ -380,7 +380,7 @@ def make_product_bundle_label(bundle):
             }).toxml()
     try:
         pretty = pretty_print(label)
-    except:
+    except Exception:
         logging.getLogger(__name__).error(label)
         raise
 
@@ -488,7 +488,7 @@ def make_product_document_label(db_bundle, db_document_product):
             }).toxml()
     try:
         pretty = pretty_print(label)
-    except:
+    except Exception:
         logging.getLogger(__name__).error(label)
         raise
 
@@ -585,7 +585,7 @@ def _make_product_spice_kernel_label(bundle, product, fits_product):
             }).toxml()
     try:
         pretty = pretty_print(label)
-    except:
+    except Exception:
         logging.getLogger(__name__).error(label)
         raise
 

@@ -27,6 +27,7 @@ class _DeleteDocCollectionsReduction(Reduction):
             print 'Deleting', document_dir
             shutil.rmtree(document_dir)
 
+
 if __name__ == '__main__':
     archive = get_any_archive()
     reduction = _DeleteDocCollectionsReduction()

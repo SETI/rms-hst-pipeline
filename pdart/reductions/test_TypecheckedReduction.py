@@ -155,6 +155,7 @@ class IndexedReduction(Reduction):
     def reduce_data_unit(self, n, data_unit):
         return ('data_unit_reduction_%d' % self.index)
 
+
 if False:
     def test_sanity():
         tc = ComponentTypechecks(1)
