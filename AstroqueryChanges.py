@@ -25,6 +25,7 @@ def get_table(startDate, endDate):
     table = None
     while table is None:
         try:
+            sys.stdout.flush()
             table = Observations.query_criteria(
                 dataproduct_type=['image'],
                 dataRights='PUBLIC',
@@ -55,6 +56,7 @@ def run_test():
                     ymdhms_format_from_mjd(rec['t_obs_release'])
         except KeyError:
             print '----', ymdhms_format_from_mjd(d), 'Nothing found.'
+        sys.stdout.flush()
 
 
 if __name__ == '__main__':
