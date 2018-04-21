@@ -21,7 +21,7 @@ def ymd_to_mjd(y, m, d):
     return julian.mjd_from_day(days)
 
 
-def get_table(startDate, endDate):
+def get_observations_table(startDate, endDate):
     table = None
     while table is None:
         try:
@@ -41,19 +41,25 @@ def get_table(startDate, endDate):
     return table
 
 
+def get_products_table(table):
+    return Observations.get_product_list(table)
+
+
 def run_test():
     today = int(ymd_to_mjd(2018, 3, 26))
     start_test = today - 365
     for d in xrange(start_test, today - 1):
         try:
-            table = get_table(d, d + 1)
-            print '****', \
-                ymdhms_format_from_mjd(d), \
-                ('Found %d changed file(s):' % len(table))
-            for rec in table:
-                print ('  hst_%s' % rec['proposal_id']), \
-                    rec['dataURL'], \
-                    ymdhms_format_from_mjd(rec['t_obs_release'])
+            table = get_observations_table(d, d + 1)
+            table = get_products_table(table)
+            proposals = sorted(list(set(table['proposal_id'])))
+            for proposal in proposals:
+                recs = [rec for rec in table if rec['proposal_id'] == proposal]
+                print '****', \
+                    ymdhms_format_from_mjd(d), \
+                    ('hst_%s changed; has %d file(s)' % (proposal, len(recs)))
+                for fn in sorted(rec['productFilename'] for rec in recs):
+                    print '  ', fn
         except KeyError:
             print '----', ymdhms_format_from_mjd(d), 'Nothing found.'
         sys.stdout.flush()
