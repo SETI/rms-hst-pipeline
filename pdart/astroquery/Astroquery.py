@@ -36,7 +36,7 @@ def getter_by_column(column_name):
 def get_table_column_names(table):
     # type: (Table) -> List[str]
     return table.colnames
-    
+
 
 get_obsids = getter_by_column(
     'obsid')  # type: Callable[[Table], Set[str]]

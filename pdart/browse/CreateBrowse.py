@@ -42,8 +42,8 @@ def create_browse_file_from_fits_file(fs, fits_product_lid,
     fits_filepath = join(lid_to_dir(LID(fits_product_lid)),
                          fits_basename)
     browse_product_dir = lid_to_dir(LID(browse_product_lid))
-    picmaker.ImagesToPics([fs.getsyspath(fits_filepath)],
-                          fs.getsyspath(browse_product_dir),
+    picmaker.ImagesToPics([str(fs.getsyspath(fits_filepath))],
+                          str(fs.getsyspath(browse_product_dir)),
                           filter="None",
                           percentiles=(1, 99))
 

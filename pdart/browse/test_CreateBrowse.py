@@ -72,6 +72,7 @@ class Test_CreateBrowse(unittest.TestCase):
 
     def test_create_browse_file_from_fits_file(self):
         # type: () -> None
-        create_browse_file_from_fits_file(self.fs, _FITS_PRODUCT_LID,
+        create_browse_file_from_fits_file(self.fs,
+                                          _FITS_PRODUCT_LID,
                                           _BROWSE_PRODUCT_LID)
         self.assertTrue(self.fs.exists(_BROWSE_FILE_PATH))

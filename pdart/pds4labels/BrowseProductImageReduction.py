@@ -87,8 +87,8 @@ class BrowseProductImageReduction(Reduction):
                     ('visit_%s' % visit))
 
                 ensure_directory(target_dir)
-                picmaker.ImagesToPics([file.full_filepath()],
-                                      target_dir,
+                picmaker.ImagesToPics([str(file.full_filepath())],
+                                      str(target_dir),
                                       filter="None",
                                       percentiles=(1, 99))
             except Exception:

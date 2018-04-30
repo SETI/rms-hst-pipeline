@@ -54,8 +54,8 @@ def make_browse_product(fits_product, browse_product):
     target_dir = join(browse_collection_dir, ('visit_%s' % visit))
     _ensure_directory(target_dir)
 
-    picmaker.ImagesToPics([filepath],
-                          target_dir,
+    picmaker.ImagesToPics([str(filepath)],
+                          str(target_dir),
                           filter="None",
                           percentiles=(1, 99))
     # POSTCONDITION: browse file exists in the filesystem
@@ -116,7 +116,7 @@ def make_db_browse_product(session, fits_product, browse_product):
         label_filepath=browse_product.label_filepath(),
         browse_filepath=browse_filepath,
         object_length=object_length
-    )
+        )
     session.add(db_browse_product)
     session.commit()
 
