@@ -1,10 +1,10 @@
 import unittest
-from pdart.astroquery.Astroquery import *
+from pdart.astroquery.Astroquery_old import *
 from pdart.astroquery.Utils import \
     table_to_list_of_dicts, ymdhms_format_from_mjd
 
 
-class TestAstroquery(unittest.TestCase):
+class TestAstroquery_old(unittest.TestCase):
     @unittest.skip('work in progress')
     def test_get_hst_moving_images(self):
         # type: () -> None

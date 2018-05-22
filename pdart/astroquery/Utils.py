@@ -1,17 +1,50 @@
-from typing import TYPE_CHECKING
+import time
+
 import pdart.add_pds_tools
 import julian
-import time
+from requests.exceptions import ConnectionError
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from astropy.table import Table
-    from typing import Any, Dict, List
+    from typing import Any, Callable, Dict, List
+    Julian = float
+
+
+def filter_table(row_predicate, table):
+    # type: (Callable[[Table], bool], Table) -> Table
+    to_delete = [n for (n, row) in enumerate(table) if row_predicate(row)]
+    copy = table.copy()
+    copy.remove_rows(to_delete)
+    return copy
+
+
+def ymd_to_mjd(y, m, d):
+    # type: (int, int, int) -> Julian
+    days = julian.day_from_ymd(y, m, d)
+    return julian.mjd_from_day(days)
 
 
 def ymdhms_format_from_mjd(mjd):
     # type: (float) -> str
     (d, s) = julian.day_sec_from_mjd(mjd)
     return julian.ymdhms_format_from_day_sec(d, s)
+
+
+def get_table_with_retries(mast_call, msg):
+    # type: (Callable[[], None], str) -> Table
+    retry = 0
+    table = None
+    while table is None:
+        try:
+            table = mast_call()
+        except ConnectionError:
+            retry = retry + 1
+            print 'Retry #%d: %s' % (retry, msg)
+            time.sleep(1)
+    return table
+
+############################################################
 
 
 def now_mjd():
