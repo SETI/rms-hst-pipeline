@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from astropy.table import Table
-    from typing import Any, Callable, Dict, List
+    from typing import Any, Callable, Dict, List, Tuple
     Julian = float
 
 
@@ -25,22 +25,29 @@ def ymd_to_mjd(y, m, d):
     return julian.mjd_from_day(days)
 
 
+def ymd_tuple_to_mjd(ymd):
+    # type: (Tuple[int, int, int]) -> Julian
+    y, m, d = ymd
+    return ymd_to_mjd(y, m, d)
+
+
 def ymdhms_format_from_mjd(mjd):
     # type: (float) -> str
     (d, s) = julian.day_sec_from_mjd(mjd)
     return julian.ymdhms_format_from_day_sec(d, s)
 
 
-def get_table_with_retries(mast_call, msg):
-    # type: (Callable[[], None], str) -> Table
+def get_table_with_retries(mast_call, max_retries):
+    # type: (Callable[[], None], int) -> Table
     retry = 0
     table = None
-    while table is None:
+    while table is None and retry <= max_retries:
         try:
+            print 'calling'
             table = mast_call()
-        except ConnectionError:
+        except ConnectionError as e:
             retry = retry + 1
-            print 'Retry #%d: %s' % (retry, msg)
+            print 'retry #%d: %s' % (retry, e)
             time.sleep(1)
     return table
 
