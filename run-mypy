@@ -15,6 +15,7 @@ mypy --silent-imports --py2 \
     pdart/rules \
     pdart/tasks \
     pdart/xml \
+    AstroqueryDownload.py \
     CheckBadFitsFiles.py \
     CheckKeywords.py \
     CheckSuffixes.py \

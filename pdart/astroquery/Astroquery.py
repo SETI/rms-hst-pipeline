@@ -27,6 +27,22 @@ def _is_accepted_instrument_product_row(row):
 class MastSlice(object):
     """
     A slice in time of the MAST database.
+
+    Column names for observations are: 'calib_level', 'dataRights',
+    'dataURL', 'dataproduct_type', 'em_max', 'em_min', 'filters',
+    'instrument_name', 'intentType', 'jpegURL', 'mtFlag', 'objID',
+    'obs_collection', 'obs_id', 'obs_title', 'obsid', 'project',
+    'proposal_id', 'proposal_pi', 'proposal_type', 's_dec', 's_ra',
+    's_region', 'srcDen', 't_exptime', 't_max', 't_min',
+    't_obs_release', 'target_classification', 'target_name',
+    'wavelength_region'
+
+    Column names for products are: 'dataURI', 'dataproduct_type',
+    'description', 'obsID', 'obs_collection', 'obs_id',
+    'parent_obsid', 'productDocumentationURL', 'productFilename',
+    'productGroupDescription', 'productSubGroupDescription',
+    'productType', 'project', 'proposal_id', 'prvversion', 'size',
+    'type'
     """
 
     def __init__(self, start_date, end_date):
@@ -74,3 +90,19 @@ class MastSlice(object):
         result = filter_table(_is_accepted_instrument_product_row,
                               products_table)
         return result
+
+    def download_products(self, products_table, download_dir):
+        # type: (Table, unicode) -> None
+        if len(products_table) > 0:
+            Observations.download_products(products_table,
+                                           download_dir=download_dir)
+
+    def download_products_by_id(self, proposal_id, download_dir):
+        # type: (int, unicode) -> None
+        products_table = self.get_products(proposal_id)
+        self.download_products(products_table,
+                               download_dir=download_dir)
+
+
+def products_size(table):
+    return sum(table['size'])
