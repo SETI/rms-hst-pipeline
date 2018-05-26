@@ -7,13 +7,14 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from astropy.table import Table
+    from astropy.table.row import Row
     from typing import Any, Callable, Dict, List, Tuple
     Julian = float
 
 
 def filter_table(row_predicate, table):
-    # type: (Callable[[Table], bool], Table) -> Table
-    to_delete = [n for (n, row) in enumerate(table) if row_predicate(row)]
+    # type: (Callable[[Row], bool], Table) -> Table
+    to_delete = [n for (n, row) in enumerate(table) if not row_predicate(row)]
     copy = table.copy()
     copy.remove_rows(to_delete)
     return copy
@@ -43,7 +44,6 @@ def get_table_with_retries(mast_call, max_retries):
     table = None
     while table is None and retry <= max_retries:
         try:
-            print 'calling'
             table = mast_call()
         except ConnectionError as e:
             retry = retry + 1
