@@ -91,6 +91,10 @@ class MastSlice(object):
                               products_table)
         return result
 
+    def to_product_set(self, proposal_id):
+        # type: (int) -> ProductSet
+        return ProductSet(self.get_products(proposal_id))
+
     def download_products(self, products_table, download_dir):
         # type: (Table, unicode) -> None
         if len(products_table) > 0:
@@ -106,3 +110,26 @@ class MastSlice(object):
 
 def products_size(table):
     return sum(table['size'])
+
+
+class ProductSet(object):
+    """
+    A downloadable collection of MAST products.
+    """
+    def __init__(self, table):
+        # type: (Table) -> None
+        self.table = table
+
+    def product_count(self):
+        # type: () -> int
+        return len(self.table)
+
+    def download_size(self):
+        # type: () -> int
+        return sum(self.table['size'])
+
+    def download(self, download_dir):
+        # type: (unicode) -> None
+        if len(self.table) > 0:
+            Observations.download_products(self.table,
+                                           download_dir=download_dir)
