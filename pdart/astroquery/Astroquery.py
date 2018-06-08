@@ -14,6 +14,14 @@ We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
 """
 
+_ACCEPTED_SUFFIXES = [
+    'C0F', 'C1F', 'C3F', 'CRJ', 'D0F', 'DRZ', 'FLT', 'RAW'
+]  # type: List[str]
+"""
+For now, we limit the types of the products to those with these
+suffixes.
+"""
+
 
 def _is_accepted_instrument_product_row(row):
     # type: (Table) -> bool
@@ -21,7 +29,24 @@ def _is_accepted_instrument_product_row(row):
     We currently only handle products from a limited set of
     instruments.
     """
-    return row['obs_id'][0].upper() in _ACCEPTED_INSTRUMENTS
+
+    def instrument_key(id):
+        """
+        Return the first letter of the obs_id, which tells which
+        instrument made the observation.
+        """
+        return id[0].upper()
+
+    return instrument_key(row['obs_id']) in _ACCEPTED_INSTRUMENTS
+
+
+def _is_accepted_product_type_product_row(row):
+    # type: (Table) -> bool
+    """
+    We currently only handle products from a limited set of
+    instruments.
+    """
+    return row['productSubGroupDescription'].upper() in _ACCEPTED_SUFFIXES
 
 
 class MastSlice(object):
@@ -86,9 +111,10 @@ class MastSlice(object):
         proposal_table = filter_table(proposal_id_matches,
                                       self.observations_table)
 
-        products_table = Observations.get_product_list(proposal_table)
+        result = Observations.get_product_list(proposal_table)
         result = filter_table(_is_accepted_instrument_product_row,
-                              products_table)
+                              result)
+        result = filter_table(_is_accepted_product_type_product_row, result)
         return result
 
     def to_product_set(self, proposal_id):
@@ -116,6 +142,7 @@ class ProductSet(object):
     """
     A downloadable collection of MAST products.
     """
+
     def __init__(self, table):
         # type: (Table) -> None
         self.table = table
