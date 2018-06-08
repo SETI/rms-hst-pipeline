@@ -9,9 +9,9 @@ def sample(slice):
 
     proposal_ids = slice.get_proposal_ids()
     for proposal_id in proposal_ids:
-        product_list = slice.get_products(proposal_id)
-        sz = to_gigabytes(sum(product_list['size']))
-        cnt = len(product_list)
+        product_set = slice.to_product_set(proposal_id)
+        sz = to_gigabytes(product_set.download_size())
+        cnt = product_set.product_count()
         if cnt > 0:
             print "%.1f GB in %d products from id %d" % (sz, cnt, proposal_id)
             sys.stdout.flush()
