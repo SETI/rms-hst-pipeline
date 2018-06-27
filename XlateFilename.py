@@ -1,11 +1,11 @@
 import os
-import sys
 
 import fs.path
 
 from pdart.pds4.HstFilename import HstFilename
 
 _ROOT = '/Volumes/PDART-5TB Part Deux/bulk-download'
+
 
 def xlate_filenames():
     for (dirpath, dirnames, filenames) in os.walk(_ROOT):
@@ -20,10 +20,11 @@ def xlate_filenames():
                 assert ext == '.fits'
                 hst_filename = HstFilename(filename)
 
-                coll = 'data_%s_%s' % (hst_filename.instrument_name(), 
+                coll = 'data_%s_%s' % (hst_filename.instrument_name(),
                                        hst_filename.suffix())
                 new_path = fs.path.join(hst, coll, hst_name, filename)
                 print new_path
+
 
 if __name__ == '__main__':
     xlate_filenames()

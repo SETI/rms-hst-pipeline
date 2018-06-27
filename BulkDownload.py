@@ -19,7 +19,7 @@ def bulk_download(dl_root_dir):
     slice = MastSlice(start, today)
     proposal_ids = slice.get_proposal_ids()
     # Continuing yesterday's bulk download
-    proposal_ids = [id for id in proposal_ids if id >= 10799]
+    proposal_ids = [id for id in proposal_ids if id == 13012]
     for proposal_id in proposal_ids:
         product_set = slice.to_product_set(proposal_id)
         if product_set.product_count() > 0:
@@ -29,11 +29,13 @@ def bulk_download(dl_root_dir):
             size = product_set.download_size()
             size_in_megs = size / 1024.0 / 1024
 
-            print '%s: %s has %d products in %.2f MB' % (now, hst_code, count, size_in_megs)
+            print '%s: %s has %d products in %.2f MB' % (
+                now, hst_code, count, size_in_megs)
             dl_dir = os.path.join(dl_root_dir, hst_code)
             mkdirs(dl_dir)
             product_set.download(dl_dir)
 
 
 if __name__ == '__main__':
-    bulk_download('/Volumes/PDART-5TB Part Deux/bulk-download')
+    # bulk_download('/Volumes/PDART-5TB Part Deux/bulk-download')
+    bulk_download('/Users/spaceman/pdart/bulk-download')

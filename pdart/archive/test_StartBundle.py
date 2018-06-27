@@ -1,8 +1,26 @@
 import os.path
+import shutil
+import tempfile
 import unittest
 
 from pdart.archive.StartBundle import *
 
+
+def _path_to_testfiles():
+    # type: () -> unicode
+    """Return the path to files needed for testing."""
+    return os.path.join(os.path.dirname(__file__), 'testfiles')
+
+def _count_fits_files(root_dir):
+    # type: (unicode) -> bool
+    def is_fits(filename):
+        _, ext = fs.path.splitext(filename)
+        return ext == '.fits'
+
+    res = 0
+    for (dirpath, dirnames, filenames) in os.walk(root_dir):
+        res += len([filename for filename in filenames if is_fits(filename)])
+    return res
 
 class TestStartBundle(unittest.TestCase):
     def setUp(self):
@@ -58,3 +76,13 @@ class TestStartBundle(unittest.TestCase):
             # to.
         finally:
             db.close()
+
+    def test_copy_downloaded_files(self):
+        # (bundle_id, download_root, archive_dir):
+        bundle_id = 12345
+        create_bundle_dir(bundle_id, self.base_directory)
+        create_bundle_db(bundle_id, self.base_directory)
+
+        copy_downloaded_files(bundle_id, _path_to_testfiles(),
+                              self.base_directory)
+        self.assertEquals(4, _count_fits_files(self.base_directory))
