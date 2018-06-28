@@ -74,6 +74,7 @@ def copy_downloaded_files(bundle_db, bundle_id, download_root, archive_dir):
         return filename[0] == '.'
 
     for (dirpath, dirnames, filenames) in os.walk(download_root):
+        # ignore .DB_Store files used by the Mac OS Finder
         filenames = [filename for filename in filenames if
                      not is_dot_file(filename)]
         if len(filenames) > 0:

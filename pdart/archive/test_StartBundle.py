@@ -135,7 +135,7 @@ class TestStartBundle(unittest.TestCase):
                                 msg=product_lidvid)
 
             # the FITS files
-            for basename, product_lidvid in [
+            fits_files = [
                 ('jbz504011_drz.fits',
                  'urn:nasa:pds:hst_13012:data_acs_drz:jbz504010::1.0'),
                 ('jbz504021_drz.fits',
@@ -143,7 +143,11 @@ class TestStartBundle(unittest.TestCase):
                 ('jbz504eoq_drz.fits',
                  'urn:nasa:pds:hst_13012:data_acs_drz:jbz504eoq::1.0'),
                 ('jbz504eoq_flt.fits',
-                 'urn:nasa:pds:hst_13012:data_acs_flt:jbz504eoq::1.0')]:
+                 'urn:nasa:pds:hst_13012:data_acs_flt:jbz504eoq::1.0')]
+            # NOTE: This bundle is anomalous; the filenames don't
+            # always match the product names.  It's not a bug in the
+            # code.
+            for basename, product_lidvid in fits_files:
                 self.assertTrue(bundle_db.fits_file_exists(basename,
                                                            product_lidvid),
                                 msg=basename)
