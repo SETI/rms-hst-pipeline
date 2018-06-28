@@ -393,6 +393,11 @@ class BundleDB(object):
         return self.session.query(Product).filter(
             Product.collection_lidvid == collection_lidvid)
 
+    def get_product_files(self, product_lidvid):
+        # TODO What is the type for this?  type: (str) -> List[File]?
+        return self.session.query(File).filter(
+            File.product_lidvid == product_lidvid)
+
     def get_file(self, product_lidvid, basename):
         # type: (str, unicode) -> File
         return self.session.query(File).filter(

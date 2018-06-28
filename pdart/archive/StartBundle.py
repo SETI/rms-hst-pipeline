@@ -5,6 +5,10 @@ import shutil
 import fs.path
 from typing import TYPE_CHECKING
 
+import pdart.add_pds_tools
+import picmaker  # need to precede this with 'import pdart.add_pds_tools'
+
+from pdart.fs.DirUtils import lidvid_to_dir
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
     create_bundle_db_from_os_filepath
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
@@ -12,6 +16,7 @@ from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
+from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 if TYPE_CHECKING:
     from typing import List
@@ -116,3 +121,56 @@ def copy_downloaded_files(bundle_db, bundle_id, download_root, archive_dir):
 
                 populate_database_from_fits_file(bundle_db, new_path,
                                                  product_lidvid)
+
+
+def make_browse_collections(bundle_db, bundle_id, archive_dir):
+    # type: (BundleDB, int, unicode) -> None
+    bundle_lidvid = str(bundle_db.get_bundle().lidvid)
+
+    # Get all the collections at once at the start, since we're adding
+    # to them.
+    for collection in list(bundle_db.get_bundle_collections(bundle_lidvid)):
+        if collection.suffix in RAW_SUFFIXES:
+            # we need a browse collection
+            raw_collection_lidvid = LIDVID(collection.lidvid)
+            browse_collection_lidvid = LIDVID.create_from_lid_and_vid(
+                raw_collection_lidvid.lid().to_browse_lid(),
+                raw_collection_lidvid.vid())
+            bundle_db.create_non_document_collection(
+                str(browse_collection_lidvid),
+                bundle_lidvid)
+            for fits_product in bundle_db.get_collection_products(
+                    collection.lidvid):
+                fits_product_lidvid = LIDVID(fits_product.lidvid)
+                browse_product_lidvid = LIDVID.create_from_lid_and_vid(
+                    fits_product_lidvid.lid().to_browse_lid(),
+                    fits_product_lidvid.vid())
+                bundle_db.create_browse_product(str(browse_product_lidvid),
+                                                fits_product.lidvid,
+                                                str(browse_collection_lidvid))
+
+                for file in bundle_db.get_product_files(fits_product.lidvid):
+                    # create browse file in the filesystem
+                    file_basename = file.basename
+                    browse_basename = os.path.splitext(file_basename)[
+                                          0] + '.jpg'
+
+                    fits_filepath = fs.path.join(
+                        archive_dir +
+                        lidvid_to_dir(fits_product_lidvid),
+                        file_basename)
+                    browse_product_dir = fs.path.join(
+                        archive_dir +
+                        lidvid_to_dir(browse_product_lidvid))
+                    os.makedirs(browse_product_dir)
+                    picmaker.ImagesToPics([str(fits_filepath)],
+                                          str(browse_product_dir),
+                                          filter="None",
+                                          percentiles=(1, 99))
+                    browse_filepath = fs.path.join(browse_product_dir,
+                                                   browse_basename)
+                    # create browse file record in the database
+                    size = os.stat(browse_filepath).st_size
+                    bundle_db.create_browse_file(browse_basename,
+                                                 str(browse_product_lidvid),
+                                                 size)

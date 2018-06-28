@@ -158,3 +158,45 @@ class TestStartBundle(unittest.TestCase):
                                 msg=basename)
         finally:
             bundle_db.close()
+
+    def test_make_browse_collections(self):
+        bundle_id = 13012
+        create_bundle_dir(bundle_id, self.base_directory)
+        bundle_db = create_bundle_db(bundle_id, self.base_directory)
+        try:
+            copy_downloaded_files(bundle_db, bundle_id,
+                                  _path_to_testfiles(), self.base_directory)
+            make_browse_collections(bundle_db, bundle_id, self.base_directory)
+
+            # Make sure the files arrived in the right places in the
+            # filesystem.
+            self.assertEquals([
+                u'hst_13012/browse_acs_flt/' +
+                u'jbz504eoq/v$1.0/jbz504eoq_flt.jpg',
+                u'hst_13012/bundle$database.db',
+                u'hst_13012/data_acs_drz/jbz504010/v$1.0/jbz504011_drz.fits',
+                u'hst_13012/data_acs_drz/jbz504020/v$1.0/jbz504021_drz.fits',
+                u'hst_13012/data_acs_drz/jbz504eoq/v$1.0/jbz504eoq_drz.fits',
+                u'hst_13012/data_acs_flt/jbz504eoq/v$1.0/jbz504eoq_flt.fits'],
+                _list_rel_filepaths(self.base_directory))
+
+            # Make sure the data ended up in the database.
+
+            # In the collection
+            collection_lidvid = 'urn:nasa:pds:hst_13012:browse_acs_flt::1.0'
+            self.assertTrue(bundle_db.non_document_collection_exists(
+                collection_lidvid), msg=collection_lidvid)
+
+            # In the product
+            product_lidvid = \
+                'urn:nasa:pds:hst_13012:browse_acs_flt:jbz504eoq::1.0'
+            self.assertTrue(bundle_db.browse_product_exists(
+                product_lidvid), msg=product_lidvid)
+
+            # In the file
+            self.assertTrue(bundle_db.browse_file_exists(
+                'jbz504eoq_flt.jpg',
+                product_lidvid), msg=product_lidvid)
+
+        finally:
+            bundle_db.close()
