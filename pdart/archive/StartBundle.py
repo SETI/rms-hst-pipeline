@@ -38,7 +38,14 @@ def create_bundle_db(bundle_id, archive_dir):
 
 def copy_downloaded_files(bundle_id, download_root, archive_dir):
     # type: (int, unicode, unicode) -> None
+
+    def is_dot_file(filename):
+        # type: (unicode) -> bool
+        return filename[0] == '.'
+
     for (dirpath, dirnames, filenames) in os.walk(download_root):
+        filenames = [filename for filename in filenames if
+                     not is_dot_file(filename)]
         if len(filenames) > 0:
             rel_dirpath = fs.path.relativefrom(download_root, dirpath)
             path = fs.path.iteratepath(rel_dirpath)
@@ -56,8 +63,7 @@ def copy_downloaded_files(bundle_id, download_root, archive_dir):
 
                 old_path = fs.path.join(dirpath, filename)
                 new_dirpath = fs.path.join(archive_dir, hst, coll,
-                                        hst_name, 'v$1')
+                                           hst_name, 'v$1')
                 new_path = fs.path.join(new_dirpath, filename)
                 os.makedirs(new_dirpath)
                 shutil.copy(old_path, new_path)
-

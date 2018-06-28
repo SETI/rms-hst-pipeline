@@ -1,7 +1,8 @@
 import os.path
-import shutil
 import tempfile
 import unittest
+
+import fs.path
 
 from pdart.archive.StartBundle import *
 
@@ -11,16 +12,17 @@ def _path_to_testfiles():
     """Return the path to files needed for testing."""
     return os.path.join(os.path.dirname(__file__), 'testfiles')
 
-def _count_fits_files(root_dir):
-    # type: (unicode) -> bool
-    def is_fits(filename):
-        _, ext = fs.path.splitext(filename)
-        return ext == '.fits'
 
-    res = 0
-    for (dirpath, dirnames, filenames) in os.walk(root_dir):
-        res += len([filename for filename in filenames if is_fits(filename)])
-    return res
+def _list_rel_filepaths(root_dir):
+    # type: (unicode) -> List[unicode]
+    def _list_rel_filepaths_gen():
+        for (dirpath, _, filenames) in os.walk(root_dir):
+            rel_dirpath = fs.path.relativefrom(root_dir, dirpath)
+            for filename in filenames:
+                yield os.path.join(rel_dirpath, filename)
+
+    return sorted(_list_rel_filepaths_gen())
+
 
 class TestStartBundle(unittest.TestCase):
     def setUp(self):
@@ -60,8 +62,9 @@ class TestStartBundle(unittest.TestCase):
             create_bundle_dir(666, self.base_directory)
 
     def test_create_bundle_db(self):
-        create_bundle_dir(12345, self.base_directory)
-        db = create_bundle_db(12345, self.base_directory)
+        bundle_id = 12345
+        create_bundle_dir(bundle_id, self.base_directory)
+        db = create_bundle_db(bundle_id, self.base_directory)
         try:
             # returns the DB
             self.assertTrue(db)
@@ -70,8 +73,11 @@ class TestStartBundle(unittest.TestCase):
                                        'bundle$database.db')
             # creates the DB file
             self.assertTrue(os.path.isfile(db_filename))
+            self.assertEquals([
+                u'hst_12345/bundle$database.db'
+            ], _list_rel_filepaths(self.base_directory))
 
-            # TODO should check for creation of tables, though
+            # TODO Could check for creation of tables, though
             # existence of the file shows that the file was written
             # to.
         finally:
@@ -79,10 +85,16 @@ class TestStartBundle(unittest.TestCase):
 
     def test_copy_downloaded_files(self):
         # (bundle_id, download_root, archive_dir):
-        bundle_id = 12345
+        bundle_id = 13012
         create_bundle_dir(bundle_id, self.base_directory)
         create_bundle_db(bundle_id, self.base_directory)
 
         copy_downloaded_files(bundle_id, _path_to_testfiles(),
                               self.base_directory)
-        self.assertEquals(4, _count_fits_files(self.base_directory))
+        self.assertEquals([
+            u'hst_13012/bundle$database.db',
+            u'hst_13012/data_acs_drz/jbz504010/v$1/jbz504011_drz.fits',
+            u'hst_13012/data_acs_drz/jbz504020/v$1/jbz504021_drz.fits',
+            u'hst_13012/data_acs_drz/jbz504eoq/v$1/jbz504eoq_drz.fits',
+            u'hst_13012/data_acs_flt/jbz504eoq/v$1/jbz504eoq_flt.fits'],
+            _list_rel_filepaths(self.base_directory))
