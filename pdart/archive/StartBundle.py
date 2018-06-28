@@ -14,10 +14,18 @@ from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
+    from typing import List
     from pdart.new_db.BundleDB import BundleDB
 
 _INITIAL_VID = VID('1.0')  # type: VID
 _INITIAL_VID_DIR = 'v$1.0'  # type: unicode
+
+
+def _create_lidvid_from_parts(parts):
+    # type: (List[str]) -> str
+    lid = LID.create_from_parts(parts)
+    lidvid = LIDVID.create_from_lid_and_vid(lid, _INITIAL_VID)
+    return str(lidvid)
 
 
 def _bundle_dir(bundle_id, archive_dir):
@@ -52,9 +60,9 @@ def create_bundle_db(bundle_id, archive_dir):
                                                         _BUNDLE_DB_NAME))
     db.create_tables()
 
-    bundle_lid = _bundle_lid(bundle_id)
-    bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, _INITIAL_VID)
-    db.create_bundle(str(bundle_lidvid))
+    bundle_name = 'hst_%05d' % bundle_id
+    bundle_lidvid = _create_lidvid_from_parts([bundle_name])
+    db.create_bundle(bundle_lidvid)
     return db
 
 
@@ -74,10 +82,7 @@ def copy_downloaded_files(bundle_db, bundle_id, download_root, archive_dir):
             depth = len(path)
             assert depth == 4, path
             bundle, _, _, hst_name = path
-
-            bundle_lid = LID.create_from_parts([bundle])
-            bundle_lidvid = str(LIDVID.create_from_lid_and_vid(bundle_lid,
-                                                               _INITIAL_VID))
+            bundle_lidvid = _create_lidvid_from_parts([bundle])
 
             product = hst_name.lower()
             for filename in filenames:
@@ -96,18 +101,15 @@ def copy_downloaded_files(bundle_db, bundle_id, download_root, archive_dir):
                 shutil.copy(old_path, new_path)
 
                 # create the collection database object if necessary
-                collection_lid = LID.create_from_parts([bundle, collection])
-                collection_lidvid = str(LIDVID.create_from_lid_and_vid(
-                    collection_lid,
-                    _INITIAL_VID))
+                collection_lidvid = _create_lidvid_from_parts([bundle,
+                                                               collection])
                 bundle_db.create_non_document_collection(collection_lidvid,
                                                          bundle_lidvid)
 
                 # create the product database object
-                product_lid = LID.create_from_parts([bundle,
-                                                     collection, product])
-                product_lidvid = str(LIDVID.create_from_lid_and_vid(
-                    product_lid, _INITIAL_VID))
+                product_lidvid = _create_lidvid_from_parts(
+                    [bundle, collection, product]
+                )
                 bundle_db.create_fits_product(product_lidvid,
                                               collection_lidvid)
 
