@@ -5,6 +5,7 @@ import unittest
 import fs.path
 
 from pdart.archive.StartBundle import *
+from pdart.archive.StartBundle import _INITIAL_VID
 
 
 def _path_to_testfiles():
@@ -32,6 +33,8 @@ class TestStartBundle(unittest.TestCase):
         shutil.rmtree(self.base_directory)
 
     def test_create_bundle_dir(self):
+        # type: () -> None
+
         # make one; test that it creates its directory
         bundle_dir = os.path.join(self.base_directory, 'hst_01234')
         self.assertFalse(os.path.isdir(bundle_dir))
@@ -62,6 +65,7 @@ class TestStartBundle(unittest.TestCase):
             create_bundle_dir(666, self.base_directory)
 
     def test_create_bundle_db(self):
+        # type: () -> None
         bundle_id = 12345
         create_bundle_dir(bundle_id, self.base_directory)
         db = create_bundle_db(bundle_id, self.base_directory)
@@ -77,24 +81,76 @@ class TestStartBundle(unittest.TestCase):
                 u'hst_12345/bundle$database.db'
             ], _list_rel_filepaths(self.base_directory))
 
-            # TODO Could check for creation of tables, though
-            # existence of the file shows that the file was written
-            # to.
+            bundle_lid = LID.create_from_parts(['hst_12345'])
+            bundle_lidvid = LIDVID.create_from_lid_and_vid(
+                bundle_lid,
+                _INITIAL_VID)
+            self.assertTrue(db.bundle_exists(str(bundle_lidvid)))
         finally:
             db.close()
 
     def test_copy_downloaded_files(self):
-        # (bundle_id, download_root, archive_dir):
+        # type: () -> None
         bundle_id = 13012
         create_bundle_dir(bundle_id, self.base_directory)
-        create_bundle_db(bundle_id, self.base_directory)
+        bundle_db = create_bundle_db(bundle_id, self.base_directory)
 
-        copy_downloaded_files(bundle_id, _path_to_testfiles(),
-                              self.base_directory)
-        self.assertEquals([
-            u'hst_13012/bundle$database.db',
-            u'hst_13012/data_acs_drz/jbz504010/v$1/jbz504011_drz.fits',
-            u'hst_13012/data_acs_drz/jbz504020/v$1/jbz504021_drz.fits',
-            u'hst_13012/data_acs_drz/jbz504eoq/v$1/jbz504eoq_drz.fits',
-            u'hst_13012/data_acs_flt/jbz504eoq/v$1/jbz504eoq_flt.fits'],
-            _list_rel_filepaths(self.base_directory))
+        try:
+            copy_downloaded_files(bundle_db, bundle_id,
+                                  _path_to_testfiles(), self.base_directory)
+
+            # Make sure the files arrived in the right places in the
+            # filesystem.
+            self.assertEquals([
+                u'hst_13012/bundle$database.db',
+                u'hst_13012/data_acs_drz/jbz504010/v$1.0/jbz504011_drz.fits',
+                u'hst_13012/data_acs_drz/jbz504020/v$1.0/jbz504021_drz.fits',
+                u'hst_13012/data_acs_drz/jbz504eoq/v$1.0/jbz504eoq_drz.fits',
+                u'hst_13012/data_acs_flt/jbz504eoq/v$1.0/jbz504eoq_flt.fits'],
+                _list_rel_filepaths(self.base_directory))
+
+            # Make sure the data ended up in the database.
+
+            # the bundle
+            bundle_lidvid = 'urn:nasa:pds:hst_13012::1.0'
+            self.assertTrue(bundle_db.bundle_exists(bundle_lidvid))
+
+            # the collections
+            collection_lidvids = [
+                'urn:nasa:pds:hst_13012:data_acs_drz::1.0',
+                'urn:nasa:pds:hst_13012:data_acs_flt::1.0']
+            for collection_lidvid in collection_lidvids:
+                self.assertTrue(bundle_db.non_document_collection_exists(
+                    collection_lidvid),
+                    msg=collection_lidvid)
+
+            # the products
+            product_lidvids = [
+                'urn:nasa:pds:hst_13012:data_acs_drz:jbz504010::1.0',
+                'urn:nasa:pds:hst_13012:data_acs_drz:jbz504020::1.0',
+                'urn:nasa:pds:hst_13012:data_acs_drz:jbz504eoq::1.0',
+                'urn:nasa:pds:hst_13012:data_acs_flt:jbz504eoq::1.0']
+            for product_lidvid in product_lidvids:
+                self.assertTrue(bundle_db.fits_product_exists(product_lidvid),
+                                msg=product_lidvid)
+
+            # the FITS files
+            for basename, product_lidvid in [
+                ('jbz504011_drz.fits',
+                 'urn:nasa:pds:hst_13012:data_acs_drz:jbz504010::1.0'),
+                ('jbz504021_drz.fits',
+                 'urn:nasa:pds:hst_13012:data_acs_drz:jbz504020::1.0'),
+                ('jbz504eoq_drz.fits',
+                 'urn:nasa:pds:hst_13012:data_acs_drz:jbz504eoq::1.0'),
+                ('jbz504eoq_flt.fits',
+                 'urn:nasa:pds:hst_13012:data_acs_flt:jbz504eoq::1.0')]:
+                self.assertTrue(bundle_db.fits_file_exists(basename,
+                                                           product_lidvid),
+                                msg=basename)
+                # assume that if the first HDU got in, they all did
+                self.assertTrue(bundle_db.hdu_exists(0,
+                                                     basename,
+                                                     product_lidvid),
+                                msg=basename)
+        finally:
+            bundle_db.close()

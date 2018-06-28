@@ -3,15 +3,33 @@ import os.path
 import shutil
 
 import fs.path
+from typing import TYPE_CHECKING
 
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
     create_bundle_db_from_os_filepath
+from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.pds4.HstFilename import HstFilename
+from pdart.pds4.LID import LID
+from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.VID import VID
+
+if TYPE_CHECKING:
+    from pdart.new_db.BundleDB import BundleDB
+
+_INITIAL_VID = VID('1.0')  # type: VID
+_INITIAL_VID_DIR = 'v$1.0'  # type: unicode
 
 
 def _bundle_dir(bundle_id, archive_dir):
+    # type: (int, unicode) -> unicode
     bundle_name = 'hst_%05d' % bundle_id
     return fs.path.join(archive_dir, bundle_name)
+
+
+def _bundle_lid(bundle_id):
+    # type: (int) -> LID
+    bundle_name = 'hst_%05d' % bundle_id
+    return LID.create_from_parts([bundle_name])
 
 
 def create_bundle_dir(bundle_id, archive_dir):
@@ -28,16 +46,20 @@ def create_bundle_dir(bundle_id, archive_dir):
 
 
 def create_bundle_db(bundle_id, archive_dir):
-    # type: (unicode) -> BundleDB
+    # type: (int, unicode) -> BundleDB
     bundle_dir = _bundle_dir(bundle_id, archive_dir)
     db = create_bundle_db_from_os_filepath(fs.path.join(bundle_dir,
                                                         _BUNDLE_DB_NAME))
     db.create_tables()
+
+    bundle_lid = _bundle_lid(bundle_id)
+    bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, _INITIAL_VID)
+    db.create_bundle(str(bundle_lidvid))
     return db
 
 
-def copy_downloaded_files(bundle_id, download_root, archive_dir):
-    # type: (int, unicode, unicode) -> None
+def copy_downloaded_files(bundle_db, bundle_id, download_root, archive_dir):
+    # type: (BundleDB, int, unicode, unicode) -> None
 
     def is_dot_file(filename):
         # type: (unicode) -> bool
@@ -51,19 +73,43 @@ def copy_downloaded_files(bundle_id, download_root, archive_dir):
             path = fs.path.iteratepath(rel_dirpath)
             depth = len(path)
             assert depth == 4, path
-            hst, _, _, hst_name = path
-            hst_name = hst_name.lower()
+            bundle, _, _, hst_name = path
+
+            bundle_lid = LID.create_from_parts([bundle])
+            bundle_lidvid = str(LIDVID.create_from_lid_and_vid(bundle_lid,
+                                                               _INITIAL_VID))
+
+            product = hst_name.lower()
             for filename in filenames:
                 _, ext = fs.path.splitext(filename)
                 assert ext == '.fits'
                 hst_filename = HstFilename(filename)
 
-                coll = 'data_%s_%s' % (hst_filename.instrument_name(),
-                                       hst_filename.suffix())
+                collection = 'data_%s_%s' % (hst_filename.instrument_name(),
+                                             hst_filename.suffix())
 
                 old_path = fs.path.join(dirpath, filename)
-                new_dirpath = fs.path.join(archive_dir, hst, coll,
-                                           hst_name, 'v$1')
+                new_dirpath = fs.path.join(archive_dir, bundle, collection,
+                                           product, _INITIAL_VID_DIR)
                 new_path = fs.path.join(new_dirpath, filename)
                 os.makedirs(new_dirpath)
                 shutil.copy(old_path, new_path)
+
+                # create the collection database object if necessary
+                collection_lid = LID.create_from_parts([bundle, collection])
+                collection_lidvid = str(LIDVID.create_from_lid_and_vid(
+                    collection_lid,
+                    _INITIAL_VID))
+                bundle_db.create_non_document_collection(collection_lidvid,
+                                                         bundle_lidvid)
+
+                # create the product database object
+                product_lid = LID.create_from_parts([bundle,
+                                                     collection, product])
+                product_lidvid = str(LIDVID.create_from_lid_and_vid(
+                    product_lid, _INITIAL_VID))
+                bundle_db.create_fits_product(product_lidvid,
+                                              collection_lidvid)
+
+                populate_database_from_fits_file(bundle_db, new_path,
+                                                 product_lidvid)
