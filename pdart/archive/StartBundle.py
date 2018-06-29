@@ -3,10 +3,9 @@ import os.path
 import shutil
 
 import fs.path
-from typing import TYPE_CHECKING
-
 import pdart.add_pds_tools
 import picmaker  # need to precede this with 'import pdart.add_pds_tools'
+from typing import TYPE_CHECKING
 
 from pdart.fs.DirUtils import lidvid_to_dir
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
@@ -174,3 +173,9 @@ def make_browse_collections(bundle_db, bundle_id, archive_dir):
                     bundle_db.create_browse_file(browse_basename,
                                                  str(browse_product_lidvid),
                                                  size)
+
+
+def make_document_collection(bundle_db, bundle_id):
+    # type: (BundleDB, int) -> None
+    # TODO mucho to do
+    pass

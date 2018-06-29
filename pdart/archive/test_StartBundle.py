@@ -200,3 +200,44 @@ class TestStartBundle(unittest.TestCase):
 
         finally:
             bundle_db.close()
+
+    @unittest.skip('unimplemented')
+    def test_make_document_collection(self):
+        bundle_id = 13012
+        create_bundle_dir(bundle_id, self.base_directory)
+        bundle_db = create_bundle_db(bundle_id, self.base_directory)
+        try:
+            copy_downloaded_files(bundle_db, bundle_id,
+                                  _path_to_testfiles(), self.base_directory)
+            make_browse_collections(bundle_db, bundle_id, self.base_directory)
+            make_document_collection(bundle_db, bundle_id)
+
+            # Make sure the files arrived in the right places in the
+            # filesystem.
+            self.assertEquals([
+                u'hst_13012/browse_acs_flt/' +
+                u'jbz504eoq/v$1.0/jbz504eoq_flt.jpg',
+                u'hst_13012/bundle$database.db',
+                u'hst_13012/data_acs_drz/jbz504010/v$1.0/jbz504011_drz.fits',
+                u'hst_13012/data_acs_drz/jbz504020/v$1.0/jbz504021_drz.fits',
+                u'hst_13012/data_acs_drz/jbz504eoq/v$1.0/jbz504eoq_drz.fits',
+                u'hst_13012/data_acs_flt/jbz504eoq/v$1.0/jbz504eoq_flt.fits',
+                u'hst_13012/document/v$1.0/something.txt'],
+                _list_rel_filepaths(self.base_directory))
+
+            # Make sure the data ended up in the database.
+
+            # the collection
+            collection_lidvid = 'urn:nasa:pds:hst_13012:document'
+            self.assertTrue(bundle_db.document_collection_exists(
+                collection_lidvid))
+
+            # the document files
+            files = []
+            for file in files:
+                # TODO I have no tests for files?  What does the
+                # label-making code do?
+                pass  # self.assertTrue(bundle_db.document_file_exists...)
+
+        finally:
+            bundle_db.close()
