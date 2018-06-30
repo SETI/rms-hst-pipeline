@@ -58,7 +58,7 @@ class FSDelta(object):
 class CopyOnWriteFS(FS):
     """
     Wraps a read-only filesystem and a read/write filesystem.  Any new
-    data goes into the read-only system.
+    data goes into the read/write system.
     """
 
     def __init__(self, base_fs, delta_fs=None):

@@ -6,6 +6,7 @@ import fs.path
 
 from pdart.archive.StartBundle import *
 from pdart.archive.StartBundle import _INITIAL_VID
+from pdart.pds4.LIDVID import LIDVID
 
 
 def _path_to_testfiles():
@@ -63,6 +64,23 @@ class TestStartBundle(unittest.TestCase):
         self.assertTrue(os.path.isfile(bundle_dir))
         with self.assertRaises(Exception):
             create_bundle_dir(666, self.base_directory)
+
+    def test_create_bundle_version_view(self):
+        # type: () -> None
+        bundle_view, bundle_db = \
+            create_bundle_version_view_and_db(13012,
+                                              self.base_directory)
+        try:
+            self.assertTrue(bundle_view)
+            self.assertTrue(bundle_db)
+            self.assertTrue(os.path.isdir(os.path.join(self.base_directory,
+                                                       'hst_13012')))
+            fs.osfs.OSFS(self.base_directory).tree()
+            self.assertEquals([u'hst_13012/bundle$database.db',
+                               u'hst_13012/v$1.0/subdir$versions.txt'],
+                              _list_rel_filepaths(self.base_directory))
+        finally:
+            bundle_db.close()
 
     def test_create_bundle_db(self):
         # type: () -> None

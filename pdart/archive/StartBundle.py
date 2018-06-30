@@ -2,12 +2,17 @@ import os
 import os.path
 import shutil
 
+import fs.osfs
 import fs.path
+import fs.tempfs
 import pdart.add_pds_tools
 import picmaker  # need to precede this with 'import pdart.add_pds_tools'
 from typing import TYPE_CHECKING
 
+from pdart.fs.CopyOnWriteFS import CopyOnWriteFS
 from pdart.fs.DirUtils import lidvid_to_dir
+from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
+from pdart.fs.VersionView import VersionView
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
     create_bundle_db_from_os_filepath
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
@@ -18,7 +23,7 @@ from pdart.pds4.VID import VID
 from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 if TYPE_CHECKING:
-    from typing import List
+    from typing import List, Tuple
     from pdart.new_db.BundleDB import BundleDB
 
 _INITIAL_VID = VID('1.0')  # type: VID
@@ -44,8 +49,23 @@ def _bundle_lid(bundle_id):
     return LID.create_from_parts([bundle_name])
 
 
+def create_bundle_version_view_and_db(bundle_id, archive_dir):
+    # type: (int, unicode) -> Tuple[CopyOnWriteFS, BundleDB]
+    '''Return a read/write view of a bundle version.'''
+    empty_fs = fs.tempfs.TempFS()
+    osfs = fs.osfs.OSFS(archive_dir)
+    cow = CopyOnWriteFS(empty_fs, osfs)
+    multiversion_fs = MultiversionBundleFS(cow)
+    bundle_name = 'hst_%05d' % bundle_id
+    bundle_lidvid = LIDVID(_create_lidvid_from_parts([bundle_name]))
+    multiversion_fs.make_lidvid_directories(bundle_lidvid)
+    view = VersionView(bundle_lidvid, multiversion_fs)
+    bundle_db = create_bundle_db(bundle_id, archive_dir)
+    return (view, bundle_db)
+
+
 def create_bundle_dir(bundle_id, archive_dir):
-    # type: (int, unicode) -> None
+    # type: (int, unicode) -> unicode
     bundle_dir = _bundle_dir(bundle_id, archive_dir)
     if os.path.isdir(bundle_dir):
         # handle "it already exists" case
@@ -55,6 +75,7 @@ def create_bundle_dir(bundle_id, archive_dir):
                         bundle_dir)
     else:
         os.mkdir(bundle_dir)
+    return bundle_dir
 
 
 def create_bundle_db(bundle_id, archive_dir):

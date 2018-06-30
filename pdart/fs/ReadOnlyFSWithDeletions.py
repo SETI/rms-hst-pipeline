@@ -28,6 +28,10 @@ class ReadOnlyFSWithDeletions(NarrowWrapFS):
         NarrowWrapFS.__init__(self, base_fs)
         self._deletion_set = deletion_set
 
+    def __str__(self):
+        return 'ReadOnlyFSWithDeletions(%s, %s)' % (self._wrap_fs,
+                                                    self._deletion_set)
+
     def getinfo(self, path, namespaces=None):
         self.check()
         if self._deletion_set.is_deleted(path):
