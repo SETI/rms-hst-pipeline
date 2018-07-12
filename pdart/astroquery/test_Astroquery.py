@@ -3,6 +3,7 @@ import unittest
 from pdart.astroquery.Astroquery import *
 
 
+@unittest.skip('really slow: investigate')
 class TestAstroquery(unittest.TestCase):
     def setUp(self):
         start_date = (1900, 1, 1)

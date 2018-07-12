@@ -3,7 +3,7 @@ import unittest
 from pdart.fs.DirUtils import *
 
 
-class test_DirUtils(unittest.TestCase):
+class Test_DirUtils(unittest.TestCase):
     def test_lid_to_dir(self):
         # type: () -> None
         self.assertEqual(u'/b', lid_to_dir(LID('urn:nasa:pds:b')))
