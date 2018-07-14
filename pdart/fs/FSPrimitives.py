@@ -1,9 +1,11 @@
 import abc
+import fs.errors
+import io
 
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
-    from typing import Any
+    pass
 
 
 class Node(object):
@@ -93,7 +95,7 @@ class FSPrimitives(object):
     def get_children(self, node):
         # type: (Node_) -> Dict[unicode, Node_]
         if self.is_file_prim(node):
-            raise Exception('foo')
+            raise fs.errors.DirectoryExpected(node.name)
         return self.get_dir_children(cast(Dir, node))
 
     @abc.abstractmethod
@@ -102,12 +104,12 @@ class FSPrimitives(object):
         pass
 
     def get_dir_child(self, parent_node, name):
-        return self.get_dir_children(parent_node)[name]
+        return self.get_children(parent_node)[name]
 
     def get_handle(self, node, mode):
-        # type: (Node_, str) -> Any
+        # type: (Node_, str) -> io.IOBase
         if self.is_dir_prim(node):
-            raise Exception('bar')
+            raise fs.errors.FileExpected(node.name)
         return self.get_file_handle(cast(File, node), mode)
 
     @abc.abstractmethod

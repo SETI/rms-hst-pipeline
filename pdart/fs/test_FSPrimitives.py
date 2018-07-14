@@ -3,6 +3,9 @@ import os.path
 import shutil
 import unittest
 
+from fs.test import FSTestCases
+
+from pdart.fs.FSPrimAdapter import FSPrimAdapter
 from pdart.fs.FSPrimitives import *
 
 if TYPE_CHECKING:
@@ -151,8 +154,11 @@ class OSFSPrimitives(FSPrimitives):
         return res
 
     def get_file_handle(self, node, mode):
-        # type: (File, str) -> Any
-        return open(node.name, mode)
+        # type: (File, str) -> io.IOBase
+        return cast(io.IOBase,
+                    io.open(node.name, fs.mode.Mode(mode).to_platform()))
+        # The cast is due to a bug in the mypy, testing, typeshed
+        # environment.
 
     def is_file_prim(self, node):
         # type: (Node_) -> bool
@@ -191,3 +197,19 @@ class Test_OSFSPrimitives(unittest.TestCase, FSPrimitives_TestBase):
     def tearDown(self):
         # type: () -> None
         shutil.rmtree(_TMP_DIR)
+
+
+class OSFSPrimAdapter(FSPrimAdapter):
+    def __init__(self, root_dir):
+        FSPrimAdapter.__init__(self, OSFSPrimitives(root_dir))
+
+
+@unittest.skip('work in progress')
+class Test_OSFSPrimAdapter(FSTestCases, unittest.TestCase):
+    def make_fs(self):
+        try:
+            os.mkdir(_TMP_DIR)
+        except OSError:
+            shutil.rmtree(_TMP_DIR)
+            os.mkdir(_TMP_DIR)
+        return OSFSPrimAdapter(_TMP_DIR)
