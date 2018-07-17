@@ -2,13 +2,19 @@ import fs.mode
 import fs.path
 from fs.base import FS
 from fs.info import Info
-from typing import TYPE_CHECKING
+from fs.enums import ResourceType
+from fs.error_tools import convert_os_errors
+import os
+import stat
+from typing import TYPE_CHECKING, cast
 
 from pdart.fs.FSPrimitives import FSPrimitives
 
 if TYPE_CHECKING:
-    from typing import Tuple
-    from pdart.fs.FSPrimitives import Node
+    from typing import Any, Text, Tuple, Union
+    from pdart.fs.FSPrimitives import Node_
+
+_WINDOWS_PLATFORM = False
 
 
 class FSPrimAdapter(FS):
@@ -17,28 +23,46 @@ class FSPrimAdapter(FS):
         FS.__init__(self)
         self.prims = fs_prims
 
+        _meta = self._meta = {
+            'case_insensitive': os.path.normcase('Aa') != 'aa',
+            'network': False,
+            'read_only': False,
+            'supports_rename': True,
+            'thread_safe': True,
+            'unicode_paths': False,
+            'virtual': False,
+            'invalid_path_chars': '\0'
+            }
+
     def getinfo(self, path, namespaces=None):
-        # type: (unicode, List[str]) -> Info
+        # type: (unicode, Any) -> Info
+
+        # The pyfilesystem2 documentation says namespaces should be a
+        # list of strings, but the test-suite has a case expecting it
+        # to succeed when it's a single string.  Geez.
+
+        # I REALLY REALLY hate untyped languages.
         self.check()
+        if not namespaces:
+            namespaces = ['basic']
+        if type(namespaces) is not list:
+            namespaces = [namespaces]
         node = self._resolve_path_to_node(path)
         assert node, path
         info = {}
         info['basic'] = {
-                'is_dir': self.prims.is_dir_prim(node),
-                'name': fs.path.basename(node.name)
+            'is_dir': self.prims.is_dir_prim(node),
+            'name': fs.path.basename(node.path)
             }
-        # info['details'] = {}
+        if 'details' in namespaces:
+            sys_path = self.getsyspath(path)
+            if sys_path:
+                with convert_os_errors('getinfo', path):
+                    _stat = os.stat(sys_path)
+                info['details'] = self._make_details_from_stat(_stat)
+            else:
+                info['details'] = self._make_default_details(node)
         return Info(info)
-
-#    def getsyspath(self, path):
-#        self.check()
-#        prims = self.prims
-#        node = self._resolve_path_to_node(path)
-#        if node:
-#            if prims.is_file():
-#                return node.name
-#            else:
-#                return None
 
     def listdir(self, path):
         self.check()
@@ -50,21 +74,36 @@ class FSPrimAdapter(FS):
             return list(prims.get_dir_children(node))
 
     def makedir(self, path, permissions=None, recreate=False):
-        # TODO What if it exists?
         self.check()
         parts = fs.path.iteratepath(path)
-        if parts:
-            parent_dir_node, name = self._resolve_path_to_parent_and_name(path)
-            child_dir = self.prims.add_child_dir(parent_dir_node, name)
-            return fs.subfs.SubFS(self, child_dir.name)
-        else:
+        if not parts:  # we're looking at the root
             if recreate:
-                return fs.subfs.SubFS(self, self.prims.root_node().name)
+                return fs.subfs.SubFS(self, self.prims.root_node().path)
             else:
                 raise fs.errors.DirectoryExists(path)
+        else:
+            prims = self.prims
+            parent_dir_node, name = self._resolve_path_to_parent_and_name(path)
+            try:
+                child = prims.get_dir_child(parent_dir_node, name)
+            except KeyError:
+                # it doesn't exist
+                child = prims.add_child_dir(parent_dir_node, name)
+                return fs.subfs.SubFS(self, child.path)
+            # it exists
+            if prims.is_file_prim(child):
+                # TODO This is wrong, but the pyfilesystem test suite
+                # asks for it...
+                raise fs.errors.DirectoryExists(path)
+            else:
+                if recreate:
+                    return fs.subfs.SubFS(self, child.path)
+                else:
+                    raise fs.errors.DirectoryExists(path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
         self.check()
+        self.validatepath(path)
         m = fs.mode.Mode(mode)
         m.validate_bin()
         prims = self.prims
@@ -72,14 +111,18 @@ class FSPrimAdapter(FS):
 
         if 't' in mode:
             raise ValueError('openbin() called with text mode %s', mode)
-        exists = name in prims.get_children(parent_dir_node)
+        exists = (prims.is_dir_prim(parent_dir_node) and
+                  name in prims.get_children(parent_dir_node))
         if exists:
-            file = prims.get_dir_child(parent_dir_node, name)
+            if m.exclusive:
+                raise fs.errors.FileExists(path)
+            else:
+                file = prims.get_dir_child(parent_dir_node, name)
         elif m.create:
             file = prims.add_child_file(parent_dir_node, name)
         else:
             raise fs.errors.ResourceNotFound(path)
-        return prims.get_handle(file, mode)
+        return prims.get_handle(file, m.to_platform())
 
     def remove(self, path):
         self.check()
@@ -117,12 +160,26 @@ class FSPrimAdapter(FS):
         self.check()
         # Check for errors.
         self._resolve_path_to_node(path)
-        # This is a no-op because the only info we use is 'basic' and
-        # that's read-only.
+        if 'details' in info:
+            sys_path = self.getsyspath(path)
+            if sys_path:
+                details = info['details']
+                if 'accessed' in details or 'modified' in details:
+                    _accessed = cast(int, details.get("accessed"))
+                    _modified = cast(int, details.get("modified",
+                                                      _accessed))
+                    accessed = int(_modified
+                                   if _accessed is None
+                                   else _accessed)
+                    modified = int(_modified)
+                    if accessed is not None or modified is not None:
+                        with convert_os_errors('setinfo', path):
+                            os.utime(sys_path, (accessed, modified))
+
         return None
 
     def _resolve_path_to_node(self, path):
-        # type: (unicode) -> Node
+        # type: (unicode) -> Node_
         prims = self.prims
         node = prims.root_node()
         try:
@@ -133,20 +190,80 @@ class FSPrimAdapter(FS):
             raise fs.errors.ResourceNotFound(path)
 
     def _resolve_path_to_parent_and_name(self, path):
-        # type: (unicode) -> Tuple[Node, unicode]
+        # type: (unicode) -> Tuple[Node_, unicode]
         prims = self.prims
         node = prims.root_node()
         parts = fs.path.iteratepath(path)
         try:
             for nm in parts[:-1]:
                 node = prims.get_dir_child(node, nm)
-        except KeyError:
+        except KeyError as e:
+            print 'e =', e
+            print 'nm =', repr(nm)
+            print ('prims.get_dir_children(%r) = %r' %
+                   (node, prims.get_dir_children(node)))
             raise fs.errors.ResourceNotFound(path)
         return (node, parts[-1])
 
-    def open(self, path, mode='r', buffering=-1,
-             encoding=None, errors=None, newline='', **options):
-        # The FS implementation seems to be wrong (?!).  I'm replacing
-        # it with something modelled off the OSFS implementation.
-        bin_mode = mode.replace('t', '')
-        return self.openbin(path, mode=bin_mode, buffering=buffering)
+    @classmethod
+    def _make_details_from_stat(cls, stat_result):
+        # type: (Any) -> Dict[str, Any]
+        """Make a *details* info dict from an `os.stat_result` object.
+        """
+        details = {
+            '_write': ['accessed', 'modified'],
+            'accessed': stat_result.st_atime,
+            'modified': stat_result.st_mtime,
+            'size': stat_result.st_size,
+            'type': int(cls._get_type_from_stat(stat_result))
+        }
+        # On other Unix systems (such as FreeBSD), the following
+        # attributes may be available (but may be only filled out if
+        # root tries to use them):
+        details['created'] = getattr(stat_result, 'st_birthtime', None)
+        ctime_key = (
+            'created'
+            if _WINDOWS_PLATFORM
+            else 'metadata_changed'
+        )
+        details[ctime_key] = stat_result.st_ctime
+        return details
+
+    def _make_default_details(self, node):
+        # type: (Node_) -> Dict[str, Any]
+        """Make a default *details* info dict"""
+        prims = self.prims
+        if prims.is_dir_prim(node):
+            resource_type = ResourceType.directory
+        elif prims.is_file_prim(node):
+            resource_type = ResourceType.file
+        else:
+            resource_type = ResourceType.unknown
+
+        details = {
+            'accessed': None,
+            'created': None,
+            'modified': None,
+            'size': 0,
+            'type': resource_type
+        }
+        return details
+
+    @classmethod
+    def _get_type_from_stat(cls, _stat):
+        # type: (Any) -> ResourceType
+        """Get the resource type from an `os.stat_result` object.
+        """
+        st_mode = _stat.st_mode
+        st_type = stat.S_IFMT(st_mode)
+        return cls.STAT_TO_RESOURCE_TYPE.get(st_type, ResourceType.unknown)
+
+    STAT_TO_RESOURCE_TYPE = {
+        stat.S_IFDIR: ResourceType.directory,
+        stat.S_IFCHR: ResourceType.character,
+        stat.S_IFBLK: ResourceType.block_special_file,
+        stat.S_IFREG: ResourceType.file,
+        stat.S_IFIFO: ResourceType.fifo,
+        stat.S_IFLNK: ResourceType.symlink,
+        stat.S_IFSOCK: ResourceType.socket
+    }

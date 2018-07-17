@@ -127,57 +127,74 @@ class OSFSPrimitives(FSPrimitives):
         FSPrimitives.__init__(self)
         self.root = root
 
-    def add_child_dir(self, parent_node, name):
-        # type: (Dir_, unicode) -> Dir_
-        path = os.path.join(parent_node.name, name)
-        os.mkdir(path)
-        return Dir(path)
+    def __str__(self):
+        return 'OSFSPrimitives(%r)' % self.root
 
-    def add_child_file(self, parent_node, name):
+    def __repr__(self):
+        return 'OSFSPrimitives(%r)' % self.root
+
+    def _to_sys_path(self, path):
+        # type: (unicode) -> unicode
+        path_part = path.lstrip('/')
+        return os.path.join(self.root, path_part)
+
+    def add_child_dir(self, parent_node, filename):
+        # type: (Dir_, unicode) -> Dir_
+        path = fs.path.join(parent_node.path, filename)
+        sys_path = self._to_sys_path(path)
+        os.mkdir(sys_path)
+        return Dir(self, path)
+
+    def add_child_file(self, parent_node, filename):
         # type: (Dir_, unicode) -> File_
-        path = os.path.join(parent_node.name, name)
-        with open(path, 'w'):
+        path = fs.path.join(parent_node.path, filename)
+        sys_path = self._to_sys_path(path)
+        with open(sys_path, 'w'):
             pass
-        return File(path)
+        return File(self, path)
 
     def get_dir_children(self, node):
         # type: (Dir_) -> Dict[unicode, Node_]
-        dir_path = node.name
+        dir_path = node.path
+        dir_sys_path = self._to_sys_path(dir_path)
         res = dict()
-        for name in os.listdir(dir_path):
-            child_path = os.path.join(dir_path, name)
+        for filename in os.listdir(dir_sys_path):
+            child_path = fs.path.join(dir_path, filename)
             if os.path.isfile(child_path):
-                child_node = File(child_path)  # type: Node
+                child_node = File(self, child_path)  # type: Node
             else:
-                child_node = Dir(child_path)
-            res[unicode(name)] = child_node
+                child_node = Dir(self, child_path)
+            res[unicode(filename)] = child_node
         return res
 
     def get_file_handle(self, node, mode):
         # type: (File, str) -> io.IOBase
+        sys_path = self._to_sys_path(node.path)
         return cast(io.IOBase,
-                    io.open(node.name, fs.mode.Mode(mode).to_platform()))
+                    io.open(sys_path, fs.mode.Mode(mode).to_platform_bin()))
         # The cast is due to a bug in the mypy, testing, typeshed
         # environment.
 
     def is_file_prim(self, node):
         # type: (Node_) -> bool
-        return os.path.isfile(node.name)
+        sys_path = self._to_sys_path(node.path)
+        return os.path.isfile(sys_path)
 
-    def remove_child(self, parent_node, name):
+    def remove_child(self, parent_node, filename):
         # type: (Dir_, unicode) -> None
-        child = self.get_dir_child(parent_node, name)
+        child = self.get_dir_child(parent_node, filename)
+        sys_path = self._to_sys_path(child.path)
         if self.is_file_prim(child):
-            os.remove(child.name)
+            os.remove(sys_path)
         else:
-            os.rmdir(child.name)
+            os.rmdir(sys_path)
 
     def root_node(self):
         # type: () -> Dir_
-        return Dir(self.root)
+        return Dir(self, u'/')
 
 
-_TMP_DIR = 'tmp_osfs_prims'
+_TMP_DIR = os.path.abspath('tmp_osfs_prims')
 
 
 class Test_OSFSPrimitives(unittest.TestCase, FSPrimitives_TestBase):
@@ -203,8 +220,10 @@ class OSFSPrimAdapter(FSPrimAdapter):
     def __init__(self, root_dir):
         FSPrimAdapter.__init__(self, OSFSPrimitives(root_dir))
 
+    def getsyspath(self, path):
+        return self.prims._to_sys_path(path)
 
-@unittest.skip('work in progress')
+
 class Test_OSFSPrimAdapter(FSTestCases, unittest.TestCase):
     def make_fs(self):
         try:

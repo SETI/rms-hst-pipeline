@@ -1,6 +1,7 @@
 import abc
 import fs.errors
 import io
+import unicodedata
 
 from typing import TYPE_CHECKING, cast
 
@@ -11,9 +12,10 @@ if TYPE_CHECKING:
 class Node(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, name):
-        # type: (unicode) -> None
-        self.name = name
+    def __init__(self, prims, path):
+        # type: (FSPrimitives, unicode) -> None
+        self.prims = prims
+        self.path = path
 
     @abc.abstractmethod
     def is_file(self):
@@ -25,27 +27,33 @@ class Node(object):
         return not self.is_file()
 
     def __eq__(self, rhs):
-        return self.name == rhs.name
+        return self.path == rhs.path
 
 
 class Dir(Node):
-    def __init__(self, name):
-        # type: (unicode) -> None
-        Node.__init__(self, name)
+    def __init__(self, prims, path):
+        # type: (FSPrimitives, unicode) -> None
+        Node.__init__(self, prims, path)
 
     def is_file(self):
         # type: () -> bool
         return False
 
+    def __repr__(self):
+        return 'Dir(%r, %r)' % (self.prims, self.path)
+
 
 class File(Node):
-    def __init__(self, name):
-        # type: (unicode) -> None
-        Node.__init__(self, name)
+    def __init__(self, prims, path):
+        # type: (FSPrimitives, unicode) -> None
+        Node.__init__(self, prims, path)
 
     def is_file(self):
         # type: () -> bool
         return True
+
+    def __repr__(self):
+        return 'File(%r, %r)' % (self.prims, self.path)
 
 
 if TYPE_CHECKING:
@@ -95,7 +103,7 @@ class FSPrimitives(object):
     def get_children(self, node):
         # type: (Node_) -> Dict[unicode, Node_]
         if self.is_file_prim(node):
-            raise fs.errors.DirectoryExpected(node.name)
+            raise fs.errors.DirectoryExpected(node.path)
         return self.get_dir_children(cast(Dir, node))
 
     @abc.abstractmethod
@@ -103,13 +111,14 @@ class FSPrimitives(object):
         # type: (Dir_) -> Dict[unicode, Node_]
         pass
 
-    def get_dir_child(self, parent_node, name):
-        return self.get_children(parent_node)[name]
+    def get_dir_child(self, parent_node, filename):
+        children = self.get_children(parent_node)
+        return children[filename]
 
     def get_handle(self, node, mode):
         # type: (Node_, str) -> io.IOBase
         if self.is_dir_prim(node):
-            raise fs.errors.FileExpected(node.name)
+            raise fs.errors.FileExpected(node.path)
         return self.get_file_handle(cast(File, node), mode)
 
     @abc.abstractmethod
@@ -118,16 +127,16 @@ class FSPrimitives(object):
         pass
 
     @abc.abstractmethod
-    def add_child_dir(self, parent_node, name):
+    def add_child_dir(self, parent_node, filename):
         # type: (Dir_, unicode) -> Dir_
         pass
 
     @abc.abstractmethod
-    def add_child_file(self, parent_node, name):
+    def add_child_file(self, parent_node, filename):
         # type: (Dir_, unicode) -> File_
         pass
 
     @abc.abstractmethod
-    def remove_child(self, parent_node, name):
+    def remove_child(self, parent_node, filename):
         # type: (Dir_, unicode) -> None
         pass
