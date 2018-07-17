@@ -30,23 +30,23 @@ class FSPrimitives_TestBase(object):
         # assert that the root exists...
         self.assertTrue(root)
         # ...and is a directory
-        self.assertTrue(fs.is_dir_prim(root))
+        self.assertTrue(fs.is_dir(root))
 
-    def test_is_dir_prim(self):
+    def test_is_dir(self):
         # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
-        self.assertTrue(fs.is_dir_prim(root))
+        self.assertTrue(fs.is_dir(root))
         file = fs.add_child_file(root, 'foo')
-        self.assertFalse(fs.is_dir_prim(file))
+        self.assertFalse(fs.is_dir(file))
 
-    def test_is_file_prim(self):
+    def test_is_file(self):
         # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
-        self.assertFalse(fs.is_file_prim(root))
+        self.assertFalse(fs.is_file(root))
         file = fs.add_child_file(root, 'foo')
-        self.assertTrue(fs.is_file_prim(file))
+        self.assertTrue(fs.is_file(file))
 
     def test_get_dir_children(self):
         # type: () -> None
@@ -70,7 +70,7 @@ class FSPrimitives_TestBase(object):
         root = fs.root_node()
         self.assertFalse(fs.get_children(root))
         dir = fs.add_child_dir(root, 'dir')
-        self.assertTrue(fs.is_dir_prim(dir))
+        self.assertTrue(fs.is_dir(dir))
         self.assertEqual(dir, fs.get_dir_child(root, 'dir'))
 
     def test_add_child_file(self):
@@ -78,7 +78,7 @@ class FSPrimitives_TestBase(object):
         root = fs.root_node()
         self.assertFalse(fs.get_children(root))
         file = fs.add_child_file(root, 'file')
-        self.assertTrue(fs.is_file_prim(file))
+        self.assertTrue(fs.is_file(file))
         self.assertEqual(file, fs.get_dir_child(root, 'file'))
 
     def test_remove_child(self):
@@ -175,7 +175,7 @@ class OSFSPrimitives(FSPrimitives):
         # The cast is due to a bug in the mypy, testing, typeshed
         # environment.
 
-    def is_file_prim(self, node):
+    def is_file(self, node):
         # type: (Node_) -> bool
         sys_path = self._to_sys_path(node.path)
         return os.path.isfile(sys_path)
@@ -184,7 +184,7 @@ class OSFSPrimitives(FSPrimitives):
         # type: (Dir_, unicode) -> None
         child = self.get_dir_child(parent_node, filename)
         sys_path = self._to_sys_path(child.path)
-        if self.is_file_prim(child):
+        if self.is_file(child):
             os.remove(sys_path)
         else:
             os.rmdir(sys_path)

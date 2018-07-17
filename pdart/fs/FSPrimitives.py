@@ -91,18 +91,18 @@ class FSPrimitives(object):
         # type: () -> Dir_
         pass
 
-    def is_dir_prim(self, node):
+    def is_dir(self, node):
         # type: (Node_) -> bool
-        return not self.is_file_prim(node)
+        return not self.is_file(node)
 
     @abc.abstractmethod
-    def is_file_prim(self, node):
+    def is_file(self, node):
         # type: (Node_) -> bool
         pass
 
     def get_children(self, node):
         # type: (Node_) -> Dict[unicode, Node_]
-        if self.is_file_prim(node):
+        if self.is_file(node):
             raise fs.errors.DirectoryExpected(node.path)
         return self.get_dir_children(cast(Dir, node))
 
@@ -117,7 +117,7 @@ class FSPrimitives(object):
 
     def get_handle(self, node, mode):
         # type: (Node_, str) -> io.IOBase
-        if self.is_dir_prim(node):
+        if self.is_dir(node):
             raise fs.errors.FileExpected(node.path)
         return self.get_file_handle(cast(File, node), mode)
 

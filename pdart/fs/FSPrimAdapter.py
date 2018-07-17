@@ -51,7 +51,7 @@ class FSPrimAdapter(FS):
         assert node, path
         info = {}
         info['basic'] = {
-            'is_dir': self.prims.is_dir_prim(node),
+            'is_dir': self.prims.is_dir(node),
             'name': fs.path.basename(node.path)
             }
         if 'details' in namespaces:
@@ -68,7 +68,7 @@ class FSPrimAdapter(FS):
         self.check()
         prims = self.prims
         node = self._resolve_path_to_node(path)
-        if prims.is_file_prim(node):
+        if prims.is_file(node):
             raise fs.errors.DirectoryExpected(path)
         else:
             return list(prims.get_dir_children(node))
@@ -91,7 +91,7 @@ class FSPrimAdapter(FS):
                 child = prims.add_child_dir(parent_dir_node, name)
                 return fs.subfs.SubFS(self, child.path)
             # it exists
-            if prims.is_file_prim(child):
+            if prims.is_file(child):
                 # TODO This is wrong, but the pyfilesystem test suite
                 # asks for it...
                 raise fs.errors.DirectoryExists(path)
@@ -111,7 +111,7 @@ class FSPrimAdapter(FS):
 
         if 't' in mode:
             raise ValueError('openbin() called with text mode %s', mode)
-        exists = (prims.is_dir_prim(parent_dir_node) and
+        exists = (prims.is_dir(parent_dir_node) and
                   name in prims.get_children(parent_dir_node))
         if exists:
             if m.exclusive:
@@ -132,7 +132,7 @@ class FSPrimAdapter(FS):
             dir = prims.get_dir_child(parent_dir_node, name)
         except KeyError:
             raise fs.errors.ResourceNotFound(path)
-        if prims.is_file_prim(dir):
+        if prims.is_file(dir):
             prims.remove_child(parent_dir_node, name)
         else:
             raise fs.errors.FileExpected(path)
@@ -148,7 +148,7 @@ class FSPrimAdapter(FS):
             dir = prims.get_dir_child(parent_dir_node, name)
         except KeyError:
             raise fs.errors.ResourceNotFound(path)
-        if prims.is_dir_prim(dir):
+        if prims.is_dir(dir):
             if prims.get_dir_children(dir):
                 raise fs.errors.DirectoryNotEmpty(path)
             else:
@@ -233,9 +233,9 @@ class FSPrimAdapter(FS):
         # type: (Node_) -> Dict[str, Any]
         """Make a default *details* info dict"""
         prims = self.prims
-        if prims.is_dir_prim(node):
+        if prims.is_dir(node):
             resource_type = ResourceType.directory
-        elif prims.is_file_prim(node):
+        elif prims.is_file(node):
             resource_type = ResourceType.file
         else:
             resource_type = ResourceType.unknown
