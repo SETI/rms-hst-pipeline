@@ -159,9 +159,8 @@ class V1Primitives(FSPrimitives):
 
     def too_deep(self, func, path):
         assert False, \
-            '%s(%r): directories in products not currently allowed' % (func, 
+            '%s(%r): directories in products not currently allowed' % (func,
                                                                        path)
-                       
 
     def is_file(self, node):
         # type: (Node_) -> bool
@@ -256,7 +255,7 @@ class V1Primitives(FSPrimitives):
             return cast(io.IOBase,
                         io.open(sys_path,
                                 fs.mode.Mode(mode).to_platform_bin()))
-        elif l in [2,3,4]:
+        elif l in [2, 3, 4]:
             sys_parts = [self.root] + parts[:-1] + [V1_0, parts[-1]]
             sys_path = fs.path.join(*sys_parts)
             return cast(io.IOBase,
@@ -293,7 +292,7 @@ class V1Primitives(FSPrimitives):
                 v1_sys_path = fs.path.join(self.root, path.lstrip('/'), V1_0)
                 osfs = OSFS(v1_sys_path)
                 d = read_subdir_versions_from_directory(osfs, u'/')
-                del d[filename]
+                del d[str(filename)]
                 write_subdir_versions_to_directory(osfs, u'/', d)
             os.rmdir(v1_path)
             os.rmdir(sys_path)
@@ -435,6 +434,7 @@ class Test_OSFSPrimAdapter(FSTestCases, unittest.TestCase):
             os.mkdir(_TMP_DIR)
         return OSFSPrimAdapter(_TMP_DIR)
 
+
 class V1PrimAdapter(FSPrimAdapter):
     def __init__(self, root_dir):
         FSPrimAdapter.__init__(self, V1Primitives(root_dir))
@@ -492,5 +492,3 @@ class Test_V1PrimAdapter(FSTestCases, unittest.TestCase):
         # Check moving a file
         with self.assertRaises(fs.errors.DirectoryExpected):
             self.fs.movedir(u'foo2/foofoo.txt', u'foo2/egg')
-
-
