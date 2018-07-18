@@ -1,9 +1,9 @@
-import fs.mode
-import fs.path
 from fs.base import FS
-from fs.info import Info
 from fs.enums import ResourceType
 from fs.error_tools import convert_os_errors
+from fs.info import Info
+import fs.mode
+import fs.path
 import os
 import stat
 from typing import TYPE_CHECKING, cast
