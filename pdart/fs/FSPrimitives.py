@@ -1,12 +1,10 @@
 import abc
-import fs.errors
-import io
-import unicodedata
 
+import fs.errors
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
-    pass
+    import io
 
 
 class Node(object):
