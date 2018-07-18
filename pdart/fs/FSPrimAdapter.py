@@ -27,7 +27,7 @@ class FSPrimAdapter(FS):
             'case_insensitive': os.path.normcase('Aa') != 'aa',
             'network': False,
             'read_only': False,
-            'supports_rename': True,
+            'supports_rename': False,
             'thread_safe': True,
             'unicode_paths': False,
             'virtual': False,
@@ -75,7 +75,7 @@ class FSPrimAdapter(FS):
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
-        parts = fs.path.iteratepath(path)
+        parts = fs.path.iteratepath(fs.path.abspath(path))
         if not parts:  # we're looking at the root
             if recreate:
                 return fs.subfs.SubFS(self, self.prims.root_node().path)

@@ -143,9 +143,25 @@ class V1Primitives(FSPrimitives):
     def __repr__(self):
         return 'V1Primitives(%r)' % self.root
 
+    def _to_sys_path(self, path):
+        # type: (unicode) -> unicode
+        file = File(self, path)
+        if self.is_file(file):
+            l, parts, path = self._do_path(file)
+            sys_path = fs.path.join(self.root, path.lstrip('/'))
+            return sys_path
+        else:
+            return None
+
     def root_node(self):
         # type: () -> Dir_
         return Dir(self, u'/')
+
+    def too_deep(self, func, path):
+        assert False, \
+            '%s(%r): directories in products not currently allowed' % (func, 
+                                                                       path)
+                       
 
     def is_file(self, node):
         # type: (Node_) -> bool
@@ -162,9 +178,7 @@ class V1Primitives(FSPrimitives):
         elif l is 4:
             return True
         else:  # l > 4:
-            assert False, ('is_file(%r): '
-                           'directories in products not current allowed' %
-                           path)
+            self.too_deep('is_file', path)
 
     def get_dir_children(self, node):
         # type: (Dir_) -> Dict[unicode, Node_]
@@ -190,12 +204,11 @@ class V1Primitives(FSPrimitives):
                     res[filename] = Dir(self, fs.path.join(path, filename))
             for filename in osfs.listdir(u'/'):
                 assert osfs.isfile(filename)
-                res[filename] = File(self, fs.path.join(path, filename))
+                if not filename == SUBDIR_VERSIONS_FILENAME:
+                    res[filename] = File(self, fs.path.join(path, filename))
             return res
         else:
-            assert False, ('get_dir_children(%r): '
-                           'directories in products not currently allowed' %
-                           fs.path.join(path, filename))
+            self.too_deep('get_dir_children(%r)', fs.path.join(path, filename))
 
     def add_child_dir(self, parent_node, filename):
         # type: (Dir_, unicode) -> Dir_
@@ -216,9 +229,7 @@ class V1Primitives(FSPrimitives):
                 write_subdir_versions_to_directory(OSFS(sys_path), u'/', {})
             return Dir(self, fs.path.join(path, filename))
         else:
-            assert False, ('add_child_dir(%r): '
-                           'directories in products not currently allowed' %
-                           fs.path.join(path, filename))
+            self.too_deep('add_child_dir', fs.path.join(path, filename))
 
     def add_child_file(self, parent_node, filename):
         # type: (Dir_, unicode) -> File_
@@ -229,9 +240,8 @@ class V1Primitives(FSPrimitives):
             sys_parts = [self.root] + parts + [V1_0, filename]
             sys_path = fs.path.join(*sys_parts)
         else:
-            assert False, ('add_child_file(%r): '
-                           'directories in products not currently allowed' %
-                           fs.path.join(path, filename))
+            self.too_deep('add_child_file', fs.path.join(path, filename))
+
         with open(sys_path, 'w'):
             pass
         return File(self, fs.path.join(path, filename))
@@ -242,7 +252,13 @@ class V1Primitives(FSPrimitives):
         if l is 0:
             assert False, "get_file_handle(u'/')"
         elif l is 1:
-            sys_path = fs.path.join(self.root, parts[0])
+            sys_path = fs.path.join(self.root, *parts)
+            return cast(io.IOBase,
+                        io.open(sys_path,
+                                fs.mode.Mode(mode).to_platform_bin()))
+        elif l in [2,3,4]:
+            sys_parts = [self.root] + parts[:-1] + [V1_0, parts[-1]]
+            sys_path = fs.path.join(*sys_parts)
             return cast(io.IOBase,
                         io.open(sys_path,
                                 fs.mode.Mode(mode).to_platform_bin()))
@@ -273,6 +289,12 @@ class V1Primitives(FSPrimitives):
                 assert os.path.exists(subdir_versions_path), \
                     subdir_versions_path
                 os.remove(subdir_versions_path)
+            if l in [1, 2]:
+                v1_sys_path = fs.path.join(self.root, path.lstrip('/'), V1_0)
+                osfs = OSFS(v1_sys_path)
+                d = read_subdir_versions_from_directory(osfs, u'/')
+                del d[filename]
+                write_subdir_versions_to_directory(osfs, u'/', d)
             os.rmdir(v1_path)
             os.rmdir(sys_path)
 
@@ -412,3 +434,63 @@ class Test_OSFSPrimAdapter(FSTestCases, unittest.TestCase):
             shutil.rmtree(_TMP_DIR)
             os.mkdir(_TMP_DIR)
         return OSFSPrimAdapter(_TMP_DIR)
+
+class V1PrimAdapter(FSPrimAdapter):
+    def __init__(self, root_dir):
+        FSPrimAdapter.__init__(self, V1Primitives(root_dir))
+
+    def getsyspath(self, path):
+        return self.prims._to_sys_path(path)
+
+
+class Test_V1PrimAdapter(FSTestCases, unittest.TestCase):
+    def make_fs(self):
+        try:
+            os.mkdir(_TMP_DIR)
+        except OSError:
+            shutil.rmtree(_TMP_DIR)
+            os.mkdir(_TMP_DIR)
+        return V1PrimAdapter(_TMP_DIR)
+
+    # We rewrite this test to use a shallower hierarchy.
+    def test_copydir(self):
+        self.fs.makedirs(u'foo/bar/egg')
+        self.fs.settext(u'foo/bar/foofoo.txt', u'Hello')
+        self.fs.makedir(u'foo2')
+        self.fs.copydir(u'foo/bar', u'foo2')
+        self.assert_text(u'foo2/foofoo.txt', u'Hello')
+        self.assert_isdir(u'foo2/egg')
+        self.assert_text(u'foo/bar/foofoo.txt', u'Hello')
+        self.assert_isdir(u'foo/bar/egg')
+
+        with self.assertRaises(fs.errors.ResourceNotFound):
+            self.fs.copydir(u'foo', u'foofoo')
+        with self.assertRaises(fs.errors.ResourceNotFound):
+            self.fs.copydir(u'spam', u'egg', create=True)
+        with self.assertRaises(fs.errors.DirectoryExpected):
+            self.fs.copydir(u'foo2/foofoo.txt', u'foofoo.txt', create=True)
+
+    # We rewrite this test to use a shallower hierarchy.
+    def test_movedir(self):
+        self.fs.makedirs(u'foo/bar/egg')
+        self.fs.settext(u'foo/bar/foofoo.txt', u'Hello')
+        self.fs.makedir(u'foo2')
+        self.fs.movedir(u'foo/bar', u'foo2')
+        self.assert_text(u'foo2/foofoo.txt', u'Hello')
+        self.assert_isdir(u'foo2/egg')
+        self.assert_not_exists(u'foo/bar/foofoo.txt')
+        self.assert_not_exists(u'foo/bar/egg')
+
+        # Check moving to an unexisting directory
+        with self.assertRaises(fs.errors.ResourceNotFound):
+            self.fs.movedir(u'foo', u'foofoo')
+
+        # Check moving an unexisting directory
+        with self.assertRaises(fs.errors.ResourceNotFound):
+            self.fs.movedir(u'spam', u'egg', create=True)
+
+        # Check moving a file
+        with self.assertRaises(fs.errors.DirectoryExpected):
+            self.fs.movedir(u'foo2/foofoo.txt', u'foo2/egg')
+
+
