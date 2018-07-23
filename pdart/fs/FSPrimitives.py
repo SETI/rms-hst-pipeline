@@ -121,7 +121,7 @@ class FSPrimitives(object):
 
     @abc.abstractmethod
     def get_file_handle(self, node, mode):
-        # type: (File, str) -> io.IOBase
+        # type: (File_, str) -> io.IOBase
         pass
 
     @abc.abstractmethod

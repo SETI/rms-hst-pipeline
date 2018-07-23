@@ -1,5 +1,6 @@
 import os.path
 import shutil
+import tempfile
 import unittest
 
 from fs.test import FSTestCases
@@ -7,36 +8,25 @@ from fs.test import FSTestCases
 from pdart.fs.V1FS import *
 from pdart.fs.test_FSPrimitives import FSPrimitives_TestBase
 
-_TMP_DIR = os.path.abspath('tmp_v1_prims')
-
 
 class Test_V1Primitives(unittest.TestCase, FSPrimitives_TestBase):
     def setUp(self):
         # type: () -> None
-        try:
-            os.mkdir(_TMP_DIR)
-        except OSError:
-            shutil.rmtree(_TMP_DIR)
-            os.mkdir(_TMP_DIR)
-
-        self.fs = V1Primitives(_TMP_DIR)
+        self.tmpdir = tempfile.mkdtemp()
+        self.fs = V1Primitives(self.tmpdir)
 
     def get_fs(self):
         return self.fs
 
     def tearDown(self):
         # type: () -> None
-        shutil.rmtree(_TMP_DIR)
+        shutil.rmtree(self.tmpdir)
 
 
 class Test_V1FS(FSTestCases, unittest.TestCase):
     def make_fs(self):
-        try:
-            os.mkdir(_TMP_DIR)
-        except OSError:
-            shutil.rmtree(_TMP_DIR)
-            os.mkdir(_TMP_DIR)
-        return V1FS(_TMP_DIR)
+        self.tmpdir = tempfile.mkdtemp()
+        return V1FS(self.tmpdir)
 
     # We rewrite this test to use a shallower hierarchy.
     def test_copydir(self):

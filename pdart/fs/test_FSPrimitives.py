@@ -2,6 +2,7 @@ import io
 import os
 import os.path
 import shutil
+import tempfile
 import unittest
 
 import fs.path
@@ -204,20 +205,15 @@ _TMP_DIR = os.path.abspath('tmp_osfs_prims')
 class Test_OSFSPrimitives(unittest.TestCase, FSPrimitives_TestBase):
     def setUp(self):
         # type: () -> None
-        try:
-            os.mkdir(_TMP_DIR)
-        except OSError:
-            shutil.rmtree(_TMP_DIR)
-            os.mkdir(_TMP_DIR)
-
-        self.fs = OSFSPrimitives(_TMP_DIR)
+        self.tmpdir = tempfile.mkdtemp()
+        self.fs = OSFSPrimitives(self.tmpdir)
 
     def get_fs(self):
         return self.fs
 
     def tearDown(self):
         # type: () -> None
-        shutil.rmtree(_TMP_DIR)
+        shutil.rmtree(self.tmpdir)
 
 
 class OSFSPrimAdapter(FSPrimAdapter):
@@ -230,9 +226,5 @@ class OSFSPrimAdapter(FSPrimAdapter):
 
 class Test_OSFSPrimAdapter(FSTestCases, unittest.TestCase):
     def make_fs(self):
-        try:
-            os.mkdir(_TMP_DIR)
-        except OSError:
-            shutil.rmtree(_TMP_DIR)
-            os.mkdir(_TMP_DIR)
-        return OSFSPrimAdapter(_TMP_DIR)
+        self.tmpdir = tempfile.mkdtemp()
+        return OSFSPrimAdapter(self.tmpdir)
