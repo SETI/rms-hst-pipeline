@@ -34,6 +34,8 @@ class FSPrimitives_TestBase(object):
         self.assertTrue(root)
         # ...and is a directory
         self.assertTrue(fs.is_dir(root))
+        # ...and has the right path
+        self.assertEqual(u'/', root.path)
 
     def test_is_dir(self):
         # type: () -> None
@@ -62,6 +64,7 @@ class FSPrimitives_TestBase(object):
         self.assertEqual(expected, fs.get_dir_children(root))
 
     def test_get_file_handle(self):
+        # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
         self.assertFalse(fs.get_children(root))
@@ -69,35 +72,95 @@ class FSPrimitives_TestBase(object):
         self.assertTrue(fs.get_file_handle(file_node, 'w'))
 
     def test_add_child_dir(self):
+        # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
         self.assertFalse(fs.get_children(root))
-        dir = fs.add_child_dir(root, 'dir')
-        self.assertTrue(fs.is_dir(dir))
-        self.assertEqual(dir, fs.get_dir_child(root, 'dir'))
-        self.assertEqual('/dir', dir.path)
+        self._assert_add_child_dir_is_correct(root, 'dir')
+
+    def _assert_add_child_dir_is_correct(self, dir, child_name):
+        # type: (Dir_, unicode) -> Dir_
+        """
+        Check that the primitive action of add_child_dir() does the
+        right things.
+        """
+        old_children = self.get_fs().get_children(dir)
+        child_dir = self.get_fs().add_child_dir(dir, child_name)
+        # the result exists
+        self.assertTrue(child_dir)
+        # the result is a directory
+        self.assertTrue(self.get_fs().is_dir(child_dir))
+        # the result is in the parent's directory
+        self.assertEqual(child_dir,
+                         self.get_fs().get_dir_child(dir, child_name))
+        # the result has the right path
+        self.assertEqual(child_dir.path, fs.path.join(dir.path, child_name))
+        # assert the children changed, and differ only by the new entry
+        new_children = self.get_fs().get_children(dir)
+        self.assertEqual(new_children[child_name], child_dir)
+        del new_children[child_name]
+        self.assertEqual(old_children, new_children)
+        return child_dir
 
     def test_add_child_file(self):
+        # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
         self.assertFalse(fs.get_children(root))
-        file = fs.add_child_file(root, 'file')
+        self._assert_add_child_file_is_correct(root, 'file')
+        file = fs.get_dir_child(root, 'file')
         self.assertTrue(fs.is_file(file))
         self.assertEqual(file, fs.get_dir_child(root, 'file'))
         self.assertEqual('/file', file.path)
 
+    def _assert_add_child_file_is_correct(self, dir, child_name):
+        # type: (Dir_, unicode) -> File_
+        """
+        Check that the primitive action of add_child_file() does the
+        right things.
+        """
+        old_children = self.get_fs().get_children(dir)
+        child_file = self.get_fs().add_child_file(dir, child_name)
+        # the result exists
+        self.assertTrue(child_file)
+        # the result is a file
+        self.assertTrue(self.get_fs().is_file(child_file))
+        # the result is in the parent's directory
+        self.assertEqual(child_file,
+                         self.get_fs().get_dir_child(dir, child_name))
+        # the result has the right path
+        self.assertEqual(child_file.path, fs.path.join(dir.path, child_name))
+        # assert the children changed, and differ only by the new entry
+        new_children = self.get_fs().get_children(dir)
+        self.assertEqual(new_children[child_name], child_file)
+        del new_children[child_name]
+        self.assertEqual(old_children, new_children)
+        return child_file
+
     def test_remove_child(self):
+        # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
         dir = fs.add_child_dir(root, 'dir')
         file = fs.add_child_file(root, 'file')
-        self.assertEqual({'dir': dir, 'file': file},
-                         fs.get_dir_children(root))
-        fs.remove_child(root, 'dir')
-        self.assertEqual({'file': file},
-                         fs.get_dir_children(root))
-        fs.remove_child(root, 'file')
-        self.assertFalse(fs.get_dir_children(root))
+        self._assert_remove_child_is_correct(root, 'dir')
+        self._assert_remove_child_is_correct(root, 'file')
+
+    def _assert_remove_child_is_correct(self, dir, child_name):
+        # type: (Dir_, unicode) -> None
+        """
+        Check that the primitive action of remove_child() does the
+        right things.
+        """
+        fs = self.get_fs()
+        old_children = fs.get_children(dir)
+        old_child = fs.get_dir_child(dir, child_name)
+        fs.remove_child(dir, child_name)
+        # assert the children changed, and differ only by the entry
+        new_children = fs.get_children(dir)
+        self.assertTrue(child_name not in new_children)
+        del old_children[child_name]
+        self.assertEqual(old_children, new_children)
 
     # The following are defined as abstract.  Their implementations
     # come from mixing with unittest.TestCase.  I can't inherit from
