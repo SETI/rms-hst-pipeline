@@ -7,7 +7,6 @@ from pdart.fs.DeliverableFS import *
 from pdart.fs.test_FSPrimitives import FSPrimitives_TestBase
 
 
-# @unittest.skip('')
 class Test_DeliverablePrimitives(unittest.TestCase, FSPrimitives_TestBase):
     def setUp(self):
         # type: () -> None
@@ -134,7 +133,6 @@ class Test_DeliverablePrimitives(unittest.TestCase, FSPrimitives_TestBase):
         self._assert_remove_child_is_correct(root, 'b')
 
 
-@unittest.skip('')
 class Test_DeliverableFS(FSTestCases, unittest.TestCase):
     def make_fs(self):
         return DeliverableFS(TempFS())

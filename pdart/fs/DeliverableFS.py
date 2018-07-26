@@ -325,7 +325,6 @@ class DeliverablePrimitives(FSPrimitives):
 
     def _to_sys_path(self, path):
         # type: (unicode) -> unicode
-        assert False, 'DeliverablePrimitives._to_sys_path: unimplemented'
         base_path = _translate_path(path, _IS_FILE)
         return self.base_fs.getsyspath(base_path)
 
