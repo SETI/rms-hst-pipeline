@@ -29,15 +29,6 @@ def _visit_of(filename):
         return None
 
 
-def _old_visit_of(filename):
-    # type: (unicode) -> unicode
-    try:
-        hf = HstFilename(filename)
-        return 'visit_' + hf.visit()
-    except AssertionError:
-        return filename
-
-
 def _union_dicts(a, b, c):
     res = {}
     res.update(a)
@@ -50,8 +41,14 @@ _IS_DIR = False  # type: bool
 _IS_FILE = True  # type: bool
 
 
-def _translate_path(path, is_file=None):
+def _translate_path_to_base_path(path, is_file_hint=None):
     # type: (unicode, bool) -> unicode
+    """
+    Translates a LID-based path to a human-preferred DeliverableFS
+    path.  For instance:
+    <bundle>/<collection>/<product>/<product_file> gets translated to
+    <bundle>/<collection>/<visit>/<product_file>.
+    """
     parts = fs.path.iteratepath(path)
     l_ = len(parts)
     if l_ in [0, 1, 2]:
@@ -59,9 +56,9 @@ def _translate_path(path, is_file=None):
     elif l_ is 3:
         # There are three cases.  First, are we looking at a file or a
         # directory?
-        if is_file is None:
-            is_file = '.' in parts[2]
-        if is_file:
+        if is_file_hint is None:
+            is_file_hint = '.' in parts[2]
+        if is_file_hint:
             # It's fine as is.
             return path
         else:
@@ -92,41 +89,15 @@ def _translate_path(path, is_file=None):
             return fs.path.join(*new_parts)
 
 
-def _old_translate_path(path, is_file=None):
-    # type: (unicode, bool) -> unicode
-    parts = fs.path.iteratepath(path)
-    l_ = len(parts)
-    if l_ in [0, 1, 2]:
-        return path
-    elif l_ is 3:
-        b, c, pf = parts
-        if is_file is None:
-            is_file = '.' in pf
-        if is_file:
-            # assume it's a file
-            return fs.path.join(b, c, pf)
-        else:
-            # assume it's a dir; here, a product name
-            v = _old_visit_of(pf)
-            return fs.path.join(b, c, v)
-    elif l_ is 4:
-        b, c, p, f = parts
-        v = _old_visit_of(f)
-        if v == f:
-            return fs.path.join(b, c, p, f)
-        else:
-            return fs.path.join(b, c, v, f)
-    else:
-        assert False, ('_translate_path(%r) not implemented (too long)' %
-                       path)
-
-
 class DeliverablePrimitives(FSPrimitives):
     """
-    Maps a filesystem organized by LIDs (not LIDVIDs; it's a single
-    version) into a filesystem organized according to what users want.
+    This is a filesystem adapter.  Its interface is LID-based; the
+    backing storage is in a human-readable hierarchy which dumps all
+    product files into common visit directories under the collection.
 
-    /<bundle>/<collection>/visit_<visit_number>/filename
+    From the outside you see
+    <bundle>/<collection>/<product>/<product_file> but the base
+    filesystem stores <bundle>/<collection>/<visit>/<product_file>.
     """
 
     def __init__(self, base_fs):
@@ -159,7 +130,7 @@ class DeliverablePrimitives(FSPrimitives):
     def add_child_dir(self, parent_node, filename):
         # type: (Dir_, unicode) -> Dir_
         path = fs.path.join(parent_node.path, filename)
-        base_path = _translate_path(path, _IS_DIR)
+        base_path = _translate_path_to_base_path(path, _IS_DIR)
         if not self.base_fs.exists(base_path):
             # You might have to insert a dir like _NO_VISIT, so we use
             # makedirs() instead of makedir().
@@ -174,7 +145,7 @@ class DeliverablePrimitives(FSPrimitives):
     def add_child_file(self, parent_node, filename):
         # type: (Dir_, unicode) -> File_
         path = fs.path.join(parent_node.path, filename)
-        base_path = _translate_path(path, _IS_FILE)
+        base_path = _translate_path_to_base_path(path, _IS_FILE)
         self.base_fs.touch(base_path)
         return File(self, path)
 
@@ -241,7 +212,7 @@ class DeliverablePrimitives(FSPrimitives):
         path = node.path
         path_parts = list(fs.path.iteratepath(path))
         l_ = len(path_parts)
-        base_path = _translate_path(path, _IS_DIR)
+        base_path = _translate_path_to_base_path(path, _IS_DIR)
         if l_ not in [2, 3]:
             for filename in self.base_fs.listdir(base_path):
                 child_path = fs.path.join(path, filename)
@@ -276,12 +247,12 @@ class DeliverablePrimitives(FSPrimitives):
 
     def get_file_handle(self, node, mode):
         # type: (File_, str) -> io.IOBase
-        base_path = _translate_path(node.path, _IS_FILE)
+        base_path = _translate_path_to_base_path(node.path, _IS_FILE)
         return self.base_fs.openbin(base_path, mode)
 
     def is_file(self, node):
         # type: (Node_) -> bool
-        base_path = _translate_path(node.path, _IS_FILE)
+        base_path = _translate_path_to_base_path(node.path, _IS_FILE)
         return self.base_fs.isfile(base_path)
 
     def _remove_no_visit_dir_if_empty(self, path):
@@ -304,16 +275,16 @@ class DeliverablePrimitives(FSPrimitives):
                 self._rm_implicit_dir(path)
             else:
                 # it's just a /b/c/p
-                base_path = _translate_path(path, _IS_FILE)
+                base_path = _translate_path_to_base_path(path, _IS_FILE)
                 if base_fs.isfile(base_path):
                     base_fs.remove(base_path)
                 else:
                     # it's a non-PDS4 directory
-                    base_path = _translate_path(path, _IS_DIR)
+                    base_path = _translate_path_to_base_path(path, _IS_DIR)
                     base_fs.removedir(base_path)
                     self._remove_no_visit_dir_if_empty(parent_node.path)
         else:
-            base_path = _translate_path(path, _IS_FILE)
+            base_path = _translate_path_to_base_path(path, _IS_FILE)
             if base_fs.isfile(base_path):
                 base_fs.remove(base_path)
             else:
@@ -325,7 +296,7 @@ class DeliverablePrimitives(FSPrimitives):
 
     def _to_sys_path(self, path):
         # type: (unicode) -> unicode
-        base_path = _translate_path(path, _IS_FILE)
+        base_path = _translate_path_to_base_path(path, _IS_FILE)
         return self.base_fs.getsyspath(base_path)
 
 
