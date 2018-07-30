@@ -15,7 +15,9 @@ instruments.  These are the first letters of their 'obs_id's.
 """
 
 _ACCEPTED_SUFFIXES = [
-    'C0F', 'C1F', 'C3F', 'CRJ', 'D0F', 'DRZ', 'FLT', 'RAW'
+    'A1F', 'A2F', 'A3F', 'ASC', 'ASN', 'C0F', 'C1F', 'C2F', 'C3F', 'CAL',
+    'CLB', 'CLF', 'CORRTAG', 'CQF', 'CRJ', 'D0F', 'DRC', 'DRZ', 'FLC', 'FLT',
+    'FLTSUM', 'MOS', 'RAW', 'SX2', 'SXL', 'X1D', 'X1DSUM', 'X2D'
 ]  # type: List[str]
 """
 For now, we limit the types of the products to those with these
@@ -125,6 +127,7 @@ class MastSlice(object):
         # type: (Table, unicode) -> None
         if len(products_table) > 0:
             Observations.download_products(products_table,
+                                           mrp_only=False,
                                            download_dir=download_dir)
 
     def download_products_by_id(self, proposal_id, download_dir):
