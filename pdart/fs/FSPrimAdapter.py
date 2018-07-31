@@ -4,6 +4,7 @@ from fs.error_tools import convert_os_errors
 from fs.info import Info
 import fs.mode
 import fs.path
+import fs.subfs
 import os
 import stat
 from typing import TYPE_CHECKING, cast

@@ -22,7 +22,7 @@ class TestUtils(unittest.TestCase):
         # I'm using MastSlice to get a table, but it would probably be
         # better to hand-construct one.
         from pdart.astroquery.Astroquery import MastSlice
-        start_date = (1900, 1, 1)
+        start_date = (2018, 1, 1)
         end_date = (2018, 3, 26)
         slice = MastSlice(start_date, end_date)
         proposal_id = int(slice.observations_table[0]['proposal_id'])

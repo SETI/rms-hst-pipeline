@@ -13,6 +13,13 @@ _V1_0 = u'v$1.0'
 
 
 class V1Primitives(FSPrimitives):
+    """
+    A primitives wrapper around an OS directory.  Write to the wrapper
+    as if you're writing a LID-based hierarchy (i.e.,
+    /<bundle>/<collection>/<product>/<product-files>), and it will
+    appear in the OS directory as a LIDVID-based hierarchy with all
+    written files at version 1.0.
+    """
     def __init__(self, root):
         # type: (unicode) -> None
         FSPrimitives.__init__(self)
@@ -185,6 +192,13 @@ class V1Primitives(FSPrimitives):
 
 
 class V1FS(FSPrimAdapter):
+    """
+    A pyfilesystems wrapper around an OS directory.  Write to the
+    wrapper as if you're writing a LID-based hierarchy (i.e.,
+    /<bundle>/<collection>/<product>/<product-files>), and it will
+    appear in the OS directory as a LIDVID-based hierarchy with all
+    written files at version 1.0.
+    """
     def __init__(self, root_dir):
         FSPrimAdapter.__init__(self, V1Primitives(root_dir))
 
