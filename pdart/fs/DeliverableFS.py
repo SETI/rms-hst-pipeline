@@ -104,19 +104,20 @@ class DeliverablePrimitives(FSPrimitives):
         # type: (FS) -> None
         FSPrimitives.__init__(self)
         self.base_fs = base_fs
-        self.implicit_dirs = {}  # type: Dict[unicode, unicode]
+        self._product_dirs = {}  # type: Dict[unicode, unicode]
 
-    def _add_implicit_dir(self, path, base_path):
+    def _add_product_dir(self, path, base_path):
         # type: (unicode, unicode) -> None
-        self.implicit_dirs[path] = base_path
+        assert len(fs.path.iteratepath(path)) == 3
+        self._product_dirs[path] = base_path
 
-    def _rm_implicit_dir(self, path):
+    def _rm_product_dir(self, path):
         # type: (unicode) -> None
-        base_path = self.implicit_dirs[path]
-        del self.implicit_dirs[path]
+        base_path = self._product_dirs[path]
+        del self._product_dirs[path]
         # If there are no more in the visit dir, remove the visit dir
         # in the base_fs
-        if base_path not in self.implicit_dirs:
+        if base_path not in self._product_dirs:
             self.base_fs.removedir(base_path)
 
     def __str__(self):
@@ -138,7 +139,7 @@ class DeliverablePrimitives(FSPrimitives):
 
         path_parts = list(fs.path.iteratepath(path))
         if len(path_parts) == 3 and _visit_of(path_parts[2]):
-            self._add_implicit_dir(path, base_path)
+            self._add_product_dir(path, base_path)
 
         return Dir(self, path)
 
@@ -149,37 +150,59 @@ class DeliverablePrimitives(FSPrimitives):
         self.base_fs.touch(base_path)
         return File(self, path)
 
+    def _info_to_node(self, parent_dir_path,  info):
+        # type: (unicode, Info) -> Node_
+        filepath = fs.path.join(parent_dir_path, info.name)
+        if info.is_file:
+            return File(self, filepath)
+        else:
+            return Dir(self, filepath)
+
     def _file_contents(self, path):
         # type: (unicode) -> Dict[unicode, Node_]
-        return {info.name: File(self, fs.path.join(path, info.name))
+        """
+        Return the contents of the path that are files.  This is only
+        called when the path has two parts, so the path is also the
+        basepath.
+        """
+        assert len(fs.path.iteratepath(path)) == 2
+        return {info.name: self._info_to_node(path, info)
                 for info
                 in self.base_fs.scandir(path, namespaces=['basic'])
                 if info.is_file}
 
     def _visit_contents(self, path):
         # type: (unicode) -> Dict[unicode, Node_]
+        """
+        Return the contents of the path that are product directories.
+        This is only called when the path has two parts, so the path
+        is also the basepath.
+        """
+        # TODO This has a bug.
+        assert len(fs.path.iteratepath(path)) == 2
         res = {}  # type: Dict[unicode, Node_]
-        for dir in self.implicit_dirs:
-            basename = fs.path.basename(dir)
-            dir_path = fs.path.join(path, basename)
-            res[unicode(basename)] = Dir(self, dir_path)
+        for dir in self._product_dirs:
+            if fs.path.isbase(dir, path):
+                # That's the right param order. The docs are currently
+                # wrong.
+                basename = fs.path.basename(dir)
+                dir_path = fs.path.join(path, basename)
+                res[unicode(basename)] = Dir(self, dir_path)
         return res
 
     def _no_visit_contents(self, path):
         # type: (unicode) -> Dict[unicode, Node_]
+        """
+        Return the contents of the path that are directories but not
+        product directories.  This is only called when the path has
+        two parts, so the path is also the basepath.
+        """
+        assert len(fs.path.iteratepath(path)) == 2
         new_path = fs.path.join(path, _NO_VISIT)
         if not self.base_fs.isdir(new_path):
             return {}
 
-        def info_to_node(info):
-            # type: (Info) -> Node_
-            filepath = fs.path.join(path, info.name)
-            if info.is_file:
-                return File(self, filepath)
-            else:
-                return Dir(self, filepath)
-
-        return {info.name: info_to_node(info)
+        return {info.name: self._info_to_node(path, info)
                 for info
                 in self.base_fs.scandir(new_path, namespaces=['basic'])}
 
@@ -191,18 +214,10 @@ class DeliverablePrimitives(FSPrimitives):
         base_dir_to_list = fs.path.join(b, c, visit_dir_name)
         res = {}
 
-        def info_to_node(info):
-            # type: (Info) -> Node_
-            filepath = fs.path.join(path, info.name)
-            if info.is_file:
-                return File(self, filepath)
-            else:
-                return Dir(self, filepath)
-
         for info in self.base_fs.scandir(base_dir_to_list):
             filename = info.name
             if filename[:9] == product_dir_name:
-                res[unicode(filename)] = info_to_node(info)
+                res[unicode(filename)] = self._info_to_node(path, info)
 
         return res
 
@@ -272,7 +287,7 @@ class DeliverablePrimitives(FSPrimitives):
         if l_ is 3:
             if _visit_of(parts[2]):
                 # it's of the form /bundle/collection/product
-                self._rm_implicit_dir(path)
+                self._rm_product_dir(path)
             else:
                 # it's just a /b/c/p
                 base_path = _translate_path_to_base_path(path, _IS_FILE)
