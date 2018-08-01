@@ -26,6 +26,7 @@ def _list_rel_filepaths(root_dir):
     return sorted(_list_rel_filepaths_gen())
 
 
+@unittest.skip('obsolete')
 class TestStartBundle(unittest.TestCase):
     def setUp(self):
         self.base_directory = tempfile.mkdtemp()
