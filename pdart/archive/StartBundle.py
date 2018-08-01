@@ -192,11 +192,11 @@ def create_browse_products(bundle_id, bundle_db, archive_dir):
                 browse_sys_filepath = fs.path.join(
                     browse_product_sys_dirpath, browse_basename)
                 size = os.stat(browse_sys_filepath).st_size
+
+                # create browse file record in the database
                 bundle_db.create_browse_file(browse_basename,
                                              browse_product_lidvid,
                                              size)
-                # create browse file record in the database
-                # TODO
 
 
 def start_bundle(src_dir, archive_dir):
@@ -208,4 +208,4 @@ def start_bundle(src_dir, archive_dir):
     bundle_db = create_bundle_db(bundle_id, archive_dir)
     populate_database(bundle_id, bundle_db, archive_dir)
     create_browse_products(bundle_id, bundle_db, archive_dir)
-    # TODO: more to do
+    # TODO: more to do.  Make document collections, at least.

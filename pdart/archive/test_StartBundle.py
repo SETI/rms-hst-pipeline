@@ -113,16 +113,26 @@ class TestStartBundle(unittest.TestCase):
         try:
             populate_database(13012, db, self.archive_dir)
             create_browse_products(13012, db, self.archive_dir)
-            # TODO This is a wimpy test: I just test that the
-            # browse_product was created in the database and that its
-            # directory was created in the filesystem.  From that I
-            # assume all is well.  I need to check more.
 
-            # Check that they exist in the database
+            # Check that the browse collection, product, and file
+            # exist in the database.
             parts = ['hst_13012', 'browse_acs_flt', 'jbz504ejq']
+            browse_file_basename = u'jbz504ejq_flt.jpg'
+            expected_collection_lidvid = _create_lidvid_from_parts(parts[:2])
+            self.assertTrue(db.non_document_collection_exists(
+                    expected_collection_lidvid))
             expected_product_lidvid = _create_lidvid_from_parts(parts)
             self.assertTrue(db.browse_product_exists(expected_product_lidvid))
-            # Check that they exist in the filesystem
-            self.assertTrue(V1FS(self.archive_dir).isdir('/'.join(parts)))
+            self.assertTrue(db.browse_file_exists(browse_file_basename,
+                                                  expected_product_lidvid))
+
+            # Check that they also exist in the filesystem.
+
+            # We don't need to check the intermediate directories; we
+            # can test for the browse file and verify them all in one
+            # fell swoop.
+            browse_file_fs_path = fs.path.join('/'.join(parts),
+                                               browse_file_basename)
+            self.assertTrue(V1FS(self.archive_dir).isfile(browse_file_fs_path))
         finally:
             db.close()
