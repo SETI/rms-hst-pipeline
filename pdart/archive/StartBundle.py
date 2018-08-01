@@ -1,10 +1,14 @@
+import os
 import re
 
 import fs.copy
 import fs.path
 from fs.osfs import OSFS
+import pdart.add_pds_tools
+import picmaker  # need to precede this with 'import pdart.add_pds_tools'
 from typing import TYPE_CHECKING
 
+from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.V1FS import V1FS
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
     create_bundle_db_from_os_filepath
@@ -13,11 +17,21 @@ from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
+from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
 
 _INITIAL_VID = VID('1.0')  # type: VID
+
+
+def _browse_lidvid(lidvid):
+    # type: (str) -> str
+    raw_lidvid = LIDVID(lidvid)
+    browse_lidvid = LIDVID.create_from_lid_and_vid(
+        raw_lidvid.lid().to_browse_lid(),
+        raw_lidvid.vid())
+    return str(browse_lidvid)
 
 
 def bundle_to_int(bundle_id):
@@ -126,6 +140,65 @@ def populate_database(bundle_id, bundle_db, archive_dir):
                                                  product_lidvid)
 
 
+def create_browse_products(bundle_id, bundle_db, archive_dir):
+    # type: (int, BundleDB, unicode) -> None
+    """
+    Create browse products from appropriate products in the bundle.
+    """
+    bundle_lidvid = str(bundle_db.get_bundle().lidvid)
+    archive_fs = V1FS(archive_dir)
+
+    # Get all the collections at once at the start, since we're adding
+    # to them.
+    for collection in list(bundle_db.get_bundle_collections(bundle_lidvid)):
+        if collection.suffix not in RAW_SUFFIXES:
+            continue
+
+        # Otherwise, We need a browse collection for it
+        browse_collection_lidvid = _browse_lidvid(collection.lidvid)
+        bundle_db.create_non_document_collection(browse_collection_lidvid,
+                                                 bundle_lidvid)
+        for fits_product in (bundle_db.get_collection_products(
+                collection.lidvid)):
+            # create a browse product
+            browse_product_lidvid = _browse_lidvid(fits_product.lidvid)
+            bundle_db.create_browse_product(browse_product_lidvid,
+                                            fits_product.lidvid,
+                                            browse_collection_lidvid)
+            for file in bundle_db.get_product_files(fits_product.lidvid):
+                # create browse file in the filesystem
+                file_basename = file.basename
+                browse_basename = fs.path.splitext(file_basename)[0] + \
+                    '.jpg'
+
+                fits_fs_filepath = fs.path.join(
+                    lid_to_dir(LIDVID(fits_product.lidvid).lid()),
+                    file_basename)
+                browse_product_fs_dirpath = lid_to_dir(
+                    LIDVID(browse_product_lidvid).lid())
+
+                fits_sys_filepath = archive_fs.getsyspath(fits_fs_filepath)
+                archive_fs.makedirs(browse_product_fs_dirpath)
+                browse_product_sys_dirpath = archive_fs.getsyspath(
+                    browse_product_fs_dirpath)
+
+                # Picmaker expects a list of strings.  If you give it
+                # unicode, it'll index into it and complain about '/'
+                # not being a file.
+                picmaker.ImagesToPics([str(fits_sys_filepath)],
+                                      browse_product_sys_dirpath,
+                                      filter="None",
+                                      percentiles=(1, 99))
+                browse_sys_filepath = fs.path.join(
+                    browse_product_sys_dirpath, browse_basename)
+                size = os.stat(browse_sys_filepath).st_size
+                bundle_db.create_browse_file(browse_basename,
+                                             browse_product_lidvid,
+                                             size)
+                # create browse file record in the database
+                # TODO
+
+
 def start_bundle(src_dir, archive_dir):
     # type: (unicode, unicode) -> None
     """
@@ -134,4 +207,5 @@ def start_bundle(src_dir, archive_dir):
     bundle_id = copy_files_from_download(src_dir, archive_dir)
     bundle_db = create_bundle_db(bundle_id, archive_dir)
     populate_database(bundle_id, bundle_db, archive_dir)
+    create_browse_products(bundle_id, bundle_db, archive_dir)
     # TODO: more to do

@@ -6,8 +6,8 @@ import unittest
 import fs.path
 
 from pdart.archive.StartBundle import *
-from pdart.archive.StartBundle import _INITIAL_VID
-from pdart.fs.V1FS import _V1_0
+from pdart.archive.StartBundle import _INITIAL_VID, _create_lidvid_from_parts
+from pdart.fs.V1FS import V1FS, _V1_0
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME
 
@@ -103,5 +103,26 @@ class TestStartBundle(unittest.TestCase):
             # I'm going to leave the testing at this high level and
             # assume if it's correct as far down as the collections,
             # the rest is too.
+        finally:
+            db.close()
+
+    def test_create_browse_products(self):
+        download_dir = _path_to_testfiles()
+        copy_files_from_download(download_dir, self.archive_dir)
+        db = create_bundle_db(13012, self.archive_dir)
+        try:
+            populate_database(13012, db, self.archive_dir)
+            create_browse_products(13012, db, self.archive_dir)
+            # TODO This is a wimpy test: I just test that the
+            # browse_product was created in the database and that its
+            # directory was created in the filesystem.  From that I
+            # assume all is well.  I need to check more.
+
+            # Check that they exist in the database
+            parts = ['hst_13012', 'browse_acs_flt', 'jbz504ejq']
+            expected_product_lidvid = _create_lidvid_from_parts(parts)
+            self.assertTrue(db.browse_product_exists(expected_product_lidvid))
+            # Check that they exist in the filesystem
+            self.assertTrue(V1FS(self.archive_dir).isdir('/'.join(parts)))
         finally:
             db.close()
