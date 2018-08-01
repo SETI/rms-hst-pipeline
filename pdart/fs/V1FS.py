@@ -1,6 +1,8 @@
 import io
 import os
+from typing import TYPE_CHECKING
 
+import fs.errors
 from fs.osfs import OSFS
 
 from pdart.fs.FSPrimAdapter import FSPrimAdapter
@@ -8,6 +10,9 @@ from pdart.fs.FSPrimitives import *
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
     write_subdir_versions_to_directory
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
+
+if TYPE_CHECKING:
+    from typing import List, Tuple
 
 _V1_0 = u'v$1.0'
 
@@ -20,6 +25,7 @@ class V1Primitives(FSPrimitives):
     appear in the OS directory as a LIDVID-based hierarchy with all
     written files at version 1.0.
     """
+
     def __init__(self, root):
         # type: (unicode) -> None
         FSPrimitives.__init__(self)
@@ -35,11 +41,10 @@ class V1Primitives(FSPrimitives):
         # type: (unicode) -> unicode
         file = File(self, path)
         if self.is_file(file):
-            l, parts, path = self._do_path(file)
-            sys_path = fs.path.join(self.root, path.lstrip('/'))
-            return sys_path
+            return fs.path.join(self.root, path.lstrip('/'))
         else:
-            return None
+            # it's a dir.
+            return fs.path.join(self.root, path.lstrip('/'), _V1_0)
 
     def root_node(self):
         # type: () -> Dir_
@@ -186,6 +191,11 @@ class V1Primitives(FSPrimitives):
             os.rmdir(sys_path)
 
     def _do_path(self, node):
+        # type: (Node_) -> Tuple[int, List[unicode], unicode]
+        """
+        Split the node's path and return a triple of the length of the path,
+        the parts, and the path itself.
+        """
         path = node.path
         parts = fs.path.iteratepath(path)
         return (len(parts), parts, path)
@@ -199,8 +209,13 @@ class V1FS(FSPrimAdapter):
     appear in the OS directory as a LIDVID-based hierarchy with all
     written files at version 1.0.
     """
+
     def __init__(self, root_dir):
         FSPrimAdapter.__init__(self, V1Primitives(root_dir))
 
     def getsyspath(self, path):
-        return self.prims._to_sys_path(path)
+        res = self.prims._to_sys_path(path)
+        if res:
+            return res
+        else:
+            raise fs.errors.NoSysPath(path)
