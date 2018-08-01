@@ -31,10 +31,10 @@ def _list_rel_filepaths(root_dir):
 
 class TestStartBundle(unittest.TestCase):
     def setUp(self):
-        self.base_directory = tempfile.mkdtemp()
+        self.archive_dir = tempfile.mkdtemp()
 
     def tearDown(self):
-        shutil.rmtree(self.base_directory)
+        shutil.rmtree(self.archive_dir)
 
     def test_bundle_to_int(self):
         self.assertEqual(bundle_to_int('hst_01234'), 1234)
@@ -45,13 +45,14 @@ class TestStartBundle(unittest.TestCase):
     def test_copy_files_from_download(self):
         # type: () -> None
         download_dir = _path_to_testfiles()
-        res = copy_files_from_download(download_dir, self.base_directory)
+        res = copy_files_from_download(download_dir, self.archive_dir)
         # check that it read the expected bundle
         self.assertEqual(res, 13012)
 
-        # Check that the newly created archive dir is in multi-version
-        # format.
-        osfs = OSFS(self.base_directory)
+        # Check that the newly created archive directory is in
+        # multi-version format and that the bundle has its own
+        # directory within the archive directory.
+        osfs = OSFS(self.archive_dir)
         BUNDLE_DIR = u'/hst_13012'
         self.assertTrue(osfs.exists(BUNDLE_DIR))
 
@@ -65,12 +66,12 @@ class TestStartBundle(unittest.TestCase):
     def test_create_bundle_db(self):
         # type: () -> None
         download_dir = _path_to_testfiles()
-        copy_files_from_download(download_dir, self.base_directory)
-        db = create_bundle_db(13012, self.base_directory)
+        copy_files_from_download(download_dir, self.archive_dir)
+        db = create_bundle_db(13012, self.archive_dir)
         try:
             # returns the DB
             self.assertTrue(db)
-            db_filename = os.path.join(self.base_directory,
+            db_filename = os.path.join(self.archive_dir,
                                        'hst_13012',
                                        _BUNDLE_DB_NAME)
             # creates the DB file
@@ -81,5 +82,26 @@ class TestStartBundle(unittest.TestCase):
                 bundle_lid,
                 _INITIAL_VID)
             self.assertTrue(db.bundle_exists(str(bundle_lidvid)))
+            BUNDLE_LIDVID = 'urn:nasa:pds:hst_13012::1.0'
+            self.assertTrue(db.bundle_exists(BUNDLE_LIDVID))
+        finally:
+            db.close()
+
+    def test_populate_database(self):
+        download_dir = _path_to_testfiles()
+        copy_files_from_download(download_dir, self.archive_dir)
+        db = create_bundle_db(13012, self.archive_dir)
+        try:
+            populate_database(13012, db, self.archive_dir)
+            # Test it.
+            archive_fs = V1FS(self.archive_dir)
+            for coll_dir in archive_fs.listdir('/hst_13012'):
+                if '$' in coll_dir:
+                    continue
+                coll_lidvid = 'urn:nasa:pds:hst_13012:%s::1.0' % coll_dir
+                self.assertTrue(db.collection_exists(coll_lidvid))
+            # I'm going to leave the testing at this high level and
+            # assume if it's correct as far down as the collections,
+            # the rest is too.
         finally:
             db.close()

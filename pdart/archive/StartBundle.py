@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from pdart.fs.V1FS import V1FS
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
     create_bundle_db_from_os_filepath
+from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -32,7 +33,7 @@ def bundle_to_int(bundle_id):
 def copy_files_from_download(src_dir, archive_dir):
     # type: (unicode, unicode) -> int
     """
-    Copies the files from a MAST download directory to a new archive
+    Copies the files from a MAST download directory to a new bundle
     directory.  The new archive uses a multi-version hierarchy to
     store the files.
     """
@@ -75,7 +76,8 @@ def _bundle_dir(bundle_id, archive_dir):
 def create_bundle_db(bundle_id, archive_dir):
     # type: (int, unicode) -> BundleDB
     """
-    Creates a new, empty BundleDB in the top, bundle directory.
+    Creates a new, empty BundleDB in the bundle directory.  The
+    database is written to hst_<bundle_id>/<bundle_db_name>.
     """
     bundle_dir = _bundle_dir(bundle_id, archive_dir)
     db = create_bundle_db_from_os_filepath(fs.path.join(bundle_dir,
@@ -88,8 +90,47 @@ def create_bundle_db(bundle_id, archive_dir):
     return db
 
 
+def populate_database(bundle_id, bundle_db, archive_dir):
+    # type: (int, BundleDB, unicode) -> None
+    bundle = 'hst_%05d' % bundle_id
+    bundle_lid = LID.create_from_parts([bundle])
+    bundle_lidvid = str(LIDVID.create_from_lid_and_vid(bundle_lid,
+                                                       _INITIAL_VID))
+    v1fs = V1FS(archive_dir)
+    for collection in v1fs.listdir(bundle):
+        if '$' in collection:
+            continue
+        collection_path = fs.path.join(bundle, collection)
+        collection_lid = LID.create_from_parts([bundle, collection])
+        collection_lidvid = str(LIDVID.create_from_lid_and_vid(collection_lid,
+                                                               _INITIAL_VID))
+        bundle_db.create_non_document_collection(collection_lidvid,
+                                                 bundle_lidvid)
+        for product in v1fs.listdir(collection_path):
+            if '$' in product:
+                continue
+            product_path = fs.path.join(collection_path, product)
+            product_lid = LID.create_from_parts(
+                [bundle, collection, product])
+            product_lidvid = str(LIDVID.create_from_lid_and_vid(product_lid,
+                                                                _INITIAL_VID))
+            bundle_db.create_fits_product(product_lidvid, collection_lidvid)
+            for fits_file in v1fs.listdir(product_path):
+                if '$' in fits_file:
+                    continue
+                assert fs.path.splitext(fits_file)[1] == '.fits'
+                fits_file_path = fs.path.join(product_path, fits_file)
+                bundle_db.create_fits_product(product_lidvid,
+                                              collection_lidvid)
+                fits_sys_path = v1fs.getsyspath(fits_file_path)
+                populate_database_from_fits_file(bundle_db, fits_sys_path,
+                                                 product_lidvid)
+
+
 def start_bundle(src_dir, archive_dir):
     # type: (unicode, unicode) -> None
+
     bundle_id = copy_files_from_download(src_dir, archive_dir)
-    create_bundle_db(bundle_id, archive_dir)
+    bundle_db = create_bundle_db(bundle_id, archive_dir)
+    populate_database(bundle_id, bundle_db, archive_dir)
     # TODO: more to do
