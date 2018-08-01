@@ -92,28 +92,27 @@ def create_bundle_db(bundle_id, archive_dir):
 
 def populate_database(bundle_id, bundle_db, archive_dir):
     # type: (int, BundleDB, unicode) -> None
+    """
+    Populates the database with collections, products, and the FITS
+    files' contents using the contents of the bundle directory in the
+    given archive.
+    """
     bundle = 'hst_%05d' % bundle_id
-    bundle_lid = LID.create_from_parts([bundle])
-    bundle_lidvid = str(LIDVID.create_from_lid_and_vid(bundle_lid,
-                                                       _INITIAL_VID))
+    bundle_lidvid = _create_lidvid_from_parts([bundle])
     v1fs = V1FS(archive_dir)
     for collection in v1fs.listdir(bundle):
         if '$' in collection:
             continue
         collection_path = fs.path.join(bundle, collection)
-        collection_lid = LID.create_from_parts([bundle, collection])
-        collection_lidvid = str(LIDVID.create_from_lid_and_vid(collection_lid,
-                                                               _INITIAL_VID))
+        collection_lidvid = _create_lidvid_from_parts([bundle, collection])
         bundle_db.create_non_document_collection(collection_lidvid,
                                                  bundle_lidvid)
         for product in v1fs.listdir(collection_path):
             if '$' in product:
                 continue
             product_path = fs.path.join(collection_path, product)
-            product_lid = LID.create_from_parts(
+            product_lidvid = _create_lidvid_from_parts(
                 [bundle, collection, product])
-            product_lidvid = str(LIDVID.create_from_lid_and_vid(product_lid,
-                                                                _INITIAL_VID))
             bundle_db.create_fits_product(product_lidvid, collection_lidvid)
             for fits_file in v1fs.listdir(product_path):
                 if '$' in fits_file:
@@ -129,7 +128,9 @@ def populate_database(bundle_id, bundle_db, archive_dir):
 
 def start_bundle(src_dir, archive_dir):
     # type: (unicode, unicode) -> None
-
+    """
+    Create the first version of a bundle from a MAST download.
+    """
     bundle_id = copy_files_from_download(src_dir, archive_dir)
     bundle_db = create_bundle_db(bundle_id, archive_dir)
     populate_database(bundle_id, bundle_db, archive_dir)
