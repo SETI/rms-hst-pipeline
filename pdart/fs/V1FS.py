@@ -39,9 +39,23 @@ class V1Primitives(FSPrimitives):
 
     def _to_sys_path(self, path):
         # type: (unicode) -> unicode
+        """
+        If the path is a file at the top level, return it relative to
+        the root.  In all other cases, insert a version number after
+        the last directory in the path.
+
+        This method is not elegant.
+        """
+        path = fs.path.abspath(path)
         file = File(self, path)
         if self.is_file(file):
-            return fs.path.join(self.root, path.lstrip('/'))
+            (parent_dir, filepath) = fs.path.split(path)
+            if parent_dir == u'/':
+                res = fs.path.join(self.root, filepath)
+            else:
+                res = fs.path.join(self.root, parent_dir.lstrip('/'),
+                                   _V1_0, filepath)
+            return res
         else:
             # it's a dir.
             return fs.path.join(self.root, path.lstrip('/'), _V1_0)
