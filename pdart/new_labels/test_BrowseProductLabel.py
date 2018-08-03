@@ -53,8 +53,8 @@ class Test_BrowseProductLabel(unittest.TestCase):
                                            browse_file_basename,
                                            5492356)
 
-        browse_file = self.db.get_file(browse_product_lidvid,
-                                       browse_file_basename)
+        browse_file = self.db.get_file(browse_file_basename,
+                                       browse_product_lidvid)
 
         str = make_browse_product_label(self.db,
                                         browse_product_lidvid,

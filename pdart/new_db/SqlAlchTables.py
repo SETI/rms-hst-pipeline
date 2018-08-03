@@ -95,25 +95,6 @@ class Product(Base):
     }
 
 
-class FitsProduct(Product):
-    """
-    A database representation of a PDS4 observational product
-    consisting of a single FITS file.
-    """
-    __tablename__ = 'fits_products'
-
-    product_lidvid = Column(String, ForeignKey('products.lidvid'),
-                            primary_key=True, nullable=False)
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'fits_product',
-    }
-
-    def __repr__(self):
-        return 'FitsProduct(lidvid=%r, collection_lidvid=%r)' % (
-            self.lidvid, self.collection_lidvid)
-
-
 class BrowseProduct(Product):
     """
     A database representation of a PDS4 product consisting of browse
@@ -157,6 +138,25 @@ class DocumentProduct(Product):
             self.lidvid, self.collection_lidvid)
 
 
+class FitsProduct(Product):
+    """
+    A database representation of a PDS4 observational product
+    consisting of a single FITS file.
+    """
+    __tablename__ = 'fits_products'
+
+    product_lidvid = Column(String, ForeignKey('products.lidvid'),
+                            primary_key=True, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'fits_product',
+    }
+
+    def __repr__(self):
+        return 'FitsProduct(lidvid=%r, collection_lidvid=%r)' % (
+            self.lidvid, self.collection_lidvid)
+
+
 ############################################################
 
 class File(Base):
@@ -181,26 +181,6 @@ class File(Base):
         'polymorphic_identity': 'file',
         'polymorphic_on': type
     }
-
-
-class FitsFile(File):
-    """
-    A database representation of a FITS file belonging to a product.
-    """
-    __tablename__ = 'fits_files'
-
-    file_id = Column(Integer, ForeignKey('files.id'),
-                     primary_key=True, nullable=False)
-    hdu_count = Column(Integer, nullable=False)
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'fits_file'
-    }
-
-    def __repr__(self):
-        return 'FitsFile(id=%d, product_lidvid=%r, basename=%r, ' \
-               'hdu_count=%d)' % (
-                   self.id, self.product_lidvid, self.basename, self.hdu_count)
 
 
 class BadFitsFile(File):
@@ -260,6 +240,26 @@ class DocumentFile(File):
     def __repr__(self):
         return 'DocumentFile(id=%d, product_lidvid=%r, basename=%d)' % (
             self.id, self.product_lidvid, self.basename)
+
+
+class FitsFile(File):
+    """
+    A database representation of a FITS file belonging to a product.
+    """
+    __tablename__ = 'fits_files'
+
+    file_id = Column(Integer, ForeignKey('files.id'),
+                     primary_key=True, nullable=False)
+    hdu_count = Column(Integer, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'fits_file'
+    }
+
+    def __repr__(self):
+        return 'FitsFile(id=%d, product_lidvid=%r, basename=%r, ' \
+               'hdu_count=%d)' % (
+                   self.id, self.product_lidvid, self.basename, self.hdu_count)
 
 
 ############################################################

@@ -37,7 +37,6 @@ class Test_CreateBrowse(unittest.TestCase):
 
     def test_populate_database_from_browse_product(self):
         # type: () -> None
-
         self.db.create_fits_product(_FITS_PRODUCT_LIDVID,
                                     _FITS_COLLECTION_LIDVID)
 
@@ -49,8 +48,9 @@ class Test_CreateBrowse(unittest.TestCase):
         self.assertTrue(self.db.browse_file_exists(file_basename,
                                                    _BROWSE_PRODUCT_LIDVID))
         self.assertTrue(self.db.browse_product_exists(_BROWSE_PRODUCT_LIDVID))
-        self.assertEqual(234567, self.db.get_file(_BROWSE_PRODUCT_LIDVID,
-                                                  file_basename).byte_size)
+        self.assertEqual(234567,
+                         self.db.get_file(file_basename,
+                                          _BROWSE_PRODUCT_LIDVID).byte_size)
 
     def test_create_browse_directory(self):
         create_browse_directory(self.fs, _BROWSE_PRODUCT_LID)

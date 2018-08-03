@@ -25,8 +25,8 @@ def make_browse_product_label(bundle_db,
     """
     fits_product_lidvid = bundle_db.get_product(
         browse_product_lidvid).fits_product_lidvid
-    browse_file = bundle_db.get_file(browse_product_lidvid,
-                                     browse_file_basename)
+    browse_file = bundle_db.get_file(browse_file_basename,
+                                     browse_product_lidvid)
 
     browse_product = bundle_db.get_product(browse_product_lidvid)
 

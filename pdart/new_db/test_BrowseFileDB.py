@@ -40,8 +40,7 @@ class Test_BrowseFileDB(unittest.TestCase):
         self.assertTrue(self.db.browse_file_exists(browse_basename,
                                                    browse_product_lidvid))
 
-        file = self.db.get_file(browse_product_lidvid,
-                                browse_basename)
+        file = self.db.get_file(browse_basename, browse_product_lidvid)
         self.assertTrue(file)
         # lidvid and basename are defined to be right (in get_file())
         self.assertTrue(isinstance(file, BrowseFile))

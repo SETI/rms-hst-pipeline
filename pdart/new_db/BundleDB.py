@@ -68,141 +68,7 @@ class BundleDB(object):
         # type: () -> None
         create_tables(self.engine)
 
-    def bundle_exists(self, bundle_lidvid):
-        # type: (str) -> bool
-        """
-        Returns True iff a bundle with the given LIDVID exists in the database.
-        """
-        return self.session.query(
-            exists().where(Bundle.lidvid == bundle_lidvid)).scalar()
-
-    def collection_exists(self, collection_lidvid):
-        # type: (str) -> bool
-
-        """
-        Returns True iff a collection with the given LIDVID exists in the
-        database.
-        """
-        return self.session.query(
-            exists().where(Collection.lidvid == collection_lidvid)).scalar()
-
-    def document_collection_exists(self, collection_lidvid):
-        # type: (str) -> bool
-
-        """
-        Returns True iff a document collection with the given LIDVID
-        exists in the database.
-        """
-        return self.session.query(
-            exists().where(
-                DocumentCollection.collection_lidvid ==
-                collection_lidvid)).scalar()
-
-    def non_document_collection_exists(self, collection_lidvid):
-        # type: (str) -> bool
-
-        """
-        Returns True iff a non-document collection with the given
-        LIDVID exists in the database.
-        """
-        return self.session.query(
-            exists().where(
-                NonDocumentCollection.collection_lidvid ==
-                collection_lidvid)).scalar()
-
-    def product_exists(self, product_lidvid):
-        # type: (str) -> bool
-        """
-        Returns True iff a product with the given LIDVID exists in the
-        database.
-        """
-        return self.session.query(
-            exists().where(Product.lidvid == product_lidvid)).scalar()
-
-    def fits_product_exists(self, product_lidvid):
-        # type: (str) -> bool
-        """
-        Returns True iff a FITS product with the given LIDVID exists in the
-        database.
-        """
-        return self.session.query(
-            exists().where(
-                FitsProduct.product_lidvid == product_lidvid)).scalar()
-
-    def browse_product_exists(self, product_lidvid):
-        # type: (str) -> bool
-        """
-        Returns True iff a browse product with the given LIDVID exists
-        in the database.
-        """
-        return self.session.query(
-            exists().where(
-                BrowseProduct.product_lidvid == product_lidvid)).scalar()
-
-    def file_exists(self, basename, product_lidvid):
-        # type: (unicode, str) -> bool
-        """
-        Returns True iff a file with the given LIDVID exists in the
-        database.
-        """
-        return self.session.query(
-            exists().where(File.basename == basename).where(
-                File.product_lidvid == product_lidvid)).scalar()
-
-    def browse_file_exists(self, basename, product_lidvid):
-        # type: (unicode, str) -> bool
-        """
-        Returns True iff a browse file with the given LIDVID exists in
-        the database.
-        """
-        return self.session.query(
-            exists().where(BrowseFile.basename == basename).where(
-                BrowseFile.product_lidvid == product_lidvid).where(
-                File.type == 'browse_file')).scalar()
-
-    def fits_file_exists(self, basename, product_lidvid):
-        # type: (unicode, str) -> bool
-        """
-        Returns True iff a FITS file with the given LIDVID exists in
-        the database.
-        """
-        return self.session.query(
-            exists().where(FitsFile.basename == basename).where(
-                FitsFile.product_lidvid == product_lidvid).where(
-                File.type == 'fits_file')).scalar()
-
-    def bad_fits_file_exists(self, basename, product_lidvid):
-        # type: (unicode, str) -> bool
-        """
-        Returns True iff a bad FITS file record with the given LIDVID
-        exists in the database.
-        """
-        return self.session.query(
-            exists().where(BadFitsFile.basename == basename).where(
-                BadFitsFile.product_lidvid == product_lidvid).where(
-                File.type == 'bad_fits_file')).scalar()
-
-    def hdu_exists(self, index, basename, product_lidvid):
-        # type: (int, unicode, str) -> bool
-        """
-        Returns True iff the n-th HDU for that FITS file exists
-        """
-        return self.session.query(
-            exists().where(
-                Hdu.product_lidvid == product_lidvid).where(
-                Hdu.hdu_index == index)).scalar()
-
-    def card_exists(self, keyword, hdu_index, product_lidvid):
-        # type: (str, int, unicode) -> bool
-        """
-        Returns True iff there is a card with the given keyword in
-        the n-th HDU of the FITS file for that product.
-        """
-        return self.session.query(
-            exists().where(
-                Card.product_lidvid == product_lidvid).where(
-                Card.hdu_index == hdu_index).where(
-                Card.keyword == keyword)).scalar()
+    ############################################################
 
     def create_bundle(self, bundle_lidvid):
         # type: (str) -> None
@@ -216,6 +82,25 @@ class BundleDB(object):
             self.session.add(Bundle(lidvid=bundle_lidvid,
                                     proposal_id=proposal_id))
             self.session.commit()
+
+    def bundle_exists(self, bundle_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff a bundle with the given LIDVID exists in the database.
+        """
+        return self.session.query(
+            exists().where(Bundle.lidvid == bundle_lidvid)).scalar()
+
+    def get_bundle(self):
+        # type: () -> Bundle
+        return self.session.query(Bundle).one()
+
+    def get_bundle_collections(self, bundle_lidvid):
+        # type: (str) -> List[Collection]
+        return self.session.query(Collection).filter(
+            Collection.bundle_lidvid == bundle_lidvid).all()
+
+    ############################################################
 
     def create_document_collection(self, collection_lidvid, bundle_lidvid):
         # type: (str, str) -> None
@@ -266,59 +151,48 @@ class BundleDB(object):
                     suffix=suffix))
             self.session.commit()
 
-    def create_fits_product(self, product_lidvid, collection_lidvid):
-        # type: (str, str) -> None
+    def collection_exists(self, collection_lidvid):
+        # type: (str) -> bool
         """
-        Create a product with this LIDVID if none exists.
+        Returns True iff a collection with the given LIDVID exists in the
+        database.
         """
-        LIDVID(product_lidvid)
-        LIDVID(collection_lidvid)
-        if self.product_exists(product_lidvid):
-            if self.fits_product_exists(product_lidvid):
-                pass
-            else:
-                raise Exception(
-                    'non-FITS product with LIDVID %s already exists' %
-                    product_lidvid)
-        else:
-            self.session.add(
-                FitsProduct(lidvid=product_lidvid,
-                            collection_lidvid=collection_lidvid))
-            self.session.commit()
+        return self.session.query(
+            exists().where(Collection.lidvid == collection_lidvid)).scalar()
 
-    def create_fits_file(self, basename, product_lidvid, hdu_count):
-        # type: (unicode, str, int) -> None
+    def document_collection_exists(self, collection_lidvid):
+        # type: (str) -> bool
         """
-        Create a FITS file with this basename belonging to the product
-        if none exists.
+        Returns True iff a document collection with the given LIDVID
+        exists in the database.
         """
-        LIDVID(product_lidvid)
-        if self.fits_file_exists(basename, product_lidvid):
-            pass
-        else:
-            self.session.add(
-                FitsFile(basename=basename,
-                         product_lidvid=product_lidvid,
-                         hdu_count=hdu_count))
-            self.session.commit()
-            assert self.fits_file_exists(basename, product_lidvid)
+        return self.session.query(
+            exists().where(
+                DocumentCollection.collection_lidvid ==
+                collection_lidvid)).scalar()
 
-    def create_bad_fits_file(self, basename, product_lidvid,
-                             exception_message):
-        # type: (unicode, str, str) -> None
+    def non_document_collection_exists(self, collection_lidvid):
+        # type: (str) -> bool
         """
-        Create a bad FITS file record with this basename belonging to
-        the product if none exists.
+        Returns True iff a non-document collection with the given
+        LIDVID exists in the database.
         """
-        LIDVID(product_lidvid)
-        if self.fits_file_exists(basename, product_lidvid):
-            pass
-        else:
-            self.session.add(
-                BadFitsFile(basename=basename,
-                            product_lidvid=product_lidvid,
-                            exception_message=exception_message))
-            self.session.commit()
+        return self.session.query(
+            exists().where(
+                NonDocumentCollection.collection_lidvid ==
+                collection_lidvid)).scalar()
+
+    def get_collection(self, lidvid):
+        # type: (str) -> Collection
+        return self.session.query(Collection).filter(
+            Collection.lidvid == lidvid).one()
+
+    def get_collection_products(self, collection_lidvid):
+        # type: (str) -> List[Product]
+        return self.session.query(Product).filter(
+            Product.collection_lidvid == collection_lidvid).all()
+
+    ############################################################
 
     def create_browse_product(self, browse_product_lidvid,
                               fits_product_lidvid, collection_lidvid):
@@ -352,6 +226,116 @@ class BundleDB(object):
                               fits_product_lidvid=fits_product_lidvid))
             self.session.commit()
 
+    def create_document_product(self, product_lidvid, collection_lidvid):
+        # type: (str, str) -> None
+        """
+        Create a product with this LIDVID if none exists.
+        """
+        LIDVID(product_lidvid)
+        LIDVID(collection_lidvid)
+        if self.product_exists(product_lidvid):
+            if self.document_product_exists(product_lidvid):
+                pass
+            else:
+                raise Exception(
+                    'non-document product with LIDVID %s already exists' %
+                    product_lidvid)
+        else:
+            self.session.add(
+                DocumentProduct(lidvid=product_lidvid,
+                                collection_lidvid=collection_lidvid))
+            self.session.commit()
+
+    def create_fits_product(self, product_lidvid, collection_lidvid):
+        # type: (str, str) -> None
+        """
+        Create a product with this LIDVID if none exists.
+        """
+        LIDVID(product_lidvid)
+        LIDVID(collection_lidvid)
+        if self.product_exists(product_lidvid):
+            if self.fits_product_exists(product_lidvid):
+                pass
+            else:
+                raise Exception(
+                    'non-FITS product with LIDVID %s already exists' %
+                    product_lidvid)
+        else:
+            self.session.add(
+                FitsProduct(lidvid=product_lidvid,
+                            collection_lidvid=collection_lidvid))
+            self.session.commit()
+
+    def product_exists(self, product_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff a product with the given LIDVID exists in the
+        database.
+        """
+        return self.session.query(
+            exists().where(Product.lidvid == product_lidvid)).scalar()
+
+    def browse_product_exists(self, product_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff a browse product with the given LIDVID exists
+        in the database.
+        """
+        return self.session.query(
+            exists().where(
+                BrowseProduct.product_lidvid == product_lidvid)).scalar()
+
+    def document_product_exists(self, product_lidvid):
+        # type: (str) -> bool
+
+        """
+        Returns True iff a document product with the given LIDVID
+        exists in the database.
+        """
+        return self.session.query(
+            exists().where(
+                DocumentProduct.product_lidvid ==
+                product_lidvid)).scalar()
+
+    def fits_product_exists(self, product_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff a FITS product with the given LIDVID exists in the
+        database.
+        """
+        return self.session.query(
+            exists().where(
+                FitsProduct.product_lidvid == product_lidvid)).scalar()
+
+    def get_product(self, lidvid):
+        # type: (str) -> Product
+        return self.session.query(Product).filter(
+            Product.lidvid == lidvid).one()
+
+    def get_product_files(self, product_lidvid):
+        # type: (str) -> List[File]
+        return self.session.query(File).filter(
+            File.product_lidvid == product_lidvid).all()
+
+    ############################################################
+
+    def create_bad_fits_file(self, basename, product_lidvid,
+                             exception_message):
+        # type: (unicode, str, str) -> None
+        """
+        Create a bad FITS file record with this basename belonging to
+        the product if none exists.
+        """
+        LIDVID(product_lidvid)
+        if self.fits_file_exists(basename, product_lidvid):
+            pass
+        else:
+            self.session.add(
+                BadFitsFile(basename=basename,
+                            product_lidvid=product_lidvid,
+                            exception_message=exception_message))
+            self.session.commit()
+
     def create_browse_file(self, basename, product_lidvid, byte_size):
         # type: (unicode, str, int) -> None
         """
@@ -369,53 +353,122 @@ class BundleDB(object):
             self.session.commit()
             assert self.browse_file_exists(basename, product_lidvid)
 
-    def get_bundle(self):
-        # type: () -> Bundle
-        return self.session.query(Bundle).one()
+    def create_document_file(self, basename, product_lidvid):
+        # type: (unicode, str) -> None
+        """
+        Create a document file with this basename belonging to the product
+        if none exists.
+        """
+        LIDVID(product_lidvid)
+        if self.document_file_exists(basename, product_lidvid):
+            pass
+        else:
+            self.session.add(
+                DocumentFile(basename=basename,
+                             product_lidvid=product_lidvid))
+            self.session.commit()
+            assert self.document_file_exists(basename, product_lidvid)
 
-    def get_collection(self, lidvid):
-        # type: (str) -> Collection
-        return self.session.query(Collection).filter(
-            Collection.lidvid == lidvid).one()
+    def create_fits_file(self, basename, product_lidvid, hdu_count):
+        # type: (unicode, str, int) -> None
+        """
+        Create a FITS file with this basename belonging to the product
+        if none exists.
+        """
+        LIDVID(product_lidvid)
+        if self.fits_file_exists(basename, product_lidvid):
+            pass
+        else:
+            self.session.add(
+                FitsFile(basename=basename,
+                         product_lidvid=product_lidvid,
+                         hdu_count=hdu_count))
+            self.session.commit()
+            assert self.fits_file_exists(basename, product_lidvid)
 
-    def get_bundle_collections(self, bundle_lidvid):
-        # TODO What is the type for this?  type: (str) -> Collection
-        return self.session.query(Collection).filter(
-            Collection.bundle_lidvid == bundle_lidvid)
+    def file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a file with the given LIDVID and basename
+        exists in the database.
+        """
+        return self.session.query(
+            exists().where(File.basename == basename).where(
+                File.product_lidvid == product_lidvid)).scalar()
 
-    def get_product(self, lidvid):
-        # type: (str) -> Product
-        return self.session.query(Product).filter(
-            Product.lidvid == lidvid).one()
+    def bad_fits_file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a bad FITS file record with the given LIDVID
+        and basename exists in the database.
+        """
+        return self.session.query(
+            exists().where(BadFitsFile.basename == basename).where(
+                BadFitsFile.product_lidvid == product_lidvid).where(
+                File.type == 'bad_fits_file')).scalar()
 
-    def get_collection_products(self, collection_lidvid):
-        # TODO What is the type for this?  type: (str) -> List[Product]?
-        return self.session.query(Product).filter(
-            Product.collection_lidvid == collection_lidvid)
+    def browse_file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a browse file with the given LIDVID and
+        basename exists in the database.
+        """
+        return self.session.query(
+            exists().where(BrowseFile.basename == basename).where(
+                BrowseFile.product_lidvid == product_lidvid).where(
+                File.type == 'browse_file')).scalar()
 
-    def get_product_files(self, product_lidvid):
-        # TODO What is the type for this?  type: (str) -> List[File]?
-        return self.session.query(File).filter(
-            File.product_lidvid == product_lidvid)
+    def document_file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a document file with the given LIDVID and
+        basename exists in the database.
+        """
+        return self.session.query(
+            exists().where(DocumentFile.basename == basename).where(
+                DocumentFile.product_lidvid == product_lidvid).where(
+                File.type == 'document_file')).scalar()
 
-    def get_file(self, product_lidvid, basename):
-        # type: (str, unicode) -> File
+    def fits_file_exists(self, basename, product_lidvid):
+        # type: (unicode, str) -> bool
+        """
+        Returns True iff a FITS file with the given LIDVID and
+        basename exists in the database.
+        """
+        return self.session.query(
+            exists().where(FitsFile.basename == basename).where(
+                FitsFile.product_lidvid == product_lidvid).where(
+                File.type == 'fits_file')).scalar()
+
+    def get_file(self, basename, product_lidvid):
+        # type: (unicode, str) -> File
         return self.session.query(File).filter(
             File.product_lidvid == product_lidvid,
             File.basename == basename).one()
 
-    def get_card_dictionaries(self, fits_product_lidvid, basename):
-        # type: (str, unicode) -> List[Dict[str, Any]]
+    ############################################################
 
-        def get_card_dictionary(index):
-            # type: (int) -> Dict[str, Any]
-            cards = self.session.query(Card).filter(
-                Card.product_lidvid == fits_product_lidvid).filter(
-                Card.hdu_index == index)
-            return {card.keyword: card.value for card in cards}
+    # The pattern of creation and access function used in higher-level
+    # objects (bundles, collections, products) you see above break
+    # down at this point, since queries inside the FITS file are
+    # handled differently.
 
-        file = self.get_file(fits_product_lidvid, basename)
-        return [get_card_dictionary(i) for i in range(file.hdu_count)]
+    def hdu_exists(self, index, basename, product_lidvid):
+        # type: (int, unicode, str) -> bool
+        """
+        Returns True iff the n-th HDU for that FITS file exists
+        """
+        return self.session.query(
+            exists().where(
+                Hdu.product_lidvid == product_lidvid).where(
+                Hdu.hdu_index == index)).scalar()
+
+    def get_hdu(self, index, basename, product_lidvid):
+        # type: (int, unicode, str) -> Hdu
+        return self.session.query(Hdu).filter(
+            Hdu.product_lidvid == product_lidvid,
+            Hdu.basename == basename,
+            Hdu.index == index).one()
 
     def get_file_offsets(self, fits_product_lidvid):
         # type: (unicode) -> List[Tuple[int, int, int, int]]
@@ -424,6 +477,38 @@ class BundleDB(object):
             Hdu.hdu_index)
         return [(hdu.hdu_index, hdu.hdr_loc, hdu.dat_loc, hdu.dat_span)
                 for hdu in hdus]
+
+    ############################################################
+
+    def card_exists(self, keyword, hdu_index, product_lidvid):
+        # type: (str, int, unicode) -> bool
+        """
+        Returns True iff there is a card with the given keyword in
+        the n-th HDU of the FITS file for that product.
+        """
+        return self.session.query(
+            exists().where(
+                Card.product_lidvid == product_lidvid).where(
+                Card.hdu_index == hdu_index).where(
+                Card.keyword == keyword)).scalar()
+
+    def get_card_dictionaries(self, fits_product_lidvid, basename):
+        # type: (str, unicode) -> List[Dict[str, Any]]
+        """
+        Return a list of dictionaries mapping FITS keys to their
+        values, one per Hdu in the FITS file.
+        """
+        def get_card_dictionary(index):
+            # type: (int) -> Dict[str, Any]
+            cards = self.session.query(Card).filter(
+                Card.product_lidvid == fits_product_lidvid).filter(
+                Card.hdu_index == index)
+            return {card.keyword: card.value for card in cards}
+
+        file = self.get_file(basename, fits_product_lidvid)
+        return [get_card_dictionary(i) for i in range(file.hdu_count)]
+
+    ############################################################
 
     def close(self):
         # type: () -> None

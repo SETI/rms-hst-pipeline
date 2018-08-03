@@ -155,24 +155,26 @@ def create_browse_products(bundle_id, bundle_db, archive_dir):
             continue
 
         # Otherwise, We need a browse collection for it
-        browse_collection_lidvid = _browse_lidvid(collection.lidvid)
+        collection_lidvid = str(collection.lidvid)
+        browse_collection_lidvid = _browse_lidvid(collection_lidvid)
         bundle_db.create_non_document_collection(browse_collection_lidvid,
                                                  bundle_lidvid)
         for fits_product in (bundle_db.get_collection_products(
-                collection.lidvid)):
+                collection_lidvid)):
             # create a browse product
-            browse_product_lidvid = _browse_lidvid(fits_product.lidvid)
+            fits_product_lidvid = str(fits_product.lidvid)
+            browse_product_lidvid = _browse_lidvid(fits_product_lidvid)
             bundle_db.create_browse_product(browse_product_lidvid,
-                                            fits_product.lidvid,
+                                            fits_product_lidvid,
                                             browse_collection_lidvid)
-            for file in bundle_db.get_product_files(fits_product.lidvid):
+            for file in bundle_db.get_product_files(fits_product_lidvid):
                 # create browse file in the filesystem
                 file_basename = file.basename
                 browse_basename = fs.path.splitext(file_basename)[0] + \
                     '.jpg'
 
                 fits_fs_filepath = fs.path.join(
-                    lid_to_dir(LIDVID(fits_product.lidvid).lid()),
+                    lid_to_dir(LIDVID(fits_product_lidvid).lid()),
                     file_basename)
                 browse_product_fs_dirpath = lid_to_dir(
                     LIDVID(browse_product_lidvid).lid())
