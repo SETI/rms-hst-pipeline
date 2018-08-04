@@ -5,10 +5,11 @@ database.
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.HstParametersXml import *
-from pdart.rules.Combinators import *
+from pdart.rules.Combinators import multiple_implementations
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List
+    from typing import Any, Callable, Dict, List
+    from pdart.xml.Templates import NodeBuilder
 
 
 def get_repeat_exposure_count(product_id):

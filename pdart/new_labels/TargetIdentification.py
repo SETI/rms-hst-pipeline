@@ -5,10 +5,11 @@ a product label using a SQLite database.
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.TargetIdentificationXml import *
-from pdart.rules.Combinators import *
+from pdart.rules.Combinators import multiple_implementations
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List
+    from typing import Any, Callable, Dict, List
+    from pdart.xml.Templates import NodeBuilder
 
 
 def _get_target_from_header_unit(card_dictionaries):

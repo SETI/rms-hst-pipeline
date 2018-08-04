@@ -22,7 +22,7 @@ def make_fits_product_label(bundle_db,
                             product_lidvid,
                             file_basename,
                             verify):
-    # type: (BundleDB, string, unicode, bool) -> unicode
+    # type: (BundleDB, str, unicode, bool) -> unicode
     """
     Create the label text for the product having this LIDVID using the
     bundle database.  If verify is True, verify the label against its

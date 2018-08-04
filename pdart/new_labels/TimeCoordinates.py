@@ -7,11 +7,11 @@ import julian
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.TimeCoordinatesXml import *
-from pdart.rules.Combinators import *
+from pdart.rules.Combinators import multiple_implementations
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List
-    from pdart.xml.Templates import *
+    from typing import Any, Callable, Dict, List
+    from pdart.xml.Templates import NodeBuilder
 
 
 def _to_string(in_str):
@@ -38,8 +38,6 @@ _get_start_stop_times = multiple_implementations(
     '_get_start_stop_times',
     _get_start_stop_times_from_cards,
     get_placeholder_start_stop_times)
-
-
 # type: Callable[[unicode, List[Dict[str, Any]]], Dict[str, str]]
 
 

@@ -1,4 +1,5 @@
 import unittest
+import xml.dom
 
 from fs.path import basename
 

@@ -1,8 +1,13 @@
 """
 Templates to create a XML ``<hst:HST />`` node.
 """
+from typing import TYPE_CHECKING
+
 from pdart.new_labels.Placeholders import *
-from pdart.xml.Templates import *
+from pdart.xml.Templates import interpret_document_template, interpret_template
+
+if TYPE_CHECKING:
+    from pdart.xml.Templates import DocTemplate, NodeBuilderTemplate
 
 hst = interpret_template("""<hst:HST>
 <NODE name="parameters_general"/>

@@ -3,12 +3,17 @@ Functionality to build the XML fragment containing the needed
 ``<Header />`` and ``<Array />`` or ``<Array_2D_Image />`` elements of
 a product label using a SQLite database.
 """
+from typing import TYPE_CHECKING
 
+from pdart.new_db.BundleDB import BundleDB
 from pdart.new_db.FitsFileDB import get_file_offsets
 from pdart.new_labels.FileContentsXml import *
+from pdart.xml.Templates import combine_fragments_into_fragment, \
+    combine_nodes_into_fragment
 
 if TYPE_CHECKING:
     from typing import Any, Callable, Dict, List
+    from pdart.xml.Templates import FragBuilder
 
 
 def _mk_axis_arrays(card_dicts, hdu_index, axes):

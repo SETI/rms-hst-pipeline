@@ -1,6 +1,11 @@
 """A document template to create a label for a raw browse product."""
-from pdart.xml.Pds4Version import *
-from pdart.xml.Templates import *
+from typing import TYPE_CHECKING
+
+from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
+from pdart.xml.Templates import interpret_document_template
+
+if TYPE_CHECKING:
+    from pdart.xml.Templates import DocTemplate
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>

@@ -5,10 +5,12 @@ labels.
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.Placeholders import placeholder_time
-from pdart.xml.Templates import *
+from pdart.xml.Templates import interpret_template
+
 
 if TYPE_CHECKING:
     from typing import Any, Dict, List
+    from pdart.xml.Templates import NodeBuilderTemplate
 
 time_coordinates = interpret_template("""<Time_Coordinates>
       <start_date_time><NODE name="start_date_time"/></start_date_time>

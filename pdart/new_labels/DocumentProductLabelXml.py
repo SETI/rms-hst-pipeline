@@ -1,12 +1,17 @@
 """A document template to create a label for a document product."""
 
+from typing import TYPE_CHECKING
 from pdart.pds4labels.Placeholders import *
-from pdart.xml.Pds4Version import *
-from pdart.xml.Templates import *
+from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
+from pdart.xml.Templates import combine_fragments_into_fragment, \
+    combine_nodes_into_fragment, interpret_document_template, \
+    interpret_template
 
 if TYPE_CHECKING:
     from typing import Any, Callable, Dict, Tuple
     from xml.dom.minidom import Document
+    from pdart.xml.Templates import DocTemplate, FragBuilder, NodeBuilder, \
+        NodeBuilderTemplate
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>

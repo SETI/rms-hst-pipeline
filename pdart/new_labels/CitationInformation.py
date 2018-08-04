@@ -1,8 +1,13 @@
 """
 Functionality to create a ``<Citation_Information />`` XML element.
 """
+from typing import TYPE_CHECKING
+
 from pdart.new_labels.Placeholders import *
-from pdart.xml.Templates import *
+from pdart.xml.Templates import interpret_template
+
+if TYPE_CHECKING:
+    from pdart.xml.Templates import NodeBuilder, NodeBuilderTemplate
 
 _placeholder_citation_information = interpret_template(
     """<Citation_Information>

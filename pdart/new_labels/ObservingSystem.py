@@ -1,5 +1,9 @@
 """Templates to create an ``<Observing_System />`` XML element."""
-from pdart.xml.Templates import *
+from typing import TYPE_CHECKING
+from pdart.xml.Templates import interpret_template
+
+if TYPE_CHECKING:
+    from pdart.xml.Templates import NodeBuilder, NodeBuilderTemplate
 
 _observing_system = interpret_template("""<Observing_System>
       <name><NODE name="name"/></name>

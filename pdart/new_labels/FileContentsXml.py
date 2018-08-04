@@ -3,7 +3,12 @@ Templates to create a XML fragment containing the needed ``<Header
 />`` and ``<Array />`` or ``<Array_2D_Image />`` elements of a product
 label.
 """
-from pdart.xml.Templates import *
+from typing import TYPE_CHECKING
+
+from pdart.xml.Templates import interpret_template
+
+if TYPE_CHECKING:
+    from pdart.xml.Templates import NodeBuilderTemplate
 
 # For product labels: produces the fragment of the File node that
 # contains Header and Array_2D_Image elements.

@@ -4,10 +4,11 @@ product labels.
 """
 from typing import TYPE_CHECKING
 
-from pdart.xml.Templates import *
+from pdart.xml.Templates import interpret_template
 
 if TYPE_CHECKING:
     from typing import Tuple
+    from pdart.xml.Templates import NodeBuilder
 
 
 def target_identification(target_name, target_type, target_description):

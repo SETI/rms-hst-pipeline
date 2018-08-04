@@ -2,6 +2,7 @@
 Functionality to create a label for a document product.
 """
 from datetime import date
+from typing import TYPE_CHECKING
 
 from pdart.new_labels.DocumentProductLabelXml import *
 from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
@@ -15,7 +16,7 @@ def make_document_product_label(bundle_db,
                                 document_product_lidvid,
                                 verify,
                                 publication_date=None):
-    # type: (BundleDB, str, bool) -> unicode
+    # type: (BundleDB, str, bool, str) -> unicode
     """
     Create the label text for the document product in the bundle
     having this :class:`~pdart.pds4.LIDVID` using the database

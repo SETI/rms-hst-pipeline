@@ -16,7 +16,7 @@ def make_browse_product_label(bundle_db,
                               browse_product_lidvid,
                               browse_file_basename,
                               verify):
-    # type: (BundleDB, str, str, unicode, bool) -> unicode
+    # type: (BundleDB, str, unicode, bool) -> unicode
     """
     Create the label text for the browse product having the given
     LIDVID using the bundle database.  If verify is True, verify the
