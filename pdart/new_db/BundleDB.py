@@ -312,6 +312,12 @@ class BundleDB(object):
         return self.session.query(Product).filter(
             Product.lidvid == lidvid).one()
 
+    def get_product_file(self, product_lidvid):
+        # type: (str) -> File
+        """When you know there's only one, as in browse and FITS products"""
+        return self.session.query(File).filter(
+            File.product_lidvid == product_lidvid).one()
+
     def get_product_files(self, product_lidvid):
         # type: (str) -> List[File]
         return self.session.query(File).filter(
