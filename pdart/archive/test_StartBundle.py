@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+from typing import TYPE_CHECKING
 import unittest
 
 import fs.path
@@ -10,6 +11,9 @@ from pdart.archive.StartBundle import _INITIAL_VID, _create_lidvid_from_parts
 from pdart.fs.V1FS import V1FS, _V1_0
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME
+
+if TYPE_CHECKING:
+    from sqlalchemy.schema import Column
 
 
 def _path_to_testfiles():
@@ -134,5 +138,77 @@ class TestStartBundle(unittest.TestCase):
             browse_file_fs_path = fs.path.join('/'.join(parts),
                                                browse_file_basename)
             self.assertTrue(V1FS(self.archive_dir).isfile(browse_file_fs_path))
+        finally:
+            db.close()
+
+    def test_create_pds4_labels(self):
+        # type: () -> None
+        download_dir = _path_to_testfiles()
+        copy_files_from_download(download_dir, self.archive_dir)
+        db = create_bundle_db(13012, self.archive_dir)
+        try:
+            populate_database(13012, db, self.archive_dir)
+            create_browse_products(13012, db, self.archive_dir)
+            create_pds4_labels(13012, db, self.archive_dir)
+
+            # Test that all the labels exist
+            vfs = V1FS(self.archive_dir)
+
+            def lidvid_to_dir(lidvid):
+                # type: (str) -> unicode
+                def get_lid(lidvid):
+                    # type: (str) -> LID
+                    return LIDVID(lidvid).lid()
+
+                return lid_to_dir(get_lid(str(lidvid)))
+
+            # check that product labels exist
+            bundle = db.get_bundle()
+            bundle_lidvid = str(bundle.lidvid)
+            bundle_dir = lidvid_to_dir(bundle_lidvid)
+            for collection in db.get_bundle_collections(bundle_lidvid):
+                collection_lidvid = str(collection.lidvid)
+                for product in db.get_collection_products(collection_lidvid):
+                    product_lidvid = str(product.lidvid)
+                    product_dir = lidvid_to_dir(product_lidvid)
+                    if db.browse_product_exists(product_lidvid):
+                        # handle browse product
+                        files = list(db.get_product_files(product_lidvid))
+                        self.assertEquals(1, len(files))
+                        file = files[0]
+                        label_base = fs.path.splitext(file.basename)[0]
+                        label_filename = label_base + u'.xml'
+                        label_filepath = fs.path.join(product_dir,
+                                                      label_filename)
+                        self.assertTrue(vfs.isfile(label_filepath))
+                    elif db.document_product_exists(product_lidvid):
+                        # handle document product
+                        assert False, 'TODO'
+                    elif db.fits_product_exists(product_lidvid):
+                        # handle fits product
+                        files = list(db.get_product_files(product_lidvid))
+                        self.assertEquals(1, len(files))
+                        file = files[0]
+                        label_base = fs.path.splitext(file.basename)[0]
+                        label_filename = label_base + u'.xml'
+                        label_filepath = fs.path.join(product_dir,
+                                                      label_filename)
+                        self.assertTrue(vfs.isfile(label_filepath))
+                    else:
+                        assert False, ('missing case: ' + product_lidvid)
+
+                collection_dir = lidvid_to_dir(collection_lidvid)
+                label_filename = get_collection_label_name(db,
+                                                           collection_lidvid)
+                label_filepath = fs.path.join(collection_dir, label_filename)
+                self.assertTrue(vfs.isfile(label_filepath), label_filepath)
+                inventory_filename = get_collection_inventory_name(
+                    db, collection_lidvid)
+                inventory_filepath = fs.path.join(collection_dir,
+                                                  inventory_filename)
+                self.assertTrue(vfs.isfile(inventory_filepath),
+                                inventory_filepath)
+            label_filepath = fs.path.join(bundle_dir, u'bundle.xml')
+            self.assertTrue(vfs.isfile(label_filepath), label_filepath)
         finally:
             db.close()

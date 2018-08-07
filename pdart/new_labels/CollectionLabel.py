@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from pdart.new_labels.CitationInformation \
     import make_placeholder_citation_information
+from pdart.new_labels.CollectionInventory import get_collection_inventory_name
 from pdart.new_labels.CollectionLabelXml import make_label
 from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
@@ -15,17 +16,6 @@ if TYPE_CHECKING:
 
 
 # TODO Should probably test document_collection independently.
-
-def get_inventory_name(bundle_db, collection_lidvid):
-    # type: (BundleDB, str) -> unicode
-    collection = bundle_db.get_collection(collection_lidvid)
-    try:
-        inventory_name = 'collection_%s.csv' % collection.prefix
-    except Exception:
-        # Document collections won't have prefixes.
-        inventory_name = 'collection.csv'
-    return inventory_name
-
 
 def get_collection_label_name(bundle_db, collection_lidvid):
     # type: (BundleDB, str) -> unicode
@@ -51,7 +41,8 @@ def make_collection_label(bundle_db, collection_lidvid, verify):
     collection = bundle_db.get_collection(collection_lidvid)
     suffix = collection.suffix
     proposal_id = bundle_db.get_bundle().proposal_id
-    inventory_name = get_inventory_name(bundle_db, collection_lidvid)
+    inventory_name = get_collection_inventory_name(bundle_db,
+                                                   collection_lidvid)
 
     label = make_label({
         'collection_lid': collection_lid,

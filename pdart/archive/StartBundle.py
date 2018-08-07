@@ -13,6 +13,13 @@ from pdart.fs.V1FS import V1FS
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
     create_bundle_db_from_os_filepath
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
+from pdart.new_labels.BrowseProductLabel import make_browse_product_label
+from pdart.new_labels.BundleLabel import make_bundle_label
+from pdart.new_labels.CollectionLabel import get_collection_label_name, \
+    make_collection_label
+from pdart.new_labels.CollectionInventory import \
+    get_collection_inventory_name, make_collection_inventory
+from pdart.new_labels.FitsProductLabel import make_fits_product_label
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -186,7 +193,7 @@ def create_browse_products(bundle_id, bundle_db, archive_dir):
 
                 # Picmaker expects a list of strings.  If you give it
                 # unicode, it'll index into it and complain about '/'
-                # not being a file.
+                # not being a file.  So don't do that!
                 picmaker.ImagesToPics([str(fits_sys_filepath)],
                                       browse_product_sys_dirpath,
                                       filter="None",
@@ -201,6 +208,90 @@ def create_browse_products(bundle_id, bundle_db, archive_dir):
                                              size)
 
 
+def create_pds4_labels(bundle_id, bundle_db, archive_dir):
+    # type: (int, BundleDB, unicode) -> None
+    """
+    Create bundle labels, collection inventories and labels, and
+    product labels for all the bundles, collections, and products in
+    the database.  These should be the same as are in the filesystem.
+    """
+    archive_fs = V1FS(archive_dir)
+
+    def lidvid_to_dir(lidvid):
+        # type: (str) -> unicode
+        def get_lid(lidvid):
+            # type: (str) -> LID
+            return LIDVID(lidvid).lid()
+
+        return lid_to_dir(get_lid(str(lidvid)))
+
+    bundle = bundle_db.get_bundle()
+    bundle_lidvid = str(bundle.lidvid)
+    bundle_dir_path = lidvid_to_dir(bundle_lidvid)
+    for collection in bundle_db.get_bundle_collections(bundle_lidvid):
+        collection_lidvid = str(collection.lidvid)
+        collection_dir_path = lidvid_to_dir(collection_lidvid)
+        for product in bundle_db.get_collection_products(collection_lidvid):
+            product_lidvid = str(product.lidvid)
+            product_dir_path = lidvid_to_dir(product_lidvid)
+            if bundle_db.browse_product_exists(product_lidvid):
+                files = list(bundle_db.get_product_files(product_lidvid))
+                assert len(files) == 1
+                label = make_browse_product_label(bundle_db,
+                                                  product_lidvid,
+                                                  files[0].basename,
+                                                  False)
+                label_base = fs.path.splitext(files[0].basename)[0]
+                label_filename = label_base + '.xml'
+                label_filepath = fs.path.join(
+                    product_dir_path,
+                    label_filename)
+                archive_fs.settext(label_filepath, unicode(label))
+            elif bundle_db.document_product_exists(product_lidvid):
+                # TODO I'm missing document products
+                assert False, ('missing case for document product %s' %
+                               product_lidvid)
+            elif bundle_db.fits_product_exists(product_lidvid):
+                # do something with the FITS product
+                for file in bundle_db.get_product_files(product_lidvid):
+                    label = make_fits_product_label(bundle_db,
+                                                    product_lidvid,
+                                                    file.basename,
+                                                    False)
+                    label_base = fs.path.splitext(file.basename)[0]
+                    label_filename = label_base + '.xml'
+                    label_filepath = fs.path.join(
+                        product_dir_path,
+                        label_filename)
+                    archive_fs.settext(label_filepath, unicode(label))
+            else:
+                assert False, 'missing case for product %s' % product_lidvid
+
+        inventory = make_collection_inventory(bundle_db, collection_lidvid)
+        inventory_filename = get_collection_inventory_name(bundle_db,
+                                                           collection_lidvid)
+        inventory_filepath = fs.path.join(
+            collection_dir_path,
+            inventory_filename)
+        archive_fs.settext(inventory_filepath, unicode(inventory))
+
+        label = make_collection_label(bundle_db, collection_lidvid, False)
+        label_filename = get_collection_label_name(bundle_db,
+                                                   collection_lidvid)
+        label_filepath = fs.path.join(
+            collection_dir_path,
+            label_filename)
+        archive_fs.settext(label_filepath, unicode(label))
+
+    # do something with the bundle
+    label = make_bundle_label(bundle_db, False)
+    label_filename = 'bundle.xml'
+    label_filepath = fs.path.join(
+        bundle_dir_path,
+        label_filename)
+    archive_fs.settext(label_filepath, unicode(label))
+
+
 def start_bundle(src_dir, archive_dir):
     # type: (unicode, unicode) -> None
     """
@@ -210,4 +301,9 @@ def start_bundle(src_dir, archive_dir):
     bundle_db = create_bundle_db(bundle_id, archive_dir)
     populate_database(bundle_id, bundle_db, archive_dir)
     create_browse_products(bundle_id, bundle_db, archive_dir)
-    # TODO: more to do.  Make document collections, at least.
+    # create_spice_products(bundle_id, bundle_db, archive_dir)
+    # create_document_collections(bundle_id, bundle_db, archive_dir)
+    create_pds4_labels(bundle_id, bundle_db, archive_dir)
+
+    # TODO: more to do.  Make SPICE collections, document collections,
+    # and labels.
