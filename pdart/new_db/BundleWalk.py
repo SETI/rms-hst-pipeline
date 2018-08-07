@@ -43,9 +43,10 @@ class BundleWalk(object):
 
     def _walk_bundle(self, bundle):
         # type: (Bundle) -> None
+        bundle_lidvid = str(bundle.lidvid)
         self.visit_bundle(bundle, False)
 
-        for collection in self.db.get_bundle_collections(bundle):
+        for collection in self.db.get_bundle_collections(bundle_lidvid):
             collection_lidvid = str(collection.lidvid)
             if self.db.document_collection_exists(collection_lidvid):
                 self._walk_document_collection(collection)

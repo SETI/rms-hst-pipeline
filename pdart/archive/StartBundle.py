@@ -2,23 +2,25 @@ import os
 import re
 
 import fs.copy
-import fs.path
 from fs.osfs import OSFS
+import fs.path
+from typing import TYPE_CHECKING
+
 import pdart.add_pds_tools
 import picmaker  # need to precede this with 'import pdart.add_pds_tools'
-from typing import TYPE_CHECKING
 
 from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.V1FS import V1FS
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
     create_bundle_db_from_os_filepath
+from pdart.new_db.BundleWalk import BundleWalk
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.new_labels.BrowseProductLabel import make_browse_product_label
 from pdart.new_labels.BundleLabel import make_bundle_label
-from pdart.new_labels.CollectionLabel import get_collection_label_name, \
-    make_collection_label
 from pdart.new_labels.CollectionInventory import \
     get_collection_inventory_name, make_collection_inventory
+from pdart.new_labels.CollectionLabel import get_collection_label_name, \
+    make_collection_label
 from pdart.new_labels.FitsProductLabel import make_fits_product_label
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
@@ -28,6 +30,7 @@ from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
+    from pdart.new_db.SqlAlchTables import *
 
 _INITIAL_VID = VID('1.0')  # type: VID
 
@@ -177,8 +180,8 @@ def create_browse_products(bundle_id, bundle_db, archive_dir):
             for file in bundle_db.get_product_files(fits_product_lidvid):
                 # create browse file in the filesystem
                 file_basename = file.basename
-                browse_basename = fs.path.splitext(file_basename)[0] + \
-                    '.jpg'
+                browse_basename = (fs.path.splitext(file_basename)[0] +
+                                   '.jpg')
 
                 fits_fs_filepath = fs.path.join(
                     lid_to_dir(LIDVID(fits_product_lidvid).lid()),
@@ -208,88 +211,117 @@ def create_browse_products(bundle_id, bundle_db, archive_dir):
                                              size)
 
 
-def create_pds4_labels(bundle_id, bundle_db, archive_dir):
-    # type: (int, BundleDB, unicode) -> None
+def _lidvid_to_dir(lidvid):
+    # type: (str) -> unicode
+    def get_lid(lidvid):
+        # type: (str) -> LID
+        return LIDVID(lidvid).lid()
+
+    return lid_to_dir(get_lid(str(lidvid)))
+
+
+class _CreateLabelsWalk(BundleWalk):
     """
-    Create bundle labels, collection inventories and labels, and
-    product labels for all the bundles, collections, and products in
-    the database.  These should be the same as are in the filesystem.
+    A class for walking a bundle and building labels (and a collection
+    inventory) for it.
     """
-    archive_fs = V1FS(archive_dir)
 
-    def lidvid_to_dir(lidvid):
-        # type: (str) -> unicode
-        def get_lid(lidvid):
-            # type: (str) -> LID
-            return LIDVID(lidvid).lid()
+    def __init__(self, bundle_db, archive_fs):
+        BundleWalk.__init__(self, bundle_db)
+        self.fs = archive_fs
 
-        return lid_to_dir(get_lid(str(lidvid)))
+    def visit_bundle(self, bundle, post):
+        # type: (Bundle, bool) -> None
+        if not post:
+            return
+        bundle_lidvid = str(bundle.lidvid)
+        bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
+        label = make_bundle_label(self.db, False)
+        label_filename = 'bundle.xml'
+        label_filepath = fs.path.join(
+            bundle_dir_path,
+            label_filename)
+        self.fs.settext(label_filepath, unicode(label))
 
-    bundle = bundle_db.get_bundle()
-    bundle_lidvid = str(bundle.lidvid)
-    bundle_dir_path = lidvid_to_dir(bundle_lidvid)
-    for collection in bundle_db.get_bundle_collections(bundle_lidvid):
+    def _post_visit_collection(self, collection):
+        # type: (Collection) -> None
+        """Common implementation for all collections."""
         collection_lidvid = str(collection.lidvid)
-        collection_dir_path = lidvid_to_dir(collection_lidvid)
-        for product in bundle_db.get_collection_products(collection_lidvid):
-            product_lidvid = str(product.lidvid)
-            product_dir_path = lidvid_to_dir(product_lidvid)
-            if bundle_db.browse_product_exists(product_lidvid):
-                files = list(bundle_db.get_product_files(product_lidvid))
-                assert len(files) == 1
-                label = make_browse_product_label(bundle_db,
-                                                  product_lidvid,
-                                                  files[0].basename,
-                                                  False)
-                label_base = fs.path.splitext(files[0].basename)[0]
-                label_filename = label_base + '.xml'
-                label_filepath = fs.path.join(
-                    product_dir_path,
-                    label_filename)
-                archive_fs.settext(label_filepath, unicode(label))
-            elif bundle_db.document_product_exists(product_lidvid):
-                # TODO I'm missing document products
-                assert False, ('missing case for document product %s' %
-                               product_lidvid)
-            elif bundle_db.fits_product_exists(product_lidvid):
-                # do something with the FITS product
-                for file in bundle_db.get_product_files(product_lidvid):
-                    label = make_fits_product_label(bundle_db,
-                                                    product_lidvid,
-                                                    file.basename,
-                                                    False)
-                    label_base = fs.path.splitext(file.basename)[0]
-                    label_filename = label_base + '.xml'
-                    label_filepath = fs.path.join(
-                        product_dir_path,
-                        label_filename)
-                    archive_fs.settext(label_filepath, unicode(label))
-            else:
-                assert False, 'missing case for product %s' % product_lidvid
+        collection_dir_path = _lidvid_to_dir(collection_lidvid)
 
-        inventory = make_collection_inventory(bundle_db, collection_lidvid)
-        inventory_filename = get_collection_inventory_name(bundle_db,
+        inventory = make_collection_inventory(self.db, collection_lidvid)
+        inventory_filename = get_collection_inventory_name(self.db,
                                                            collection_lidvid)
         inventory_filepath = fs.path.join(
             collection_dir_path,
             inventory_filename)
-        archive_fs.settext(inventory_filepath, unicode(inventory))
+        self.fs.settext(inventory_filepath, unicode(inventory))
 
-        label = make_collection_label(bundle_db, collection_lidvid, False)
-        label_filename = get_collection_label_name(bundle_db,
+        label = make_collection_label(self.db, collection_lidvid, False)
+        label_filename = get_collection_label_name(self.db,
                                                    collection_lidvid)
         label_filepath = fs.path.join(
             collection_dir_path,
             label_filename)
-        archive_fs.settext(label_filepath, unicode(label))
+        self.fs.settext(label_filepath, unicode(label))
 
-    # do something with the bundle
-    label = make_bundle_label(bundle_db, False)
-    label_filename = 'bundle.xml'
-    label_filepath = fs.path.join(
-        bundle_dir_path,
-        label_filename)
-    archive_fs.settext(label_filepath, unicode(label))
+    def visit_document_collection(self, document_collection, post):
+        # type: (DocumentCollection, bool) -> None
+        if post:
+            self._post_visit_collection(document_collection)
+
+    def visit_non_document_collection(self, non_document_collection, post):
+        # type: (NonDocumentCollection, bool) -> None
+        if post:
+            self._post_visit_collection(non_document_collection)
+
+    def visit_browse_file(self, browse_file):
+        # type: (BrowseFile) -> None
+        label = make_browse_product_label(self.db,
+                                          str(browse_file.product_lidvid),
+                                          str(browse_file.basename),
+                                          False)
+        label_base = fs.path.splitext(browse_file.basename)[0]
+        label_filename = label_base + '.xml'
+        product_lidvid = str(browse_file.product_lidvid)
+        product_dir_path = _lidvid_to_dir(product_lidvid)
+        label_filepath = fs.path.join(
+            product_dir_path,
+            label_filename)
+        self.fs.settext(label_filepath, unicode(label))
+
+    def visit_bad_fits_file(self, bad_fits_file):
+        # type: (BadFitsFile) -> None
+        assert False, ('Not yet handling bad FITS file %s in product %s' %
+                       (str(bad_fits_file.filename),
+                        str(bad_fits_file.lidvid)))
+
+    def visit_document_file(self, document_file):
+        # type: (DocumentFile) -> None
+        assert False, ('Not yet handling bad document file %s in product %s' %
+                       (str(document_file.filename),
+                        str(document_file.lidvid)))
+
+    def visit_fits_file(self, fits_file):
+        # type: (FitsFile) -> None
+        label = make_fits_product_label(self.db,
+                                        str(fits_file.product_lidvid),
+                                        str(fits_file.basename),
+                                        False)
+        label_base = fs.path.splitext(fits_file.basename)[0]
+        label_filename = label_base + '.xml'
+        product_lidvid = str(fits_file.product_lidvid)
+        product_dir_path = _lidvid_to_dir(product_lidvid)
+        label_filepath = fs.path.join(
+            product_dir_path,
+            label_filename)
+        self.fs.settext(label_filepath, unicode(label))
+
+
+def create_pds4_labels(bundle_id, bundle_db, archive_dir):
+    # type: (int, BundleDB, unicode) -> None
+    archive_fs = V1FS(archive_dir)
+    _CreateLabelsWalk(bundle_db, archive_fs).walk()
 
 
 def start_bundle(src_dir, archive_dir):
