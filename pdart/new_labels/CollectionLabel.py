@@ -16,6 +16,27 @@ if TYPE_CHECKING:
 
 # TODO Should probably test document_collection independently.
 
+def get_inventory_name(bundle_db, collection_lidvid):
+    # type: (BundleDB, str) -> unicode
+    collection = bundle_db.get_collection(collection_lidvid)
+    try:
+        inventory_name = 'collection_%s.csv' % collection.prefix
+    except Exception:
+        # Document collections won't have prefixes.
+        inventory_name = 'collection.csv'
+    return inventory_name
+
+
+def get_collection_label_name(bundle_db, collection_lidvid):
+    # type: (BundleDB, str) -> unicode
+    collection = bundle_db.get_collection(collection_lidvid)
+    try:
+        collection_label_name = 'collection_%s.xml' % collection.prefix
+    except Exception:
+        # Document collections won't have prefixes.
+        collection_label_name = 'collection.xml'
+    return collection_label_name
+
 
 def make_collection_label(bundle_db, collection_lidvid, verify):
     # type: (BundleDB, str, bool) -> unicode
@@ -30,11 +51,7 @@ def make_collection_label(bundle_db, collection_lidvid, verify):
     collection = bundle_db.get_collection(collection_lidvid)
     suffix = collection.suffix
     proposal_id = bundle_db.get_bundle().proposal_id
-    try:
-        inventory_name = 'collection_%s.csv' % collection.prefix
-    except Exception:
-        # Document collections won't have prefixes.
-        inventory_name = 'collection.csv'
+    inventory_name = get_inventory_name(bundle_db, collection_lidvid)
 
     label = make_label({
         'collection_lid': collection_lid,
