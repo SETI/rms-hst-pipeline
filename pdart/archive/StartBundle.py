@@ -149,86 +149,81 @@ def populate_database(bundle_id, bundle_db, archive_dir):
                                                  product_lidvid)
 
 
-class _CreateBrowseProducts(BundleWalk):
-    """
-    A class for walking a bundle and building browse products (and
-    collections) for image files.
-    """
-
-    def __init__(self, bundle_db, archive_fs):
-        # type: (BundleDB, V1FS) -> None
-        BundleWalk.__init__(self, bundle_db)
-        self.fs = archive_fs
-
-    def visit_non_document_collection(self, collection, post):
-        # type: (NonDocumentCollection, bool) -> None
-        if post:
-            return
-        # pre-visit
-        if collection.suffix not in RAW_SUFFIXES:
-            return
-        collection_lidvid = str(collection.lidvid)
-        browse_collection_lidvid = _browse_lidvid(collection_lidvid)
-        bundle_lidvid = str(collection.bundle_lidvid)
-        self.db.create_non_document_collection(browse_collection_lidvid,
-                                               bundle_lidvid)
-
-    def visit_fits_product(self, fits_product, post):
-        # type: (FitsProduct, bool) -> None
-        if post:
-            return
-        collection_lidvid = str(fits_product.collection_lidvid)
-        collection = self.db.get_collection(collection_lidvid)
-        if collection.suffix not in RAW_SUFFIXES:
-            return
-
-        fits_product_lidvid = str(fits_product.lidvid)
-        browse_collection_lidvid = _browse_lidvid(collection_lidvid)
-        browse_product_lidvid = _browse_lidvid(fits_product_lidvid)
-        self.db.create_browse_product(browse_product_lidvid,
-                                      fits_product_lidvid,
-                                      browse_collection_lidvid)
-        file = self.db.get_product_file(fits_product_lidvid)
-        # create browse file in the filesystem
-        file_basename = file.basename
-        browse_basename = (fs.path.splitext(file_basename)[0] +
-                           '.jpg')
-
-        fits_fs_filepath = fs.path.join(
-            lid_to_dir(LIDVID(fits_product_lidvid).lid()),
-            file_basename)
-        browse_product_fs_dirpath = lid_to_dir(
-            LIDVID(browse_product_lidvid).lid())
-
-        fits_sys_filepath = self.fs.getsyspath(fits_fs_filepath)
-        self.fs.makedirs(browse_product_fs_dirpath)
-        browse_product_sys_dirpath = self.fs.getsyspath(
-            browse_product_fs_dirpath)
-
-        # Picmaker expects a list of strings.  If you give it
-        # unicode, it'll index into it and complain about '/'
-        # not being a file.  So don't do that!
-        picmaker.ImagesToPics([str(fits_sys_filepath)],
-                              browse_product_sys_dirpath,
-                              filter="None",
-                              percentiles=(1, 99))
-        browse_sys_filepath = fs.path.join(
-            browse_product_sys_dirpath, browse_basename)
-        size = os.stat(browse_sys_filepath).st_size
-
-        # create browse file record in the database
-        self.db.create_browse_file(browse_basename,
-                                   browse_product_lidvid,
-                                   size)
-
-
 def create_browse_products(bundle_id, bundle_db, archive_dir):
     # type: (int, BundleDB, unicode) -> None
     """
     Create browse products from appropriate products in the bundle.
     """
     archive_fs = V1FS(archive_dir)
-    _CreateBrowseProducts(bundle_db, archive_fs).walk()
+
+    class _CreateBrowseProducts(BundleWalk):
+        """
+        A class for walking a bundle and building browse products (and
+        collections) for image files.
+        """
+
+        def visit_non_document_collection(self, collection, post):
+            # type: (NonDocumentCollection, bool) -> None
+            if post:
+                return
+            # pre-visit
+            if collection.suffix not in RAW_SUFFIXES:
+                return
+            collection_lidvid = str(collection.lidvid)
+            browse_collection_lidvid = _browse_lidvid(collection_lidvid)
+            bundle_lidvid = str(collection.bundle_lidvid)
+            self.db.create_non_document_collection(browse_collection_lidvid,
+                                                   bundle_lidvid)
+
+        def visit_fits_product(self, fits_product, post):
+            # type: (FitsProduct, bool) -> None
+            if post:
+                return
+            collection_lidvid = str(fits_product.collection_lidvid)
+            collection = self.db.get_collection(collection_lidvid)
+            if collection.suffix not in RAW_SUFFIXES:
+                return
+
+            fits_product_lidvid = str(fits_product.lidvid)
+            browse_collection_lidvid = _browse_lidvid(collection_lidvid)
+            browse_product_lidvid = _browse_lidvid(fits_product_lidvid)
+            self.db.create_browse_product(browse_product_lidvid,
+                                          fits_product_lidvid,
+                                          browse_collection_lidvid)
+            file = self.db.get_product_file(fits_product_lidvid)
+            # create browse file in the filesystem
+            file_basename = file.basename
+            browse_basename = (fs.path.splitext(file_basename)[0] +
+                               '.jpg')
+
+            fits_fs_filepath = fs.path.join(
+                lid_to_dir(LIDVID(fits_product_lidvid).lid()),
+                file_basename)
+            browse_product_fs_dirpath = lid_to_dir(
+                LIDVID(browse_product_lidvid).lid())
+
+            fits_sys_filepath = archive_fs.getsyspath(fits_fs_filepath)
+            archive_fs.makedirs(browse_product_fs_dirpath)
+            browse_product_sys_dirpath = archive_fs.getsyspath(
+                browse_product_fs_dirpath)
+
+            # Picmaker expects a list of strings.  If you give it
+            # unicode, it'll index into it and complain about '/'
+            # not being a file.  So don't do that!
+            picmaker.ImagesToPics([str(fits_sys_filepath)],
+                                  browse_product_sys_dirpath,
+                                  filter="None",
+                                  percentiles=(1, 99))
+            browse_sys_filepath = fs.path.join(
+                browse_product_sys_dirpath, browse_basename)
+            size = os.stat(browse_sys_filepath).st_size
+
+            # create browse file record in the database
+            self.db.create_browse_file(browse_basename,
+                                       browse_product_lidvid,
+                                       size)
+
+    _CreateBrowseProducts(bundle_db).walk()
 
 
 def _lidvid_to_dir(lidvid):
@@ -240,109 +235,104 @@ def _lidvid_to_dir(lidvid):
     return lid_to_dir(get_lid(str(lidvid)))
 
 
-class _CreateLabelsWalk(BundleWalk):
-    """
-    A class for walking a bundle and building labels (and a collection
-    inventory) for it.
-    """
-
-    def __init__(self, bundle_db, archive_fs):
-        # type: (BundleDB, V1FS) -> None
-        BundleWalk.__init__(self, bundle_db)
-        self.fs = archive_fs
-
-    def visit_bundle(self, bundle, post):
-        # type: (Bundle, bool) -> None
-        if not post:
-            return
-        bundle_lidvid = str(bundle.lidvid)
-        bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
-        label = make_bundle_label(self.db, False)
-        label_filename = 'bundle.xml'
-        label_filepath = fs.path.join(
-            bundle_dir_path,
-            label_filename)
-        self.fs.settext(label_filepath, unicode(label))
-
-    def _post_visit_collection(self, collection):
-        # type: (Collection) -> None
-        """Common implementation for all collections."""
-        collection_lidvid = str(collection.lidvid)
-        collection_dir_path = _lidvid_to_dir(collection_lidvid)
-
-        inventory = make_collection_inventory(self.db, collection_lidvid)
-        inventory_filename = get_collection_inventory_name(self.db,
-                                                           collection_lidvid)
-        inventory_filepath = fs.path.join(
-            collection_dir_path,
-            inventory_filename)
-        self.fs.settext(inventory_filepath, unicode(inventory))
-
-        label = make_collection_label(self.db, collection_lidvid, False)
-        label_filename = get_collection_label_name(self.db,
-                                                   collection_lidvid)
-        label_filepath = fs.path.join(
-            collection_dir_path,
-            label_filename)
-        self.fs.settext(label_filepath, unicode(label))
-
-    def visit_document_collection(self, document_collection, post):
-        # type: (DocumentCollection, bool) -> None
-        if post:
-            self._post_visit_collection(document_collection)
-
-    def visit_non_document_collection(self, non_document_collection, post):
-        # type: (NonDocumentCollection, bool) -> None
-        if post:
-            self._post_visit_collection(non_document_collection)
-
-    def visit_browse_file(self, browse_file):
-        # type: (BrowseFile) -> None
-        label = make_browse_product_label(self.db,
-                                          str(browse_file.product_lidvid),
-                                          str(browse_file.basename),
-                                          False)
-        label_base = fs.path.splitext(browse_file.basename)[0]
-        label_filename = label_base + '.xml'
-        product_lidvid = str(browse_file.product_lidvid)
-        product_dir_path = _lidvid_to_dir(product_lidvid)
-        label_filepath = fs.path.join(
-            product_dir_path,
-            label_filename)
-        self.fs.settext(label_filepath, unicode(label))
-
-    def visit_bad_fits_file(self, bad_fits_file):
-        # type: (BadFitsFile) -> None
-        assert False, ('Not yet handling bad FITS file %s in product %s' %
-                       (str(bad_fits_file.filename),
-                        str(bad_fits_file.lidvid)))
-
-    def visit_document_file(self, document_file):
-        # type: (DocumentFile) -> None
-        assert False, ('Not yet handling bad document file %s in product %s' %
-                       (str(document_file.filename),
-                        str(document_file.lidvid)))
-
-    def visit_fits_file(self, fits_file):
-        # type: (FitsFile) -> None
-        label = make_fits_product_label(self.db,
-                                        str(fits_file.product_lidvid),
-                                        str(fits_file.basename),
-                                        False)
-        label_base = fs.path.splitext(fits_file.basename)[0]
-        label_filename = label_base + '.xml'
-        product_lidvid = str(fits_file.product_lidvid)
-        product_dir_path = _lidvid_to_dir(product_lidvid)
-        label_filepath = fs.path.join(
-            product_dir_path,
-            label_filename)
-        self.fs.settext(label_filepath, unicode(label))
-
-
 def create_pds4_labels(bundle_id, bundle_db, archive_dir):
     # type: (int, BundleDB, unicode) -> None
     archive_fs = V1FS(archive_dir)
-    _CreateLabelsWalk(bundle_db, archive_fs).walk()
+
+    class _CreateLabelsWalk(BundleWalk):
+        """
+        A class for walking a bundle and building labels (and a collection
+        inventory) for it.
+        """
+        def visit_bundle(self, bundle, post):
+            # type: (Bundle, bool) -> None
+            if not post:
+                return
+            bundle_lidvid = str(bundle.lidvid)
+            bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
+            label = make_bundle_label(self.db, False)
+            label_filename = 'bundle.xml'
+            label_filepath = fs.path.join(
+                bundle_dir_path,
+                label_filename)
+            archive_fs.settext(label_filepath, unicode(label))
+
+        def _post_visit_collection(self, collection):
+            # type: (Collection) -> None
+            """Common implementation for all collections."""
+            collection_lidvid = str(collection.lidvid)
+            collection_dir_path = _lidvid_to_dir(collection_lidvid)
+
+            inventory = make_collection_inventory(self.db, collection_lidvid)
+            inventory_filename = get_collection_inventory_name(
+                self.db,
+                collection_lidvid)
+            inventory_filepath = fs.path.join(
+                collection_dir_path,
+                inventory_filename)
+            archive_fs.settext(inventory_filepath, unicode(inventory))
+
+            label = make_collection_label(self.db, collection_lidvid, False)
+            label_filename = get_collection_label_name(self.db,
+                                                       collection_lidvid)
+            label_filepath = fs.path.join(
+                collection_dir_path,
+                label_filename)
+            archive_fs.settext(label_filepath, unicode(label))
+
+        def visit_document_collection(self, document_collection, post):
+            # type: (DocumentCollection, bool) -> None
+            if post:
+                self._post_visit_collection(document_collection)
+
+        def visit_non_document_collection(self, non_document_collection, post):
+            # type: (NonDocumentCollection, bool) -> None
+            if post:
+                self._post_visit_collection(non_document_collection)
+
+        def visit_browse_file(self, browse_file):
+            # type: (BrowseFile) -> None
+            label = make_browse_product_label(self.db,
+                                              str(browse_file.product_lidvid),
+                                              str(browse_file.basename),
+                                              False)
+            label_base = fs.path.splitext(browse_file.basename)[0]
+            label_filename = label_base + '.xml'
+            product_lidvid = str(browse_file.product_lidvid)
+            product_dir_path = _lidvid_to_dir(product_lidvid)
+            label_filepath = fs.path.join(
+                product_dir_path,
+                label_filename)
+            archive_fs.settext(label_filepath, unicode(label))
+
+        def visit_bad_fits_file(self, bad_fits_file):
+            # type: (BadFitsFile) -> None
+            assert False, (
+                'Not yet handling bad FITS file %s in product %s' %
+                (str(bad_fits_file.filename), str(bad_fits_file.lidvid)))
+
+        def visit_document_file(self, document_file):
+            # type: (DocumentFile) -> None
+            assert False, (
+                'Not yet handling bad document file %s in product %s' %
+                (str(document_file.filename), str(document_file.lidvid)))
+
+        def visit_fits_file(self, fits_file):
+            # type: (FitsFile) -> None
+            label = make_fits_product_label(self.db,
+                                            str(fits_file.product_lidvid),
+                                            str(fits_file.basename),
+                                            False)
+            label_base = fs.path.splitext(fits_file.basename)[0]
+            label_filename = label_base + '.xml'
+            product_lidvid = str(fits_file.product_lidvid)
+            product_dir_path = _lidvid_to_dir(product_lidvid)
+            label_filepath = fs.path.join(
+                product_dir_path,
+                label_filename)
+            archive_fs.settext(label_filepath, unicode(label))
+
+    _CreateLabelsWalk(bundle_db).walk()
 
 
 def start_bundle(src_dir, archive_dir):
