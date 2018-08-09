@@ -29,7 +29,9 @@ from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
-    from pdart.new_db.SqlAlchTables import *
+    from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, Bundle, \
+        Collection, DocumentCollection, DocumentFile, FitsFile, FitsProduct, \
+        NonDocumentCollection
 
 _INITIAL_VID = VID('1.0')  # type: VID
 
@@ -335,6 +337,24 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
     _CreateLabelsWalk(bundle_db).walk()
 
 
+def create_document_collection(bundle_id, bundle_db, archive_dir):
+    # type: (int, BundleDB, unicode) -> None
+    archive_fs = V1FS(archive_dir)
+    bundle_part = 'hst_%05d' % bundle_id
+    bundle_lidvid = _create_lidvid_from_parts([bundle_part])
+    collection_lidvid = _create_lidvid_from_parts([bundle_part,
+                                                   'document'])
+
+    # create the collection
+    bundle_db.create_document_collection(collection_lidvid, bundle_lidvid)
+    document_collection_dir = lid_to_dir(LIDVID(collection_lidvid).lid())
+
+    # create the directory
+    archive_fs.makedirs(document_collection_dir)
+
+    assert False, 'MORE TO DO'
+
+
 def start_bundle(src_dir, archive_dir):
     # type: (unicode, unicode) -> None
     """
@@ -345,7 +365,9 @@ def start_bundle(src_dir, archive_dir):
     populate_database(bundle_id, bundle_db, archive_dir)
     create_browse_products(bundle_id, bundle_db, archive_dir)
     # create_spice_products(bundle_id, bundle_db, archive_dir)
-    # create_document_collections(bundle_id, bundle_db, archive_dir)
+    if False:
+        # under development
+        create_document_collection(bundle_id, bundle_db, archive_dir)
     create_pds4_labels(bundle_id, bundle_db, archive_dir)
 
     # TODO: more to do.  Make SPICE collections, document collections,

@@ -141,6 +141,31 @@ class TestStartBundle(unittest.TestCase):
         finally:
             db.close()
 
+    @unittest.skip('under development')
+    def test_create_document_collection(self):
+        # type: () -> None
+        download_dir = _path_to_testfiles()
+        copy_files_from_download(download_dir, self.archive_dir)
+        db = create_bundle_db(13012, self.archive_dir)
+        try:
+            populate_database(13012, db, self.archive_dir)
+            create_document_collection(13012, db, self.archive_dir)
+
+            # ensure the collection exists in the database
+            document_collection_lidvid = _create_lidvid_from_parts(
+                ['hst_13012', 'document'])
+            self.assertTrue(db.document_collection_exists(
+                    document_collection_lidvid))
+
+            # ensure the collection exists in the filesystem
+            document_collection_dir = u'/hst_13012/document'
+            self.assertTrue(V1FS(self.archive_dir).isdir(
+                    document_collection_dir))
+
+            assert False, 'MORE TO DO'
+        finally:
+            db.close()
+
     def test_create_pds4_labels(self):
         # type: () -> None
         download_dir = _path_to_testfiles()
