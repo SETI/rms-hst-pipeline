@@ -1,5 +1,7 @@
 import os
 import re
+import shutil
+import tempfile
 
 import fs.copy
 import fs.path
@@ -8,6 +10,7 @@ import picmaker  # need to precede this with 'import pdart.add_pds_tools'
 from fs.osfs import OSFS
 from typing import TYPE_CHECKING
 
+from pdart.documents.Downloads import download_product_documents
 from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.V1FS import V1FS
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, \
@@ -311,13 +314,15 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
             # type: (BadFitsFile) -> None
             assert False, (
                 'Not yet handling bad FITS file %s in product %s' %
-                (str(bad_fits_file.filename), str(bad_fits_file.lidvid)))
+                (str(bad_fits_file.basename),
+                 str(bad_fits_file.product_lidvid)))
 
         def visit_document_file(self, document_file):
             # type: (DocumentFile) -> None
             assert False, (
-                'Not yet handling bad document file %s in product %s' %
-                (str(document_file.filename), str(document_file.lidvid)))
+                'Not yet handling document file %s in product %s' %
+                (str(document_file.basename),
+                 str(document_file.product_lidvid)))
 
         def visit_fits_file(self, fits_file):
             # type: (FitsFile) -> None
@@ -337,22 +342,42 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
     _CreateLabelsWalk(bundle_db).walk()
 
 
-def create_document_collection(bundle_id, bundle_db, archive_dir):
-    # type: (int, BundleDB, unicode) -> None
+def create_document_collection(bundle_id, bundle_db, archive_dir,
+                               document_dir, document_files):
+    # type: (int, BundleDB, unicode, unicode, Set[unicode]) -> None
+    if not document_files:
+        return
     archive_fs = V1FS(archive_dir)
     bundle_part = 'hst_%05d' % bundle_id
     bundle_lidvid = _create_lidvid_from_parts([bundle_part])
     collection_lidvid = _create_lidvid_from_parts([bundle_part,
                                                    'document'])
 
-    # create the collection
+    # create the collection in the database
     bundle_db.create_document_collection(collection_lidvid, bundle_lidvid)
-    document_collection_dir = lid_to_dir(LIDVID(collection_lidvid).lid())
 
-    # create the directory
+    # create the product in the database
+    product_lidvid = _create_lidvid_from_parts([bundle_part,
+                                                'document',
+                                                'phase2'])
+
+    bundle_db.create_document_product(product_lidvid, collection_lidvid)
+
+    # create the files in the database
+    for basename in document_files:
+        bundle_db.create_document_file(basename, product_lidvid)
+
+    # create the collection in the filesystem
+    document_collection_dir = _lidvid_to_dir(collection_lidvid)
     archive_fs.makedirs(document_collection_dir)
 
-    assert False, 'MORE TO DO'
+    # create the product in the filesystem
+    document_product_dir = _lidvid_to_dir(product_lidvid)
+    archive_fs.makedirs(document_product_dir)
+
+    # create the files in the filesystem
+    doc_fs = OSFS(document_dir)
+    fs.copy.copy_dir(doc_fs, u'/', archive_fs, document_product_dir)
 
 
 def start_bundle(src_dir, archive_dir):
@@ -365,9 +390,14 @@ def start_bundle(src_dir, archive_dir):
     populate_database(bundle_id, bundle_db, archive_dir)
     create_browse_products(bundle_id, bundle_db, archive_dir)
     # create_spice_products(bundle_id, bundle_db, archive_dir)
-    if False:
-        # under development
-        create_document_collection(bundle_id, bundle_db, archive_dir)
+
+    documents_dir = tempfile.mkdtemp()
+    try:
+        docs = download_product_documents(bundle_id, documents_dir)
+        create_document_collection(bundle_id, bundle_db, archive_dir,
+                                   documents_dir, docs)
+    finally:
+        shutil.rmtree(documents_dir)
     create_pds4_labels(bundle_id, bundle_db, archive_dir)
 
     # TODO: more to do.  Make SPICE collections, document collections,

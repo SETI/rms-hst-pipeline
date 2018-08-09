@@ -16,6 +16,10 @@ if TYPE_CHECKING:
     from sqlalchemy.schema import Column
 
 
+_DOC_FILES = {u'phase2.pro', u'phase2.pdf', u'phase2.apt'}
+# type: Set[unicode]
+
+
 def _path_to_testfiles():
     # type: () -> unicode
     """Return the path to files needed for testing."""
@@ -48,7 +52,9 @@ class TestStartBundle(unittest.TestCase):
 
     def test_copy_files_from_download(self):
         # type: () -> None
-        download_dir = _path_to_testfiles()
+        download_dir = fs.path.join(_path_to_testfiles(),
+                                    'download_dir')
+
         res = copy_files_from_download(download_dir, self.archive_dir)
         # check that it read the expected bundle
         self.assertEqual(res, 13012)
@@ -69,7 +75,8 @@ class TestStartBundle(unittest.TestCase):
 
     def test_create_bundle_db(self):
         # type: () -> None
-        download_dir = _path_to_testfiles()
+        download_dir = fs.path.join(_path_to_testfiles(),
+                                    'download_dir')
         copy_files_from_download(download_dir, self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
@@ -92,7 +99,9 @@ class TestStartBundle(unittest.TestCase):
             db.close()
 
     def test_populate_database(self):
-        download_dir = _path_to_testfiles()
+        download_dir = fs.path.join(_path_to_testfiles(),
+                                    'download_dir')
+
         copy_files_from_download(download_dir, self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
@@ -111,7 +120,9 @@ class TestStartBundle(unittest.TestCase):
             db.close()
 
     def test_create_browse_products(self):
-        download_dir = _path_to_testfiles()
+        download_dir = fs.path.join(_path_to_testfiles(),
+                                    'download_dir')
+
         copy_files_from_download(download_dir, self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
@@ -141,15 +152,22 @@ class TestStartBundle(unittest.TestCase):
         finally:
             db.close()
 
-    @unittest.skip('under development')
     def test_create_document_collection(self):
         # type: () -> None
-        download_dir = _path_to_testfiles()
+        download_dir = fs.path.join(_path_to_testfiles(),
+                                    'download_dir')
+        documents_dir = fs.path.join(_path_to_testfiles(), 'document_files')
+
         copy_files_from_download(download_dir, self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
+            archive_fs = V1FS(self.archive_dir)
             populate_database(13012, db, self.archive_dir)
-            create_document_collection(13012, db, self.archive_dir)
+
+            create_document_collection(
+                13012, db, self.archive_dir,
+                documents_dir,
+                _DOC_FILES)
 
             # ensure the collection exists in the database
             document_collection_lidvid = _create_lidvid_from_parts(
@@ -159,21 +177,53 @@ class TestStartBundle(unittest.TestCase):
 
             # ensure the collection exists in the filesystem
             document_collection_dir = u'/hst_13012/document'
-            self.assertTrue(V1FS(self.archive_dir).isdir(
+            self.assertTrue(archive_fs.isdir(
                     document_collection_dir))
 
-            assert False, 'MORE TO DO'
+            # ensure the product exists in the database
+            document_product_lidvid = _create_lidvid_from_parts(
+                ['hst_13012', 'document', 'phase2'])
+            self.assertTrue(db.document_product_exists(
+                    document_product_lidvid))
+
+            # ensure the product exists in the filesystem
+            document_product_dir = u'/hst_13012/document/phase2'
+            self.assertTrue(archive_fs.isdir(
+                    document_product_dir))
+
+            # ensure the files exist in the database
+            for basename in _DOC_FILES:
+                self.assertTrue(db.document_file_exists(
+                        basename,
+                        document_product_lidvid))
+
+            # ensure the files exist in the filesystem
+            for basename in _DOC_FILES:
+                document_file_filepath = fs.path.join(document_product_dir,
+                                                      basename)
+                self.assertTrue(archive_fs.isfile(document_file_filepath))
         finally:
             db.close()
 
     def test_create_pds4_labels(self):
         # type: () -> None
-        download_dir = _path_to_testfiles()
+        download_dir = fs.path.join(_path_to_testfiles(),
+                                    'download_dir')
+        documents_dir = fs.path.join(_path_to_testfiles(), 'document_files')
+
         copy_files_from_download(download_dir, self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
             populate_database(13012, db, self.archive_dir)
             create_browse_products(13012, db, self.archive_dir)
+
+            if False:
+                # MORE TO DO
+                create_document_collection(
+                    13012, db, self.archive_dir,
+                    documents_dir,
+                    _DOC_FILES)
+
             create_pds4_labels(13012, db, self.archive_dir)
 
             # Test that all the labels exist

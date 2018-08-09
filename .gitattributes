@@ -1,3 +1,4 @@
 * text=auto
+*.apt text eol=crlf
 pdart/new_labels/test_CollectionInventory.golden.txt text eol=crlf
 
