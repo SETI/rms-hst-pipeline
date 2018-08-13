@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING
 from pdart.new_labels.CitationInformation \
     import make_placeholder_citation_information
 from pdart.new_labels.CollectionInventory import get_collection_inventory_name
-from pdart.new_labels.CollectionLabelXml import make_label
+from pdart.new_labels.CollectionLabelXml import make_label, \
+    make_document_collection_title, make_non_document_collection_title
 from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
@@ -39,15 +40,25 @@ def make_collection_label(bundle_db, collection_lidvid, verify):
     collection_lid = lidvid_to_lid(collection_lidvid)
     collection_vid = lidvid_to_vid(collection_lidvid)
     collection = bundle_db.get_collection(collection_lidvid)
-    suffix = collection.suffix
+    is_doc_coll = bundle_db.document_collection_exists(collection_lidvid)
+
     proposal_id = bundle_db.get_bundle().proposal_id
+    if is_doc_coll:
+        title = make_document_collection_title({
+                'proposal_id': str(proposal_id)
+                })
+    else:
+        title = make_non_document_collection_title({
+                'suffix': collection.suffix,
+                'proposal_id': str(proposal_id)})
+
     inventory_name = get_collection_inventory_name(bundle_db,
                                                    collection_lidvid)
 
     label = make_label({
         'collection_lid': collection_lid,
         'collection_vid': collection_vid,
-        'suffix': suffix,
+        'title': title,
         'proposal_id': str(proposal_id),
         'Citation_Information': make_placeholder_citation_information(
             collection_lid),

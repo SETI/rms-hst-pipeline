@@ -2,10 +2,25 @@
 from typing import TYPE_CHECKING
 
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
-from pdart.xml.Templates import interpret_document_template
+from pdart.xml.Templates import interpret_document_template, \
+    interpret_template
 
 if TYPE_CHECKING:
-    from pdart.xml.Templates import DocTemplate
+    from pdart.xml.Templates import DocTemplate, NodeBuilderTemplate
+
+
+make_document_collection_title = interpret_template(
+    """
+    <title>This collection contains documentation from \
+HST Observing Program <NODE name="proposal_id"/>.</title>
+    """)  # type: NodeBuilderTemplate
+
+
+make_non_document_collection_title = interpret_template(
+    """<title>This collection contains the <NODE name="suffix"/> \
+images obtained from HST Observing Program \
+<NODE name="proposal_id"/>.</title>""")  # type: NodeBuilderTemplate
+
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
@@ -16,9 +31,7 @@ make_label = interpret_document_template(
   <Identification_Area>
     <logical_identifier><NODE name="collection_lid" /></logical_identifier>
     <version_id><NODE name="collection_vid" /></version_id>
-    <title>This collection contains the <NODE name="suffix"/> \
-images obtained from HST Observing Program \
-<NODE name="proposal_id"/>.</title>
+    <NODE name="title"/>
     <information_model_version>%s</information_model_version>
     <product_class>Product_Collection</product_class>
 
