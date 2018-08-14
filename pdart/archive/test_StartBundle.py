@@ -217,12 +217,10 @@ class TestStartBundle(unittest.TestCase):
             populate_database(13012, db, self.archive_dir)
             create_browse_products(13012, db, self.archive_dir)
 
-            if False:
-                # MORE TO DO
-                create_document_collection(
-                    13012, db, self.archive_dir,
-                    documents_dir,
-                    _DOC_FILES)
+            create_document_collection(
+                13012, db, self.archive_dir,
+                documents_dir,
+                _DOC_FILES)
 
             create_pds4_labels(13012, db, self.archive_dir)
 
@@ -258,7 +256,12 @@ class TestStartBundle(unittest.TestCase):
                         self.assertTrue(vfs.isfile(label_filepath))
                     elif db.document_product_exists(product_lidvid):
                         # handle document product
-                        assert False, 'TODO'
+                        label_filename = 'phase2.xml'
+                        label_filepath = fs.path.join(product_dir,
+                                                      label_filename)
+                        vfs.tree()
+                        self.assertTrue(vfs.isfile(label_filepath),
+                                        label_filepath)
                     elif db.fits_product_exists(product_lidvid):
                         # handle fits product
                         files = list(db.get_product_files(product_lidvid))

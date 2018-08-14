@@ -23,6 +23,7 @@ from pdart.new_labels.CollectionInventory import \
     get_collection_inventory_name, make_collection_inventory
 from pdart.new_labels.CollectionLabel import get_collection_label_name, \
     make_collection_label
+from pdart.new_labels.DocumentProductLabel import make_document_product_label
 from pdart.new_labels.FitsProductLabel import make_fits_product_label
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
@@ -33,8 +34,8 @@ from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
     from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, Bundle, \
-        Collection, DocumentCollection, DocumentFile, FitsFile, FitsProduct, \
-        NonDocumentCollection
+        Collection, DocumentCollection, DocumentProduct, DocumentFile, \
+        FitsFile, FitsProduct, NonDocumentCollection
 
 _INITIAL_VID = VID('1.0')  # type: VID
 
@@ -295,6 +296,25 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
             if post:
                 self._post_visit_collection(non_document_collection)
 
+        def visit_document_product(self, document_product, post):
+            # type: (DocumentProduct, bool) -> None
+            if not post:
+                return
+            product_lidvid = str(document_product.lidvid)
+            label = make_document_product_label(self.db,
+                                                product_lidvid,
+                                                False,
+                                                None)
+            # TODO publication date left blank
+
+            label_base = LIDVID(product_lidvid).lid().product_id
+            label_filename = label_base + '.xml'
+            product_dir_path = _lidvid_to_dir(product_lidvid)
+            label_filepath = fs.path.join(
+                product_dir_path,
+                label_filename)
+            archive_fs.settext(label_filepath, unicode(label))
+
         def visit_browse_file(self, browse_file):
             # type: (BrowseFile) -> None
             label = make_browse_product_label(self.db,
@@ -316,13 +336,6 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 'Not yet handling bad FITS file %s in product %s' %
                 (str(bad_fits_file.basename),
                  str(bad_fits_file.product_lidvid)))
-
-        def visit_document_file(self, document_file):
-            # type: (DocumentFile) -> None
-            assert False, (
-                'Not yet handling document file %s in product %s' %
-                (str(document_file.basename),
-                 str(document_file.product_lidvid)))
 
         def visit_fits_file(self, fits_file):
             # type: (FitsFile) -> None
