@@ -1,6 +1,7 @@
+from typing import TYPE_CHECKING
 import unittest
 
-from pdart.astroquery.Utils import *
+from pdart.astroquery.Utils import filter_table, ymdhms_format_from_mjd
 
 if TYPE_CHECKING:
     from astroquery.table.row import Row

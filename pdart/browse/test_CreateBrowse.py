@@ -1,10 +1,11 @@
 import unittest
 
 from fs.osfs import OSFS
-from fs.path import dirname
+from fs.path import basename, dirname, join
 from fs.tempfs import TempFS
 
-from pdart.browse.CreateBrowse import *
+from pdart.browse.CreateBrowse import create_browse_directory, \
+    create_browse_file_from_fits_file, populate_database_from_browse_product
 from pdart.fs.CopyOnWriteFS import CopyOnWriteFS
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 

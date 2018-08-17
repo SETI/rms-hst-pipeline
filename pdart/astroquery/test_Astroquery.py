@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.astroquery.Astroquery import *
+from pdart.astroquery.Astroquery import MastSlice
 
 
 @unittest.skip('really slow: investigate')
