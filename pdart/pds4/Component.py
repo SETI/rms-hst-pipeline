@@ -6,7 +6,7 @@ import abc
 from fs.path import join, splitext
 from typing import TYPE_CHECKING
 
-from pdart.pds4.LID import *
+from pdart.pds4.LID import LID
 
 if TYPE_CHECKING:
     from typing import Iterator

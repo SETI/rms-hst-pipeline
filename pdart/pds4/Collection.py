@@ -1,10 +1,11 @@
 """Representation of a PDS4 collection."""
+import re
 
-from fs.path import splitext
+from fs.path import join, splitext
 from typing import TYPE_CHECKING
 
-from pdart.pds4.Component import *
-from pdart.pds4.LID import *
+from pdart.pds4.Component import Component
+from pdart.pds4.LID import LID
 
 # We only import PDS4 subcomponent modules to avoid circular imports.
 # If you want to import a supercomponent module, do it within a

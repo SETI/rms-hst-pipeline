@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.pds4.LID import *
+from pdart.pds4.LID import LID
 
 
 class TestLID(unittest.TestCase):

@@ -2,7 +2,7 @@ import shutil
 import tempfile
 import unittest
 
-from pdart.pds4.Archive import *
+from pdart.pds4.Archive import Archive
 
 
 class TestArchive(unittest.TestCase):

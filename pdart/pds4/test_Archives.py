@@ -1,4 +1,4 @@
-from pdart.pds4.Archives import *
+from pdart.pds4.Archives import get_mini_archive_dir
 
 
 def test_get_mini_archive_dir():

@@ -1,6 +1,8 @@
 import unittest
 
-from pdart.pds4.LIDVID import *
+from pdart.pds4.LID import LID
+from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.VID import VID
 
 
 class TestLIDVID(unittest.TestCase):

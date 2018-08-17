@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.pds4.VID import *
+from pdart.pds4.VID import VID
 
 
 class TestVID(unittest.TestCase):

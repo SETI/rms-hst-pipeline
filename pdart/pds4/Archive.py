@@ -1,12 +1,13 @@
 """Representation of an archive containing PDS4 bundles."""
-
-from fs.osfs import OSFS
+import re
 from typing import TYPE_CHECKING
 
-from pdart.pds4.Bundle import *
-from pdart.pds4.Collection import *
-from pdart.pds4.LID import *
-from pdart.pds4.Product import *
+from fs.osfs import OSFS
+
+from pdart.pds4.Bundle import Bundle
+from pdart.pds4.Collection import Collection
+from pdart.pds4.LID import LID
+from pdart.pds4.Product import Product
 
 if TYPE_CHECKING:
     from typing import Iterator
