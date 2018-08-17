@@ -52,7 +52,7 @@ def get_bandwidth(product_id, instrument, header):
     """
     if instrument == 'wfpc2':
         try:
-            return header['BANDWID'] * 1.e-4
+            return header['BANDWID'] * 1.0e-4
         except KeyError:
             return placeholder_float(product_id, 'bandwidth')
 
@@ -64,7 +64,7 @@ def get_center_filter_wavelength(product_id, instrument, header):
     """
     if instrument == 'wfpc2':
         try:
-            return header['CENTRWV'] * 1.e-4
+            return header['CENTRWV'] * 1.0e-4
         except KeyError:
             return placeholder_float(product_id, 'center_filter_wavelength')
 

@@ -66,7 +66,7 @@ def _get_db_bandwidth(headers, instrument, product_id):
     # type: (Headers, unicode, unicode) -> unicode
     if instrument == 'wfpc2':
         bandwid = float(headers[0]['BANDWID'])
-        return str(bandwid * 1.e-4)
+        return str(bandwid * 1.0e-4)
 
 
 def _get_db_bandwidth_placeholder(headers, instrument, product_id):
@@ -91,7 +91,7 @@ def _get_db_center_filter_wavelength(headers, instrument, product_id):
     # type: (Headers, unicode, unicode) -> unicode
     if instrument == 'wfpc2':
         centrwv = float(headers[0]['CENTRWV'])
-        return str(centrwv * 1.e-4)
+        return str(centrwv * 1.0e-4)
     else:
         raise Exception('Unhandled instrument %s' % instrument)
 

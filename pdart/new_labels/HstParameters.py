@@ -68,7 +68,7 @@ def _get_bandwidth(card_dicts, instrument, product_id):
     # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
     if instrument == 'wfpc2':
         bandwid = float(card_dicts[0]['BANDWID'])
-        return str(bandwid * 1.e-4)
+        return str(bandwid * 1.0e-4)
 
 
 def _get_bandwidth_placeholder(card_dicts, instrument, product_id):
@@ -94,7 +94,7 @@ def _get_center_filter_wavelength(card_dicts, instrument, product_id):
     # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
     if instrument == 'wfpc2':
         centrwv = float(card_dicts[0]['CENTRWV'])
-        return str(centrwv * 1.e-4)
+        return str(centrwv * 1.0e-4)
     else:
         raise Exception('Unhandled instrument %s' % instrument)
 
