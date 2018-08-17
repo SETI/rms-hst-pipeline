@@ -13,7 +13,7 @@ from contextlib import closing
 
 from typing import TYPE_CHECKING
 
-from pdart.xml.Pds4Version import *
+from pdart.xml.Pds4Version import PDS4_SHORT_VERSION
 
 if TYPE_CHECKING:
     from typing import Sequence, Tuple, Union

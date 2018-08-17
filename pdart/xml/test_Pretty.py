@@ -1,4 +1,4 @@
-from pdart.xml.Pretty import *
+from pdart.xml.Pretty import pretty_print
 
 _PP = """<?xml version="1.0"?>
 <foobar>

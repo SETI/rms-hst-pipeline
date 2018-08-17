@@ -76,7 +76,7 @@ import xml.sax
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any, Callable, Dict, List
-    from xml.dom.minidom import *
+    from xml.dom.minidom import Document, Text
     TemplateDict = Dict[str, Any]
     Node = Text
     Frag = List[Text]

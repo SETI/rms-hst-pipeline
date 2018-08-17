@@ -1,7 +1,8 @@
 import unittest
 import xml.dom
 
-from pdart.xml.Templates import *
+from pdart.xml.Templates import interpret_document_template, \
+    interpret_template, interpret_text
 
 
 class TestTemplates(unittest.TestCase):
