@@ -3,9 +3,10 @@ import shutil
 import tempfile
 import unittest
 
+import fs.errors
 from fs.test import FSTestCases
 
-from pdart.fs.V1FS import *
+from pdart.fs.V1FS import V1FS, V1Primitives
 from pdart.fs.test_FSPrimitives import FSPrimitives_TestBase
 
 

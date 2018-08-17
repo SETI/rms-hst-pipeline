@@ -2,7 +2,9 @@ import unittest
 
 from fs.memoryfs import MemoryFS
 
-from pdart.fs.SubdirVersions import *
+from pdart.fs.SubdirVersions import parse_subdir_versions, \
+    read_subdir_versions_from_directory, str_subdir_versions, \
+    write_subdir_versions_to_directory
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME
 
 

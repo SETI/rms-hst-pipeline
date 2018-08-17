@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.fs.DeletionSet import *
+from pdart.fs.DeletionSet import DeletionSet
 
 
 class TestDeletionSet(unittest.TestCase):

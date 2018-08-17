@@ -1,9 +1,13 @@
 """
 A view on a filesystem to make it read-only.
 """
+from typing import TYPE_CHECKING
 from fs.errors import ResourceReadOnly
 
-from pdart.fs.NarrowWrapFS import *
+from pdart.fs.NarrowWrapFS import NarrowWrapFS
+
+if TYPE_CHECKING:
+    from fs.base import FS
 
 
 class ReadOnlyView(NarrowWrapFS):

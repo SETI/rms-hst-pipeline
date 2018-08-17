@@ -1,18 +1,21 @@
+import abc
 import io
 import os
 import os.path
 import shutil
 import tempfile
+from typing import TYPE_CHECKING, cast
 import unittest
 
 import fs.path
 from fs.test import FSTestCases
 
 from pdart.fs.FSPrimAdapter import FSPrimAdapter
-from pdart.fs.FSPrimitives import *
+from pdart.fs.FSPrimitives import Dir, File, FSPrimitives, Node
 
 if TYPE_CHECKING:
     from typing import Any
+    from pdart.fs.FSPrimitives import Dir_, File_, Node_
 
 
 class FSPrimitives_TestBase(object):

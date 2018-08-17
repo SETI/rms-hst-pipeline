@@ -2,16 +2,18 @@
 A view into a MultiversionBundleFS that exposes only a single version
 of the bundle and its components.
 """
+from typing import TYPE_CHECKING
+
 from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound
 from fs.info import Info
 from fs.mode import Mode
-from fs.path import abspath, basename, iteratepath, normpath, split
+from fs.path import abspath, basename, iteratepath, join, normpath, split
 
 from pdart.fs.DirUtils import lidvid_to_dir
 from pdart.fs.ISingleVersionBundleFS import ISingleVersionBundleFS
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.fs.ReadOnlyView import ReadOnlyView
-from pdart.fs.SubdirVersions import *
+from pdart.fs.SubdirVersions import read_subdir_versions_from_directory
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID

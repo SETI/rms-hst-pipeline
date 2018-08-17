@@ -2,7 +2,7 @@ import unittest
 
 from fs.memoryfs import MemoryFS
 
-from pdart.fs.MultiversionBundleFS import *
+from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID

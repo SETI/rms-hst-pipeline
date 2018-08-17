@@ -1,8 +1,8 @@
 """
 Work on viewing an archive folder as a versioned filesystem.
 """
+import abc
 import io
-from abc import *
 
 from fs.base import FS
 from fs.errors import DirectoryExpected, FileExpected, ResourceNotFound, \
@@ -53,7 +53,7 @@ FILE_EXCLUSION_PATS = [u'.DS_Store', u'*.db']
 
 
 class _FSPath(object):
-    __metaclass__ = ABCMeta
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self, fs, path):
         # type: (OSFS, unicode) -> None
@@ -65,17 +65,17 @@ class _FSPath(object):
                                self._legacy_fs,
                                self._original_path)
 
-    @abstractmethod
+    @abc.abstractmethod
     def getinfo(self, namespaces):
         # type: (Tuple) -> Info
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def listdir(self):
         # type: () -> List[unicode]
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def openbin(self, mode, buffering, **options):
         # type: (AnyStr, int, **Any) -> Any
         pass

@@ -1,9 +1,11 @@
 import unittest
 
+from fs.errors import DirectoryNotEmpty, FileExpected, ResourceNotFound, \
+    ResourceReadOnly
 from fs.tempfs import TempFS
 
 import pdart.fs.DeletionSet
-from pdart.fs.ReadOnlyFSWithDeletions import *
+from pdart.fs.ReadOnlyFSWithDeletions import ReadOnlyFSWithDeletions
 
 
 class TestReadOnlyFSWithDeletions(unittest.TestCase):

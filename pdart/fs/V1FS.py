@@ -1,18 +1,19 @@
 import io
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import fs.errors
 from fs.osfs import OSFS
 
 from pdart.fs.FSPrimAdapter import FSPrimAdapter
-from pdart.fs.FSPrimitives import *
+from pdart.fs.FSPrimitives import Dir, File, Node, FSPrimitives
 from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
     write_subdir_versions_to_directory
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 
 if TYPE_CHECKING:
     from typing import List, Tuple
+    from pdart.fs.FSPrimitives import Dir_, File_, Node_
 
 _V1_0 = u'v$1.0'
 

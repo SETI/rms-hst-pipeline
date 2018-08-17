@@ -1,6 +1,9 @@
 import unittest
 
-from pdart.fs.DirUtils import *
+from pdart.pds4.LID import LID
+from pdart.pds4.LIDVID import LIDVID
+from pdart.fs.DirUtils import dir_to_lid, dir_to_lidvid, lid_to_dir, \
+    lidvid_to_dir
 
 
 class Test_DirUtils(unittest.TestCase):

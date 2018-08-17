@@ -3,7 +3,7 @@ import unittest
 from fs.tempfs import TempFS
 from fs.test import FSTestCases
 
-from pdart.fs.DeliverableFS import *
+from pdart.fs.DeliverableFS import DeliverableFS, DeliverablePrimitives
 from pdart.fs.test_FSPrimitives import FSPrimitives_TestBase
 
 
