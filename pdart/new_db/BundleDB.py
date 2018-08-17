@@ -6,11 +6,14 @@ from sqlalchemy.orm import sessionmaker
 
 import pdart.pds4.Bundle
 import pdart.pds4.Collection
-from pdart.new_db.SqlAlchTables import *
+from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, \
+    BrowseProduct, Bundle, Card, Collection, DocumentCollection, \
+    DocumentFile, DocumentProduct, File, FitsFile, FitsProduct, Hdu, \
+    NonDocumentCollection, Product, create_tables
 from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
-    from typing import Dict, List, Tuple
+    from typing import Any, Dict, List, Tuple
 
 _BUNDLE_DB_NAME = 'bundle$database.db'  # type: unicode
 

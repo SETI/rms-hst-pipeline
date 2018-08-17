@@ -2,7 +2,7 @@ import unittest
 
 from fs.path import join
 
-from pdart.new_db.BrowseFileDB import *
+from pdart.new_db.BrowseFileDB import populate_database_from_browse_file
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.SqlAlchTables import BrowseFile
 from pdart.new_db.Utils import path_to_testfile

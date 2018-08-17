@@ -1,9 +1,10 @@
 import unittest
 
-from fs.path import join
+from fs.path import basename, join
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
-from pdart.new_db.FitsFileDB import *
+from pdart.new_db.FitsFileDB import get_card_dictionaries, get_file_offsets, \
+     populate_database_from_fits_file
 from pdart.new_db.Utils import path_to_testfile
 
 
