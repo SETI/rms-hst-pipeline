@@ -4,7 +4,11 @@ database.
 """
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.HstParametersXml import *
+from pdart.new_labels.HstParametersXml import get_pc1_flag, \
+    get_targeted_detector_id, get_wf2_flag, get_wf3_flag, get_wf4_flag, hst, \
+    parameters_acs, parameters_general, parameters_wfc3, parameters_wfpc2
+from pdart.new_labels.Placeholders import known_placeholder, placeholder, \
+    placeholder_float, placeholder_int
 from pdart.rules.Combinators import multiple_implementations
 
 if TYPE_CHECKING:

@@ -1,7 +1,7 @@
 import unittest
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
-from pdart.new_labels.BundleLabel import *
+from pdart.new_labels.BundleLabel import make_bundle_label
 from pdart.new_labels.Utils import golden_file_contents
 
 _BUNDLE_LIDVID = 'urn:nasa:pds:hst_09059::1.3'

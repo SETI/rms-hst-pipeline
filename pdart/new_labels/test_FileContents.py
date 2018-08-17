@@ -5,7 +5,7 @@ from fs.path import basename
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
-from pdart.new_labels.FileContents import *
+from pdart.new_labels.FileContents import get_file_contents
 from pdart.new_labels.Utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
 from pdart.xml.Templates import interpret_document_template

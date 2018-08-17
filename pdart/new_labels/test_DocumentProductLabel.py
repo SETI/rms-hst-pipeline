@@ -1,7 +1,7 @@
 import unittest
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
-from pdart.new_labels.DocumentProductLabel import *
+from pdart.new_labels.DocumentProductLabel import make_document_product_label
 from pdart.new_labels.Utils import golden_file_contents
 
 

@@ -4,7 +4,8 @@ Functionality to create a label for a document product.
 from datetime import date
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.DocumentProductLabelXml import *
+from pdart.new_labels.DocumentProductLabelXml \
+    import make_citation_information, make_document_edition, make_label
 from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 

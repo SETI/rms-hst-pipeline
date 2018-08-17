@@ -1,8 +1,10 @@
 """Functionality to build a bundle label using a SQLite database."""
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.BundleLabelXml import *
-from pdart.new_labels.CitationInformation import *
+from pdart.new_labels.BundleLabelXml \
+    import make_bundle_entry_member, make_label
+from pdart.new_labels.CitationInformation \
+    import make_placeholder_citation_information
 from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import combine_nodes_into_fragment

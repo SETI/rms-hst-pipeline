@@ -6,7 +6,8 @@ import pdart.add_pds_tools
 import julian
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.TimeCoordinatesXml import *
+from pdart.new_labels.TimeCoordinatesXml \
+    import get_placeholder_start_stop_times, time_coordinates
 from pdart.rules.Combinators import multiple_implementations
 
 if TYPE_CHECKING:

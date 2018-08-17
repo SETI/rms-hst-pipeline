@@ -3,7 +3,7 @@ Functionality to create a ``<Citation_Information />`` XML element.
 """
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.Placeholders import *
+from pdart.new_labels.Placeholders import known_placeholder, placeholder_year
 from pdart.xml.Templates import interpret_template
 
 if TYPE_CHECKING:

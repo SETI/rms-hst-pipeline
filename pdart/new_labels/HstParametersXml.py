@@ -3,7 +3,7 @@ Templates to create a XML ``<hst:HST />`` node.
 """
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.Placeholders import *
+from pdart.new_labels.Placeholders import placeholder, placeholder_int
 from pdart.xml.Templates import interpret_document_template, interpret_template
 
 if TYPE_CHECKING:

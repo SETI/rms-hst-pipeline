@@ -4,11 +4,12 @@ a product label using a SQLite database.
 """
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.TargetIdentificationXml import *
+from pdart.new_labels.TargetIdentificationXml import \
+    approximate_target_table, get_placeholder_target, target_identification
 from pdart.rules.Combinators import multiple_implementations
 
 if TYPE_CHECKING:
-    from typing import Any, Callable, Dict, List
+    from typing import Any, Callable, Dict, List, Tuple
     from pdart.xml.Templates import NodeBuilder
 
 

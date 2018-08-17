@@ -2,7 +2,7 @@ import unittest
 
 from pdart.new_db.BrowseFileDB import populate_database_from_browse_file
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
-from pdart.new_labels.BrowseProductLabel import *
+from pdart.new_labels.BrowseProductLabel import make_browse_product_label
 from pdart.new_labels.Utils import golden_file_contents
 
 

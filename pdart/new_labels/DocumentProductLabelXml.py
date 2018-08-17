@@ -1,7 +1,7 @@
 """A document template to create a label for a document product."""
 
 from typing import TYPE_CHECKING
-from pdart.pds4labels.Placeholders import *
+from pdart.pds4labels.Placeholders import known_placeholder, placeholder_year
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
 from pdart.xml.Templates import combine_fragments_into_fragment, \
     combine_nodes_into_fragment, interpret_document_template, \

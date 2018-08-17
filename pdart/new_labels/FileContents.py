@@ -7,18 +7,22 @@ from typing import TYPE_CHECKING
 
 from pdart.new_db.BundleDB import BundleDB
 from pdart.new_db.FitsFileDB import get_file_offsets
-from pdart.new_labels.FileContentsXml import *
+from pdart.new_labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE, \
+    axis_array, data_1d_contents, data_2d_contents, element_array, \
+    header_contents
 from pdart.xml.Templates import combine_fragments_into_fragment, \
     combine_nodes_into_fragment
 
 if TYPE_CHECKING:
     from typing import Any, Callable, Dict, List
-    from pdart.xml.Templates import FragBuilder
+    from pdart.xml.Templates import FragBuilder, NodeBuilder
 
 
 def _mk_axis_arrays(card_dicts, hdu_index, axes):
     # type: (List[Dict[str, Any]], int, int) -> FragBuilder
+
     def mk_axis_array(i):
+        # type: (int) -> NodeBuilder
         axis_name = AXIS_NAME_TABLE[i]
 
         elements = card_dicts[hdu_index]['NAXIS%d' % i]
