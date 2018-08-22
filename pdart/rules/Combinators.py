@@ -86,7 +86,8 @@ back into normal code.  The end-user will never see the *rcode*.
 """
 import traceback
 
-from pdart.rules.ExceptionInfo import *
+from pdart.rules.ExceptionInfo import CalculationException, \
+    GroupedExceptionInfo, SingleExceptionInfo
 from pdart.rules.Result import Failure, Success
 
 from typing import TYPE_CHECKING

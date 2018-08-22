@@ -1,6 +1,8 @@
 import unittest
 
-from pdart.rules.Combinators import *
+from pdart.rules.Combinators import multiple_implementations, \
+    normalized_exceptions
+from pdart.rules.ExceptionInfo import CalculationException
 
 
 class TestCombinators(unittest.TestCase):

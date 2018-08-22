@@ -1,7 +1,8 @@
 import unittest
 import xml.dom
 
-from pdart.rules.ExceptionInfo import *
+from pdart.rules.ExceptionInfo import ExceptionInfo, GroupedExceptionInfo, \
+    SingleExceptionInfo
 
 
 class TestSingleExceptionInfo(unittest.TestCase):
