@@ -7,19 +7,12 @@ mypy --silent-imports --py2 \
     pdart/fs \
     pdart/new_db \
     pdart/pds4 \
-    pdart/reductions \
     pdart/rules \
     pdart/xml \
     AstroqueryDownload.py \
     BulkDownload.py \
-    CheckBadFitsFiles.py \
-    CheckKeywords.py \
-    CheckSuffixes.py \
-    CheckTimes.py \
-    DeleteDocs.py \
     MakeDocCollections.py \
     MakeNewArchive.py \
     PopulateDB.py \
     TestMast.py \
-    ValidateArchive.py \
     ValidateLabel.py
