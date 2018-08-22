@@ -25,11 +25,11 @@ from pdart.new_labels.CollectionLabel import get_collection_label_name, \
     make_collection_label
 from pdart.new_labels.DocumentProductLabel import make_document_product_label
 from pdart.new_labels.FitsProductLabel import make_fits_product_label
+from pdart.new_labels.RawSuffixes import RAW_SUFFIXES
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from pdart.pds4labels.RawSuffixes import RAW_SUFFIXES
 
 if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
@@ -402,6 +402,7 @@ def start_bundle(src_dir, archive_dir):
     bundle_db = create_bundle_db(bundle_id, archive_dir)
     populate_database(bundle_id, bundle_db, archive_dir)
     create_browse_products(bundle_id, bundle_db, archive_dir)
+    # TODO: more to do.  Make SPICE collections.
     # create_spice_products(bundle_id, bundle_db, archive_dir)
 
     documents_dir = tempfile.mkdtemp()
@@ -412,6 +413,3 @@ def start_bundle(src_dir, archive_dir):
     finally:
         shutil.rmtree(documents_dir)
     create_pds4_labels(bundle_id, bundle_db, archive_dir)
-
-    # TODO: more to do.  Make SPICE collections, document collections,
-    # and labels.
