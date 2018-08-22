@@ -4,17 +4,11 @@ source activate mypy
 mypy --silent-imports --py2 \
     pdart/archive \
     pdart/astroquery \
-    pdart/browse \
-    pdart/db \
-    pdart/downloader \
     pdart/fs \
-    pdart/hst \
     pdart/new_db \
     pdart/pds4 \
-    pdart/pds4labels \
     pdart/reductions \
     pdart/rules \
-    pdart/tasks \
     pdart/xml \
     AstroqueryDownload.py \
     BulkDownload.py \
@@ -22,24 +16,10 @@ mypy --silent-imports --py2 \
     CheckKeywords.py \
     CheckSuffixes.py \
     CheckTimes.py \
-    CompleteArchive.py \
-    DeleteBrowse.py \
-    DeleteDB.py \
     DeleteDocs.py \
-    MakeBundleDBs.py \
-    MakeDB.py \
     MakeDocCollections.py \
-    MakeDocLabel.py \
-    MakeLabel.py \
-    MakeLabels.py \
     MakeNewArchive.py \
-    MakeRawBrowse.py \
     PopulateDB.py \
-    SearchDev.py \
-    SqlAlch.py \
-    SqlAlchComplete.py \
-    TestHstParams.py \
     TestMast.py \
     ValidateArchive.py \
-    ValidateLabel.py \
-    ValidateLabels.py
+    ValidateLabel.py
