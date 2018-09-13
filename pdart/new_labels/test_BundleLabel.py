@@ -23,5 +23,5 @@ class Test_BundleLabel(unittest.TestCase):
     def test_make_bundle_label(self):
         # type: () -> None
         label = make_bundle_label(self.db, True)
-        expected_label = golden_file_contents('test_BundleLabel.golden.xml')
-        self.assertEqual(expected_label, label)
+        expected = golden_file_contents('test_BundleLabel.golden.xml')
+        self.assertEqual(expected, label)

@@ -44,6 +44,6 @@ class Test_CollectionLabel(unittest.TestCase):
         label = make_collection_label(self.db,
                                       _DOC_COLLECTION_LIDVID,
                                       True)
-        expected_label = golden_file_contents(
+        expected = golden_file_contents(
             'test_DocCollectionLabel.golden.xml')
-        self.assertEqual(expected_label, label)
+        self.assertEqual(expected, label)

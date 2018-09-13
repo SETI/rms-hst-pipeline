@@ -39,10 +39,10 @@ class Test_FitsProductLabel(unittest.TestCase):
 
         file_basename = basename(os_filepath)
 
-        str = make_fits_product_label(self.db,
-                                      fits_product_lidvid,
-                                      file_basename,
-                                      True)
+        label = make_fits_product_label(self.db,
+                                        fits_product_lidvid,
+                                        file_basename,
+                                        True)
 
         expected = golden_file_contents('test_FitsProductLabel.golden.xml')
-        self.assertEqual(expected, str)
+        self.assertEqual(expected, label)
