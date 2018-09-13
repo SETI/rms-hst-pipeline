@@ -24,8 +24,8 @@ parameters_general = interpret_template("""<hst:Parameters_General>
   <hst:hst_proposal_id><NODE name="hst_proposal_id" /></hst:hst_proposal_id>
   <hst:hst_pi_name><NODE name="hst_pi_name" /></hst:hst_pi_name>
   <hst:hst_target_name><NODE name="hst_target_name" /></hst:hst_target_name>
-  <hst:aperture_type><NODE name="aperture_type" /></hst:aperture_type>
-  <hst:exposure_duration><NODE name="exposure_duration" />\
+  <hst:aperture_name><NODE name="aperture_name" /></hst:aperture_name>
+  <hst:exposure_duration unit="s"><NODE name="exposure_duration" />\
 </hst:exposure_duration>
   <hst:exposure_type><NODE name="exposure_type" /></hst:exposure_type>
   <hst:filter_name><NODE name="filter_name" /></hst:filter_name>

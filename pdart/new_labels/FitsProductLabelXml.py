@@ -1,7 +1,8 @@
 """Templates to create a label for a product."""
 from typing import TYPE_CHECKING
 
-from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
+from pdart.xml.Pds4Version import HST_SHORT_VERSION, \
+    INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
 from pdart.xml.Templates import interpret_document_template
 
 if TYPE_CHECKING:
@@ -13,11 +14,13 @@ make_label = interpret_document_template(
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational
    xmlns="http://pds.nasa.gov/pds4/pds/v1"
-   xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
+   xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1"
    xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
-                       http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd">
+   xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 \
+https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd \
+http://pds.nasa.gov/pds4/mission/hst/v1 \
+https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_%s.xsd">
   <Identification_Area>
     <logical_identifier><NODE name="lid" /></logical_identifier>
     <version_id><NODE name="vid" /></version_id>
@@ -56,7 +59,8 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     <FRAGMENT name="file_contents" />
   </File_Area_Observational>
 </Product_Observational>""" %
-    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION, INFORMATION_MODEL_VERSION))
+    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION,
+     HST_SHORT_VERSION, INFORMATION_MODEL_VERSION))
 # type: DocTemplate
 """
 An interpreted document template to create a product label.

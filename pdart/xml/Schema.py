@@ -6,6 +6,7 @@ programs.
 PDS4 labels.
 """
 import os
+import os.path
 import subprocess
 import tempfile
 import xml.dom.minidom
@@ -13,28 +14,24 @@ from contextlib import closing
 
 from typing import TYPE_CHECKING
 
-from pdart.xml.Pds4Version import PDS4_SHORT_VERSION
+from pdart.xml.Pds4Version import HST_SHORT_VERSION, PDS4_SHORT_VERSION
 
 if TYPE_CHECKING:
     from typing import Sequence, Tuple, Union
 
     _Cmd = Union[str, Sequence[str]]
 
-PDS_XML_SCHEMA = './xml/PDS4_PDS_%s.xsd.xml' % PDS4_SHORT_VERSION
-# type: str
+PDS_XML_SCHEMA = ('./xml/PDS4_PDS_%s.xsd.xml' %
+                  PDS4_SHORT_VERSION)  # type: str
 
-PDS_SCHEMATRON_SCHEMA = './xml/PDS4_PDS_%s.sch.xml' % 1600 \
-    # PDS4_SHORT_VERSION -- FIXME
-# type: str
+PDS_SCHEMATRON_SCHEMA = ('./xml/PDS4_PDS_%s.sch.xml' %
+                         PDS4_SHORT_VERSION)  # type: str
 
-HST_XML_SCHEMA = './xml/PDS4_HST_%s_0200.xsd.xml' % 1600 \
-    # PDS4_SHORT_VERSION -- FIXME
-# type: str
+HST_XML_SCHEMA = ('./xml/PDS4_HST_%s.xsd.xml' %
+                  HST_SHORT_VERSION)  # type: str
 
-HST_SCHEMATRON_SCHEMA = './xml/PDS4_HST_%s_0200.sch.xml' % PDS4_SHORT_VERSION
-
-
-# type: str
+HST_SCHEMATRON_SCHEMA = ('./xml/PDS4_HST_%s.sch.xml' %
+                         HST_SHORT_VERSION)  # type: str
 
 
 def run_subprocess(cmd, stdin=None):
@@ -72,6 +69,10 @@ def _xsd_validator_schema(filepath,
     a triple of exit_code, stderr, and stdout.
     """
     args = ['java', '-jar', 'XsdValidator.jar']
+
+    for filename in schemas:
+        assert os.path.isfile(filename), 'schema %s exists' % filename
+
     args.extend(schemas)
     if stdin is None:
         args.append(str(filepath))  # illogical cast to shut up mypy
@@ -168,7 +169,7 @@ def probatron_with_svrl_result(filepath,
     return xml.dom.minidom.parseString(stdout)
 
 
-def _svrl_failures(svrl):
+def svrl_failures(svrl):
     # type: (xml.dom.minidom.Document) -> Sequence[xml.dom.minidom.Node]
     return svrl.documentElement.getElementsByTagName('svrl:failed-assert')
 
@@ -178,7 +179,7 @@ def svrl_has_failures(svrl):
     """
     Given an SVRL document, return True iff it contains failures.
     """
-    return len(_svrl_failures(svrl)) > 0
+    return len(svrl_failures(svrl)) > 0
 
 
 def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
@@ -190,7 +191,7 @@ def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
     they exist.
     """
     svrl = probatron_with_svrl_result(filepath, stdin, schema)
-    failures = _svrl_failures(svrl)
+    failures = svrl_failures(svrl)
     if len(failures) > 0:
         # should I have a pretty option here for human-readability?
 
@@ -223,7 +224,7 @@ def verify_label_or_raise(label):
             raise Exception('Schematron validation errors: ' + failures)
     except Exception:
         # Debugging functionality: write the label to disk.
-        PRINT_AND_SAVE_LABEL = False
+        PRINT_AND_SAVE_LABEL = True
         if PRINT_AND_SAVE_LABEL:
             import time
             print label

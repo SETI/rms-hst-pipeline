@@ -35,31 +35,31 @@ def get_subarray_flag(product_id):
 
 
 ##############################
-# get_aperture_type
+# get_aperture_name
 ##############################
 
 
-def _get_aperture_type(card_dicts, instrument, product_id):
+def _get_aperture_name(card_dicts, instrument, product_id):
     # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
     if instrument == 'wfpc2':
-        return _get_aperture_type_placeholder(card_dicts, instrument,
+        return _get_aperture_name_placeholder(card_dicts, instrument,
                                               product_id)
     else:
         return card_dicts[0]['APERTURE']
 
 
-def _get_aperture_type_placeholder(card_dicts, instrument, product_id):
+def _get_aperture_name_placeholder(card_dicts, instrument, product_id):
     # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
-    return placeholder(product_id, 'aperture_type')
+    return placeholder(product_id, 'aperture_name')
 
 
-get_aperture_type = multiple_implementations(
-    'get_aperture_type',
-    _get_aperture_type,
-    _get_aperture_type_placeholder)
+get_aperture_name = multiple_implementations(
+    'get_aperture_name',
+    _get_aperture_name,
+    _get_aperture_name_placeholder)
 # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
-Return text for the ``<aperture_type />`` XML element.
+Return text for the ``<aperture_name />`` XML element.
 """
 
 
@@ -434,7 +434,7 @@ def get_hst_parameters(card_dicts, instrument, product_id):
          'hst_proposal_id': get_hst_proposal_id(card_dicts, product_id),
          'hst_pi_name': get_hst_pi_name(card_dicts, product_id),
          'hst_target_name': get_hst_target_name(card_dicts, product_id),
-         'aperture_type': get_aperture_type(card_dicts, instrument,
+         'aperture_name': get_aperture_name(card_dicts, instrument,
                                             product_id),
          'exposure_duration': get_exposure_duration(card_dicts, product_id),
          'exposure_type': get_exposure_type(card_dicts, product_id),

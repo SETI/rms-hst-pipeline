@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!-- PDS4 XML/Schema for Name Space Id:hst  Version:0.2.0.0 - Fri Jun 03 16:13:55 EDT 2016 -->
-  <!-- Generated from the PDS4 Information Model Version 1.6.0.0 - System Build 6b -->
+  <!-- PDS4 XML/Schema for Name Space Id:hst  Version:1.0.0.0 - Fri Apr 27 16:28:21 EDT 2018 -->
+  <!-- Generated from the PDS4 Information Model Version 1.9.0.0 - System Build 8a -->
   <!-- *** This PDS4 product schema is an operational deliverable. *** -->
+  <!--                                                                           -->
+  <!--               Dictionary Stack                                            -->
+  <!-- 1.9.0.0 - pds: - Common Dictionary - N/A                                  -->
+  <!-- 1.0.0.0 - hst: - Hubble Space Telescope Dictionary Full - ingest_hst_1900 -->
+  <!--                                                                           -->
   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://pds.nasa.gov/pds4/hst/v0"
-    xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
+    targetNamespace="http://pds.nasa.gov/pds4/mission/hst/v1"
+    xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1"
     xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
     elementFormDefault="qualified"
     attributeFormDefault="unqualified"
-    version="0.2.0.0">
+    version="1.0.0.0">
  
-    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1600.xsd"/>
+    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1A10.xsd"/>
  
   <xs:annotation>
-    <xs:documentation>    	
-    	version 0.1.0.0  2016-03-11
-        - preliminary draft.
-     	version 0.2.0.0  2016-06-03
-        - update to IM 1.6.0.0
-        - changed data type for hst_pi_name to UTF8_Text_Preserved
-        - added class: HST, Parameters_ACS, Parameters_WFC3
-        - renamed class HST_General_Parameters to Parameters_General
-        - renamed class WFPC2_Parameters to Parameters_WFPC2
-        - added attributes gyroscope_mode, moving_target_flag, repeat_exposure_count, subarray_flag
-        - to be done add definitions to attributes
-      </xs:documentation>
+    <xs:documentation>
+
+    	version 1.0  2018-04-27
+        - Initial version
+    
+    </xs:documentation>
   </xs:annotation>
  
   <xs:element name="HST" type="hst:HST"> </xs:element>
@@ -57,6 +56,12 @@
       <xs:element name="repeat_exposure_count" type="hst:repeat_exposure_count" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="subarray_flag" type="hst:subarray_flag" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
+    <!-- Begin assert statements for schematron - Enumerated Values -->
+    <!-- <xs:assert test="hst:detector_id = ('@@@')"/> -->
+    <!-- <xs:assert test="hst:gain_mode_id = ('@@@')"/> -->
+    <!-- <xs:assert test="hst:observation_type = ('image', 'spectrum')"/> -->
+    <!-- <xs:assert test="hst:subarray_flag = ('@@@')"/> -->
+    <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
 
   <xs:complexType name="Parameters_General">
@@ -70,7 +75,7 @@
       <xs:element name="hst_proposal_id" type="hst:hst_proposal_id" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="hst_pi_name" type="hst:hst_pi_name" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="hst_target_name" type="hst:hst_target_name" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="aperture_type" type="hst:aperture_type" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="aperture_name" type="hst:aperture_name" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="exposure_duration" type="hst:exposure_duration" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="exposure_type" type="hst:exposure_type" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="filter_name" type="hst:filter_name" minOccurs="1" maxOccurs="1"> </xs:element>
@@ -80,6 +85,10 @@
       <xs:element name="moving_target_flag" type="hst:moving_target_flag" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
     <!-- Begin assert statements for schematron - Enumerated Values -->
+    <!-- <xs:assert test="hst:exposure_type = ('@@@', '@@@', '@@@', '@@@', 'extended', 'incomplete', 'indeterminate', 'interrupted', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain')"/> -->
+    <!-- <xs:assert test="hst:fine_guidance_system_lock_type = ('course', 'fine', 'fine/gyro', 'gyros', 'unknown')"/> -->
+    <!-- <xs:assert test="hst:gyroscope_mode = ('@@@')"/> -->
+    <!-- <xs:assert test="hst:instrument_mode_id = ('accum', 'acq')"/> -->
     <!-- <xs:assert test="hst:moving_target_flag = ('false', 'true')"/> -->
     <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
@@ -96,6 +105,11 @@
       <xs:element name="repeat_exposure_count" type="hst:repeat_exposure_count" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="subarray_flag" type="hst:subarray_flag" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
+    <!-- Begin assert statements for schematron - Enumerated Values -->
+    <!-- <xs:assert test="hst:detector_id = ('@@@')"/> -->
+    <!-- <xs:assert test="hst:observation_type = ('image', 'spectrum')"/> -->
+    <!-- <xs:assert test="hst:subarray_flag = ('@@@')"/> -->
+    <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
 
   <xs:complexType name="Parameters_WFPC2">
@@ -109,11 +123,11 @@
       <xs:element name="center_filter_wavelength" type="hst:center_filter_wavelength" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="targeted_detector_id" type="hst:targeted_detector_id" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="gain_mode_id" type="hst:gain_mode_id" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="pc1_flag" type="hst:pc1_flag" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="wf2_flag" type="hst:wf2_flag" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="wf3_flag" type="hst:wf3_flag" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="wf4_flag" type="hst:wf4_flag" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
+    <!-- Begin assert statements for schematron - Enumerated Values -->
+    <!-- <xs:assert test="hst:targeted_detector_id = ('pc1', 'wf2', 'wf3', 'wf4')"/> -->
+    <!-- <xs:assert test="hst:gain_mode_id = ('@@@')"/> -->
+    <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
 
     <xs:annotation>
@@ -124,9 +138,10 @@
       </xs:documentation>
     </xs:annotation>
 
-  <xs:simpleType name="aperture_type">
+  <xs:simpleType name="aperture_name">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The STScI name of the aperture used for the
+        observation. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -134,25 +149,52 @@
 	   </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="bandwidth">
-    <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
-    </xs:annotation>
+  <xs:simpleType name="bandwidth_WO_Units">
     <xs:restriction base="pds:ASCII_Real">
+    	<xs:pattern value='[-+]?[0-9]+(\.?[0-9]+)?([eE][-+]?[0-9]+)?'/>
+     <xs:minInclusive value="-1.7976931348623157e308"/>
+     <xs:maxInclusive value="1.7976931348623157e308"/>
 	   </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="center_filter_wavelength">
+  <xs:complexType name="bandwidth">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The full width of the spectral bandpass, in
+        microns. Zero if unknown. </xs:documentation>
     </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="hst:bandwidth_WO_Units">
+        <xs:attribute name="unit" type="pds:Units_of_Length" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="center_filter_wavelength_WO_Units">
     <xs:restriction base="pds:ASCII_Real">
+    	<xs:pattern value='[-+]?[0-9]+(\.?[0-9]+)?([eE][-+]?[0-9]+)?'/>
+     <xs:minInclusive value="-1.7976931348623157e308"/>
+     <xs:maxInclusive value="1.7976931348623157e308"/>
 	   </xs:restriction>
   </xs:simpleType>
+
+  <xs:complexType name="center_filter_wavelength">
+    <xs:annotation>
+      <xs:documentation>The approximate central wavelength of the filter
+        bandpass, in microns. Zero if unknown. </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="hst:center_filter_wavelength_WO_Units">
+        <xs:attribute name="unit" type="pds:Units_of_Length" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="detector_id">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>An abbreviated name or acronym which identifies
+        the instrument's detector used for this observation. Since WFPC2
+        generally uses all four of it's detectors, this field is not
+        applicable to WFPC2 observations. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -160,17 +202,30 @@
 	   </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="exposure_duration">
-    <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
-    </xs:annotation>
+  <xs:simpleType name="exposure_duration_WO_Units">
     <xs:restriction base="pds:ASCII_Real">
+    	<xs:pattern value='[-+]?[0-9]+(\.?[0-9]+)?([eE][-+]?[0-9]+)?'/>
+     <xs:minInclusive value="-1.7976931348623157e308"/>
+     <xs:maxInclusive value="1.7976931348623157e308"/>
 	   </xs:restriction>
   </xs:simpleType>
 
+  <xs:complexType name="exposure_duration">
+    <xs:annotation>
+      <xs:documentation>The total duration of the observation, in
+        seconds. </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="hst:exposure_duration_WO_Units">
+        <xs:attribute name="unit" type="pds:Units_of_Time" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
   <xs:simpleType name="exposure_type">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The exposure setting used in the
+        observation.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -180,7 +235,10 @@
 
   <xs:simpleType name="filter_name">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The name of the filter(s) used for the
+        observation. If two overlapping filters, or a filter and
+        polarizer are used, then both names are given, separated by a
+        plus sign '+'.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -190,7 +248,9 @@
 
   <xs:simpleType name="fine_guidance_system_lock_type">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The state of the fine guidence sensor on HST.
+        Possible values are fine, coarse, gyros, fine/gyro, and
+        unknown.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -200,7 +260,8 @@
 
   <xs:simpleType name="gain_mode_id">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The gain state of the
+        instrument.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -220,7 +281,9 @@
 
   <xs:simpleType name="hst_pi_name">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The name of the principal investigator for this
+        HST program, in the form 'last, first, middle initial'
+        </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:UTF8_Text_Preserved">
      <xs:minLength value="1"/>
@@ -229,15 +292,20 @@
 
   <xs:simpleType name="hst_proposal_id">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The numeric identifier of the proposal or
+        observing program, as assigned by Space Telescope Science
+        Institute. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Integer">
+     <xs:minInclusive value="-9223372036854775808"/>
+     <xs:maxInclusive value="9223372036854775807"/>
 	   </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="hst_target_name">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The target of the observation as defined by the
+        principal investigator. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -247,7 +315,8 @@
 
   <xs:simpleType name="instrument_mode_id">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The operating mode of the instrument. Possible
+        values are accum and acq</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -257,7 +326,9 @@
 
   <xs:simpleType name="moving_target_flag">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>Flag (true, false) indicating whether or not the
+        telescope pointing was based on tracking a moving
+        target.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Boolean">
 	   </xs:restriction>
@@ -265,19 +336,12 @@
 
   <xs:simpleType name="observation_type">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>The type of the observation, e.g., image or
+        spectrum. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
      <xs:maxLength value="255"/>
-	   </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="pc1_flag">
-    <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
-    </xs:annotation>
-    <xs:restriction base="pds:ASCII_Integer">
 	   </xs:restriction>
   </xs:simpleType>
 
@@ -286,12 +350,18 @@
 <xs:documentation>TBD</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Integer">
+     <xs:minInclusive value="-9223372036854775808"/>
+     <xs:maxInclusive value="9223372036854775807"/>
 	   </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="stsci_group_id">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>An identifier for a particular group of data
+        files in the STScI archive. you can retrieve the associated
+        files from STScI by entering this id into the box found on this
+        page: http://archive.stsci.edu/cgi-bin/dataset_lookup/
+        </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -311,35 +381,12 @@
 
   <xs:simpleType name="targeted_detector_id">
     <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
+      <xs:documentation>Indicates which WFPC2 detector was
+        preferentially used for the camera pointing.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
      <xs:maxLength value="255"/>
-	   </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="wf2_flag">
-    <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
-    </xs:annotation>
-    <xs:restriction base="pds:ASCII_Integer">
-	   </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="wf3_flag">
-    <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
-    </xs:annotation>
-    <xs:restriction base="pds:ASCII_Integer">
-	   </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="wf4_flag">
-    <xs:annotation>
-<xs:documentation>TBD</xs:documentation>
-    </xs:annotation>
-    <xs:restriction base="pds:ASCII_Integer">
 	   </xs:restriction>
   </xs:simpleType>
 </xs:schema>

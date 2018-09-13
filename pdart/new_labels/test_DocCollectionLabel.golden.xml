@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1700.sch"
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1A10.sch"
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1">
   <Identification_Area>
     <logical_identifier>urn:nasa:pds:hst_09059:document</logical_identifier>
     <version_id>1.2</version_id>
     <title>This collection contains documentation from HST Observing Program 9059.</title>
-    <information_model_version>1.6.0.0</information_model_version>
+    <information_model_version>1.10.1.0</information_model_version>
     <product_class>Product_Collection</product_class>
     <Citation_Information>
       <publication_year>2000</publication_year>

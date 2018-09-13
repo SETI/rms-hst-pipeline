@@ -1,6 +1,6 @@
 from pdart.xml.Schema import PDS_SCHEMATRON_SCHEMA, probatron, \
     probatron_with_stdin, probatron_with_svrl_result, run_subprocess, \
-    schematron_failures, svrl_has_failures, xml_schema_failures
+    schematron_failures, svrl_failures, svrl_has_failures, xml_schema_failures
 from pdart.xml.Utils import path_to_testfile
 
 import unittest
