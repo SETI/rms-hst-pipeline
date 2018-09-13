@@ -1,6 +1,7 @@
 """A document template to create a label for a raw browse product."""
 from typing import TYPE_CHECKING
 
+from pdart.new_labels.Namespaces import BROWSE_PRODUCT_NAMESPACES
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
 from pdart.xml.Templates import interpret_document_template
 
@@ -11,11 +12,7 @@ make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Browse
-   xmlns="http://pds.nasa.gov/pds4/pds/v1"
-   xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd">
+<Product_Browse %s>
   <Identification_Area>
     <logical_identifier><NODE name="browse_lid" /></logical_identifier>
     <version_id><NODE name="browse_vid" /></version_id>
@@ -49,7 +46,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     </Encoded_Image>
   </File_Area_Browse>
 </Product_Browse>""" %
-    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION,
+    (PDS4_SHORT_VERSION, BROWSE_PRODUCT_NAMESPACES,
      INFORMATION_MODEL_VERSION))  # type: DocTemplate
 """
 An interpreted document template to create a label for a RAW browse product.

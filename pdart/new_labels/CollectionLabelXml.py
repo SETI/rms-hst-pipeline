@@ -1,6 +1,7 @@
 """Templates to create a label for a collection."""
 from typing import TYPE_CHECKING
 
+from pdart.new_labels.Namespaces import COLLECTION_NAMESPACES
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
 from pdart.xml.Templates import interpret_document_template, \
     interpret_template
@@ -26,8 +27,7 @@ make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1"
-                    xmlns:pds="http://pds.nasa.gov/pds4/pds/v1">
+<Product_Collection %s>
   <Identification_Area>
     <logical_identifier><NODE name="collection_lid" /></logical_identifier>
     <version_id><NODE name="collection_vid" /></version_id>
@@ -69,8 +69,8 @@ make_label = interpret_document_template(
       <reference_type>inventory_has_member_product</reference_type>
     </Inventory>
   </File_Area_Inventory>
-</Product_Collection>""" % (
-        PDS4_SHORT_VERSION, INFORMATION_MODEL_VERSION))  # type: DocTemplate
+</Product_Collection>""" % (PDS4_SHORT_VERSION, COLLECTION_NAMESPACES,
+                            INFORMATION_MODEL_VERSION))  # type: DocTemplate
 """
 An interpreted document template to create a collection label.
 """

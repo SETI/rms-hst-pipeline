@@ -1,6 +1,7 @@
 """A document template to create a label for a document product."""
 
 from typing import TYPE_CHECKING
+from pdart.new_labels.Namespaces import DOCUMENT_PRODUCT_NAMESPACES
 from pdart.new_labels.Placeholders import known_placeholder, placeholder_year
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
 from pdart.xml.Templates import combine_fragments_into_fragment, \
@@ -17,13 +18,7 @@ make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
     <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
             schematypens="http://purl.oclc.org/dsdl/schematron"?>
-    <Product_Document
-        xmlns="http://pds.nasa.gov/pds4/pds/v1"
-        xmlns:hst="http://pds.nasa.gov/pds4/hst/v0"
-        xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
-                            http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd">
+    <Product_Document %s>
     <Identification_Area>
     <logical_identifier><NODE name="product_lid" /></logical_identifier>
     <version_id><NODE name="product_vid" /></version_id>
@@ -43,7 +38,7 @@ make_label = interpret_document_template(
         <NODE name="Document_Edition" />
     </Document>
     </Product_Document>""" %
-    (PDS4_SHORT_VERSION, PDS4_SHORT_VERSION,
+    (PDS4_SHORT_VERSION, DOCUMENT_PRODUCT_NAMESPACES,
      INFORMATION_MODEL_VERSION))  # type: DocTemplate
 
 
