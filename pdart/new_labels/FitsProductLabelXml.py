@@ -1,7 +1,8 @@
 """Templates to create a label for a product."""
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.Namespaces import FITS_PRODUCT_NAMESPACES
+from pdart.new_labels.Namespaces import FITS_PRODUCT_NAMESPACES, \
+    HST_XML_MODEL, PDS4_XML_MODEL
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
 from pdart.xml.Templates import interpret_document_template
 
@@ -10,8 +11,8 @@ if TYPE_CHECKING:
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
-            schematypens="http://purl.oclc.org/dsdl/schematron"?>
+%s
+%s
 <Product_Observational %s>
   <Identification_Area>
     <logical_identifier><NODE name="lid" /></logical_identifier>
@@ -51,7 +52,8 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     <FRAGMENT name="file_contents" />
   </File_Area_Observational>
 </Product_Observational>""" %
-    (PDS4_SHORT_VERSION, FITS_PRODUCT_NAMESPACES, INFORMATION_MODEL_VERSION))
+    (PDS4_XML_MODEL, HST_XML_MODEL, FITS_PRODUCT_NAMESPACES,
+     INFORMATION_MODEL_VERSION))
 # type: DocTemplate
 """
 An interpreted document template to create a product label.

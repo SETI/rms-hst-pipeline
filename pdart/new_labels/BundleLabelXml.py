@@ -1,7 +1,7 @@
 """Templates to create a label for a bundle."""
 from typing import TYPE_CHECKING
 
-from pdart.new_labels.Namespaces import BUNDLE_NAMESPACES
+from pdart.new_labels.Namespaces import BUNDLE_NAMESPACES, PDS4_XML_MODEL
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
 from pdart.xml.Templates import interpret_document_template, interpret_template
 
@@ -10,8 +10,7 @@ if TYPE_CHECKING:
 
 make_label = interpret_document_template(
     """<?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch"
-            schematypens="http://purl.oclc.org/dsdl/schematron"?>
+%s
 <Product_Bundle %s>
   <Identification_Area>
     <logical_identifier><NODE name="bundle_lid"/></logical_identifier>
@@ -26,7 +25,7 @@ make_label = interpret_document_template(
     <bundle_type>Archive</bundle_type>
   </Bundle>
   <FRAGMENT name="Bundle_Member_Entries"/>
-</Product_Bundle>""" % (PDS4_SHORT_VERSION, BUNDLE_NAMESPACES,
+</Product_Bundle>""" % (PDS4_XML_MODEL, BUNDLE_NAMESPACES,
                         INFORMATION_MODEL_VERSION))  # type: DocTemplate
 """
 An interpreted document template to create a bundle label.
