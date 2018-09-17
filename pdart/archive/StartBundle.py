@@ -59,20 +59,20 @@ def bundle_to_int(bundle_id):
         return None
 
 
-def copy_files_from_download(src_dir, archive_dir):
-    # type: (unicode, unicode) -> int
+def copy_files_from_download(download_dir, bundle, archive_dir):
+    # type: (unicode, unicode, unicode) -> int
     """
     Copies the files from a MAST download directory to a new bundle
     directory.  The new archive uses a multi-version hierarchy to
     store the files.
     """
-    src_fs = OSFS(src_dir)
+    src_fs = OSFS(fs.path.join(download_dir, bundle))
     archive_fs = V1FS(archive_dir)
     for filepath in src_fs.walk.files(filter=['*.fits']):
         parts = fs.path.iteratepath(filepath)
         depth = len(parts)
-        assert depth == 5, filepath
-        bundle, _, _, product, filename = parts
+        assert depth == 4, filepath
+        _, _, product, filename = parts
         filename = filename.lower()
         hst_filename = HstFilename(filename)
         coll = 'data_%s_%s' % (hst_filename.instrument_name(),
@@ -393,12 +393,12 @@ def create_document_collection(bundle_id, bundle_db, archive_dir,
     fs.copy.copy_dir(doc_fs, u'/', archive_fs, document_product_dir)
 
 
-def start_bundle(src_dir, archive_dir):
-    # type: (unicode, unicode) -> None
+def start_bundle(download_dir, bundle, archive_dir):
+    # type: (unicode, unicode, unicode) -> None
     """
     Create the first version of a bundle from a MAST download.
     """
-    bundle_id = copy_files_from_download(src_dir, archive_dir)
+    bundle_id = copy_files_from_download(download_dir, bundle, archive_dir)
     bundle_db = create_bundle_db(bundle_id, archive_dir)
     populate_database(bundle_id, bundle_db, archive_dir)
     create_browse_products(bundle_id, bundle_db, archive_dir)
