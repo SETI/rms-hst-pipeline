@@ -160,28 +160,3 @@ class TestVersionView(unittest.TestCase):
             VID('1.1'),
             self.version_view.lid_to_vid(
                 LID(u'urn:nasa:pds:hst_00000:data_xxx_raw:u2q9xx01j_raw')))
-
-
-@unittest.skip('takes a long time')
-def test_version_view_on_archive():
-    # type: () -> None
-    """
-    Run through all the bundles in the archive, view them as versioned
-    filesystems, and try to verify them, then copy them to another
-    (in-memory) filesystem.  See whether anything breaks.
-    """
-    import fs.copy
-    from fs.memoryfs import MemoryFS
-    from fs.osfs import OSFS
-    from pdart.fs.InitialVersionedView import InitialVersionedView
-    from pdart.pds4.Archives import get_any_archive
-
-    archive = get_any_archive()
-    for bundle in archive.bundles():
-        print bundle
-        with OSFS(bundle.absolute_filepath()) as osfs:
-            ivv = MultiversionBundleFS(
-                InitialVersionedView(bundle.lid.bundle_id, osfs))
-            vv = VersionView(LIDVID(str(bundle.lid) + '::1'), ivv)
-            with MemoryFS() as memoryfs:
-                fs.copy.copy_fs(vv, memoryfs)

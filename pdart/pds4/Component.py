@@ -35,6 +35,7 @@ class Component(object):
         assert lid
         assert isinstance(lid, LID)
         self.lid = lid
+        assert False
 
     def __eq__(self, other):
         return self.archive == other.archive and self.lid == other.lid

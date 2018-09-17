@@ -11,8 +11,6 @@ mypy --silent-imports --py2 \
     pdart/xml \
     AstroqueryDownload.py \
     BulkDownload.py \
-    MakeDocCollections.py \
     MakeNewArchive.py \
-    PopulateDB.py \
     TestMast.py \
     ValidateLabel.py
