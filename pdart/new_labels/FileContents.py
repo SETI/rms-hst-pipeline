@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 from pdart.new_db.BundleDB import BundleDB
 from pdart.new_db.FitsFileDB import get_file_offsets
 from pdart.new_labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE, \
-    axis_array, data_1d_contents, data_2d_contents, element_array, \
-    header_contents
+    axis_array, data_1d_contents, data_2d_contents, data_3d_contents, \
+    element_array, header_contents
 from pdart.xml.Templates import combine_fragments_into_fragment, \
     combine_nodes_into_fragment
 
@@ -66,6 +66,9 @@ def get_file_contents(bundle_db, card_dicts, fits_product_lidvid):
             data_type = BITPIX_TABLE[bitpix]
             elmt_arr = element_array({'data_type': data_type})
 
+            assert axes in [1, 2, 3], \
+                ('NAXIS = %d in hdu #%d in %s' %
+                 (axes, hdu_index, fits_product_lidvid))
             if axes == 1:
                 data = data_1d_contents({
                     'offset': str(datLoc),
@@ -75,6 +78,13 @@ def get_file_contents(bundle_db, card_dicts, fits_product_lidvid):
                 })
             elif axes == 2:
                 data = data_2d_contents({
+                    'offset': str(datLoc),
+                    'Element_Array': elmt_arr,
+                    'Axis_Arrays': _mk_axis_arrays(card_dicts,
+                                                   hdu_index, axes)
+                })
+            elif axes == 3:
+                data = data_3d_contents({
                     'offset': str(datLoc),
                     'Element_Array': elmt_arr,
                     'Axis_Arrays': _mk_axis_arrays(card_dicts,

@@ -63,7 +63,8 @@ class TestStartBundle(unittest.TestCase):
         download_dir = fs.path.join(_path_to_testfiles(),
                                     'download_dir')
 
-        res = copy_files_from_download(download_dir, self.archive_dir)
+        res = copy_files_from_download(download_dir, 'hst_13012',
+                                       self.archive_dir)
         # check that it read the expected bundle
         self.assertEqual(res, 13012)
 
@@ -85,7 +86,7 @@ class TestStartBundle(unittest.TestCase):
         # type: () -> None
         download_dir = fs.path.join(_path_to_testfiles(),
                                     'download_dir')
-        copy_files_from_download(download_dir, self.archive_dir)
+        copy_files_from_download(download_dir, 'hst_13012', self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
             # returns the DB
@@ -110,7 +111,7 @@ class TestStartBundle(unittest.TestCase):
         download_dir = fs.path.join(_path_to_testfiles(),
                                     'download_dir')
 
-        copy_files_from_download(download_dir, self.archive_dir)
+        copy_files_from_download(download_dir, 'hst_13012', self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
             populate_database(13012, db, self.archive_dir)
@@ -131,7 +132,7 @@ class TestStartBundle(unittest.TestCase):
         download_dir = fs.path.join(_path_to_testfiles(),
                                     'download_dir')
 
-        copy_files_from_download(download_dir, self.archive_dir)
+        copy_files_from_download(download_dir, 'hst_13012', self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
             populate_database(13012, db, self.archive_dir)
@@ -166,7 +167,7 @@ class TestStartBundle(unittest.TestCase):
                                     'download_dir')
         documents_dir = fs.path.join(_path_to_testfiles(), 'document_files')
 
-        copy_files_from_download(download_dir, self.archive_dir)
+        copy_files_from_download(download_dir, 'hst_13012', self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
             archive_fs = V1FS(self.archive_dir)
@@ -219,7 +220,7 @@ class TestStartBundle(unittest.TestCase):
                                     'download_dir')
         documents_dir = fs.path.join(_path_to_testfiles(), 'document_files')
 
-        copy_files_from_download(download_dir, self.archive_dir)
+        copy_files_from_download(download_dir, 'hst_13012', self.archive_dir)
         db = create_bundle_db(13012, self.archive_dir)
         try:
             populate_database(13012, db, self.archive_dir)

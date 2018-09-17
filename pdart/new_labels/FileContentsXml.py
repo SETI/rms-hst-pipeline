@@ -16,7 +16,8 @@ if TYPE_CHECKING:
 
 AXIS_NAME_TABLE = {
     1: 'Line',
-    2: 'Sample'
+    2: 'Sample',
+    3: 'Band'
 }
 # type: Dict[int, unicode]
 
@@ -80,6 +81,19 @@ data_2d_contents = interpret_template("""<Array_2D_Image>
 # type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Array_2D_Image />``
+XML element.
+"""
+
+data_3d_contents = interpret_template("""<Array_3D_Image>
+<offset unit="byte"><NODE name="offset" /></offset>
+<axes>3</axes>
+<axis_index_order>Last Index Fastest</axis_index_order>
+<NODE name="Element_Array" />
+<FRAGMENT name="Axis_Arrays" />
+</Array_3D_Image>""")
+# type: NodeBuilderTemplate
+"""
+An interpreted node template to create an ``<Array_3D_Image />``
 XML element.
 """
 
