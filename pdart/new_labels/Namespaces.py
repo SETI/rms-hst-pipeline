@@ -46,37 +46,33 @@ def make_schema_locations(*args):
 
 ############################################################
 
-BUNDLE_NAMESPACES = make_namespaces(_PDS4_NAMESPACE,
-                                    _PDS_NAMESPACE)
-
-BROWSE_PRODUCT_NAMESPACES = \
+_NAMESPACES_WITHOUT_HST =  \
     make_namespaces(_PDS4_NAMESPACE,
                     _PDS_NAMESPACE,
                     _XSI_NAMESPACE,
-                    make_schema_locations(_VERSIONED_PDS4_SCHEMA_LOCATION))
+                    make_schema_locations(_PDS4_SCHEMA_LOCATION,
+                                          _VERSIONED_PDS4_SCHEMA_LOCATION))
 
-COLLECTION_NAMESPACES = make_namespaces(_PDS4_NAMESPACE,
-                                        _PDS_NAMESPACE)
+_NAMESPACES_WITH_HST = \
+    make_namespaces(_PDS4_NAMESPACE,
+                    _PDS_NAMESPACE,
+                    _HST_NAMESPACE,
+                    _XSI_NAMESPACE,
+                    make_schema_locations(_PDS4_SCHEMA_LOCATION,
+                                          _VERSIONED_PDS4_SCHEMA_LOCATION,
+                                          _HST_SCHEMA_LOCATION,
+                                          _VERSIONED_HST_SCHEMA_LOCATION))
 
-DOCUMENT_PRODUCT_NAMESPACES = make_namespaces(
-    _PDS4_NAMESPACE,
-    _PDS_NAMESPACE,
-    _HST_NAMESPACE,
-    _XSI_NAMESPACE,
-    make_schema_locations(
-        _PDS4_SCHEMA_LOCATION,
-        _VERSIONED_PDS4_SCHEMA_LOCATION))
 
-FITS_PRODUCT_NAMESPACES = make_namespaces(
-    _PDS4_NAMESPACE,
-    _PDS_NAMESPACE,
-    _HST_NAMESPACE,
-    _XSI_NAMESPACE,
-    make_schema_locations(
-        _PDS4_SCHEMA_LOCATION,
-        _VERSIONED_PDS4_SCHEMA_LOCATION,
-        _HST_SCHEMA_LOCATION,
-        _VERSIONED_HST_SCHEMA_LOCATION))
+BUNDLE_NAMESPACES = _NAMESPACES_WITHOUT_HST
+
+BROWSE_PRODUCT_NAMESPACES = _NAMESPACES_WITHOUT_HST
+
+COLLECTION_NAMESPACES = _NAMESPACES_WITHOUT_HST
+
+DOCUMENT_PRODUCT_NAMESPACES = _NAMESPACES_WITHOUT_HST
+
+FITS_PRODUCT_NAMESPACES = _NAMESPACES_WITH_HST
 
 
 ############################################################
