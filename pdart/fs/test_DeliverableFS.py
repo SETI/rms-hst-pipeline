@@ -3,7 +3,8 @@ import unittest
 from fs.tempfs import TempFS
 from fs.test import FSTestCases
 
-from pdart.fs.DeliverableFS import DeliverableFS, DeliverablePrimitives
+from pdart.fs.DeliverableFS import DeliverableFS, DeliverablePrimitives, \
+    _translate_path_to_base_path
 from pdart.fs.test_FSPrimitives import FSPrimitives_TestBase
 
 
@@ -131,6 +132,25 @@ class Test_DeliverablePrimitives(unittest.TestCase, FSPrimitives_TestBase):
         self._assert_remove_child_is_correct(b_dir, 'b.txt')
         self.assertFalse(fs.get_children(b_dir))
         self._assert_remove_child_is_correct(root, 'b')
+
+    def test_translate_path_to_base_path(self):
+        test_cases = [
+            ('/b', '/b'),
+            ('/b/label.xml', '/b/label.xml'),
+            ('/b/c', '/b/c'),
+            ('/b/c/label.xml', '/b/c/label.xml'),
+            ('/b/document', '/b/document'),
+            ('/b/document/label.xml', '/b/document/label.xml'),
+            ('/b/c/visit_01', '/b/c/u2mu0101j'),
+            ('/b/c/visit_01/label.xml', '/b/c/u2mu0101j/label.xml'),
+            ('/b/document/phase2', '/b/document/phase2'),
+            ('/b/document/phase2/info.pdf', '/b/document/phase2/info.pdf'),
+            ('/b/c/no$visit/p', '/b/c/p'),
+            ('/b/c/no$visit/p/label.xml', '/b/c/p/label.xml'),
+            ]
+        for (expected, pds4_path) in test_cases:
+            actual = _translate_path_to_base_path(unicode(pds4_path))
+            self.assertEqual(unicode(expected), actual)
 
 
 class Test_DeliverableFS(FSTestCases, unittest.TestCase):

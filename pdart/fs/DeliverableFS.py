@@ -54,39 +54,54 @@ def _translate_path_to_base_path(path, is_file_hint=None):
     if l_ in [0, 1, 2]:
         return path
     elif l_ is 3:
-        # There are three cases.  First, are we looking at a file or a
-        # directory?
+
+        # There are three cases.  First, are we looking at a path for
+        # a file or for a directory?
+
+        b, c, p = parts
         if is_file_hint is None:
-            is_file_hint = '.' in parts[2]
+            is_file_hint = '.' in p
         if is_file_hint:
-            # It's fine as is.
-            return path
+            # It's a path to a collection file, perhaps a label or
+            # inventory, and is fine as is.
+            return fs.path.abspath(path)
+        elif c == 'document':
+            # It's a path in a document collection.  Leave it as is.
+            return fs.path.abspath(path)
         else:
-            # Does it look like a PDS4 product directory or not?
-            b, c, p = parts
+            # It's a path to a directory.  Does it look like a PDS4
+            # product directory?
             v = _visit_of(p)
             if v:
                 # It looks like a PDS4 product dir and we'll treat it
                 # as such.
-                return fs.path.join(b, c, v)
+                return fs.path.abspath(fs.path.join(b, c, v))
             else:
                 # It's not a PDS4 product dir.  This is not expected
                 # in our archive, but to make the pyfilesystem testing
                 # work, we allow it and put the extra stuff into a
                 # special dir.
-                return fs.path.join(b, c, _NO_VISIT, p)
+                return fs.path.abspath(fs.path.join(b, c, _NO_VISIT, p))
     else:
-        # Does the third part look like a PDS4 product directory or not?
-        v = _visit_of(parts[2])
+        # l_ > 3.  Let's name the first three parts.
+        b, c, p = parts[:3]
+        # Is this path part of a document collection?
+        if c == 'document':
+            # no change needed
+            return fs.path.abspath(path)
+
+        # Does the third part look like a PDS4 product directory or
+        # not: does it encode a visit?
+        v = _visit_of(p)
         if v:
             # It looks like a PDS4 product dir and we'll treat it as
             # such.
             new_parts = parts[:2] + [v] + parts[3:]
-            return fs.path.join(*new_parts)
+            return fs.path.abspath(fs.path.join(*new_parts))
         else:
-            # It does not.
+            # It does not.  We'll file it in a special directory.
             new_parts = parts[:2] + [_NO_VISIT] + parts[2:]
-            return fs.path.join(*new_parts)
+            return fs.path.abspath(fs.path.join(*new_parts))
 
 
 class DeliverablePrimitives(FSPrimitives):
