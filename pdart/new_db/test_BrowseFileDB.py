@@ -35,6 +35,7 @@ class Test_BrowseFileDB(unittest.TestCase):
                                            browse_product_lidvid,
                                            fits_product_lidvid,
                                            browse_collection_lidvid,
+                                           os_filepath,
                                            browse_basename,
                                            byte_size)
         self.assertTrue(self.db.browse_file_exists(browse_basename,

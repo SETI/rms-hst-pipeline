@@ -1,3 +1,5 @@
+import os
+import tempfile
 from typing import TYPE_CHECKING
 import unittest
 
@@ -20,6 +22,12 @@ class Test_BundleDB(unittest.TestCase):
         # type: () -> None
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
+        (handle, filepath) = tempfile.mkstemp()
+        os.close(handle)
+        self.dummy_os_filepath = filepath
+
+    def tearDown(self):
+        os.remove(self.dummy_os_filepath)
 
     def test_BundleDB(self):
         # type: () -> None
@@ -430,7 +438,8 @@ class Test_BundleDB(unittest.TestCase):
 
         self.assertFalse(self.db.get_product_files(product_lidvid))
 
-        self.db.create_fits_file('p_raw.fits', product_lidvid, 1)
+        self.db.create_fits_file(self.dummy_os_filepath,
+                                 'p_raw.fits', product_lidvid, 1)
         self.assertEqual(1, len(self.db.get_product_files(product_lidvid)))
 
     ############################################################
@@ -460,11 +469,13 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(
             self.db.browse_file_exists(basename, browse_product_lidvid))
 
-        self.db.create_browse_file(basename, browse_product_lidvid, 1)
+        self.db.create_browse_file(self.dummy_os_filepath,
+                                   basename, browse_product_lidvid, 1)
         self.assertTrue(
             self.db.browse_file_exists(basename, browse_product_lidvid))
 
-        self.db.create_browse_file(basename, browse_product_lidvid, 1)
+        self.db.create_browse_file(self.dummy_os_filepath,
+                                   basename, browse_product_lidvid, 1)
         self.assertTrue(
             self.db.browse_file_exists(basename, browse_product_lidvid))
 
@@ -484,7 +495,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.document_file_exists(filename,
                                                       product_lidvid))
 
-        self.db.create_document_file(filename, product_lidvid)
+        self.db.create_document_file(self.dummy_os_filepath,
+                                     filename, product_lidvid)
         self.assertTrue(self.db.document_file_exists(filename,
                                                      product_lidvid))
 
@@ -503,10 +515,12 @@ class Test_BundleDB(unittest.TestCase):
         basename = 'file.fits'
         self.assertFalse(self.db.fits_file_exists(basename, product_lidvid))
 
-        self.db.create_fits_file(basename, product_lidvid, 1)
+        self.db.create_fits_file(self.dummy_os_filepath,
+                                 basename, product_lidvid, 1)
         self.assertTrue(self.db.fits_file_exists(basename, product_lidvid))
 
-        self.db.create_fits_file(basename, product_lidvid, 1)
+        self.db.create_fits_file(self.dummy_os_filepath,
+                                 basename, product_lidvid, 1)
         self.assertTrue(self.db.fits_file_exists(basename, product_lidvid))
 
     def test_file_exists(self):
@@ -557,7 +571,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.file_exists(doc_filename_2,
                                              doc_prod_lidvid))
 
-        self.db.create_bad_fits_file(bad_fits_filename,
+        self.db.create_bad_fits_file(self.dummy_os_filepath,
+                                     bad_fits_filename,
                                      bad_fits_prod_lidvid,
                                      'kablooey!')
 
@@ -572,7 +587,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.file_exists(doc_filename_2,
                                              doc_prod_lidvid))
 
-        self.db.create_fits_file(fits_filename,
+        self.db.create_fits_file(self.dummy_os_filepath,
+                                 fits_filename,
                                  fits_prod_lidvid,
                                  666)
 
@@ -587,7 +603,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.file_exists(doc_filename_2,
                                              doc_prod_lidvid))
 
-        self.db.create_browse_file(browse_filename,
+        self.db.create_browse_file(self.dummy_os_filepath,
+                                   browse_filename,
                                    browse_prod_lidvid,
                                    666)
 
@@ -602,7 +619,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.file_exists(doc_filename_2,
                                              doc_prod_lidvid))
 
-        self.db.create_document_file(doc_filename,
+        self.db.create_document_file(self.dummy_os_filepath,
+                                     doc_filename,
                                      doc_prod_lidvid)
 
         self.assertTrue(self.db.file_exists(bad_fits_filename,
@@ -616,7 +634,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.file_exists(doc_filename_2,
                                              doc_prod_lidvid))
 
-        self.db.create_document_file(doc_filename_2,
+        self.db.create_document_file(self.dummy_os_filepath,
+                                     doc_filename_2,
                                      doc_prod_lidvid)
 
         self.assertTrue(self.db.file_exists(bad_fits_filename,
@@ -646,7 +665,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.bad_fits_file_exists(filename,
                                                       product_lidvid))
 
-        self.db.create_bad_fits_file(filename, product_lidvid, "kablooey!")
+        self.db.create_bad_fits_file(self.dummy_os_filepath,
+                                     filename, product_lidvid, "kablooey!")
         self.assertTrue(self.db.bad_fits_file_exists(filename,
                                                      product_lidvid))
 
@@ -670,7 +690,8 @@ class Test_BundleDB(unittest.TestCase):
         basename = 'p.jpg'
         self.assertFalse(self.db.browse_file_exists(basename,
                                                     product_lidvid))
-        self.db.create_browse_file(basename, product_lidvid, 1024)
+        self.db.create_browse_file(self.dummy_os_filepath,
+                                   basename, product_lidvid, 1024)
         self.assertTrue(self.db.browse_file_exists(basename,
                                                    product_lidvid))
 
@@ -690,7 +711,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.document_file_exists(filename,
                                                       product_lidvid))
 
-        self.db.create_document_file(filename, product_lidvid)
+        self.db.create_document_file(self.dummy_os_filepath,
+                                     filename, product_lidvid)
         self.assertTrue(self.db.document_file_exists(filename,
                                                      product_lidvid))
 
@@ -710,7 +732,8 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.fits_file_exists(filename,
                                                   product_lidvid))
 
-        self.db.create_fits_file(filename, product_lidvid, 1)
+        self.db.create_fits_file(self.dummy_os_filepath,
+                                 filename, product_lidvid, 1)
         self.assertTrue(self.db.fits_file_exists(filename,
                                                  product_lidvid))
 
@@ -731,7 +754,8 @@ class Test_BundleDB(unittest.TestCase):
             self.db.get_file(filename,
                              product_lidvid)
 
-        self.db.create_fits_file(filename, product_lidvid, 1)
+        self.db.create_fits_file(self.dummy_os_filepath,
+                                 filename, product_lidvid, 1)
         self.assertTrue(self.db.get_file(filename,
                                          product_lidvid))
 

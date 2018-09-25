@@ -21,7 +21,8 @@ def populate_database_from_fits_file(db, os_filepath, fits_product_lidvid):
         fits = pyfits.open(os_filepath)
 
         try:
-            db.create_fits_file(file_basename, fits_product_lidvid, len(fits))
+            db.create_fits_file(os_filepath,
+                                file_basename, fits_product_lidvid, len(fits))
             _populate_hdus_and_cards(db,
                                      fits,
                                      file_basename,
@@ -30,7 +31,8 @@ def populate_database_from_fits_file(db, os_filepath, fits_product_lidvid):
             fits.close()
 
     except IOError as e:
-        db.create_bad_fits_file(file_basename, fits_product_lidvid, e.message)
+        db.create_bad_fits_file(os_filepath,
+                                file_basename, fits_product_lidvid, e.message)
 
 
 def _populate_hdus_and_cards(db,

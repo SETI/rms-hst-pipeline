@@ -1,3 +1,5 @@
+import os
+import tempfile
 import unittest
 
 from pdart.new_db.BrowseFileDB import populate_database_from_browse_file
@@ -10,10 +12,13 @@ class Test_BrowseProductLabel(unittest.TestCase):
     def setUp(self):
         # type: () -> None
         self.db = create_bundle_db_in_memory()
+        (handle, filepath) = tempfile.mkstemp()
+        os.close(handle)
+        self.dummy_os_filepath = filepath
 
     def tearDown(self):
         # type: () -> None
-        pass
+        os.remove(self.dummy_os_filepath)
 
     def test_make_browse_product_label(self):
         # type: () -> None
@@ -50,6 +55,7 @@ class Test_BrowseProductLabel(unittest.TestCase):
                                            browse_product_lidvid,
                                            fits_product_lidvid,
                                            browse_collection_lidvid,
+                                           self.dummy_os_filepath,
                                            browse_file_basename,
                                            5492356)
 

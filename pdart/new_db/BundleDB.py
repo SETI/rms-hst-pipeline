@@ -330,9 +330,9 @@ class BundleDB(object):
 
     ############################################################
 
-    def create_bad_fits_file(self, basename, product_lidvid,
+    def create_bad_fits_file(self, os_filepath, basename, product_lidvid,
                              exception_message):
-        # type: (unicode, str, str) -> None
+        # type: (unicode, unicode, str, str) -> None
         """
         Create a bad FITS file record with this basename belonging to
         the product if none exists.
@@ -348,8 +348,9 @@ class BundleDB(object):
                             exception_message=exception_message))
             self.session.commit()
 
-    def create_browse_file(self, basename, product_lidvid, byte_size):
-        # type: (unicode, str, int) -> None
+    def create_browse_file(self, os_filepath, basename, product_lidvid,
+                           byte_size):
+        # type: (unicode, unicode, str, int) -> None
         """
         Create a browse file with this basename belonging to the product
         if none exists.
@@ -366,8 +367,8 @@ class BundleDB(object):
             self.session.commit()
             assert self.browse_file_exists(basename, product_lidvid)
 
-    def create_document_file(self, basename, product_lidvid):
-        # type: (unicode, str) -> None
+    def create_document_file(self, os_filepath, basename, product_lidvid):
+        # type: (unicode, unicode, str) -> None
         """
         Create a document file with this basename belonging to the product
         if none exists.
@@ -383,8 +384,9 @@ class BundleDB(object):
             self.session.commit()
             assert self.document_file_exists(basename, product_lidvid)
 
-    def create_fits_file(self, basename, product_lidvid, hdu_count):
-        # type: (unicode, str, int) -> None
+    def create_fits_file(self, os_filepath, basename, product_lidvid,
+                         hdu_count):
+        # type: (unicode, unicode, str, int) -> None
         """
         Create a FITS file with this basename belonging to the product
         if none exists.

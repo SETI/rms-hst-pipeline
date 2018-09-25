@@ -150,8 +150,8 @@ def populate_database(bundle_id, bundle_db, archive_dir):
                 fits_file_path = fs.path.join(product_path, fits_file)
                 bundle_db.create_fits_product(product_lidvid,
                                               collection_lidvid)
-                fits_sys_path = v1fs.getsyspath(fits_file_path)
-                populate_database_from_fits_file(bundle_db, fits_sys_path,
+                fits_os_path = v1fs.getsyspath(fits_file_path)
+                populate_database_from_fits_file(bundle_db, fits_os_path,
                                                  product_lidvid)
 
 
@@ -208,24 +208,25 @@ def create_browse_products(bundle_id, bundle_db, archive_dir):
             browse_product_fs_dirpath = lid_to_dir(
                 LIDVID(browse_product_lidvid).lid())
 
-            fits_sys_filepath = archive_fs.getsyspath(fits_fs_filepath)
+            fits_os_filepath = archive_fs.getsyspath(fits_fs_filepath)
             archive_fs.makedirs(browse_product_fs_dirpath)
-            browse_product_sys_dirpath = archive_fs.getsyspath(
+            browse_product_os_dirpath = archive_fs.getsyspath(
                 browse_product_fs_dirpath)
 
             # Picmaker expects a list of strings.  If you give it
             # unicode, it'll index into it and complain about '/'
             # not being a file.  So don't do that!
-            picmaker.ImagesToPics([str(fits_sys_filepath)],
-                                  browse_product_sys_dirpath,
+            picmaker.ImagesToPics([str(fits_os_filepath)],
+                                  browse_product_os_dirpath,
                                   filter="None",
                                   percentiles=(1, 99))
-            browse_sys_filepath = fs.path.join(
-                browse_product_sys_dirpath, browse_basename)
-            size = os.stat(browse_sys_filepath).st_size
+            browse_os_filepath = fs.path.join(
+                browse_product_os_dirpath, browse_basename)
+            size = os.stat(browse_os_filepath).st_size
 
             # create browse file record in the database
-            self.db.create_browse_file(browse_basename,
+            self.db.create_browse_file(browse_os_filepath,
+                                       browse_basename,
                                        browse_product_lidvid,
                                        size)
 
@@ -378,7 +379,8 @@ def create_document_collection(bundle_id, bundle_db, archive_dir,
 
     # create the files in the database
     for basename in document_files:
-        bundle_db.create_document_file(basename, product_lidvid)
+        os_filepath = fs.path.join(document_dir, basename)
+        bundle_db.create_document_file(os_filepath, basename, product_lidvid)
 
     # create the collection in the filesystem
     document_collection_dir = _lidvid_to_dir(collection_lidvid)
