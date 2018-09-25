@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
 
+from pdart.new_db.Utils import file_md5
 import pdart.pds4.Bundle
 import pdart.pds4.Collection
 from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, \
@@ -16,8 +17,6 @@ if TYPE_CHECKING:
     from typing import Any, Dict, List, Tuple
 
 _BUNDLE_DB_NAME = 'bundle$database.db'  # type: unicode
-
-_DUMMY_MD5_HASH = 'xxx'
 
 
 def create_bundle_db_from_os_filepath(os_filepath):
@@ -343,7 +342,7 @@ class BundleDB(object):
         else:
             self.session.add(
                 BadFitsFile(basename=basename,
-                            md5_hash=_DUMMY_MD5_HASH,
+                            md5_hash=file_md5(os_filepath),
                             product_lidvid=product_lidvid,
                             exception_message=exception_message))
             self.session.commit()
@@ -361,7 +360,7 @@ class BundleDB(object):
         else:
             self.session.add(
                 BrowseFile(basename=basename,
-                           md5_hash=_DUMMY_MD5_HASH,
+                           md5_hash=file_md5(os_filepath),
                            product_lidvid=product_lidvid,
                            byte_size=byte_size))
             self.session.commit()
@@ -379,7 +378,7 @@ class BundleDB(object):
         else:
             self.session.add(
                 DocumentFile(basename=basename,
-                             md5_hash=_DUMMY_MD5_HASH,
+                             md5_hash=file_md5(os_filepath),
                              product_lidvid=product_lidvid))
             self.session.commit()
             assert self.document_file_exists(basename, product_lidvid)
@@ -397,7 +396,7 @@ class BundleDB(object):
         else:
             self.session.add(
                 FitsFile(basename=basename,
-                         md5_hash=_DUMMY_MD5_HASH,
+                         md5_hash=file_md5(os_filepath),
                          product_lidvid=product_lidvid,
                          hdu_count=hdu_count))
             self.session.commit()

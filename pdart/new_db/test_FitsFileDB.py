@@ -46,8 +46,8 @@ class Test_FitsFileDB(unittest.TestCase):
         # type: () -> None
 
         fits_product_lidvid = \
-            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2.0'
-        os_filepath = 'j6gp01lzq_raw.fits'
+            'urn:nasa:pds:hst_09059:data_acs_raw:j6gp02lzq_raw::2.0'
+        os_filepath = path_to_testfile('j6gp02lzq_raw.fits')
 
         populate_database_from_fits_file(self.db,
                                          os_filepath,
