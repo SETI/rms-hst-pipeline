@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 _BUNDLE_DB_NAME = 'bundle$database.db'  # type: unicode
 
+_DUMMY_MD5_HASH = 'xxx'
+
 
 def create_bundle_db_from_os_filepath(os_filepath):
     # type: (unicode) -> BundleDB
@@ -341,6 +343,7 @@ class BundleDB(object):
         else:
             self.session.add(
                 BadFitsFile(basename=basename,
+                            md5_hash=_DUMMY_MD5_HASH,
                             product_lidvid=product_lidvid,
                             exception_message=exception_message))
             self.session.commit()
@@ -357,6 +360,7 @@ class BundleDB(object):
         else:
             self.session.add(
                 BrowseFile(basename=basename,
+                           md5_hash=_DUMMY_MD5_HASH,
                            product_lidvid=product_lidvid,
                            byte_size=byte_size))
             self.session.commit()
@@ -374,6 +378,7 @@ class BundleDB(object):
         else:
             self.session.add(
                 DocumentFile(basename=basename,
+                             md5_hash=_DUMMY_MD5_HASH,
                              product_lidvid=product_lidvid))
             self.session.commit()
             assert self.document_file_exists(basename, product_lidvid)
@@ -390,6 +395,7 @@ class BundleDB(object):
         else:
             self.session.add(
                 FitsFile(basename=basename,
+                         md5_hash=_DUMMY_MD5_HASH,
                          product_lidvid=product_lidvid,
                          hdu_count=hdu_count))
             self.session.commit()

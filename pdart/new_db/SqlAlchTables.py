@@ -172,6 +172,7 @@ class File(Base):
                             nullable=False)
     basename = Column(String, nullable=False)
     type = Column(String(16), nullable=False)
+    md5_hash = Column(String(32), nullable=False)
 
     __table_args__ = (
         UniqueConstraint('product_lidvid', 'basename'),
