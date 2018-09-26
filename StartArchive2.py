@@ -35,7 +35,11 @@ def start_archive(src_dir, dst_dir, tar_dir):
         os.makedirs(t_dst_dir)
         dst_fs = OSFS(t_dst_dir)
         dst_del_fs = DeliverableFS(dst_fs)
-        fs.copy.copy_fs(src_fs, dst_del_fs)
+
+        def on_copy(src_fs, src_path, dst_fs, dst_path):
+            print 'copying %s to %s' % (src_path, dst_path)
+
+        fs.copy.copy_fs(src_fs, dst_del_fs, on_copy=on_copy)
         tarfile_name = '%s.tar.gz' % bundle_name
         with TarFS(fs.path.join(tar_dir, tarfile_name), write=True) as tar_fs:
             fs.copy.copy_fs(dst_fs, tar_fs)
@@ -57,7 +61,9 @@ if __name__ == '__main__':
     TAR_DIR = '/Volumes/PDART-8TB/tarfiles'
 
     if True:
-        shutil.rmtree(fs.path.join(DST_DIR, 'hst_05167'), True)
-        shutil.rmtree(fs.path.join(TAR_DIR, 'hst_05167'), True)
+        shutil.rmtree(DST_DIR, True)
+        os.makedirs(DST_DIR)
+        shutil.rmtree(TAR_DIR, True)
+        os.makedirs(TAR_DIR)
 
     start_archive(SRC_DIR, DST_DIR, TAR_DIR)

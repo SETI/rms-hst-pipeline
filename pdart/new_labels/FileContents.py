@@ -61,8 +61,9 @@ def get_file_contents(bundle_db, card_dicts, instrument, fits_product_lidvid):
                                   'object_length': object_length})
 
         if datSpan:
-            bitpix = int(card_dicts[hdu_index]['BITPIX'])
-            axes = int(card_dicts[hdu_index]['NAXIS'])
+            hdu_card_dict = card_dicts[hdu_index]
+            bitpix = int(hdu_card_dict['BITPIX'])
+            axes = int(hdu_card_dict['NAXIS'])
             data_type = BITPIX_TABLE[bitpix]
             elmt_arr = element_array({'data_type': data_type})
 
@@ -86,14 +87,17 @@ def get_file_contents(bundle_db, card_dicts, instrument, fits_product_lidvid):
                 })
                 node_functions = [header, data]
             elif axes == 3:
-                # "3-D" images from WFPC2 are really three separate
+                # "3-D" images from WFPC2 are really four separate
                 # 2-D images.  We document them as such.
                 assert instrument == 'wfpc2', \
                     ('NAXIS=3 and instrument=%s' % instrument)
-                assert card_dicts[hdu_index]['NAXIS2'] == 3, \
-                    ('NAXIS2=%d' % card_dicts[hdu_index]['NAXIS2'])
-                assert (datSpan % 3 == 0), ('datSpan=%d' % datSpan)
-                layerOffset = datSpan / 3
+                assert int(hdu_card_dict['NAXIS3']) == 4, \
+                    ('NAXIS1=%s, NAXIS2=%s, NAXIS3=%s' %
+                     (hdu_card_dict['NAXIS1'],
+                      hdu_card_dict['NAXIS2'],
+                      hdu_card_dict['NAXIS3']))
+                assert (datSpan % 4 == 0), ('datSpan=%d' % datSpan)
+                layerOffset = datSpan / 4
                 data1 = data_2d_contents({
                     'offset': str(datLoc),
                     'Element_Array': elmt_arr,
@@ -109,7 +113,12 @@ def get_file_contents(bundle_db, card_dicts, instrument, fits_product_lidvid):
                     'Element_Array': elmt_arr,
                     'Axis_Arrays': _mk_axis_arrays(card_dicts, hdu_index, 2)
                 })
-                node_functions = [header, data1, data2, data3]
+                data4 = data_2d_contents({
+                    'offset': str(datLoc + 3 * layerOffset),
+                    'Element_Array': elmt_arr,
+                    'Axis_Arrays': _mk_axis_arrays(card_dicts, hdu_index, 2)
+                })
+                node_functions = [header, data1, data2, data3, data4]
         else:
             node_functions = [header]
 
