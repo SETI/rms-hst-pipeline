@@ -33,7 +33,7 @@ class Test_FileContents(unittest.TestCase):
         card_dicts = db.get_card_dictionaries(fits_product_lidvid,
                                               file_basename)
 
-        fb = get_file_contents(db, card_dicts, fits_product_lidvid)
+        fb = get_file_contents(db, card_dicts, 'acs', fits_product_lidvid)
         doc = _fragment_wrapper({'frag': fb})
         str = doc.toxml()
         str = pretty_print(str)

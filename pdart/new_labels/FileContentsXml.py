@@ -84,19 +84,6 @@ An interpreted node template to create an ``<Array_2D_Image />``
 XML element.
 """
 
-data_3d_contents = interpret_template("""<Array_3D_Image>
-<offset unit="byte"><NODE name="offset" /></offset>
-<axes>3</axes>
-<axis_index_order>Last Index Fastest</axis_index_order>
-<NODE name="Element_Array" />
-<FRAGMENT name="Axis_Arrays" />
-</Array_3D_Image>""")
-# type: NodeBuilderTemplate
-"""
-An interpreted node template to create an ``<Array_3D_Image />``
-XML element.
-"""
-
 element_array = interpret_template("""<Element_Array>
 <data_type><NODE name="data_type" /></data_type></Element_Array>""")
 # type: NodeBuilderTemplate

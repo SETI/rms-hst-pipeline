@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 from pdart.new_db.BundleDB import BundleDB
 from pdart.new_db.FitsFileDB import get_file_offsets
 from pdart.new_labels.FileContentsXml import AXIS_NAME_TABLE, BITPIX_TABLE, \
-    axis_array, data_1d_contents, data_2d_contents, data_3d_contents, \
-    element_array, header_contents
+    axis_array, data_1d_contents, data_2d_contents, element_array, \
+    header_contents
 from pdart.xml.Templates import combine_fragments_into_fragment, \
     combine_nodes_into_fragment
 
@@ -36,8 +36,8 @@ def _mk_axis_arrays(card_dicts, hdu_index, axes):
         [mk_axis_array(i + 1) for i in range(0, axes)])
 
 
-def get_file_contents(bundle_db, card_dicts, fits_product_lidvid):
-    # type: (BundleDB, List[Dict[str, Any]], unicode) -> FragBuilder
+def get_file_contents(bundle_db, card_dicts, instrument, fits_product_lidvid):
+    # type: (BundleDB, List[Dict[str, Any]], str, unicode) -> FragBuilder
     """
     Given the dictionary of the header fields from a product's FITS
     file, an open connection to the database, and the product's
@@ -76,6 +76,7 @@ def get_file_contents(bundle_db, card_dicts, fits_product_lidvid):
                     'Axis_Arrays': _mk_axis_arrays(card_dicts,
                                                    hdu_index, axes)
                 })
+                node_functions = [header, data]
             elif axes == 2:
                 data = data_2d_contents({
                     'offset': str(datLoc),
@@ -83,14 +84,32 @@ def get_file_contents(bundle_db, card_dicts, fits_product_lidvid):
                     'Axis_Arrays': _mk_axis_arrays(card_dicts,
                                                    hdu_index, axes)
                 })
+                node_functions = [header, data]
             elif axes == 3:
-                data = data_3d_contents({
+                # "3-D" images from WFPC2 are really three separate
+                # 2-D images.  We document them as such.
+                assert instrument == 'wfpc2', \
+                    ('NAXIS=3 and instrument=%s' % instrument)
+                assert card_dicts[hdu_index]['NAXIS2'] == 3, \
+                    ('NAXIS2=%d' % card_dicts[hdu_index]['NAXIS2'])
+                assert (datSpan % 3 == 0), ('datSpan=%d' % datSpan)
+                layerOffset = datSpan / 3
+                data1 = data_2d_contents({
                     'offset': str(datLoc),
                     'Element_Array': elmt_arr,
-                    'Axis_Arrays': _mk_axis_arrays(card_dicts,
-                                                   hdu_index, axes)
+                    'Axis_Arrays': _mk_axis_arrays(card_dicts, hdu_index, 2)
                 })
-            node_functions = [header, data]
+                data2 = data_2d_contents({
+                    'offset': str(datLoc + layerOffset),
+                    'Element_Array': elmt_arr,
+                    'Axis_Arrays': _mk_axis_arrays(card_dicts, hdu_index, 2)
+                })
+                data3 = data_2d_contents({
+                    'offset': str(datLoc + 2 * layerOffset),
+                    'Element_Array': elmt_arr,
+                    'Axis_Arrays': _mk_axis_arrays(card_dicts, hdu_index, 2)
+                })
+                node_functions = [header, data1, data2, data3]
         else:
             node_functions = [header]
 
