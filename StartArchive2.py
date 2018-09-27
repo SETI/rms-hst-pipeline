@@ -7,9 +7,12 @@ import fs.path
 from fs.osfs import OSFS
 from fs.tarfs import TarFS
 
-from pdart.archive.StartBundle import start_bundle
-from pdart.fs.DeliverableFS import DeliverableFS
+from pdart.archive.ChecksumManifest import make_checksum_manifest
+from pdart.archive.TransferManifest import make_transfer_manifest
+from pdart.archive.StartBundle import start_bundle, _BUNDLE_DB_NAME
+from pdart.fs.DeliverableFS import DeliverableFS, lidvid_to_dirpath
 from pdart.fs.V1FS import V1FS
+from pdart.new_db.BundleDB import create_bundle_db_from_os_filepath
 from pdart.pds4.HstFilename import HstFilename
 
 
@@ -36,20 +39,27 @@ def start_archive(src_dir, dst_dir, tar_dir):
         dst_fs = OSFS(t_dst_dir)
         dst_del_fs = DeliverableFS(dst_fs)
         fs.copy.copy_fs(src_fs, dst_del_fs)
+
         # TODO add manifests to dst_fs (not dst_del_fs)
+        os_filepath = fs.path.join(DST_DIR, bundle_name,
+                                   bundle_name, _BUNDLE_DB_NAME)
+        bundle_db = create_bundle_db_from_os_filepath(os_filepath)
+        checksum_manifest = make_checksum_manifest(bundle_db,
+                                                   lidvid_to_dirpath)
+        filepath = fs.path.join(TAR_DIR, bundle_name, 'checksum.manifest.txt')
+        with open(filepath, 'w') as f:
+            f.write(checksum_manifest)
+
+        transfer_manifest = make_transfer_manifest(bundle_db,
+                                                   lidvid_to_dirpath)
+
+        filepath = fs.path.join(TAR_DIR, bundle_name, 'transfer.manifest.txt')
+        with open(filepath, 'w') as f:
+            f.write(transfer_manifest)
+
         tarfile_name = '%s.tar.gz' % bundle_name
         with TarFS(fs.path.join(tar_dir, tarfile_name), write=True) as tar_fs:
             fs.copy.copy_fs(dst_fs, tar_fs)
-
-
-def make_delivery(src_dir, dst_dir):
-    src_fs = V1FS(src_dir)
-    print '===='
-    osfs = OSFS(dst_dir)
-    dst_fs = DeliverableFS(osfs)
-    fs.copy.copy_fs(src_fs, dst_fs)
-    print 'Delivery looks like this:'
-    osfs.tree()
 
 
 if __name__ == '__main__':
