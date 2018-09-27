@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 def _make_bundle_pair(bundle, lidvid_to_dirpath):
     # type: (Bundle, _LTD) -> Tuple[str, unicode]
     lidvid = str(bundle.lidvid)
-    dir = lidvid_to_dirpath(LIDVID(lidvid))
+    dir = fs.path.relpath(lidvid_to_dirpath(LIDVID(lidvid)))
     filepath = 'bundle.xml'
     return (lidvid,
             fs.path.join(dir, filepath))
@@ -24,7 +24,7 @@ def _make_bundle_pair(bundle, lidvid_to_dirpath):
 def _make_collection_pair(bundle_db, collection, lidvid_to_dirpath):
     # type: (BundleDB, Collection, _LTD) -> Tuple[str, unicode]
     lidvid = str(collection.lidvid)
-    dir = lidvid_to_dirpath(LIDVID(lidvid))
+    dir = fs.path.relpath(lidvid_to_dirpath(LIDVID(lidvid)))
     filepath = get_collection_label_name(bundle_db, lidvid)
     return (str(collection.lidvid), fs.path.join(dir, filepath))
 
@@ -32,7 +32,7 @@ def _make_collection_pair(bundle_db, collection, lidvid_to_dirpath):
 def _make_product_pair(product, lidvid_to_dirpath):
     # type: (Product, _LTD) -> Tuple[str, unicode]
     lidvid = str(product.lidvid)
-    dir = lidvid_to_dirpath(LIDVID(lidvid))
+    dir = fs.path.relpath(lidvid_to_dirpath(LIDVID(lidvid)))
     filepath = '%s.xml' % (LIDVID(lidvid).lid().product_id)
     return (lidvid, fs.path.join(dir, filepath))
 

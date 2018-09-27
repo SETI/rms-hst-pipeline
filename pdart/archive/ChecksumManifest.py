@@ -30,6 +30,6 @@ def make_checksum_pair(file, lidvid_to_dirpath):
     def file_to_filepath(file):
         # type: (File) -> unicode
         dir = lidvid_to_dirpath(LIDVID(file.product_lidvid))
-        return fs.path.join(dir, file.basename)
+        return fs.path.relpath(fs.path.join(dir, file.basename))
 
     return (file_to_filepath(file), file.md5_hash)
