@@ -38,6 +38,11 @@ class Test_DeliverablePrimitives(unittest.TestCase, FSPrimitives_TestBase):
         product_dir = self._assert_add_child_dir_is_correct(collection_dir,
                                                             'u2mu0101j')
 
+        doc_collection_dir = self._assert_add_child_dir_is_correct(
+            bundle_dir, 'document')
+        doc_product_dir = self._assert_add_child_dir_is_correct(
+            doc_collection_dir, 'phase2')
+
         # create a random dir
         b_dir = self._assert_add_child_dir_is_correct(root, 'b')
         c_dir = self._assert_add_child_dir_is_correct(b_dir, 'c')
@@ -60,11 +65,20 @@ class Test_DeliverablePrimitives(unittest.TestCase, FSPrimitives_TestBase):
             collection_dir,
             'collection.xml')
 
+        doc_collection_dir = fs.add_child_dir(bundle_dir, 'document')
+        doc_collection_label = self._assert_add_child_file_is_correct(
+            doc_collection_dir,
+            'collection.xml')
+
         product_dir = fs.add_child_dir(collection_dir, 'u2mu0101j')
         product_file = self._assert_add_child_file_is_correct(
             product_dir, 'u2mu0101j_cmh.fits')
         product_label = self._assert_add_child_file_is_correct(
             product_dir, 'u2mu0101j_cmh.xml')
+
+        doc_product_dir = fs.add_child_dir(doc_collection_dir, 'phase2')
+        doc_product_file = self._assert_add_child_file_is_correct(
+            doc_product_dir, 'phase2.pdf')
 
         # create a random file
         b_dir = fs.add_child_dir(root, 'b')

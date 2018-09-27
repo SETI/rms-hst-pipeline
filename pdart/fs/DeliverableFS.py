@@ -29,11 +29,10 @@ def _visit_of(filename):
         return None
 
 
-def _union_dicts(a, b, c):
+def _union_dicts(*ds):
     res = {}
-    res.update(a)
-    res.update(b)
-    res.update(c)
+    for d in ds:
+        res.update(d)
     return res
 
 
@@ -205,6 +204,16 @@ class DeliverablePrimitives(FSPrimitives):
                 res[unicode(basename)] = Dir(self, dir_path)
         return res
 
+    def _doc_contents(self, path):
+        # type: (unicode) -> Dict[unicode, Node_]
+        b, c = fs.path.iteratepath(path)
+        if c == 'document':
+            return {info.name: self._info_to_node(path, info)
+                    for info
+                    in self.base_fs.scandir(path, namespaces=['basic'])}
+        else:
+            return {}
+
     def _no_visit_contents(self, path):
         # type: (unicode) -> Dict[unicode, Node_]
         """
@@ -212,7 +221,11 @@ class DeliverablePrimitives(FSPrimitives):
         product directories.  This is only called when the path has
         two parts, so the path is also the basepath.
         """
-        assert len(fs.path.iteratepath(path)) == 2
+        parts = fs.path.iteratepath(path)
+        assert len(parts) == 2
+        b, c = parts
+        if c == 'document':
+            return {}
         new_path = fs.path.join(path, _NO_VISIT)
         if not self.base_fs.isdir(new_path):
             return {}
@@ -256,7 +269,8 @@ class DeliverablePrimitives(FSPrimitives):
             # note that path == base_path for l_ == 2
             return _union_dicts(self._file_contents(path),
                                 self._visit_contents(path),
-                                self._no_visit_contents(path))
+                                self._no_visit_contents(path),
+                                self._doc_contents(path))
         elif l_ is 3:
             product_dir_name = path_parts[2]
             v = _visit_of(product_dir_name)
