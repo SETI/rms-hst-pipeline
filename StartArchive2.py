@@ -35,11 +35,8 @@ def start_archive(src_dir, dst_dir, tar_dir):
         os.makedirs(t_dst_dir)
         dst_fs = OSFS(t_dst_dir)
         dst_del_fs = DeliverableFS(dst_fs)
-
-        def on_copy(src_fs, src_path, dst_fs, dst_path):
-            print 'copying %s to %s' % (src_path, dst_path)
-
-        fs.copy.copy_fs(src_fs, dst_del_fs, on_copy=on_copy)
+        fs.copy.copy_fs(src_fs, dst_del_fs)
+        # TODO add manifests to dst_fs (not dst_del_fs)
         tarfile_name = '%s.tar.gz' % bundle_name
         with TarFS(fs.path.join(tar_dir, tarfile_name), write=True) as tar_fs:
             fs.copy.copy_fs(dst_fs, tar_fs)
