@@ -3,6 +3,7 @@ import re
 import fs.path
 from typing import TYPE_CHECKING
 
+from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.FSPrimAdapter import FSPrimAdapter
 from pdart.fs.FSPrimitives import Dir, FSPrimitives, File
 from pdart.pds4.HstFilename import HstFilename
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
     from fs.base import FS
     from fs.info import Info
     from pdart.fs.FSPrimitives import Dir_, File_, Node_
+    from pdart.pds4.LIDVID import LIDVID
 
 _NO_VISIT = u'no$visit'
 
@@ -38,6 +40,17 @@ def _union_dicts(*ds):
 
 _IS_DIR = False  # type: bool
 _IS_FILE = True  # type: bool
+
+
+def lidvid_to_dirpath(lidvid):
+    # type: (LIDVID) -> unicode
+    """
+    Useful for making PDS4 delivery manifests.
+    """
+    lid = lidvid.lid()
+    dir = lid_to_dir(lid)
+    dirpath = _translate_path_to_base_path(dir, _IS_DIR)
+    return dirpath
 
 
 def _translate_path_to_base_path(path, is_file_hint=None):

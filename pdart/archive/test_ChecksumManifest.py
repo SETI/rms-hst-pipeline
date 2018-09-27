@@ -24,7 +24,7 @@ _PRODUCT2_BASENAME = 'phase2.pdf'
 _PRODUCT2_CONTENTS = "I am mascarading as a PDF file."
 
 
-def _lidvid_to_filepath(lidvid):
+def _lidvid_to_dirpath(lidvid):
     # type: (LIDVID) -> unicode
     lid = lidvid.lid()
     return fs.path.relpath(lid_to_dir(lid))
@@ -42,7 +42,7 @@ class test_ChecksumManifest(unittest.TestCase):
 
     def test_empty_db(self):
         self.assertEqual('', make_checksum_manifest(self.bundle_db,
-                                                    _lidvid_to_filepath))
+                                                    _lidvid_to_dirpath))
 
     def test_minimal_db(self):
         self.bundle_db.create_non_document_collection(_COLLECTION_LIDVID,
@@ -56,7 +56,7 @@ class test_ChecksumManifest(unittest.TestCase):
         self.bundle_db.create_fits_file(os_filepath, _PRODUCT_BASENAME,
                                         _PRODUCT_LIDVID, _HDU_COUNT)
 
-        manifest = make_checksum_manifest(self.bundle_db, _lidvid_to_filepath)
+        manifest = make_checksum_manifest(self.bundle_db, _lidvid_to_dirpath)
 
         self.assertEqual(
             'ba8a714e47d3c7606c0a2d438f9e4811  '
@@ -82,5 +82,5 @@ class test_ChecksumManifest(unittest.TestCase):
                     '64d11a5e59de03ce7ee7acf905c67aee  '
                     'hst_00001/document/phase2/phase2.pdf\n')
 
-        manifest = make_checksum_manifest(self.bundle_db, _lidvid_to_filepath)
+        manifest = make_checksum_manifest(self.bundle_db, _lidvid_to_dirpath)
         self.assertEqual(expected, manifest)
