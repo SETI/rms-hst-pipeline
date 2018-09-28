@@ -1,16 +1,16 @@
 import re
-from typing import TYPE_CHECKING
 
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
+from typing import TYPE_CHECKING
 
-from pdart.new_db.Utils import file_md5
 import pdart.pds4.Bundle
 import pdart.pds4.Collection
 from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, \
     BrowseProduct, Bundle, Card, Collection, DocumentCollection, \
     DocumentFile, DocumentProduct, File, FitsFile, FitsProduct, Hdu, \
     NonDocumentCollection, Product, create_tables
+from pdart.new_db.Utils import file_md5
 from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
@@ -80,7 +80,7 @@ class BundleDB(object):
         Create a bundle with this LIDVID if none exists.
         """
 
-        LIDVID(bundle_lidvid)
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
         if not self.bundle_exists(bundle_lidvid):
             proposal_id = _lidvid_to_proposal_id(bundle_lidvid)
             self.session.add(Bundle(lidvid=bundle_lidvid,
@@ -111,8 +111,8 @@ class BundleDB(object):
         """
         Create a document_collection with this LIDVID if none exists.
         """
-        LIDVID(collection_lidvid)
-        LIDVID(bundle_lidvid)
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
         if self.collection_exists(collection_lidvid):
             if self.document_collection_exists(collection_lidvid):
                 pass
@@ -132,8 +132,8 @@ class BundleDB(object):
         """
         Create a non_document_collection with this LIDVID if none exists.
         """
-        LIDVID(collection_lidvid)
-        LIDVID(bundle_lidvid)
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
         if self.collection_exists(collection_lidvid):
             if self.non_document_collection_exists(collection_lidvid):
                 pass
@@ -204,9 +204,9 @@ class BundleDB(object):
         """
         Create a product with this LIDVID if none exists.
         """
-        LIDVID(browse_product_lidvid)
-        LIDVID(fits_product_lidvid)
-        LIDVID(collection_lidvid)
+        assert LIDVID(browse_product_lidvid).is_product_lidvid()
+        assert LIDVID(fits_product_lidvid).is_product_lidvid()
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
         if self.product_exists(fits_product_lidvid):
             if not self.fits_product_exists(fits_product_lidvid):
                 raise Exception('product %s is not a FITS product' %
@@ -235,8 +235,8 @@ class BundleDB(object):
         """
         Create a product with this LIDVID if none exists.
         """
-        LIDVID(product_lidvid)
-        LIDVID(collection_lidvid)
+        assert LIDVID(product_lidvid).is_product_lidvid()
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
         if self.product_exists(product_lidvid):
             if self.document_product_exists(product_lidvid):
                 pass
@@ -255,7 +255,7 @@ class BundleDB(object):
         """
         Create a product with this LIDVID if none exists.
         """
-        LIDVID(product_lidvid)
+        assert LIDVID(product_lidvid).is_product_lidvid()
         LIDVID(collection_lidvid)
         if self.product_exists(product_lidvid):
             if self.fits_product_exists(product_lidvid):
@@ -263,7 +263,7 @@ class BundleDB(object):
             else:
                 raise Exception(
                     'non-FITS product with LIDVID %s already exists' %
-                    product_lidvid)
+                    LIDVID(product_lidvid))
         else:
             self.session.add(
                 FitsProduct(lidvid=product_lidvid,
@@ -336,7 +336,7 @@ class BundleDB(object):
         Create a bad FITS file record with this basename belonging to
         the product if none exists.
         """
-        LIDVID(product_lidvid)
+        assert LIDVID(product_lidvid).is_product_lidvid()
         if self.fits_file_exists(basename, product_lidvid):
             pass
         else:
@@ -354,7 +354,7 @@ class BundleDB(object):
         Create a browse file with this basename belonging to the product
         if none exists.
         """
-        LIDVID(product_lidvid)
+        assert LIDVID(product_lidvid).is_product_lidvid()
         if self.browse_file_exists(basename, product_lidvid):
             pass
         else:
@@ -372,7 +372,7 @@ class BundleDB(object):
         Create a document file with this basename belonging to the product
         if none exists.
         """
-        LIDVID(product_lidvid)
+        assert LIDVID(product_lidvid).is_product_lidvid()
         if self.document_file_exists(basename, product_lidvid):
             pass
         else:
@@ -390,7 +390,7 @@ class BundleDB(object):
         Create a FITS file with this basename belonging to the product
         if none exists.
         """
-        LIDVID(product_lidvid)
+        assert LIDVID(product_lidvid).is_product_lidvid()
         if self.fits_file_exists(basename, product_lidvid):
             pass
         else:
@@ -514,6 +514,7 @@ class BundleDB(object):
         Return a list of dictionaries mapping FITS keys to their
         values, one per Hdu in the FITS file.
         """
+
         def get_card_dictionary(index):
             # type: (int) -> Dict[str, Any]
             cards = self.session.query(Card).filter(
