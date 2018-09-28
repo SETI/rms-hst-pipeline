@@ -7,9 +7,10 @@ from typing import TYPE_CHECKING
 import pdart.pds4.Bundle
 import pdart.pds4.Collection
 from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, \
-    BrowseProduct, Bundle, Card, Collection, DocumentCollection, \
+    BrowseProduct, Bundle, BundleLabel, Card, Collection, \
+    CollectionInventory, CollectionLabel, DocumentCollection, \
     DocumentFile, DocumentProduct, File, FitsFile, FitsProduct, Hdu, \
-    NonDocumentCollection, Product, create_tables
+    NonDocumentCollection, Product, ProductLabel, create_tables
 from pdart.new_db.Utils import file_md5
 from pdart.pds4.LIDVID import LIDVID
 
@@ -524,6 +525,152 @@ class BundleDB(object):
 
         file = self.get_file(basename, fits_product_lidvid)
         return [get_card_dictionary(i) for i in range(file.hdu_count)]
+
+    ############################################################
+
+    def create_bundle_label(self, os_filepath, basename, bundle_lidvid):
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if self.bundle_label_exists(bundle_lidvid):
+            pass
+        else:
+            self.session.add(
+                BundleLabel(bundle_lidvid=bundle_lidvid,
+                            basename=basename,
+                            md5_hash=file_md5(os_filepath)))
+            self.session.commit()
+            assert self.bundle_label_exists(bundle_lidvid)
+
+    def bundle_label_exists(self, bundle_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff there is a label for the bundle with the
+        given LIDVID.
+        """
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        return self.session.query(
+            exists().where(
+                BundleLabel.bundle_lidvid == bundle_lidvid)).scalar()
+
+    def get_bundle_label(self, bundle_lidvid):
+        # type: (str) -> BundleLabel
+        """
+        Returns the label for the bundle with the given LIDVID, or
+        raises an exception.
+        """
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        return self.session.query(BundleLabel).filter(
+            BundleLabel.bundle_lidvid == bundle_lidvid).one()
+
+    ############################################################
+
+    def create_collection_label(self, os_filepath,
+                                basename, collection_lidvid):
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if self.collection_label_exists(collection_lidvid):
+            pass
+        else:
+            self.session.add(
+                CollectionLabel(collection_lidvid=collection_lidvid,
+                                basename=basename,
+                                md5_hash=file_md5(os_filepath)))
+            self.session.commit()
+            assert self.collection_label_exists(collection_lidvid)
+
+    def collection_label_exists(self, collection_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff there is a label for the collection with the
+        given LIDVID.
+        """
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        return self.session.query(
+            exists().where(
+                CollectionLabel.collection_lidvid == collection_lidvid
+            )).scalar()
+
+    def get_collection_label(self, collection_lidvid):
+        # type: (str) -> CollectionLabel
+        """
+        Returns the label for the collection with the given LIDVID, or
+        raises an exception.
+        """
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        return self.session.query(CollectionLabel).filter(
+            CollectionLabel.collection_lidvid == collection_lidvid).one()
+
+    ############################################################
+
+    def create_collection_inventory(self, os_filepath,
+                                    basename, collection_lidvid):
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if self.collection_inventory_exists(collection_lidvid):
+            pass
+        else:
+            self.session.add(
+                CollectionInventory(collection_lidvid=collection_lidvid,
+                                    basename=basename,
+                                    md5_hash=file_md5(os_filepath)))
+            self.session.commit()
+            assert self.collection_inventory_exists(collection_lidvid)
+
+    def collection_inventory_exists(self, collection_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff there is a inventory for the collection with the
+        given LIDVID.
+        """
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        return self.session.query(
+            exists().where(
+                CollectionInventory.collection_lidvid == collection_lidvid
+            )).scalar()
+
+    def get_collection_inventory(self, collection_lidvid):
+        # type: (str) -> CollectionInventory
+        """
+        Returns the inventory for the collection with the given LIDVID, or
+        raises an exception.
+        """
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        return self.session.query(CollectionInventory).filter(
+            CollectionInventory.collection_lidvid == collection_lidvid).one()
+
+    ############################################################
+
+    def create_product_label(self, os_filepath,
+                             basename, product_lidvid):
+        assert LIDVID(product_lidvid).is_product_lidvid()
+        if self.product_label_exists(product_lidvid):
+            pass
+        else:
+            self.session.add(
+                ProductLabel(product_lidvid=product_lidvid,
+                             basename=basename,
+                             md5_hash=file_md5(os_filepath)))
+            self.session.commit()
+            assert self.product_label_exists(product_lidvid)
+
+    def product_label_exists(self, product_lidvid):
+        # type: (str) -> bool
+        """
+        Returns True iff there is a label for the product with the
+        given LIDVID.
+        """
+        assert LIDVID(product_lidvid).is_product_lidvid()
+        return self.session.query(
+            exists().where(
+                ProductLabel.product_lidvid == product_lidvid
+            )).scalar()
+
+    def get_product_label(self, product_lidvid):
+        # type: (str) -> ProductLabel
+        """
+        Returns the label for the product with the given LIDVID, or
+        raises an exception.
+        """
+        assert LIDVID(product_lidvid).is_product_lidvid()
+        return self.session.query(ProductLabel).filter(
+            ProductLabel.product_lidvid == product_lidvid).one()
 
     ############################################################
 

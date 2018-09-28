@@ -1,10 +1,15 @@
 import os
 import tempfile
-from typing import TYPE_CHECKING
 import unittest
 
-from pdart.new_db.BundleDB import BundleDB, create_bundle_db_in_memory
+from typing import TYPE_CHECKING
+
+from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.SqlAlchTables import Base, Bundle, NonDocumentCollection
+from pdart.new_db.Utils import file_md5
+from pdart.new_labels.CollectionInventory import get_collection_inventory_name
+from pdart.new_labels.CollectionLabel import get_collection_label_name
+from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
     from typing import Set
@@ -14,7 +19,9 @@ _TABLES = {'bundles',
            'products', 'browse_products', 'document_products', 'fits_products',
            'files', 'fits_files', 'bad_fits_files', 'browse_files',
            'document_files',
-           'hdus', 'cards'}  # type: Set[str]
+           'hdus', 'cards',
+           'bundle_labels', 'collection_labels',
+           'collection_inventories', 'product_labels'}  # type: Set[str]
 
 
 class Test_BundleDB(unittest.TestCase):
@@ -23,6 +30,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
         (handle, filepath) = tempfile.mkstemp()
+        os.write(handle, os.urandom(32))
         os.close(handle)
         self.dummy_os_filepath = filepath
 
@@ -758,6 +766,206 @@ class Test_BundleDB(unittest.TestCase):
                                  filename, product_lidvid, 1)
         self.assertTrue(self.db.get_file(filename,
                                          product_lidvid))
+
+    ############################################################
+
+    def test_create_bundle_label(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        self.assertFalse(self.db.bundle_label_exists(bundle_lidvid))
+        basename = 'bundle.xml'
+        self.db.create_bundle_label(self.dummy_os_filepath,
+                                    basename, bundle_lidvid)
+        self.assertTrue(self.db.bundle_label_exists(bundle_lidvid))
+        self.db.create_bundle_label(self.dummy_os_filepath,
+                                    basename, bundle_lidvid)
+        self.assertTrue(self.db.bundle_label_exists(bundle_lidvid))
+
+    def test_bundle_label_exists(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        self.assertFalse(self.db.bundle_label_exists(bundle_lidvid))
+        basename = 'bundle.xml'
+        self.db.create_bundle_label(self.dummy_os_filepath,
+                                    basename, bundle_lidvid)
+        self.assertTrue(self.db.bundle_label_exists(bundle_lidvid))
+
+    def test_get_bundle_label(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+
+        basename = 'bundle.xml'
+        self.db.create_bundle_label(self.dummy_os_filepath,
+                                    basename, bundle_lidvid)
+        bundle_label = self.db.get_bundle_label(bundle_lidvid)
+        self.assertEquals(bundle_lidvid, bundle_label.bundle_lidvid)
+        self.assertEquals(basename, bundle_label.basename)
+        self.assertEquals(file_md5(self.dummy_os_filepath),
+                          bundle_label.md5_hash)
+
+    def test_create_collection_label(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        self.assertFalse(self.db.collection_label_exists(collection_lidvid))
+        basename = 'collection.xml'
+        self.db.create_collection_label(self.dummy_os_filepath,
+                                        basename, collection_lidvid)
+        self.assertTrue(self.db.collection_label_exists(collection_lidvid))
+        self.db.create_collection_label(self.dummy_os_filepath,
+                                        basename, collection_lidvid)
+        self.assertTrue(self.db.collection_label_exists(collection_lidvid))
+
+    def test_collection_label_exists(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        self.assertFalse(self.db.collection_label_exists(collection_lidvid))
+        basename = 'collection.xml'
+        self.db.create_collection_label(self.dummy_os_filepath,
+                                        basename, collection_lidvid)
+        self.assertTrue(self.db.collection_label_exists(collection_lidvid))
+
+    def test_get_collection_label(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        basename = get_collection_label_name(self.db,
+                                             collection_lidvid)
+        self.db.create_collection_label(self.dummy_os_filepath,
+                                        basename, collection_lidvid)
+        collection_label = self.db.get_collection_label(
+            collection_lidvid)
+        self.assertEquals(collection_lidvid,
+                          collection_label.collection_lidvid)
+        self.assertEquals(basename, collection_label.basename)
+        self.assertEquals(file_md5(self.dummy_os_filepath),
+                          collection_label.md5_hash)
+
+    def test_create_collection_inventory(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        self.assertFalse(
+            self.db.collection_inventory_exists(collection_lidvid))
+        basename = 'collection.xml'
+        self.db.create_collection_inventory(self.dummy_os_filepath,
+                                            basename, collection_lidvid)
+        self.assertTrue(self.db.collection_inventory_exists(collection_lidvid))
+        self.db.create_collection_inventory(self.dummy_os_filepath,
+                                            basename, collection_lidvid)
+        self.assertTrue(self.db.collection_inventory_exists(collection_lidvid))
+
+    def test_collection_inventory_exists(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        self.assertFalse(
+            self.db.collection_inventory_exists(collection_lidvid))
+        basename = 'collection.xml'
+        self.db.create_collection_inventory(self.dummy_os_filepath,
+                                            basename, collection_lidvid)
+        self.assertTrue(self.db.collection_inventory_exists(collection_lidvid))
+
+    def test_get_collection_inventory(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+
+        basename = get_collection_inventory_name(self.db,
+                                                 collection_lidvid)
+        self.db.create_collection_inventory(self.dummy_os_filepath,
+                                            basename, collection_lidvid)
+        collection_inventory = self.db.get_collection_inventory(
+            collection_lidvid)
+        self.assertEquals(collection_lidvid,
+                          collection_inventory.collection_lidvid)
+        self.assertEquals(basename, collection_inventory.basename)
+        self.assertEquals(file_md5(self.dummy_os_filepath),
+                          collection_inventory.md5_hash)
+
+    def test_create_product_label(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+        product_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw:j6gp01lzq::1.8'
+        self.db.create_fits_product(product_lidvid, collection_lidvid)
+
+        self.assertFalse(self.db.product_label_exists(product_lidvid))
+        basename = '%s.xml' % LIDVID(product_lidvid).lid().product_id
+        self.db.create_product_label(self.dummy_os_filepath,
+                                     basename, product_lidvid)
+        self.assertTrue(self.db.product_label_exists(product_lidvid))
+        self.db.create_product_label(self.dummy_os_filepath,
+                                     basename, product_lidvid)
+        self.assertTrue(self.db.product_label_exists(product_lidvid))
+
+    def test_product_label_exists(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+        product_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw:j6gp01lzq::1.8'
+        self.db.create_fits_product(product_lidvid, collection_lidvid)
+
+        self.assertFalse(self.db.product_label_exists(product_lidvid))
+        basename = '%s.xml' % LIDVID(product_lidvid).lid().product_id
+        self.db.create_product_label(self.dummy_os_filepath,
+                                     basename, product_lidvid)
+        self.assertTrue(self.db.product_label_exists(product_lidvid))
+
+    def test_get_product_label(self):
+        # type: () -> None
+        bundle_lidvid = 'urn:nasa:pds:hst_99999::1.1'
+        self.db.create_bundle(bundle_lidvid)
+        collection_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw::1.1'
+        self.db.create_non_document_collection(collection_lidvid,
+                                               bundle_lidvid)
+        product_lidvid = 'urn:nasa:pds:hst_99999:data_acs_raw:j6gp01lzq::1.8'
+        self.db.create_fits_product(product_lidvid, collection_lidvid)
+
+        basename = 'j6gp01lzq_raw.fits'
+        self.db.create_product_label(self.dummy_os_filepath,
+                                     basename, product_lidvid)
+        product_label = self.db.get_product_label(product_lidvid)
+        self.assertEquals(product_lidvid,
+                          product_label.product_lidvid)
+        self.assertEquals(basename, product_label.basename)
+        self.assertEquals(file_md5(self.dummy_os_filepath),
+                          product_label.md5_hash)
 
     ############################################################
 

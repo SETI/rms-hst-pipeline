@@ -317,3 +317,61 @@ class Card(Base):
 
 
 Index('idx_cards_product_hdu_index', Card.product_lidvid, Card.hdu_index)
+
+
+############################################################
+
+class BundleLabel(Base):
+    """
+    A database representation of a PDS4 bundle label.
+    """
+    __tablename__ = 'bundle_labels'
+
+    bundle_lidvid = Column(String,
+                           ForeignKey('bundles.lidvid'),
+                           primary_key=True,
+                           nullable=False)
+    basename = Column(String, nullable=False)
+    md5_hash = Column(String(32), nullable=False)
+
+
+class CollectionLabel(Base):
+    """
+    A database representation of a PDS4 collection label.
+    """
+    __tablename__ = 'collection_labels'
+
+    collection_lidvid = Column(String,
+                               ForeignKey('collections.lidvid'),
+                               primary_key=True,
+                               nullable=False)
+    basename = Column(String, nullable=False)
+    md5_hash = Column(String(32), nullable=False)
+
+
+class CollectionInventory(Base):
+    """
+    A database representation of a PDS4 collection inventory.
+    """
+    __tablename__ = 'collection_inventories'
+
+    collection_lidvid = Column(String,
+                               ForeignKey('collections.lidvid'),
+                               primary_key=True,
+                               nullable=False)
+    basename = Column(String, nullable=False)
+    md5_hash = Column(String(32), nullable=False)
+
+
+class ProductLabel(Base):
+    """
+    A database representation of a PDS4 product label.
+    """
+    __tablename__ = 'product_labels'
+
+    product_lidvid = Column(String,
+                            ForeignKey('products.lidvid'),
+                            primary_key=True,
+                            nullable=False)
+    basename = Column(String, nullable=False)
+    md5_hash = Column(String(32), nullable=False)
