@@ -265,6 +265,10 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 bundle_dir_path,
                 label_filename)
             archive_fs.settext(label_filepath, unicode(label))
+            bundle_db.create_bundle_label(
+                archive_fs.getsyspath(label_filepath),
+                label_filename,
+                bundle_lidvid)
 
         def _post_visit_collection(self, collection):
             # type: (Collection) -> None
@@ -280,6 +284,11 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 collection_dir_path,
                 inventory_filename)
             archive_fs.settext(inventory_filepath, unicode(inventory))
+            bundle_db.create_collection_inventory(
+                archive_fs.getsyspath(inventory_filepath),
+                inventory_filename,
+                collection_lidvid
+                )
 
             label = make_collection_label(self.db, collection_lidvid, False)
             label_filename = get_collection_label_name(self.db,
@@ -288,6 +297,11 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 collection_dir_path,
                 label_filename)
             archive_fs.settext(label_filepath, unicode(label))
+            bundle_db.create_collection_label(
+                archive_fs.getsyspath(label_filepath),
+                label_filename,
+                collection_lidvid
+                )
 
         def visit_document_collection(self, document_collection, post):
             # type: (DocumentCollection, bool) -> None
@@ -317,6 +331,10 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 product_dir_path,
                 label_filename)
             archive_fs.settext(label_filepath, unicode(label))
+            bundle_db.create_product_label(
+                archive_fs.getsyspath(label_filepath),
+                label_filename,
+                product_lidvid)
 
         def visit_browse_file(self, browse_file):
             # type: (BrowseFile) -> None
@@ -332,6 +350,10 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 product_dir_path,
                 label_filename)
             archive_fs.settext(label_filepath, unicode(label))
+            bundle_db.create_product_label(
+                archive_fs.getsyspath(label_filepath),
+                label_filename,
+                product_lidvid)
 
         def visit_bad_fits_file(self, bad_fits_file):
             # type: (BadFitsFile) -> None
@@ -354,6 +376,10 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 product_dir_path,
                 label_filename)
             archive_fs.settext(label_filepath, unicode(label))
+            bundle_db.create_product_label(
+                archive_fs.getsyspath(label_filepath),
+                label_filename,
+                product_lidvid)
 
     _CreateLabelsWalk(bundle_db).walk()
 
