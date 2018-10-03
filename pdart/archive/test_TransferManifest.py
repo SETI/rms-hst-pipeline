@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING
 import unittest
 
 import fs.path
+from typing import TYPE_CHECKING
 
 from pdart.archive.TransferManifest import make_transfer_manifest
 from pdart.fs.DirUtils import lid_to_dir

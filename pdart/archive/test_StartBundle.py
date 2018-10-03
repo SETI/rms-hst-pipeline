@@ -1,11 +1,11 @@
 import os
 import shutil
 import tempfile
-from typing import TYPE_CHECKING
 import unittest
 
-from fs.osfs import OSFS
 import fs.path
+from fs.osfs import OSFS
+from typing import TYPE_CHECKING
 
 from pdart.archive.StartBundle import _INITIAL_VID, \
     _create_lidvid_from_parts, bundle_to_int, copy_files_from_download, \
@@ -14,17 +14,18 @@ from pdart.archive.StartBundle import _INITIAL_VID, \
 from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.V1FS import V1FS, _V1_0
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME
 from pdart.new_labels.CollectionLabel import get_collection_inventory_name, \
     get_collection_label_name
+from pdart.pds4.LID import LID
+from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
-    from sqlalchemy.schema import Column
-
+    pass
 
 _DOC_FILES = {u'phase2.pro', u'phase2.pdf', u'phase2.apt'}
+
+
 # type: Set[unicode]
 
 
@@ -144,7 +145,7 @@ class TestStartBundle(unittest.TestCase):
             browse_file_basename = u'jbz504ejq_flt.jpg'
             expected_collection_lidvid = _create_lidvid_from_parts(parts[:2])
             self.assertTrue(db.non_document_collection_exists(
-                    expected_collection_lidvid))
+                expected_collection_lidvid))
             expected_product_lidvid = _create_lidvid_from_parts(parts)
             self.assertTrue(db.browse_product_exists(expected_product_lidvid))
             self.assertTrue(db.browse_file_exists(browse_file_basename,
@@ -182,29 +183,29 @@ class TestStartBundle(unittest.TestCase):
             document_collection_lidvid = _create_lidvid_from_parts(
                 ['hst_13012', 'document'])
             self.assertTrue(db.document_collection_exists(
-                    document_collection_lidvid))
+                document_collection_lidvid))
 
             # ensure the collection exists in the filesystem
             document_collection_dir = u'/hst_13012/document'
             self.assertTrue(archive_fs.isdir(
-                    document_collection_dir))
+                document_collection_dir))
 
             # ensure the product exists in the database
             document_product_lidvid = _create_lidvid_from_parts(
                 ['hst_13012', 'document', 'phase2'])
             self.assertTrue(db.document_product_exists(
-                    document_product_lidvid))
+                document_product_lidvid))
 
             # ensure the product exists in the filesystem
             document_product_dir = u'/hst_13012/document/phase2'
             self.assertTrue(archive_fs.isdir(
-                    document_product_dir))
+                document_product_dir))
 
             # ensure the files exist in the database
             for basename in _DOC_FILES:
                 self.assertTrue(db.document_file_exists(
-                        basename,
-                        document_product_lidvid))
+                    basename,
+                    document_product_lidvid))
 
             # ensure the files exist in the filesystem
             for basename in _DOC_FILES:

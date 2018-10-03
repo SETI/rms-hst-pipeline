@@ -1,13 +1,15 @@
 import shutil
 import tempfile
-from typing import TYPE_CHECKING
 import unittest
 
 import fs.path
+from typing import TYPE_CHECKING
 
 from pdart.archive.ChecksumManifest import make_checksum_manifest
 from pdart.fs.DirUtils import lid_to_dir
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
+from pdart.new_labels.CollectionInventory import get_collection_inventory_name
+from pdart.new_labels.CollectionLabel import get_collection_label_name
 
 if TYPE_CHECKING:
     from pdart.pds4.LIDVID import LIDVID
@@ -41,10 +43,17 @@ class test_ChecksumManifest(unittest.TestCase):
         shutil.rmtree(self.tmpdir)
 
     def test_empty_db(self):
-        self.assertEqual('', make_checksum_manifest(self.bundle_db,
-                                                    _lidvid_to_dirpath))
+        os_filepath = fs.path.join(self.tmpdir, 'bundle.xml')
+        with open(os_filepath, 'w') as f:
+            f.write("I'm neither XML nor a label, sadly.")
+        self.bundle_db.create_bundle_label(os_filepath, 'bundle.xml',
+                                           _BUNDLE_LIDVID)
+        self.assertEqual(
+            'e2309513113b550428af0cf476f1fb67  hst_00001/bundle.xml\n',
+            make_checksum_manifest(self.bundle_db, _lidvid_to_dirpath))
 
     def test_minimal_db(self):
+        # create stuff (top-down)
         self.bundle_db.create_non_document_collection(_COLLECTION_LIDVID,
                                                       _BUNDLE_LIDVID)
         self.bundle_db.create_fits_product(_PRODUCT_LIDVID,
@@ -56,13 +65,37 @@ class test_ChecksumManifest(unittest.TestCase):
         self.bundle_db.create_fits_file(os_filepath, _PRODUCT_BASENAME,
                                         _PRODUCT_LIDVID, _HDU_COUNT)
 
+        # create labels (bottom-up)
+        self.bundle_db.create_product_label(os_filepath, 'u2no0401t.xml',
+                                            _PRODUCT_LIDVID)
+        collection_label_name = get_collection_label_name(self.bundle_db,
+                                                          _COLLECTION_LIDVID)
+        self.bundle_db.create_collection_label(os_filepath,
+                                               collection_label_name,
+                                               _COLLECTION_LIDVID)
+        collection_inventory_name = get_collection_inventory_name(
+            self.bundle_db, _COLLECTION_LIDVID)
+        self.bundle_db.create_collection_inventory(os_filepath,
+                                                   collection_inventory_name,
+                                                   _COLLECTION_LIDVID)
+        self.bundle_db.create_bundle_label(os_filepath, 'bundle.xml',
+                                           _BUNDLE_LIDVID)
+
         manifest = make_checksum_manifest(self.bundle_db, _lidvid_to_dirpath)
 
         self.assertEqual(
+            'ba8a714e47d3c7606c0a2d438f9e4811  hst_00001/bundle.xml\n'
+            'ba8a714e47d3c7606c0a2d438f9e4811  '
+            'hst_00001/data_wfpc2_raw/collection_data.csv\n'
+            'ba8a714e47d3c7606c0a2d438f9e4811  '
+            'hst_00001/data_wfpc2_raw/collection_data.xml\n'
+            'ba8a714e47d3c7606c0a2d438f9e4811  '
+            'hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t.xml\n'
             'ba8a714e47d3c7606c0a2d438f9e4811  '
             'hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t_raw.fits\n',
             manifest)
 
+        # create stuff (top-down)
         self.bundle_db.create_document_collection(_COLLECTION2_LIDVID,
                                                   _BUNDLE_LIDVID)
 
@@ -77,10 +110,40 @@ class test_ChecksumManifest(unittest.TestCase):
                                             _PRODUCT2_BASENAME,
                                             _PRODUCT2_LIDVID)
 
-        expected = ('ba8a714e47d3c7606c0a2d438f9e4811  '
-                    'hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t_raw.fits\n'
-                    '64d11a5e59de03ce7ee7acf905c67aee  '
-                    'hst_00001/document/phase2/phase2.pdf\n')
+        # create labels (bottom-up)
+        self.bundle_db.create_product_label(os_filepath, 'phase2.xml',
+                                            _PRODUCT2_LIDVID)
+        collection_label_name = get_collection_label_name(self.bundle_db,
+                                                          _COLLECTION2_LIDVID)
+        self.bundle_db.create_collection_label(os_filepath,
+                                               collection_label_name,
+                                               _COLLECTION2_LIDVID)
+
+        collection_inventory_name = get_collection_inventory_name(
+            self.bundle_db, _COLLECTION2_LIDVID)
+        self.bundle_db.create_collection_inventory(os_filepath,
+                                                   collection_inventory_name,
+                                                   _COLLECTION2_LIDVID)
+
+        expected = (
+            'ba8a714e47d3c7606c0a2d438f9e4811  hst_00001/bundle.xml\n'
+            'ba8a714e47d3c7606c0a2d438f9e4811  '
+            'hst_00001/data_wfpc2_raw/collection_data.csv\n'
+            'ba8a714e47d3c7606c0a2d438f9e4811  '
+            'hst_00001/data_wfpc2_raw/collection_data.xml\n'
+            'ba8a714e47d3c7606c0a2d438f9e4811  '
+            'hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t.xml\n'
+            'ba8a714e47d3c7606c0a2d438f9e4811  '
+            'hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t_raw.fits\n'
+            '64d11a5e59de03ce7ee7acf905c67aee  '
+            'hst_00001/document/collection.csv\n'
+            '64d11a5e59de03ce7ee7acf905c67aee  '
+            'hst_00001/document/collection.xml\n'
+            '64d11a5e59de03ce7ee7acf905c67aee  '
+            'hst_00001/document/phase2/phase2.pdf\n'
+            '64d11a5e59de03ce7ee7acf905c67aee  '
+            'hst_00001/document/phase2/phase2.xml\n'
+            )
 
         manifest = make_checksum_manifest(self.bundle_db, _lidvid_to_dirpath)
         self.assertEqual(expected, manifest)

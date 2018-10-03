@@ -1,6 +1,5 @@
-from typing import TYPE_CHECKING
-
 import fs.path
+from typing import TYPE_CHECKING
 
 from pdart.new_db.BundleDB import BundleDB
 from pdart.new_db.SqlAlchTables import Bundle, Collection, Product
@@ -9,6 +8,7 @@ from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
     from typing import Callable, Tuple
+
     _LTD = Callable[[LIDVID], unicode]
 
 

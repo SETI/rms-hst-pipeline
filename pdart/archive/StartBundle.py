@@ -34,8 +34,9 @@ from pdart.pds4.VID import VID
 if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
     from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, Bundle, \
-        Collection, DocumentCollection, DocumentProduct, DocumentFile, \
-        FitsFile, FitsProduct, NonDocumentCollection
+        Collection, DocumentCollection, DocumentProduct, FitsFile, \
+        FitsProduct, \
+        NonDocumentCollection
 
 _INITIAL_VID = VID('1.0')  # type: VID
 
@@ -251,6 +252,7 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
         A class for walking a bundle and building labels (and a collection
         inventory) for it.
         """
+
         def visit_bundle(self, bundle, post):
             # type: (Bundle, bool) -> None
             if not post:
@@ -334,9 +336,9 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
         def visit_bad_fits_file(self, bad_fits_file):
             # type: (BadFitsFile) -> None
             assert False, (
-                'Not yet handling bad FITS file %s in product %s' %
-                (str(bad_fits_file.basename),
-                 str(bad_fits_file.product_lidvid)))
+                    'Not yet handling bad FITS file %s in product %s' %
+                    (str(bad_fits_file.basename),
+                     str(bad_fits_file.product_lidvid)))
 
         def visit_fits_file(self, fits_file):
             # type: (FitsFile) -> None
