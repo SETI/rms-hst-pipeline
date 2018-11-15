@@ -39,6 +39,7 @@ def make_document_product_label(bundle_db,
         'title': title,
         'publication_date': publication_date,
         'Citation_Information': make_citation_information(
+            bundle_db,
             lidvid_to_lid(bundle.lidvid),  # only a placeholder tag
             proposal_id),
 

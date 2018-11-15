@@ -46,18 +46,15 @@ make_label = interpret_document_template(
 # ----------------
 # making <Citation_Information>
 # ----------------
-def _make_proposal_description(bundle_id, proposal_id):
-    # type: (unicode, int) -> unicode
+def _make_proposal_description(proposal_id, proposal_title,
+                               pi_name, publication_year):
+    # type: (int, unicode, unicode, unicode) -> unicode
     """
     Return a placeholder string the describes the proposal.
-    """
-    proposal_title = _make_placeholder_proposal_title(bundle_id)
-    pi = _make_placeholder_pi_name(bundle_id)
-    yr = _make_placeholder_proposal_year(bundle_id)
-
+     """
     return 'This document provides a summary of the observation ' + \
            'plan for HST proposal %d, %s, PI %s, %s.' % \
-           (proposal_id, proposal_title, pi, yr)
+           (proposal_id, proposal_title, pi_name, publication_year)
 
 
 _citation_information_template = interpret_template("""<Citation_Information>
@@ -70,18 +67,37 @@ _citation_information_template = interpret_template("""<Citation_Information>
 # type: NodeBuilderTemplate
 
 
-def make_citation_information(lid, proposal_id):
-    # type: (unicode, int) -> NodeBuilder
+def make_citation_information(bundle_db, bundle_lid, proposal_id):
+    # type: (BundleDB, unicode, int) -> NodeBuilder
     """
     Create a ``<Citation_Information />`` element for the proposal ID.
     """
-    return _citation_information_template({
-        'author_list': _make_placeholder_author_list(lid),
-        'publication_year': _make_placeholder_publication_year(lid),
-        'description': _make_proposal_description(
-            lid,
-            proposal_id)
-    })
+    try:
+        proposal_info = bundle_db.get_proposal_info(bundle_lid)
+        return _citation_information_template({
+                'author_list': proposal_info.author_list,
+                'publication_year': proposal_info.publication_year,
+                'description': _make_proposal_description(
+                    proposal_id,
+                    proposal_info.proposal_title,
+                    proposal_info.pi_name,
+                    proposal_info.proposal_year)})
+    except Exception:
+        author_list = _make_placeholder_author_list(bundle_lid)
+        proposal_title = _make_placeholder_proposal_title(bundle_lid)
+        publication_year = _make_placeholder_publication_year(bundle_lid)
+        pi_name = _make_placeholder_pi_name(bundle_lid)
+        proposal_year = _make_placeholder_proposal_year(bundle_lid)
+
+        return _citation_information_template({
+                'author_list': author_list,
+                'publication_year': publication_year,
+                'description': _make_proposal_description(
+                    proposal_id,
+                    proposal_title,
+                    pi_name,
+                    proposal_year)
+                })
 
 
 # ----------------
