@@ -21,7 +21,8 @@ _TABLES = {'bundles',
            'document_files',
            'hdus', 'cards',
            'bundle_labels', 'collection_labels',
-           'collection_inventories', 'product_labels'}  # type: Set[str]
+           'collection_inventories', 'product_labels',
+           'proposal_info'}  # type: Set[str]
 
 
 class Test_BundleDB(unittest.TestCase):
@@ -985,3 +986,27 @@ class Test_BundleDB(unittest.TestCase):
         # what happens if you create tables twice?
         self.db.create_tables()
         # no exception, at least
+
+    ############################################################
+
+    def test_get_proposal_info(self):
+        # type: () -> None
+        bundle_lid = 'urn:nasa:pds:hst_99999'
+        self.assertFalse(self.db.proposal_info_exists(bundle_lid))
+        with self.assertRaises(Exception):
+            self.db.get_proposal_info(bundle_lid)
+
+        self.db.create_proposal_info(bundle_lid,
+                                     proposal_title='Proposal of marriage',
+                                     pi_name='Romeo Montague',
+                                     author_list='R. Montague, B. Montague',
+                                     proposal_year='1476',
+                                     publication_year='1597')
+        self.assertTrue(self.db.proposal_info_exists(bundle_lid))
+
+        not_a_bundle_lid = 'urn:nasa:pds:space_1999'
+        self.assertFalse(self.db.proposal_info_exists(not_a_bundle_lid))
+
+        proposal_info = self.db.get_proposal_info(bundle_lid)
+        self.assertEqual('Proposal of marriage',
+                         proposal_info.proposal_title)

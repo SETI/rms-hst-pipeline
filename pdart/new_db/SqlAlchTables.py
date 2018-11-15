@@ -375,3 +375,20 @@ class ProductLabel(Base):
                             nullable=False)
     basename = Column(String, nullable=False)
     md5_hash = Column(String(32), nullable=False)
+
+############################################################
+
+
+class ProposalInfo(Base):
+    """
+    Proposal-related information that should not change over time,
+    organized by LID rather than LIDVID.
+    """
+    __tablename__ = 'proposal_info'
+
+    bundle_lid = Column(String, primary_key=True, nullable=False)
+    proposal_title = Column(String, nullable=False)
+    pi_name = Column(String, nullable=False)
+    author_list = Column(String, nullable=False)
+    proposal_year = Column(String, nullable=False)
+    publication_year = Column(String, nullable=False)

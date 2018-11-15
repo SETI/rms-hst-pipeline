@@ -10,8 +10,9 @@ from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, \
     BrowseProduct, Bundle, BundleLabel, Card, Collection, \
     CollectionInventory, CollectionLabel, DocumentCollection, \
     DocumentFile, DocumentProduct, File, FitsFile, FitsProduct, Hdu, \
-    NonDocumentCollection, Product, ProductLabel, create_tables
+    NonDocumentCollection, Product, ProductLabel, ProposalInfo, create_tables
 from pdart.new_db.Utils import file_md5
+from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
@@ -671,6 +672,42 @@ class BundleDB(object):
         assert LIDVID(product_lidvid).is_product_lidvid()
         return self.session.query(ProductLabel).filter(
             ProductLabel.product_lidvid == product_lidvid).one()
+
+    ############################################################
+
+    def proposal_info_exists(self, bundle_lid):
+        # type: (str) -> bool
+        assert LID(bundle_lid).is_bundle_lid()
+        return self.session.query(
+            exists().where(ProposalInfo.bundle_lid == bundle_lid)).scalar()
+
+    def create_proposal_info(self, bundle_lid,
+                             proposal_title, pi_name, author_list,
+                             proposal_year, publication_year):
+        # type: (str, unicode, unicode, unicode, unicode, unicode) -> None
+        '''
+        Creates a record of proposal info for the given LID.
+
+        NOTE: We don't allow updating through this interface now.  We
+        might want to allow it in the future.
+        '''
+        assert LID(bundle_lid).is_bundle_lid()
+        if self.proposal_info_exists(bundle_lid):
+            raise Exception('proposal info with LID %s already exists' %
+                            bundle_lid)
+        else:
+            self.session.add(ProposalInfo(
+                    bundle_lid=bundle_lid,
+                    proposal_title=proposal_title,
+                    pi_name=pi_name,
+                    author_list=author_list,
+                    proposal_year=proposal_year,
+                    publication_year=publication_year))
+
+    def get_proposal_info(self, bundle_lid):
+        # type: (str) -> ProposalInfo
+        return self.session.query(ProposalInfo).filter(
+            ProposalInfo.bundle_lid == bundle_lid).one()
 
     ############################################################
 
