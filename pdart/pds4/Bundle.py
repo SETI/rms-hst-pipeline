@@ -21,8 +21,7 @@ if TYPE_CHECKING:
 class Bundle(Component):
     """A PDS4 Bundle."""
 
-    DIRECTORY_PATTERN = r'\Ahst_([0-9]{5})\Z'
-    # type: str
+    DIRECTORY_PATTERN = r'\Ahst_([0-9]{5})\Z'  # type: str
     """
     A regexp pattern for bundle directory names, used to validate
     directory names or to extract proposal ids.

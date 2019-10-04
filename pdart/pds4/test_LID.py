@@ -94,8 +94,7 @@ class TestLID(unittest.TestCase):
 
     def test_create_lid_from_parts(self):
         # type: () -> None
-        parts = []
-        # type: List[str]
+        parts = []  # type: List[str]
         with self.assertRaises(AssertionError):
             LID.create_from_parts(parts)
 

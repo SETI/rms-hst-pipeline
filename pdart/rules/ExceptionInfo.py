@@ -70,7 +70,6 @@ class ExceptionInfo(object):
         Return an XML document data structure for this
         :class:`~pdart.rules.ExceptionInfo.ExceptionInfo`.
         """
-        # type: () -> unicode
         document = xml.dom.getDOMImplementation().createDocument(None,
                                                                  None,
                                                                  None)

@@ -13,8 +13,7 @@ _placeholder_citation_information = interpret_template(
     """<Citation_Information>
 <publication_year><NODE name="publication_year" /></publication_year>
 <description><NODE name="description" /></description>
-</Citation_Information>""")
-# type: NodeBuilderTemplate
+</Citation_Information>""")  # type: NodeBuilderTemplate
 """
 An interpreted template to create a ``<Citation_Information
 />`` XML element.

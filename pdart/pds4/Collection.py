@@ -19,5 +19,5 @@ if TYPE_CHECKING:
 class Collection(Component):
     """A PDS4 Collection."""
 
-    DIRECTORY_PATTERN = r'\A(([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)|document)\Z'
-    # type: str
+    DIRECTORY_PATTERN \
+        = r'\A(([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)|document)\Z'  # type: str

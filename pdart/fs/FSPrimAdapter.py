@@ -105,6 +105,9 @@ class FSPrimAdapter(FS):
     def openbin(self, path, mode="r", buffering=-1, **options):
         self.check()
         self.validatepath(path)
+        if path  == u'/':
+            # TODO  Hackish special case.  Clean this up.
+            raise fs.errors.FileExpected(path)
         m = fs.mode.Mode(mode)
         m.validate_bin()
         prims = self.prims

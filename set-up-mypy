@@ -1,15 +1,17 @@
 #!/bin/bash -e
 
 # clean up any old environment
-source deactivate || echo "No environment to deactivate."
-(yes | conda remove -n mypy --all) || echo "No mypy to remove."
+conda deactivate || echo "No environment to deactivate."
+(yes | conda remove --name mypy --all) || echo "No mypy to remove."
 
 # set up the mypy environment
-(yes | conda create -n mypy python=3)
+(yes | conda create --name mypy python=3.7)
 conda install -c stsci pyfits scipy
+conda install -c anaconda mypy
+
 cd ~/pdart || (echo "No ~/pdart/" && exit)
 source activate mypy
-python3 -m pip install mypy-lang
+# python3 -m pip install mypy-lang
 
 # create expanded set of stubs
 mkdir out || echo "out/ already exists"

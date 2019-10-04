@@ -20,13 +20,13 @@ _VERSION_DIR_PREFIX = u'v$'  # type: unicode
 
 
 def scan_vfs_dir(fs, dir, namespaces=None):
+    # type: (FS, unicode, Tuple) -> Tuple[_INFOS, _INFOS, _INFOS, _INFOS]
     """
     Returns a 4-tuple of (ordinary-file infos, ordinary-directory
     infos, subdir-versions-file infos, version-directory infos).  This
     lets us separate "real" files and dirs from the "bookkeeping"
     ones.
     """
-    # type: (FS, unicode, Tuple) -> Tuple[_INFOS, _INFOS, _INFOS, _INFOS]
     infos = list(fs.scandir(dir, namespaces=namespaces))
     file_infos = [info for info in infos if info.is_file]
     dir_infos = [info for info in infos if info.is_dir]

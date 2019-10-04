@@ -15,8 +15,7 @@ class DeletionSet(object):
     """
     def __init__(self):
         # type: () -> None
-        self._deleted_paths = set()
-        # type: Set[unicode]
+        self._deleted_paths = set()  # type: Set[unicode]
 
     def __str__(self):
         return 'DeletionSet(%s)' % self._deleted_paths

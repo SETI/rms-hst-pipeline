@@ -47,13 +47,13 @@ class LIDVID(object):
         return self._lid.is_bundle_lid()
 
     def next_major_lidvid(self):
-        """Return the next major LIDVID."""
         # type: () -> LIDVID
+        """Return the next major LIDVID."""
         return LIDVID('%s::%s' % (self.lid(), self.vid().next_major_vid()))
 
     def next_minor_lidvid(self):
-        """Return the next minor LIDVID."""
         # type: () -> LIDVID
+        """Return the next minor LIDVID."""
         return LIDVID('%s::%s' % (self.lid(), self.vid().next_minor_vid()))
 
     def __cmp__(self, other):

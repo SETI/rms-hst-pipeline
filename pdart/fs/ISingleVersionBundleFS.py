@@ -22,8 +22,8 @@ class ISingleVersionBundleFS(object):
 
     @abc.abstractmethod
     def bundle_lidvid(self):
-        """Return the LIDVID for the bundle the filesystem holds."""
         # type: () -> LIDVID
+        """Return the LIDVID for the bundle the filesystem holds."""
         pass
 
     @abc.abstractmethod

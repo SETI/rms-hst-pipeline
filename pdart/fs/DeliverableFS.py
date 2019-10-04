@@ -205,13 +205,10 @@ class DeliverablePrimitives(FSPrimitives):
         This is only called when the path has two parts, so the path
         is also the basepath.
         """
-        # TODO This has a bug.
         assert len(fs.path.iteratepath(path)) == 2
         res = {}  # type: Dict[unicode, Node_]
         for dir in self._product_dirs:
-            if fs.path.isbase(dir, path):
-                # That's the right param order. The docs are currently
-                # wrong.
+            if fs.path.isbase(path, dir):
                 basename = fs.path.basename(dir)
                 dir_path = fs.path.join(path, basename)
                 res[unicode(basename)] = Dir(self, dir_path)

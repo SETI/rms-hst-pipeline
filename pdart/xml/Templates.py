@@ -301,8 +301,10 @@ def combine_fragments_into_fragment(doc_funcs):
     return func
 
 
-_DOC = xml.dom.getDOMImplementation().createDocument(None, None, None)
-# type: Document
+_DOC = xml.dom.getDOMImplementation().createDocument(None,
+                                                     None,
+                                                     None)  \
+                                                     # type: Document
 """
 A constant document used as a throw-away argument to builder functions
 so we can typecheck their results.

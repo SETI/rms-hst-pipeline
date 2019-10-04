@@ -25,23 +25,23 @@ class VID(object):
         self._minor = int(vs[1])
 
     def major(self):
-        """Return the major version number."""
         # type: () -> int
+        """Return the major version number."""
         return self._major
 
     def minor(self):
-        """Return the minor version number."""
         # type: () -> int
+        """Return the minor version number."""
         return self._minor
 
     def next_major_vid(self):
-        """Return the next major VID."""
         # type: () -> VID
+        """Return the next major VID."""
         return VID('%d.0' % (self.major() + 1))
 
     def next_minor_vid(self):
-        """Return the next minor VID."""
         # type: () -> VID
+        """Return the next minor VID."""
         return VID('%d.%d' % (self.major(), self.minor() + 1))
 
     def __cmp__(self, other):

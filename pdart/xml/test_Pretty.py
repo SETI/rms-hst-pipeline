@@ -4,8 +4,7 @@ _PP = """<?xml version="1.0"?>
 <foobar>
   <baz/>
 </foobar>
-"""
-# type: unicode
+"""  # type: unicode
 
 
 def test_pretty_print():

@@ -23,10 +23,7 @@ from pdart.pds4.LIDVID import LIDVID
 if TYPE_CHECKING:
     pass
 
-_DOC_FILES = {u'phase2.pro', u'phase2.pdf', u'phase2.apt'}
-
-
-# type: Set[unicode]
+_DOC_FILES = {u'phase2.pro', u'phase2.pdf', u'phase2.apt'}  # type: Set[unicode]
 
 
 def _path_to_testfiles():

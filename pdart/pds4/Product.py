@@ -37,25 +37,20 @@ def _find_product_file(fs, visit_dir, product_id):
 class Product(Component):
     """A PDS4 Product."""
 
-    VISIT_DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'
-    # type: str
+    VISIT_DIRECTORY_PATTERN = r'\Avisit_([a-z0-9]{2})\Z'  # type: str
     """
     A regexp pattern for product visit directory names, used to
     validate visit directory names or to extract visit ids.
     """
 
-    DATA_EXTS = ['.fits']
-    # type: List[unicode]
+    DATA_EXTS = ['.fits']  # type: List[unicode]
     """Currently legal file extensions for data product files."""
 
-    BROWSE_EXTS = ['.jpg']
-    # type: List[unicode]
+    BROWSE_EXTS = ['.jpg']  # type: List[unicode]
     """Currently legal file extensions for browse product files."""
 
-    DOC_EXTS = ['.apt', '.pdf', '.pro', '.prop']
-    # type: List[unicode]
+    DOC_EXTS = ['.apt', '.pdf', '.pro', '.prop']  # type: List[unicode]
     """Currently legal file extensions for document product files."""
 
-    FILE_EXTS = DATA_EXTS + BROWSE_EXTS + DOC_EXTS
-    # type: List[unicode]
+    FILE_EXTS = DATA_EXTS + BROWSE_EXTS + DOC_EXTS  # type: List[unicode]
     """Currently legal file extensions for product files."""

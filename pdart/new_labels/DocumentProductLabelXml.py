@@ -61,10 +61,7 @@ _citation_information_template = interpret_template("""<Citation_Information>
 <author_list><NODE name="author_list" /></author_list>
 <publication_year><NODE name="publication_year" /></publication_year>
 <description><NODE name="description" /></description>
-</Citation_Information>""")
-
-
-# type: NodeBuilderTemplate
+</Citation_Information>""")  # type: NodeBuilderTemplate
 
 
 def make_citation_information(bundle_db, bundle_lid, proposal_id):
@@ -105,15 +102,11 @@ def make_citation_information(bundle_db, bundle_lid, proposal_id):
 # ----------------
 
 _make_file = interpret_template('<file_name><NODE name="file_name" />\
-</file_name>')
-# type: NodeBuilderTemplate
+</file_name>')  # type: NodeBuilderTemplate
 
 _make_document_standard_id = interpret_template('<document_standard_id>\
 <NODE name="document_standard_id" />\
-</document_standard_id>')
-
-
-# type: NodeBuilderTemplate
+</document_standard_id>')  # type: NodeBuilderTemplate
 
 
 def _make_document_file_entry(file_name, document_standard_id):
@@ -133,18 +126,15 @@ _make_document_edition = interpret_template(
             <Document_File>
             <FRAGMENT name="document_file_entries" />
             </Document_File>
-        </Document_Edition>""")
-
-
-# type: NodeBuilderTemplate
+        </Document_Edition>""")  # type: NodeBuilderTemplate
 
 
 def make_document_edition(edition_name, file_stds):
     # type: (str, List[Tuple[str, str]]) -> NodeBuilder
 
     fragments = [_make_document_file_entry(file_name, document_standard_id)
-                 for (file_name, document_standard_id) in file_stds]
-    # type: List[FragBuilder]
+                 for (file_name, document_standard_id)
+                 in file_stds]  # type: List[FragBuilder]
 
     return _make_document_edition({
         'edition_name': edition_name,

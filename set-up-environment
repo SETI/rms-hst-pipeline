@@ -1,20 +1,22 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # You must have Miniconda for Python 2.7 installed, probably from
 # http://conda.pydata.org/miniconda.html
 
+### conda update conda
+
 # Uncomment the following line back in if you want to rebuild the
 # environment from scratch.
 
-conda update conda
-
-### conda remove --name pdart --all
+(conda remove -y --name pdart --all) || echo "no pdart environment to remove"
 
 # Create a minimal environment and activate it.  
-conda create --name pdart mock pil pip psutil pycodestyle pyparsing \
-    pytest sphinx sqlalchemy
+conda create -y --name pdart mock psutil pycodestyle pyparsing \
+    pytest sphinx sqlalchemy python=2.7
 
 source activate pdart
+
+### conda install -c anaconda pil
 
 # for debugging
 conda install -c asmeurer pudb=2015.3

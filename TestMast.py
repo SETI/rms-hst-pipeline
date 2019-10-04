@@ -15,8 +15,7 @@ _QUERY_DEFAULTS = {
     'sci_mtflag': 'T',
     'outputformat': 'CSV',
     'resolver': "don'tresolve"
-    }
-# type: Dict[str, str]
+    }  # type: Dict[str, str]
 
 
 def _make_url(query_dict):

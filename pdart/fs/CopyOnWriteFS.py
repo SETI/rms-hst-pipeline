@@ -97,12 +97,12 @@ class CopyOnWriteFS(FS):
                 delta_fs.removedir(dir_path)
 
     def _remove_duplicates(self):
+        # type: () -> None
         """
         Remove all unnecessarily duplicated files: files whose
         contents are the same in both the read-only and the read/write
         filesystems.
         """
-        # type: () -> None
 
         # walk all the files in the delta.  If they are the same as the
         # files in the R/O filesystem, delete them and make sure they
@@ -245,16 +245,16 @@ class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
         self._version_view = version_view
 
     def bundle_lidvid(self):
-        """Return the LIDVID for the bundle the filesystem holds."""
         # type: () -> LIDVID
+        """Return the LIDVID for the bundle the filesystem holds."""
         return self._version_view.bundle_lidvid()
 
     def lid_to_vid(self, lid):
+        # type: (LID) -> VID
         """
         Find the VID for the bundle, collection, or product that has
         the given LID.
         """
-        # type: (LID) -> VID
         try:
             return self._version_view.lid_to_vid(lid)
         except KeyError:
