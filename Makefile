@@ -1,8 +1,14 @@
-.PHONY : clean save-reqs
+.PHONY : clean java-requirement save-reqs
 
 # test: I should also run mypy
-test : venv
+test : venv java-requirement
 	source venv/bin/activate && py.test pdart
+
+java-requirement :
+	@if ! [ -x "$(shell command -v java)" ]; then \
+	    echo "**** Java must be installed to run PDART tests ****" ; \
+	    exit 1; \
+	fi
 
 venv : requirements.txt
 	virtualenv --no-site-packages -p python2.7 $@
