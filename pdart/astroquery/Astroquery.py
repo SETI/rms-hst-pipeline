@@ -1,4 +1,5 @@
 from astroquery.mast import Observations
+import numpy
 from typing import TYPE_CHECKING
 
 from pdart.astroquery.Utils import filter_table, get_table_with_retries, \
@@ -48,7 +49,8 @@ def _is_accepted_product_type_product_row(row):
     We currently only handle products from a limited set of
     instruments.
     """
-    return row['productSubGroupDescription'].upper() in _ACCEPTED_SUFFIXES
+    desc = str(row['productSubGroupDescription'])
+    return desc.upper() in _ACCEPTED_SUFFIXES
 
 
 class MastSlice(object):
@@ -59,17 +61,17 @@ class MastSlice(object):
     'dataURL', 'dataproduct_type', 'em_max', 'em_min', 'filters',
     'instrument_name', 'intentType', 'jpegURL', 'mtFlag', 'objID',
     'obs_collection', 'obs_id', 'obs_title', 'obsid', 'project',
-    'proposal_id', 'proposal_pi', 'proposal_type', 's_dec', 's_ra',
-    's_region', 'srcDen', 't_exptime', 't_max', 't_min',
-    't_obs_release', 'target_classification', 'target_name',
-    'wavelength_region'
+    'proposal_id', 'proposal_pi', 'proposal_type', 'provenance_name',
+    's_dec', 's_ra', 's_region', 'sequence_number', 'srcDen',
+    't_exptime', 't_max', 't_min', 't_obs_release',
+    'target_classification', 'target_name', 'wavelength_region'
 
-    Column names for products are: 'dataURI', 'dataproduct_type',
-    'description', 'obsID', 'obs_collection', 'obs_id',
-    'parent_obsid', 'productDocumentationURL', 'productFilename',
-    'productGroupDescription', 'productSubGroupDescription',
-    'productType', 'project', 'proposal_id', 'prvversion', 'size',
-    'type'
+    Column names for products are: 'dataRights', 'dataURI',
+    'dataproduct_type', 'description', 'obsID', 'obs_collection',
+    'obs_id', 'parent_obsid', 'productDocumentationURL',
+    'productFilename', 'productGroupDescription',
+    'productSubGroupDescription', 'productType', 'project',
+    'proposal_id', 'prvversion', 'size', 'type'
     """
 
     def __init__(self, start_date, end_date):
