@@ -39,12 +39,12 @@ class TestVersionView(unittest.TestCase):
 
         self.versioned_fs.make_lidvid_directories(_LIDVID_C1)
         self.versioned_fs.make_lidvid_directories(_LIDVID_C2)
-        self.versioned_fs.add_subcomponent(_LIDVID_B4, _LIDVID_C3)
+        self.versioned_fs.add_subcomponent(_LIDVID_B3, _LIDVID_C3)
 
         self.versioned_fs.make_lidvid_directories(_LIDVID_P1)
         self.versioned_fs.add_subcomponent(_LIDVID_C3, _LIDVID_P2)
 
-        self.version_view = VersionView(_LIDVID_B4,
+        self.version_view = VersionView(_LIDVID_B3,
                                         self.versioned_fs)
 
     @unittest.skip('fails on purpose; for use while testing')
@@ -56,7 +56,7 @@ class TestVersionView(unittest.TestCase):
     def test_creation(self):
         # type: () -> None
         self.assertEqual(self.version_view._bundle_id, _BUNDLE_ID)
-        self.assertEqual(self.version_view._version_id, u'4.1')
+        self.assertEqual(self.version_view._version_id, u'3.1')
         with self.assertRaises(Exception):
             VersionView(LIDVID('urn:nasa:pds:hst_00000::666.333'),
                         self.versioned_fs)
@@ -81,13 +81,13 @@ class TestVersionView(unittest.TestCase):
 
         # test that files don't appear when wrong version
         self.versioned_fs.touch(
-            join(ROOT, _BUNDLE_ID, u'v$2.1', u'bundle.xml'))
+            join(ROOT, _BUNDLE_ID, u'v$1.1', u'bundle.xml'))
         self.assertFalse(self.version_view.exists(
             join(ROOT, _BUNDLE_ID, u'bundle.xml')))
 
         # test that files do appear when right version
         self.versioned_fs.touch(
-            join(ROOT, _BUNDLE_ID, u'v$4.1', u'bundle.xml'))
+            join(ROOT, _BUNDLE_ID, u'v$3.1', u'bundle.xml'))
         self.assertTrue(self.version_view.exists(
             join(ROOT, _BUNDLE_ID, u'bundle.xml')))
 
@@ -101,12 +101,12 @@ class TestVersionView(unittest.TestCase):
                          self.version_view.listdir(COLLECTION_DIR))
 
         # test that files don't appear when wrong version
-        self.versioned_fs.touch(join(COLLECTION_DIR, u'v$2.1',
+        self.versioned_fs.touch(join(COLLECTION_DIR, u'v$1.1',
                                      u'collection.xml'))
         self.assertFalse(self.version_view.exists(join(COLLECTION_DIR,
                                                        u'collection.xml')))
         # test that files do appear when right version
-        self.versioned_fs.touch(join(COLLECTION_DIR, u'v$3.1',
+        self.versioned_fs.touch(join(COLLECTION_DIR, u'v$2.1',
                                      u'collection.xml'))
         self.assertTrue(self.version_view.exists(
             join(COLLECTION_DIR, u'collection.xml')))
@@ -125,7 +125,7 @@ class TestVersionView(unittest.TestCase):
                                                        u'product.xml')))
 
         # test that files do appear when right version
-        self.versioned_fs.touch(join(PRODUCT_DIR, u'v$2.1',
+        self.versioned_fs.touch(join(PRODUCT_DIR, u'v$1.1',
                                      u'product.xml'))
         self.assertTrue(self.version_view.exists(
             join(PRODUCT_DIR, u'product.xml')))
@@ -150,13 +150,13 @@ class TestVersionView(unittest.TestCase):
             self.version_view.lid_to_vid(LID(u'urn:nasa:pds:b'))
         self.versioned_fs.tree()
         self.assertEqual(
-            VID('4.1'),
+            VID('3.1'),
             self.version_view.lid_to_vid(LID(u'urn:nasa:pds:hst_00000')))
         self.assertEqual(
-            VID('3.1'),
+            VID('2.1'),
             self.version_view.lid_to_vid(
                 LID(u'urn:nasa:pds:hst_00000:data_xxx_raw')))
         self.assertEqual(
-            VID('2.1'),
+            VID('1.1'),
             self.version_view.lid_to_vid(
                 LID(u'urn:nasa:pds:hst_00000:data_xxx_raw:u2q9xx01j_raw')))

@@ -140,7 +140,7 @@ class MultiversionBundleFS(WrapFS):
                 for dir_name in self.listdir(path)
                 if _is_dir_part(dir_name)]
         if not vids:
-            return VID('0.0')
+            return VID('1.0')
         else:
             return max(vids)
 

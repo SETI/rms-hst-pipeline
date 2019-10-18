@@ -258,4 +258,4 @@ class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
         try:
             return self._version_view.lid_to_vid(lid)
         except KeyError:
-            return VID('0.0')
+            return VID('1.0')

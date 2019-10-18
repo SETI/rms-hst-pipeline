@@ -35,7 +35,7 @@ class TestMultiversionBundleFS(unittest.TestCase):
         # type: () -> None
         lid = LID('urn:nasa:pds:b')
         self.fs.make_lid_directories(lid)
-        self.assertEqual(VID('0.0'), self.fs.current_vid(lid))
+        self.assertEqual(VID('1.0'), self.fs.current_vid(lid))
 
         # I have tests for the functions but need tests for the class
         # MultiversionBundleFS itself.

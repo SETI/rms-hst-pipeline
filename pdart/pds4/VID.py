@@ -22,7 +22,7 @@ class VID(object):
 
         self._VID = str
         self._major = int(vs[0])
-        # assert self._major != 0  TODO Add this test in
+        assert self._major != 0  # the major version may not be zero
         self._minor = int(vs[1])
 
     def major(self):

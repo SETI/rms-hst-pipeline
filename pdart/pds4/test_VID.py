@@ -42,8 +42,8 @@ class TestVID(unittest.TestCase):
         with self.assertRaises(Exception):
             VID('foo')
 
-        # TODO This is wrong: the major version can't be zero.
-        VID('0.0')
+        with self.assertRaises(Exception):
+            VID('0.0')
         with self.assertRaises(Exception):
             VID('0.0.0')
         with self.assertRaises(Exception):
