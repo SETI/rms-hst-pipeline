@@ -18,27 +18,28 @@ def clean_dir(path):
 
 
 if __name__ == '__main__':
-    clean_dir('/Users/spaceman/pdart/init-bundle')
+    clean_dir('/Users/spaceman/pdart/new-init-bundle')
 
     print 'starting the bundle'
-    start_bundle('/Users/spaceman/pdart/bulk-download',
-                 '/Users/spaceman/pdart/init-bundle')
+    start_bundle('/Users/spaceman/pdart/new-bulk-download',
+                 'hst_11187',
+                 '/Users/spaceman/pdart/new-init-bundle')
 
     print 'finished the bundle'
     print 'creating deliverable'
 
-    lidvid = LIDVID('urn:nasa:pds:hst_13012::1.0')
+    lidvid = LIDVID('urn:nasa:pds:hst_11187::1.0')
     src = VersionView(
         lidvid,
         MultiversionBundleFS(
-            OSFS('/Users/spaceman/pdart/init-bundle')))
+            OSFS('/Users/spaceman/pdart/new-init-bundle')))
 
-    clean_dir('/Users/spaceman/pdart/tar-site')
-    tar_fs = OSFS('/Users/spaceman/pdart/tar-site')
+    clean_dir('/Users/spaceman/pdart/new-tar-site')
+    tar_fs = OSFS('/Users/spaceman/pdart/new-tar-site')
     dfs = DeliverableFS(tar_fs)
     fs.copy.copy_fs(src, dfs)
     print 'created deliverable'
     print 'creating tarball'
-    with TarFS('hst_13012-1.0.tar.gz', write=True) as t:
+    with TarFS('hst_11187-1.0.tar.gz', write=True) as t:
         fs.copy.copy_fs(tar_fs, t)
     print 'created tarball'

@@ -41,13 +41,14 @@ def do_with_retries(msg, action):
 def bulk_download(dl_root_dir):
     # type: (unicode) -> None
     mkdirs(dl_root_dir)
-    today = (2018, 12, 31)
+    today = (2019, 12, 31)
     start = (1900, 1, 1)
     slice = MastSlice(start, today)
     proposal_ids = slice.get_proposal_ids()
     # Continuing yesterday's bulk download
     if True:
-        proposal_ids = [id for id in proposal_ids if id >= 14092]
+        # proposal_ids = [id for id in proposal_ids if id >= 14092]
+        proposal_ids = [11187]
     else:
         # sampling: let's take five from the already downloaded list
         proposal_ids = [id for id in proposal_ids if id <= 14092]
@@ -84,5 +85,5 @@ def bulk_download(dl_root_dir):
 
 
 if __name__ == '__main__':
-    bulk_download('/Volumes/PDART-5TB Part Deux/bulk-download')
-    # bulk_download('/Users/spaceman/pdart/bulk-download')
+    # bulk_download('/Volumes/PDART-5TB Part Deux/bulk-download')
+    bulk_download('/Users/spaceman/pdart/new-bulk-download')

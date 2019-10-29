@@ -1,6 +1,8 @@
 # Python cruft
 *.pyc
 .cache
+.hypothesis
+.idea
 
 # Mac OS X cruft
 .DS_Store
