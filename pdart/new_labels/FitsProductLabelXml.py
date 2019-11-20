@@ -17,7 +17,7 @@ make_label = interpret_document_template(
   <Identification_Area>
     <logical_identifier><NODE name="lid" /></logical_identifier>
     <version_id><NODE name="vid" /></version_id>
-    <title>This collection contains the <NODE name="suffix" /> \
+    <title>This product contains the <NODE name="suffix" /> \
 image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
     <information_model_version>%s</information_model_version>

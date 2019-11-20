@@ -1,8 +1,15 @@
-.PHONY : clean java-requirement save-reqs
+.PHONY : aq clean java-requirement mtb save-reqs
 
 # test: I should also run mypy
 test : venv java-requirement
 	source venv/bin/activate && py.test pdart
+
+aq : venv
+	source venv/bin/activate && python AQ.py
+
+mtb : venv
+	source venv/bin/activate && \
+	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
 java-requirement :
 	@if ! [ -x "$(shell command -v java)" ]; then \
