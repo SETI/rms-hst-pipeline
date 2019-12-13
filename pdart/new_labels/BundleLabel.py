@@ -34,8 +34,7 @@ def make_bundle_label(bundle_db, info, verify):
         'bundle_lid': lidvid_to_lid(bundle.lidvid),
         'bundle_vid': lidvid_to_vid(bundle.lidvid),
         'proposal_id': str(proposal_id),
-        'Citation_Information':
-            make_citation_information(info, bundle_lid),
+        'Citation_Information': make_citation_information(info),
         'Bundle_Member_Entries': combine_nodes_into_fragment(
             reduced_collections)
     }).toxml()

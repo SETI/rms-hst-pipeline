@@ -61,8 +61,7 @@ def make_collection_label(bundle_db, info, collection_lidvid, verify):
         'collection_vid': collection_vid,
         'title': title,
         'proposal_id': str(proposal_id),
-        'Citation_Information':
-            make_citation_information(info, collection_lid),
+        'Citation_Information': make_citation_information(info),
         'inventory_name': inventory_name
     }).toxml()
 

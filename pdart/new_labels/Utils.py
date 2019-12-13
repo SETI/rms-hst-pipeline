@@ -68,7 +68,7 @@ def assert_golden_file_equal(testcase, basename,
                 roundtrip = f.read()
                 assert roundtrip[-2:] == '\r\n', 'inventory roundtripped is wrong'
         else:
-            with io.open(filepath, 'w') as f:
+            with open(filepath, 'w') as f:
                 f.write(calculated_contents)
         testcase.fail('Golden file %r did not exist but it was created.' %
                       basename)

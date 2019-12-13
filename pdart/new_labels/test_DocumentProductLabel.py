@@ -1,5 +1,6 @@
 import unittest
 
+from Citation_Information import Citation_Information
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_labels.DocumentProductLabel import make_document_product_label
 from pdart.new_labels.Utils import assert_golden_file_equal
@@ -10,6 +11,7 @@ class Test_DocumentProductLabel(unittest.TestCase):
         # type: () -> None
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
+        self.info = Citation_Information.create_test_citation_information()
 
     def test_make_document_product_label(self):
         # type: () -> None
@@ -24,6 +26,7 @@ class Test_DocumentProductLabel(unittest.TestCase):
         document_product_lidvid = 'urn:nasa:pds:hst_13012:document:phase2::1.0'
 
         label = make_document_product_label(self.db,
+                                            self.info,
                                             document_product_lidvid,
                                             True,
                                             '2017-02-31')

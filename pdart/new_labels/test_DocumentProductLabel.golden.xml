@@ -9,9 +9,9 @@
     <information_model_version>1.10.1.0</information_model_version>
     <product_class>Product_Document</product_class>
     <Citation_Information>
-      <author_list>### placeholder for doc product author_list ###</author_list>
-      <publication_year>2000</publication_year>
-      <description>This document provides a summary of the observation plan for HST proposal 13012, ### placeholder for doc product proposal_title ###, PI ### placeholder for doc product pi_name ###, 2000.</description>
+      <author_list>&lt;author_list&gt;</author_list>
+      <publication_year>2001</publication_year>
+      <description>&lt;description&gt;</description>
     </Citation_Information>
   </Identification_Area>
   <Reference_List>

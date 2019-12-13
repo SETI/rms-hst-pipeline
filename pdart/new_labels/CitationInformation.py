@@ -21,8 +21,8 @@ An interpreted template to create a ``<Citation_Information
 """
 
 
-def make_citation_information(info, component_id):
-    # type: (Citation_Information, unicode) -> NodeBuilder
+def make_citation_information(info):
+    # type: (Citation_Information) -> NodeBuilder
     """
     Return a placeholder ``<Citation_Information />`` XML element.
     """

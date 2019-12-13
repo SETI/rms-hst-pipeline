@@ -322,6 +322,7 @@ def create_pds4_labels(bundle_id, bundle_db, info, archive_dir):
                 return
             product_lidvid = str(document_product.lidvid)
             label = make_document_product_label(self.db,
+                                                info,
                                                 product_lidvid,
                                                 False,
                                                 None)
