@@ -7,7 +7,7 @@ from pdart.pds4.LIDVID import LIDVID
 
 
 def runGeneric(fits_product_lidvid_str, fits_filepath):
-    # type: (str, str) -> str
+    # type: (str, str) -> unicode
     """
     Given a LIDVID and a FITS file, build a sample label for an
     instrument.
@@ -49,7 +49,7 @@ def runTracedGeneric(instrument, fits_product_lidvid_str, fits_filepath):
     base = splitext(basename(fits_filepath))[0]
     label_filepath = '/Users/spaceman/' + base + '.xml'
     with open(label_filepath, 'w') as f:
-        f.write(label)
+        f.write(str(label))
     print 'ran for', LIDVID(fits_product_lidvid_str), 'on', instrument
 
 

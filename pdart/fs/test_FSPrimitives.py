@@ -14,7 +14,7 @@ from pdart.fs.FSPrimAdapter import FSPrimAdapter
 from pdart.fs.FSPrimitives import Dir, File, FSPrimitives, Node
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Dict
     from pdart.fs.FSPrimitives import Dir_, File_, Node_
 
 

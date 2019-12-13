@@ -1,7 +1,11 @@
+from typing import TYPE_CHECKING
 import unittest
 from hypothesis import assume, given
 import hypothesis.strategies as st
 from pdart.pds4.LID import LID
+
+if TYPE_CHECKING:
+    from typing import List
 
 def lid_segments():
     '''A Hypothesis strategy to generate a legal LID segment string.'''
@@ -26,9 +30,6 @@ def lids():
 class TestLID(unittest.TestCase):
     def test_init(self):
         # type: () -> None
-        # sanity-check
-        with self.assertRaises(Exception):
-            LID(None)
 
         # test segments
         with self.assertRaises(Exception):

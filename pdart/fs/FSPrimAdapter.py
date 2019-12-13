@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, cast
 from pdart.fs.FSPrimitives import FSPrimitives
 
 if TYPE_CHECKING:
-    from typing import Any, Text, Tuple, Union
+    from typing import Any, Dict, Text, Tuple, Union
     from pdart.fs.FSPrimitives import Node_
 
 _WINDOWS_PLATFORM = False
@@ -50,19 +50,20 @@ class FSPrimAdapter(FS):
             namespaces = [namespaces]
         node = self._resolve_path_to_node(path)
         assert node, path
-        info = {}
-        info['basic'] = {
-            'is_dir': self.prims.is_dir(node),
-            'name': fs.path.basename(node.path)
+        info = {}  # Dict[unicode, Dict[unicode, object]]
+        info[u'basic'] = {
+            u'is_dir': self.prims.is_dir(node),
+            u'name': fs.path.basename(node.path)
             }
         if 'details' in namespaces:
             sys_path = self.getsyspath(path)
             if sys_path:
                 with convert_os_errors('getinfo', path):
                     _stat = os.stat(sys_path)
-                info['details'] = self._make_details_from_stat(_stat)
+                info[u'details'] = self._make_details_from_stat(_stat)
             else:
-                info['details'] = self._make_default_details(node)
+                info[u'details'] = self._make_default_details(node)
+
         return Info(info)
 
     def listdir(self, path):
@@ -211,7 +212,7 @@ class FSPrimAdapter(FS):
 
     @classmethod
     def _make_details_from_stat(cls, stat_result):
-        # type: (Any) -> Dict[str, Any]
+        # type: (Any) -> Dict[unicode, Any]
         """Make a *details* info dict from an `os.stat_result` object.
         """
         details = {
@@ -220,7 +221,8 @@ class FSPrimAdapter(FS):
             'modified': stat_result.st_mtime,
             'size': stat_result.st_size,
             'type': int(cls._get_type_from_stat(stat_result))
-        }
+        }  # type: Dict[unicode, Any]
+
         # On other Unix systems (such as FreeBSD), the following
         # attributes may be available (but may be only filled out if
         # root tries to use them):
@@ -234,7 +236,7 @@ class FSPrimAdapter(FS):
         return details
 
     def _make_default_details(self, node):
-        # type: (Node_) -> Dict[str, Any]
+        # type: (Node_) -> Dict[unicode, Any]
         """Make a default *details* info dict"""
         prims = self.prims
         if prims.is_dir(node):
@@ -250,7 +252,7 @@ class FSPrimAdapter(FS):
             'modified': None,
             'size': 0,
             'type': resource_type
-        }
+        }  # type: Dict[unicode, Any]
         return details
 
     @classmethod

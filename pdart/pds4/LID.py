@@ -1,5 +1,9 @@
 """Representation of a PDS4 LID."""
+from typing import TYPE_CHECKING
 import re
+
+if TYPE_CHECKING:
+    from typing import List, Optional
 
 
 class LID(object):
@@ -28,13 +32,9 @@ class LID(object):
         self.lid = str
         self.bundle_id = ids[3]
 
-        # Now we modify ids to include possibly missing Ids...
-        while len(ids) < 6:
-            ids.append(None)
-
         # ...so this indexing of ids is safe
-        self.collection_id = ids[4]
-        self.product_id = ids[5]
+        self.collection_id = ids[4] if len(ids) > 4 else None
+        self.product_id = ids[5] if len(ids) > 5 else None
 
     @staticmethod
     def create_from_parts(parts):

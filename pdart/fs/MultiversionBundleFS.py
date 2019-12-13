@@ -51,7 +51,7 @@ class MultiversionBundleFS(WrapFS):
         self._wrap_fs.makedirs(path, recreate=True)
 
     def read_lidvid_subdir_versions(self, lidvid):
-        # type: (LIDVID) -> Dict[unicode, unicode]
+        # type: (LIDVID) -> Dict[str, str]
         """
         For a given LIDVID, read and return the dictionary stored
         in the subdir_versions file.
@@ -60,7 +60,7 @@ class MultiversionBundleFS(WrapFS):
         return read_subdir_versions_from_path(self, path)
 
     def write_lidvid_subdir_versions(self, lidvid, d):
-        # type: (LIDVID, Dict[unicode, unicode]) -> None
+        # type: (LIDVID, Dict[str, str]) -> None
         """
         For a given LIDVID, write a dictionary into the subdir_versions file.
         """
@@ -68,7 +68,7 @@ class MultiversionBundleFS(WrapFS):
         return write_subdir_versions_to_path(self, path, d)
 
     def read_subdirectory_paths(self, lidvid):
-        # type: (LIDVID) -> Dict[unicode, unicode]
+        # type: (LIDVID) -> Dict[str, str]
         """
         Read the dictionary that maps from subdirectories
         to their paths.
@@ -94,6 +94,7 @@ class MultiversionBundleFS(WrapFS):
             '%s is not parent to %s' % (parent_lidvid, child_lidvid)
         d = self.read_lidvid_subdir_versions(parent_lidvid)
         last_id = child_lid.product_id or child_lid.collection_id
+        assert last_id
         d[last_id] = str(child_lidvid.vid())
         self.write_lidvid_subdir_versions(parent_lidvid, d)
         self.make_lidvid_directories(child_lidvid)
@@ -160,7 +161,7 @@ class MultiversionBundleFS(WrapFS):
         """
         root_contents = self.listdir(u'/')
         assert len(root_contents) == 1
-        bundle_id = root_contents[0]
+        bundle_id = str(root_contents[0])
         lid = LID('urn:nasa:pds:' + bundle_id)
         vid = self.current_vid(lid)
         return LIDVID.create_from_lid_and_vid(lid, vid)

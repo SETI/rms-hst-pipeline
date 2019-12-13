@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from pdart.xml.Templates import interpret_template
 
 if TYPE_CHECKING:
-    from typing import Tuple
+    from typing import Dict, Tuple
     from pdart.xml.Templates import NodeBuilder
 
 

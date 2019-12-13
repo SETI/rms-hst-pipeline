@@ -14,7 +14,6 @@ from pdart.pds4.LID import LID
 
 if TYPE_CHECKING:
     from typing import Iterator
-    import pdart.pds4.Archive
     import pdart.pds4.Product
 
 

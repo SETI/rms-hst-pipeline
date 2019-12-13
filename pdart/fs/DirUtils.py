@@ -3,12 +3,16 @@ Utility functions to convert from LIDs and LIDVIDs to their canonical
 paths in a filesystem.
 """
 import re
+from typing import TYPE_CHECKING
 
 from fs.path import iteratepath, join
 
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
+
+if TYPE_CHECKING:
+    from typing import List, Optional
 
 _DIR_PART_PATTERN = re.compile('^v\\$(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*))?$')
 
@@ -19,8 +23,13 @@ def _lid_to_parts(lid):
     Extract the parts (bundle, collection, product) from the LID and
     return as a list.
     """
-    return filter(lambda (x): x is not None,
-                  [lid.bundle_id, lid.collection_id, lid.product_id])
+    res = [lid.bundle_id]
+    if lid.collection_id:
+        res.append(lid.collection_id)
+    if lid.product_id:
+        res.append(lid.product_id)
+    return [unicode(id) for id in res]
+          
 
 
 def lid_to_dir(lid):
@@ -48,7 +57,7 @@ def dir_to_lid(dir):
     """
     Convert a directory path to a LID.  Raise on errors.
     """
-    parts = iteratepath(dir)
+    parts = [str(part) for part in iteratepath(dir)]
     return LID.create_from_parts(parts)
 
 
@@ -58,7 +67,7 @@ def dir_to_lidvid(dir):
     Convert a directory path to a LIDVID.  Raise on errors.
     """
 
-    parts = iteratepath(dir)
+    parts = [str(part) for part in iteratepath(dir)]
     lid_parts = parts[0:-1]
     vid_part = parts[-1]
     lid = LID.create_from_parts(lid_parts)
@@ -80,7 +89,7 @@ def dir_part_to_vid(dir_part):
     Convert a directory name to a VID.  Raise on errors.
     """
     assert _is_dir_part(dir_part), '%s is not a dir_part' % dir_part
-    return VID(dir_part[2:])
+    return VID(str(dir_part[2:]))
 
 
 def _is_dir_part(dir_part):

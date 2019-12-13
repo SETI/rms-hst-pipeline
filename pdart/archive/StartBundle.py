@@ -32,6 +32,7 @@ from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
+    from typing import List, Set
     from pdart.new_db.BundleDB import BundleDB
     from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, Bundle, \
         Collection, DocumentCollection, DocumentProduct, FitsFile, \
@@ -57,7 +58,7 @@ def bundle_to_int(bundle_id):
     if res:
         return int(res.group(1))
     else:
-        return None
+        raise ValueError('bundle_to_int(%s)' % bundle_id)
 
 
 def copy_files_from_download(download_dir, bundle, archive_dir):
@@ -325,6 +326,7 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
             # TODO publication date left blank
 
             label_base = LIDVID(product_lidvid).lid().product_id
+            assert label_base
             label_filename = label_base + '.xml'
             product_dir_path = _lidvid_to_dir(product_lidvid)
             label_filepath = fs.path.join(

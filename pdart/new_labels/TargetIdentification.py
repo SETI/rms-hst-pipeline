@@ -25,10 +25,8 @@ def _get_target_from_header_unit(card_dictionaries):
 
 _get_target = multiple_implementations('_get_target',
                                        _get_target_from_header_unit,
-                                       get_placeholder_target)
-
-
-# type: Callable[[List[Dict[str, Any]]], Tuple[unicode, unicode, unicode]]
+                                       get_placeholder_target
+)  # type: Callable[[List[Dict[str, Any]]], Tuple[unicode, unicode, unicode]]
 
 
 def get_target(card_dictionaries):

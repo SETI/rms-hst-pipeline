@@ -12,7 +12,7 @@ from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 
 if TYPE_CHECKING:
-    from typing import List, Tuple
+    from typing import Dict, List, Tuple
     from pdart.fs.FSPrimitives import Dir_, File_, Node_
 
 _V1_0 = u'v$1.0'
@@ -86,6 +86,7 @@ class V1Primitives(FSPrimitives):
             return True
         else:  # l > 4:
             self.too_deep('is_file', path)
+            raise Exception('V1FS.is_file: too deep')
 
     def get_dir_children(self, node):
         # type: (Dir_) -> Dict[unicode, Node_]
@@ -116,6 +117,7 @@ class V1Primitives(FSPrimitives):
             return res
         else:
             self.too_deep('get_dir_children(%r)', fs.path.join(path, filename))
+            assert False
 
     def add_child_dir(self, parent_node, filename):
         # type: (Dir_, unicode) -> Dir_
@@ -137,6 +139,7 @@ class V1Primitives(FSPrimitives):
             return Dir(self, fs.path.join(path, filename))
         else:
             self.too_deep('add_child_dir', fs.path.join(path, filename))
+            assert False
 
     def add_child_file(self, parent_node, filename):
         # type: (Dir_, unicode) -> File_

@@ -7,14 +7,6 @@ _TEST_FILENAME = '/some/random/folder/j6gp01mmq_trl.fits'
 
 class TestHstFilename(unittest.TestCase):
     def test_init(self):
-        # type: () -> None
-        # test bad type
-        with self.assertRaises(Exception):
-            HstFilename(None)
-
-        # with self.assertRaises(Exception):
-        #    HstFilename(1)
-
         # test length
         with self.assertRaises(Exception):
             HstFilename('123456')

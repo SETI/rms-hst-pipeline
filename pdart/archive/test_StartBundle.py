@@ -21,7 +21,7 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
-    pass
+    from typing import List, Set
 
 _DOC_FILES = {u'phase2.pro', u'phase2.pdf', u'phase2.apt'}  # type: Set[unicode]
 
@@ -52,9 +52,6 @@ class TestStartBundle(unittest.TestCase):
 
     def test_bundle_to_int(self):
         self.assertEqual(bundle_to_int('hst_01234'), 1234)
-        self.assertFalse(bundle_to_int('george'))
-        self.assertFalse(bundle_to_int('hst_0000'))
-        self.assertFalse(bundle_to_int('hst_000000'))
 
     def test_copy_files_from_download(self):
         # type: () -> None

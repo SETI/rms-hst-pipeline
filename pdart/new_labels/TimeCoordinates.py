@@ -38,8 +38,8 @@ def _get_start_stop_times_from_cards(fits_product_lidvid, card_dicts):
 _get_start_stop_times = multiple_implementations(
     '_get_start_stop_times',
     _get_start_stop_times_from_cards,
-    get_placeholder_start_stop_times)
-# type: Callable[[unicode, List[Dict[str, Any]]], Dict[str, str]]
+    get_placeholder_start_stop_times
+)  # type: Callable[[unicode, List[Dict[str, Any]]], Dict[str, str]]
 
 
 def get_time_coordinates(fits_product_lidvid, card_dicts):

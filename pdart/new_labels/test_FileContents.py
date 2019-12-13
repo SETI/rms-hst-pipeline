@@ -92,5 +92,5 @@ class Test_FileContents(unittest.TestCase):
 
 
 _fragment_wrapper = interpret_document_template(
-    """<Wrapper><FRAGMENT name="frag" /></Wrapper>""")
-# type: DocTemplate
+    """<Wrapper><FRAGMENT name="frag" /></Wrapper>"""
+)  # type: DocTemplate

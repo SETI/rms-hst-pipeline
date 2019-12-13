@@ -4,7 +4,7 @@ import urllib2
 import fs.path
 
 if TYPE_CHECKING:
-    from typing import List, Tuple
+    from typing import List, Set, Tuple
 
 
 def _retrieve_doc(url, filepath):

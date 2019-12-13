@@ -7,7 +7,7 @@ from pdart.astroquery.Utils import filter_table, get_table_with_retries, \
 
 if TYPE_CHECKING:
     from astroquery.table import Table
-    from typing import Tuple
+    from typing import List, Optional, Tuple
 
 _ACCEPTED_INSTRUMENTS = "IJU"  # type: str
 """
@@ -81,7 +81,7 @@ class MastSlice(object):
                 mtFlag=True)
 
         self.observations_table = get_table_with_retries(mast_call, 1)
-        self.proposal_ids = None  # type: List[int]
+        self.proposal_ids = None  # type: Optional[List[int]]
 
     def __str__(self):
         return 'MastSlice(julian day [%f, %f])' % (

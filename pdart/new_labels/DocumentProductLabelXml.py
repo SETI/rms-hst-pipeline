@@ -10,8 +10,9 @@ from pdart.xml.Templates import combine_fragments_into_fragment, \
     interpret_template
 
 if TYPE_CHECKING:
-    from typing import Any, Callable, Dict, Tuple
+    from typing import Any, Callable, Dict, List, Tuple
     from xml.dom.minidom import Document
+    from pdart.new_db.BundleDB import BundleDB
     from pdart.xml.Templates import DocTemplate, FragBuilder, NodeBuilder, \
         NodeBuilderTemplate
 
@@ -65,7 +66,7 @@ _citation_information_template = interpret_template("""<Citation_Information>
 
 
 def make_citation_information(bundle_db, bundle_lid, proposal_id):
-    # type: (BundleDB, unicode, int) -> NodeBuilder
+    # type: (BundleDB, str, int) -> NodeBuilder
     """
     Create a ``<Citation_Information />`` element for the proposal ID.
     """

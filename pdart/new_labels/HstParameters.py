@@ -12,7 +12,7 @@ from pdart.new_labels.Placeholders import known_placeholder, placeholder, \
 from pdart.rules.Combinators import multiple_implementations
 
 if TYPE_CHECKING:
-    from typing import Any, Callable, Dict, List
+    from typing import Any, Callable, Dict, List, Optional
     from pdart.xml.Templates import NodeBuilder
 
 
@@ -56,8 +56,8 @@ def _get_aperture_name_placeholder(card_dicts, instrument, product_id):
 get_aperture_name = multiple_implementations(
     'get_aperture_name',
     _get_aperture_name,
-    _get_aperture_name_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+    _get_aperture_name_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
 Return text for the ``<aperture_name />`` XML element.
 """
@@ -73,6 +73,7 @@ def _get_bandwidth(card_dicts, instrument, product_id):
     if instrument == 'wfpc2':
         bandwid = float(card_dicts[0]['BANDWID'])
         return str(bandwid * 1.0e-4)
+    assert False
 
 
 def _get_bandwidth_placeholder(card_dicts, instrument, product_id):
@@ -83,8 +84,8 @@ def _get_bandwidth_placeholder(card_dicts, instrument, product_id):
 get_bandwidth = multiple_implementations(
     'get_bandwidth',
     _get_bandwidth,
-    _get_bandwidth_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+    _get_bandwidth_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
 Return a float for the ``<bandwidth />`` XML element.
 """
@@ -112,8 +113,8 @@ def _get_center_filter_wavelength_placeholder(card_dicts,
 get_center_filter_wavelength = multiple_implementations(
     'get_center_filter_wavelength',
     _get_center_filter_wavelength,
-    _get_center_filter_wavelength_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+    _get_center_filter_wavelength_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
 Return a float for the ``<center_filter_wavelength />`` XML element.
 """
@@ -143,8 +144,8 @@ def _get_detector_id_placeholder(card_dicts, instrument, product_id):
 get_detector_id = multiple_implementations(
     'get_detector_id',
     _get_detector_id,
-    _get_detector_id_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+    _get_detector_id_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
 Return text for the ``<detector_id />`` XML element.
 """
@@ -167,8 +168,8 @@ def _get_exposure_duration_placeholder(card_dicts, product_id):
 get_exposure_duration = multiple_implementations(
     'get_exposure_duration',
     _get_exposure_duration,
-    _get_exposure_duration_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode], unicode]
+    _get_exposure_duration_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
 """
 Return a float for the ``<exposure_duration />`` XML element.
 """
@@ -191,8 +192,8 @@ def _get_exposure_type_placeholder(card_dicts, product_id):
 get_exposure_type = multiple_implementations(
     'get_exposure_type',
     _get_exposure_type,
-    _get_exposure_type_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode], unicode]
+    _get_exposure_type_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
 """
 Return text for the ``<exposure_type />`` XML element.
 """
@@ -226,7 +227,8 @@ def _get_filter_name(card_dicts, instrument, product_name):
                 return filter1
             else:
                 return '%s+%s' % (filter1, filter2)
-    elif instrument == 'wfc3':
+    else:
+        assert (instrument == 'wfc3')
         return card_dicts[0]['FILTER']
 
 
@@ -238,8 +240,8 @@ def _get_filter_name_placeholder(card_dicts, instrument, product_id):
 get_filter_name = multiple_implementations(
     'get_filter_name',
     _get_filter_name,
-    _get_filter_name_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+    _get_filter_name_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
 Return text for the ``<filter_name />`` XML element.
 """
@@ -260,8 +262,8 @@ def _get_fine_guidance_system_lock_type_placeholder(card_dicts, product_id):
 get_fine_guidance_system_lock_type = multiple_implementations(
     'get_fine_guidance_system_lock_type',
     _get_fine_guidance_system_lock_type,
-    _get_fine_guidance_system_lock_type_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode], unicode]
+    _get_fine_guidance_system_lock_type_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
 """
 Return text for the ``<fine_guidance_system_lock_type />`` XML element.
 """
@@ -279,6 +281,7 @@ def _get_gain_mode_id(card_dicts, instrument, product_id):
         return str(atodgain)
     elif instrument == 'wfpc2':
         return 'A2D' + str(int(atodgain))
+    assert False
 
 
 def _get_gain_mode_id_placeholder(card_dicts, instrument, product_id):
@@ -289,8 +292,8 @@ def _get_gain_mode_id_placeholder(card_dicts, instrument, product_id):
 get_gain_mode_id = multiple_implementations(
     'get_gain_mode_id',
     _get_gain_mode_id,
-    _get_gain_mode_id_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+    _get_gain_mode_id_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
 Return text for the ``<gain_mode_id />`` XML element.
 """
@@ -316,8 +319,8 @@ def _get_hst_pi_name_placeholder(card_dicts, product_id):
 get_hst_pi_name = multiple_implementations(
     'get_hst_pi_name',
     _get_hst_pi_name,
-    _get_hst_pi_name_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode], unicode]
+    _get_hst_pi_name_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
 """
 Return text for the ``<hst_pi_name />`` XML element.
 """
@@ -340,8 +343,8 @@ def _get_hst_proposal_id_placeholder(card_dicts, product_id):
 get_hst_proposal_id = multiple_implementations(
     'get_hst_proposal_id',
     _get_hst_proposal_id,
-    _get_hst_proposal_id_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode], unicode]
+    _get_hst_proposal_id_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
 """
 Return text for the ``<hst_proposal_id />`` XML element.
 """
@@ -364,8 +367,8 @@ def _get_hst_target_name_placeholder(card_dicts, product_id):
 get_hst_target_name = multiple_implementations(
     'get_hst_target_name',
     _get_hst_target_name,
-    _get_hst_target_name_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode], unicode]
+    _get_hst_target_name_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
 """
 Return text for the ``<hst_target_name />`` XML element.
 """
@@ -391,8 +394,8 @@ def _get_instrument_mode_id_placeholder(card_dicts, instrument, product_id):
 get_instrument_mode_id = multiple_implementations(
     'get_instrument_mode_id',
     _get_instrument_mode_id,
-    _get_instrument_mode_id_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+    _get_instrument_mode_id_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
 Return text for the ``<instrument_mode_id />`` XML element.
 """
@@ -418,8 +421,8 @@ def _get_observation_type_placeholder(card_dicts, instrument, product_id):
 get_observation_type = multiple_implementations(
     'get_observation_type',
     _get_observation_type,
-    _get_observation_type_placeholder)
-# type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+    _get_observation_type_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
 """
 Return text for the ``<observation_type />`` XML element.
 """
@@ -459,26 +462,19 @@ def get_hst_parameters(card_dicts, instrument, product_id):
              'repeat_exposure_count': get_repeat_exposure_count(product_id),
              'subarray_flag': get_subarray_flag(product_id)})
     elif instrument == 'wfpc2':
-        header = None
-        # type: unicode
         parameters_instrument = parameters_wfpc2(
             {'bandwidth': get_bandwidth(card_dicts, instrument, product_id),
              'center_filter_wavelength':
                  get_center_filter_wavelength(card_dicts,
                                               instrument, product_id),
              'targeted_detector_id':
-                 get_targeted_detector_id(product_id, instrument,
-                                          header),
+                 get_targeted_detector_id(product_id, instrument),
              'gain_mode_id': get_gain_mode_id(card_dicts, instrument,
                                               product_id),
-             'pc1_flag': get_pc1_flag(product_id, instrument,
-                                      header),
-             'wf2_flag': get_wf2_flag(product_id, instrument,
-                                      header),
-             'wf3_flag': get_wf3_flag(product_id, instrument,
-                                      header),
-             'wf4_flag': get_wf4_flag(product_id, instrument,
-                                      header)})
+             'pc1_flag': get_pc1_flag(product_id, instrument),
+             'wf2_flag': get_wf2_flag(product_id, instrument),
+             'wf3_flag': get_wf3_flag(product_id, instrument),
+             'wf4_flag': get_wf4_flag(product_id, instrument)})
     elif instrument == 'wfc3':
         parameters_instrument = parameters_wfc3(
             {'detector_id': get_detector_id(card_dicts,

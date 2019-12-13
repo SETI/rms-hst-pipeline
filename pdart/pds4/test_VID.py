@@ -35,10 +35,6 @@ def pdart_vids(max_value=9):
 class TestVID(unittest.TestCase):
     def test_init(self):
         # type: () -> None
-        # sanity-check
-        with self.assertRaises(Exception):
-            VID(None)
-
         with self.assertRaises(Exception):
             VID('foo')
 

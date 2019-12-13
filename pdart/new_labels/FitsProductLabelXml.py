@@ -53,8 +53,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
   </File_Area_Observational>
 </Product_Observational>""" %
     (PDS4_XML_MODEL, HST_XML_MODEL, FITS_PRODUCT_NAMESPACES,
-     INFORMATION_MODEL_VERSION))
-# type: DocTemplate
+     INFORMATION_MODEL_VERSION))  # type: DocTemplate
 """
 An interpreted document template to create a product label.
 """
