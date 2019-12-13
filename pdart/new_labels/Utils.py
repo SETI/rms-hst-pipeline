@@ -32,7 +32,7 @@ def _golden_filepath(basename):
 
 
 def _golden_file_contents(basename, is_inventory):
-    # type: (unicode, bool) -> unicode
+    # Leave untyped due to problems with open()/io.open().
     """
     Return the contents as a Unicode string of the golden file with
     the given basename.
@@ -46,7 +46,7 @@ def _golden_file_contents(basename, is_inventory):
 
 def assert_golden_file_equal(testcase, basename,
                              calculated_contents, is_inventory=False):
-    # type: (unittest.TestCase, unicode, Union[str, unicode], bool) -> None
+    # Leave untyped due to problems with open()/io.open().
     """
     Finds the golden file and compares its contents with the given string.
     Raises an exception via the unittest.TestCase argument if they are
@@ -69,7 +69,7 @@ def assert_golden_file_equal(testcase, basename,
                 assert roundtrip[-2:] == '\r\n', 'inventory roundtripped is wrong'
         else:
             with io.open(filepath, 'w') as f:
-                f.write(unicode(calculated_contents))
+                f.write(calculated_contents)
         testcase.fail('Golden file %r did not exist but it was created.' %
                       basename)
 

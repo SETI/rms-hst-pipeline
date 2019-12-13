@@ -497,15 +497,15 @@ def _get_stsci_group_id(card_dicts, product_id):
         return card_dicts[0]['ROOTNAME']
 
 
-def _get_stsci_group_id_placeholder(card_dicts, instrument, product_id):
-    # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
+def _get_stsci_group_id_placeholder(card_dicts, product_id):
+    # type: (List[Dict[str, Any]], unicode) -> unicode
     return placeholder(product_id, 'stsci_group_id')
 
 get_stsci_group_id = multiple_implementations(
     'get_stsci_group_id',
     _get_stsci_group_id,
     _get_stsci_group_id_placeholder
-)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
 """
 Return text for the ``<stsci_group_id />`` XML element.
 """
