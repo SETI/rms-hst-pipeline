@@ -42,6 +42,9 @@ class Test_CollectionLabel(unittest.TestCase):
                                  'test_CollectionLabel.golden.xml',
                                  label)
 
+    def test_make_doc_collection_label(self):
+        # type: () -> None
+
         # make a documentation collection label
         label = make_collection_label(self.db, self.info,
                                       _DOC_COLLECTION_LIDVID,

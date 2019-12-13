@@ -60,7 +60,7 @@
     <Mission_Area>
       <hst:HST>
         <hst:Parameters_General>
-          <hst:stsci_group_id>### placeholder for stsci_group_id ###</hst:stsci_group_id>
+          <hst:stsci_group_id>jbz504eoq</hst:stsci_group_id>
           <hst:hst_proposal_id>13012</hst:hst_proposal_id>
           <hst:hst_pi_name>Lamy, Laurent </hst:hst_pi_name>
           <hst:hst_target_name>URANUS</hst:hst_target_name>

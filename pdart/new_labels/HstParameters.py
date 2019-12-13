@@ -482,14 +482,40 @@ get_observation_type = multiple_implementations(
 Return text for the ``<observation_type />`` XML element.
 """
 
+##############################
+# get_stsci_group_id: NOTE the name is going to change
+##############################
 
+def _get_stsci_group_id(card_dicts, product_id):
+    try:
+        asn_id = card_dicts[0]['ASN_ID']
+        if asn_id == 'NONE':
+            return card_dicts[0]['ROOTNAME']
+        else:
+            return asn_id
+    except KeyError:
+        return card_dicts[0]['ROOTNAME']
+
+
+def _get_stsci_group_id_placeholder(card_dicts, instrument, product_id):
+    # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
+    return placeholder(product_id, 'stsci_group_id')
+
+get_stsci_group_id = multiple_implementations(
+    'get_stsci_group_id',
+    _get_stsci_group_id,
+    _get_stsci_group_id_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+"""
+Return text for the ``<stsci_group_id />`` XML element.
+"""
 
 ##############################
 
 def get_hst_parameters(card_dicts, instrument, product_id):
     # type: (List[Dict[str, Any]], str, str) -> NodeBuilder
     """Return an ``<hst:HST />`` XML element."""
-    d = {'stsci_group_id': known_placeholder(product_id, 'stsci_group_id'),
+    d = {'stsci_group_id': get_stsci_group_id(card_dicts, product_id),
          'hst_proposal_id': get_hst_proposal_id(card_dicts, product_id),
          'hst_pi_name': get_hst_pi_name(card_dicts, product_id),
          'hst_target_name': get_hst_target_name(card_dicts, product_id),

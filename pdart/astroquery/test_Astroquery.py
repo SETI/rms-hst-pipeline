@@ -3,7 +3,7 @@ import unittest
 from pdart.astroquery.Astroquery import MastSlice
 
 
-@unittest.skip('really slow: investigate')
+# @unittest.skip('really slow: investigate')
 class TestAstroquery(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
