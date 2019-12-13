@@ -5,7 +5,7 @@ import unittest
 from pdart.new_db.BrowseFileDB import populate_database_from_browse_file
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_labels.BrowseProductLabel import make_browse_product_label
-from pdart.new_labels.Utils import golden_file_contents
+from pdart.new_labels.Utils import assert_golden_file_equal
 
 
 class Test_BrowseProductLabel(unittest.TestCase):
@@ -67,5 +67,5 @@ class Test_BrowseProductLabel(unittest.TestCase):
                                           browse_file_basename,
                                           True)
 
-        expected = golden_file_contents('test_BrowseProductLabel.golden.xml')
-        self.assertEqual(expected, label)
+        assert_golden_file_equal(self,
+                                 'test_BrowseProductLabel.golden.xml', label)

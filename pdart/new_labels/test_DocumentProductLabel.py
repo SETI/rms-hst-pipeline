@@ -2,7 +2,7 @@ import unittest
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_labels.DocumentProductLabel import make_document_product_label
-from pdart.new_labels.Utils import golden_file_contents
+from pdart.new_labels.Utils import assert_golden_file_equal
 
 
 class Test_DocumentProductLabel(unittest.TestCase):
@@ -28,5 +28,7 @@ class Test_DocumentProductLabel(unittest.TestCase):
                                             True,
                                             '2017-02-31')
 
-        expected = golden_file_contents('test_DocumentProductLabel.golden.xml')
-        self.assertEqual(expected, label)
+        assert_golden_file_equal(self,
+                                 'test_DocumentProductLabel.golden.xml',
+                                 label)
+

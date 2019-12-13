@@ -5,7 +5,7 @@ from fs.path import basename
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.new_labels.FitsProductLabel import make_fits_product_label
-from pdart.new_labels.Utils import golden_file_contents, path_to_testfile
+from pdart.new_labels.Utils import assert_golden_file_equal, path_to_testfile
 
 
 class Test_FitsProductLabel(unittest.TestCase):
@@ -44,5 +44,5 @@ class Test_FitsProductLabel(unittest.TestCase):
                                         file_basename,
                                         True)
 
-        expected = golden_file_contents('test_FitsProductLabel.golden.xml')
-        self.assertEqual(expected, label)
+        assert_golden_file_equal(self,
+                                 'test_FitsProductLabel.golden.xml', label)

@@ -4,8 +4,12 @@
 # Mark Showalter, December 12, 2019
 ################################################################################
 
-from Citation_Information_from_apt import Citation_Information_from_apt
-from Citation_Information_from_pro import Citation_Information_from_pro
+from typing import TYPE_CHECKING
+from .Citation_Information_from_apt import Citation_Information_from_apt
+from .Citation_Information_from_pro import Citation_Information_from_pro
+
+if TYPE_CHECKING:
+    from typing import Any
 
 class Citation_Information:
     """This class encapsulates the information needed for the PDS4
@@ -33,11 +37,25 @@ class Citation_Information:
     object.
     """
 
-    def __init__(self, filename, pipeline_version=None):
-
-        # Save the filename because why not
+    def __init__(self, filename, propno, category, cycle, authors,
+                 title, year, author_list, editor_list, publication_year,
+                 keyword, description):
         self.filename = filename
+        self.propno = propno
+        self.category = category
+        self.cycle = cycle
+        self.authors = authors
+        self.title = title
+        self.year = year
+        self.author_list = author_list
+        self.editor_list = editor_list
+        self.publication_year = publication_year
+        self.keyword = keyword
+        self.description = description
 
+    @staticmethod
+    def create_from_file(filename, pipeline_version=None):
+        # type: (unicode, Any) -> Citation_Information
         # Read the file and extract the key info
         filename_lc = filename.lower()
         if filename_lc.endswith('.apt'):
@@ -47,31 +65,40 @@ class Citation_Information:
         else:
             raise ValueError('unrecognized file format: ' + filename)
 
-        (self.propno,
-         self.category,
-         self.cycle,
-         self.authors,
-         self.title,
-         self.year) = info
+        (propno, category, cycle, authors, title, year) = info
 
         # Construct needed fields for Citation_Information object
-        self.author_list = ', '.join(self.authors)
+        author_list = ', '.join(authors)
 
         editor = 'RMS Node MAST-to-PDS4 Pipeline'
         if pipeline_version:
             editor = editor + ' v. ' + str(pipeline_version)
-        self.editor_list = [editor]
+        editor_list = [editor]
 
-        self.publication_year = str(self.year)
+        publication_year = str(year)
 
-        self.keyword = ''
+        keyword = ''
 
-        self.description = (
-            self.author_list + 
-            ', "' + self.title +
-            '", HST Cycle ' + str(self.cycle) +
-            ' Program ' + self.category + ' ' + str(self.propno) +
-            ', ' + str(self.year) + '.')
+        description = (
+            author_list + 
+            ', "' + title +
+            '", HST Cycle ' + str(cycle) +
+            ' Program ' + category + ' ' + str(propno) +
+            ', ' + str(year) + '.')
+
+        return Citation_Information(
+            filename, propno, category, cycle, authors,
+            title, year, author_list, editor_list, publication_year,
+            keyword, description)
+
+    @staticmethod
+    def create_test_citation_information():
+        # type: () -> Citation_Information
+        """For testing."""
+        return Citation_Information(
+            '<filename>', '<propno>', '<category>', '<cycle>', '<authors>',
+            '<title>', '2001', '<author_list>', '<editor_list>',
+            '2001', '<keyword>', '<description>')
 
     def replace_year(self, year):
         """Replaces the year that appears in the citation."""

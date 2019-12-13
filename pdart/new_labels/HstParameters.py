@@ -25,13 +25,28 @@ def get_repeat_exposure_count(product_id):
     return placeholder_int(product_id, 'repeat_exposure_count')
 
 
-def get_subarray_flag(product_id):
-    # type: (unicode) -> unicode
+def _get_subarray_flag(card_dicts, instrument, product_id):
+    # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
     """
     Return placeholder text for the ``<subarray_flag />`` XML element,
     noting the problem.
     """
-    return placeholder(product_id, 'subarray_flag')
+    if instrument != 'wfpc2':
+        return card_dicts[0]['SUBARRAY']
+    assert False
+
+def _get_subarray_flag_placeholder(card_dicts, instrument, product_id):
+    # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
+    return placeholder(product_id, 'subarry_flag')
+
+get_subarray_flag = multiple_implementations(
+    'get_subarray_flag',
+    _get_subarray_flag,
+    _get_subarray_flag_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode, unicode], unicode]
+"""
+Return text for the ``<subarray_flag />`` XML element.
+"""
 
 
 ##############################
@@ -42,8 +57,10 @@ def get_subarray_flag(product_id):
 def _get_aperture_name(card_dicts, instrument, product_id):
     # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
     if instrument == 'wfpc2':
-        return _get_aperture_name_placeholder(card_dicts, instrument,
-                                              product_id)
+        try:
+            return card_dicts[0]['APERTURE']
+        except KeyError:
+            return card_dicts[0]['APEROBJ']
     else:
         return card_dicts[0]['APERTURE']
 
@@ -179,13 +196,19 @@ Return a float for the ``<exposure_duration />`` XML element.
 # get_exposure_type
 ##############################
 
-def _get_exposure_type(card_dicts, product_id):
-    # type: (List[Dict[str, Any]], unicode) -> unicode
-    return card_dicts[0]['EXPFLAG']
+def _get_exposure_type(card_dicts, instrument, product_id):
+    # type: (List[Dict[str, Any]], str, str) -> unicode
+    if instrument == 'acs':
+        try:
+            return card_dicts[0]['EXPFLAG']
+        except KeyError:
+            return 'UNK'
+    else:
+        return card_dicts[0]['EXPFLAG']
 
 
-def _get_exposure_type_placeholder(card_dicts, product_id):
-    # type: (List[Dict[str, Any]], unicode) -> unicode
+def _get_exposure_type_placeholder(card_dicts, instrument, product_id):
+    # type: (List[Dict[str, Any]], str, str) -> unicode
     return placeholder(product_id, 'exposure_type')
 
 
@@ -193,7 +216,7 @@ get_exposure_type = multiple_implementations(
     'get_exposure_type',
     _get_exposure_type,
     _get_exposure_type_placeholder
-)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
+)  # type: Callable[[List[Dict[str, Any]], str, str], unicode]
 """
 Return text for the ``<exposure_type />`` XML element.
 """
@@ -215,8 +238,8 @@ def _get_filter_name(card_dicts, instrument, product_name):
         else:
             return '%s+%s' % (filtnam1, filtnam2)
     elif instrument == 'acs':
-        filter1 = card_dicts[0]['FILTER1']
-        filter2 = card_dicts[0]['FILTER2']
+        filter1 = card_dicts[0]['FILTER1'].strip()
+        filter2 = card_dicts[0]['FILTER2'].strip()
         if filter1.startswith('CLEAR'):
             if filter2.startswith('CLEAR'):
                 return 'CLEAR'
@@ -252,7 +275,10 @@ Return text for the ``<filter_name />`` XML element.
 ##############################
 
 def _get_fine_guidance_system_lock_type(card_dicts, product_id):
-    return card_dicts[0]['FGSLOCK']
+    try:
+        return card_dicts[0]['FGSLOCK']
+    except KeyError:
+        return 'UNK'
 
 
 def _get_fine_guidance_system_lock_type_placeholder(card_dicts, product_id):
@@ -276,7 +302,10 @@ Return text for the ``<fine_guidance_system_lock_type />`` XML element.
 
 def _get_gain_mode_id(card_dicts, instrument, product_id):
     # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
-    atodgain = card_dicts[0]['ATODGAIN']
+    try:
+        atodgain = card_dicts[0]['ATODGAIN']
+    except KeyError:
+        return 'N/A'
     if instrument == 'acs':
         return str(atodgain)
     elif instrument == 'wfpc2':
@@ -300,6 +329,23 @@ Return text for the ``<gain_mode_id />`` XML element.
 
 
 ##############################
+# get_gyroscope_mode
+##############################
+
+def _get_gyroscope_mode(card_dicts, product_id):
+    return card_dicts[0]['GYROMODE']
+
+def _get_gyroscope_mode_placeholder(card_dicts, product_id):
+    return placeholder(product_id, 'gyroscope_mode')
+
+get_gyroscope_mode  = multiple_implementations(
+    'get_gyroscope_mode',
+    _get_gyroscope_mode,
+    _get_gyroscope_mode_placeholder
+)  # type: Callable[[List[Dict[str, Any]], unicode], unicode]
+
+
+##############################
 # get_hst_pi_name
 ##############################
 
@@ -307,8 +353,11 @@ def _get_hst_pi_name(card_dicts, product_id):
     # type: (List[Dict[str, Any]], unicode) -> unicode
     pr_inv_l = card_dicts[0]['PR_INV_L']
     pr_inv_f = card_dicts[0]['PR_INV_F']
-    pr_inv_m = card_dicts[0]['PR_INV_M']
-    return '%s, %s %s' % (pr_inv_l, pr_inv_f, pr_inv_m)
+    try:
+        pr_inv_m = card_dicts[0]['PR_INV_M']
+        return '%s, %s %s' % (pr_inv_l, pr_inv_f, pr_inv_m)
+    except KeyError:
+        return '%s, %s' % (pr_inv_l, pr_inv_f)
 
 
 def _get_hst_pi_name_placeholder(card_dicts, product_id):
@@ -380,9 +429,15 @@ Return text for the ``<hst_target_name />`` XML element.
 
 def _get_instrument_mode_id(card_dicts, instrument, product_id):
     # type: (List[Dict[str, Any]], unicode, unicode) -> unicode
+    if instrument == 'acs':
+        try:
+            return card_dicts[0]['OBSMODE']
+        except KeyError:
+            return 'UNK'
     if instrument == 'wfpc2':
         return card_dicts[0]['MODE']
     else:
+        assert (instrument == 'wfc3')
         return card_dicts[0]['OBSMODE']
 
 
@@ -428,10 +483,11 @@ Return text for the ``<observation_type />`` XML element.
 """
 
 
+
 ##############################
 
 def get_hst_parameters(card_dicts, instrument, product_id):
-    # type: (List[Dict[str, Any]], unicode, unicode) -> NodeBuilder
+    # type: (List[Dict[str, Any]], str, str) -> NodeBuilder
     """Return an ``<hst:HST />`` XML element."""
     d = {'stsci_group_id': known_placeholder(product_id, 'stsci_group_id'),
          'hst_proposal_id': get_hst_proposal_id(card_dicts, product_id),
@@ -440,12 +496,12 @@ def get_hst_parameters(card_dicts, instrument, product_id):
          'aperture_name': get_aperture_name(card_dicts, instrument,
                                             product_id),
          'exposure_duration': get_exposure_duration(card_dicts, product_id),
-         'exposure_type': get_exposure_type(card_dicts, product_id),
+         'exposure_type':
+             get_exposure_type(card_dicts, instrument, product_id),
          'filter_name': get_filter_name(card_dicts, instrument, product_id),
          'fine_guidance_system_lock_type':
              get_fine_guidance_system_lock_type(card_dicts, product_id),
-         'gyroscope_mode': known_placeholder(product_id,
-                                             'gyroscope_mode'),
+         'gyroscope_mode': get_gyroscope_mode(card_dicts, product_id),
          'instrument_mode_id': get_instrument_mode_id(card_dicts,
                                                       instrument,
                                                       product_id),
@@ -460,15 +516,17 @@ def get_hst_parameters(card_dicts, instrument, product_id):
              'observation_type':
                  get_observation_type(card_dicts, instrument, product_id),
              'repeat_exposure_count': get_repeat_exposure_count(product_id),
-             'subarray_flag': get_subarray_flag(product_id)})
+             'subarray_flag':
+                 get_subarray_flag(card_dicts, instrument, product_id)})
     elif instrument == 'wfpc2':
         parameters_instrument = parameters_wfpc2(
             {'bandwidth': get_bandwidth(card_dicts, instrument, product_id),
              'center_filter_wavelength':
                  get_center_filter_wavelength(card_dicts,
-                                              instrument, product_id),
+                                              instrument,
+                                              product_id),
              'targeted_detector_id':
-                 get_targeted_detector_id(product_id, instrument),
+                 get_targeted_detector_id(card_dicts[0]['APERTURE']),
              'gain_mode_id': get_gain_mode_id(card_dicts, instrument,
                                               product_id),
              'pc1_flag': get_pc1_flag(product_id, instrument),
@@ -485,7 +543,7 @@ def get_hst_parameters(card_dicts, instrument, product_id):
              'repeat_exposure_count':
                  get_repeat_exposure_count(product_id),
              'subarray_flag':
-                 get_subarray_flag(product_id)})
+                 get_subarray_flag(card_dicts, instrument, product_id)})
     else:
         assert False, 'Bad instrument value: %s' % instrument
 

@@ -5,7 +5,7 @@ from datetime import date
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.DocumentProductLabelXml \
-    import make_citation_information, make_document_edition, make_label
+    import make_doc_citation_information, make_document_edition, make_label
 from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
@@ -38,7 +38,7 @@ def make_document_product_label(bundle_db,
         'product_vid': product_vid,
         'title': title,
         'publication_date': publication_date,
-        'Citation_Information': make_citation_information(
+        'Citation_Information': make_doc_citation_information(
             bundle_db,
             lidvid_to_lid(bundle.lidvid),  # only a placeholder tag
             proposal_id),

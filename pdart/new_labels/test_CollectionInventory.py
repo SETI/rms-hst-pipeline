@@ -2,7 +2,7 @@ import unittest
 
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_labels.CollectionInventory import make_collection_inventory
-from pdart.new_labels.Utils import golden_file_contents
+from pdart.new_labels.Utils import assert_golden_file_equal
 
 _BUNDLE_LIDVID = 'urn:nasa:pds:hst_09059::1.3'
 _COLLECTION_LIDVID = 'urn:nasa:pds:hst_09059:data_acs_raw::1.4'
@@ -25,6 +25,7 @@ class Test_CollectionInventory(unittest.TestCase):
         inventory = make_collection_inventory(self.db,
                                               _COLLECTION_LIDVID)
 
-        expected_inventory = golden_file_contents(
-            'test_CollectionInventory.golden.txt')
-        self.assertEqual(expected_inventory, inventory)
+        assert_golden_file_equal(self,
+                                 'test_CollectionInventory.golden.txt',
+                                 inventory,
+                                 is_inventory=True)

@@ -65,7 +65,7 @@ _citation_information_template = interpret_template("""<Citation_Information>
 </Citation_Information>""")  # type: NodeBuilderTemplate
 
 
-def make_citation_information(bundle_db, bundle_lid, proposal_id):
+def make_doc_citation_information(bundle_db, bundle_lid, proposal_id):
     # type: (BundleDB, str, int) -> NodeBuilder
     """
     Create a ``<Citation_Information />`` element for the proposal ID.

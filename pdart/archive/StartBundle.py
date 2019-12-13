@@ -10,6 +10,7 @@ import picmaker  # need to precede this with 'import pdart.add_pds_tools'
 from fs.osfs import OSFS
 from typing import TYPE_CHECKING
 
+from Citation_Information import Citation_Information
 from pdart.documents.Downloads import download_product_documents
 from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.V1FS import V1FS
@@ -244,8 +245,8 @@ def _lidvid_to_dir(lidvid):
     return lid_to_dir(get_lid(str(lidvid)))
 
 
-def create_pds4_labels(bundle_id, bundle_db, archive_dir):
-    # type: (int, BundleDB, unicode) -> None
+def create_pds4_labels(bundle_id, bundle_db, info, archive_dir):
+    # type: (int, BundleDB, Citation_Information, unicode) -> None
     archive_fs = V1FS(archive_dir)
 
     class _CreateLabelsWalk(BundleWalk):
@@ -260,7 +261,7 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 return
             bundle_lidvid = str(bundle.lidvid)
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
-            label = make_bundle_label(self.db, False)
+            label = make_bundle_label(self.db, info, False)
             label_filename = 'bundle.xml'
             label_filepath = fs.path.join(
                 bundle_dir_path,
@@ -291,7 +292,8 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 collection_lidvid
                 )
 
-            label = make_collection_label(self.db, collection_lidvid, False)
+            label = make_collection_label(self.db, info,
+                                          collection_lidvid, False)
             label_filename = get_collection_label_name(self.db,
                                                        collection_lidvid)
             label_filepath = fs.path.join(
@@ -442,6 +444,8 @@ def start_bundle(download_dir, bundle, archive_dir):
         docs = download_product_documents(bundle_id, documents_dir)
         create_document_collection(bundle_id, bundle_db, archive_dir,
                                    documents_dir, docs)
+        # TODO Fix this!!!
+        info = Citation_Information.create_test_citation_information()
     finally:
         shutil.rmtree(documents_dir)
-    create_pds4_labels(bundle_id, bundle_db, archive_dir)
+    create_pds4_labels(bundle_id, bundle_db, info, archive_dir)

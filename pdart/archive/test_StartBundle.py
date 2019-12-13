@@ -7,6 +7,7 @@ import fs.path
 from fs.osfs import OSFS
 from typing import TYPE_CHECKING
 
+from Citation_Information import Citation_Information
 from pdart.archive.StartBundle import _INITIAL_VID, \
     _create_lidvid_from_parts, bundle_to_int, copy_files_from_download, \
     create_browse_products, create_bundle_db, create_document_collection, \
@@ -46,6 +47,7 @@ def _list_rel_filepaths(root_dir):
 class TestStartBundle(unittest.TestCase):
     def setUp(self):
         self.archive_dir = tempfile.mkdtemp()
+        self.info = Citation_Information.create_test_citation_information()
 
     def tearDown(self):
         shutil.rmtree(self.archive_dir)
@@ -226,7 +228,7 @@ class TestStartBundle(unittest.TestCase):
                 documents_dir,
                 _DOC_FILES)
 
-            create_pds4_labels(13012, db, self.archive_dir)
+            create_pds4_labels(13012, db, self.info, self.archive_dir)
 
             # Test that all the labels exist
             vfs = V1FS(self.archive_dir)

@@ -5,7 +5,7 @@ Functionality to build a collection label using a SQLite database.
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.CitationInformation \
-    import make_placeholder_citation_information
+    import make_citation_information
 from pdart.new_labels.CollectionInventory import get_collection_inventory_name
 from pdart.new_labels.CollectionLabelXml import make_label, \
     make_document_collection_title, make_non_document_collection_title
@@ -13,6 +13,7 @@ from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
 if TYPE_CHECKING:
+    from Citation_Information import Citation_Information
     from pdart.new_db.BundleDB import BundleDB
 
 
@@ -29,8 +30,8 @@ def get_collection_label_name(bundle_db, collection_lidvid):
     return collection_label_name
 
 
-def make_collection_label(bundle_db, collection_lidvid, verify):
-    # type: (BundleDB, str, bool) -> unicode
+def make_collection_label(bundle_db, info, collection_lidvid, verify):
+    # type: (BundleDB, Citation_Information, str, bool) -> unicode
     """
     Create the label text for the collection having this LIDVID using
     the bundle database.  If verify is True, verify the label against
@@ -60,8 +61,8 @@ def make_collection_label(bundle_db, collection_lidvid, verify):
         'collection_vid': collection_vid,
         'title': title,
         'proposal_id': str(proposal_id),
-        'Citation_Information': make_placeholder_citation_information(
-            collection_lid),
+        'Citation_Information':
+            make_citation_information(info, collection_lid),
         'inventory_name': inventory_name
     }).toxml()
 

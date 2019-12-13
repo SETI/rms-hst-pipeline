@@ -45,7 +45,7 @@ mypy : mypy-venv
 	grep -v "Name 'xml.sax.ContentHandler' is not defined"
 
 raw-mypy : mypy-venv
-	source mypy-venv/bin/activate && mypy --py2 pdart
+	source mypy-venv/bin/activate && mypy --py2 pdart Citation_Information
 
 mypy-venv : requirements-mypy.txt
 	virtualenv --no-site-packages -p python3 $@

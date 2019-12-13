@@ -7,6 +7,7 @@ from pdart.new_labels.Placeholders import placeholder, placeholder_int
 from pdart.xml.Templates import interpret_document_template, interpret_template
 
 if TYPE_CHECKING:
+    from typing import Dict
     from pdart.xml.Templates import DocTemplate, NodeBuilderTemplate
 
 hst = interpret_template("""<hst:HST>
@@ -91,13 +92,38 @@ wrapper = interpret_document_template(
 # Not XML, but placeholder code common to both the database- and the
 # read-and-parse-FITS-file code.
 
-def get_targeted_detector_id(fits_product_lidvid_id, instrument):
-    # type: (unicode, unicode) -> unicode
+def get_targeted_detector_id(aperture):
+    # type: (unicode) -> unicode
     """
     Return placeholder text for the ``<targeted_detector_id />`` XML
     element.
     """
-    return placeholder(fits_product_lidvid_id, 'targeted_detector_id')
+    general_cases = {u'PC1': 'PC1',
+                     'WF2': 'WF2',
+                     'WF3': 'WF3',
+                     'WF4': 'WF4',
+                     'ALL': 'WF3',
+                     'W2': 'WF2',
+                     'W3': 'WF3',
+                     'W4': 'WF4'}
+
+    # quad or polarizing filters
+    special_cases = {u'FQUVN33': 'WF2',
+                     'POLQN33': 'WF2',
+                     'POLQN18': 'WF2',
+                     'POLQP15P': 'PC1',
+                     'POLQP15W': 'WF2',
+                     'FQCH4N33': 'WF2',
+                     'FQCH4N15': 'PC1',
+                     'FQCH4P15': 'PC1',
+                     'FQCH4N15': 'WF3',
+                     'F160BN15': 'WF3'}
+
+    # union the two dictionaries and try a lookup
+    all_cases = general_cases
+    all_cases.update(special_cases)
+
+    return all_cases[aperture]
 
 
 def get_pc1_flag(fits_product_lidvid_id, instrument):

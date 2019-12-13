@@ -1,8 +1,10 @@
 import unittest
 
+from Citation_Information import Citation_Information
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_labels.BundleLabel import make_bundle_label
-from pdart.new_labels.Utils import golden_file_contents
+from pdart.new_labels.Utils import assert_golden_file_equal
+
 
 _BUNDLE_LIDVID = 'urn:nasa:pds:hst_09059::1.3'
 _COLLECTION_LIDVID = 'urn:nasa:pds:hst_09059:data_acs_raw::1.2'
@@ -19,9 +21,9 @@ class Test_BundleLabel(unittest.TestCase):
                                                _BUNDLE_LIDVID)
 
         self.db.create_fits_product(_FITS_PRODUCT_LIDVID, _COLLECTION_LIDVID)
+        self.info = Citation_Information.create_test_citation_information()
 
     def test_make_bundle_label(self):
         # type: () -> None
-        label = make_bundle_label(self.db, True)
-        expected = golden_file_contents('test_BundleLabel.golden.xml')
-        self.assertEqual(expected, label)
+        label = make_bundle_label(self.db, self.info, True)
+        assert_golden_file_equal(self, 'test_BundleLabel.golden.xml', label)
