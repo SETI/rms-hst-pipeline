@@ -11,16 +11,15 @@ from pdart.pds4.HstFilename import HstFilename
 # If you want to import a supercomponent module, do it within a
 # function or method.
 if TYPE_CHECKING:
-    from typing import Iterator
+    from typing import Iterator, List, Optional
     from fs.base import FS
-    import pdart.pds4.Archive
     import pdart.pds4.Bundle
     import pdart.pds4.Collection
     import pdart.pds4.LID
 
 
 def _find_product_file(fs, visit_dir, product_id):
-    # type: (FS, unicode, unicode) -> unicode
+    # type: (FS, unicode, unicode) -> Optional[unicode]
     """
     Find a file by name in a directory or one of its subdirectories
     and return the relative filepath.  Assume the directory path is

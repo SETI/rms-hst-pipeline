@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from typing import Set
     from pdart.fs.VersionView import VersionView
     from pdart.pds4.LID import LID
+    from pdart.pds4.LIDVID import LIDVID
 
 
 class FSDelta(object):

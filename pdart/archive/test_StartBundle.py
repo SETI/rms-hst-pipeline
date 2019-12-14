@@ -7,6 +7,7 @@ import fs.path
 from fs.osfs import OSFS
 from typing import TYPE_CHECKING
 
+from Citation_Information import Citation_Information
 from pdart.archive.StartBundle import _INITIAL_VID, \
     _create_lidvid_from_parts, bundle_to_int, copy_files_from_download, \
     create_browse_products, create_bundle_db, create_document_collection, \
@@ -21,7 +22,7 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
-    pass
+    from typing import List, Set
 
 _DOC_FILES = {u'phase2.pro', u'phase2.pdf', u'phase2.apt'}  # type: Set[unicode]
 
@@ -46,15 +47,13 @@ def _list_rel_filepaths(root_dir):
 class TestStartBundle(unittest.TestCase):
     def setUp(self):
         self.archive_dir = tempfile.mkdtemp()
+        self.info = Citation_Information.create_test_citation_information()
 
     def tearDown(self):
         shutil.rmtree(self.archive_dir)
 
     def test_bundle_to_int(self):
         self.assertEqual(bundle_to_int('hst_01234'), 1234)
-        self.assertFalse(bundle_to_int('george'))
-        self.assertFalse(bundle_to_int('hst_0000'))
-        self.assertFalse(bundle_to_int('hst_000000'))
 
     def test_copy_files_from_download(self):
         # type: () -> None
@@ -229,7 +228,7 @@ class TestStartBundle(unittest.TestCase):
                 documents_dir,
                 _DOC_FILES)
 
-            create_pds4_labels(13012, db, self.archive_dir)
+            create_pds4_labels(13012, db, self.info, self.archive_dir)
 
             # Test that all the labels exist
             vfs = V1FS(self.archive_dir)

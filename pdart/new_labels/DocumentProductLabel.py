@@ -5,19 +5,21 @@ from datetime import date
 from typing import TYPE_CHECKING
 
 from pdart.new_labels.DocumentProductLabelXml \
-    import make_citation_information, make_document_edition, make_label
+    import make_doc_citation_information, make_document_edition, make_label
 from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
 if TYPE_CHECKING:
+    from Citation_Information import Citation_Information
     from pdart.new_db.BundleDB import BundleDB
 
 
 def make_document_product_label(bundle_db,
+                                info,
                                 document_product_lidvid,
                                 verify,
                                 publication_date=None):
-    # type: (BundleDB, str, bool, str) -> unicode
+    # type: (BundleDB, Citation_Information, str, bool, str) -> unicode
     """
     Create the label text for the document product in the bundle
     having this :class:`~pdart.pds4.LIDVID` using the database
@@ -38,10 +40,7 @@ def make_document_product_label(bundle_db,
         'product_vid': product_vid,
         'title': title,
         'publication_date': publication_date,
-        'Citation_Information': make_citation_information(
-            bundle_db,
-            lidvid_to_lid(bundle.lidvid),  # only a placeholder tag
-            proposal_id),
+        'Citation_Information': make_doc_citation_information(info),
 
         # TODO don't the arguments to make_document_edition() need to not
         # be hard-coded?

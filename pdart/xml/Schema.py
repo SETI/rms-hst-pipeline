@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING
 from pdart.xml.Pds4Version import HST_SHORT_VERSION, PDS4_SHORT_VERSION
 
 if TYPE_CHECKING:
-    from typing import Sequence, Tuple, Union
+    from typing import List, Optional, Sequence, Tuple, Union
 
     _Cmd = Union[str, Sequence[str]]
 
@@ -62,7 +62,7 @@ def run_subprocess(cmd, stdin=None):
 def _xsd_validator_schema(filepath,
                           stdin=None,
                           schemas=[PDS_XML_SCHEMA, HST_XML_SCHEMA]):
-    # type: (unicode, unicode, List[str]) -> Tuple[int, unicode, unicode]
+    # type: (Optional[unicode], Optional[unicode], List[str]) -> Tuple[int, unicode, unicode]
     """
     Run XsdValidator.jar on the XML at the filepath (ignored if stdin
     is not None) or on stdin, validating against the schemas.  Returns
@@ -98,7 +98,7 @@ def _xmllint_schema(filepath, stdin=None, schema=PDS_XML_SCHEMA):
 
 
 def xml_schema_failures(filepath, stdin=None, schema=PDS_XML_SCHEMA):
-    # type: (unicode, unicode, str) -> unicode
+    # type: (Optional[unicode], unicode, str) -> Optional[unicode]
     """
     Run an XML Schema validator on the XML at the filepath (ignored if
     stdin is not None) or in stdin, validating against the schema.
@@ -133,13 +133,14 @@ def probatron(filepath, schema=PDS_SCHEMATRON_SCHEMA):
 
 
 def probatron_with_stdin(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
-    # type: (unicode, unicode, str) -> Tuple[int, unicode, unicode]
+    # type: (Optional[unicode], Optional[unicode], str) -> Tuple[int, unicode, unicode]
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns a
     triple of exit_code, stderr and stdout.
     """
     if stdin is None:
+        assert filepath
         return probatron(filepath, schema)
     else:
         (handle, filepath) = tempfile.mkstemp()
@@ -157,7 +158,7 @@ def probatron_with_stdin(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
 def probatron_with_svrl_result(filepath,
                                stdin=None,
                                schema=PDS_SCHEMATRON_SCHEMA):
-    # type: (unicode, unicode, str) -> xml.dom.minidom.Document
+    # type: (Optional[unicode], Optional[unicode], str) -> xml.dom.minidom.Document
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns the
@@ -183,7 +184,7 @@ def svrl_has_failures(svrl):
 
 
 def schematron_failures(filepath, stdin=None, schema=PDS_SCHEMATRON_SCHEMA):
-    # type: (unicode, unicode, str) -> unicode
+    # type: (Optional[unicode], Optional[unicode], str) -> Optional[unicode]
     """
     Run probatron on the XML at the filepath (ignored if stdin is not
     None) or in stdin, validating against the schema.  Returns None if

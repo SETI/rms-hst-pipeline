@@ -1,4 +1,4 @@
-.PHONY : aq clean java-requirement mtb save-reqs
+.PHONY : aq clean java-requirement mtb mypy raw-mypy  save-reqs
 
 # test: I should also run mypy
 test : venv java-requirement
@@ -33,7 +33,22 @@ save-reqs :
 # To use/run mypy
 #
 mypy : mypy-venv
-	source mypy-venv/bin/activate && mypy --py2 .
+	source mypy-venv/bin/activate && mypy --py2 pdart | \
+	grep -v julian | \
+	grep -v picmaker | \
+	grep -v "#missing-imports" | \
+	grep -v "No library stub file for standard library module 'xml.dom" |\
+	grep -v "No library stub file for module 'numpy" | \
+	grep -v "No library stub file for module 'sqlalchemy" | \
+	grep -v 'Node? has no attribute ' | \
+	grep -v "Cannot find module named 'astropy" | \
+	grep -v "Cannot find module named 'astroquery" | \
+	grep -v "Cannot find module named 'hypothesis" | \
+	grep -v "Cannot find module named 'pyfits'" | \
+	grep -v "Name 'xml.sax.ContentHandler' is not defined"
+
+raw-mypy : mypy-venv
+	source mypy-venv/bin/activate && mypy --py2 pdart Citation_Information
 
 mypy-venv : requirements-mypy.txt
 	virtualenv --no-site-packages -p python3 $@

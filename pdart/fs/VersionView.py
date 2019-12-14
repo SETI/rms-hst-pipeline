@@ -72,7 +72,7 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
                         raise ResourceNotFound(path)
                 parts = iteratepath(legacy_path[1])
                 parts[-1] = new_segment
-                lid = LID.create_from_parts(parts)
+                lid = LID.create_from_parts([str(part) for part in parts])
                 lidvid = LIDVID.create_from_lid_and_vid(lid, VID(version_id))
                 return 'd', lidvid_to_dir(lidvid)
             else:
@@ -152,6 +152,7 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
             bundle_subdirs = read_subdir_versions_from_directory(
                 self._legacy_fs, lidvid_to_dir(bundle_lidvid)
             )
+            assert lid.collection_id
             return VID(bundle_subdirs[lid.collection_id])
         elif lid.is_product_lid():
             collection_lid = lid.parent_lid()
@@ -161,15 +162,16 @@ class VersionView(ReadOnlyView, ISingleVersionBundleFS):
                 collection_vid)
             collection_subdirs = read_subdir_versions_from_directory(
                 self._legacy_fs, lidvid_to_dir(collection_lidvid))
+            assert lid.product_id
             return VID(collection_subdirs[lid.product_id])
         else:
             assert False, 'impossible case: %r' % lid
 
 
-def _layered():
-    from fs.osfs import OSFS
-    from pdart.fs.InitialVersionedView import InitialVersionedView
-    osfs = OSFS('/Users/spaceman/Desktop/Archive/hst_11972')
-    ivv = InitialVersionedView('hst_11972', osfs)
-    vv = VersionView(LIDVID('urn:nasa:pds:hst_11972::1'), ivv)
-    return vv
+# def _layered():
+#     from fs.osfs import OSFS
+#     from pdart.fs.InitialVersionedView import InitialVersionedView
+#     osfs = OSFS('/Users/spaceman/Desktop/Archive/hst_11972')
+#     ivv = InitialVersionedView('hst_11972', osfs)
+#     vv = VersionView(LIDVID('urn:nasa:pds:hst_11972::1'), ivv)
+#     return vv

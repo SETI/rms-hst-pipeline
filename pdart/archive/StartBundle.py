@@ -10,6 +10,7 @@ import picmaker  # need to precede this with 'import pdart.add_pds_tools'
 from fs.osfs import OSFS
 from typing import TYPE_CHECKING
 
+from Citation_Information import Citation_Information
 from pdart.documents.Downloads import download_product_documents
 from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.V1FS import V1FS
@@ -32,6 +33,7 @@ from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
+    from typing import List, Set
     from pdart.new_db.BundleDB import BundleDB
     from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, Bundle, \
         Collection, DocumentCollection, DocumentProduct, FitsFile, \
@@ -57,7 +59,7 @@ def bundle_to_int(bundle_id):
     if res:
         return int(res.group(1))
     else:
-        return None
+        raise ValueError('bundle_to_int(%s)' % bundle_id)
 
 
 def copy_files_from_download(download_dir, bundle, archive_dir):
@@ -243,8 +245,8 @@ def _lidvid_to_dir(lidvid):
     return lid_to_dir(get_lid(str(lidvid)))
 
 
-def create_pds4_labels(bundle_id, bundle_db, archive_dir):
-    # type: (int, BundleDB, unicode) -> None
+def create_pds4_labels(bundle_id, bundle_db, info, archive_dir):
+    # type: (int, BundleDB, Citation_Information, unicode) -> None
     archive_fs = V1FS(archive_dir)
 
     class _CreateLabelsWalk(BundleWalk):
@@ -259,7 +261,7 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 return
             bundle_lidvid = str(bundle.lidvid)
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
-            label = make_bundle_label(self.db, False)
+            label = make_bundle_label(self.db, info, False)
             label_filename = 'bundle.xml'
             label_filepath = fs.path.join(
                 bundle_dir_path,
@@ -290,7 +292,8 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 collection_lidvid
                 )
 
-            label = make_collection_label(self.db, collection_lidvid, False)
+            label = make_collection_label(self.db, info,
+                                          collection_lidvid, False)
             label_filename = get_collection_label_name(self.db,
                                                        collection_lidvid)
             label_filepath = fs.path.join(
@@ -319,12 +322,14 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
                 return
             product_lidvid = str(document_product.lidvid)
             label = make_document_product_label(self.db,
+                                                info,
                                                 product_lidvid,
                                                 False,
                                                 None)
             # TODO publication date left blank
 
             label_base = LIDVID(product_lidvid).lid().product_id
+            assert label_base
             label_filename = label_base + '.xml'
             product_dir_path = _lidvid_to_dir(product_lidvid)
             label_filepath = fs.path.join(
@@ -383,12 +388,44 @@ def create_pds4_labels(bundle_id, bundle_db, archive_dir):
 
     _CreateLabelsWalk(bundle_db).walk()
 
+def _placeholder_citation_information(bundle_id):
+    return CitationInformation(
+        placeholder(bundle_id, 'filename'),
+        placeholder(bundle_id, 'propno'),
+        placeholder(bundle_id, 'category'),
+        placeholder(bundle_id, 'cycle'),
+        placeholder(bundle_id, 'authors'),
+        placeholder(bundle_id, 'title'),
+        placeholder(bundle_id, 'year'),
+        placeholder(bundle_id, 'author_list'),
+        placeholder(bundle_id, 'editor_list'),
+        placeholder(bundle_id, 'publication_year'),
+        placeholder(bundle_id, 'keyword'),
+        placeholder(bundle_id, 'description'))
+
+
+def _create_citation_info(document_dir, document_files, id):
+    # type: (unicode, Set[unicode], unicode) -> Citation_Information
+
+    # We sort only to make '.apt' appear before '.pro' since the
+    # algorithm for '.apt' is more reliable.
+    for basename in sorted(document_files):
+        _, ext = fs.path.splitext(basename)
+        if ext.lower() in ['.apt', '.pro']:
+            os_filepath = fs.path.join(document_dir, basename)
+            return Citation_Information.create_from_file(os_filepath)
+
+    # If you got here, there was no '.apt' or '.pro' file and so we don't
+    # know how to make Citation_Information.
+    return _placeholder_citation_information(id)
+
 
 def create_document_collection(bundle_id, bundle_db, archive_dir,
                                document_dir, document_files):
-    # type: (int, BundleDB, unicode, unicode, Set[unicode]) -> None
+    # type: (int, BundleDB, unicode, unicode, Set[unicode]) -> Citation_Information
     if not document_files:
-        return
+        return _placeholder_citation_information(bundle_id)
+
     archive_fs = V1FS(archive_dir)
     bundle_part = 'hst_%05d' % bundle_id
     bundle_lidvid = _create_lidvid_from_parts([bundle_part])
@@ -422,6 +459,10 @@ def create_document_collection(bundle_id, bundle_db, archive_dir,
     doc_fs = OSFS(document_dir)
     fs.copy.copy_dir(doc_fs, u'/', archive_fs, document_product_dir)
 
+    return _create_citation_info(document_dir,
+                                 document_files,
+                                 str(bundle_lidvid))
+
 
 def start_bundle(download_dir, bundle, archive_dir):
     # type: (unicode, unicode, unicode) -> None
@@ -438,8 +479,8 @@ def start_bundle(download_dir, bundle, archive_dir):
     documents_dir = tempfile.mkdtemp()
     try:
         docs = download_product_documents(bundle_id, documents_dir)
-        create_document_collection(bundle_id, bundle_db, archive_dir,
-                                   documents_dir, docs)
+        info = create_document_collection(bundle_id, bundle_db, archive_dir,
+                                          documents_dir, docs)
     finally:
         shutil.rmtree(documents_dir)
-    create_pds4_labels(bundle_id, bundle_db, archive_dir)
+    create_pds4_labels(bundle_id, bundle_db, info, archive_dir)

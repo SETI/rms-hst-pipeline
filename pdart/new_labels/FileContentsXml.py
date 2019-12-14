@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from pdart.xml.Templates import interpret_template
 
 if TYPE_CHECKING:
+    from typing import Dict
     from pdart.xml.Templates import NodeBuilderTemplate
 
 # For product labels: produces the fragment of the File node that
@@ -18,8 +19,7 @@ AXIS_NAME_TABLE = {
     1: 'Line',
     2: 'Sample',
     3: 'Band'
-}
-# type: Dict[int, unicode]
+}  # type: Dict[int, unicode]
 
 
 BITPIX_TABLE = {
@@ -30,16 +30,14 @@ BITPIX_TABLE = {
     64: 'SignedMSB8',
     -32: 'IEEE754MSBSingle',
     -62: 'IEEE754MSBDouble'
-}
-# type: Dict[int, unicode]
+}  # type: Dict[int, unicode]
 
 
 axis_array = interpret_template("""<Axis_Array>
 <axis_name><NODE name="axis_name"/></axis_name>
 <elements><NODE name="elements"/></elements>
 <sequence_number><NODE name="sequence_number"/></sequence_number>
-</Axis_Array>""")
-# type: NodeBuilderTemplate
+</Axis_Array>""")  # type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Axis_Array />``
 XML element.
@@ -51,8 +49,7 @@ header_contents = interpret_template("""<Header>
 <object_length unit="byte"><NODE name="object_length"/></object_length>
 <parsing_standard_id>FITS 3.0</parsing_standard_id>
 <description>Global FITS Header</description>
-</Header>""")
-# type: NodeBuilderTemplate
+</Header>""")  # type: NodeBuilderTemplate
 """
 An interpreted node template to create a ``<Header />``
 XML element.
@@ -64,8 +61,7 @@ data_1d_contents = interpret_template("""<Array>
 <axis_index_order>Last Index Fastest</axis_index_order>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
-</Array>""")
-# type: NodeBuilderTemplate
+</Array>""")  # type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Array />``
 XML element.
@@ -77,16 +73,15 @@ data_2d_contents = interpret_template("""<Array_2D_Image>
 <axis_index_order>Last Index Fastest</axis_index_order>
 <NODE name="Element_Array" />
 <FRAGMENT name="Axis_Arrays" />
-</Array_2D_Image>""")
-# type: NodeBuilderTemplate
+</Array_2D_Image>""")  # type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Array_2D_Image />``
 XML element.
 """
 
 element_array = interpret_template("""<Element_Array>
-<data_type><NODE name="data_type" /></data_type></Element_Array>""")
-# type: NodeBuilderTemplate
+<data_type><NODE name="data_type" /></data_type></Element_Array>"""
+)  # type: NodeBuilderTemplate
 """
 An interpreted node template to create an ``<Element_Array />``
 XML element.

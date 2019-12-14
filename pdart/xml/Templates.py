@@ -78,7 +78,7 @@ if TYPE_CHECKING:
     from typing import Any, Callable, Dict, List
     from xml.dom.minidom import Document, Text
     TemplateDict = Dict[str, Any]
-    Node = Text
+    Node = Any  # should be Text
     Frag = List[Text]
     NodeBuilder = Callable[[Document], Node]
     FragBuilder = Callable[[Document], Frag]

@@ -27,10 +27,6 @@ def pdart_lidvids():
 class TestLIDVID(unittest.TestCase):
     def test_init(self):
         # type: () -> None
-        # sanity-check
-        with self.assertRaises(Exception):
-            LIDVID(None)
-
         with self.assertRaises(Exception):
             LIDVID('::2.0')
         with self.assertRaises(Exception):

@@ -63,8 +63,9 @@ class HstFilename(object):
         after the first underscore up to the period before the 'fits'
         extension.
         """
-        return str(re.match(r'\A[^_]+_([^\.]+)\..*\Z',
-                            self._basename()).group(1))
+        match = re.match(r'\A[^_]+_([^\.]+)\..*\Z', self._basename())
+        assert match
+        return str(match.group(1))
 
     def visit(self):
         # type: () -> str

@@ -4,17 +4,18 @@ from typing import TYPE_CHECKING
 from pdart.new_labels.BundleLabelXml \
     import make_bundle_entry_member, make_label
 from pdart.new_labels.CitationInformation \
-    import make_placeholder_citation_information
+    import make_citation_information
 from pdart.new_labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import combine_nodes_into_fragment
 
 if TYPE_CHECKING:
+    from Citation_Information import Citation_Information
     from pdart.new_db.BundleDB import BundleDB
 
 
-def make_bundle_label(bundle_db, verify):
-    # type: (BundleDB, bool) -> unicode
+def make_bundle_label(bundle_db, info, verify):
+    # type: (BundleDB, Citation_Information, bool) -> unicode
     """
     Create the label text for the bundle in the bundle database using
     the database connection.  If verify is True, verify the label
@@ -33,8 +34,7 @@ def make_bundle_label(bundle_db, verify):
         'bundle_lid': lidvid_to_lid(bundle.lidvid),
         'bundle_vid': lidvid_to_vid(bundle.lidvid),
         'proposal_id': str(proposal_id),
-        'Citation_Information': make_placeholder_citation_information(
-            bundle_lid),
+        'Citation_Information': make_citation_information(info),
         'Bundle_Member_Entries': combine_nodes_into_fragment(
             reduced_collections)
     }).toxml()

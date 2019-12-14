@@ -6,7 +6,7 @@ from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
     from typing import Callable, List, Tuple
-    from pdart.new_db.SqlTables import BundleLabel, CollectionInventory, \
+    from pdart.new_db.SqlAlchTables import BundleLabel, CollectionInventory, \
         CollectionLabel, File, ProductLabel
 
     _LTD = Callable[[LIDVID], unicode]

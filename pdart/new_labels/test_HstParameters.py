@@ -6,7 +6,7 @@ from fs.path import basename
 from pdart.new_db.BundleDB import create_bundle_db_in_memory
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.new_labels.HstParameters import get_hst_parameters
-from pdart.new_labels.Utils import golden_file_contents, path_to_testfile
+from pdart.new_labels.Utils import assert_golden_file_equal, path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
 
@@ -33,10 +33,9 @@ class Test_HstParameters(unittest.TestCase):
         card_dicts = db.get_card_dictionaries(fits_product_lidvid,
                                               file_basename)
 
-        nb = get_hst_parameters(card_dicts, u'acs', fits_product_lidvid)
+        nb = get_hst_parameters(card_dicts, 'acs', fits_product_lidvid)
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str = nb(doc).toxml()
         str = pretty_print(str)
 
-        expected = golden_file_contents('test_HstParameters.golden.xml')
-        self.assertEqual(expected, str)
+        assert_golden_file_equal(self, 'test_HstParameters.golden.xml', str)

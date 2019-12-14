@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from pdart.new_db.SqlAlchTables import Card, Hdu
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Tuple
+    from typing import Any, Dict, List, Tuple
     from pdart.new_db.BundleDB import BundleDB
 
     # unfortunately, untyped

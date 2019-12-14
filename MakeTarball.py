@@ -28,7 +28,7 @@ def clean_dir(path):
     os.mkdir(path)
 
 
-def make_single_tarball():
+def make_single_tarball(temp_fs=None):
     clean_dir('/Users/spaceman/pdart/new-init-bundle')
 
     print 'starting the bundle'
@@ -51,11 +51,17 @@ def make_single_tarball():
     fs.copy.copy_fs(src, dfs)
     print 'created deliverable'
     print 'creating tarball'
-    with TarFS('hst_11187-1.0.tar.gz', write=True) as t:
-        fs.copy.copy_fs(tar_fs, t)
+
+    if temp_fs:
+        with TarFS('hst_11187-1.0.tar.gz', write=True, temp_fs=temp_fs) as t:
+            fs.copy.copy_fs(tar_fs, t)
+    else:
+        with TarFS('hst_11187-1.0.tar.gz', write=True) as t:
+            fs.copy.copy_fs(tar_fs, t)
+
     print 'created tarball'
 
-def make_one_of_many_tarballs(src_dir, dst_dir, proposal_id):
+def make_one_of_many_tarballs(src_dir, dst_dir, proposal_id, temp_fs=None):
     with temp_directory() as init_bundle_dir:
         bundle_name = 'hst_%05d' % proposal_id 
         print 'starting the bundle %s' % bundle_name
@@ -80,6 +86,9 @@ def make_one_of_many_tarballs(src_dir, dst_dir, proposal_id):
             print 'creating tarball for %s' % bundle_name
             target_filepath = fs.path.join(dst_dir,
                                            'hst_%05d-1.0.tar.gz' % proposal_id)
+            # TODO temp_fs is what you  need
+            # with TarFS(target_filepath,
+            #            write=True, temp_fs=None) as t:
             with TarFS(target_filepath, write=True) as t:
                 fs.copy.copy_fs(tar_fs, t)
             print 'created tarball for %s' % bundle_name

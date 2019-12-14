@@ -7,13 +7,13 @@ from pdart.new_labels.Placeholders import placeholder, placeholder_int
 from pdart.xml.Templates import interpret_document_template, interpret_template
 
 if TYPE_CHECKING:
+    from typing import Dict
     from pdart.xml.Templates import DocTemplate, NodeBuilderTemplate
 
 hst = interpret_template("""<hst:HST>
 <NODE name="parameters_general"/>
 <NODE name="parameters_instrument"/>
-</hst:HST>""")
-# type: NodeBuilderTemplate
+</hst:HST>""")  # type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:HST />``
 XML element.
@@ -37,8 +37,7 @@ parameters_general = interpret_template("""<hst:Parameters_General>
 </hst:instrument_mode_id>
   <hst:moving_target_flag><NODE name="moving_target_flag" />\
 </hst:moving_target_flag>
-</hst:Parameters_General>""")
-# type: NodeBuilderTemplate
+</hst:Parameters_General>""")  # type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_General />``
 XML element.
@@ -51,8 +50,7 @@ parameters_acs = interpret_template("""<hst:Parameters_ACS>
 <hst:repeat_exposure_count><NODE name="repeat_exposure_count" />\
 </hst:repeat_exposure_count>
 <hst:subarray_flag><NODE name="subarray_flag" /></hst:subarray_flag>
-</hst:Parameters_ACS>""")
-# type: NodeBuilderTemplate
+</hst:Parameters_ACS>""")  # type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_ACS />``
 XML element.
@@ -64,8 +62,7 @@ parameters_wfc3 = interpret_template("""<hst:Parameters_WFC3>
 <hst:repeat_exposure_count><NODE name="repeat_exposure_count" />\
 </hst:repeat_exposure_count>
 <hst:subarray_flag><NODE name="subarray_flag" /></hst:subarray_flag>
-</hst:Parameters_WFC3>""")
-# type: NodeBuilderTemplate
+</hst:Parameters_WFC3>""")  # type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_WFC3 />``
 XML element.
@@ -82,8 +79,7 @@ parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
 <hst:wf2_flag><NODE name="wf2_flag" /></hst:wf2_flag>
 <hst:wf3_flag><NODE name="wf3_flag" /></hst:wf3_flag>
 <hst:wf4_flag><NODE name="wf4_flag" /></hst:wf4_flag>
-</hst:Parameters_WFPC2>""")
-# type: NodeBuilderTemplate
+</hst:Parameters_WFPC2>""")  # type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_WFPC2 />``
 XML element.
@@ -96,17 +92,42 @@ wrapper = interpret_document_template(
 # Not XML, but placeholder code common to both the database- and the
 # read-and-parse-FITS-file code.
 
-def get_targeted_detector_id(fits_product_lidvid_id, instrument, header):
-    # type: (unicode, unicode, unicode) -> unicode
+def get_targeted_detector_id(aperture):
+    # type: (unicode) -> unicode
     """
     Return placeholder text for the ``<targeted_detector_id />`` XML
     element.
     """
-    return placeholder(fits_product_lidvid_id, 'targeted_detector_id')
+    general_cases = {u'PC1': 'PC1',
+                     'WF2': 'WF2',
+                     'WF3': 'WF3',
+                     'WF4': 'WF4',
+                     'ALL': 'WF3',
+                     'W2': 'WF2',
+                     'W3': 'WF3',
+                     'W4': 'WF4'}
+
+    # quad or polarizing filters
+    special_cases = {u'FQUVN33': 'WF2',
+                     'POLQN33': 'WF2',
+                     'POLQN18': 'WF2',
+                     'POLQP15P': 'PC1',
+                     'POLQP15W': 'WF2',
+                     'FQCH4N33': 'WF2',
+                     'FQCH4N15': 'PC1',
+                     'FQCH4P15': 'PC1',
+                     'FQCH4N15': 'WF3',
+                     'F160BN15': 'WF3'}
+
+    # union the two dictionaries and try a lookup
+    all_cases = general_cases
+    all_cases.update(special_cases)
+
+    return all_cases[aperture]
 
 
-def get_pc1_flag(fits_product_lidvid_id, instrument, header):
-    # type: (unicode, unicode, unicode) -> unicode
+def get_pc1_flag(fits_product_lidvid_id, instrument):
+    # type: (unicode, unicode) -> unicode
     """
     Return a placeholder integer for the ``<pc1_flag />`` XML element,
     noting the problem.
@@ -114,8 +135,8 @@ def get_pc1_flag(fits_product_lidvid_id, instrument, header):
     return placeholder_int(fits_product_lidvid_id, 'pc1_flag')
 
 
-def get_wf2_flag(fits_product_lidvid_id, instrument, header):
-    # type: (unicode, unicode, unicode) -> unicode
+def get_wf2_flag(fits_product_lidvid_id, instrument):
+    # type: (unicode, unicode) -> unicode
     """
     Return a placeholder integer for the ``<wf2_flag />`` XML element,
     noting the problem.
@@ -123,8 +144,8 @@ def get_wf2_flag(fits_product_lidvid_id, instrument, header):
     return placeholder_int(fits_product_lidvid_id, 'wf2_flag')
 
 
-def get_wf3_flag(fits_product_lidvid_id, instrument, header):
-    # type: (unicode, unicode, unicode) -> unicode
+def get_wf3_flag(fits_product_lidvid_id, instrument):
+    # type: (unicode, unicode) -> unicode
     """
     Return a placeholder integer for the ``<wf3_flag />`` XML element,
     noting the problem.
@@ -132,8 +153,8 @@ def get_wf3_flag(fits_product_lidvid_id, instrument, header):
     return placeholder_int(fits_product_lidvid_id, 'wf3_flag')
 
 
-def get_wf4_flag(fits_product_lidvid_id, instrument, header):
-    # type: (unicode, unicode, unicode) -> unicode
+def get_wf4_flag(fits_product_lidvid_id, instrument):
+    # type: (unicode, unicode) -> unicode
     """
     Return a placeholder integer for the ``<wf4_flag />`` XML element,
     noting the problem.

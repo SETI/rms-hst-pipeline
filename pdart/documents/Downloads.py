@@ -4,7 +4,7 @@ import urllib2
 import fs.path
 
 if TYPE_CHECKING:
-    from typing import List, Tuple
+    from typing import List, Set, Tuple
 
 
 def _retrieve_doc(url, filepath):
@@ -41,4 +41,5 @@ def download_product_documents(proposal_id, download_dir):
         filepath = fs.path.join(download_dir, basename)
         if _retrieve_doc(url, filepath):
             res.add(basename)
+
     return res

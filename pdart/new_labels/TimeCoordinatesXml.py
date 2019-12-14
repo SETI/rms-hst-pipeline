@@ -15,8 +15,7 @@ if TYPE_CHECKING:
 time_coordinates = interpret_template("""<Time_Coordinates>
       <start_date_time><NODE name="start_date_time"/></start_date_time>
       <stop_date_time><NODE name="stop_date_time"/></stop_date_time>
-    </Time_Coordinates>""")
-# type: NodeBuilderTemplate
+    </Time_Coordinates>""")  # type: NodeBuilderTemplate
 """
 An interpreted node builder template to create an ``<Time_Coordinates />``
 XML element.

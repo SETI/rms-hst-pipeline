@@ -9,6 +9,7 @@ from pdart.fs.FSPrimitives import Dir, FSPrimitives, File
 from pdart.pds4.HstFilename import HstFilename
 
 if TYPE_CHECKING:
+    from typing import Any, Dict, Optional
     import io
     from fs.base import FS
     from fs.info import Info
@@ -23,7 +24,7 @@ def _is_visit_dir(filename):
 
 
 def _visit_of(filename):
-    # type: (unicode) -> unicode
+    # type: (unicode) -> Optional[unicode]
     try:
         hf = HstFilename(filename)
         return 'visit_' + hf.visit()
@@ -281,7 +282,8 @@ class DeliverablePrimitives(FSPrimitives):
                                 self._visit_contents(path),
                                 self._no_visit_contents(path),
                                 self._doc_contents(path))
-        elif l_ is 3:
+        else:
+            assert(l_ is 3)
             product_dir_name = path_parts[2]
             v = _visit_of(product_dir_name)
             if v:
@@ -298,9 +300,10 @@ class DeliverablePrimitives(FSPrimitives):
                     else:
                         res[unicode(filename)] = Dir(self, child_path)
             return res
+            
 
     def get_file_handle(self, node, mode):
-        # type: (File_, str) -> io.IOBase
+        # type: (File_, str) -> Any
         base_path = _translate_path_to_base_path(node.path, _IS_FILE)
         return self.base_fs.openbin(base_path, mode)
 

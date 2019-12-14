@@ -1,8 +1,12 @@
+from typing import TYPE_CHECKING
 import unittest
 import xml.dom
 
 from pdart.rules.ExceptionInfo import ExceptionInfo, GroupedExceptionInfo, \
     SingleExceptionInfo
+
+if TYPE_CHECKING:
+    from typing import List
 
 
 class TestSingleExceptionInfo(unittest.TestCase):

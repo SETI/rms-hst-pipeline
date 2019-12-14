@@ -56,4 +56,4 @@ class ISingleVersionBundleFS(object):
     def directory_to_lid(dir):
         # type: (unicode) -> LID
         """Return the LID corresponding to the given directory."""
-        return LID.create_from_parts(iteratepath(dir))
+        return LID.create_from_parts([str(part) for part in iteratepath(dir)])
