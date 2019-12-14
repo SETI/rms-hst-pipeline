@@ -41,4 +41,5 @@ def download_product_documents(proposal_id, download_dir):
         filepath = fs.path.join(download_dir, basename)
         if _retrieve_doc(url, filepath):
             res.add(basename)
+
     return res

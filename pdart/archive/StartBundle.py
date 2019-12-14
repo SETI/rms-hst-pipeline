@@ -388,12 +388,44 @@ def create_pds4_labels(bundle_id, bundle_db, info, archive_dir):
 
     _CreateLabelsWalk(bundle_db).walk()
 
+def _placeholder_citation_information(bundle_id):
+    return CitationInformation(
+        placeholder(bundle_id, 'filename'),
+        placeholder(bundle_id, 'propno'),
+        placeholder(bundle_id, 'category'),
+        placeholder(bundle_id, 'cycle'),
+        placeholder(bundle_id, 'authors'),
+        placeholder(bundle_id, 'title'),
+        placeholder(bundle_id, 'year'),
+        placeholder(bundle_id, 'author_list'),
+        placeholder(bundle_id, 'editor_list'),
+        placeholder(bundle_id, 'publication_year'),
+        placeholder(bundle_id, 'keyword'),
+        placeholder(bundle_id, 'description'))
+
+
+def _create_citation_info(document_dir, document_files, id):
+    # type: (unicode, Set[unicode], unicode) -> Citation_Information
+
+    # We sort only to make '.apt' appear before '.pro' since the
+    # algorithm for '.apt' is more reliable.
+    for basename in sorted(document_files):
+        _, ext = fs.path.splitext(basename)
+        if ext.lower() in ['.apt', '.pro']:
+            os_filepath = fs.path.join(document_dir, basename)
+            return Citation_Information.create_from_file(os_filepath)
+
+    # If you got here, there was no '.apt' or '.pro' file and so we don't
+    # know how to make Citation_Information.
+    return _placeholder_citation_information(id)
+
 
 def create_document_collection(bundle_id, bundle_db, archive_dir,
                                document_dir, document_files):
-    # type: (int, BundleDB, unicode, unicode, Set[unicode]) -> None
+    # type: (int, BundleDB, unicode, unicode, Set[unicode]) -> Citation_Information
     if not document_files:
-        return
+        return _placeholder_citation_information(bundle_id)
+
     archive_fs = V1FS(archive_dir)
     bundle_part = 'hst_%05d' % bundle_id
     bundle_lidvid = _create_lidvid_from_parts([bundle_part])
@@ -427,6 +459,10 @@ def create_document_collection(bundle_id, bundle_db, archive_dir,
     doc_fs = OSFS(document_dir)
     fs.copy.copy_dir(doc_fs, u'/', archive_fs, document_product_dir)
 
+    return _create_citation_info(document_dir,
+                                 document_files,
+                                 str(bundle_lidvid))
+
 
 def start_bundle(download_dir, bundle, archive_dir):
     # type: (unicode, unicode, unicode) -> None
@@ -443,10 +479,8 @@ def start_bundle(download_dir, bundle, archive_dir):
     documents_dir = tempfile.mkdtemp()
     try:
         docs = download_product_documents(bundle_id, documents_dir)
-        create_document_collection(bundle_id, bundle_db, archive_dir,
-                                   documents_dir, docs)
-        # TODO Fix this!!!
-        info = Citation_Information.create_test_citation_information()
+        info = create_document_collection(bundle_id, bundle_db, archive_dir,
+                                          documents_dir, docs)
     finally:
         shutil.rmtree(documents_dir)
     create_pds4_labels(bundle_id, bundle_db, info, archive_dir)
