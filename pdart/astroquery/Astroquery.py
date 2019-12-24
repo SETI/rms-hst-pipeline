@@ -18,7 +18,7 @@ instruments.  These are the first letters of their 'obs_id's.
 _ACCEPTED_SUFFIXES = [
     'A1F', 'A2F', 'A3F', 'ASC', 'ASN', 'C0F', 'C1F', 'C2F', 'C3F', 'CAL',
     'CLB', 'CLF', 'CORRTAG', 'CQF', 'CRJ', 'D0F', 'DRC', 'DRZ', 'FLC', 'FLT',
-    'FLTSUM', 'MOS', 'RAW', 'SX2', 'SXL', 'X1D', 'X1DSUM', 'X2D'
+    'FLTSUM', 'MOS', 'RAW', 'SHM', 'SX2', 'SXL', 'X1D', 'X1DSUM', 'X2D'
 ]  # type: List[str]
 """
 For now, we limit the types of the products to those with these
