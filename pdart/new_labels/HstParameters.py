@@ -554,7 +554,9 @@ def get_hst_parameters(card_dicts, shm_card_dicts, instrument, product_id):
                                               instrument,
                                               product_id),
              'targeted_detector_id':
-                 get_targeted_detector_id(card_dicts[0]['APERTURE']),
+                 get_targeted_detector_id(
+                    _get_aperture_name(card_dicts, shm_card_dicts,
+                                       instrument, product_id)),
              'gain_mode_id': get_gain_mode_id(card_dicts, instrument,
                                               product_id),
              'pc1_flag': get_pc1_flag(product_id, instrument),
