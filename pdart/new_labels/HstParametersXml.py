@@ -106,6 +106,9 @@ def get_targeted_detector_id(aperture):
                      'W2': 'WF2',
                      'W3': 'WF3',
                      'W4': 'WF4'}
+    for k, v in general_cases.items():
+        if k in aperture:
+            return v
 
     # quad or polarizing filters
     special_cases = {u'FQUVN33': 'WF2',
@@ -119,11 +122,11 @@ def get_targeted_detector_id(aperture):
                      'FQCH4N15': 'WF3',
                      'F160BN15': 'WF3'}
 
-    # union the two dictionaries and try a lookup
-    all_cases = general_cases
-    all_cases.update(special_cases)
+    for k, v in special_cases.items():
+        if k in aperture:
+            return v
 
-    return all_cases[aperture]
+    raise ValueError('get_targeted_detector_id(%r)' % aperture)
 
 
 def get_pc1_flag(fits_product_lidvid_id, instrument):

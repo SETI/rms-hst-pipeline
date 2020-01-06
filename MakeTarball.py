@@ -92,6 +92,7 @@ def make_one_of_many_tarballs(src_dir, dst_dir, proposal_id, temp_fs=None):
             with TarFS(target_filepath, write=True) as t:
                 fs.copy.copy_fs(tar_fs, t)
             print 'created tarball for %s' % bundle_name
+        sys.stdout.flush()
 
 def usage():
     print 'usage: python MakeTarball.py <download-dir> <tarfile-dir> <proposal-id>'
