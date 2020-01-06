@@ -389,7 +389,7 @@ def create_pds4_labels(bundle_id, bundle_db, info, archive_dir):
     _CreateLabelsWalk(bundle_db).walk()
 
 def _placeholder_citation_information(bundle_id):
-    return CitationInformation(
+    return Citation_Information(
         placeholder(bundle_id, 'filename'),
         placeholder(bundle_id, 'propno'),
         placeholder(bundle_id, 'category'),

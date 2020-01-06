@@ -17,6 +17,9 @@ java-requirement :
 	    exit 1; \
 	fi
 
+bulk : venv
+	source venv/bin/activate && (python BulkDownload.py | tee bulk.log)
+
 venv : requirements.txt
 	virtualenv --no-site-packages -p python2.7 $@
 	# pyfits requires numpy to be installed first; dunno why
