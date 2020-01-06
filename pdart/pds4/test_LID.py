@@ -126,6 +126,12 @@ class TestLID(unittest.TestCase):
 
         # TODO Write tests for is_bundle_id, etc.
 
+    def test_to_shm_lid(self):
+        # type: () -> None
+        data_coll_lid = LID('urn:nasa:pds:bundle:data_collection_raw:product')
+        shm_coll_lid = LID('urn:nasa:pds:bundle:data_collection_shm:product')
+        self.assertEquals(shm_coll_lid, data_coll_lid.to_shm_lid())
+
     def test_create_lid_from_parts(self):
         # type: () -> None
         parts = []  # type: List[str]

@@ -29,6 +29,8 @@ def make_fits_product_label(bundle_db,
     XML and Schematron schemas.  Raise an exception if either fails.
     """
     card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
+    shm_card_dicts = bundle_db.get_shm_card_dictionaries(product_lidvid,
+                                                         file_basename)
     product = bundle_db.get_product(product_lidvid)
     collection_lidvid = product.collection_lidvid
 
@@ -54,7 +56,8 @@ def make_fits_product_label(bundle_db,
         'Observing_System': observing_system(instrument),
         'Time_Coordinates': get_time_coordinates(product_lidvid, card_dicts),
         'Target_Identification': get_target(card_dicts),
-        'HST': get_hst_parameters(card_dicts, instrument, product_lidvid)
+        'HST': get_hst_parameters(card_dicts, shm_card_dicts,
+                                  instrument, product_lidvid)
     }).toxml()
 
     return pretty_and_verify(label, verify)

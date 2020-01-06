@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 import unittest
 import xml.dom
 
@@ -9,6 +11,8 @@ from pdart.new_labels.HstParameters import get_hst_parameters
 from pdart.new_labels.Utils import assert_golden_file_equal, path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
+if TYPE_CHECKING:
+    from typing import Any, Dict, List
 
 class Test_HstParameters(unittest.TestCase):
     # TODO Write cases for other two instruments
@@ -32,8 +36,10 @@ class Test_HstParameters(unittest.TestCase):
 
         card_dicts = db.get_card_dictionaries(fits_product_lidvid,
                                               file_basename)
+        shm_card_dicts = []  # type: List[Dict[str, Any]]
 
-        nb = get_hst_parameters(card_dicts, 'acs', fits_product_lidvid)
+        nb = get_hst_parameters(card_dicts, shm_card_dicts,
+                                'acs', fits_product_lidvid)
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str = nb(doc).toxml()
         str = pretty_print(str)

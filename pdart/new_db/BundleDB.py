@@ -1,3 +1,4 @@
+import os.path
 import re
 
 from sqlalchemy import create_engine, exists
@@ -20,6 +21,22 @@ if TYPE_CHECKING:
 
 _BUNDLE_DB_NAME = 'bundle$database.db'  # type: unicode
 
+def get_shm_basename(filepath):
+    # type: (unicode) -> unicode
+
+    # TODO BUFFALO A hack.  Make this private and refactor as necessary.
+    match = re.match(r'\A([^_]+)_[^\.]+\..*\Z', os.path.basename(filepath))
+    assert match
+    return str(match.group(1)) + "_shm.fits"
+
+def get_shm_product_lidvid(lidvid_str):
+    # type: (str) -> str
+    lidvid = LIDVID(lidvid_str)
+    lid = lidvid.lid()
+    vid = lidvid.vid()
+    shm_lid = lid.to_shm_lid()
+    # TODO BUFFALO A hack: this is only valid for the initial version.
+    return str(LIDVID.create_from_lid_and_vid(shm_lid, vid))
 
 def create_bundle_db_from_os_filepath(os_filepath):
     # type: (unicode) -> BundleDB
@@ -526,6 +543,20 @@ class BundleDB(object):
 
         file = self.get_file(basename, fits_product_lidvid)
         return [get_card_dictionary(i) for i in range(file.hdu_count)]
+
+    def get_shm_card_dictionaries(self, fits_product_lidvid, basename):
+        # type: (str, unicode) -> List[Dict[str, Any]]
+        """
+        Return a list of dictionaries mapping FITS keys to their
+        values, one per Hdu in the FITS file.
+        """
+        # TODO BUFFALO
+        try:
+            return self.get_card_dictionaries(
+                get_shm_product_lidvid(fits_product_lidvid),
+                get_shm_basename(basename))
+        except:
+            return []
 
     ############################################################
 
