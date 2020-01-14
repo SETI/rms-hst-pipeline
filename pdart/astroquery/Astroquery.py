@@ -8,6 +8,7 @@ from pdart.astroquery.Utils import filter_table, get_table_with_retries, \
 if TYPE_CHECKING:
     from astroquery.table import Table
     from typing import List, Optional, Tuple
+    _YMD = Tuple[int, int, int]
 
 _ACCEPTED_INSTRUMENTS = "IJU"  # type: str
 """
@@ -61,8 +62,8 @@ class MastSlice(object):
     returned for observations and products.
     """
 
-    def __init__(self, start_date, end_date):
-        # type: (Tuple[int, int, int], Tuple[int, int, int]) -> None
+    def __init__(self, start_date, end_date, proposal_id=None):
+        # type: (_YMD, _YMD, Optional[int]) -> None
         """
         Given a start and an end date expressed as ymd triples,
         download a slice of the MAST database and express it as an
@@ -73,12 +74,21 @@ class MastSlice(object):
 
         def mast_call():
             # type: () -> Table
-            return Observations.query_criteria(
-                dataproduct_type=['image'],
-                dataRights='PUBLIC',
-                obs_collection=['HST'],
-                t_obs_release=(self.start_date, self.end_date),
-                mtFlag=True)
+            if proposal_id is not None:
+                return Observations.query_criteria(
+                    dataproduct_type=['image'],
+                    dataRights='PUBLIC',
+                    obs_collection=['HST'],
+                    proposal_id=str(proposal_id),
+                    t_obs_release=(self.start_date, self.end_date),
+                    mtFlag=True)
+            else:
+                return Observations.query_criteria(
+                    dataproduct_type=['image'],
+                    dataRights='PUBLIC',
+                    obs_collection=['HST'],
+                    t_obs_release=(self.start_date, self.end_date),
+                    mtFlag=True)
 
         self.observations_table = get_table_with_retries(mast_call, 1)
         self.proposal_ids = None  # type: Optional[List[int]]

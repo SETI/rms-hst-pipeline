@@ -11,6 +11,11 @@ mtb : venv
 	source venv/bin/activate && \
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
+pipeline : venv
+	source venv/bin/activate && python Pipeline.py 9296 check_downloads 
+	say okay
+	find tmp-working-dir
+
 java-requirement :
 	@if ! [ -x "$(shell command -v java)" ]; then \
 	    echo "**** Java must be installed to run PDART tests ****" ; \
