@@ -51,6 +51,9 @@ class VID(object):
             res = self.minor() - other.minor()
         return res
 
+    def __hash__(self):
+        return hash((self._major, self._minor))
+
     def __str__(self):
         return self._VID
 

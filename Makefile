@@ -12,6 +12,8 @@ mtb : venv
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
 pipeline : venv
+	# j ??? 9296
+	# u WFPC2 7240
 	source venv/bin/activate && python Pipeline.py 9296 check_downloads 
 	say okay
 	find tmp-working-dir

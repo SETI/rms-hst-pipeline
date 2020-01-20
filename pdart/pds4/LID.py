@@ -53,6 +53,9 @@ class LID(object):
     def __cmp__(self, other):
         return cmp(str(self), str(other))
 
+    def __hash__(self):
+        return hash(self.lid)
+
     def __str__(self):
         return self.lid
 

@@ -62,6 +62,9 @@ class LIDVID(object):
             res = cmp(self.vid(), other.vid())
         return res
 
+    def __hash__(self):
+        return hash((self._lid, self._vid))
+
     def __str__(self):
         return self._lidvid
 
