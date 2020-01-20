@@ -50,6 +50,11 @@ class LID(object):
             b, c, p = parts
             return LID('urn:nasa:pds:%s:%s:%s' % (b, c, p))
 
+    def parts(self):
+        # type: () -> List[str]
+        ids = [self.bundle_id, self.collection_id, self.product_id]
+        return [p for p in ids if p is not None]
+
     def __cmp__(self, other):
         return cmp(str(self), str(other))
 
