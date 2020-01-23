@@ -130,3 +130,12 @@ class LID(object):
         lid_parts[4] = shm_collection_id
         shm_product_lid = ':'.join(lid_parts)
         return LID(shm_product_lid)
+
+    def extend_lid(self, segment):
+        # type: (str) -> LID
+        """
+        Create a new LID by extending this one with  another segment.
+        """
+        ps = self.parts()
+        ps.append(segment)
+        return LID.create_from_parts(ps)
