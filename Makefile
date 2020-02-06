@@ -13,10 +13,10 @@ mtb : venv
 
 PYPATH="$(HOME)/fs-copy-on-write:$(HOME)/fs-multiversioned"
 
-PROJ_IDS=7240 9296 15419
-STEPS=check_downloads copy_downloads make_new_versions
+PROJ_IDS=7240 # 9296 15419
+STEPS=check_downloads copy_downloads make_new_versions make_browse
 
-pipeline : venv mypy
+pipeline : venv
 	# i WFC3 hst_15419 is 101.5MB
 	# j ACS hst_09296 is 247.9MB
 	# u WFPC2 hst_07240 is 19.8MB
