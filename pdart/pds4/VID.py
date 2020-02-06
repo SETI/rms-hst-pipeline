@@ -46,6 +46,8 @@ class VID(object):
         return VID('%d.%d' % (self.major(), self.minor() + 1))
 
     def __cmp__(self, other):
+        if other is None:
+            return 1
         res = self.major() - other.major()
         if res == 0:
             res = self.minor() - other.minor()

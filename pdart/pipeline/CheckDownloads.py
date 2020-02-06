@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING
 
 from pdart.astroquery.Astroquery import MastSlice
 
-def check_downloads(working_dir, proposal_id):
-    # type: (unicode, int) -> None
+def check_downloads(working_dir, mast_downloads_dir, proposal_id):
+    # type: (unicode, unicode, int) -> None
 
     # first pass, <working_dir> shouldn't exist; second pass
     # <working_dir>/mastDownload should not exist.
-    assert not os.path.isdir(os.path.join(working_dir, 'mastDownload'))
+    assert not os.path.isdir(mast_downloads_dir)
 
     # TODO These dates are wrong.  Do I need to do some optimization
     # here?
@@ -20,7 +20,10 @@ def check_downloads(working_dir, proposal_id):
     product_set = slice.to_product_set(proposal_id)
     if not os.path.isdir(working_dir): 
         os.makedirs(working_dir)
+
+    # TODO I should also download the documents here.
     
     product_set.download(working_dir)
-    
-
+    # TODO This might fail if there are no files.  Which might not be
+    # a bad thing.
+    assert os.path.isdir(mast_downloads_dir)

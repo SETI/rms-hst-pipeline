@@ -3,6 +3,7 @@
 .cache
 .hypothesis
 .idea
+.mypy_cache
 
 # Mac OS X cruft
 .DS_Store

@@ -56,6 +56,8 @@ class LID(object):
         return [p for p in ids if p is not None]
 
     def __cmp__(self, other):
+        if other is None:
+            return 1
         return cmp(str(self), str(other))
 
     def __hash__(self):

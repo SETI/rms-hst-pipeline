@@ -11,12 +11,25 @@ mtb : venv
 	source venv/bin/activate && \
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
-pipeline : venv
-	# j ??? 9296
-	# u WFPC2 7240
-	source venv/bin/activate && python Pipeline.py 9296 check_downloads 
+PYPATH="$(HOME)/fs-copy-on-write:$(HOME)/fs-multiversioned"
+
+PROJ_IDS=7240 9296 15419
+STEPS=check_downloads copy_downloads make_new_versions
+
+pipeline : venv mypy
+	# i WFC3 hst_15419 is 101.5MB
+	# j ACS hst_09296 is 247.9MB
+	# u WFPC2 hst_07240 is 19.8MB
+	-rm -rf tmp-working-dir/*
+	for project_id in $(PROJ_IDS); do \
+	    for step in $(STEPS); do \
+		source venv/bin/activate && \
+		    PYTHONPATH=$(PYPATH) \
+			python Pipeline.py $$project_id $$step; \
+            done; \
+        done; \
 	say okay
-	find tmp-working-dir
+	open tmp-working-dir
 
 java-requirement :
 	@if ! [ -x "$(shell command -v java)" ]; then \
@@ -40,7 +53,9 @@ save-reqs :
 # To use/run mypy
 #
 mypy : mypy-venv
-	source mypy-venv/bin/activate && mypy --py2 pdart | \
+	source mypy-venv/bin/activate && \
+	    PYTHONPATH="$(HOME)/fs-copy-on-write/cowfs" \
+                mypy --py2 pdart Pipeline.py | \
 	grep -v julian | \
 	grep -v picmaker | \
 	grep -v "#missing-imports" | \

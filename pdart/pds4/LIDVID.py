@@ -57,6 +57,8 @@ class LIDVID(object):
         return LIDVID('%s::%s' % (self.lid(), self.vid().next_minor_vid()))
 
     def __cmp__(self, other):
+        if other is None:
+            return 1
         res = cmp(self.lid(), other.lid())
         if res == 0:
             res = cmp(self.vid(), other.vid())
