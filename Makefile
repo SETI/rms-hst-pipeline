@@ -1,8 +1,11 @@
 .PHONY : aq clean java-requirement mtb mypy raw-mypy  save-reqs
 
+PYPATH="$(HOME)/fs-copy-on-write:$(HOME)/fs-multiversioned"
+
+
 # test: I should also run mypy
 test : venv java-requirement
-	source venv/bin/activate && py.test pdart
+	PYTHONPATH=$(PYPATH) source venv/bin/activate && py.test pdart
 
 aq : venv
 	source venv/bin/activate && python AQ.py
@@ -10,8 +13,6 @@ aq : venv
 mtb : venv
 	source venv/bin/activate && \
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
-
-PYPATH="$(HOME)/fs-copy-on-write:$(HOME)/fs-multiversioned"
 
 PROJ_IDS=7240 # 9296 15419
 STEPS=check_downloads copy_downloads make_new_versions make_browse
