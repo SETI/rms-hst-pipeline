@@ -75,12 +75,12 @@ class SingleVersionedCOWFS(COWFS, Versioned):
 
     @staticmethod
     def create_cowfs_suffixed(base_fs,
-                              read_write_layer_partial_path,
+                              deltas_layer_partial_path,
                               recreate=False):
         # type: (FS, unicode, bool) -> COWFS
-        read_write_layer_path = \
-            read_write_layer_partial_path + u'-read-write-layer-sv'
-        rwfs = SingleVersionedOSFS(read_write_layer_path, create=recreate)
+        deltas_layer_path = \
+            deltas_layer_partial_path + u'-deltas-layer-sv'
+        rwfs = SingleVersionedOSFS(deltas_layer_path, create=recreate)
         additions_fs = rwfs.makedir(u'/additions', recreate=recreate)
         deletions_fs = rwfs.makedir(u'/deletions', recreate=recreate)
         return SingleVersionedCOWFS(rwfs,
@@ -100,12 +100,12 @@ class MultiversionedCOWFS(COWFS, Versioned):
 
     @staticmethod
     def create_cowfs_suffixed(base_fs,
-                              read_write_layer_partial_path,
+                              deltas_layer_partial_path,
                               recreate=False):
         # type: (FS, unicode, bool) -> COWFS
-        read_write_layer_path = \
-            read_write_layer_partial_path + '-read-write-layer-mv'
-        rwfs = MultiversionedOSFS(read_write_layer_path, create=recreate)
+        deltas_layer_path = \
+            deltas_layer_partial_path + '-deltas-layer-mv'
+        rwfs = MultiversionedOSFS(deltas_layer_path, create=recreate)
         additions_fs = rwfs.makedir(u'/additions', recreate=recreate)
         deletions_fs = rwfs.makedir(u'/deletions', recreate=recreate)
         return MultiversionedCOWFS(rwfs,
