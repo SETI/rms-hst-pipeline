@@ -24,7 +24,7 @@ def to_segment_dir(name):
 
 
 def copy_downloads(bundle_segment, mast_downloads_dir,
-                   next_version_fits_and_docs_deltas_dir, archive_dir):
+                   fits_and_docs_deltas_dir, archive_dir):
     # type: (unicode, unicode, unicode, unicode) -> None
     assert os.path.isdir(mast_downloads_dir)
 
@@ -32,11 +32,11 @@ def copy_downloads(bundle_segment, mast_downloads_dir,
     assert bundle_segment[-5:].isdigit()
 
     with make_osfs(mast_downloads_dir) as mast_downloads_fs, \
-        make_osfs(archive_dir) as archive_fs, \
+        make_mv_osfs(archive_dir) as archive_fs, \
         make_version_view(archive_fs, bundle_segment) as version_fs, \
-        make_deltas(version_fs,
-                    next_version_fits_and_docs_deltas_dir) \
-                    as next_version_fits_and_docs_delta_fs:
+        make_sv_deltas(version_fs,
+                       fits_and_docs_deltas_dir) \
+                       as fits_and_docs_delta_fs:
 
         # Walk the mast_downloads_dir for FITS file and file
         # them into the COW filesystem.
@@ -53,12 +53,13 @@ def copy_downloads(bundle_segment, mast_downloads_dir,
                                     to_segment_dir(coll),
                                     to_segment_dir(product), filename)
             dirs, filename = fs.path.split(new_path)
-            next_version_fits_and_docs_delta_fs.makedirs(dirs)
+            fits_and_docs_delta_fs.makedirs(dirs)
             fs.copy.copy_file(mast_downloads_fs, filepath,
-                              next_version_fits_and_docs_delta_fs, new_path)
+                              fits_and_docs_delta_fs, new_path)
 
-    assert os.path.isdir(archive_dir)
-    assert os.path.isdir(next_version_fits_and_docs_deltas_dir)
+    assert os.path.isdir(archive_dir + '-mv'), (archive_dir + '-mv')
+    assert os.path.isdir(fits_and_docs_deltas_dir + '-deltas-sv'), \
+        (fits_and_docs_deltas_dir + '-deltas-sv')
     # If I made it to here, it should be safe to delete the downloads
     shutil.rmtree(mast_downloads_dir)
     assert not os.path.isdir(mast_downloads_dir)

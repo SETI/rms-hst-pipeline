@@ -40,7 +40,7 @@ class LID(object):
     def create_from_parts(parts):
         # type: (List[str]) -> LID
         parts_len = len(parts)
-        assert parts_len in [1, 2, 3]
+        assert parts_len in [1, 2, 3], parts
         if parts_len == 1:
             return LID('urn:nasa:pds:%s' % parts[0])
         elif parts_len == 2:

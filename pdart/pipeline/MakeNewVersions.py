@@ -17,17 +17,17 @@ def make_new_versions(bundle_segment,
                       next_version_deltas_dir,
                       archive_next_version_fits_and_docs_dir):
     # type: (unicode, unicode, unicode, unicode) -> None
-    assert os.path.isdir(archive_dir)
-    assert os.path.isdir(next_version_deltas_dir)
+    assert os.path.isdir(archive_dir + '-mv')
+    assert os.path.isdir(next_version_deltas_dir + '-deltas-sv')
 
-    with make_osfs(archive_dir) as last_archive_fs, \
+    with make_mv_osfs(archive_dir) as last_archive_fs, \
             make_version_view(last_archive_fs,
                               bundle_segment) as last_version_view_fs, \
-            make_deltas(last_version_view_fs,
+            make_sv_deltas(last_version_view_fs,
                         next_version_deltas_dir) as next_version_view_fs, \
-            make_deltas(last_archive_fs,
-                        archive_next_version_fits_and_docs_dir) \
-                        as archive_next_version_fits_and_docs_fs:
+            make_mv_deltas(last_archive_fs,
+                           archive_next_version_fits_and_docs_dir) \
+                           as archive_next_version_fits_and_docs_fs:
 
         if _VERBOSE:
             show_tree('last_archive_fs', last_archive_fs)
@@ -43,13 +43,14 @@ def make_new_versions(bundle_segment,
             show_tree('archive_next_version_fits_and_docs_fs',
                       archive_next_version_fits_and_docs_fs)
 
-    shutil.rmtree(next_version_deltas_dir)
+    shutil.rmtree(next_version_deltas_dir + '-deltas-sv')
     if changed:
-        assert os.path.isdir(archive_next_version_fits_and_docs_dir)
+        assert os.path.isdir(archive_next_version_fits_and_docs_dir + '-deltas-mv')
     else:
-        shutil.rmtree(archive_next_version_fits_and_docs_dir)
-        assert not os.path.isdir(archive_next_version_fits_and_docs_dir)
+        shutil.rmtree(archive_next_version_fits_and_docs_dir + '-deltas-mv')
+        assert not os.path.isdir(archive_next_version_fits_and_docs_dir + 
+                                 '-deltas-mv')
 
-    assert os.path.isdir(archive_dir)
-    assert not os.path.isdir(next_version_deltas_dir)
+    assert os.path.isdir(archive_dir + '-mv')
+    assert not os.path.isdir(next_version_deltas_dir + '-deltas-sv')
 

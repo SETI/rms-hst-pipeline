@@ -20,6 +20,10 @@ class ISingleVersionBundleFS(object):
     """
     __metaclass__ = abc.ABCMeta
 
+    def is_single_versioned_fs(self):
+        # type: () -> bool
+        return True
+
     @abc.abstractmethod
     def bundle_lidvid(self):
         # type: () -> LIDVID

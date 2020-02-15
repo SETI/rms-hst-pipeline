@@ -36,7 +36,7 @@ class Test_Versioned(unittest.TestCase):
             recreate=True)
         self.assertTrue(cowfs.is_single_versioned_fs())
         names = OSFS(self.temp_dir).listdir(u'/')
-        self.assertEquals({u'base-sv', u'next-deltas-layer-sv'},
+        self.assertEquals({u'base-sv', u'next-deltas-sv'},
                           set(names))
 
     def test_multiversioned_cowfs(self):
@@ -50,5 +50,5 @@ class Test_Versioned(unittest.TestCase):
             recreate=True)
         self.assertTrue(cowfs.is_multiversioned_fs())
         names = OSFS(self.temp_dir).listdir(u'/')
-        self.assertEquals({u'base-mv', u'next-deltas-layer-mv'},
+        self.assertEquals({u'base-mv', u'next-deltas-mv'},
                           set(names))

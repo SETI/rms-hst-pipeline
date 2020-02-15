@@ -20,21 +20,21 @@ class Directories(object):
 
     def next_version_deltas_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
-                            'next-version-deltas-sv')
+                            'next-version')
 
     def archive_next_version_fits_and_docs_deltas_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
-                            'archive-next-version-fits-and-docs-deltas-mv')
+                            'fits-and-docs')
 
     def archive_next_version_browse_deltas_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
-                            'archive-next-version-browse-deltas-sv')
+                            'browse')
 
     def archive_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
-                            'archive-mv')
+                            'archive')
 
     def new_versions_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
-                            'last-version-sv')
+                            'last-version')
 

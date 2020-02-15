@@ -7,6 +7,9 @@ PYPATH="$(HOME)/fs-copy-on-write:$(HOME)/fs-multiversioned"
 test : venv java-requirement
 	PYTHONPATH=$(PYPATH) source venv/bin/activate && py.test pdart
 
+smalltest : venv java-requirement
+	PYTHONPATH=$(PYPATH) source venv/bin/activate && py.test pdart/fs pdart/pipeline
+
 aq : venv
 	source venv/bin/activate && python AQ.py
 
@@ -14,7 +17,7 @@ mtb : venv
 	source venv/bin/activate && \
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
-PROJ_IDS=7240 # 9296 15419
+PROJ_IDS=7240 9296 15419
 STEPS=check_downloads copy_downloads make_new_versions make_browse
 
 pipeline : venv
