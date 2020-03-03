@@ -26,7 +26,7 @@ class LID(object):
         assert ids[2] == 'pds'
         allowed_chars_re = r'\A[-._a-z0-9]+\Z'
         for id in ids:
-            assert re.match(allowed_chars_re, id)
+            assert re.match(allowed_chars_re, id), id
 
         # Assign the Id fields
         self.lid = str

@@ -1,7 +1,6 @@
-.PHONY : aq clean java-requirement mtb mypy raw-mypy  save-reqs
+.PHONY : aq clean java-requirement mtb mypy raw-mypy  save-reqs tar
 
 PYPATH="$(HOME)/fs-copy-on-write:$(HOME)/fs-multiversioned"
-
 
 # test: I should also run mypy
 test : venv java-requirement
@@ -18,15 +17,18 @@ mtb : venv
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
 PROJ_IDS=7240 9296 15419
-STEPS=check_downloads copy_downloads make_new_versions make_browse
+STEPS=copy_primary_files record_changes insert_changes # copy_downloads make_new_versions make_browse
+# STEPS=download_docs check_downloads copy_primary_files record_changes # copy_downloads make_new_versions make_browse
 
 pipeline : venv
 	# i WFC3 hst_15419 is 101.5MB
 	# j ACS hst_09296 is 247.9MB
 	# u WFPC2 hst_07240 is 19.8MB
-	-rm -rf tmp-working-dir/*
+	-rm -rf tmp-working-dir
+	open tmp-working-dir.tar
 	for project_id in $(PROJ_IDS); do \
 	    for step in $(STEPS); do \
+		echo $$project_id $$step; \
 		source venv/bin/activate && \
 		    PYTHONPATH=$(PYPATH) \
 			python Pipeline.py $$project_id $$step; \
@@ -34,6 +36,23 @@ pipeline : venv
         done; \
 	say okay
 	open tmp-working-dir
+
+tar : tmp-working-dir.tar
+	# pass
+
+TAR_STEPS=download_docs check_downloads
+tmp-working-dir.tar :
+	-rm -rf tmp-working-dir/*
+	for project_id in $(PROJ_IDS); do \
+	    for step in $(TAR_STEPS); do \
+		source venv/bin/activate && \
+		    PYTHONPATH=$(PYPATH) \
+			python Pipeline.py $$project_id $$step; \
+	    done; \
+        done; \
+	say okay
+	tar -cf tmp-working-dir.tar tmp-working-dir
+
 
 java-requirement :
 	@if ! [ -x "$(shell command -v java)" ]; then \
@@ -84,6 +103,7 @@ clean :
 	find . -name '*~' -delete
 	find . -name '#*' -delete
 	find . -name '*.pyc' -delete
+	-rm -rf .hypothesis
 	-rm -rf apidocs dist MANIFEST
 	-rm -rf venv
 	-rm -rf mypy-venv

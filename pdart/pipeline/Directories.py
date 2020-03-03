@@ -22,9 +22,17 @@ class Directories(object):
         return os.path.join(self.working_dir(proposal_id),
                             'next-version')
 
-    def archive_next_version_fits_and_docs_deltas_dir(self, proposal_id):
+    def primary_files_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
-                            'fits-and-docs')
+                            'primary-files')
+
+    def documents_dir(self, proposal_id):
+        return os.path.join(self.working_dir(proposal_id),
+                            'documentDownload')
+
+    def archive_next_version_primary_deltas_dir(self, proposal_id):
+        return os.path.join(self.working_dir(proposal_id),
+                            'primary')
 
     def archive_next_version_browse_deltas_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
