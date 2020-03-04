@@ -27,7 +27,7 @@ pipeline : venv
 	# j ACS hst_09296 is 247.9MB
 	# u WFPC2 hst_07240 is 19.8MB
 	-rm -rf tmp-working-dir
-	open tmp-working-dir.tar
+	tar -xf tmp-working-dir.tar
 	for project_id in $(PROJ_IDS); do \
 	    for step in $(STEPS); do \
 		echo $$project_id $$step; \

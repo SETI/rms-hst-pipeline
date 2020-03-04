@@ -31,7 +31,8 @@ def _copy_docs_files(bundle_segment,
     with make_osfs(documents_dir) as documents_fs, \
         make_sv_osfs(primary_files_dir) as primary_files_fs:
         new_dir_path = os.path.join(to_segment_dir(bundle_segment),
-                                    to_segment_dir('document'))
+                                    to_segment_dir('document'),
+                                    to_segment_dir('phase2'))
         primary_files_fs.makedirs(new_dir_path)
         for file in documents_fs.walk.files():
             file_basename = os.path.basename(file)
