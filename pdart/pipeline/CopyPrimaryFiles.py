@@ -85,8 +85,6 @@ def copy_primary_files(bundle_segment,
     assert bundle_segment.startswith('hst_')
     assert bundle_segment[-5:].isdigit()
 
-    print '****_copy_docs_files'
     _copy_docs_files(bundle_segment, documents_dir, primary_files_dir)
-    print '****_copy_fits_files'
     _copy_fits_files(bundle_segment, mast_downloads_dir, primary_files_dir)
 

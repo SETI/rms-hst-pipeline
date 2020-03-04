@@ -17,7 +17,9 @@ mtb : venv
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
 PROJ_IDS=7240 9296 15419
-STEPS=copy_primary_files record_changes insert_changes # copy_downloads make_new_versions make_browse
+STEPS=copy_primary_files record_changes insert_changes populate_database \
+    build_browse # copy_downloads make_new_versions make_browse
+
 # STEPS=download_docs check_downloads copy_primary_files record_changes # copy_downloads make_new_versions make_browse
 
 pipeline : venv

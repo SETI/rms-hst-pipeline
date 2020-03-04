@@ -25,14 +25,14 @@ def insert_changes(bundle_segment,
                    working_dir,
                    primary_files_dir,
                    archive_dir,
-                   archive_next_version_primary_deltas_dir):
+                   archive_primary_deltas_dir):
     # type: (unicode, unicode, unicode, unicode, unicode) -> None
     changes_path = os.path.join(working_dir, CHANGES_DICT)
     with make_osfs(archive_dir) as archive_osfs, \
             make_version_view(archive_osfs, bundle_segment) as version_view, \
             make_sv_osfs(primary_files_dir) as primary_files_osfs, \
             make_sv_deltas(version_view,
-                           archive_next_version_primary_deltas_dir)  \
+                           archive_primary_deltas_dir)  \
                            as sv_deltas:
 
         archive_dirs = list(archive_osfs.walk.dirs())
@@ -48,12 +48,10 @@ def insert_changes(bundle_segment,
                 fs.copy.copy_file(primary_files_osfs, filepath,
                                   sv_deltas, filepath)
 
-    os.remove(changes_path)
     shutil.rmtree(primary_files_dir + '-sv')
 
     assert os.path.isdir(archive_dir), archive_dir
-    dirpath = archive_next_version_primary_deltas_dir + '-deltas-sv'
+    dirpath = archive_primary_deltas_dir + '-deltas-sv'
     assert os.path.isdir(dirpath), dirpath
-    assert not os.path.isfile(changes_path)
-
+    assert os.path.isfile(changes_path)
     

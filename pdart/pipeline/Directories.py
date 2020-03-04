@@ -30,11 +30,11 @@ class Directories(object):
         return os.path.join(self.working_dir(proposal_id),
                             'documentDownload')
 
-    def archive_next_version_primary_deltas_dir(self, proposal_id):
+    def archive_primary_deltas_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
                             'primary')
 
-    def archive_next_version_browse_deltas_dir(self, proposal_id):
+    def archive_browse_deltas_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
                             'browse')
 
