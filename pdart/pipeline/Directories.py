@@ -38,6 +38,10 @@ class Directories(object):
         return os.path.join(self.working_dir(proposal_id),
                             'browse')
 
+    def archive_label_deltas_dir(self, proposal_id):
+        return os.path.join(self.working_dir(proposal_id),
+                            'label')
+
     def archive_dir(self, proposal_id):
         return os.path.join(self.working_dir(proposal_id),
                             'archive')
