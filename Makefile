@@ -92,6 +92,9 @@ mypy : mypy-venv
 	grep -v "Cannot find module named 'astroquery" | \
 	grep -v "Cannot find module named 'hypothesis" | \
 	grep -v "Cannot find module named 'pyfits'" | \
+	grep -v "Cannot find module named 'multiversioned." | \
+	grep -v "Cannot find module named 'cowfs." | \
+	grep -v "Cannot find module named 'pdart.pds4.Archive'" | \
 	grep -v "Name 'xml.sax.ContentHandler' is not defined"
 
 raw-mypy : mypy-venv
