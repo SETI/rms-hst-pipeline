@@ -99,9 +99,11 @@ def run():
         dispatch(dirs, proposal_id, command)
     except Exception as e:
         with open(failure_marker_filepath, 'w') as f:
-            f.write(traceback.format_exc())
-            print '**** EXCEPTION raised by %d %s: %s' % \
-                (proposal_id, command, str(e))
+            header = 'EXCEPTION raised by hst_%05d, stage %s:' % \
+                (proposal_id, command)
+            print '****', header, str(e)
+            print >> f, header
+            print >> f, traceback.format_exc()
         
 if __name__ == '__main__':
     run()
