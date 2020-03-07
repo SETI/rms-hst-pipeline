@@ -11,7 +11,6 @@ from pdart.pipeline.CopyPrimaryFiles import copy_primary_files
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.InsertChanges import insert_changes
 from pdart.pipeline.MakeNewVersions import make_new_versions
-from pdart.pipeline.MakeBrowseFiles import make_browse_files
 from pdart.pipeline.PopulateDatabase import populate_database
 from pdart.pipeline.RecordChanges import record_changes
 
@@ -40,11 +39,6 @@ def dispatch(dirs, proposal_id, command):
             dirs.archive_dir(proposal_id),
             dirs.next_version_deltas_dir(proposal_id),
             dirs.archive_primary_deltas_dir(proposal_id))
-    elif command == 'make_browse':
-        make_browse_files(
-            dirs.archive_dir(proposal_id),
-            dirs.archive_primary_deltas_dir(proposal_id),
-            dirs.archive_browse_deltas_dir(proposal_id))
     elif command == 'record_changes':
         record_changes(
             bundle_segment,

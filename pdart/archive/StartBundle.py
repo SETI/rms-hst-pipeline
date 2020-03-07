@@ -37,8 +37,7 @@ if TYPE_CHECKING:
     from pdart.new_db.BundleDB import BundleDB
     from pdart.new_db.SqlAlchTables import BadFitsFile, BrowseFile, Bundle, \
         Collection, DocumentCollection, DocumentProduct, FitsFile, \
-        FitsProduct, \
-        NonDocumentCollection
+        FitsProduct, NonDocumentCollection
 
 _INITIAL_VID = VID('1.0')  # type: VID
 
