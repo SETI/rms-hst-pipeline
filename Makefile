@@ -16,8 +16,8 @@ mtb : venv
 	source venv/bin/activate && \
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
-# PROJ_IDS=7240 9296 15419
-PROJ_IDS=15419
+PROJ_IDS=7240 9296 15419
+# PROJ_IDS=15419
 STEPS=copy_primary_files record_changes insert_changes populate_database \
     build_browse build_labels # copy_downloads make_new_versions make_browse
 
@@ -37,7 +37,7 @@ pipeline : venv
 			python Pipeline.py $$project_id $$step; \
             done; \
         done; \
-	say I got your pipeline right here
+	say pipeline is done
 	open tmp-working-dir
 
 tar : tmp-working-dir.tar

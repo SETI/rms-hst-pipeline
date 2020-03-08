@@ -84,6 +84,7 @@ def dispatch(dirs, proposal_id, command):
         # Build labels for the new components.
         "build_labels": (
             lambda: build_labels(
+                proposal_id,
                 bundle_segment,
                 dirs.working_dir(proposal_id),
                 dirs.archive_dir(proposal_id),
