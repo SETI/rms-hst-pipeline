@@ -38,6 +38,7 @@ if TYPE_CHECKING:
         NonDocumentCollection,
     )
 
+_VERIFY = True
 
 def _placeholder_citation_information(proposal_id):
     # type: (int) -> Citation_Information
@@ -99,7 +100,7 @@ def create_pds4_labels(bundle_db, label_deltas, info):
                 return
             bundle_lidvid = str(bundle.lidvid)
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
-            label = make_bundle_label(self.db, info, False)
+            label = make_bundle_label(self.db, info, _VERIFY)
             label_filename = "bundle.xml"
             label_filepath = fs.path.join(bundle_dir_path, label_filename)
             label_deltas.settext(label_filepath, unicode(label))
@@ -125,7 +126,7 @@ def create_pds4_labels(bundle_db, label_deltas, info):
                 collection_lidvid,
             )
 
-            label = make_collection_label(self.db, info, collection_lidvid, False)
+            label = make_collection_label(self.db, info, collection_lidvid, _VERIFY)
             label_filename = get_collection_label_name(self.db, collection_lidvid)
             label_filepath = fs.path.join(collection_dir_path, label_filename)
             label_deltas.settext(label_filepath, unicode(label))
@@ -150,10 +151,12 @@ def create_pds4_labels(bundle_db, label_deltas, info):
             if not post:
                 return
             product_lidvid = str(document_product.lidvid)
-            label = make_document_product_label(
-                self.db, info, product_lidvid, False, None
-            )
+
             # TODO publication date left blank
+            publication_date = None
+            label = make_document_product_label(
+                self.db, info, product_lidvid, _VERIFY, publication_date
+            )
 
             label_base = LIDVID(product_lidvid).lid().product_id
             assert label_base
@@ -171,7 +174,7 @@ def create_pds4_labels(bundle_db, label_deltas, info):
                 self.db,
                 str(browse_file.product_lidvid),
                 str(browse_file.basename),
-                False,
+                _VERIFY
             )
             label_base = fs.path.splitext(browse_file.basename)[0]
             label_filename = label_base + ".xml"
@@ -193,7 +196,7 @@ def create_pds4_labels(bundle_db, label_deltas, info):
         def visit_fits_file(self, fits_file):
             # type: (FitsFile) -> None
             label = make_fits_product_label(
-                self.db, str(fits_file.product_lidvid), str(fits_file.basename), False
+                self.db, str(fits_file.product_lidvid), str(fits_file.basename), _VERIFY
             )
             label_base = fs.path.splitext(fits_file.basename)[0]
             label_filename = label_base + ".xml"
