@@ -12,6 +12,7 @@ from pdart.pipeline.DownloadDocs import download_docs
 from pdart.pipeline.InsertChanges import insert_changes
 from pdart.pipeline.PopulateDatabase import populate_database
 from pdart.pipeline.RecordChanges import record_changes
+from pdart.pipeline.MakeDeliverable import make_deliverable
 
 
 def dispatch(dirs, proposal_id, command):
@@ -84,6 +85,18 @@ def dispatch(dirs, proposal_id, command):
         # Build labels for the new components.
         "build_labels": (
             lambda: build_labels(
+                proposal_id,
+                bundle_segment,
+                dirs.working_dir(proposal_id),
+                dirs.archive_dir(proposal_id),
+                dirs.archive_primary_deltas_dir(proposal_id),
+                dirs.archive_browse_deltas_dir(proposal_id),
+                dirs.archive_label_deltas_dir(proposal_id),
+            )
+        ),
+        # Build labels for the new components.
+        "make_deliverable": (
+            lambda: make_deliverable(
                 proposal_id,
                 bundle_segment,
                 dirs.working_dir(proposal_id),

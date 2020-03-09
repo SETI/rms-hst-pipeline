@@ -38,7 +38,7 @@ if TYPE_CHECKING:
         NonDocumentCollection,
     )
 
-_VERIFY = True
+_VERIFY = False
 
 def _placeholder_citation_information(proposal_id):
     # type: (int) -> Citation_Information
@@ -244,6 +244,3 @@ def build_labels(
         info = _create_citation_info(sv_deltas, documents_dir, docs, proposal_id)
 
         create_pds4_labels(db, label_deltas, info)
-
-        # instrumentation
-        label_deltas.tree()
