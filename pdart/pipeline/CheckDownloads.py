@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from pdart.astroquery.Astroquery import MastSlice
 
+
 def check_downloads(working_dir, mast_downloads_dir, proposal_id):
     # type: (unicode, unicode, int) -> None
 
@@ -15,14 +16,13 @@ def check_downloads(working_dir, mast_downloads_dir, proposal_id):
     # here?
     slice = MastSlice((1900, 1, 1), (2025, 1, 1), proposal_id)
     proposal_ids = slice.get_proposal_ids()
-    assert proposal_id in proposal_ids, \
-        "%d in %s" % (proposal_id, proposal_ids)
+    assert proposal_id in proposal_ids, "%d in %s" % (proposal_id, proposal_ids)
     product_set = slice.to_product_set(proposal_id)
-    if not os.path.isdir(working_dir): 
+    if not os.path.isdir(working_dir):
         os.makedirs(working_dir)
 
     # TODO I should also download the documents here.
-    
+
     product_set.download(working_dir)
     # TODO This might fail if there are no files.  Which might not be
     # a bad thing.

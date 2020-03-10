@@ -40,6 +40,7 @@ if TYPE_CHECKING:
 
 _VERIFY = False
 
+
 def _placeholder_citation_information(proposal_id):
     # type: (int) -> Citation_Information
     bundle_id = "hst_%05d" % proposal_id
@@ -174,7 +175,7 @@ def create_pds4_labels(bundle_db, label_deltas, info):
                 self.db,
                 str(browse_file.product_lidvid),
                 str(browse_file.basename),
-                _VERIFY
+                _VERIFY,
             )
             label_base = fs.path.splitext(browse_file.basename)[0]
             label_filename = label_base + ".xml"

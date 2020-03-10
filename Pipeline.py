@@ -108,13 +108,9 @@ def dispatch(dirs, proposal_id, command):
         # Build labels for the new components.
         "make_deliverable": (
             lambda: make_deliverable(
-                proposal_id,
                 bundle_segment,
-                dirs.working_dir(proposal_id),
                 dirs.archive_dir(proposal_id),
-                dirs.archive_primary_deltas_dir(proposal_id),
-                dirs.archive_browse_deltas_dir(proposal_id),
-                dirs.archive_label_deltas_dir(proposal_id),
+                dirs.deliverable_dir(proposal_id),
             )
         ),
     }

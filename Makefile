@@ -22,9 +22,13 @@ mtb : venv
 # u WFPC2 hst_05783 is 39MB
 # u WFPC2 hst_06621 is 39MB
 # u WFPC2 hst_07240 is 19.8MB
+# 5167 u2no0402t_shm.fits
+# 5640 u2eb0409t_shm.fits
+# 9985 j8xy02010_asn.fits
+# 11497 ua6c0502m_shm.fits
 
-# PROJ_IDS=7240 9296 15419
-PROJ_IDS=7240 15419
+# PROJ_IDS=9059 13199
+PROJ_IDS=15419
 STEPS=copy_primary_files record_changes insert_changes populate_database \
     build_browse build_labels update_archive make_deliverable
 

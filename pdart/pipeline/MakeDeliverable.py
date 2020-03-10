@@ -5,25 +5,30 @@ import os
 
 from pdart.pipeline.Utils import make_osfs, make_version_view, make_sv_deltas
 
-def make_deliverable(
-    proposal_id,
-    bundle_segment,
-    working_dir,
-    archive_dir,
-    archive_primary_deltas_dir,
-    archive_browse_deltas_dir,
-    archive_label_deltas_dir):
-    # type: (int, str, unicode, unicode, unicode, unicode, unicode) -> None
+
+def _fix_up_deliverable(dir):
+    # type: (unicode) -> None
+
+    # TODO DeliverableFS was written with an older directory
+    # structure.  When used with the new, we get trailing dollar signs
+    # on directories representing bundles, collections, and products.
+    # No time to fix it right now, so we just patch up the resulting
+    # directory tree.  TODO But *do* fix it.
+    for path, _, _ in os.walk(dir, topdown=False):
+        if path[-1] == "$":
+            print "****", path, "=>", path[:-1], "****"
+            os.rename(path, path[:-1])
+
+
+def make_deliverable(bundle_segment, archive_dir, deliverable_dir):
+    # type: (str, unicode, unicode) -> None
     with make_osfs(archive_dir) as archive_osfs, make_version_view(
         archive_osfs, bundle_segment
     ) as version_view:
         # Hack-ish: just trying to get everything into place
-        deliverable_path = fs.path.join(working_dir, 'deliverable')
-        os.mkdir(deliverable_path)
-        deliverable_osfs = OSFS(deliverable_path)
+        os.mkdir(deliverable_dir)
+        deliverable_osfs = OSFS(deliverable_dir)
         deliverable_fs = DeliverableFS(deliverable_osfs)
         fs.copy.copy_fs(version_view, deliverable_fs)
-        
-        # instrumentation
-        deliverable_osfs.tree()
 
+        _fix_up_deliverable(deliverable_dir)
