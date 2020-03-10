@@ -10,9 +10,10 @@ from pdart.pipeline.CopyPrimaryFiles import copy_primary_files
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.DownloadDocs import download_docs
 from pdart.pipeline.InsertChanges import insert_changes
+from pdart.pipeline.MakeDeliverable import make_deliverable
 from pdart.pipeline.PopulateDatabase import populate_database
 from pdart.pipeline.RecordChanges import record_changes
-from pdart.pipeline.MakeDeliverable import make_deliverable
+from pdart.pipeline.UpdateArchive import update_archive
 
 
 def dispatch(dirs, proposal_id, command):
@@ -93,6 +94,16 @@ def dispatch(dirs, proposal_id, command):
                 dirs.archive_browse_deltas_dir(proposal_id),
                 dirs.archive_label_deltas_dir(proposal_id),
             )
+        ),
+        # Update the archive with the new version
+        "update_archive": (
+            lambda: update_archive(bundle_segment,
+                dirs.working_dir(proposal_id),
+                dirs.archive_dir(proposal_id),
+                dirs.archive_primary_deltas_dir(proposal_id),
+                dirs.archive_browse_deltas_dir(proposal_id),
+                dirs.archive_label_deltas_dir(proposal_id),
+                )
         ),
         # Build labels for the new components.
         "make_deliverable": (

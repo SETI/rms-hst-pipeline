@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+import traceback
 
 import pdart.add_pds_tools
 import picmaker  # need to precede this with 'import pdart.add_pds_tools'
@@ -95,10 +96,16 @@ def _build_browse_collection(db, browse_deltas, bundle_segment,
             # Picmaker expects a list of strings.  If you give it
             # unicode, it'll index into it and complain about '/'
             # not being a file.  So don't do that!
-            picmaker.ImagesToPics([str(fits_os_filepath)],
-                                  browse_product_os_dirpath,
-                                  filter="None",
-                                  percentiles=(1, 99))
+            try:
+                picmaker.ImagesToPics([str(fits_os_filepath)],
+                                      browse_product_os_dirpath,
+                                      filter="None",
+                                      percentiles=(1, 99))
+            except IndexError as e:
+                tb = traceback.format_exc()
+                message = "File %s: %s\n%s" % (fits_file, str(e), tb)
+                raise Exception(message)
+
             browse_os_filepath = fs.path.join(
                 browse_product_os_dirpath, browse_file)
             size = os.stat(browse_os_filepath).st_size

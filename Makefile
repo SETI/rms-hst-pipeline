@@ -16,17 +16,23 @@ mtb : venv
 	source venv/bin/activate && \
 	    python MakeTarball.py /Users/spaceman/pdart/new-bulk-download . 11187
 
+# j ACS hst_09296 is 247.9MB
+# j ACS hst_09985 is 279MB
+# j ACS hst_15098 is 273MB
+# u WFPC2 hst_05783 is 39MB
+# u WFPC2 hst_06621 is 39MB
+# u WFPC2 hst_07240 is 19.8MB
+
 # PROJ_IDS=7240 9296 15419
-PROJ_IDS=15419
+PROJ_IDS=7240 15419
 STEPS=copy_primary_files record_changes insert_changes populate_database \
-    build_browse build_labels make_deliverable
+    build_browse build_labels update_archive # make_deliverable
+
 
 # STEPS=download_docs check_downloads copy_primary_files record_changes # copy_downloads make_new_versions make_browse
 
 pipeline : venv
 	# i WFC3 hst_15419 is 101.5MB
-	# j ACS hst_09296 is 247.9MB
-	# u WFPC2 hst_07240 is 19.8MB
 	-rm -rf tmp-working-dir
 	tar -xf tmp-working-dir.tar
 	for project_id in $(PROJ_IDS); do \
