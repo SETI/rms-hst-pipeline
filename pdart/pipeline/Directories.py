@@ -45,4 +45,4 @@ class Directories(object):
         return os.path.join(self.working_dir(proposal_id), "archive")
 
     def deliverable_dir(self, proposal_id):
-        return os.path.join(self.working_dir(proposal_id), "deliverable")
+        return os.path.join(self.working_dir(proposal_id), "hst_%05d-deliverable" % proposal_id)

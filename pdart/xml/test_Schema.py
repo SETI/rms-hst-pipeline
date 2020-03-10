@@ -73,5 +73,5 @@ class TestXmlSchema(unittest.TestCase):
         self.assertTrue(failures)
 
         self.assertIsNone(schematron_failures(path_to_testfile('bundle.xml')))
-        failures = schematron_failures(path_to_testfile('bad_bundle.xml'))
-        self.assertIsNotNone(failures)
+        sch_failures = schematron_failures(path_to_testfile('bad_bundle.xml'))
+        self.assertNotEquals([], sch_failures)
