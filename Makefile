@@ -26,7 +26,7 @@ mtb : venv
 # PROJ_IDS=7240 9296 15419
 PROJ_IDS=7240 15419
 STEPS=copy_primary_files record_changes insert_changes populate_database \
-    build_browse build_labels update_archive # make_deliverable
+    build_browse build_labels update_archive make_deliverable
 
 
 # STEPS=download_docs check_downloads copy_primary_files record_changes # copy_downloads make_new_versions make_browse

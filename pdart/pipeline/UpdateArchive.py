@@ -31,9 +31,12 @@ def update_archive(
     ) as browse_deltas, make_sv_deltas(
         browse_deltas, archive_label_deltas_dir
     ) as label_deltas:
+
+        # TODO I *think* this is a hack and will only work for the
+        # initial import...but maybe I accidentally wrote better code
+        # than I think and it'll work for all cases.  Investigate.
         mv = Multiversioned(archive_osfs)
         mv.update_from_single_version(std_is_new, label_deltas)
-        archive_osfs.tree()
 
     shutil.rmtree(archive_primary_deltas_dir + '-deltas-sv')
     shutil.rmtree(archive_browse_deltas_dir + '-deltas-sv')

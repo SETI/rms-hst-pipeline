@@ -16,19 +16,14 @@ def make_deliverable(
     # type: (int, str, unicode, unicode, unicode, unicode, unicode) -> None
     with make_osfs(archive_dir) as archive_osfs, make_version_view(
         archive_osfs, bundle_segment
-    ) as version_view, make_sv_deltas(
-        version_view, archive_primary_deltas_dir
-    ) as sv_deltas, make_sv_deltas(
-        sv_deltas, archive_browse_deltas_dir
-    ) as browse_deltas, make_sv_deltas(
-        browse_deltas, archive_label_deltas_dir
-    ) as label_deltas:
+    ) as version_view:
         # Hack-ish: just trying to get everything into place
         deliverable_path = fs.path.join(working_dir, 'deliverable')
         os.mkdir(deliverable_path)
-        deliverable_fs = DeliverableFS(OSFS(deliverable_path))
-        fs.copy.copy_fs(label_deltas, deliverable_fs)
+        deliverable_osfs = OSFS(deliverable_path)
+        deliverable_fs = DeliverableFS(deliverable_osfs)
+        fs.copy.copy_fs(version_view, deliverable_fs)
         
         # instrumentation
-        deliverable_fs.tree()
+        deliverable_osfs.tree()
 
