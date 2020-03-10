@@ -20,19 +20,18 @@ XML element.
 """
 
 parameters_general = interpret_template("""<hst:Parameters_General>
-  <hst:stsci_group_id><NODE name="stsci_group_id" /></hst:stsci_group_id>
+  <hst:mast_observation_id><NODE name="mast_observation_id" /></hst:mast_observation_id>
   <hst:hst_proposal_id><NODE name="hst_proposal_id" /></hst:hst_proposal_id>
   <hst:hst_pi_name><NODE name="hst_pi_name" /></hst:hst_pi_name>
-  <hst:hst_target_name><NODE name="hst_target_name" /></hst:hst_target_name>
-  <hst:aperture_name><NODE name="aperture_name" /></hst:aperture_name>
   <hst:exposure_duration unit="s"><NODE name="exposure_duration" />\
 </hst:exposure_duration>
+  <hst:hst_target_name><NODE name="hst_target_name" /></hst:hst_target_name>
+  <hst:aperture_name><NODE name="aperture_name" /></hst:aperture_name>
   <hst:exposure_type><NODE name="exposure_type" /></hst:exposure_type>
   <hst:filter_name><NODE name="filter_name" /></hst:filter_name>
   <hst:fine_guidance_system_lock_type>\
 <NODE name="fine_guidance_system_lock_type" />\
 </hst:fine_guidance_system_lock_type>
-  <hst:gyroscope_mode><NODE name="gyroscope_mode" /></hst:gyroscope_mode>
   <hst:instrument_mode_id><NODE name="instrument_mode_id" />\
 </hst:instrument_mode_id>
   <hst:moving_target_flag><NODE name="moving_target_flag" />\

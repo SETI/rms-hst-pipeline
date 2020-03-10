@@ -62,10 +62,15 @@ class TestXmlSchema(unittest.TestCase):
         self.assertNotEquals('', stdout)
 
         svrl = probatron_with_svrl_result(path_to_testfile('bundle.xml'))
-        self.assertFalse(svrl_has_failures(svrl))
+        failures = svrl_failures(svrl)
+        self.assertFalse(failures, 
+                         ('\n'.join([f.toxml()
+                                     for f in failures])).replace('\n',
+                                                                  '\\n'))
 
         svrl = probatron_with_svrl_result(path_to_testfile('bad_bundle.xml'))
-        self.assertTrue(svrl_has_failures(svrl))
+        failures = svrl_failures(svrl)
+        self.assertTrue(failures)
 
         self.assertIsNone(schematron_failures(path_to_testfile('bundle.xml')))
         failures = schematron_failures(path_to_testfile('bad_bundle.xml'))

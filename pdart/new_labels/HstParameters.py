@@ -330,23 +330,6 @@ Return text for the ``<gain_mode_id />`` XML element.
 
 
 ##############################
-# get_gyroscope_mode
-##############################
-
-def _get_gyroscope_mode(card_dicts, product_id):
-    return card_dicts[0]['GYROMODE']
-
-def _get_gyroscope_mode_placeholder(card_dicts, product_id):
-    return placeholder(product_id, 'gyroscope_mode')
-
-get_gyroscope_mode  = multiple_implementations(
-    'get_gyroscope_mode',
-    _get_gyroscope_mode,
-    _get_gyroscope_mode_placeholder
-)  # type: Callable[[_CARDS, unicode], unicode]
-
-
-##############################
 # get_hst_pi_name
 ##############################
 
@@ -484,10 +467,10 @@ Return text for the ``<observation_type />`` XML element.
 """
 
 ##############################
-# get_stsci_group_id: NOTE the name is going to change
+# get_mast_observation_id:
 ##############################
 
-def _get_stsci_group_id(card_dicts, product_id):
+def _get_mast_observation_id(card_dicts, product_id):
     try:
         asn_id = card_dicts[0]['ASN_ID']
         if asn_id == 'NONE':
@@ -498,17 +481,17 @@ def _get_stsci_group_id(card_dicts, product_id):
         return card_dicts[0]['ROOTNAME']
 
 
-def _get_stsci_group_id_placeholder(card_dicts, product_id):
+def _get_mast_observation_id_placeholder(card_dicts, product_id):
     # type: (_CARDS, unicode) -> unicode
-    return placeholder(product_id, 'stsci_group_id')
+    return placeholder(product_id, 'mast_observation_id')
 
-get_stsci_group_id = multiple_implementations(
-    'get_stsci_group_id',
-    _get_stsci_group_id,
-    _get_stsci_group_id_placeholder
+get_mast_observation_id = multiple_implementations(
+    'get_mast_observation_id',
+    _get_mast_observation_id,
+    _get_mast_observation_id_placeholder
 )  # type: Callable[[_CARDS, unicode], unicode]
 """
-Return text for the ``<stsci_group_id />`` XML element.
+Return text for the ``<mast_observation_id />`` XML element.
 """
 
 ##############################
@@ -516,7 +499,7 @@ Return text for the ``<stsci_group_id />`` XML element.
 def get_hst_parameters(card_dicts, shm_card_dicts, instrument, product_id):
     # type: (_CARDS, _CARDS, str, str) -> NodeBuilder
     """Return an ``<hst:HST />`` XML element."""
-    d = {'stsci_group_id': get_stsci_group_id(card_dicts, product_id),
+    d = {'mast_observation_id': get_mast_observation_id(card_dicts, product_id),
          'hst_proposal_id': get_hst_proposal_id(card_dicts, product_id),
          'hst_pi_name': get_hst_pi_name(card_dicts, product_id),
          'hst_target_name': get_hst_target_name(card_dicts, product_id),
@@ -529,7 +512,6 @@ def get_hst_parameters(card_dicts, shm_card_dicts, instrument, product_id):
          'filter_name': get_filter_name(card_dicts, instrument, product_id),
          'fine_guidance_system_lock_type':
              get_fine_guidance_system_lock_type(card_dicts, product_id),
-         'gyroscope_mode': get_gyroscope_mode(card_dicts, product_id),
          'instrument_mode_id': get_instrument_mode_id(card_dicts,
                                                       instrument,
                                                       product_id),

@@ -71,7 +71,7 @@ def _xsd_validator_schema(filepath,
     args = ['java', '-jar', 'XsdValidator.jar']
 
     for filename in schemas:
-        assert os.path.isfile(filename), 'schema %s exists' % filename
+        assert os.path.isfile(filename), 'schema %s required' % filename
 
     args.extend(schemas)
     if stdin is None:

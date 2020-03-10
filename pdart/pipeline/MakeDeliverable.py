@@ -16,7 +16,6 @@ def _fix_up_deliverable(dir):
     # directory tree.  TODO But *do* fix it.
     for path, _, _ in os.walk(dir, topdown=False):
         if path[-1] == "$":
-            print "****", path, "=>", path[:-1], "****"
             os.rename(path, path[:-1])
 
 

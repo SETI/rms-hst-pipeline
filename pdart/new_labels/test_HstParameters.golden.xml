@@ -1,16 +1,15 @@
 <?xml version="1.0"?>
 <hst:HST>
   <hst:Parameters_General>
-    <hst:stsci_group_id>jbz504eoq</hst:stsci_group_id>
+    <hst:mast_observation_id>jbz504eoq</hst:mast_observation_id>
     <hst:hst_proposal_id>13012</hst:hst_proposal_id>
     <hst:hst_pi_name>Lamy, Laurent </hst:hst_pi_name>
+    <hst:exposure_duration unit="s">270.0</hst:exposure_duration>
     <hst:hst_target_name>URANUS</hst:hst_target_name>
     <hst:aperture_name>SBC</hst:aperture_name>
-    <hst:exposure_duration unit="s">270.0</hst:exposure_duration>
     <hst:exposure_type>NORMAL</hst:exposure_type>
     <hst:filter_name>F165LP+N/A</hst:filter_name>
     <hst:fine_guidance_system_lock_type>FINE</hst:fine_guidance_system_lock_type>
-    <hst:gyroscope_mode>T</hst:gyroscope_mode>
     <hst:instrument_mode_id>ACCUM</hst:instrument_mode_id>
     <hst:moving_target_flag>true</hst:moving_target_flag>
   </hst:Parameters_General>

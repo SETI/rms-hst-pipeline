@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <!-- PDS4 Schematron for Name Space Id:hst  Version:1.0.0.0 - Mon Dec 16 15:07:52 EST 2019 -->
+  <!-- Generated from the PDS4 Information Model Version 1.13.0.0 - System Build 10a -->
+  <!-- *** This PDS4 schematron file is an operational deliverable. *** -->
+<sch:schema xmlns:sch="http://purl.oclc.org/dsdl/schematron" queryBinding="xslt2">
+
+  <sch:title>Schematron using XPath 2.0</sch:title>
+
+  <sch:ns uri="http://www.w3.org/2001/XMLSchema-instance" prefix="xsi"/>
+  <sch:ns uri="http://pds.nasa.gov/pds4/pds/v1" prefix="pds"/>
+  <sch:ns uri="http://pds.nasa.gov/pds4/mission/hst/v1" prefix="hst"/>
+
+		   <!-- ================================================ -->
+		   <!-- NOTE:  There are two types of schematron rules.  -->
+		   <!--        One type includes rules written for       -->
+		   <!--        specific situations. The other type are   -->
+		   <!--        generated to validate enumerated value    -->
+		   <!--        lists. These two types of rules have been -->
+		   <!--        merged together in the rules below.       -->
+		   <!-- ================================================ -->
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_ACS/hst:detector_id">
+      <sch:assert test=". = ('@@@')">
+        The attribute hst:detector_id must be equal to the value '@@@'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_ACS/hst:gain_mode_id">
+      <sch:assert test=". = ('@@@')">
+        The attribute hst:gain_mode_id must be equal to the value '@@@'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_ACS/hst:observation_type">
+      <sch:assert test=". = ('image', 'spectrum')">
+        The attribute hst:observation_type must be equal to one of the following values 'image', 'spectrum'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_ACS/hst:subarray_flag">
+      <sch:assert test=". = ('@@@')">
+        The attribute hst:subarray_flag must be equal to the value '@@@'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_General">
+      <sch:assert test="if (hst:moving_target_flag) then hst:moving_target_flag = ('true', 'false') else true()">
+        The attribute hst:moving_target_flag must be equal to one of the following values 'true', 'false'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_General/hst:exposure_duration">
+      <sch:assert test="@unit = ('day', 'hr', 'julian day', 'microseconds', 'min', 'ms', 's', 'yr')">
+        The attribute @unit must be equal to one of the following values 'day', 'hr', 'julian day', 'microseconds', 'min', 'ms', 's', 'yr'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_General/hst:exposure_type">
+      <sch:assert test=". = ('@@@', '@@@', '@@@', '@@@', 'extended', 'incomplete', 'indeterminate', 'interrupted', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain')">
+        The attribute hst:exposure_type must be equal to one of the following values '@@@', '@@@', '@@@', '@@@', 'extended', 'incomplete', 'indeterminate', 'interrupted', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_General/hst:fine_guidance_system_lock_type">
+      <sch:assert test=". = ('course', 'fine', 'fine/gyro', 'gyros', 'unknown')">
+        The attribute hst:fine_guidance_system_lock_type must be equal to one of the following values 'course', 'fine', 'fine/gyro', 'gyros', 'unknown'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_General/hst:instrument_mode_id">
+      <sch:assert test=". = ('accum', 'acq')">
+        The attribute hst:instrument_mode_id must be equal to one of the following values 'accum', 'acq'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_General/hst:moving_target_flag">
+      <sch:assert test=". = ('false', 'true')">
+        The attribute hst:moving_target_flag must be equal to one of the following values 'false', 'true'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_WFC3/hst:detector_id">
+      <sch:assert test=". = ('@@@')">
+        The attribute hst:detector_id must be equal to the value '@@@'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_WFC3/hst:observation_type">
+      <sch:assert test=". = ('image', 'spectrum')">
+        The attribute hst:observation_type must be equal to one of the following values 'image', 'spectrum'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_WFC3/hst:subarray_flag">
+      <sch:assert test=". = ('@@@')">
+        The attribute hst:subarray_flag must be equal to the value '@@@'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_WFPC2/hst:bandwidth">
+      <sch:assert test="@unit = ('AU', 'Angstrom', 'cm', 'km', 'm', 'micrometer', 'mm', 'nm')">
+        The attribute @unit must be equal to one of the following values 'AU', 'Angstrom', 'cm', 'km', 'm', 'micrometer', 'mm', 'nm'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_WFPC2/hst:center_filter_wavelength">
+      <sch:assert test="@unit = ('AU', 'Angstrom', 'cm', 'km', 'm', 'micrometer', 'mm', 'nm')">
+        The attribute @unit must be equal to one of the following values 'AU', 'Angstrom', 'cm', 'km', 'm', 'micrometer', 'mm', 'nm'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_WFPC2/hst:gain_mode_id">
+      <sch:assert test=". = ('@@@')">
+        The attribute hst:gain_mode_id must be equal to the value '@@@'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:rule context="hst:Parameters_WFPC2/hst:targeted_detector_id">
+      <sch:assert test=". = ('pc1', 'wf2', 'wf3', 'wf4')">
+        The attribute hst:targeted_detector_id must be equal to one of the following values 'pc1', 'wf2', 'wf3', 'wf4'.</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+</sch:schema>
