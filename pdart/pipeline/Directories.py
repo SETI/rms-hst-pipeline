@@ -1,3 +1,4 @@
+import abc
 import os.path
 
 # TODO Make this abstract and implement for development and also for
@@ -5,6 +6,60 @@ import os.path
 
 
 class Directories(object):
+    __metaclass__ == abc.ABCMeta
+
+    @abc.abstractmethod
+    def working_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def mast_downloads_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def next_version_deltas_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def primary_files_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def documents_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def archive_primary_deltas_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def archive_browse_deltas_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def archive_label_deltas_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def archive_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+    @abc.abstractmethod
+    def deliverable_dir(self, proposal_id):
+        # type: (int) -> unicode
+        pass
+
+
+class DevDirectories(Directories):
     """
     We use this object as a way to configure where to find data files.
     This allows us to move the archives around or even split them over

@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 import sys
 
 import os.path
@@ -7,13 +9,16 @@ from pdart.pipeline.BuildBrowse import build_browse
 from pdart.pipeline.BuildLabels import build_labels
 from pdart.pipeline.CheckDownloads import check_downloads
 from pdart.pipeline.CopyPrimaryFiles import copy_primary_files
-from pdart.pipeline.Directories import Directories
+from pdart.pipeline.Directories import DevDirectories
 from pdart.pipeline.DownloadDocs import download_docs
 from pdart.pipeline.InsertChanges import insert_changes
 from pdart.pipeline.MakeDeliverable import make_deliverable
 from pdart.pipeline.PopulateDatabase import populate_database
 from pdart.pipeline.RecordChanges import record_changes
 from pdart.pipeline.UpdateArchive import update_archive
+
+if TYPE_CHECKING:
+    from pdart.pipeline.Directories import Directories
 
 
 def dispatch(dirs, proposal_id, command):
@@ -97,13 +102,14 @@ def dispatch(dirs, proposal_id, command):
         ),
         # Update the archive with the new version
         "update_archive": (
-            lambda: update_archive(bundle_segment,
+            lambda: update_archive(
+                bundle_segment,
                 dirs.working_dir(proposal_id),
                 dirs.archive_dir(proposal_id),
                 dirs.archive_primary_deltas_dir(proposal_id),
                 dirs.archive_browse_deltas_dir(proposal_id),
                 dirs.archive_label_deltas_dir(proposal_id),
-                )
+            )
         ),
         # Build labels for the new components.
         "make_deliverable": (
@@ -126,7 +132,7 @@ def run():
     proposal_id = int(sys.argv[1])
     command = sys.argv[2]
 
-    dirs = Directories("tmp-working-dir")
+    dirs = DevDirectories("tmp-working-dir")
     failure_marker_filepath = os.path.join(
         dirs.working_dir(proposal_id), _FAILURE_MARKER
     )
