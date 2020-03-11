@@ -14,7 +14,7 @@ class TestDeletionSet(unittest.TestCase):
 
     def test_delete(self):
         # type: () -> None
-        FOO = '/foo/bar/baz'
+        FOO = "/foo/bar/baz"
         self.assertFalse(self._deletion_set.is_deleted(FOO))
         self._deletion_set.delete(FOO)
         self.assertTrue(self._deletion_set.is_deleted(FOO))
@@ -22,7 +22,7 @@ class TestDeletionSet(unittest.TestCase):
 
     def test_undelete(self):
         # type: () -> None
-        FOO = '/foo/bar/baz'
+        FOO = "/foo/bar/baz"
         self._deletion_set.delete(FOO)
         self._deletion_set.undelete(FOO)
         self.assertFalse(self._deletion_set.is_deleted(FOO))
@@ -30,8 +30,8 @@ class TestDeletionSet(unittest.TestCase):
 
     def test_as_set(self):
         # type: () -> None
-        FOO = '/foo'
-        BAR = '/bar'
+        FOO = "/foo"
+        BAR = "/bar"
         self.assertFalse(self._deletion_set.as_set())
         self._deletion_set.delete(FOO)
         self.assertEquals(set([FOO]), self._deletion_set.as_set())

@@ -3,8 +3,8 @@ from contextlib import contextmanager
 import os.path
 import shutil
 
-from multiversioned.Multiversioned import Multiversioned
-from multiversioned.VersionView import VersionView
+from pdart.fs.multiversioned.Multiversioned import Multiversioned
+from pdart.fs.multiversioned.VersionView import VersionView
 from pdart.fs.Versioned import (
     SingleVersionedOSFS,
     MultiversionedOSFS,
@@ -12,10 +12,10 @@ from pdart.fs.Versioned import (
     MultiversionedCOWFS,
 )
 
-from cowfs.COWFS import COWFS
 from fs.osfs import OSFS
 import fs.path
 
+from pdart.fs.cowfs.COWFS import COWFS
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 
@@ -24,7 +24,7 @@ from pdart.pipeline.FSTypes import *
 if TYPE_CHECKING:
     from typing import Generator
     from fs.base import FS
-    from multiversioned.VersionView import VersionView
+    from pdart.fs.multiversioned.VersionView import VersionView
 
 
 def show_tree(tag, fs):

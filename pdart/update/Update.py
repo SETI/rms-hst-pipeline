@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from pdart.fs.CopyOnWriteFS import CopyOnWriteVersionView
 from pdart.fs.DirUtils import lid_to_dir, lidvid_to_dir
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
-from pdart.fs.VersionView import VersionView
+from pdart.fs.OldVersionView import OldVersionView
 from pdart.pds4.LIDVID import LIDVID
 
 if TYPE_CHECKING:
@@ -55,7 +55,7 @@ def update_bundle(multiversioned_fs, last_bundle_lidvid, is_major, update):
     Use the update function (or callable) to update the bundle with
     the given LIDVID in the filesystem.
     """
-    last_version_view = VersionView(last_bundle_lidvid, multiversioned_fs)
+    last_version_view = OldVersionView(last_bundle_lidvid, multiversioned_fs)
 
     cow_fs = CopyOnWriteVersionView(last_version_view)
     update(cow_fs)

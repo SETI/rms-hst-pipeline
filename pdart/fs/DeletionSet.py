@@ -13,12 +13,13 @@ class DeletionSet(object):
     Represents a set of paths to files and directories that have been
     deleted from a copy-on-write filesystem.
     """
+
     def __init__(self):
         # type: () -> None
         self._deleted_paths = set()  # type: Set[unicode]
 
     def __str__(self):
-        return 'DeletionSet(%s)' % self._deleted_paths
+        return "DeletionSet(%s)" % self._deleted_paths
 
     def is_deleted(self, path):
         # type: (unicode) -> bool

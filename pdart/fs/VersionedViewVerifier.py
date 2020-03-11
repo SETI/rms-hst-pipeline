@@ -8,7 +8,7 @@ from pdart.fs.SubdirVersions import read_subdir_versions_from_directory
 from pdart.fs.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME, scan_vfs_dir
 
 if TYPE_CHECKING:
-    from pdart.fs.VersionView import VersionView
+    from pdart.fs.OldVersionView import OldVersionView
 
 
 class VersionedViewException(Exception):
@@ -23,7 +23,7 @@ class VersionedViewVerifier(object):
     """
 
     def __init__(self, view):
-        # type: (VersionView) -> None
+        # type: (OldVersionView) -> None
         self.view = view
         self.test_has_bundle_dirs()
 
@@ -35,10 +35,12 @@ class VersionedViewVerifier(object):
 
         # Everything under the bundle dir must also be a dir.  There
         # are version directories and collection directories.
-        (ordinary_file_infos,
-         ordinary_dir_infos,
-         subdir_versions_file_infos,
-         version_dir_infos) = scan_vfs_dir(self.view, bundle_dir)
+        (
+            ordinary_file_infos,
+            ordinary_dir_infos,
+            subdir_versions_file_infos,
+            version_dir_infos,
+        ) = scan_vfs_dir(self.view, bundle_dir)
 
         # No files in the bundle dir
         self.assertFalse(ordinary_file_infos + subdir_versions_file_infos)
@@ -47,11 +49,11 @@ class VersionedViewVerifier(object):
         self.assertTrue(len(version_dir_infos) >= 1)
 
         # Version and collection dirs are all that's in the bundle dir
-        self.assertEqual([coll_dir_info.name
-                          for coll_dir_info in ordinary_dir_infos] +
-                         [version_dir_info.name
-                          for version_dir_info in version_dir_infos],
-                         self.view.listdir(bundle_dir))
+        self.assertEqual(
+            [coll_dir_info.name for coll_dir_info in ordinary_dir_infos]
+            + [version_dir_info.name for version_dir_info in version_dir_infos],
+            self.view.listdir(bundle_dir),
+        )
 
         for version_info in version_dir_infos:
             VERSION_DIR = join(bundle_dir, version_info.name)
@@ -68,10 +70,12 @@ class VersionedViewVerifier(object):
         """
         # Everything under the collection dir must also be a dir.  There
         # are version directories and product directories.
-        (ordinary_file_infos,
-         ordinary_dir_infos,
-         subdir_versions_file_infos,
-         version_dir_infos) = scan_vfs_dir(self.view, collection_dir)
+        (
+            ordinary_file_infos,
+            ordinary_dir_infos,
+            subdir_versions_file_infos,
+            version_dir_infos,
+        ) = scan_vfs_dir(self.view, collection_dir)
 
         # No files in the collection dir
         self.assertFalse(ordinary_file_infos + subdir_versions_file_infos)
@@ -81,11 +85,11 @@ class VersionedViewVerifier(object):
         self.assertTrue(len(collection_versions) >= 1)
 
         # Product and version dirs are all
-        self.assertEqual([prod_dir_info.name
-                          for prod_dir_info in ordinary_dir_infos] +
-                         [version_dir_info.name
-                          for version_dir_info in version_dir_infos],
-                         self.view.listdir(collection_dir))
+        self.assertEqual(
+            [prod_dir_info.name for prod_dir_info in ordinary_dir_infos]
+            + [version_dir_info.name for version_dir_info in version_dir_infos],
+            self.view.listdir(collection_dir),
+        )
 
         for version_info in version_dir_infos:
             VERSION_DIR = join(collection_dir, version_info.name)
@@ -103,10 +107,12 @@ class VersionedViewVerifier(object):
 
         # Everything under the product dir must also be a dir.  There
         # are version directories and product directories.
-        (ordinary_file_infos,
-         ordinary_dir_infos,
-         subdir_versions_file_infos,
-         version_dir_infos) = scan_vfs_dir(self.view, product_dir)
+        (
+            ordinary_file_infos,
+            ordinary_dir_infos,
+            subdir_versions_file_infos,
+            version_dir_infos,
+        ) = scan_vfs_dir(self.view, product_dir)
 
         # No files in the product dir
         self.assertFalse(ordinary_file_infos + subdir_versions_file_infos)
@@ -116,9 +122,10 @@ class VersionedViewVerifier(object):
         self.assertTrue(len(product_versions) >= 1)
 
         # Version dirs are all
-        self.assertEqual(set([version_dir_info.name
-                              for version_dir_info in version_dir_infos]),
-                         set(self.view.listdir(product_dir)))
+        self.assertEqual(
+            set([version_dir_info.name for version_dir_info in version_dir_infos]),
+            set(self.view.listdir(product_dir)),
+        )
 
         for version_info in version_dir_infos:
             VERSION_DIR = join(product_dir, version_info.name)
@@ -130,10 +137,9 @@ class VersionedViewVerifier(object):
         Verify a version directory.
         """
 
-        assert basename(version_dir)[0:2] == 'v$'
+        assert basename(version_dir)[0:2] == "v$"
         # All version dirs must contain a subdir versions file
-        SUBDIR_VERSIONS_FILEPATH = join(version_dir,
-                                        SUBDIR_VERSIONS_FILENAME)
+        SUBDIR_VERSIONS_FILEPATH = join(version_dir, SUBDIR_VERSIONS_FILENAME)
 
         self.assertTrue(self.view.exists(SUBDIR_VERSIONS_FILEPATH))
         self.assertTrue(self.view.isfile(SUBDIR_VERSIONS_FILEPATH))
@@ -143,14 +149,15 @@ class VersionedViewVerifier(object):
         self.check_subdir_versions_file(version_dir)
 
         # version dirs contain only files
-        (ordinary_file_infos,
-         ordinary_dir_infos,
-         subdir_versions_file_infos,
-         version_dir_infos) = scan_vfs_dir(self.view, version_dir)
+        (
+            ordinary_file_infos,
+            ordinary_dir_infos,
+            subdir_versions_file_infos,
+            version_dir_infos,
+        ) = scan_vfs_dir(self.view, version_dir)
         self.assertFalse(ordinary_dir_infos + version_dir_infos)
 
-    def check_subdir_versions_file(self,
-                                   version_dir):
+    def check_subdir_versions_file(self, version_dir):
         # type: (unicode) -> None
         """
         Verify a subdir-versions file.
@@ -159,7 +166,7 @@ class VersionedViewVerifier(object):
         for subdir_name, version in d.items():
             # each subdirectory entry must correspond to an
             # existing subdirectory
-            subdir = join(version_dir, '..', subdir_name, 'v$' + version)
+            subdir = join(version_dir, "..", subdir_name, "v$" + version)
             self.view.exists(subdir)
             self.view.isdir(subdir)
 

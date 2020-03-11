@@ -52,7 +52,7 @@ def make_deliverable(bundle_segment, working_dir, archive_dir, deliverable_dir):
         with open(transfer_manifest_path, "w") as f:
             f.write(make_transfer_manifest(db, lidvid_to_dirpath))
 
-        # tar up
+        # Tar it up.
         bundle_dir = str(fs.path.join(deliverable_dir, bundle_segment))
 
         with tarfile.open("%s.tar" % bundle_dir, "w") as tar:

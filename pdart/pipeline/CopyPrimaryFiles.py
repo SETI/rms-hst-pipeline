@@ -3,10 +3,10 @@ from contextlib import contextmanager
 import os.path
 import shutil
 
-from multiversioned.Multiversioned import Multiversioned
+from pdart.fs.multiversioned.Multiversioned import Multiversioned
 from pdart.pipeline.Utils import *
 
-from cowfs.COWFS import COWFS
+from pdart.fs.cowfs.COWFS import COWFS
 from fs.osfs import OSFS
 from fs.tempfs import TempFS
 import fs.path
@@ -17,7 +17,7 @@ from pdart.pds4.LID import LID
 if TYPE_CHECKING:
     from typing import Generator
     from fs.base import FS
-    from multiversioned.VersionView import VersionView
+    from pdart.fs.multiversioned.VersionView import VersionView
 
 
 def to_segment_dir(name):

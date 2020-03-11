@@ -16,18 +16,18 @@ if TYPE_CHECKING:
     from pdart.fs.FSPrimitives import Dir_, File_, Node_
     from pdart.pds4.LIDVID import LIDVID
 
-_NO_VISIT = u'no$visit'
+_NO_VISIT = u"no$visit"
 
 
 def _is_visit_dir(filename):
-    return re.match(r'^visit_..$', filename) is not None
+    return re.match(r"^visit_..$", filename) is not None
 
 
 def _visit_of(filename):
     # type: (unicode) -> Optional[unicode]
     try:
         hf = HstFilename(filename)
-        return 'visit_' + hf.visit()
+        return "visit_" + hf.visit()
     except AssertionError:
         return None
 
@@ -73,12 +73,12 @@ def _translate_path_to_base_path(path, is_file_hint=None):
 
         b, c, p = parts
         if is_file_hint is None:
-            is_file_hint = '.' in p
+            is_file_hint = "." in p
         if is_file_hint:
             # It's a path to a collection file, perhaps a label or
             # inventory, and is fine as is.
             return fs.path.abspath(path)
-        elif c == 'document':
+        elif c == "document":
             # It's a path in a document collection.  Leave it as is.
             return fs.path.abspath(path)
         else:
@@ -99,7 +99,7 @@ def _translate_path_to_base_path(path, is_file_hint=None):
         # l_ > 3.  Let's name the first three parts.
         b, c, p = parts[:3]
         # Is this path part of a document collection?
-        if c == 'document':
+        if c == "document":
             # no change needed
             return fs.path.abspath(path)
 
@@ -150,11 +150,11 @@ class DeliverablePrimitives(FSPrimitives):
 
     def __str__(self):
         # type: () -> str
-        return 'DeliverablePrimitives(%r)' % self.base_fs
+        return "DeliverablePrimitives(%r)" % self.base_fs
 
     def __repr__(self):
         # type: () -> str
-        return 'DeliverablePrimitives(%r)' % self.base_fs
+        return "DeliverablePrimitives(%r)" % self.base_fs
 
     def add_child_dir(self, parent_node, filename):
         # type: (Dir_, unicode) -> Dir_
@@ -178,7 +178,7 @@ class DeliverablePrimitives(FSPrimitives):
         self.base_fs.touch(base_path)
         return File(self, path)
 
-    def _info_to_node(self, parent_dir_path,  info):
+    def _info_to_node(self, parent_dir_path, info):
         # type: (unicode, Info) -> Node_
         filepath = fs.path.join(parent_dir_path, info.name)
         if info.is_file:
@@ -194,10 +194,11 @@ class DeliverablePrimitives(FSPrimitives):
         basepath.
         """
         assert len(fs.path.iteratepath(path)) == 2
-        return {info.name: self._info_to_node(path, info)
-                for info
-                in self.base_fs.scandir(path, namespaces=['basic'])
-                if info.is_file}
+        return {
+            info.name: self._info_to_node(path, info)
+            for info in self.base_fs.scandir(path, namespaces=["basic"])
+            if info.is_file
+        }
 
     def _visit_contents(self, path):
         # type: (unicode) -> Dict[unicode, Node_]
@@ -218,10 +219,11 @@ class DeliverablePrimitives(FSPrimitives):
     def _doc_contents(self, path):
         # type: (unicode) -> Dict[unicode, Node_]
         b, c = fs.path.iteratepath(path)
-        if c == 'document':
-            return {info.name: self._info_to_node(path, info)
-                    for info
-                    in self.base_fs.scandir(path, namespaces=['basic'])}
+        if c == "document":
+            return {
+                info.name: self._info_to_node(path, info)
+                for info in self.base_fs.scandir(path, namespaces=["basic"])
+            }
         else:
             return {}
 
@@ -235,15 +237,16 @@ class DeliverablePrimitives(FSPrimitives):
         parts = fs.path.iteratepath(path)
         assert len(parts) == 2
         b, c = parts
-        if c == 'document':
+        if c == "document":
             return {}
         new_path = fs.path.join(path, _NO_VISIT)
         if not self.base_fs.isdir(new_path):
             return {}
 
-        return {info.name: self._info_to_node(path, info)
-                for info
-                in self.base_fs.scandir(new_path, namespaces=['basic'])}
+        return {
+            info.name: self._info_to_node(path, info)
+            for info in self.base_fs.scandir(new_path, namespaces=["basic"])
+        }
 
     def _product_dir_contents(self, path, visit_dir_name, product_dir_name):
         # type: (unicode, unicode, unicode) -> Dict[unicode, Node_]
@@ -278,12 +281,14 @@ class DeliverablePrimitives(FSPrimitives):
             return res
         elif l_ is 2:
             # note that path == base_path for l_ == 2
-            return _union_dicts(self._file_contents(path),
-                                self._visit_contents(path),
-                                self._no_visit_contents(path),
-                                self._doc_contents(path))
+            return _union_dicts(
+                self._file_contents(path),
+                self._visit_contents(path),
+                self._no_visit_contents(path),
+                self._doc_contents(path),
+            )
         else:
-            assert(l_ is 3)
+            assert l_ is 3
             product_dir_name = path_parts[2]
             v = _visit_of(product_dir_name)
             if v:
@@ -300,7 +305,6 @@ class DeliverablePrimitives(FSPrimitives):
                     else:
                         res[unicode(filename)] = Dir(self, child_path)
             return res
-            
 
     def get_file_handle(self, node, mode):
         # type: (File_, str) -> Any
@@ -349,7 +353,7 @@ class DeliverablePrimitives(FSPrimitives):
 
     def root_node(self):
         # type: () -> Dir_
-        return Dir(self, u'/')
+        return Dir(self, u"/")
 
     def _to_sys_path(self, path):
         # type: (unicode) -> unicode

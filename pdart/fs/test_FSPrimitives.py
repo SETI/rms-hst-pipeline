@@ -22,6 +22,7 @@ class FSPrimitives_TestBase(object):
     """
     This is not a test case, but an abstract base class for a test case.
     """
+
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
@@ -38,14 +39,14 @@ class FSPrimitives_TestBase(object):
         # ...and is a directory
         self.assertTrue(fs.is_dir(root))
         # ...and has the right path
-        self.assertEqual(u'/', root.path)
+        self.assertEqual(u"/", root.path)
 
     def test_is_dir(self):
         # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
         self.assertTrue(fs.is_dir(root))
-        file = fs.add_child_file(root, 'foo')
+        file = fs.add_child_file(root, "foo")
         self.assertFalse(fs.is_dir(file))
 
     def test_is_file(self):
@@ -53,7 +54,7 @@ class FSPrimitives_TestBase(object):
         fs = self.get_fs()
         root = fs.root_node()
         self.assertFalse(fs.is_file(root))
-        file = fs.add_child_file(root, 'foo')
+        file = fs.add_child_file(root, "foo")
         self.assertTrue(fs.is_file(file))
 
     def test_get_dir_children(self):
@@ -61,9 +62,9 @@ class FSPrimitives_TestBase(object):
         fs = self.get_fs()
         root = fs.root_node()
         self.assertFalse(fs.get_dir_children(root))
-        file_node = fs.add_child_file(root, 'file')
-        dir_node = fs.add_child_dir(root, 'dir')
-        expected = {'file': file_node, 'dir': dir_node}
+        file_node = fs.add_child_file(root, "file")
+        dir_node = fs.add_child_dir(root, "dir")
+        expected = {"file": file_node, "dir": dir_node}
         self.assertEqual(expected, fs.get_dir_children(root))
 
     def test_get_file_handle(self):
@@ -71,15 +72,15 @@ class FSPrimitives_TestBase(object):
         fs = self.get_fs()
         root = fs.root_node()
         self.assertFalse(fs.get_children(root))
-        file_node = fs.add_child_file(root, 'file')
-        self.assertTrue(fs.get_file_handle(file_node, 'w'))
+        file_node = fs.add_child_file(root, "file")
+        self.assertTrue(fs.get_file_handle(file_node, "w"))
 
     def test_add_child_dir(self):
         # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
         self.assertFalse(fs.get_children(root))
-        self._assert_add_child_dir_is_correct(root, 'dir')
+        self._assert_add_child_dir_is_correct(root, "dir")
 
     def _assert_add_child_dir_is_correct(self, dir, child_name):
         # type: (Dir_, unicode) -> Dir_
@@ -94,8 +95,7 @@ class FSPrimitives_TestBase(object):
         # the result is a directory
         self.assertTrue(self.get_fs().is_dir(child_dir))
         # the result is in the parent's directory
-        self.assertEqual(child_dir,
-                         self.get_fs().get_dir_child(dir, child_name))
+        self.assertEqual(child_dir, self.get_fs().get_dir_child(dir, child_name))
         # the result has the right path
         self.assertEqual(child_dir.path, fs.path.join(dir.path, child_name))
         # assert the children changed, and differ only by the new entry
@@ -110,11 +110,11 @@ class FSPrimitives_TestBase(object):
         fs = self.get_fs()
         root = fs.root_node()
         self.assertFalse(fs.get_children(root))
-        self._assert_add_child_file_is_correct(root, 'file')
-        file = fs.get_dir_child(root, 'file')
+        self._assert_add_child_file_is_correct(root, "file")
+        file = fs.get_dir_child(root, "file")
         self.assertTrue(fs.is_file(file))
-        self.assertEqual(file, fs.get_dir_child(root, 'file'))
-        self.assertEqual('/file', file.path)
+        self.assertEqual(file, fs.get_dir_child(root, "file"))
+        self.assertEqual("/file", file.path)
 
     def _assert_add_child_file_is_correct(self, dir, child_name):
         # type: (Dir_, unicode) -> File_
@@ -129,8 +129,7 @@ class FSPrimitives_TestBase(object):
         # the result is a file
         self.assertTrue(self.get_fs().is_file(child_file))
         # the result is in the parent's directory
-        self.assertEqual(child_file,
-                         self.get_fs().get_dir_child(dir, child_name))
+        self.assertEqual(child_file, self.get_fs().get_dir_child(dir, child_name))
         # the result has the right path
         self.assertEqual(child_file.path, fs.path.join(dir.path, child_name))
         # assert the children changed, and differ only by the new entry
@@ -144,10 +143,10 @@ class FSPrimitives_TestBase(object):
         # type: () -> None
         fs = self.get_fs()
         root = fs.root_node()
-        dir = fs.add_child_dir(root, 'dir')
-        file = fs.add_child_file(root, 'file')
-        self._assert_remove_child_is_correct(root, 'dir')
-        self._assert_remove_child_is_correct(root, 'file')
+        dir = fs.add_child_dir(root, "dir")
+        file = fs.add_child_file(root, "file")
+        self._assert_remove_child_is_correct(root, "dir")
+        self._assert_remove_child_is_correct(root, "file")
 
     def _assert_remove_child_is_correct(self, dir, child_name):
         # type: (Dir_, unicode) -> None
@@ -199,14 +198,14 @@ class OSFSPrimitives(FSPrimitives):
         self.root = root
 
     def __str__(self):
-        return 'OSFSPrimitives(%r)' % self.root
+        return "OSFSPrimitives(%r)" % self.root
 
     def __repr__(self):
-        return 'OSFSPrimitives(%r)' % self.root
+        return "OSFSPrimitives(%r)" % self.root
 
     def _to_sys_path(self, path):
         # type: (unicode) -> unicode
-        path_part = path.lstrip('/')
+        path_part = path.lstrip("/")
         return os.path.join(self.root, path_part)
 
     def add_child_dir(self, parent_node, filename):
@@ -220,7 +219,7 @@ class OSFSPrimitives(FSPrimitives):
         # type: (Dir_, unicode) -> File_
         path = fs.path.join(parent_node.path, filename)
         sys_path = self._to_sys_path(path)
-        with open(sys_path, 'w'):
+        with open(sys_path, "w"):
             pass
         return File(self, path)
 
@@ -241,8 +240,7 @@ class OSFSPrimitives(FSPrimitives):
     def get_file_handle(self, node, mode):
         # type: (File, str) -> io.IOBase
         sys_path = self._to_sys_path(node.path)
-        return cast(io.IOBase,
-                    io.open(sys_path, fs.mode.Mode(mode).to_platform_bin()))
+        return cast(io.IOBase, io.open(sys_path, fs.mode.Mode(mode).to_platform_bin()))
         # The cast is due to a bug in the mypy, testing, typeshed
         # environment.
 
@@ -262,10 +260,10 @@ class OSFSPrimitives(FSPrimitives):
 
     def root_node(self):
         # type: () -> Dir_
-        return Dir(self, u'/')
+        return Dir(self, u"/")
 
 
-_TMP_DIR = os.path.abspath('tmp_osfs_prims')
+_TMP_DIR = os.path.abspath("tmp_osfs_prims")
 
 
 class Test_OSFSPrimitives(unittest.TestCase, FSPrimitives_TestBase):

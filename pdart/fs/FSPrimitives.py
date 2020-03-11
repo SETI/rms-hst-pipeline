@@ -39,7 +39,7 @@ class Dir(Node):
         return False
 
     def __repr__(self):
-        return 'Dir(%r, %r)' % (self.prims, self.path)
+        return "Dir(%r, %r)" % (self.prims, self.path)
 
 
 class File(Node):
@@ -52,7 +52,7 @@ class File(Node):
         return True
 
     def __repr__(self):
-        return 'File(%r, %r)' % (self.prims, self.path)
+        return "File(%r, %r)" % (self.prims, self.path)
 
 
 if TYPE_CHECKING:
@@ -83,6 +83,7 @@ class FSPrimitives(object):
 
     The laws a filesystem must uphold are few.  See the tests.
     """
+
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod

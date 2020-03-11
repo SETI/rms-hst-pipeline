@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from fs.path import join
 from fs.tempfs import TempFS
-from multiversioned.VersionContents import VersionContents
+from pdart.fs.multiversioned.VersionContents import VersionContents
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.Utils import *
 

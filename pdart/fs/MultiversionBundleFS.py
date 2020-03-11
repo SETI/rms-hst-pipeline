@@ -5,11 +5,18 @@ from fs.path import iteratepath, join
 from fs.wrap import WrapFS
 from typing import TYPE_CHECKING
 
-from pdart.fs.DirUtils import dir_part_to_vid, _is_dir_part, \
-    _vid_to_dir_part, \
-    lid_to_dir, lidvid_to_dir
-from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
-    read_subdir_versions_from_path, write_subdir_versions_to_path
+from pdart.fs.DirUtils import (
+    dir_part_to_vid,
+    _is_dir_part,
+    _vid_to_dir_part,
+    lid_to_dir,
+    lidvid_to_dir,
+)
+from pdart.fs.SubdirVersions import (
+    read_subdir_versions_from_directory,
+    read_subdir_versions_from_path,
+    write_subdir_versions_to_path,
+)
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -80,8 +87,10 @@ class MultiversionBundleFS(WrapFS):
         def make_version_subdir(dir_name, version):
             return join(base_dir, dir_name, _vid_to_dir_part(VID(version)))
 
-        return {dir_name: make_version_subdir(dir_name, version)
-                for dir_name, version in d.items()}
+        return {
+            dir_name: make_version_subdir(dir_name, version)
+            for dir_name, version in d.items()
+        }
 
     def add_subcomponent(self, parent_lidvid, child_lidvid):
         # type: (LIDVID, LIDVID) -> None
@@ -90,8 +99,9 @@ class MultiversionBundleFS(WrapFS):
         necessary.
         """
         child_lid = child_lidvid.lid()
-        assert child_lid.parent_lid() == parent_lidvid.lid(), \
-            '%s is not parent to %s' % (parent_lidvid, child_lidvid)
+        assert (
+            child_lid.parent_lid() == parent_lidvid.lid()
+        ), "%s is not parent to %s" % (parent_lidvid, child_lidvid)
         d = self.read_lidvid_subdir_versions(parent_lidvid)
         last_id = child_lid.product_id or child_lid.collection_id
         assert last_id
@@ -109,11 +119,13 @@ class MultiversionBundleFS(WrapFS):
 
         def make_subcomp_lidvid(dir_name, version):
             # type: (unicode, unicode) -> LIDVID
-            assert False, 'unimplemented'
+            assert False, "unimplemented"
             pass
 
-        return {dir_name: make_subcomp_lidvid(dir_name, version)
-                for dir_name, version in d.items()}
+        return {
+            dir_name: make_subcomp_lidvid(dir_name, version)
+            for dir_name, version in d.items()
+        }
 
     def directory_contents(self, dir_path):
         # type: (unicode) -> Tuple[Dict[str, str], List[unicode]]
@@ -121,9 +133,11 @@ class MultiversionBundleFS(WrapFS):
         Given the path to a directory, return a dictionary of xxx and
         a list of file names in the directory.
         """
-        files = [info.name
-                 for info in self.scandir(dir_path)
-                 if info.is_file and info.name != SUBDIR_VERSIONS_FILENAME]
+        files = [
+            info.name
+            for info in self.scandir(dir_path)
+            if info.is_file and info.name != SUBDIR_VERSIONS_FILENAME
+        ]
         if len(iteratepath(dir_path)) >= 4:
             # if we're a versioned product dir: /b/c/p/v$n
             d = {}  # type: Dict[str, str]
@@ -137,11 +151,13 @@ class MultiversionBundleFS(WrapFS):
         For a given LID, find the current (latest) VID in the filesystem.
         """
         path = lid_to_dir(lid)
-        vids = [dir_part_to_vid(dir_name)
-                for dir_name in self.listdir(path)
-                if _is_dir_part(dir_name)]
+        vids = [
+            dir_part_to_vid(dir_name)
+            for dir_name in self.listdir(path)
+            if _is_dir_part(dir_name)
+        ]
         if not vids:
-            return VID('1.0')
+            return VID("1.0")
         else:
             return max(vids)
 
@@ -159,10 +175,10 @@ class MultiversionBundleFS(WrapFS):
         """
         Return the LIDVID of the bundle.
         """
-        root_contents = self.listdir(u'/')
+        root_contents = self.listdir(u"/")
         assert len(root_contents) == 1
         bundle_id = str(root_contents[0])
-        lid = LID('urn:nasa:pds:' + bundle_id)
+        lid = LID("urn:nasa:pds:" + bundle_id)
         vid = self.current_vid(lid)
         return LIDVID.create_from_lid_and_vid(lid, vid)
 
@@ -173,5 +189,4 @@ def _lidvid_to_subdir_versions_path(lidvid):
     For a given LIDVID, give the path to the subdir_versions file
     indicating its subdirectories.
     """
-    return join(lidvid_to_dir(lidvid),
-                SUBDIR_VERSIONS_FILENAME)
+    return join(lidvid_to_dir(lidvid), SUBDIR_VERSIONS_FILENAME)

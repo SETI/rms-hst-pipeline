@@ -16,7 +16,7 @@ from pdart.pipeline.Utils import make_osfs, make_version_view, make_sv_deltas
 if TYPE_CHECKING:
     from typing import List
     from pdart.new_db.BundleDB import BundleDB
-    from cowfs.COWFS import COWFS
+    from pdart.fs.cowfs.COWFS import COWFS
 
 _INITIAL_VID = VID("1.0")  # type: VID
 
@@ -56,7 +56,7 @@ def _build_browse_collection(
     )
     db.create_non_document_collection(str(browse_collection_lidvid), bundle_lidvid)
     product_segments = [
-        prod[:-1] for prod in browse_deltas.listdir(collection_path) if "$" in prod
+        str(prod[:-1]) for prod in browse_deltas.listdir(collection_path) if "$" in prod
     ]
     for product_segment in product_segments:
         product_path = u"%s%s$/" % (collection_path, product_segment)
@@ -132,7 +132,7 @@ def build_browse(
     ) as browse_deltas:
         bundle_path = u"/%s$/" % bundle_segment
         collection_segments = [
-            coll[:-1] for coll in browse_deltas.listdir(bundle_path) if "$" in coll
+            str(coll[:-1]) for coll in browse_deltas.listdir(bundle_path) if "$" in coll
         ]
         for collection_segment in collection_segments:
             if collection_segment.startswith("data_"):

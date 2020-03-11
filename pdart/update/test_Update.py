@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from pdart.fs.DirUtils import lid_to_dir
 from pdart.fs.MultiversionBundleFS import MultiversionBundleFS
-from pdart.fs.VersionView import VersionView
+from pdart.fs.OldVersionView import OldVersionView
 from pdart.pds4.LIDVID import LIDVID
 from pdart.update.Update import is_fits_file, update_bundle
 
@@ -37,7 +37,7 @@ class Test_Update(unittest.TestCase):
         mvfs.add_subcomponent(collection2_lidvid, product3_lidvid)
         # <<< end write empty tree
 
-        vv = VersionView(bundle_lidvid, mvfs)
+        vv = OldVersionView(bundle_lidvid, mvfs)
         vv.settext(join(lid_to_dir(product_lidvid.lid()), u"foo.fits"),
                    u'some text')
         vv.settext(join(lid_to_dir(product_lidvid.lid()), u"bar.fits"),
@@ -137,7 +137,7 @@ class Test_Update(unittest.TestCase):
                          curr_bundle_lidvid)
 
         old_vv = cow_fs
-        new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
+        new_vv = OldVersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)
 
     def test_update_bundle_with_file_addition(self):
@@ -158,7 +158,7 @@ class Test_Update(unittest.TestCase):
                          curr_bundle_lidvid)
 
         old_vv = cow_fs
-        new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
+        new_vv = OldVersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)
 
     def test_update_bundle_with_file_deletion(self):
@@ -178,7 +178,7 @@ class Test_Update(unittest.TestCase):
                          curr_bundle_lidvid)
 
         old_vv = cow_fs
-        new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
+        new_vv = OldVersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)
 
     def test_update_bundle_with_product_deletion(self):
@@ -198,7 +198,7 @@ class Test_Update(unittest.TestCase):
                          curr_bundle_lidvid)
 
         old_vv = cow_fs
-        new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
+        new_vv = OldVersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)
 
     def test_update_bundle_with_product_addition(self):
@@ -219,7 +219,7 @@ class Test_Update(unittest.TestCase):
                          curr_bundle_lidvid)
 
         old_vv = cow_fs
-        new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
+        new_vv = OldVersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)
 
     def test_update_bundle_with_collection_deletion(self):
@@ -239,7 +239,7 @@ class Test_Update(unittest.TestCase):
                          curr_bundle_lidvid)
 
         old_vv = cow_fs
-        new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
+        new_vv = OldVersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)
 
     def test_update_bundle_with_collection_addition(self):
@@ -260,5 +260,5 @@ class Test_Update(unittest.TestCase):
                          curr_bundle_lidvid)
 
         old_vv = cow_fs
-        new_vv = VersionView(curr_bundle_lidvid, self.multiversioned_fs)
+        new_vv = OldVersionView(curr_bundle_lidvid, self.multiversioned_fs)
         self.assert_filtered_filesystems_equal(old_vv, new_vv, is_fits_file)

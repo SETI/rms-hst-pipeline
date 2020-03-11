@@ -19,6 +19,7 @@ from pdart.pds4.VID import VID
 if TYPE_CHECKING:
     from typing import Any, Callable, Iterator, List, Optional, Set
     from fs.base import FS
+    from pdart.fs.multiversioned.VersionView import VersionView
 
     IS_NEW_TEST = Callable[[LIDVID, VersionContents, Multiversioned], bool]
 
@@ -36,7 +37,7 @@ def fits_filter(filepath):
 
 
 def std_is_new(lidvid, contents, mv):
-    # type: (LIDVID, VersionContents, Multiversioned) -> None
+    # type: (LIDVID, VersionContents, Multiversioned) -> bool
     lid = lidvid.lid()
     if lid.is_collection_lid() and lid.collection_id == "document":
         filt = doc_filter
@@ -153,16 +154,16 @@ class Multiversioned(MutableMapping):
             return LIDVID.create_from_lid_and_vid(lid, VID("1.0"))
 
     def create_version_view(self, lid):
-        # type: (LID) -> FS
+        # type: (LID) -> VersionView
+        from pdart.fs.multiversioned.VersionView import VersionView
+
         lidvid = self.latest_lidvid(lid)
         if lidvid is None:
             # It's only read, not written to, and the Multiversioned
             # is empty (at least for this bundle). We can return
             # anything that's empty, so:
-            return TempFS()
+            return cast(VersionView, TempFS())
         else:
-            from multiversioned.VersionView import VersionView
-
             return VersionView(self, lidvid)
 
     def add_contents_if(self, is_new, lid, contents, minor_change=False):
@@ -187,7 +188,7 @@ class Multiversioned(MutableMapping):
         # TODO This import is circular; that's why I have it here
         # inside the function.  But there must be a better way to
         # structure.
-        from multiversioned.VersionView import is_segment, strip_segment, vv_lid_path
+        from pdart.fs.multiversioned.VersionView import is_segment, strip_segment, vv_lid_path
 
         # TODO Note that this makes assumptions about the source
         # filesystem format.  Document them.

@@ -3,7 +3,7 @@ import os.path
 import pickle
 
 from fs.path import iteratepath
-from multiversioned.VersionView import VersionView
+from pdart.fs.multiversioned.VersionView import VersionView
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID

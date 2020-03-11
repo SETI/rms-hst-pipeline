@@ -24,7 +24,7 @@ from pdart.new_labels.Placeholders import placeholder
 
 if TYPE_CHECKING:
     from typing import Set
-    from cowfs.COWFS import COWFS
+    from pdart.fs.cowfs.COWFS import COWFS
     from pdart.new_db.BundleDB import BundleDB
     from pdart.new_db.SqlAlchTables import (
         BadFitsFile,
@@ -61,7 +61,7 @@ def _placeholder_citation_information(proposal_id):
 
 
 def _create_citation_info(sv_deltas, document_dir, document_files, proposal_id):
-    # type: (COWS, unicode, Set[unicode], int) -> Citation_Information
+    # type: (COWFS, unicode, Set[unicode], int) -> Citation_Information
 
     # We sort only to make '.apt' appear before '.pro' since the
     # algorithm for '.apt' is more reliable.

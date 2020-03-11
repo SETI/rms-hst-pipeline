@@ -1,13 +1,12 @@
 .PHONY : aq clean java-requirement mtb mypy raw-mypy  save-reqs tar
 
-PYPATH="$(HOME)/fs-copy-on-write:$(HOME)/fs-multiversioned"
 
 # test: I should also run mypy
 test : venv java-requirement
-	PYTHONPATH=$(PYPATH) source venv/bin/activate && py.test pdart
+	source venv/bin/activate && py.test pdart
 
 smalltest : venv java-requirement
-	PYTHONPATH=$(PYPATH) source venv/bin/activate && py.test pdart/fs pdart/pipeline
+	source venv/bin/activate && py.test pdart/fs pdart/pipeline
 
 aq : venv
 	source venv/bin/activate && python AQ.py

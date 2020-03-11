@@ -7,15 +7,17 @@ from fs.osfs import OSFS
 
 from pdart.fs.FSPrimAdapter import FSPrimAdapter
 from pdart.fs.FSPrimitives import Dir, File, Node, FSPrimitives
-from pdart.fs.SubdirVersions import read_subdir_versions_from_directory, \
-    write_subdir_versions_to_directory
+from pdart.fs.SubdirVersions import (
+    read_subdir_versions_from_directory,
+    write_subdir_versions_to_directory,
+)
 from pdart.fs.VersionedFS import SUBDIR_VERSIONS_FILENAME
 
 if TYPE_CHECKING:
     from typing import Dict, List, Tuple
     from pdart.fs.FSPrimitives import Dir_, File_, Node_
 
-_V1_0 = u'v$1.0'
+_V1_0 = u"v$1.0"
 
 
 class V1Primitives(FSPrimitives):
@@ -33,10 +35,10 @@ class V1Primitives(FSPrimitives):
         self.root = root
 
     def __str__(self):
-        return 'V1Primitives(%r)' % self.root
+        return "V1Primitives(%r)" % self.root
 
     def __repr__(self):
-        return 'V1Primitives(%r)' % self.root
+        return "V1Primitives(%r)" % self.root
 
     def _to_sys_path(self, path):
         # type: (unicode) -> unicode
@@ -51,24 +53,24 @@ class V1Primitives(FSPrimitives):
         file = File(self, path)
         if self.is_file(file):
             (parent_dir, filepath) = fs.path.split(path)
-            if parent_dir == u'/':
+            if parent_dir == u"/":
                 res = fs.path.join(self.root, filepath)
             else:
-                res = fs.path.join(self.root, parent_dir.lstrip('/'),
-                                   _V1_0, filepath)
+                res = fs.path.join(self.root, parent_dir.lstrip("/"), _V1_0, filepath)
             return res
         else:
             # it's a dir.
-            return fs.path.join(self.root, path.lstrip('/'), _V1_0)
+            return fs.path.join(self.root, path.lstrip("/"), _V1_0)
 
     def root_node(self):
         # type: () -> Dir_
-        return Dir(self, u'/')
+        return Dir(self, u"/")
 
     def too_deep(self, func, path):
-        assert False, \
-            '%s(%r): directories in products not currently allowed' % (func,
-                                                                       path)
+        assert False, "%s(%r): directories in products not currently allowed" % (
+            func,
+            path,
+        )
 
     def is_file(self, node):
         # type: (Node_) -> bool
@@ -76,7 +78,7 @@ class V1Primitives(FSPrimitives):
         if l is 0:
             return False
         elif l is 1:
-            sys_path = fs.path.join(self.root, path.lstrip('/'))
+            sys_path = fs.path.join(self.root, path.lstrip("/"))
             return os.path.isfile(sys_path)
         elif l in [2, 3]:
             sys_parts = [self.root] + parts[:-1] + [_V1_0, parts[-1]]
@@ -85,8 +87,8 @@ class V1Primitives(FSPrimitives):
         elif l is 4:
             return True
         else:  # l > 4:
-            self.too_deep('is_file', path)
-            raise Exception('V1FS.is_file: too deep')
+            self.too_deep("is_file", path)
+            raise Exception("V1FS.is_file: too deep")
 
     def get_dir_children(self, node):
         # type: (Dir_) -> Dict[unicode, Node_]
@@ -103,20 +105,20 @@ class V1Primitives(FSPrimitives):
                 res[unicode(filename)] = child_node
             return res
         elif l in [1, 2, 3]:
-            v1_sys_path = fs.path.join(self.root, path.lstrip('/'), _V1_0)
+            v1_sys_path = fs.path.join(self.root, path.lstrip("/"), _V1_0)
             osfs = OSFS(v1_sys_path)
             res = {}
             if l is not 3:
-                d = read_subdir_versions_from_directory(osfs, u'/')
+                d = read_subdir_versions_from_directory(osfs, u"/")
                 for filename in d:
                     res[filename] = Dir(self, fs.path.join(path, filename))
-            for filename in osfs.listdir(u'/'):
+            for filename in osfs.listdir(u"/"):
                 assert osfs.isfile(filename)
                 if not filename == SUBDIR_VERSIONS_FILENAME:
                     res[filename] = File(self, fs.path.join(path, filename))
             return res
         else:
-            self.too_deep('get_dir_children(%r)', fs.path.join(path, filename))
+            self.too_deep("get_dir_children(%r)", fs.path.join(path, filename))
             assert False
 
     def add_child_dir(self, parent_node, filename):
@@ -124,21 +126,21 @@ class V1Primitives(FSPrimitives):
         l, parts, path = self._do_path(parent_node)
         if l in [0, 1, 2]:
             if l in [1, 2]:
-                v1_path = fs.path.join(self.root, path.lstrip('/'), _V1_0)
+                v1_path = fs.path.join(self.root, path.lstrip("/"), _V1_0)
                 osfs = OSFS(v1_path)
-                d = read_subdir_versions_from_directory(osfs, u'/')
-                d[str(filename)] = '1.0'
-                write_subdir_versions_to_directory(osfs, u'/', d)
+                d = read_subdir_versions_from_directory(osfs, u"/")
+                d[str(filename)] = "1.0"
+                write_subdir_versions_to_directory(osfs, u"/", d)
 
-            sys_path = fs.path.join(self.root, path.lstrip('/'), filename)
+            sys_path = fs.path.join(self.root, path.lstrip("/"), filename)
             os.mkdir(sys_path)
             sys_path = fs.path.join(sys_path, _V1_0)
             os.mkdir(sys_path)
             if l is not 2:
-                write_subdir_versions_to_directory(OSFS(sys_path), u'/', {})
+                write_subdir_versions_to_directory(OSFS(sys_path), u"/", {})
             return Dir(self, fs.path.join(path, filename))
         else:
-            self.too_deep('add_child_dir', fs.path.join(path, filename))
+            self.too_deep("add_child_dir", fs.path.join(path, filename))
             assert False
 
     def add_child_file(self, parent_node, filename):
@@ -150,9 +152,9 @@ class V1Primitives(FSPrimitives):
             sys_parts = [self.root] + parts + [_V1_0, filename]
             sys_path = fs.path.join(*sys_parts)
         else:
-            self.too_deep('add_child_file', fs.path.join(path, filename))
+            self.too_deep("add_child_file", fs.path.join(path, filename))
 
-        with open(sys_path, 'w'):
+        with open(sys_path, "w"):
             pass
         return File(self, fs.path.join(path, filename))
 
@@ -163,17 +165,17 @@ class V1Primitives(FSPrimitives):
             assert False, "get_file_handle(u'/')"
         elif l is 1:
             sys_path = fs.path.join(self.root, *parts)
-            return cast(io.IOBase,
-                        io.open(sys_path,
-                                fs.mode.Mode(mode).to_platform_bin()))
+            return cast(
+                io.IOBase, io.open(sys_path, fs.mode.Mode(mode).to_platform_bin())
+            )
         elif l in [2, 3, 4]:
             sys_parts = [self.root] + parts[:-1] + [_V1_0, parts[-1]]
             sys_path = fs.path.join(*sys_parts)
-            return cast(io.IOBase,
-                        io.open(sys_path,
-                                fs.mode.Mode(mode).to_platform_bin()))
+            return cast(
+                io.IOBase, io.open(sys_path, fs.mode.Mode(mode).to_platform_bin())
+            )
         else:
-            assert False, 'get_file_handle(%r)' % path
+            assert False, "get_file_handle(%r)" % path
 
     def remove_child(self, parent_node, filename):
         # type: (Dir_, unicode) -> None
@@ -194,17 +196,15 @@ class V1Primitives(FSPrimitives):
             sys_path = fs.path.join(*sys_parts)
             v1_path = fs.path.join(sys_path, _V1_0)
             if l is not 2:
-                subdir_versions_path = fs.path.join(v1_path,
-                                                    SUBDIR_VERSIONS_FILENAME)
-                assert os.path.exists(subdir_versions_path), \
-                    subdir_versions_path
+                subdir_versions_path = fs.path.join(v1_path, SUBDIR_VERSIONS_FILENAME)
+                assert os.path.exists(subdir_versions_path), subdir_versions_path
                 os.remove(subdir_versions_path)
             if l in [1, 2]:
-                v1_sys_path = fs.path.join(self.root, path.lstrip('/'), _V1_0)
+                v1_sys_path = fs.path.join(self.root, path.lstrip("/"), _V1_0)
                 osfs = OSFS(v1_sys_path)
-                d = read_subdir_versions_from_directory(osfs, u'/')
+                d = read_subdir_versions_from_directory(osfs, u"/")
                 del d[str(filename)]
-                write_subdir_versions_to_directory(osfs, u'/', d)
+                write_subdir_versions_to_directory(osfs, u"/", d)
             os.rmdir(v1_path)
             os.rmdir(sys_path)
 

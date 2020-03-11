@@ -5,7 +5,7 @@ import shutil
 from typing import TYPE_CHECKING
 
 
-from multiversioned.Multiversioned import Multiversioned, std_is_new
+from pdart.fs.multiversioned.Multiversioned import Multiversioned, std_is_new
 from pdart.pipeline.RecordChanges import CHANGES_DICT
 from pdart.pipeline.Utils import make_osfs, make_version_view, make_sv_deltas
 

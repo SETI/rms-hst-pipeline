@@ -25,15 +25,15 @@ class FSPrimAdapter(FS):
         self.prims = fs_prims
 
         _meta = self._meta = {
-            'case_insensitive': os.path.normcase('Aa') != 'aa',
-            'network': False,
-            'read_only': False,
-            'supports_rename': False,
-            'thread_safe': True,
-            'unicode_paths': False,
-            'virtual': False,
-            'invalid_path_chars': '\0'
-            }
+            "case_insensitive": os.path.normcase("Aa") != "aa",
+            "network": False,
+            "read_only": False,
+            "supports_rename": False,
+            "thread_safe": True,
+            "unicode_paths": False,
+            "virtual": False,
+            "invalid_path_chars": "\0",
+        }
 
     def getinfo(self, path, namespaces=None):
         # type: (unicode, Any) -> Info
@@ -45,24 +45,24 @@ class FSPrimAdapter(FS):
         # I REALLY REALLY hate untyped languages.
         self.check()
         if not namespaces:
-            namespaces = ['basic']
+            namespaces = ["basic"]
         if type(namespaces) is not list:
             namespaces = [namespaces]
         node = self._resolve_path_to_node(path)
         assert node, path
         info = {}  # Dict[unicode, Dict[unicode, object]]
-        info[u'basic'] = {
-            u'is_dir': self.prims.is_dir(node),
-            u'name': fs.path.basename(node.path)
-            }
-        if 'details' in namespaces:
+        info[u"basic"] = {
+            u"is_dir": self.prims.is_dir(node),
+            u"name": fs.path.basename(node.path),
+        }
+        if "details" in namespaces:
             sys_path = self.getsyspath(path)
             if sys_path:
-                with convert_os_errors('getinfo', path):
+                with convert_os_errors("getinfo", path):
                     _stat = os.stat(sys_path)
-                info[u'details'] = self._make_details_from_stat(_stat)
+                info[u"details"] = self._make_details_from_stat(_stat)
             else:
-                info[u'details'] = self._make_default_details(node)
+                info[u"details"] = self._make_default_details(node)
 
         return Info(info)
 
@@ -106,7 +106,7 @@ class FSPrimAdapter(FS):
     def openbin(self, path, mode="r", buffering=-1, **options):
         self.check()
         self.validatepath(path)
-        if path  == u'/':
+        if path == u"/":
             # TODO  Hackish special case.  Clean this up.
             raise fs.errors.FileExpected(path)
         m = fs.mode.Mode(mode)
@@ -114,10 +114,11 @@ class FSPrimAdapter(FS):
         prims = self.prims
         parent_dir_node, name = self._resolve_path_to_parent_and_name(path)
 
-        if 't' in mode:
-            raise ValueError('openbin() called with text mode %s', mode)
-        exists = (prims.is_dir(parent_dir_node) and
-                  name in prims.get_children(parent_dir_node))
+        if "t" in mode:
+            raise ValueError("openbin() called with text mode %s", mode)
+        exists = prims.is_dir(parent_dir_node) and name in prims.get_children(
+            parent_dir_node
+        )
         if exists:
             if m.exclusive:
                 raise fs.errors.FileExists(path)
@@ -165,20 +166,17 @@ class FSPrimAdapter(FS):
         self.check()
         # Check for errors.
         self._resolve_path_to_node(path)
-        if 'details' in info:
+        if "details" in info:
             sys_path = self.getsyspath(path)
             if sys_path:
-                details = info['details']
-                if 'accessed' in details or 'modified' in details:
+                details = info["details"]
+                if "accessed" in details or "modified" in details:
                     _accessed = cast(int, details.get("accessed"))
-                    _modified = cast(int, details.get("modified",
-                                                      _accessed))
-                    accessed = int(_modified
-                                   if _accessed is None
-                                   else _accessed)
+                    _modified = cast(int, details.get("modified", _accessed))
+                    accessed = int(_modified if _accessed is None else _accessed)
                     modified = int(_modified)
                     if accessed is not None or modified is not None:
-                        with convert_os_errors('setinfo', path):
+                        with convert_os_errors("setinfo", path):
                             os.utime(sys_path, (accessed, modified))
 
         return None
@@ -203,10 +201,11 @@ class FSPrimAdapter(FS):
             for nm in parts[:-1]:
                 node = prims.get_dir_child(node, nm)
         except KeyError as e:
-            print 'e =', e
-            print 'nm =', repr(nm)
-            print ('prims.get_dir_children(%r) = %r' %
-                   (node, prims.get_dir_children(node)))
+            print "e =", e
+            print "nm =", repr(nm)
+            print (
+                "prims.get_dir_children(%r) = %r" % (node, prims.get_dir_children(node))
+            )
             raise fs.errors.ResourceNotFound(path)
         return (node, parts[-1])
 
@@ -216,22 +215,18 @@ class FSPrimAdapter(FS):
         """Make a *details* info dict from an `os.stat_result` object.
         """
         details = {
-            '_write': ['accessed', 'modified'],
-            'accessed': stat_result.st_atime,
-            'modified': stat_result.st_mtime,
-            'size': stat_result.st_size,
-            'type': int(cls._get_type_from_stat(stat_result))
+            "_write": ["accessed", "modified"],
+            "accessed": stat_result.st_atime,
+            "modified": stat_result.st_mtime,
+            "size": stat_result.st_size,
+            "type": int(cls._get_type_from_stat(stat_result)),
         }  # type: Dict[unicode, Any]
 
         # On other Unix systems (such as FreeBSD), the following
         # attributes may be available (but may be only filled out if
         # root tries to use them):
-        details['created'] = getattr(stat_result, 'st_birthtime', None)
-        ctime_key = (
-            'created'
-            if _WINDOWS_PLATFORM
-            else 'metadata_changed'
-        )
+        details["created"] = getattr(stat_result, "st_birthtime", None)
+        ctime_key = "created" if _WINDOWS_PLATFORM else "metadata_changed"
         details[ctime_key] = stat_result.st_ctime
         return details
 
@@ -247,11 +242,11 @@ class FSPrimAdapter(FS):
             resource_type = ResourceType.unknown
 
         details = {
-            'accessed': None,
-            'created': None,
-            'modified': None,
-            'size': 0,
-            'type': resource_type
+            "accessed": None,
+            "created": None,
+            "modified": None,
+            "size": 0,
+            "type": resource_type,
         }  # type: Dict[unicode, Any]
         return details
 
@@ -271,5 +266,5 @@ class FSPrimAdapter(FS):
         stat.S_IFREG: ResourceType.file,
         stat.S_IFIFO: ResourceType.fifo,
         stat.S_IFLNK: ResourceType.symlink,
-        stat.S_IFSOCK: ResourceType.socket
+        stat.S_IFSOCK: ResourceType.socket,
     }

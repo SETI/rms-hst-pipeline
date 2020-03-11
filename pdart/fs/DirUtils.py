@@ -14,7 +14,7 @@ from pdart.pds4.VID import VID
 if TYPE_CHECKING:
     from typing import List, Optional
 
-_DIR_PART_PATTERN = re.compile('^v\\$(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*))?$')
+_DIR_PART_PATTERN = re.compile("^v\\$(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*))?$")
 
 
 def _lid_to_parts(lid):
@@ -29,7 +29,6 @@ def _lid_to_parts(lid):
     if lid.product_id:
         res.append(lid.product_id)
     return [unicode(id) for id in res]
-          
 
 
 def lid_to_dir(lid):
@@ -38,7 +37,7 @@ def lid_to_dir(lid):
     Convert a LID to a directory path.
     """
     dir_parts = _lid_to_parts(lid)
-    dir_parts.insert(0, u'/')
+    dir_parts.insert(0, u"/")
     return apply(join, dir_parts)
 
 
@@ -80,7 +79,7 @@ def _vid_to_dir_part(vid):
     """
     Convert a VID to a directory name.
     """
-    return 'v$%s' % str(vid)
+    return "v$%s" % str(vid)
 
 
 def dir_part_to_vid(dir_part):
@@ -88,7 +87,7 @@ def dir_part_to_vid(dir_part):
     """
     Convert a directory name to a VID.  Raise on errors.
     """
-    assert _is_dir_part(dir_part), '%s is not a dir_part' % dir_part
+    assert _is_dir_part(dir_part), "%s is not a dir_part" % dir_part
     return VID(str(dir_part[2:]))
 
 

@@ -18,6 +18,7 @@ class ISingleVersionBundleFS(object):
     """
     A filesystem that contains a single version of a single bundle.
     """
+
     __metaclass__ = abc.ABCMeta
 
     def is_single_versioned_fs(self):

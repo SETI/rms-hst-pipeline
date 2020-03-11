@@ -3,7 +3,7 @@ import os.path
 
 import fs.path
 
-from cowfs.COWFS import COWFS
+from pdart.fs.cowfs.COWFS import COWFS
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
 from pdart.new_db.FitsFileDB import populate_database_from_fits_file
 from pdart.pds4.LID import LID
@@ -50,7 +50,7 @@ def _populate_from_non_document_collection(
     db.create_non_document_collection(collection_lidvid, bundle_lidvid)
 
     product_segments = [
-        prod[:-1] for prod in sv_deltas.listdir(collection_path) if "$" in prod
+        str(prod[:-1]) for prod in sv_deltas.listdir(collection_path) if "$" in prod
     ]
     for product_segment in product_segments:
         product_path = u"%s%s$/" % (collection_path, product_segment)
@@ -90,7 +90,7 @@ def populate_database(
     ) as sv_deltas:
         bundle_path = u"/%s$/" % bundle_segment
         collection_segments = [
-            coll[:-1] for coll in sv_deltas.listdir(bundle_path) if "$" in coll
+            str(coll[:-1]) for coll in sv_deltas.listdir(bundle_path) if "$" in coll
         ]
         for collection_segment in collection_segments:
             is_document_collection = collection_segment == u"document"

@@ -17,7 +17,7 @@ from pdart.pds4.VID import VID
 
 if TYPE_CHECKING:
     from typing import Set
-    from pdart.fs.VersionView import VersionView
+    from pdart.fs.OldVersionView import OldVersionView
     from pdart.pds4.LID import LID
     from pdart.pds4.LIDVID import LIDVID
 
@@ -47,12 +47,13 @@ class FSDelta(object):
     def directories(self):
         # type: () -> Set[unicode]
         """Returns a set of the directories with changes."""
-        deletion_dirs = [d for f in list(self._deletions)
-                         for d in recursepath(dirname(f))]
+        deletion_dirs = [
+            d for f in list(self._deletions) for d in recursepath(dirname(f))
+        ]
         addition_dirs = list(self._additions.walk.dirs())
         result = set(deletion_dirs + addition_dirs)
         if result:
-            result.add(u'/')
+            result.add(u"/")
         return result
 
 
@@ -66,8 +67,7 @@ class CopyOnWriteFS(FS):
         # type: (FS, FS) -> None
         FS.__init__(self)
         self._deletion_set = DeletionSet()
-        self._readonly_fs = ReadOnlyFSWithDeletions(base_fs,
-                                                    self._deletion_set)
+        self._readonly_fs = ReadOnlyFSWithDeletions(base_fs, self._deletion_set)
         if not delta_fs:
             delta_fs = TempFS()
         self._delta_fs = delta_fs
@@ -93,7 +93,7 @@ class CopyOnWriteFS(FS):
         Remove empty directories from the read/write filesystem.
         """
         delta_fs = self._delta_fs
-        for dir_path in delta_fs.walk.dirs(search='depth'):
+        for dir_path in delta_fs.walk.dirs(search="depth"):
             if not delta_fs.listdir(dir_path):
                 delta_fs.removedir(dir_path)
 
@@ -111,19 +111,23 @@ class CopyOnWriteFS(FS):
         def files_equal(filepath):
             readonly_del = self._readonly_fs.delegate_fs()
             if readonly_del.exists(filepath):
-                bytes_eq = (self._delta_fs.getbytes(filepath) ==
-                            readonly_del.getbytes(filepath))
+                bytes_eq = self._delta_fs.getbytes(filepath) == readonly_del.getbytes(
+                    filepath
+                )
                 return bytes_eq
             else:
                 return False
 
-        redundant_files = [filepath for filepath in self._delta_fs.walk.files()
-                           if files_equal(filepath)]
+        redundant_files = [
+            filepath
+            for filepath in self._delta_fs.walk.files()
+            if files_equal(filepath)
+        ]
         for filepath in redundant_files:
             self._deletion_set.undelete(filepath)
             self._delta_fs.remove(filepath)
 
-    def getmeta(self, namespace='standard'):
+    def getmeta(self, namespace="standard"):
         """
         Gets the metadata from the filesystem.
         """
@@ -136,12 +140,10 @@ class CopyOnWriteFS(FS):
         assert path
         parent = dirname(path)
 
-        if self._readonly_fs.exists(parent) and \
-                not self._delta_fs.exists(parent):
+        if self._readonly_fs.exists(parent) and not self._delta_fs.exists(parent):
             self._delta_fs.makedirs(parent, recreate=True)
 
-        if self._readonly_fs.exists(path) and \
-                not self._delta_fs.exists(path):
+        if self._readonly_fs.exists(path) and not self._delta_fs.exists(path):
             copy_file(self._readonly_fs, path, self._delta_fs, path)
             self._deletion_set.delete(path)
             self._deletion_set.delete(path)
@@ -162,8 +164,7 @@ class CopyOnWriteFS(FS):
         else:
             res = []
         if self._readonly_fs.exists(path):
-            nondups = [p for p in self._readonly_fs.listdir(path)
-                       if p not in res]
+            nondups = [p for p in self._readonly_fs.listdir(path) if p not in res]
             res.extend(nondups)
         return res
 
@@ -175,34 +176,30 @@ class CopyOnWriteFS(FS):
             # TODO Is this right?  The SubFS is physically on the
             # delta filesystem, but conceptually on self.
             parent_dir = dirname(path)
-            if self.exists(parent_dir) and \
-                    not self._delta_fs.exists(parent_dir):
+            if self.exists(parent_dir) and not self._delta_fs.exists(parent_dir):
                 self._delta_fs.makedirs(parent_dir)
-            return self._delta_fs.makedir(path,
-                                          permissions=permissions,
-                                          recreate=recreate)
+            return self._delta_fs.makedir(
+                path, permissions=permissions, recreate=recreate
+            )
 
-    def openbin(self, path, mode=u'r', buffering=-1, **options):
+    def openbin(self, path, mode=u"r", buffering=-1, **options):
         self.check()
         mode_obj = Mode(mode)
         if mode_obj.writing:
             self._ensure_path_is_writable(path)
-            return self._delta_fs.openbin(path,
-                                          mode=mode,
-                                          buffering=buffering,
-                                          **options)
+            return self._delta_fs.openbin(
+                path, mode=mode, buffering=buffering, **options
+            )
         if mode_obj.reading:
             if self._delta_fs.exists(path):
-                return self._delta_fs.openbin(path,
-                                              mode=mode,
-                                              buffering=buffering,
-                                              **options)
+                return self._delta_fs.openbin(
+                    path, mode=mode, buffering=buffering, **options
+                )
             else:
-                return self._readonly_fs.openbin(path,
-                                                 mode=mode,
-                                                 buffering=buffering,
-                                                 **options)
-        assert False, 'openbin (neither writing nor reading)'
+                return self._readonly_fs.openbin(
+                    path, mode=mode, buffering=buffering, **options
+                )
+        assert False, "openbin (neither writing nor reading)"
 
     def remove(self, path):
         self.check()
@@ -237,11 +234,11 @@ class CopyOnWriteFS(FS):
 
 class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
     """
-    A CopyOnWriteFS that wraps a VersionView, so is itself a VersionView too.
+    A CopyOnWriteFS that wraps a OldVersionView, so is itself a OldVersionView too.
     """
 
     def __init__(self, version_view, delta_fs=None):
-        # type: (VersionView, FS) -> None
+        # type: (OldVersionView, FS) -> None
         CopyOnWriteFS.__init__(self, version_view, delta_fs)
         self._version_view = version_view
 
@@ -259,4 +256,4 @@ class CopyOnWriteVersionView(CopyOnWriteFS, ISingleVersionBundleFS):
         try:
             return self._version_view.lid_to_vid(lid)
         except KeyError:
-            return VID('1.0')
+            return VID("1.0")

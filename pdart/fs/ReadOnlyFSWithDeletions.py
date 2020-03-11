@@ -1,9 +1,13 @@
 """
 A (mostly) read-only filesystem from which you can "delete" files.
 """
-from fs.errors \
-    import DirectoryExists, DirectoryNotEmpty, FileExpected, \
-    ResourceNotFound, ResourceReadOnly
+from fs.errors import (
+    DirectoryExists,
+    DirectoryNotEmpty,
+    FileExpected,
+    ResourceNotFound,
+    ResourceReadOnly,
+)
 from fs.mode import Mode
 from fs.path import dirname, join
 from typing import TYPE_CHECKING
@@ -29,8 +33,7 @@ class ReadOnlyFSWithDeletions(NarrowWrapFS):
         self._deletion_set = deletion_set
 
     def __str__(self):
-        return 'ReadOnlyFSWithDeletions(%s, %s)' % (self._wrap_fs,
-                                                    self._deletion_set)
+        return "ReadOnlyFSWithDeletions(%s, %s)" % (self._wrap_fs, self._deletion_set)
 
     def getinfo(self, path, namespaces=None):
         self.check()
@@ -43,22 +46,24 @@ class ReadOnlyFSWithDeletions(NarrowWrapFS):
         if self._deletion_set.is_deleted(path):
             raise ResourceNotFound(path)
         else:
-            return [child
-                    for child in self.delegate_fs().listdir(path)
-                    if not self._deletion_set.is_deleted(join(path,
-                                                              child))]
+            return [
+                child
+                for child in self.delegate_fs().listdir(path)
+                if not self._deletion_set.is_deleted(join(path, child))
+            ]
 
     def makedir(self, path, permissions=None, recreate=False):
         parent = dirname(path)
-        if self._deletion_set.is_deleted(parent) \
-                or not self.delegate_fs().exists(parent):
+        if self._deletion_set.is_deleted(parent) or not self.delegate_fs().exists(
+            parent
+        ):
             raise ResourceNotFound(parent)
         elif self.isdir(path):
             raise DirectoryExists(path)
         else:
             raise ResourceReadOnly(parent)
 
-    def openbin(self, path, mode=u'r', buffering=-1, **options):
+    def openbin(self, path, mode=u"r", buffering=-1, **options):
         mode_obj = Mode(mode)
         if mode_obj.reading and self._deletion_set.is_deleted(path):
             raise ResourceNotFound(path)
@@ -70,14 +75,11 @@ class ReadOnlyFSWithDeletions(NarrowWrapFS):
             else:
                 raise ResourceNotFound(parent)
 
-        return self.delegate_fs().openbin(path, mode,
-                                          buffering=buffering,
-                                          **options)
+        return self.delegate_fs().openbin(path, mode, buffering=buffering, **options)
 
     def remove(self, path):
         self.check()
-        if self._deletion_set.is_deleted(path) \
-                or not self.delegate_fs().exists(path):
+        if self._deletion_set.is_deleted(path) or not self.delegate_fs().exists(path):
             raise ResourceNotFound(path)
         elif self.isdir(path):
             raise FileExpected(path)
@@ -86,8 +88,7 @@ class ReadOnlyFSWithDeletions(NarrowWrapFS):
 
     def removedir(self, path):
         self.check()
-        if self._deletion_set.is_deleted(path) \
-                or not self.delegate_fs().exists(path):
+        if self._deletion_set.is_deleted(path) or not self.delegate_fs().exists(path):
             raise ResourceNotFound(path)
         elif self.isfile(path):
             raise FileExpected(path)
@@ -98,8 +99,7 @@ class ReadOnlyFSWithDeletions(NarrowWrapFS):
 
     def setinfo(self, path, info):
         self.check()
-        if self._deletion_set.is_deleted(path) \
-                or not self.delegate_fs().exists(path):
+        if self._deletion_set.is_deleted(path) or not self.delegate_fs().exists(path):
             raise ResourceNotFound(path)
         else:
             raise ResourceReadOnly(path)
