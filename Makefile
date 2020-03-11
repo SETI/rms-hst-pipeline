@@ -42,8 +42,7 @@ pipeline : venv
 	    for step in $(STEPS); do \
 		echo $$project_id $$step; \
 		source venv/bin/activate && \
-		    PYTHONPATH=$(PYPATH) \
-			python Pipeline.py $$project_id $$step; \
+		    python Pipeline.py $$project_id $$step; \
             done; \
         done; \
 	say pipeline is done
@@ -58,8 +57,7 @@ tmp-working-dir.tar :
 	for project_id in $(PROJ_IDS); do \
 	    for step in $(TAR_STEPS); do \
 		source venv/bin/activate && \
-		    PYTHONPATH=$(PYPATH) \
-			python Pipeline.py $$project_id $$step; \
+		    python Pipeline.py $$project_id $$step; \
 	    done; \
         done; \
 	say okay

@@ -3,7 +3,7 @@ import unittest
 
 from fs.memoryfs import MemoryFS
 
-from cowfs.COWFS import COWFS
+from pdart.fs.cowfs.COWFS import COWFS
 
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID

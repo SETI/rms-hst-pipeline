@@ -6,7 +6,7 @@ from fs.osfs import OSFS
 from fs.tempfs import TempFS
 
 # from pdart.fs.OldVersionView import OldVersionView
-from cowfs.COWFS import COWFS
+from pdart.fs.cowfs.COWFS import COWFS
 
 if TYPE_CHECKING:
     from typing import Optional
