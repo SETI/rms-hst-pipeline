@@ -109,6 +109,7 @@ def dispatch(dirs, proposal_id, command):
         "make_deliverable": (
             lambda: make_deliverable(
                 bundle_segment,
+                dirs.working_dir(proposal_id),
                 dirs.archive_dir(proposal_id),
                 dirs.deliverable_dir(proposal_id),
             )

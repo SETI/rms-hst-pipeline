@@ -1,5 +1,8 @@
 from fs.osfs import OSFS
-from pdart.fs.DeliverableFS import DeliverableFS
+from pdart.archive.ChecksumManifest import make_checksum_manifest
+from pdart.archive.TransferManifest import make_transfer_manifest
+from pdart.fs.DeliverableFS import DeliverableFS, lidvid_to_dirpath
+from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
 import fs.path
 import os
 import os.path
@@ -23,8 +26,8 @@ def _fix_up_deliverable(dir):
             os.rename(path, path[:-1])
 
 
-def make_deliverable(bundle_segment, archive_dir, deliverable_dir):
-    # type: (str, unicode, unicode) -> None
+def make_deliverable(bundle_segment, working_dir, archive_dir, deliverable_dir):
+    # type: (str, unicode, unicode, unicode) -> None
     with make_osfs(archive_dir) as archive_osfs, make_version_view(
         archive_osfs, bundle_segment
     ) as version_view:
@@ -36,12 +39,18 @@ def make_deliverable(bundle_segment, archive_dir, deliverable_dir):
 
         _fix_up_deliverable(deliverable_dir)
 
-        # add manifests
-        checksum_manifest_path = fs.path.join(deliverable_dir, "checksum-manifest.txt")
-        open(checksum_manifest_path, "a").close()  # TODO
+        # open the database
+        db_filepath = fs.path.join(working_dir, _BUNDLE_DB_NAME)
+        db = create_bundle_db_from_os_filepath(db_filepath)
 
-        transfer_manifest_path = fs.path.join(deliverable_dir, "transfer-manifest.txt")
-        open(transfer_manifest_path, "a").close()  # TODO
+        # add manifests
+        checksum_manifest_path = fs.path.join(deliverable_dir, "checksum.manifest.txt")
+        with open(checksum_manifest_path, "w") as f:
+            f.write(make_checksum_manifest(db, lidvid_to_dirpath))
+
+        transfer_manifest_path = fs.path.join(deliverable_dir, "transfer.manifest.txt")
+        with open(transfer_manifest_path, "w") as f:
+            f.write(make_transfer_manifest(db, lidvid_to_dirpath))
 
         # tar up
         bundle_dir = str(fs.path.join(deliverable_dir, bundle_segment))
