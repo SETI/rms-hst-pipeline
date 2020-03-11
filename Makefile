@@ -28,7 +28,7 @@ mtb : venv
 # 11497 ua6c0502m_shm.fits
 
 # PROJ_IDS=9059 13199
-PROJ_IDS=15419
+PROJ_IDS=7240 9296 15419
 STEPS=copy_primary_files record_changes insert_changes populate_database \
     build_browse build_labels update_archive make_deliverable
 
