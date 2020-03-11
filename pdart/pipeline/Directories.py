@@ -6,7 +6,7 @@ import os.path
 
 
 class Directories(object):
-    __metaclass__ == abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def working_dir(self, proposal_id):
