@@ -65,12 +65,14 @@ def make_one_of_many_tarballs(src_dir, dst_dir, proposal_id, temp_fs=None):
     with temp_directory() as init_bundle_dir:
         bundle_name = 'hst_%05d' % proposal_id 
         print 'starting the bundle %s' % bundle_name
+        sys.stdout.flush()
         start_bundle(src_dir,
                      bundle_name,
                      init_bundle_dir)
 
         print 'finished the bundle %s' % bundle_name
         print 'creating deliverable for %s' % bundle_name
+        sys.stdout.flush()
 
         lidvid = LIDVID('urn:nasa:pds:hst_%05d::1.0' % proposal_id)
         src = VersionView(
@@ -84,6 +86,7 @@ def make_one_of_many_tarballs(src_dir, dst_dir, proposal_id, temp_fs=None):
             fs.copy.copy_fs(src, dfs)
             print 'created deliverable for %s' % bundle_name
             print 'creating tarball for %s' % bundle_name
+            sys.stdout.flush()
             target_filepath = fs.path.join(dst_dir,
                                            'hst_%05d-1.0.tar.gz' % proposal_id)
             # TODO temp_fs is what you  need
