@@ -540,11 +540,8 @@ def get_hst_parameters(card_dicts, shm_card_dicts, instrument, product_id):
                     _get_aperture_name(card_dicts, shm_card_dicts,
                                        instrument, product_id)),
              'gain_mode_id': get_gain_mode_id(card_dicts, instrument,
-                                              product_id),
-             'pc1_flag': get_pc1_flag(product_id, instrument),
-             'wf2_flag': get_wf2_flag(product_id, instrument),
-             'wf3_flag': get_wf3_flag(product_id, instrument),
-             'wf4_flag': get_wf4_flag(product_id, instrument)})
+                                              product_id)
+             })
     elif instrument == 'wfc3':
         parameters_instrument = parameters_wfc3(
             {'detector_id': get_detector_id(card_dicts,

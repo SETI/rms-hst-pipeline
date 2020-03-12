@@ -16,7 +16,7 @@ We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
 """
 
-_ACCEPTED_SUFFIXES = [
+ACCEPTED_SUFFIXES = [
     'A1F', 'A2F', 'A3F', 'ASC', 'ASN', 'C0F', 'C1F', 'C2F', 'C3F', 'CAL',
     'CLB', 'CLF', 'CORRTAG', 'CQF', 'CRJ', 'D0F', 'DRC', 'DRZ', 'FLC', 'FLT',
     'FLTSUM', 'MOS', 'RAW', 'SHM', 'SX2', 'SXL', 'X1D', 'X1DSUM', 'X2D'
@@ -51,7 +51,7 @@ def _is_accepted_product_type_product_row(row):
     instruments.
     """
     desc = str(row['productSubGroupDescription'])
-    return desc.upper() in _ACCEPTED_SUFFIXES
+    return desc.upper() in ACCEPTED_SUFFIXES
 
 
 class MastSlice(object):

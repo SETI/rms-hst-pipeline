@@ -53,9 +53,11 @@ def make_deliverable(bundle_segment, working_dir, archive_dir, deliverable_dir):
             f.write(make_transfer_manifest(db, lidvid_to_dirpath))
 
         # Tar it up.
-        bundle_dir = str(fs.path.join(deliverable_dir, bundle_segment))
+        TAR_NEEDED = False
+        if TAR_NEEDED:
+            bundle_dir = str(fs.path.join(deliverable_dir, bundle_segment))
 
-        with tarfile.open("%s.tar" % bundle_dir, "w") as tar:
-            tar.add(bundle_dir, arcname=os.path.basename(bundle_dir))
+            with tarfile.open("%s.tar" % bundle_dir, "w") as tar:
+                tar.add(bundle_dir, arcname=os.path.basename(bundle_dir))
 
-        shutil.rmtree(bundle_dir)
+            shutil.rmtree(bundle_dir)

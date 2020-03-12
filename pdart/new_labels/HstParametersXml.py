@@ -68,16 +68,12 @@ XML element.
 """
 
 parameters_wfpc2 = interpret_template("""<hst:Parameters_WFPC2>
-<hst:bandwidth><NODE name="bandwidth" /></hst:bandwidth>
-<hst:center_filter_wavelength><NODE name="center_filter_wavelength" />\
+<hst:bandwidth unit="nm"><NODE name="bandwidth" /></hst:bandwidth>
+<hst:center_filter_wavelength unit="nm"><NODE name="center_filter_wavelength" />\
 </hst:center_filter_wavelength>
 <hst:targeted_detector_id><NODE name="targeted_detector_id" />\
 </hst:targeted_detector_id>
 <hst:gain_mode_id><NODE name="gain_mode_id" /></hst:gain_mode_id>
-<hst:pc1_flag><NODE name="pc1_flag" /></hst:pc1_flag>
-<hst:wf2_flag><NODE name="wf2_flag" /></hst:wf2_flag>
-<hst:wf3_flag><NODE name="wf3_flag" /></hst:wf3_flag>
-<hst:wf4_flag><NODE name="wf4_flag" /></hst:wf4_flag>
 </hst:Parameters_WFPC2>""")  # type: NodeBuilderTemplate
 """
 An interpreted fragment template to create an ``<hst:Parameters_WFPC2 />``

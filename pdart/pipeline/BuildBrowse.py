@@ -7,6 +7,7 @@ import picmaker  # need to precede this with 'import pdart.add_pds_tools'
 import fs.path
 import os
 
+from pdart.astroquery.Astroquery import ACCEPTED_SUFFIXES
 from pdart.new_db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -14,7 +15,7 @@ from pdart.pds4.VID import VID
 from pdart.pipeline.Utils import make_osfs, make_version_view, make_sv_deltas
 
 if TYPE_CHECKING:
-    from typing import List
+    from typing import List, Set
     from pdart.new_db.BundleDB import BundleDB
     from pdart.fs.cowfs.COWFS import COWFS
 
@@ -112,6 +113,14 @@ def _build_browse_collection(
             )
 
 
+_NON_IMAGE_SUFFIXES = {"ASN", "SHM"}  # type: Set[str]
+
+
+_BROWSE_SUFFIXES = [
+    suffix for suffix in ACCEPTED_SUFFIXES if suffix not in _NON_IMAGE_SUFFIXES
+]  # type: List[str]
+
+
 def build_browse(
     bundle_segment,
     working_dir,
@@ -135,7 +144,8 @@ def build_browse(
             str(coll[:-1]) for coll in browse_deltas.listdir(bundle_path) if "$" in coll
         ]
         for collection_segment in collection_segments:
-            if collection_segment.startswith("data_"):
+            parts = collection_segment.upper().split("_")
+            if len(parts) == 3 and parts[0] == "data" and parts[2] in _BROWSE_SUFFIXES:
                 _build_browse_collection(
                     db, browse_deltas, bundle_segment, collection_segment, bundle_path
                 )

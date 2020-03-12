@@ -38,7 +38,7 @@ if TYPE_CHECKING:
         NonDocumentCollection,
     )
 
-_VERIFY = False
+_VERIFY = True
 
 
 def _placeholder_citation_information(proposal_id):
