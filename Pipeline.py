@@ -9,7 +9,7 @@ from pdart.pipeline.BuildBrowse import build_browse
 from pdart.pipeline.BuildLabels import build_labels
 from pdart.pipeline.CheckDownloads import check_downloads
 from pdart.pipeline.CopyPrimaryFiles import copy_primary_files
-from pdart.pipeline.Directories import DevDirectories
+from pdart.pipeline.Directories import Directories, make_directories
 from pdart.pipeline.DownloadDocs import download_docs
 from pdart.pipeline.InsertChanges import insert_changes
 from pdart.pipeline.MakeDeliverable import make_deliverable
@@ -132,7 +132,7 @@ def run():
     proposal_id = int(sys.argv[1])
     command = sys.argv[2]
 
-    dirs = DevDirectories("tmp-working-dir")
+    dirs = make_directories()
     failure_marker_filepath = os.path.join(
         dirs.working_dir(proposal_id), _FAILURE_MARKER
     )
