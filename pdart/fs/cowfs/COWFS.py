@@ -107,8 +107,15 @@ class COWFS(FS):
                            for file
                            in self.deletions_fs.walk.files()}
         assert additions_paths <= deletions_paths, \
-            'additions_paths %s is not a subset of deletions_path %s' % \
-            (additions_paths, deletions_paths)
+            """additions_paths is not a subset of deletions_path.
+Extra paths =
+    %s
+additions_paths =
+    %s
+deletions_paths =
+    %s
+""" % (additions_paths.difference(deletions_paths),
+       additions_paths, deletions_paths)
 
         return True
 
