@@ -1,5 +1,4 @@
 ACTIVATE=source venv/bin/activate
-MYPY-ACTIVATE=source mypy-venv/bin/activate
 PIP=python3 -m pip
 
 ############################################################
@@ -8,8 +7,8 @@ PIP=python3 -m pip
 
 # Run mypy.
 .PHONY: mypy
-mypy : mypy-venv
-	$(MYPY-ACTIVATE) && mypy pdart
+mypy : venv
+	$(ACTIVATE) && mypy pdart
 
 ############################################################
 # TESTS
@@ -24,8 +23,6 @@ test: venv
 # THE VIRTUAL ENVIRONMENT
 ############################################################
 
-#### MAIN ####
-
 # Install the virtual environment.
 venv : requirements.txt
 	python3 -m venv venv
@@ -38,22 +35,6 @@ venv : requirements.txt
 save-reqs :
 	$(ACTIVATE) && $(PIP) freeze > requirements.txt
 	touch venv  # to prevent rebuilding
-
-#### MYPY ####
-
-# Install the mypy virtual environment.
-mypy-venv : mypy-requirements.txt
-	python3 -m venv mypy-venv
-	$(MYPY-ACTIVATE) && \
-	    $(PIP) install --upgrade pip && \
-	    $(PIP) install -r mypy-requirements.txt
-
-# After you've hand-installed new packages for mypy, save them to the
-# requirements list.
-.PHONY: mypy-save-reqs
-mypy-save-reqs :
-	$(MYPY-ACTIVATE) && $(PIP) freeze > mypy-requirements.txt
-	touch mypy-venv  # to prevent rebuilding
 
 ############################################################
 # MAINTENANCE
@@ -74,4 +55,4 @@ tidy : black
 # Remove the virtual environment and cruft.
 .PHONY: clean
 clean : tidy
-	-rm -rf venv mypy-venv
+	-rm -rf venv
