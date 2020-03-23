@@ -6,6 +6,16 @@ PIP=python3 -m pip
 ############################################################
 
 # Run mypy.
+
+MYPY-FLAGS=--disallow-any-generics \
+	--disallow-any-unimported \
+	--disallow-untyped-calls \
+	--disallow-untyped-defs \
+	--strict-equality \
+	--warn-redundant-casts \
+	--warn-return-any \
+	--warn-unreachable
+
 .PHONY: mypy
 mypy : venv
 	$(ACTIVATE) && mypy pdart
