@@ -126,7 +126,6 @@ class TestLIDVID(unittest.TestCase):
         )
 
     def test_eq(self):
-        # type: () -> None
         self.assertTrue(
             LIDVID("urn:nasa:pds:b:c:p::1.0") == LIDVID("urn:nasa:pds:b:c:p::1.0")
         )
@@ -159,7 +158,6 @@ class TestLIDVID(unittest.TestCase):
         self.assertEqual(lidvid_str, str(LIDVID(lidvid_str)))
 
     def test_repr(self):
-        # type: () -> None
         self.assertEqual(
             "LIDVID('urn:nasa:pds:b:c:p::1.0')", repr(LIDVID("urn:nasa:pds:b:c:p::1.0"))
         )
