@@ -66,16 +66,12 @@ black :
 
 # Remove cruft.
 .PHONY: tidy
-tidy :
+tidy : black
 	find . -name '*~' -delete
 	find . -name '#*' -delete
 	find . -name '*.pyc' -delete
-	-rm -rf venv
 
 # Remove the virtual environment and cruft.
 .PHONY: clean
 clean : tidy
-	find . -name '*~' -delete
-	find . -name '#*' -delete
-	find . -name '*.pyc' -delete
 	-rm -rf venv mypy-venv
