@@ -1,7 +1,6 @@
 # coding=utf-8
 import os
 import tempfile
-from typing import TYPE_CHECKING
 import unittest
 
 from pdart.db.Utils import file_md5, string_md5

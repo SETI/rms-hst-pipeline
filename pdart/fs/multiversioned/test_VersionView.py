@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 import unittest
 
 from fs.errors import FileExpected
@@ -11,9 +10,8 @@ from pdart.fs.multiversioned.VersionContents import VersionContents
 from pdart.fs.multiversioned.VersionView import *
 from pdart.pds4.LIDVID import LIDVID
 
-if TYPE_CHECKING:
-    from typing import Any, Dict, Set
-    from fs.base import FS
+from typing import Any, Dict, Set
+from fs.base import FS
 
 ############################################################
 

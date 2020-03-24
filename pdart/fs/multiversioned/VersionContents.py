@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, cast
+from typing import List, cast
 
 from fs.path import isabs
 from pdart.pds4.LID import LID
