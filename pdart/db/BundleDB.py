@@ -1,9 +1,9 @@
 import os.path
 import re
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
-from typing import Any, Dict, List, Optional, Tuple, cast
 
 from pdart.db.SqlAlchTables import (
     BadFitsFile,

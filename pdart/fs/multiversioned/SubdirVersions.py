@@ -4,12 +4,11 @@ subdir-version dictionary has keys corresponding to subdirectory
 names, and values corresponding to VIDs.
 """
 import re
-
-from fs.errors import ResourceNotFound
-from fs.path import join
 from typing import Dict, Pattern
 
 from fs.base import FS
+from fs.errors import ResourceNotFound
+from fs.path import join
 
 SUBDIR_VERSIONS_FILENAME: str = "subdir$versions.txt"
 

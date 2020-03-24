@@ -1,17 +1,14 @@
 import unittest
+from typing import Dict
 
 from fs.errors import FileExpected
 from fs.tempfs import TempFS
-from fs.path import join
 
 from pdart.fs.multiversioned.Multiversioned import Multiversioned
 from pdart.fs.multiversioned.Utils import dictionary_to_contents
-from pdart.fs.multiversioned.VersionContents import VersionContents
 from pdart.fs.multiversioned.VersionView import *
 from pdart.pds4.LIDVID import LIDVID
 
-from typing import Any, Dict, Set
-from fs.base import FS
 
 ############################################################
 

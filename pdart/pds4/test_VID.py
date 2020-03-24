@@ -1,6 +1,7 @@
 import unittest
-from hypothesis import assume, given
+
 import hypothesis.strategies as st
+from hypothesis import assume, given
 
 from pdart.pds4.VID import VID
 

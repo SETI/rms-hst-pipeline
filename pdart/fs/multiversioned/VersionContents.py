@@ -1,11 +1,10 @@
-from typing import List, cast
+from typing import Any, Callable, List, Set, Union, cast
 
+from fs.base import FS
 from fs.path import isabs
+
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
-
-from typing import Callable, Set, Union, Any
-from fs.base import FS
 
 _SUBCOMPS = Union[Set[LID], Set[LIDVID]]
 

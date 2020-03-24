@@ -1,7 +1,9 @@
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple
+
 import astropy.io.fits
 import astropy.io.fits.card
 from fs.path import basename
+
 from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import Card, Hdu
 

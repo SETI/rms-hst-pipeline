@@ -1,28 +1,22 @@
-from typing import TYPE_CHECKING
+from functools import reduce
+from typing import Any, BinaryIO, Collection, List, Mapping, Optional
 
+import fs.mode
+import fs.path
 from fs.base import FS
 from fs.errors import ResourceNotFound, ResourceReadOnly
 from fs.info import Info
-import fs.mode
-import fs.path
+from fs.permissions import Permissions
 from fs.subfs import SubFS
 
-if TYPE_CHECKING:
-    from pdart.fs.multiversioned.Multiversioned import Multiversioned, lidvid_path
-from pdart.fs.multiversioned.VersionContents import VersionContents
 from pdart.fs.multiversioned.SubdirVersions import (
     SUBDIR_VERSIONS_FILENAME,
     read_subdir_versions_from_directory,
 )
+from pdart.fs.multiversioned.VersionContents import VersionContents
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from functools import reduce
-
-from typing import Any, BinaryIO, Dict, List, Mapping, Optional, Set, Collection
-from io import IOBase
-from fs.permissions import Permissions
-from fs.subfs import SubFS
 
 _INFO = Mapping[str, Mapping[str, Any]]
 

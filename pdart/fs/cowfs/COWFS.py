@@ -1,25 +1,22 @@
-import fs.copy
-import fs.errors
-from fs.info import Info
-import fs.path
-from fs.subfs import SubFS
-import fs.wrap
-from fs.base import FS
-from fs.mode import Mode
-from fs.tempfs import TempFS
 from typing import (
     BinaryIO,
     Collection,
-    Any,
-    Dict,
     Generator,
     List,
     Mapping,
     Optional,
-    Text,
 )
+
+import fs.copy
+import fs.errors
+import fs.path
+import fs.wrap
+from fs.base import FS
+from fs.info import Info
+from fs.mode import Mode
 from fs.permissions import Permissions
 from fs.subfs import SubFS
+from fs.tempfs import TempFS
 
 _INFO_DICT = Mapping[str, Mapping[str, object]]
 

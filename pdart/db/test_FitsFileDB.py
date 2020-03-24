@@ -1,6 +1,6 @@
 import unittest
 
-from fs.path import basename, join
+from fs.path import basename
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import (

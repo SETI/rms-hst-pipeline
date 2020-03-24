@@ -1,17 +1,16 @@
 import os
 import tempfile
 import unittest
-
-from typing import cast, Set
+from typing import Set, cast
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.SqlAlchTables import Base, Bundle, NonDocumentCollection
 from pdart.db.Utils import file_md5
 
-# from pdart.new_labels.CollectionInventory import get_collection_inventory_name
+# from pdart.new_labels.CollectionInventory import
+# get_collection_inventory_name
 # from pdart.new_labels.CollectionLabel import get_collection_label_name
 from pdart.pds4.LIDVID import LIDVID
-
 
 _TABLES = {
     "bundles",

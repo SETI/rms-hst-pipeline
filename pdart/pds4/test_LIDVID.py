@@ -1,12 +1,13 @@
 import unittest
-from hypothesis import given
+
 import hypothesis.strategies as st
+from hypothesis import given
 
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from pdart.pds4.test_LID import lids, lid_strings
-from pdart.pds4.test_VID import pdart_vids, pdart_vid_strings
+from pdart.pds4.test_LID import lid_strings, lids
+from pdart.pds4.test_VID import pdart_vid_strings, pdart_vids
 
 
 def pdart_lidvid_strings() -> st.SearchStrategy[str]:

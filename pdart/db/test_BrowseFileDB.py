@@ -1,7 +1,5 @@
-from typing import cast
 import unittest
-
-from fs.path import join
+from typing import cast
 
 from pdart.db.BrowseFileDB import populate_database_from_browse_file
 from pdart.db.BundleDB import create_bundle_db_in_memory

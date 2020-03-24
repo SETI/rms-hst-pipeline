@@ -1,7 +1,8 @@
 from collections.abc import MutableMapping
-from typing import cast, Any, Callable, Iterator, List, Optional, Set
+from typing import Any, Callable, Iterator, List, Optional, Set, cast
 
 import fs.path
+from fs.base import FS
 from fs.subfs import SubFS
 from fs.tempfs import TempFS
 
@@ -12,12 +13,9 @@ from pdart.fs.multiversioned.SubdirVersions import (
 )
 from pdart.fs.multiversioned.VersionContents import VersionContents
 from pdart.fs.multiversioned.VersionView import VersionView
-
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-
-from fs.base import FS
 
 IS_NEW_TEST = Callable[[LIDVID, VersionContents, "Multiversioned"], bool]
 

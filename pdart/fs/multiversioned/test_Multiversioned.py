@@ -1,13 +1,8 @@
-from typing import cast
 import unittest
 
 from fs.memoryfs import MemoryFS
 
 from pdart.fs.cowfs.COWFS import COWFS
-
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-
 from pdart.fs.multiversioned.Multiversioned import *
 from pdart.fs.multiversioned.Utils import dictionary_to_contents
 from pdart.fs.multiversioned.VersionView import VersionView

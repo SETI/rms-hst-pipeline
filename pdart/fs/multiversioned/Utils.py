@@ -1,11 +1,10 @@
-from typing import Any, Dict, List, Set, cast
+from typing import Any, Dict, Set
 
 from fs.base import FS
 from fs.memoryfs import MemoryFS
 from fs.path import join
 
 from pdart.fs.multiversioned.VersionContents import VersionContents
-
 from pdart.pds4.LIDVID import LIDVID
 
 

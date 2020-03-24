@@ -1,7 +1,7 @@
 import unittest
 
-from fs.memoryfs import MemoryFS
 import fs.path
+from fs.memoryfs import MemoryFS
 from fs.tempfs import TempFS
 from fs.test import FSTestCases
 

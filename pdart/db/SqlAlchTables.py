@@ -1,8 +1,9 @@
+from typing import Any
+
 from sqlalchemy import Column, ForeignKey, Index, Integer, String, UniqueConstraint
+from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import RelationshipProperty, backref, relationship
-from typing import Any
-from sqlalchemy.engine import Engine
 
 Base: Any = declarative_base()
 
