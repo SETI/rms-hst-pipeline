@@ -25,7 +25,7 @@ def pdart_vid_strings(max_value: int = 9):
     components
     """
     return st.builds(
-        lambda maj, min: "%d.%d" % (maj, min),
+        lambda major, minor: "%d.%d" % (major, minor),
         st.integers(min_value=1, max_value=max_value),
         st.integers(min_value=0, max_value=max_value),
     )
@@ -65,11 +65,11 @@ class TestVID(unittest.TestCase):
 
     @given(pdart_vids())
     def test_next_major_vid_property(self, vid: VID):
-        next = vid.next_major_vid()
+        next_vid = vid.next_major_vid()
         # The major version should increment
-        self.assertEqual(next.major(), vid.major() + 1)
+        self.assertEqual(next_vid.major(), vid.major() + 1)
         # and the minor should be zero
-        self.assertEqual(0, next.minor())
+        self.assertEqual(0, next_vid.minor())
 
     def test_next_minor_vid(self):
         self.assertEqual(VID("2.1"), VID("2.0").next_minor_vid())
@@ -77,11 +77,11 @@ class TestVID(unittest.TestCase):
 
     @given(pdart_vids())
     def test_next_minor_vid_property(self, vid: VID):
-        next = vid.next_minor_vid()
+        next_vid = vid.next_minor_vid()
         # The major version should not change
-        self.assertEqual(next.major(), vid.major())
+        self.assertEqual(next_vid.major(), vid.major())
         # and the minor should increment
-        self.assertEqual(next.minor(), vid.minor() + 1)
+        self.assertEqual(next_vid.minor(), vid.minor() + 1)
 
     def test_cmp(self):
         self.assertTrue(VID("2.3") == VID("2.3"))

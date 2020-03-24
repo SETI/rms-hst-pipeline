@@ -43,8 +43,7 @@ class TestLIDVID(unittest.TestCase):
         vid = VID("2.5")
         lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
         self.assertEqual(
-            LIDVID("urn:nasa:pds:ssc01.hirespc.cruise:browse::2.5"),
-            LIDVID.create_from_lid_and_vid(lid, vid),
+            LIDVID("urn:nasa:pds:ssc01.hirespc.cruise:browse::2.5"), lidvid
         )
 
     @given(lids(), pdart_vids())

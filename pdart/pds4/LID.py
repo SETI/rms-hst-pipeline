@@ -2,7 +2,7 @@
 import functools
 import re
 
-from typing import List, Optional
+from typing import List
 
 
 @functools.total_ordering
@@ -24,8 +24,8 @@ class LID(object):
         assert ids[1] == "nasa"
         assert ids[2] == "pds"
         allowed_chars_re = r"\A[-._a-z0-9]+\Z"
-        for id in ids:
-            assert re.match(allowed_chars_re, id), id
+        for id_ in ids:
+            assert re.match(allowed_chars_re, id_), id_
 
         # Assign the Id fields
         self.lid = lid_str
