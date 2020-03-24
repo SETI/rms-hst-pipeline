@@ -5,7 +5,7 @@ import re
 class VID(object):
     """Representation of a PDS4 VID."""
 
-    def __init__(self, vid_str: str):
+    def __init__(self, vid_str: str) -> None:
         """
         Create a VID object from a string, raising an exception if
         the VID string is malformed.

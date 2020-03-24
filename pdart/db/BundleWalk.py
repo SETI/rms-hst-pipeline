@@ -35,10 +35,10 @@ class BundleWalk(object):
     hand and to localize necessary changes in code.
     """
 
-    def __init__(self, bundle_db: BundleDB):
+    def __init__(self, bundle_db: BundleDB) -> None:
         self.db = bundle_db
 
-    def walk(self):
+    def walk(self) -> None:
         bundle = self.db.get_bundle()
         self._walk_bundle(bundle)
 
@@ -49,7 +49,7 @@ class BundleWalk(object):
     #    visit xxx's children
     #    post-visit xxx
 
-    def _walk_bundle(self, bundle: Bundle):
+    def _walk_bundle(self, bundle: Bundle) -> None:
         bundle_lidvid = str(bundle.lidvid)
         self.visit_bundle(bundle, False)
 
@@ -66,7 +66,9 @@ class BundleWalk(object):
 
         self.visit_bundle(bundle, True)
 
-    def _walk_document_collection(self, document_collection: DocumentCollection):
+    def _walk_document_collection(
+        self, document_collection: DocumentCollection
+    ) -> None:
         self.visit_document_collection(document_collection, False)
 
         collection_lidvid = str(document_collection.lidvid)
@@ -77,7 +79,7 @@ class BundleWalk(object):
 
     def _walk_non_document_collection(
         self, non_document_collection: NonDocumentCollection
-    ):
+    ) -> None:
         self.visit_non_document_collection(non_document_collection, False)
 
         collection_lidvid = str(non_document_collection.lidvid)
@@ -92,7 +94,7 @@ class BundleWalk(object):
 
         self.visit_non_document_collection(non_document_collection, True)
 
-    def _walk_browse_product(self, browse_product: BrowseProduct):
+    def _walk_browse_product(self, browse_product: BrowseProduct) -> None:
         self.visit_browse_product(browse_product, False)
 
         product_lidvid = str(browse_product.lidvid)
@@ -101,7 +103,7 @@ class BundleWalk(object):
 
         self.visit_browse_product(browse_product, True)
 
-    def _walk_document_product(self, document_product: DocumentProduct):
+    def _walk_document_product(self, document_product: DocumentProduct) -> None:
         self.visit_document_product(document_product, False)
 
         product_lidvid = str(document_product.lidvid)
@@ -110,7 +112,7 @@ class BundleWalk(object):
 
         self.visit_document_product(document_product, True)
 
-    def _walk_fits_product(self, fits_product: FitsProduct):
+    def _walk_fits_product(self, fits_product: FitsProduct) -> None:
         self.visit_fits_product(fits_product, False)
 
         product_lidvid = str(fits_product.lidvid)
@@ -130,42 +132,44 @@ class BundleWalk(object):
 
     ############################################################
 
-    def visit_bundle(self, bundle: Bundle, post: bool):
+    def visit_bundle(self, bundle: Bundle, post: bool) -> None:
         pass
 
     ############################################################
 
     def visit_document_collection(
         self, document_collection: DocumentCollection, post: bool
-    ):
+    ) -> None:
         pass
 
     def visit_non_document_collection(
         self, non_document_collection: NonDocumentCollection, post: bool
-    ):
+    ) -> None:
         pass
 
     ############################################################
 
-    def visit_browse_product(self, browse_product: BrowseProduct, post: bool):
+    def visit_browse_product(self, browse_product: BrowseProduct, post: bool) -> None:
         pass
 
-    def visit_document_product(self, document_product: DocumentProduct, post: bool):
+    def visit_document_product(
+        self, document_product: DocumentProduct, post: bool
+    ) -> None:
         pass
 
-    def visit_fits_product(self, fits_product: FitsProduct, post: bool):
+    def visit_fits_product(self, fits_product: FitsProduct, post: bool) -> None:
         pass
 
     ############################################################
 
-    def visit_browse_file(self, browse_file: BrowseFile):
+    def visit_browse_file(self, browse_file: BrowseFile) -> None:
         pass
 
-    def visit_document_file(self, document_file: DocumentFile):
+    def visit_document_file(self, document_file: DocumentFile) -> None:
         pass
 
-    def visit_fits_file(self, fits_file: FitsFile):
+    def visit_fits_file(self, fits_file: FitsFile) -> None:
         pass
 
-    def visit_bad_fits_file(self, bad_fits_file: BadFitsFile):
+    def visit_bad_fits_file(self, bad_fits_file: BadFitsFile) -> None:
         pass

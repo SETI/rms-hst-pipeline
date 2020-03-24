@@ -10,7 +10,7 @@ class HstFilename(object):
     data from the filename.
     """
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str) -> None:
         self.filename = filename
         assert (
             len(basename(filename)) > 6

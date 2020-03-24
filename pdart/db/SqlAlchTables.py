@@ -7,7 +7,7 @@ from sqlalchemy.engine import Engine
 Base: Any = declarative_base()
 
 
-def create_tables(engine: Engine):
+def create_tables(engine: Engine) -> None:
     Base.metadata.create_all(engine)
 
 
@@ -16,7 +16,7 @@ class Bundle(Base):
     lidvid = Column(String, primary_key=True, nullable=False)
     proposal_id = Column(Integer, nullable=False)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "Bundle(lidvid=%r, proposal_id=%d)" % (self.lidvid, self.proposal_id)
 
 
@@ -46,7 +46,7 @@ class DocumentCollection(Collection):
         "polymorphic_identity": "document_collection",
     }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "DocumentCollection(lidvid=%r, bundle_lidvid=%r)" % (
             self.lidvid,
             self.bundle_lidvid,
@@ -68,7 +68,7 @@ class NonDocumentCollection(Collection):
         "polymorphic_identity": "non_document_collection",
     }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "NonDocumentCollection(lidvid=%r, bundle_lidvid=%r, "
             "instrument=%r, prefix=%r, suffix=%r)"
@@ -116,10 +116,10 @@ class BrowseProduct(Product):
         "polymorphic_identity": "browse_product",
     }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "BrowseProduct(lidvid=%r, collection_lidvid=%r, "
-            "fits_product_lidvid)"
+            "fits_product_lidvid=%r)"
             % (self.lidvid, self.collection_lidvid, self.fits_product_lidvid)
         )
 
@@ -140,7 +140,7 @@ class DocumentProduct(Product):
         "polymorphic_identity": "document_product",
     }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "DocumentProduct(lidvid=%r, collection_lidvid=%r)" % (
             self.lidvid,
             self.collection_lidvid,
@@ -163,7 +163,7 @@ class FitsProduct(Product):
         "polymorphic_identity": "fits_product",
     }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "FitsProduct(lidvid=%r, collection_lidvid=%r)" % (
             self.lidvid,
             self.collection_lidvid,
@@ -207,7 +207,7 @@ class BadFitsFile(File):
 
     __mapper_args__ = {"polymorphic_identity": "bad_fits_file"}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "BadFitsFile(id=%d, product_lidvid=%r, basename=%r)" % (
             self.id,
             self.product_lidvid,
@@ -227,7 +227,7 @@ class BrowseFile(File):
 
     __mapper_args__ = {"polymorphic_identity": "browse_file"}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "BrowseFile(id=%d, product_lidvid=%r, basename=%r, " "byte_size=%d)" % (
             self.id,
             self.product_lidvid,
@@ -248,8 +248,8 @@ class DocumentFile(File):
 
     __mapper_args__ = {"polymorphic_identity": "document_file"}
 
-    def __repr__(self):
-        return "DocumentFile(id=%d, product_lidvid=%r, basename=%d)" % (
+    def __repr__(self) -> str:
+        return "DocumentFile(id=%d, product_lidvid=%r, basename=%r)" % (
             self.id,
             self.product_lidvid,
             self.basename,
@@ -268,7 +268,7 @@ class FitsFile(File):
 
     __mapper_args__ = {"polymorphic_identity": "fits_file"}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "FitsFile(id=%d, product_lidvid=%r, basename=%r, " "hdu_count=%d)" % (
             self.id,
             self.product_lidvid,
@@ -307,11 +307,17 @@ class Hdu(Base):
         "FitsProduct", backref=backref("hdus", order_by=hdu_index)
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "Hdu(product_lid=%r, hdu_index=%d, hdr_loc=%d, dat_loc=%d, "
             "dat_span=%d)"
-            % (self.product_lid, self.hdu_index, self.keyword, self.value)
+            % (
+                self.product.lid,
+                self.hdu_index,
+                self.hdr_loc,
+                self.dat_loc,
+                self.dat_span,
+            )
         )
 
 
@@ -333,7 +339,7 @@ class Card(Base):
         "Hdu", backref=backref("cards", order_by=id)
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "Card(product_lidvid=%r, hdu_index=%d, "
             + "card_index=%d, keyword=%r, value=%r)"

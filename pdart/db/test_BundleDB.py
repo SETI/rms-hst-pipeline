@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from typing import TYPE_CHECKING
+from typing import cast, Set
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.SqlAlchTables import Base, Bundle, NonDocumentCollection
@@ -12,8 +12,6 @@ from pdart.db.Utils import file_md5
 # from pdart.new_labels.CollectionLabel import get_collection_label_name
 from pdart.pds4.LIDVID import LIDVID
 
-if TYPE_CHECKING:
-    from typing import Set
 
 _TABLES = {
     "bundles",
@@ -40,8 +38,7 @@ _TABLES = {
 
 
 class Test_BundleDB(unittest.TestCase):
-    def setUp(self):
-        # type: () -> None
+    def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
         (handle, filepath) = tempfile.mkstemp()
@@ -49,11 +46,10 @@ class Test_BundleDB(unittest.TestCase):
         os.close(handle)
         self.dummy_os_filepath = filepath
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         os.remove(self.dummy_os_filepath)
 
-    def test_BundleDB(self):
-        # type: () -> None
+    def test_BundleDB(self) -> None:
         db = self.db
         self.assertTrue(db.is_open())
         metadata = Base.metadata
@@ -63,8 +59,7 @@ class Test_BundleDB(unittest.TestCase):
 
     ############################################################
 
-    def test_create_bundle(self):
-        # type: () -> None
+    def test_create_bundle(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.assertTrue(
             self.db.session.query(Bundle).filter(Bundle.lidvid == bundle_lidvid).count()
@@ -80,23 +75,20 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
         self.assertTrue(self.db.bundle_exists(bundle_lidvid))
 
-    def test_bundle_exists(self):
-        # type: () -> None
+    def test_bundle_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.assertFalse(self.db.bundle_exists(bundle_lidvid))
         self.db.create_bundle(bundle_lidvid)
         self.assertTrue(self.db.bundle_exists(bundle_lidvid))
 
-    def test_get_bundle(self):
-        # type: () -> None
+    def test_get_bundle(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         bundle = self.db.get_bundle()
         self.assertEqual(bundle_lidvid, bundle.lidvid)
         self.assertEqual(99999, bundle.proposal_id)
 
-    def test_get_bundle_collections(self):
-        # type: () -> None
+    def test_get_bundle_collections(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         non_doc_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
         doc_collection_lidvid = "urn:nasa:pds:hst_99999:document::1.1"
@@ -121,8 +113,7 @@ class Test_BundleDB(unittest.TestCase):
 
     ############################################################
 
-    def test_create_document_collection(self):
-        # type: () -> None
+    def test_create_document_collection(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -135,8 +126,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_document_collection(collection_lidvid, bundle_lidvid)
         self.assertTrue(self.db.document_collection_exists(collection_lidvid))
 
-    def test_create_non_document_collection(self):
-        # type: () -> None
+    def test_create_non_document_collection(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -149,8 +139,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
         self.assertTrue(self.db.non_document_collection_exists(collection_lidvid))
 
-    def test_collection_exists(self):
-        # type: () -> None
+    def test_collection_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
         self.db.create_bundle(bundle_lidvid)
@@ -159,8 +148,7 @@ class Test_BundleDB(unittest.TestCase):
 
         self.assertTrue(self.db.collection_exists(collection_lidvid))
 
-    def test_document_collection_exists(self):
-        # type: () -> None
+    def test_document_collection_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -174,8 +162,7 @@ class Test_BundleDB(unittest.TestCase):
 
         self.assertTrue(self.db.document_collection_exists(doc_collection_lidvid))
 
-    def test_non_document_collection_exists(self):
-        # type: () -> None
+    def test_non_document_collection_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -193,7 +180,7 @@ class Test_BundleDB(unittest.TestCase):
             self.db.non_document_collection_exists(non_doc_collection_lidvid)
         )
 
-    def test_get_collection(self):
+    def test_get_collection(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -201,12 +188,12 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
 
         collection = self.db.get_collection(collection_lidvid)
-        self.assertEqual(NonDocumentCollection, type(collection))
-        self.assertEqual("acs", collection.instrument)
-        self.assertEqual("raw", collection.suffix)
+        self.assertTrue(isinstance(collection, NonDocumentCollection))
+        nd_collection = cast(NonDocumentCollection, collection)
+        self.assertEqual("acs", nd_collection.instrument)
+        self.assertEqual("raw", nd_collection.suffix)
 
-    def test_get_collection_products(self):
-        # type: () -> None
+    def test_get_collection_products(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
         p1_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:j6gp01lzq::1.8"
@@ -240,8 +227,7 @@ class Test_BundleDB(unittest.TestCase):
 
     ############################################################
 
-    def test_create_browse_product(self):
-        # type: () -> None
+    def test_create_browse_product(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -273,8 +259,7 @@ class Test_BundleDB(unittest.TestCase):
         )
         self.assertTrue(self.db.browse_product_exists(browse_product_lidvid))
 
-    def test_create_document_product(self):
-        # type: () -> None
+    def test_create_document_product(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:document::1.8"
@@ -285,8 +270,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_document_product(product_lidvid, collection_lidvid)
         self.assertTrue(self.db.document_product_exists(product_lidvid))
 
-    def test_create_fits_product(self):
-        # type: () -> None
+    def test_create_fits_product(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -302,8 +286,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_fits_product(product_lidvid, collection_lidvid)
         self.assertTrue(self.db.fits_product_exists(product_lidvid))
 
-    def test_product_exists(self):
-        # type: () -> None
+    def test_product_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         data_coll_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
@@ -341,8 +324,7 @@ class Test_BundleDB(unittest.TestCase):
         self.assertTrue(self.db.product_exists(browse_prod_lidvid))
         self.assertTrue(self.db.product_exists(doc_prod_lidvid))
 
-    def test_browse_product_exists(self):
-        # type: () -> None
+    def test_browse_product_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw::1.8"
@@ -358,8 +340,7 @@ class Test_BundleDB(unittest.TestCase):
         )
         self.assertTrue(self.db.browse_product_exists(product_lidvid))
 
-    def test_document_product_exists(self):
-        # type: () -> None
+    def test_document_product_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:document::1.8"
@@ -370,8 +351,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_document_product(product_lidvid, collection_lidvid)
         self.assertTrue(self.db.document_product_exists(product_lidvid))
 
-    def test_fits_product_exists(self):
-        # type: () -> None
+    def test_fits_product_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
@@ -382,7 +362,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_fits_product(product_lidvid, collection_lidvid)
         self.assertTrue(self.db.fits_product_exists(product_lidvid))
 
-    def test_get_product(self):
+    def test_get_product(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -396,8 +376,7 @@ class Test_BundleDB(unittest.TestCase):
         self.assertEqual(product_lidvid, product.lidvid)
         self.assertEqual(collection_lidvid, product.collection_lidvid)
 
-    def test_get_product_files(self):
-        # type: () -> None
+    def test_get_product_files(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -416,8 +395,7 @@ class Test_BundleDB(unittest.TestCase):
 
     ############################################################
 
-    def test_create_browse_file(self):
-        # type: () -> None
+    def test_create_browse_file(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -447,8 +425,7 @@ class Test_BundleDB(unittest.TestCase):
         )
         self.assertTrue(self.db.browse_file_exists(basename, browse_product_lidvid))
 
-    def test_create_document_file(self):
-        # type: () -> None
+    def test_create_document_file(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -464,8 +441,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_document_file(self.dummy_os_filepath, filename, product_lidvid)
         self.assertTrue(self.db.document_file_exists(filename, product_lidvid))
 
-    def test_create_fits_file(self):
-        # type: () -> None
+    def test_create_fits_file(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -484,8 +460,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_fits_file(self.dummy_os_filepath, basename, product_lidvid, 1)
         self.assertTrue(self.db.fits_file_exists(basename, product_lidvid))
 
-    def test_file_exists(self):
-        # type: () -> None
+    def test_file_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         raw_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
@@ -567,8 +542,7 @@ class Test_BundleDB(unittest.TestCase):
         self.assertTrue(self.db.file_exists(doc_filename, doc_prod_lidvid))
         self.assertTrue(self.db.file_exists(doc_filename_2, doc_prod_lidvid))
 
-    def test_bad_fits_file_exists(self):
-        # type: () -> None
+    def test_bad_fits_file_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -586,8 +560,7 @@ class Test_BundleDB(unittest.TestCase):
         )
         self.assertTrue(self.db.bad_fits_file_exists(filename, product_lidvid))
 
-    def test_browse_file_exists(self):
-        # type: () -> None
+    def test_browse_file_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         raw_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
@@ -607,8 +580,7 @@ class Test_BundleDB(unittest.TestCase):
         )
         self.assertTrue(self.db.browse_file_exists(basename, product_lidvid))
 
-    def test_document_file_exists(self):
-        # type: () -> None
+    def test_document_file_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -624,8 +596,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_document_file(self.dummy_os_filepath, filename, product_lidvid)
         self.assertTrue(self.db.document_file_exists(filename, product_lidvid))
 
-    def test_fits_file_exists(self):
-        # type: () -> None
+    def test_fits_file_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -641,8 +612,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_fits_file(self.dummy_os_filepath, filename, product_lidvid, 1)
         self.assertTrue(self.db.fits_file_exists(filename, product_lidvid))
 
-    def test_get_file(self):
-        # type: () -> None
+    def test_get_file(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -661,8 +631,7 @@ class Test_BundleDB(unittest.TestCase):
 
     ############################################################
 
-    def test_create_bundle_label(self):
-        # type: () -> None
+    def test_create_bundle_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -673,8 +642,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle_label(self.dummy_os_filepath, basename, bundle_lidvid)
         self.assertTrue(self.db.bundle_label_exists(bundle_lidvid))
 
-    def test_bundle_label_exists(self):
-        # type: () -> None
+    def test_bundle_label_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -683,8 +651,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle_label(self.dummy_os_filepath, basename, bundle_lidvid)
         self.assertTrue(self.db.bundle_label_exists(bundle_lidvid))
 
-    def test_get_bundle_label(self):
-        # type: () -> None
+    def test_get_bundle_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
@@ -695,8 +662,7 @@ class Test_BundleDB(unittest.TestCase):
         self.assertEqual(basename, bundle_label.basename)
         self.assertEqual(file_md5(self.dummy_os_filepath), bundle_label.md5_hash)
 
-    def test_create_collection_label(self):
-        # type: () -> None
+    def test_create_collection_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
@@ -713,8 +679,7 @@ class Test_BundleDB(unittest.TestCase):
         )
         self.assertTrue(self.db.collection_label_exists(collection_lidvid))
 
-    def test_collection_label_exists(self):
-        # type: () -> None
+    def test_collection_label_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
@@ -726,6 +691,8 @@ class Test_BundleDB(unittest.TestCase):
             self.dummy_os_filepath, basename, collection_lidvid
         )
         self.assertTrue(self.db.collection_label_exists(collection_lidvid))
+
+        # TODO Fix this.
 
     #     def test_get_collection_label(self):
     #         # type: () -> None
@@ -743,8 +710,7 @@ class Test_BundleDB(unittest.TestCase):
     #         self.assertEqual(basename, collection_label.basename)
     #         self.assertEqual(file_md5(self.dummy_os_filepath), collection_label.md5_hash)
 
-    def test_create_collection_inventory(self):
-        # type: () -> None
+    def test_create_collection_inventory(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
@@ -761,8 +727,7 @@ class Test_BundleDB(unittest.TestCase):
         )
         self.assertTrue(self.db.collection_inventory_exists(collection_lidvid))
 
-    def test_collection_inventory_exists(self):
-        # type: () -> None
+    def test_collection_inventory_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
@@ -774,6 +739,8 @@ class Test_BundleDB(unittest.TestCase):
             self.dummy_os_filepath, basename, collection_lidvid
         )
         self.assertTrue(self.db.collection_inventory_exists(collection_lidvid))
+
+        # TODO Fix this.
 
     #     def test_get_collection_inventory(self):
     #         # type: () -> None
@@ -793,8 +760,7 @@ class Test_BundleDB(unittest.TestCase):
     #             file_md5(self.dummy_os_filepath), collection_inventory.md5_hash
     #         )
 
-    def test_create_product_label(self):
-        # type: () -> None
+    def test_create_product_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
@@ -809,8 +775,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_product_label(self.dummy_os_filepath, basename, product_lidvid)
         self.assertTrue(self.db.product_label_exists(product_lidvid))
 
-    def test_product_label_exists(self):
-        # type: () -> None
+    def test_product_label_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
@@ -823,8 +788,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_product_label(self.dummy_os_filepath, basename, product_lidvid)
         self.assertTrue(self.db.product_label_exists(product_lidvid))
 
-    def test_get_product_label(self):
-        # type: () -> None
+    def test_get_product_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
@@ -841,9 +805,7 @@ class Test_BundleDB(unittest.TestCase):
 
     ############################################################
 
-    def test_get_card_dictionaries(self):
-        # type: () -> None
-
+    def test_get_card_dictionaries(self) -> None:
         # We don't test the functionality of get_card_dictionaries()
         # here, since we'd first need to populate the database with
         # the contents of the FITS file and that machinery is in
@@ -852,16 +814,14 @@ class Test_BundleDB(unittest.TestCase):
         # intentionally blank" message.
         pass
 
-    def test_exploratory(self):
-        # type: () -> None
+    def test_exploratory(self) -> None:
         # what happens if you create tables twice?
         self.db.create_tables()
         # no exception, at least
 
     ############################################################
 
-    def test_get_proposal_info(self):
-        # type: () -> None
+    def test_get_proposal_info(self) -> None:
         bundle_lid = "urn:nasa:pds:hst_99999"
         self.assertFalse(self.db.proposal_info_exists(bundle_lid))
         with self.assertRaises(Exception):

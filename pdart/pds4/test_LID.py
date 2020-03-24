@@ -7,12 +7,12 @@ import hypothesis.strategies as st
 from pdart.pds4.LID import LID
 
 
-def lid_segments():
+def lid_segments() -> st.SearchStrategy[str]:
     """A Hypothesis strategy to generate a legal LID segment string."""
     return st.from_regex(r"[a-z0-9][a-z0-9._-]*", fullmatch=True)
 
 
-def lid_strings():
+def lid_strings() -> st.SearchStrategy[str]:
     """A Hypothesis strategy to generate LID strings."""
 
     def segments_to_lid(segments: List[str]) -> str:
@@ -24,13 +24,13 @@ def lid_strings():
     return st.lists(lid_segments(), min_size=1, max_size=3).map(segments_to_lid)
 
 
-def lids():
+def lids() -> st.SearchStrategy[LID]:
     """A Hypothesis strategy to generate LIDs."""
     return st.builds(LID, lid_strings())
 
 
 class TestLID(unittest.TestCase):
-    def test_init(self):
+    def test_init(self) -> None:
         # test segments
         with self.assertRaises(Exception):
             LID("urn:nasa")
@@ -78,7 +78,7 @@ class TestLID(unittest.TestCase):
         self.assertEqual("product", lid.product_id)
         self.assertEqual("urn:nasa:pds:bundle:collection:product", lid.lid)
 
-    def test_eq(self):
+    def test_eq(self) -> None:
         self.assertTrue(
             LID("urn:nasa:pds:bundle:collection:product")
             == LID("urn:nasa:pds:bundle:collection:product")
@@ -97,31 +97,31 @@ class TestLID(unittest.TestCase):
         )
 
     @given(lid_strings(), lid_strings())
-    def test_eq_property(self, lhs: str, rhs: str):
+    def test_eq_property(self, lhs: str, rhs: str) -> None:
         # two LIDs are equal iff their strings are equal
         self.assertEqual(lhs == rhs, LID(lhs) == LID(rhs))
 
-    def test_str(self):
+    def test_str(self) -> None:
         self.assertEqual(
             "urn:nasa:pds:bundle:collection:product",
             str(LID("urn:nasa:pds:bundle:collection:product")),
         )
 
     @given(lid_strings())
-    def test_str_roundtrip_property(self, lid_str: str):
+    def test_str_roundtrip_property(self, lid_str: str) -> None:
         """
         Creating a LID from a string and turning it back into a string
         should result in the same string.
         """
         self.assertEqual(lid_str, str(LID(lid_str)))
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         self.assertEqual(
             "LID('urn:nasa:pds:bundle:collection:product')",
             repr(LID("urn:nasa:pds:bundle:collection:product")),
         )
 
-    def test_to_browse_lid(self):
+    def test_to_browse_lid(self) -> None:
         data_coll_lid = LID("urn:nasa:pds:bundle:data_collection_raw")
         browse_coll_lid = LID("urn:nasa:pds:bundle:browse_collection_raw")
         self.assertEqual(browse_coll_lid, data_coll_lid.to_browse_lid())
@@ -132,12 +132,12 @@ class TestLID(unittest.TestCase):
 
         # TODO Write tests for is_bundle_id, etc.
 
-    def test_to_shm_lid(self):
+    def test_to_shm_lid(self) -> None:
         data_coll_lid = LID("urn:nasa:pds:bundle:data_collection_raw:product")
         shm_coll_lid = LID("urn:nasa:pds:bundle:data_collection_shm:product")
         self.assertEqual(shm_coll_lid, data_coll_lid.to_shm_lid())
 
-    def test_create_lid_from_parts(self):
+    def test_create_lid_from_parts(self) -> None:
         parts: List[str] = []
         with self.assertRaises(AssertionError):
             LID.create_from_parts(parts)
@@ -156,7 +156,7 @@ class TestLID(unittest.TestCase):
             LID.create_from_parts(parts)
 
     @given(lids())
-    def test_is_xxx_lid_property(self, lid: LID):
+    def test_is_xxx_lid_property(self, lid: LID) -> None:
         # LIDs must be either for bundles, collections, or products.
         if lid.is_bundle_lid():
             self.assertIsNotNone(lid.bundle_id)

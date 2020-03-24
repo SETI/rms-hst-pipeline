@@ -1,5 +1,6 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 import astropy.io.fits
+import astropy.io.fits.card
 from fs.path import basename
 from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import Card, Hdu
@@ -11,7 +12,7 @@ _PYFITS_OBJ = Any
 
 def populate_database_from_fits_file(
     db: BundleDB, os_filepath: str, fits_product_lidvid: str
-):
+) -> None:
     file_basename = basename(os_filepath)
     try:
         fits = astropy.io.fits.open(os_filepath)
@@ -30,7 +31,7 @@ def populate_database_from_fits_file(
 
 def _populate_hdus_and_cards(
     db: BundleDB, pyfits_obj: _PYFITS_OBJ, file_basename: str, fits_product_lidvid: str
-):
+) -> None:
     def create_hdu_dict(index: int, hdu: _PYFITS_HDU) -> Dict[str, Any]:
         fileinfo = hdu.fileinfo()
         return {
@@ -44,7 +45,7 @@ def _populate_hdus_and_cards(
     hdu_dicts = [create_hdu_dict(index, hdu) for index, hdu in enumerate(pyfits_obj)]
     db.session.bulk_insert_mappings(Hdu, hdu_dicts)
 
-    def handle_undefined(val):
+    def handle_undefined(val: bool) -> Optional[bool]:
         """Convert undefined values to None"""
         if isinstance(val, astropy.io.fits.card.Undefined):
             return None

@@ -9,7 +9,7 @@ from typing import List
 class LID(object):
     """Representation of a PDS4 LID."""
 
-    def __init__(self, lid_str: str):
+    def __init__(self, lid_str: str) -> None:
         """
         Create a LID object from a string, raising an exception if
         the LID string is malformed.
@@ -79,8 +79,7 @@ class LID(object):
         """Return True iff the LID is a collection LID."""
         return self.collection_id is not None and self.product_id is None
 
-    def is_bundle_lid(self):
-        # type: () -> bool
+    def is_bundle_lid(self) -> bool:
         """Return True iff the LID is a bundle LID."""
         return self.bundle_id is not None and self.collection_id is None
 
@@ -100,7 +99,7 @@ class LID(object):
         Convert a LID within a data collection into the corresponding
         LID in the browse collection.
         """
-        assert self.collection_id, "to_browse_lid(): Can't call on bundle LID"
+        assert self.collection_id, "to_browse_lid() -> None: Can't call on bundle LID"
         collection_id_parts = self.collection_id.split("_")
         assert collection_id_parts[0] == "data", (
             "to_browse_lid: Only legal within data_ collections; had %s" % self

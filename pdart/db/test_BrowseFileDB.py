@@ -1,3 +1,4 @@
+from typing import cast
 import unittest
 
 from fs.path import join
@@ -9,11 +10,11 @@ from pdart.db.Utils import path_to_testfile
 
 
 class Test_BrowseFileDB(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
 
-    def test_populate_database_from_browse_file(self):
+    def test_populate_database_from_browse_file(self) -> None:
         fits_product_lidvid = "urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::2.0"
         fits_collection_lidvid = "urn:nasa:pds:hst_09059:data_acs_raw::2.0"
         os_filepath = path_to_testfile("j6gp01lzq_raw.fits")
@@ -43,4 +44,5 @@ class Test_BrowseFileDB(unittest.TestCase):
         self.assertTrue(file)
         # lidvid and basename are defined to be right (in get_file())
         self.assertTrue(isinstance(file, BrowseFile))
-        self.assertEqual(byte_size, file.byte_size)
+        browse_file = cast(BrowseFile, file)
+        self.assertEqual(byte_size, browse_file.byte_size)

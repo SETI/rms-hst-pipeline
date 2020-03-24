@@ -8,7 +8,7 @@ from pdart.db.Utils import file_md5, string_md5
 
 
 class Test_Utils(unittest.TestCase):
-    def test_file_md5(self):
+    def test_file_md5(self) -> None:
         (handle, filepath) = tempfile.mkstemp()
         try:
             os.close(handle)
@@ -16,7 +16,7 @@ class Test_Utils(unittest.TestCase):
         finally:
             os.remove(filepath)
 
-    def test_string_md5(self):
+    def test_string_md5(self) -> None:
         self.assertEqual("d41d8cd98f00b204e9800998ecf8427e", string_md5(""))
         self.assertEqual("3858f62230ac3c915f300c664312c63f", string_md5("foobar"))
         self.assertEqual("d41d8cd98f00b204e9800998ecf8427e", string_md5(""))

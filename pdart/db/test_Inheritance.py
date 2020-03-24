@@ -15,15 +15,12 @@ import unittest
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from typing import TYPE_CHECKING
+from typing import Any
 
-if TYPE_CHECKING:
-    from typing import Any
-
-Base = declarative_base()  # type: Any
+Base: Any = declarative_base()
 
 
-def create_tables(engine):
+def create_tables(engine) -> None:
     Base.metadata.create_all(engine)
 
 
@@ -66,12 +63,12 @@ class Dog(Mammal):
 
 
 class Test_Inheritance(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.engine = create_engine("sqlite:///", echo=True)  # in memory
         create_tables(self.engine)
         self.session = sessionmaker(bind=self.engine)()
 
-    def testDBInsertion(self):
+    def testDBInsertion(self) -> None:
         cat = Cat(birds_killed=23, scratches_people=True)
         self.session.add(cat)
         self.session.commit()

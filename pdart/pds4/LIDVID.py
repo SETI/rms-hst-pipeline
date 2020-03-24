@@ -10,7 +10,7 @@ from pdart.pds4.VID import VID
 class LIDVID(object):
     """Representation of a PDS4 LIDVID."""
 
-    def __init__(self, lidvid_str: str):
+    def __init__(self, lidvid_str: str) -> None:
         """
         Create a LIDVID object from a string, raising an exception if
         the LIDVID string is malformed.

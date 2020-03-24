@@ -95,21 +95,21 @@ def _lidvid_to_suffix(nondoc_collection_lidvid) -> str:
 
 
 class BundleDB(object):
-    def __init__(self, url: str):
+    def __init__(self, url: str) -> None:
         self.url = url
         self.engine = create_engine(url)
         self.session = sessionmaker(bind=self.engine)()
 
-    def dump(self):
+    def dump(self) -> None:
         for line in self.engine.raw_connection().iterdump():
             print(line)
 
-    def create_tables(self):
+    def create_tables(self) -> None:
         create_tables(self.engine)
 
     ############################################################
 
-    def create_bundle(self, bundle_lidvid: str):
+    def create_bundle(self, bundle_lidvid: str) -> None:
         """
         Create a bundle with this LIDVID if none exists.
         """
@@ -140,7 +140,9 @@ class BundleDB(object):
 
     ############################################################
 
-    def create_document_collection(self, collection_lidvid: str, bundle_lidvid: str):
+    def create_document_collection(
+        self, collection_lidvid: str, bundle_lidvid: str
+    ) -> None:
         """
         Create a document_collection with this LIDVID if none exists.
         """
@@ -164,7 +166,7 @@ class BundleDB(object):
 
     def create_non_document_collection(
         self, collection_lidvid: str, bundle_lidvid: str
-    ):
+    ) -> None:
         """
         Create a non_document_collection with this LIDVID if none exists.
         """
@@ -238,7 +240,7 @@ class BundleDB(object):
         browse_product_lidvid: str,
         fits_product_lidvid: str,
         collection_lidvid: str,
-    ):
+    ) -> None:
         """
         Create a product with this LIDVID if none exists.
         """
@@ -274,7 +276,9 @@ class BundleDB(object):
             )
             self.session.commit()
 
-    def create_document_product(self, product_lidvid: str, collection_lidvid: str):
+    def create_document_product(
+        self, product_lidvid: str, collection_lidvid: str
+    ) -> None:
         """
         Create a product with this LIDVID if none exists.
         """
@@ -296,7 +300,7 @@ class BundleDB(object):
             )
             self.session.commit()
 
-    def create_fits_product(self, product_lidvid: str, collection_lidvid: str):
+    def create_fits_product(self, product_lidvid: str, collection_lidvid: str) -> None:
         """
         Create a product with this LIDVID if none exists.
         """
@@ -374,7 +378,7 @@ class BundleDB(object):
         basename: str,
         product_lidvid: str,
         exception_message: str,
-    ):
+    ) -> None:
         """
         Create a bad FITS file record with this basename belonging to
         the product if none exists.
@@ -395,7 +399,7 @@ class BundleDB(object):
 
     def create_browse_file(
         self, os_filepath: str, basename: str, product_lidvid: str, byte_size: int
-    ):
+    ) -> None:
         """
         Create a browse file with this basename belonging to the product
         if none exists.
@@ -417,7 +421,7 @@ class BundleDB(object):
 
     def create_document_file(
         self, os_filepath: str, basename: str, product_lidvid: str
-    ):
+    ) -> None:
         """
         Create a document file with this basename belonging to the product
         if none exists.
@@ -438,7 +442,7 @@ class BundleDB(object):
 
     def create_fits_file(
         self, os_filepath: str, basename: str, product_lidvid: str, hdu_count: int
-    ):
+    ) -> None:
         """
         Create a FITS file with this basename belonging to the product
         if none exists.
@@ -614,7 +618,9 @@ class BundleDB(object):
 
     ############################################################
 
-    def create_bundle_label(self, os_filepath: str, basename: str, bundle_lidvid: str):
+    def create_bundle_label(
+        self, os_filepath: str, basename: str, bundle_lidvid: str
+    ) -> None:
         assert LIDVID(bundle_lidvid).is_bundle_lidvid()
         if self.bundle_label_exists(bundle_lidvid):
             pass
@@ -655,7 +661,7 @@ class BundleDB(object):
 
     def create_collection_label(
         self, os_filepath: str, basename: str, collection_lidvid: str
-    ):
+    ) -> None:
         assert LIDVID(collection_lidvid).is_collection_lidvid()
         if self.collection_label_exists(collection_lidvid):
             pass
@@ -696,7 +702,7 @@ class BundleDB(object):
 
     def create_collection_inventory(
         self, os_filepath: str, basename: str, collection_lidvid: str
-    ):
+    ) -> None:
         assert LIDVID(collection_lidvid).is_collection_lidvid()
         if self.collection_inventory_exists(collection_lidvid):
             pass
@@ -737,7 +743,7 @@ class BundleDB(object):
 
     def create_product_label(
         self, os_filepath: str, basename: str, product_lidvid: str
-    ):
+    ) -> None:
         assert LIDVID(product_lidvid).is_product_lidvid()
         if self.product_label_exists(product_lidvid):
             pass
@@ -821,7 +827,7 @@ class BundleDB(object):
 
     ############################################################
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the session associated with this BundleDB.
         """
