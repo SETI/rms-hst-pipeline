@@ -1,3 +1,61 @@
+/* Here's the tentative shape, based on the Python2.7 version of
+ * PDART. It may not be right.
+ *
+ * I broke up the modules within fs to see what's used by whom.
+ * Unfortunately, that package is a bit of a mess.
+ *
+ * Mark nodes blue when done.
+ * 
+ * Use this as a guide of what to convert next.
+ */
+
 digraph {
+    "fs.FSPrimitives"[shape=box];
+    "fs.VersionedFS"[shape=box];
+    astroquery[shape=box];
+    cows[shape=box;color=blue];
+    db[color=blue];
+    documents[shape=box];
+    multiversioned[color=blue];
+    pds4[shape=box;color=blue];
+    rules[shape=box];
+    xml[shape=box];
+
+    "fs.DeliverableFS" -> "fs.DirUtils";
+    "fs.DeliverableFS" -> "fs.FSPrimAdapter";
+    "fs.DeliverableFS" -> "fs.FSPrimitives";
+    "fs.DeliverableFS" -> pds4;
+    "fs.DirUtils" -> pds4;
+    "fs.FSPrimAdapter" -> "fs.FSPrimitives";
+    "fs.ISingleVersionBundleFS" -> pds4;
+    "fs.SubdirVersions" -> "fs.VersionedFS";
+    "fs.V1FS" -> "fs.FSPrimAdapter";
+    "fs.V1FS" -> "fs.FSPrimitives";
+    "fs.V1FS" -> "fs.SubdirVersions";
+    "fs.V1FS" -> "fs.VersionedFS";
+    "fs.Versioned" -> "fs.ISingleVersionBundleFS";
+    "fs.Versioned" -> cows;
+    archive -> "fs.DirUtils";
+    archive -> "fs.V1FS";
+    archive -> "fs.VersionedFS";
+    archive -> db;
+    archive -> documents;
+    archive -> labels;
+    archive -> pds4;
     db -> pds4;
+    labels -> db;
+    labels -> pds4;
+    labels -> rules;
+    labels -> xml;
+    multiversioned -> pds4;
+    pipeline -> "fs.DeliverableFS";
+    pipeline -> "fs.Versioned";
+    pipeline -> archive;
+    pipeline -> astroquery
+    pipeline -> cows;
+    pipeline -> db;
+    pipeline -> documents;
+    pipeline -> labels;
+    pipeline -> multiversioned;
+    pipeline -> pds4;
 }
