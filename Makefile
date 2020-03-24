@@ -18,7 +18,7 @@ MYPY-FLAGS=--disallow-any-generics \
 
 .PHONY: mypy
 mypy : venv
-	$(ACTIVATE) && mypy pdart
+	$(ACTIVATE) && MYPYPATH=stubs mypy pdart
 
 ############################################################
 # TESTS
