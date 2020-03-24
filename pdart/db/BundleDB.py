@@ -153,8 +153,8 @@ class BundleDB(object):
                 pass
             else:
                 raise Exception(
-                    "non-document-collection with LIDVID %s already exists"
-                    % collection_lidvid
+                    f"non-document-collection with "
+                    f"LIDVID {collection_lidvid} already exists"
                 )
         else:
             self.session.add(
@@ -177,8 +177,8 @@ class BundleDB(object):
                 pass
             else:
                 raise Exception(
-                    "document-collection with LIDVID %s already exists"
-                    % collection_lidvid
+                    f"document-collection with "
+                    f"LIDVID {collection_lidvid} already exists"
                 )
         else:
             instrument = _lidvid_to_instrument(collection_lidvid)
@@ -249,13 +249,11 @@ class BundleDB(object):
         assert LIDVID(collection_lidvid).is_collection_lidvid()
         if self.product_exists(fits_product_lidvid):
             if not self.fits_product_exists(fits_product_lidvid):
-                raise Exception(
-                    "product %s is not a FITS product" % fits_product_lidvid
-                )
+                raise Exception(f"product {fits_product_lidvid} is not a FITS product")
         else:
             raise Exception(
-                "FITS product %s must exist before building "
-                "browse product %s" % (fits_product_lidvid, browse_product_lidvid)
+                f"FITS product {fits_product_lidvid} must exist before "
+                f"building browse product {browse_product_lidvid}"
             )
 
         if self.product_exists(browse_product_lidvid):
@@ -263,8 +261,7 @@ class BundleDB(object):
                 pass
             else:
                 raise Exception(
-                    "non-browse product with LIDVID %s already exists"
-                    % browse_product_lidvid
+                    f"non-browse product with LIDVID {browse_product_lidvid} already exists"
                 )
         else:
             self.session.add(
@@ -289,8 +286,7 @@ class BundleDB(object):
                 pass
             else:
                 raise Exception(
-                    "non-document product with LIDVID %s already exists"
-                    % product_lidvid
+                    f"non-document product with LIDVID {product_lidvid} already exists"
                 )
         else:
             self.session.add(
@@ -311,8 +307,7 @@ class BundleDB(object):
                 pass
             else:
                 raise Exception(
-                    "non-FITS product with LIDVID %s already exists"
-                    % LIDVID(product_lidvid)
+                    f"non-FITS product with LIDVID {product_lidvid} already exists"
                 )
         else:
             self.session.add(
@@ -805,7 +800,7 @@ class BundleDB(object):
         """
         assert LID(bundle_lid).is_bundle_lid()
         if self.proposal_info_exists(bundle_lid):
-            raise Exception("proposal info with LID %s already exists" % bundle_lid)
+            raise Exception(f"proposal info with LID {bundle_lid} already exists")
         else:
             self.session.add(
                 ProposalInfo(

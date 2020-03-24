@@ -62,7 +62,7 @@ class BundleWalk(object):
                     cast(NonDocumentCollection, collection)
                 )
             else:
-                assert False, "Missing collection case: %s" % collection_lidvid
+                assert False, f"Missing collection case: {collection_lidvid}"
 
         self.visit_bundle(bundle, True)
 
@@ -90,7 +90,7 @@ class BundleWalk(object):
             elif self.db.fits_product_exists(product_lidvid):
                 self._walk_fits_product(cast(FitsProduct, product))
             else:
-                assert False, "Missing product case: %s" % product_lidvid
+                assert False, f"Missing product case: {product_lidvid}"
 
         self.visit_non_document_collection(non_document_collection, True)
 
@@ -123,10 +123,7 @@ class BundleWalk(object):
         elif self.db.fits_file_exists(basename, product_lidvid):
             self.visit_fits_file(cast(FitsFile, fits_file))
         else:
-            assert False, "Missing FITS product case: %s in %s" % (
-                basename,
-                product_lidvid,
-            )
+            assert False, "Missing FITS product case: {basename} in {product_lidvid}u"
 
         self.visit_fits_product(fits_product, True)
 

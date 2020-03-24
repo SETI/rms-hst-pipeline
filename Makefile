@@ -1,6 +1,10 @@
 ACTIVATE=source venv/bin/activate
 PIP=python3 -m pip
 
+# Format, typecheck, and test.
+.PHONY: all
+all : black mypy test
+
 ############################################################
 # MYPY TYPECHECKING
 ############################################################

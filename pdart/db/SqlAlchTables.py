@@ -17,7 +17,7 @@ class Bundle(Base):
     proposal_id = Column(Integer, nullable=False)
 
     def __repr__(self) -> str:
-        return "Bundle(lidvid=%r, proposal_id=%d)" % (self.lidvid, self.proposal_id)
+        return f"Bundle(lidvid={self.lidvid!r}, proposal_id={self.proposal_id})"
 
 
 ############################################################
@@ -47,10 +47,7 @@ class DocumentCollection(Collection):
     }
 
     def __repr__(self) -> str:
-        return "DocumentCollection(lidvid=%r, bundle_lidvid=%r)" % (
-            self.lidvid,
-            self.bundle_lidvid,
-        )
+        return f"DocumentCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
 
 
 class NonDocumentCollection(Collection):
@@ -70,15 +67,10 @@ class NonDocumentCollection(Collection):
 
     def __repr__(self) -> str:
         return (
-            "NonDocumentCollection(lidvid=%r, bundle_lidvid=%r, "
-            "instrument=%r, prefix=%r, suffix=%r)"
-            % (
-                self.lidvid,
-                self.bundle_lidvid,
-                self.instrument,
-                self.prefix,
-                self.suffix,
-            )
+            f"NonDocumentCollection(lidvid={self.lidvid!r}, "
+            f"bundle_lidvid={self.bundle_lidvid!r}, "
+            f"instrument={self.instrument!r}, "
+            f"prefix={self.prefix!r}, suffix={self.suffix!r})"
         )
 
 
@@ -118,9 +110,9 @@ class BrowseProduct(Product):
 
     def __repr__(self) -> str:
         return (
-            "BrowseProduct(lidvid=%r, collection_lidvid=%r, "
-            "fits_product_lidvid=%r)"
-            % (self.lidvid, self.collection_lidvid, self.fits_product_lidvid)
+            f"BrowseProduct(lidvid={self.lidvid!r}, "
+            f"collection_lidvid={self.collection_lidvid!r}, "
+            f"fits_product_lidvid={self.fits_product_lidvid!r})"
         )
 
 
@@ -141,9 +133,9 @@ class DocumentProduct(Product):
     }
 
     def __repr__(self) -> str:
-        return "DocumentProduct(lidvid=%r, collection_lidvid=%r)" % (
-            self.lidvid,
-            self.collection_lidvid,
+        return (
+            f"DocumentProduct(lidvid={self.lidvid!r}, "
+            f"collection_lidvid={self.collection_lidvid!r})"
         )
 
 
@@ -164,9 +156,9 @@ class FitsProduct(Product):
     }
 
     def __repr__(self) -> str:
-        return "FitsProduct(lidvid=%r, collection_lidvid=%r)" % (
-            self.lidvid,
-            self.collection_lidvid,
+        return (
+            f"FitsProduct(lidvid={self.lidvid!r}, "
+            f"collection_lidvid={self.collection_lidvid!r})"
         )
 
 
@@ -208,10 +200,10 @@ class BadFitsFile(File):
     __mapper_args__ = {"polymorphic_identity": "bad_fits_file"}
 
     def __repr__(self) -> str:
-        return "BadFitsFile(id=%d, product_lidvid=%r, basename=%r)" % (
-            self.id,
-            self.product_lidvid,
-            self.basename,
+        return (
+            f"BadFitsFile(id={self.id!r}, "
+            f"product_lidvid={self.product_lidvid!r}, "
+            f"basename={self.basename!r})"
         )
 
 
@@ -228,11 +220,11 @@ class BrowseFile(File):
     __mapper_args__ = {"polymorphic_identity": "browse_file"}
 
     def __repr__(self) -> str:
-        return "BrowseFile(id=%d, product_lidvid=%r, basename=%r, " "byte_size=%d)" % (
-            self.id,
-            self.product_lidvid,
-            self.basename,
-            self.byte_size,
+        return (
+            f"BrowseFile(id={self.id}, "
+            f"product_lidvid={self.product_lidvid!r}, "
+            f"basename={self.basename!r}, "
+            f"byte_size={self.byte_size})"
         )
 
 
@@ -249,10 +241,10 @@ class DocumentFile(File):
     __mapper_args__ = {"polymorphic_identity": "document_file"}
 
     def __repr__(self) -> str:
-        return "DocumentFile(id=%d, product_lidvid=%r, basename=%r)" % (
-            self.id,
-            self.product_lidvid,
-            self.basename,
+        return (
+            f"DocumentFile(id={self.id}, "
+            f"product_lidvid={self.product_lidvid!r}, "
+            f"basename={self.basename!r})"
         )
 
 
@@ -269,11 +261,11 @@ class FitsFile(File):
     __mapper_args__ = {"polymorphic_identity": "fits_file"}
 
     def __repr__(self) -> str:
-        return "FitsFile(id=%d, product_lidvid=%r, basename=%r, " "hdu_count=%d)" % (
-            self.id,
-            self.product_lidvid,
-            self.basename,
-            self.hdu_count,
+        return (
+            f"FitsFile(id={self.id}, "
+            f"product_lidvid={self.product_lidvid!r}, "
+            f"basename={self.basename!r}, "
+            f"hdu_count={self.hdu_count})"
         )
 
 
@@ -309,15 +301,11 @@ class Hdu(Base):
 
     def __repr__(self) -> str:
         return (
-            "Hdu(product_lid=%r, hdu_index=%d, hdr_loc=%d, dat_loc=%d, "
-            "dat_span=%d)"
-            % (
-                self.product.lid,
-                self.hdu_index,
-                self.hdr_loc,
-                self.dat_loc,
-                self.dat_span,
-            )
+            f"Hdu(product_lid={self.product.lid!r}, "
+            f"hdu_index={self.hdu_index}, "
+            f"hdr_loc={self.hdr_loc}, "
+            f"dat_loc={self.dat_loc}, "
+            f"dat_span={self.dat_span})"
         )
 
 
@@ -341,14 +329,11 @@ class Card(Base):
 
     def __repr__(self) -> str:
         return (
-            "Card(product_lidvid=%r, hdu_index=%d, "
-            + "card_index=%d, keyword=%r, value=%r)"
-        ) % (
-            self.product_lidvid,
-            self.hdu_index,
-            self.card_index,
-            self.keyword,
-            self.value,
+            f"Card(product_lidvid={self.product_lidvid!r}, "
+            f"hdu_index={self.hdu_index}, "
+            f"card_index={self.card_index}, "
+            f"keyword={self.keyword!r}, "
+            f"value={self.value!r})"
         )
 
 

@@ -769,7 +769,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_fits_product(product_lidvid, collection_lidvid)
 
         self.assertFalse(self.db.product_label_exists(product_lidvid))
-        basename = "%s.xml" % LIDVID(product_lidvid).lid().product_id
+        basename = f"{LIDVID(product_lidvid).lid().product_id}.xml"
         self.db.create_product_label(self.dummy_os_filepath, basename, product_lidvid)
         self.assertTrue(self.db.product_label_exists(product_lidvid))
         self.db.create_product_label(self.dummy_os_filepath, basename, product_lidvid)
@@ -784,7 +784,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_fits_product(product_lidvid, collection_lidvid)
 
         self.assertFalse(self.db.product_label_exists(product_lidvid))
-        basename = "%s.xml" % LIDVID(product_lidvid).lid().product_id
+        basename = f"{LIDVID(product_lidvid).lid().product_id}.xml"
         self.db.create_product_label(self.dummy_os_filepath, basename, product_lidvid)
         self.assertTrue(self.db.product_label_exists(product_lidvid))
 
