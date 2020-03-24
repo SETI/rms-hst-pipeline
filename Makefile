@@ -68,6 +68,7 @@ tidy : black
 	find . -name '*~' -delete
 	find . -name '#*' -delete
 	find . -name '*.pyc' -delete
+	find . -name '__pycache__' -delete
 
 # Remove the virtual environment and cruft.
 .PHONY: clean
