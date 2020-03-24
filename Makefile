@@ -50,6 +50,12 @@ save-reqs :
 # MAINTENANCE
 ############################################################
 
+# Show a diagram of the module dependencies.  Do not break these.
+.PHONY: modules
+modules:
+	dot -Tpng modules.dot -o modules.png
+	open modules.png
+
 # Format the Python source with black: https://black.readthedocs.io/
 .PHONY: black
 black :
@@ -58,6 +64,7 @@ black :
 # Remove cruft.
 .PHONY: tidy
 tidy : black
+	-rm modules.png
 	find . -name '*~' -delete
 	find . -name '#*' -delete
 	find . -name '*.pyc' -delete
