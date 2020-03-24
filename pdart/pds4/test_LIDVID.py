@@ -15,7 +15,7 @@ def pdart_lidvid_strings() -> st.SearchStrategy[str]:
     two components.
     """
     return st.builds(
-        lambda lid, vid: "%s::%s" % (lid, vid), lid_strings(), pdart_vid_strings()
+        lambda lid, vid: f"{lid}::{vid}", lid_strings(), pdart_vid_strings()
     )
 
 

@@ -12,7 +12,8 @@ def vid_strings(draw, max_value: int = 9) -> str:
         st.lists(st.integers(min_value=0, max_value=max_value), min_size=0, max_size=3,)
     )
     if rest:
-        res = "%d.%s" % (first, ".".join([str(n) for n in rest]))
+        tail = ".".join([str(n) for n in rest])
+        res = f"{first}.{tail}"
     else:
         res = str(first)
     assume(len(res) <= 255)
@@ -25,7 +26,7 @@ def pdart_vid_strings(max_value: int = 9) -> st.SearchStrategy[str]:
     components
     """
     return st.builds(
-        lambda major, minor: "%d.%d" % (major, minor),
+        lambda major, minor: f"{major}.{minor}",
         st.integers(min_value=1, max_value=max_value),
         st.integers(min_value=0, max_value=max_value),
     )

@@ -23,7 +23,7 @@ class LIDVID(object):
 
     @staticmethod
     def create_from_lid_and_vid(lid: LID, vid: VID) -> "LIDVID":
-        return LIDVID("%s::%s" % (str(lid), str(vid)))
+        return LIDVID(f"{lid}::{vid}")
 
     def lid(self) -> LID:
         return self._lid
@@ -45,11 +45,11 @@ class LIDVID(object):
 
     def next_major_lidvid(self) -> "LIDVID":
         """Return the next major LIDVID."""
-        return LIDVID("%s::%s" % (self.lid(), self.vid().next_major_vid()))
+        return LIDVID(f"{self.lid()}::{self.vid().next_major_vid()}")
 
     def next_minor_lidvid(self) -> "LIDVID":
         """Return the next minor LIDVID."""
-        return LIDVID("%s::%s" % (self.lid(), self.vid().next_minor_vid()))
+        return LIDVID(f"{self.lid()}::{self.vid().next_minor_vid()}")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, LIDVID):
@@ -71,4 +71,4 @@ class LIDVID(object):
         return self._lidvid
 
     def __repr__(self) -> str:
-        return "LIDVID(%r)" % self._lidvid
+        return f"LIDVID({self._lidvid!r})"

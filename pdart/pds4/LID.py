@@ -40,13 +40,11 @@ class LID(object):
         parts_len = len(parts)
         assert parts_len in [1, 2, 3], parts
         if parts_len == 1:
-            return LID("urn:nasa:pds:%s" % parts[0])
+            return LID(f"urn:nasa:pds:{parts[0]}")
         elif parts_len == 2:
-            b, c = parts
-            return LID("urn:nasa:pds:%s:%s" % (b, c))
+            return LID(f"urn:nasa:pds:{parts[0]}:{parts[1]}")
         else:
-            b, c, p = parts
-            return LID("urn:nasa:pds:%s:%s:%s" % (b, c, p))
+            return LID(f"urn:nasa:pds:{parts[0]}:{parts[1]}:{parts[2]}")
 
     def parts(self) -> List[str]:
         ids = [self.bundle_id, self.collection_id, self.product_id]
@@ -69,7 +67,7 @@ class LID(object):
         return self.lid
 
     def __repr__(self) -> str:
-        return "LID(%r)" % self.lid
+        return f"LID({self.lid!r})"
 
     def is_product_lid(self) -> bool:
         """Return True iff the LID is a product LID."""
@@ -89,7 +87,7 @@ class LID(object):
         iff the object is a bundle LID.
         """
         if self.is_bundle_lid():
-            raise ValueError("bundle LID %r has no parent LID" % self.lid)
+            raise ValueError(f"bundle LID {self.lid!r} has no parent LID")
         else:
             parts = self.lid.split(":")
             return LID(":".join(parts[:-1]))
@@ -101,9 +99,9 @@ class LID(object):
         """
         assert self.collection_id, "to_browse_lid() -> None: Can't call on bundle LID"
         collection_id_parts = self.collection_id.split("_")
-        assert collection_id_parts[0] == "data", (
-            "to_browse_lid: Only legal within data_ collections; had %s" % self
-        )
+        assert (
+            collection_id_parts[0] == "data"
+        ), f"to_browse_lid: Only legal within data_ collections; had {self}"
         collection_id_parts[0] = "browse"
         browse_collection_id = "_".join(collection_id_parts)
 
@@ -118,9 +116,9 @@ class LID(object):
         """
         assert self.collection_id, "to_shm_lid(): Can't call on bundle LID"
         collection_id_parts = self.collection_id.split("_")
-        assert collection_id_parts[0] == "data", (
-            "to_shm_lid: Only legal within data_ collections; had %s" % self
-        )
+        assert (
+            collection_id_parts[0] == "data"
+        ), f"to_shm_lid: Only legal within data_ collections; had {self}"
         # replace the suffix
         collection_id_parts[2] = "shm"
         shm_collection_id = "_".join(collection_id_parts)

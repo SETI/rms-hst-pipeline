@@ -47,9 +47,9 @@ class TestLID(unittest.TestCase):
             LID("urn:nasa:pdddddds:bundle")
 
         # test length
-        LID("urn:nasa:pds:%s" % ("a" * 200))
+        LID(f"urn:nasa:pds:{'a'*200}")
         with self.assertRaises(Exception):
-            LID("urn:nasa:pds:%s" % ("a" * 250))
+            LID(f"urn:nasa:pds:{'a'*250}")
 
         # test characters
         with self.assertRaises(Exception):

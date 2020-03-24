@@ -14,9 +14,9 @@ class VID(object):
 
         # Check requirements
         assert len(vid_str) <= 255, "VID is too long"
-        assert len(vs) is 2, "VID %s does not have two components" % vid_str
+        assert len(vs) is 2, f"VID {vid_str} does not have two components"
         for v in vs:
-            assert re.match("\\A(0|[1-9][0-9]*)\\Z", v), "VID is non-numeric: %s" % v
+            assert re.match("\\A(0|[1-9][0-9]*)\\Z", v), f"VID is non-numeric: {v}"
 
         self._VID = vid_str
         self._major = int(vs[0])
@@ -33,11 +33,11 @@ class VID(object):
 
     def next_major_vid(self) -> "VID":
         """Return the next major VID."""
-        return VID("%d.0" % (self.major() + 1))
+        return VID(f"{self.major() + 1}.0")
 
     def next_minor_vid(self) -> "VID":
         """Return the next minor VID."""
-        return VID("%d.%d" % (self.major(), self.minor() + 1))
+        return VID(f"{self.major()}.{self.minor()+ 1}")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, VID):
@@ -59,4 +59,4 @@ class VID(object):
         return self._VID
 
     def __repr__(self) -> str:
-        return "VID(%r)" % self._VID
+        return f"VID({self._VID!r})"
