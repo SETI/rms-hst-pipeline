@@ -4,6 +4,8 @@
  * I broke up the modules within fs to see what's used by whom.
  * Unfortunately, that package is a bit of a mess.
  *
+ * Note that there is a SubdirVersions in both fs and multiversioned.
+ *
  * Mark nodes blue when done.
  * 
  * Use this as a guide of what to convert next.
@@ -19,7 +21,7 @@ digraph {
     multiversioned[color=blue];
     pds4[shape=box;color=blue];
     rules[shape=box];
-    xml[shape=box];
+    xml[shape=box;color=blue];
 
     "fs.DeliverableFS" -> "fs.DirUtils";
     "fs.DeliverableFS" -> "fs.FSPrimAdapter";
