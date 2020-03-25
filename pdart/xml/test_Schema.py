@@ -1,3 +1,5 @@
+import unittest
+
 from pdart.xml.Schema import (
     PDS_SCHEMATRON_SCHEMA,
     probatron,
@@ -10,8 +12,6 @@ from pdart.xml.Schema import (
     xml_schema_failures,
 )
 from pdart.xml.Utils import path_to_testfile
-
-import unittest
 
 
 class TestXmlSchema(unittest.TestCase):

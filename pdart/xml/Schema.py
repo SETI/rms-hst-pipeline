@@ -11,10 +11,9 @@ import subprocess
 import tempfile
 import xml.dom.minidom
 from contextlib import closing
+from typing import List, Optional, Sequence, Tuple, Union
 
 from pdart.xml.Pds4Version import HST_SHORT_VERSION, PDS4_SHORT_VERSION
-
-from typing import List, Optional, Sequence, Tuple, Union
 
 _Cmd = Union[str, Sequence[str]]
 
