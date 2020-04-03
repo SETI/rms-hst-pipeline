@@ -22,7 +22,7 @@ digraph {
     astroquery[shape=box];
     cows[shape=box;color=blue];
     db[color=blue];
-    documents[shape=box];
+    documents[shape=box;color=blue];
     multiversioned[color=blue];
     pds4[shape=box;color=blue];
     rules[shape=box];
