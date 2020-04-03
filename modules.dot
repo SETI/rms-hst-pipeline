@@ -20,6 +20,7 @@ digraph {
     "fs.V1FS"[color=blue];
     "fs.VersionedFS"[shape=box;color=blue];
     astroquery[shape=box];
+    citations[shape=box;color=blue];
     cows[shape=box;color=blue];
     db[color=blue];
     documents[shape=box;color=blue];
@@ -50,6 +51,7 @@ digraph {
     archive -> labels;
     archive -> pds4;
     db -> pds4;
+    labels -> citations;
     labels -> db;
     labels -> pds4;
     labels -> rules;
