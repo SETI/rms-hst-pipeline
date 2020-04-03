@@ -12,8 +12,13 @@
  */
 
 digraph {
-    "fs.FSPrimitives"[shape=box];
-    "fs.VersionedFS"[shape=box];
+    "fs.DeliverableFS"[color=blue];
+    "fs.DirUtils"[color=blue];
+    "fs.FSPrimAdapter"[color=blue];
+    "fs.FSPrimitives"[shape=box;color=blue];
+    "fs.SubdirVersions"[color=blue];
+    "fs.V1FS"[color=blue];
+    "fs.VersionedFS"[shape=box;color=blue];
     astroquery[shape=box];
     cows[shape=box;color=blue];
     db[color=blue];
