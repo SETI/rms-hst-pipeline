@@ -138,10 +138,10 @@ class DeliverablePrimitives(FSPrimitives):
             self.base_fs.removedir(base_path)
 
     def __str__(self) -> str:
-        return "DeliverablePrimitives(%r)" % self.base_fs
+        return f"DeliverablePrimitives({self.base_fs})"
 
     def __repr__(self) -> str:
-        return "DeliverablePrimitives(%r)" % self.base_fs
+        return f"DeliverablePrimitives({self.base_fs!r}"
 
     def add_child_dir(self, parent_node: Dir, filename: str) -> Dir:
         path = fs.path.join(parent_node.path, filename)

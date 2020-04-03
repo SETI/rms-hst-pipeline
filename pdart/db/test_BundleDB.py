@@ -7,12 +7,9 @@ from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.SqlAlchTables import Base, Bundle, NonDocumentCollection
 from pdart.db.Utils import file_md5
 
-# from pdart.new_labels.CollectionInventory import
-# get_collection_inventory_name
-# from pdart.new_labels.CollectionLabel import get_collection_label_name
 from pdart.pds4.LIDVID import LIDVID
 
-_TABLES = {
+_TABLES: Set[str] = {
     "bundles",
     "collections",
     "document_collections",
@@ -33,7 +30,7 @@ _TABLES = {
     "collection_inventories",
     "product_labels",
     "proposal_info",
-}  # type: Set[str]
+}
 
 
 class Test_BundleDB(unittest.TestCase):
@@ -693,8 +690,7 @@ class Test_BundleDB(unittest.TestCase):
 
         # TODO Fix this.
 
-    #     def test_get_collection_label(self):
-    #         # type: () -> None
+    #     def test_get_collection_label(self) -> None:
     #         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
     #         self.db.create_bundle(bundle_lidvid)
     #         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
@@ -741,8 +737,7 @@ class Test_BundleDB(unittest.TestCase):
 
         # TODO Fix this.
 
-    #     def test_get_collection_inventory(self):
-    #         # type: () -> None
+    #     def test_get_collection_inventory(self) -> None:
     #         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
     #         self.db.create_bundle(bundle_lidvid)
     #         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"

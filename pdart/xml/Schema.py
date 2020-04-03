@@ -29,9 +29,9 @@ HST_XML_SCHEMA: str = f"./xml/PDS4_HST_{HST_SHORT_VERSION}.xsd.xml"
 
 HST_SCHEMATRON_SCHEMA: str = f"./xml/PDS4_HST_{HST_SHORT_VERSION}.sch.xml"
 
-DISP_XML_SCHEMA = "./xml/PDS4_DISP_%s.xsd.xml" % DISP_SHORT_VERSION  # type: str
+DISP_XML_SCHEMA: str = f"./xml/PDS4_DISP_{DISP_SHORT_VERSION}.xsd.xml"
 
-DISP_SCHEMATRON_SCHEMA = "./xml/PDS4_DISP_%s.sch.xml" % DISP_SHORT_VERSION  # type: str
+DISP_SCHEMATRON_SCHEMA: str = f"./xml/PDS4_DISP_{DISP_SHORT_VERSION}.sch.xml"
 
 
 def run_subprocess(

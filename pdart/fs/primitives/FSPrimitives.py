@@ -34,7 +34,7 @@ class Dir(Node):
         return False
 
     def __repr__(self) -> str:
-        return "Dir(%r, %r)" % (self.prims, self.path)
+        return f"Dir({self.prims!r}, {self.path!r})"
 
 
 class File(Node):
@@ -45,7 +45,7 @@ class File(Node):
         return True
 
     def __repr__(self) -> str:
-        return "File(%r, %r)" % (self.prims, self.path)
+        return f"File({self.prims!r}, {self.path!r})"
 
 
 class FSPrimitives(object, metaclass=abc.ABCMeta):

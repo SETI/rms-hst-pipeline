@@ -56,16 +56,6 @@ def read_subdir_versions_from_directory(fs: FS, dir: str) -> Dict[str, str]:
         return dict()
 
 
-# def read_subdir_versions_from_path(fs, path):
-#     # type: (FS, str) -> Dict[str, str]
-#     """
-#     Given the path to a subdir-version file, parse and return its
-#     contents into a subdir-version dictionary.
-#     """
-#     return parse_subdir_versions(fs.readtext(path,
-#                                              encoding='ascii'))
-
-
 def write_subdir_versions_to_directory(fs: FS, dir: str, d: Dict[str, str]) -> None:
     """
     Given the path to a directory, un-parse and write the contents of
@@ -74,14 +64,3 @@ def write_subdir_versions_to_directory(fs: FS, dir: str, d: Dict[str, str]) -> N
     """
     SUBDIR_VERSIONS_FILEPATH = join(dir, SUBDIR_VERSIONS_FILENAME)
     fs.writetext(SUBDIR_VERSIONS_FILEPATH, unparse_subdir_versions(d), encoding="ascii")
-
-
-# def write_subdir_versions_to_path(fs, path, d):
-#     # type: (FS, str, Dict[str, str]) -> None
-#     """
-#     Given the path to a subdir-versions file, un-parse and write the
-#     contents of the given subdir-versions dictionary into it.
-#     """
-#     fs.writetext(path,
-#                  unparse_subdir_versions(d),
-#                  encoding='ascii')

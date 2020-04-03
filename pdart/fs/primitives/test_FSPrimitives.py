@@ -176,10 +176,10 @@ class OSFSPrimitives(FSPrimitives):
         self.root = root
 
     def __str__(self) -> str:
-        return "OSFSPrimitives(%r)" % self.root
+        return f"OSFSPrimitives({self.root})"
 
     def __repr__(self) -> str:
-        return "OSFSPrimitives(%r)" % self.root
+        return f"OSFSPrimitives({self.root!r})"
 
     def _to_sys_path(self, path: str) -> str:
         path_part = path.lstrip("/")
