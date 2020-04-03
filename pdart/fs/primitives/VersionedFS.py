@@ -5,9 +5,9 @@ sorted into "real" files and directories and "bookkeeping" ones.
 """
 
 from typing import List, Tuple
+
 from fs.base import FS
 from fs.info import Info
-
 
 ROOT: str = "/"
 

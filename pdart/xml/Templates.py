@@ -73,7 +73,7 @@ function from *a* to *b* and *[c]* is a list of *c* s.
 import xml.dom
 import xml.sax
 import xml.sax.handler
-from typing import Any, Callable, Dict, List, TYPE_CHECKING
+from typing import Any, Callable, Dict, List
 from xml.dom.minidom import Document, Text
 
 TemplateDict = Dict[str, Any]

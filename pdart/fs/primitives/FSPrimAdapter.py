@@ -1,16 +1,17 @@
+import os
+import stat
+from typing import Any, Dict, List, Mapping, Optional, Tuple, cast
+
+import fs.mode
+import fs.path
+import fs.subfs
 from fs.base import FS
 from fs.enums import ResourceType
 from fs.error_tools import convert_os_errors
 from fs.info import Info
-import fs.mode
-import fs.path
 from fs.permissions import Permissions
-import fs.subfs
-import os
-import stat
-from typing import cast, Any, Dict, Optional, Text, Tuple, Union, List, cast, Mapping
 
-from pdart.fs.primitives.FSPrimitives import FSPrimitives, Dir, Node
+from pdart.fs.primitives.FSPrimitives import Dir, FSPrimitives, Node
 
 _WINDOWS_PLATFORM: bool = False
 

@@ -1,18 +1,17 @@
 import io
 import os
-from typing import cast, Dict, List, Tuple
+from typing import Dict, List, Tuple, cast
 
 import fs.errors
 from fs.osfs import OSFS
 
 from pdart.fs.primitives.FSPrimAdapter import FSPrimAdapter
-from pdart.fs.primitives.FSPrimitives import Dir, File, Node, FSPrimitives
+from pdart.fs.primitives.FSPrimitives import Dir, FSPrimitives, File, Node
 from pdart.fs.primitives.SubdirVersions import (
     read_subdir_versions_from_directory,
     write_subdir_versions_to_directory,
 )
 from pdart.fs.primitives.VersionedFS import SUBDIR_VERSIONS_FILENAME
-
 
 _V1_0: str = "v$1.0"
 

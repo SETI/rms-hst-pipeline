@@ -1,10 +1,9 @@
-import io
 import re
 from typing import Any, Dict, Optional, cast
 
+import fs.path
 from fs.base import FS
 from fs.info import Info
-import fs.path
 
 from pdart.fs.primitives.DirUtils import lid_to_dir
 from pdart.fs.primitives.FSPrimAdapter import FSPrimAdapter

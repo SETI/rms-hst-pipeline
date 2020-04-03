@@ -1,7 +1,9 @@
 """Representation of a PDS4 VID."""
+import functools
 import re
 
 
+@functools.total_ordering
 class VID(object):
     """Representation of a PDS4 VID."""
 

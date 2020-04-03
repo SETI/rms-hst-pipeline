@@ -1,9 +1,8 @@
 import abc
+import io
+from typing import Dict, cast
 
 import fs.errors
-from typing import cast, Dict
-
-import io
 
 
 class Node(object, metaclass=abc.ABCMeta):

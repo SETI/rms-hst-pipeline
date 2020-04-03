@@ -4,13 +4,12 @@ subdir-version dictionary has keys corresponding to subdirectory
 names, and values corresponding to VIDs.
 """
 import re
+from typing import Dict
 
 from fs.base import FS
 from fs.path import join
-from typing import Dict
 
 from pdart.fs.primitives.VersionedFS import SUBDIR_VERSIONS_FILENAME
-
 
 _versionRE: re.Pattern = re.compile("^[0-9.]+$")
 

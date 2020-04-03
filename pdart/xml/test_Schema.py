@@ -8,7 +8,6 @@ from pdart.xml.Schema import (
     run_subprocess,
     schematron_failures,
     svrl_failures,
-    svrl_has_failures,
     xml_schema_failures,
 )
 from pdart.xml.Utils import path_to_testfile

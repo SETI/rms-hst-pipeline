@@ -4,14 +4,14 @@ import os
 import os.path
 import shutil
 import tempfile
-from typing import Any, Dict, cast
 import unittest
+from typing import Any, Dict, cast
 
 import fs.path
 from fs.test import FSTestCases
 
 from pdart.fs.primitives.FSPrimAdapter import FSPrimAdapter
-from pdart.fs.primitives.FSPrimitives import Dir, File, FSPrimitives, Node
+from pdart.fs.primitives.FSPrimitives import Dir, FSPrimitives, File, Node
 
 
 class FSPrimitives_TestBase(object, metaclass=abc.ABCMeta):

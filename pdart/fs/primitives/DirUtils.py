@@ -3,7 +3,7 @@ Utility functions to convert from LIDs and LIDVIDs to their canonical
 paths in a filesystem.
 """
 import re
-from typing import List, Optional
+from typing import List
 
 from fs.path import iteratepath, join
 
