@@ -31,7 +31,11 @@ mypy : venv
 # Run the tests.
 .PHONY: test
 test: venv
-	$(ACTIVATE) && pytest pdart
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart
+
+.PHONY: t
+t: venv
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/
 
 ############################################################
 # THE VIRTUAL ENVIRONMENT

@@ -26,7 +26,6 @@ digraph {
     documents[shape=box;color=blue];
     multiversioned[color=blue];
     pds4[shape=box;color=blue];
-    rules[shape=box];
     xml[shape=box;color=blue];
 
     "fs.DeliverableFS" -> "fs.DirUtils";
@@ -54,7 +53,6 @@ digraph {
     labels -> citations;
     labels -> db;
     labels -> pds4;
-    labels -> rules;
     labels -> xml;
     multiversioned -> pds4;
     pipeline -> "fs.DeliverableFS";

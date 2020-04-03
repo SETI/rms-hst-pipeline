@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Bundle xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd">
+  <Identification_Area>
+    <logical_identifier>urn:nasa:pds:hst_09059</logical_identifier>
+    <version_id>1.3</version_id>
+    <title>This bundle contains images obtained from HST Observing Program
+9059.</title>
+    <information_model_version>1.13.0.0</information_model_version>
+    <product_class>Product_Bundle</product_class>
+    <Citation_Information>
+      <publication_year>2001</publication_year>
+      <description>&lt;description&gt;</description>
+    </Citation_Information>
+  </Identification_Area>
+  <Bundle>
+    <bundle_type>Archive</bundle_type>
+  </Bundle>
+  <Bundle_Member_Entry>
+    <lidvid_reference>urn:nasa:pds:hst_09059:data_acs_raw::1.2</lidvid_reference>
+    <member_status>Primary</member_status>
+    <reference_type>bundle_has_data_collection</reference_type>
+  </Bundle_Member_Entry>
+</Product_Bundle>

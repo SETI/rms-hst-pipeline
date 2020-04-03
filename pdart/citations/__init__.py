@@ -67,7 +67,7 @@ class Citation_Information:
     @staticmethod
     def create_from_file(
         filename: str, pipeline_version: Any = None
-    ) -> Citation_Information:
+    ) -> "Citation_Information":
         # Read the file and extract the key info
         filename_lc = filename.lower()
         if filename_lc.endswith(".apt"):
@@ -122,7 +122,7 @@ class Citation_Information:
         )
 
     @staticmethod
-    def create_test_citation_information() -> Citation_Information:
+    def create_test_citation_information() -> "Citation_Information":
         """For testing."""
         return Citation_Information(
             "<filename>",
