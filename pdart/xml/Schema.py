@@ -13,7 +13,11 @@ import xml.dom.minidom
 from contextlib import closing
 from typing import List, Optional, Sequence, Tuple, Union
 
-from pdart.xml.Pds4Version import HST_SHORT_VERSION, PDS4_SHORT_VERSION
+from pdart.xml.Pds4Version import (
+    DISP_SHORT_VERSION,
+    HST_SHORT_VERSION,
+    PDS4_SHORT_VERSION,
+)
 
 _Cmd = Union[str, Sequence[str]]
 
@@ -24,6 +28,10 @@ PDS_SCHEMATRON_SCHEMA: str = f"./xml/PDS4_PDS_{PDS4_SHORT_VERSION}.sch.xml"
 HST_XML_SCHEMA: str = f"./xml/PDS4_HST_{HST_SHORT_VERSION}.xsd.xml"
 
 HST_SCHEMATRON_SCHEMA: str = f"./xml/PDS4_HST_{HST_SHORT_VERSION}.sch.xml"
+
+DISP_XML_SCHEMA = "./xml/PDS4_DISP_%s.xsd.xml" % DISP_SHORT_VERSION  # type: str
+
+DISP_SCHEMATRON_SCHEMA = "./xml/PDS4_DISP_%s.sch.xml" % DISP_SHORT_VERSION  # type: str
 
 
 def run_subprocess(
@@ -52,7 +60,7 @@ def run_subprocess(
 def _xsd_validator_schema(
     filepath: Optional[str],
     stdin: Optional[bytes] = None,
-    schemas: List[str] = [PDS_XML_SCHEMA, HST_XML_SCHEMA],
+    schemas: List[str] = [PDS_XML_SCHEMA, DISP_XML_SCHEMA, HST_XML_SCHEMA],
 ) -> Tuple[int, bytes, bytes]:
     """
     Run XsdValidator.jar on the XML at the filepath (ignored if stdin
@@ -214,12 +222,14 @@ def verify_label_or_raise(label: bytes) -> None:
     validations on it.  Raise an exception on failures.
     """
     try:
-        schema_failures = xml_schema_failures(None, label)
-        if schema_failures is not None:
-            raise Exception(f"XML schema validation errors: {str(schema_failures)}")
-        schematron_failures = schematron_failures(None, label)
-        if schematron_failures is not None:
-            raise Exception(f"Schematron validation errors: {schematron_failures}")
+        failures_from_xml_schema = xml_schema_failures(None, label)
+        if failures_from_xml_schema is not None:
+            raise Exception(
+                f"XML schema validation errors: {str(failures_from_xml_schema)}"
+            )
+        failures_from_schematron = schematron_failures(None, label)
+        if failures_from_schematron is not None:
+            raise Exception(f"Schematron validation errors: {failures_from_schematron}")
     except Exception:
         # Debugging functionality: write the label to disk.
         PRINT_AND_SAVE_LABEL = True
