@@ -2,10 +2,12 @@
 Templates to create a XML ``<hst:HST />`` node.
 """
 
-from pdart.xml.Templates import interpret_document_template, interpret_template
-
-from typing import Dict
-from pdart.xml.Templates import DocTemplate, NodeBuilderTemplate
+from pdart.xml.Templates import (
+    DocTemplate,
+    NodeBuilderTemplate,
+    interpret_document_template,
+    interpret_template,
+)
 
 hst: NodeBuilderTemplate = interpret_template(
     """<hst:HST>

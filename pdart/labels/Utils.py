@@ -2,13 +2,11 @@
 Utility functions.
 """
 import unittest
-from fs.path import dirname, join
-import io
 from os.path import isfile
 
-from pdart.pds4.LIDVID import LIDVID
+from fs.path import dirname, join
 
-from typing import Union
+from pdart.pds4.LIDVID import LIDVID
 
 
 def lidvid_to_lid(lidvid: str) -> str:

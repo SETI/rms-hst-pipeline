@@ -2,6 +2,8 @@
 Functionality to create a label for a data product containing a single
 FITS file.
 """
+from pdart.db.BundleDB import BundleDB
+from pdart.db.SqlAlchTables import NonDocumentCollection
 from pdart.labels.FileContents import get_file_contents
 from pdart.labels.FitsProductLabelXml import (
     make_label,
@@ -14,9 +16,6 @@ from pdart.labels.TargetIdentification import get_target
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
-
-from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import NonDocumentCollection
 
 
 def make_fits_product_label(

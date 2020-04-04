@@ -3,11 +3,12 @@ Functionality to build a ``<Target_Identification />`` XML element of
 a product label using a SQLite database.
 """
 
+from typing import Any, Dict, List, Tuple
+
 from pdart.labels.TargetIdentificationXml import (
     approximate_target_table,
     target_identification,
 )
-from typing import Any, Callable, Dict, List, Tuple
 from pdart.xml.Templates import NodeBuilder
 
 

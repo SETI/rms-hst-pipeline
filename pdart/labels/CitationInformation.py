@@ -3,9 +3,7 @@ Functionality to create a ``<Citation_Information />`` XML element.
 """
 
 from pdart.citations import Citation_Information
-from pdart.xml.Templates import interpret_template
-
-from pdart.xml.Templates import NodeBuilder, NodeBuilderTemplate
+from pdart.xml.Templates import NodeBuilder, NodeBuilderTemplate, interpret_template
 
 _citation_information: NodeBuilderTemplate = interpret_template(
     """<Citation_Information>

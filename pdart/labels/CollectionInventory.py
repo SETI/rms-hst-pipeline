@@ -2,7 +2,7 @@
 Functionality to build a collection inventory using a SQLite database.
 """
 
-from typing import cast, List
+from typing import List, cast
 
 from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import DocumentCollection, NonDocumentCollection

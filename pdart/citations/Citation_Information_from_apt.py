@@ -1,7 +1,6 @@
-from typing import cast, List, Tuple
-
-import xml.dom.minidom as md
 import re
+import xml.dom.minidom as md
+from typing import List, Tuple, cast
 
 # This is how we find a date embedded inside a comment
 DATE_PATTERN1: re.Pattern = re.compile(

@@ -7,9 +7,7 @@ from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.labels.FileContents import get_file_contents
 from pdart.labels.Utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
-from pdart.xml.Templates import interpret_document_template
-
-from pdart.xml.Templates import DocTemplate
+from pdart.xml.Templates import DocTemplate, interpret_document_template
 
 
 class Test_FileContents(unittest.TestCase):

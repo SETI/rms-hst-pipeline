@@ -1,9 +1,11 @@
 """
 Functionality to create a label for a document product.
 """
-from typing import Optional
 from datetime import date
+from typing import Optional
 
+from pdart.citations import Citation_Information
+from pdart.db.BundleDB import BundleDB
 from pdart.labels.DocumentProductLabelXml import (
     make_doc_citation_information,
     make_document_edition,
@@ -11,9 +13,6 @@ from pdart.labels.DocumentProductLabelXml import (
 )
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
-
-from pdart.citations import Citation_Information
-from pdart.db.BundleDB import BundleDB
 
 
 def make_document_product_label(

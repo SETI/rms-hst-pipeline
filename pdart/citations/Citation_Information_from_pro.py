@@ -1,5 +1,5 @@
 import re
-from typing import Optional, List, Tuple, Any
+from typing import List, Tuple
 
 ################################################################################
 # This is the top of a sample .PRO file after c. 1995
@@ -103,26 +103,28 @@ INFO_PATTERN3: re.Pattern = re.compile(r".{22} *(GO|GTO).*")
 CYCLE_PATTERN: re.Pattern = re.compile(r".*CYCLE ([0-9]).*")
 
 # Authors are always one PI followed by zero or more CoI lines
-AUTHOR_PATTERN1: re.Pattern = re.compile(" *PI?i?:? +(.*?)($|  .*)")
-AUTHOR_PATTERN2: re.Pattern = re.compile(" *CoI?n?:? +(.*?)   .*")
+AUTHOR_PATTERN1: re.Pattern = re.compile(r" *PI?i?:? +(.*?)($|  .*)")
+AUTHOR_PATTERN2: re.Pattern = re.compile(r" *CoI?n?:? +(.*?)   .*")
 
 # The title is always after this line
-TITLE_HEADER: re.Pattern = re.compile("1\. *Proposal Title:\s*")
+TITLE_HEADER: re.Pattern = re.compile(r"1\. *Proposal Title:\s*")
 
 # The first option below usually provides the check-in date of the Phase II
 # program. However, sometimes it fails, in which case the check-in date is in
 # the header line for page 2. For very old files, there's a "Report Date"
 # instead.
-YEAR1_PATTERN: re.Pattern = re.compile(" *Check-in Date: .*?-.*?-([0-9]{4})\s*")
+YEAR1_PATTERN: re.Pattern = re.compile(r" *Check-in Date: .*?-.*?-([0-9]{4})\s*")
 YEAR2_PATTERN: re.Pattern = re.compile(
-    ".* [01][0-9]/[0-3][0-9]/([0-9]{2}) .*\[  2\]\s*"
+    r".* [01][0-9]/[0-3][0-9]/([0-9]{2}) .*\[  2\]\s*"
 )
-YEAR3_PATTERN: re.Pattern = re.compile(" *Report Date: [0-9]{2}-...-([0-9]{2})[^0-9].*")
+YEAR3_PATTERN: re.Pattern = re.compile(
+    r" *Report Date: [0-9]{2}-...-([0-9]{2})[^0-9].*"
+)
 
 # This pattern matches any year used in a timing constraint, where the format is
 # dd-MON-yy.
 REQ_PATTERN: re.Pattern = re.compile(
-    ".*[0-9]{1,2}-(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-([0-9]{2})[^0-9].*"
+    r".*[0-9]{1,2}-(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-([0-9]{2})[^0-9].*"
 )
 
 # Ideally, the year returned should be the year of the last observation obtained
@@ -139,7 +141,7 @@ def Citation_Information_from_pro(
 ) -> Tuple[int, str, int, List[str], str, str]:
 
     # Quick and dirty function to standardize program titles
-    def fix_title(title):
+    def fix_title(title: str) -> str:
 
         # Fix known weirdness
         title = title.replace("\\\\cotwo\\\\", "CO2")
@@ -174,7 +176,7 @@ def Citation_Information_from_pro(
         return title
 
     # A quick and dirty function to standardize author names
-    def fix_authors(authors):
+    def fix_authors(authors: List[str]) -> List[str]:
 
         for k, author in enumerate(authors):
 

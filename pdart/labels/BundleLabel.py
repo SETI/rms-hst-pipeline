@@ -1,13 +1,12 @@
 """Functionality to build a bundle label using a SQLite database."""
 
+from pdart.citations import Citation_Information
+from pdart.db.BundleDB import BundleDB
 from pdart.labels.BundleLabelXml import make_bundle_entry_member, make_label
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import combine_nodes_into_fragment
-
-from pdart.citations import Citation_Information
-from pdart.db.BundleDB import BundleDB
 
 
 def make_bundle_label(

@@ -1,6 +1,6 @@
-from typing import Any, Dict, List
 import unittest
 import xml.dom
+from typing import Any, Dict, List
 
 from fs.path import basename
 

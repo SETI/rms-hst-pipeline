@@ -3,19 +3,19 @@ Functionality to create a label for a browse product containing browse
 images.
 """
 from typing import cast
-from pdart.labels.BrowseProductLabelXml import make_label
-from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
-from pdart.xml.Pretty import pretty_and_verify
 
 from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import (
     BrowseFile,
-    File,
+    BrowseProduct,
     Collection,
+    File,
     NonDocumentCollection,
     Product,
-    BrowseProduct,
 )
+from pdart.labels.BrowseProductLabelXml import make_label
+from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
+from pdart.xml.Pretty import pretty_and_verify
 
 
 def make_browse_product_label(

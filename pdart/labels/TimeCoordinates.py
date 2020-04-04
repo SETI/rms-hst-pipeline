@@ -2,11 +2,11 @@
 Functionality to build an ``<Time_Coordinates />`` XML element using a
 SQLite database.
 """
+from typing import Any, Dict, List
+
 import julian
 
 from pdart.labels.TimeCoordinatesXml import time_coordinates
-
-from typing import Any, Callable, Dict, List
 from pdart.xml.Templates import NodeBuilder
 
 

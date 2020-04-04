@@ -3,6 +3,8 @@ Functionality to build an ``<hst:HST />`` XML element using a SQLite
 database.
 """
 
+from typing import Any, Dict, List
+
 from pdart.labels.HstParametersXml import (
     get_targeted_detector_id,
     hst,
@@ -11,8 +13,6 @@ from pdart.labels.HstParametersXml import (
     parameters_wfc3,
     parameters_wfpc2,
 )
-
-from typing import Any, Callable, Dict, List, Optional
 from pdart.xml.Templates import NodeBuilder
 
 _CARDS = List[Dict[str, Any]]

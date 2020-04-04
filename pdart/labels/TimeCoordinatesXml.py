@@ -3,9 +3,7 @@ Templates to create a ``<Time_Coordinates />`` XML node for product
 labels.
 """
 
-from pdart.xml.Templates import interpret_template
-from typing import Any, Dict, List
-from pdart.xml.Templates import NodeBuilderTemplate
+from pdart.xml.Templates import NodeBuilderTemplate, interpret_template
 
 time_coordinates: NodeBuilderTemplate = interpret_template(
     """<Time_Coordinates>

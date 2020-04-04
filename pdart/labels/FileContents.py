@@ -4,6 +4,8 @@ Functionality to build the XML fragment containing the needed
 a product label using a SQLite database.
 """
 
+from typing import Any, Dict, List
+
 from pdart.db.BundleDB import BundleDB
 from pdart.db.FitsFileDB import get_file_offsets
 from pdart.labels.FileContentsXml import (
@@ -16,13 +18,11 @@ from pdart.labels.FileContentsXml import (
     header_contents,
 )
 from pdart.xml.Templates import (
+    FragBuilder,
+    NodeBuilder,
     combine_fragments_into_fragment,
     combine_nodes_into_fragment,
 )
-
-
-from typing import Any, Callable, Dict, List
-from pdart.xml.Templates import FragBuilder, NodeBuilder
 
 
 def _mk_axis_arrays(

@@ -6,7 +6,6 @@ from typing import Set, cast
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.SqlAlchTables import Base, Bundle, NonDocumentCollection
 from pdart.db.Utils import file_md5
-
 from pdart.pds4.LIDVID import LIDVID
 
 _TABLES: Set[str] = {

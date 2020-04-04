@@ -1,27 +1,24 @@
 """A document template to create a label for a document product."""
 
+from typing import List, Tuple
+
+from pdart.citations import Citation_Information
+from pdart.db.BundleDB import BundleDB
 from pdart.labels.Namespaces import (
     DOCUMENT_PRODUCT_NAMESPACES,
     HST_XML_MODEL,
     PDS4_XML_MODEL,
 )
-from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
-from pdart.xml.Templates import (
-    combine_fragments_into_fragment,
-    combine_nodes_into_fragment,
-    interpret_document_template,
-    interpret_template,
-)
-
-from typing import Any, Callable, Dict, List, Tuple
-from pdart.citations import Citation_Information
-from xml.dom.minidom import Document
-from pdart.db.BundleDB import BundleDB
+from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import (
     DocTemplate,
     FragBuilder,
     NodeBuilder,
     NodeBuilderTemplate,
+    combine_fragments_into_fragment,
+    combine_nodes_into_fragment,
+    interpret_document_template,
+    interpret_template,
 )
 
 make_label: DocTemplate = interpret_document_template(

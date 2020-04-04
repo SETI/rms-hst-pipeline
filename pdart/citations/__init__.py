@@ -4,10 +4,10 @@
 # Mark Showalter, December 12, 2019
 ################################################################################
 
+from typing import Any
+
 from .Citation_Information_from_apt import Citation_Information_from_apt
 from .Citation_Information_from_pro import Citation_Information_from_pro
-
-from typing import Any, List
 
 
 class Citation_Information:

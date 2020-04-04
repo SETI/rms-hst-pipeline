@@ -1,10 +1,8 @@
 """A document template to create a label for a raw browse product."""
 
 from pdart.labels.Namespaces import BROWSE_PRODUCT_NAMESPACES, PDS4_XML_MODEL
-from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
-from pdart.xml.Templates import interpret_document_template
-
-from pdart.xml.Templates import DocTemplate
+from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
+from pdart.xml.Templates import DocTemplate, interpret_document_template
 
 make_label: DocTemplate = interpret_document_template(
     f"""<?xml version="1.0" encoding="utf-8"?>

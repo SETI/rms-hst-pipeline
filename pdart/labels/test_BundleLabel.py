@@ -5,7 +5,6 @@ from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.labels.BundleLabel import make_bundle_label
 from pdart.labels.Utils import assert_golden_file_equal
 
-
 _BUNDLE_LIDVID = "urn:nasa:pds:hst_09059::1.3"
 _COLLECTION_LIDVID = "urn:nasa:pds:hst_09059:data_acs_raw::1.2"
 _FITS_PRODUCT_LIDVID = "urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::1.2"

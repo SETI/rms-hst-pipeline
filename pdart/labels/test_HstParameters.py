@@ -1,5 +1,6 @@
 import unittest
 import xml.dom
+from typing import Any, Dict, List
 
 from fs.path import basename
 
@@ -8,8 +9,6 @@ from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.labels.HstParameters import get_hst_parameters
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
 from pdart.xml.Pretty import pretty_print
-
-from typing import Any, Dict, List
 
 
 class Test_HstParameters(unittest.TestCase):

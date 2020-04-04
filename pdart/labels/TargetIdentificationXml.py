@@ -3,10 +3,9 @@ Templates to create a ``<Target_Identification />`` XML node for
 product labels.
 """
 
-from pdart.xml.Templates import interpret_template
-
 from typing import Dict, Tuple
-from pdart.xml.Templates import NodeBuilder
+
+from pdart.xml.Templates import NodeBuilder, interpret_template
 
 
 def target_identification(

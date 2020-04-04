@@ -1,12 +1,13 @@
 """Templates to create a label for a collection."""
-from typing import TYPE_CHECKING
 
 from pdart.labels.Namespaces import COLLECTION_NAMESPACES, PDS4_XML_MODEL
-from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION, PDS4_SHORT_VERSION
-from pdart.xml.Templates import interpret_document_template, interpret_template
-
-from pdart.xml.Templates import DocTemplate, NodeBuilderTemplate
-
+from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
+from pdart.xml.Templates import (
+    DocTemplate,
+    NodeBuilderTemplate,
+    interpret_document_template,
+    interpret_template,
+)
 
 make_document_collection_title: NodeBuilderTemplate = interpret_template(
     """
