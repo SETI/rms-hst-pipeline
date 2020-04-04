@@ -19,7 +19,7 @@ digraph {
     "fs.SubdirVersions"[color=blue];
     "fs.V1FS"[color=blue];
     "fs.VersionedFS"[shape=box;color=blue];
-    astroquery[shape=box];
+    astroquery[shape=box;color=blue];
     citations[shape=box;color=blue];
     cows[shape=box;color=blue];
     db[color=blue];
