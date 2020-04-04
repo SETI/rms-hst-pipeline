@@ -31,17 +31,20 @@ def make_browse_product_label(
     if either fails.
     """
     product: Product = bundle_db.get_product(browse_product_lidvid)
+
     assert isinstance(product, BrowseProduct)
-    browse_product: BrowseProduct = cast(BrowseProduct, product)
+    browse_product: BrowseProduct = product
+
     fits_product_lidvid = browse_product.fits_product_lidvid
     file: File = bundle_db.get_file(browse_file_basename, browse_product_lidvid)
     assert isinstance(file, BrowseFile)
-    browse_file: BrowseFile = cast(BrowseFile, file)
+    browse_file: BrowseFile = file
 
     browse_collection_lidvid = browse_product.collection_lidvid
     collection: Collection = bundle_db.get_collection(browse_collection_lidvid)
+
     assert isinstance(collection, NonDocumentCollection)
-    browse_collection: NonDocumentCollection = cast(NonDocumentCollection, collection)
+    browse_collection: NonDocumentCollection = collection
 
     bundle = bundle_db.get_bundle()
 
