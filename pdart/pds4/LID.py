@@ -79,7 +79,7 @@ class LID(object):
 
     def is_bundle_lid(self) -> bool:
         """Return True iff the LID is a bundle LID."""
-        return self.bundle_id is not None and self.collection_id is None
+        return self.collection_id is None
 
     def parent_lid(self) -> "LID":
         """

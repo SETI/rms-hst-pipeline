@@ -177,13 +177,10 @@ class FSPrimAdapter(FS):
             if sys_path:
                 details = info["details"]
                 if "accessed" in details or "modified" in details:
-                    _accessed = cast(int, details.get("accessed"))
-                    _modified = cast(int, details.get("modified", _accessed))
-                    accessed = int(_modified if _accessed is None else _accessed)
-                    modified = int(_modified)
-                    if accessed is not None or modified is not None:
-                        with convert_os_errors("setinfo", path):
-                            os.utime(sys_path, (accessed, modified))
+                    accessed = cast(int, details.get("accessed"))
+                    modified = cast(int, details.get("modified", accessed))
+                    with convert_os_errors("setinfo", path):
+                        os.utime(sys_path, (accessed, modified))
 
         return None
 

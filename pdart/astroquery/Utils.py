@@ -33,16 +33,15 @@ def ymdhms_format_from_mjd(mjd: float) -> str:
 
 def get_table_with_retries(mast_call: Callable[[], Table], max_retries: int) -> Table:
     retry = 0
-    table = None
-    while table is None and retry <= max_retries:
+    for retry in range(max_retries):
         try:
             table = mast_call()
+            return table
         except ConnectionError as e:
             retry = retry + 1
             print(f"retry #{retry}: {e}")
             time.sleep(1)
-    assert table is not None
-    return table
+    assert False, "get_table_with_retries() timed out"
 
 
 ############################################################

@@ -13,12 +13,14 @@ all : black mypy test
 
 MYPY_FLAGS= --disallow-untyped-calls \
 	--warn-redundant-casts \
-	# --warn-return-any \
+	--strict-equality \
+	--warn-unreachable \
         # --disallow-any-generics \
 	# --disallow-any-unimported \
 	# --disallow-untyped-defs \
-	# --strict-equality \
-	# --warn-unreachable
+
+# --warn-return-any: not practical because of SqlAlchemy's dynamic magic
+# and because FITS cards are untyped.
 
 .PHONY: mypy
 mypy : venv
