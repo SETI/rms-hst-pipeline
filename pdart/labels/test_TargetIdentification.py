@@ -32,8 +32,7 @@ class Test_TargetIdentification(unittest.TestCase):
 """
         self.assertEqual(expected, str)
 
-    def test_get_target(self):
-        # type: () -> None
+    def test_get_target(self) -> None:
         db = create_bundle_db_in_memory()
         db.create_tables()
 

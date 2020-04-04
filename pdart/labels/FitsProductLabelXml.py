@@ -11,17 +11,17 @@ from pdart.xml.Templates import interpret_document_template
 from pdart.xml.Templates import DocTemplate
 
 make_label: DocTemplate = interpret_document_template(
-    """<?xml version="1.0" encoding="utf-8"?>
-%s
-%s
-<Product_Observational %s>
+    f"""<?xml version="1.0" encoding="utf-8"?>
+{PDS4_XML_MODEL}
+{HST_XML_MODEL}
+<Product_Observational {FITS_PRODUCT_NAMESPACES}>
   <Identification_Area>
     <logical_identifier><NODE name="lid" /></logical_identifier>
     <version_id><NODE name="vid" /></version_id>
     <title>This product contains the <NODE name="suffix" /> \
 image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
-    <information_model_version>%s</information_model_version>
+    <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Observational</product_class>
     <Modification_History>
       <Modification_Detail>
@@ -53,12 +53,6 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     <FRAGMENT name="file_contents" />
   </File_Area_Observational>
 </Product_Observational>"""
-    % (
-        PDS4_XML_MODEL,
-        HST_XML_MODEL,
-        FITS_PRODUCT_NAMESPACES,
-        INFORMATION_MODEL_VERSION,
-    )
 )
 """
 An interpreted document template to create a product label.
@@ -70,7 +64,7 @@ def mk_Investigation_Area_name(proposal_id: int) -> str:
     Boilerplate for the text content of a ``<name />`` element in the
     ``<Investigation_Area />`` element.
     """
-    return "HST observing program %d" % proposal_id
+    return f"HST observing program {proposal_id}"
 
 
 def mk_Investigation_Area_lidvid(proposal_id: int) -> str:
@@ -78,6 +72,4 @@ def mk_Investigation_Area_lidvid(proposal_id: int) -> str:
     Boilerplate for the text content of a ``<lidvid />`` element in
     the ``<Investigation_Area />`` element.
     """
-    return (
-        "urn:nasa:pds:context:investigation:investigation.hst_%05d::1.0" % proposal_id
-    )
+    return f"urn:nasa:pds:context:investigation:investigation.hst_{proposal_id:05}::1.0"

@@ -2,7 +2,6 @@
 Templates to create a XML ``<hst:HST />`` node.
 """
 
-from pdart.labels.Placeholders import placeholder, placeholder_int
 from pdart.xml.Templates import interpret_document_template, interpret_template
 
 from typing import Dict
@@ -97,8 +96,7 @@ wrapper: DocTemplate = interpret_document_template("""<NODE name="wrapped" />"""
 
 def get_targeted_detector_id(aperture: str) -> str:
     """
-    Return placeholder text for the ``<targeted_detector_id />`` XML
-    element.
+    Return text for the ``<targeted_detector_id />`` XML element.
     """
     general_cases = {
         "PC1": "PC1",
@@ -132,4 +130,4 @@ def get_targeted_detector_id(aperture: str) -> str:
         if k in aperture:
             return v
 
-    raise ValueError("get_targeted_detector_id(%r)" % aperture)
+    raise ValueError(f"get_targeted_detector_id({aperture!r})")

@@ -58,9 +58,7 @@ def make_fits_product_label(
                 "Observing_System": observing_system(instrument),
                 "Time_Coordinates": get_time_coordinates(product_lidvid, card_dicts),
                 "Target_Identification": get_target(card_dicts),
-                "HST": get_hst_parameters(
-                    card_dicts, shm_card_dicts, instrument, product_lidvid
-                ),
+                "HST": get_hst_parameters(card_dicts, shm_card_dicts, instrument),
             }
         )
         .toxml()

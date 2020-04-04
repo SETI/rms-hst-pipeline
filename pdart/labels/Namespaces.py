@@ -2,23 +2,18 @@ from pdart.xml.Pds4Version import HST_SHORT_VERSION, PDS4_SHORT_VERSION
 
 _PDS4_SCHEMA_LOCATION: str = "http://pds.nasa.gov/pds4/pds/v1"
 
-_VERSIONED_PDS4_SCHEMA_LOCATION: str = "https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.xsd" % (
-    PDS4_SHORT_VERSION,
-)
+_VERSIONED_PDS4_SCHEMA_LOCATION: str = f"https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_{PDS4_SHORT_VERSION}.xsd"
 
-_VERSIONED_PDS4_SCHEMATRON_LOCATION: str = (
-    "https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_%s.sch" % (PDS4_SHORT_VERSION,)
-)
+_VERSIONED_PDS4_SCHEMATRON_LOCATION: str = f"https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_{PDS4_SHORT_VERSION}.sch"
 
-_HST_SCHEMA_LOCATION: str = "http://pds.nasa.gov/pds4/mission/hst/v1"
 
-_VERSIONED_HST_SCHEMA_LOCATION: str = (
-    "https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_%s.xsd" % (HST_SHORT_VERSION,)
-)
+_HST_SCHEMA_LOCATION: str = f"http://pds.nasa.gov/pds4/mission/hst/v1"
 
-_VERSIONED_HST_SCHEMATRON_LOCATION: str = (
-    "https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_%s.sch" % (HST_SHORT_VERSION,)
-)
+_VERSIONED_HST_SCHEMA_LOCATION: str = f"https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_{HST_SHORT_VERSION}.xsd"
+
+
+_VERSIONED_HST_SCHEMATRON_LOCATION: str = f"https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_{HST_SHORT_VERSION}.sch"
+
 
 ############################################################
 
@@ -35,12 +30,12 @@ _XSI_NAMESPACE: str = 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
 ############################################################
 
 
-def make_namespaces(*parts):
+def make_namespaces(*parts: str) -> str:
     return " ".join(parts)
 
 
-def make_schema_locations(*args):
-    return 'xsi:schemaLocation="%s"' % " ".join(args)
+def make_schema_locations(*args: str) -> str:
+    return f'''xsi:schemaLocation="{' '.join(args)}"'''
 
 
 ############################################################
@@ -81,11 +76,8 @@ FITS_PRODUCT_NAMESPACES = _NAMESPACES_WITH_HST
 
 
 def make_xml_model(href):
-    return (
-        '<?xml-model href="%s" \
+    return f'<?xml-model href="{href}" \
 schematypens="http://purl.oclc.org/dsdl/schematron"?>'
-        % href
-    )
 
 
 PDS4_XML_MODEL = make_xml_model(_VERSIONED_PDS4_SCHEMATRON_LOCATION)

@@ -6,17 +6,17 @@ from pdart.xml.Templates import interpret_document_template
 
 from pdart.xml.Templates import DocTemplate
 
-make_label = interpret_document_template(
-    """<?xml version="1.0" encoding="utf-8"?>
-%s
-<Product_Browse %s>
+make_label: DocTemplate = interpret_document_template(
+    f"""<?xml version="1.0" encoding="utf-8"?>
+{PDS4_XML_MODEL}
+<Product_Browse {BROWSE_PRODUCT_NAMESPACES}>
   <Identification_Area>
     <logical_identifier><NODE name="browse_lid" /></logical_identifier>
     <version_id><NODE name="browse_vid" /></version_id>
     <title>This product contains a browse image of a <NODE name="suffix" /> \
 image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
-    <information_model_version>%s</information_model_version>
+    <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Browse</product_class>
     <Modification_History>
       <Modification_Detail>
@@ -43,8 +43,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     </Encoded_Image>
   </File_Area_Browse>
 </Product_Browse>"""
-    % (PDS4_XML_MODEL, BROWSE_PRODUCT_NAMESPACES, INFORMATION_MODEL_VERSION)
-)  # type: DocTemplate
+)
 """
 An interpreted document template to create a label for a RAW browse product.
 """

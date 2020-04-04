@@ -55,7 +55,7 @@ def assert_golden_file_equal(
     else:
         with open(filepath, "wb") as f:
             f.write(calculated_contents)
-        testcase.fail("Golden file %r did not exist but it was created." % basename)
+        testcase.fail(f"Golden file {basename!r} did not exist but it was created.")
 
 
 def path_to_testfile(basename: str) -> str:

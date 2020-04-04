@@ -8,13 +8,14 @@ from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import DocumentCollection, NonDocumentCollection
 
 
-def get_collection_inventory_name(bundle_db, collection_lidvid):
-    # type: (BundleDB, str) -> str
+def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
+
     collection = bundle_db.get_collection(collection_lidvid)
     if isinstance(collection, DocumentCollection):
         return "collection.csv"
     else:
-        return "collection_%s.csv" % cast(NonDocumentCollection, collection).prefix
+        prefix = cast(NonDocumentCollection, collection).prefix
+        return f"collection_{prefix}.csv"
 
 
 def make_collection_inventory(bundle_db: BundleDB, collection_lidvid: str) -> bytes:

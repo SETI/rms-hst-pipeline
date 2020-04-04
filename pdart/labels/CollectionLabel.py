@@ -21,18 +21,22 @@ from pdart.db.SqlAlchTables import NonDocumentCollection, Collection, DocumentCo
 # TODO Should probably test document_collection independently.
 
 
-def get_collection_label_name(bundle_db, collection_lidvid):
-    # type: (BundleDB, str) -> str
+def get_collection_label_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
     collection = bundle_db.get_collection(collection_lidvid)
     if isinstance(collection, DocumentCollection):
         # Document collections won't have prefixes.
         return "collection.xml"
     else:
-        return "collection_%s.xml" % cast(NonDocumentCollection, collection).prefix
+        prefix = cast(NonDocumentCollection, collection).prefix
+        return f"collection_{prefix}.xml"
 
 
-def make_collection_label(bundle_db, info, collection_lidvid, verify):
-    # type: (BundleDB, Citation_Information, str, bool) -> bytes
+def make_collection_label(
+    bundle_db: BundleDB,
+    info: Citation_Information,
+    collection_lidvid: str,
+    verify: bool,
+) -> bytes:
     """
     Create the label text for the collection having this LIDVID using
     the bundle database.  If verify is True, verify the label against

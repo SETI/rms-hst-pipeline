@@ -4,10 +4,7 @@ SQLite database.
 """
 import julian
 
-from pdart.labels.TimeCoordinatesXml import (
-    get_placeholder_start_stop_times,
-    time_coordinates,
-)
+from pdart.labels.TimeCoordinatesXml import time_coordinates
 
 from typing import Any, Callable, Dict, List
 from pdart.xml.Templates import NodeBuilder
@@ -20,7 +17,7 @@ def _get_start_stop_times_from_cards(
     time_obs = card_dicts[0]["TIME-OBS"]
     exptime = float(card_dicts[0]["EXPTIME"])
 
-    start_date_time = "%sT%sZ" % (date_obs, time_obs)
+    start_date_time = f"{date_obs}T{time_obs}Z"
     stop_date_time_float = julian.tai_from_iso(start_date_time) + exptime
     stop_date_time = julian.iso_from_tai(stop_date_time_float, suffix="Z")
 

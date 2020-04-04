@@ -35,7 +35,7 @@ test: venv
 
 .PHONY: t
 t: venv
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/test_HstParameters.py
 
 ############################################################
 # THE VIRTUAL ENVIRONMENT

@@ -10,8 +10,9 @@ from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
 
 
-def make_bundle_label(bundle_db, info, verify):
-    # type: (BundleDB, Citation_Information, bool) -> bytes
+def make_bundle_label(
+    bundle_db: BundleDB, info: Citation_Information, verify: bool
+) -> bytes:
     """
     Create the label text for the bundle in the bundle database using
     the database connection.  If verify is True, verify the label

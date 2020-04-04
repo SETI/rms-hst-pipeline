@@ -31,7 +31,7 @@ def _mk_axis_arrays(
     def mk_axis_array(i: int) -> NodeBuilder:
         axis_name = AXIS_NAME_TABLE[i]
 
-        elements = card_dicts[hdu_index]["NAXIS%d" % i]
+        elements = card_dicts[hdu_index][f"NAXIS{i}"]
         # TODO Check the semantics of sequence_number
         sequence_number = str(i)
         return axis_array(
@@ -67,7 +67,7 @@ def get_file_contents(
         and ``<Array />`` or ``<Array_2D_Image />`` elements for the
         FITS file's HDUs.
         """
-        local_identifier = "hdu_%d" % hdu_index
+        local_identifier = f"hdu_{hdu_index}"
         offset = str(hdrLoc)
         object_length = str(datLoc - hdrLoc)
         header = header_contents(
@@ -85,11 +85,11 @@ def get_file_contents(
             data_type = BITPIX_TABLE[bitpix]
             elmt_arr = element_array({"data_type": data_type})
 
-            assert axes in [1, 2, 3], "NAXIS = %d in hdu #%d in %s" % (
-                axes,
-                hdu_index,
-                fits_product_lidvid,
-            )
+            assert axes in [
+                1,
+                2,
+                3,
+            ], f"NAXIS = {axes} in hdu #{hdu_index} in {fits_product_lidvid}"
             if axes == 1:
                 data = data_1d_contents(
                     {
@@ -111,16 +111,12 @@ def get_file_contents(
             elif axes == 3:
                 # "3-D" images from WFPC2 are really four separate
                 # 2-D images.  We document them as such.
-                assert instrument == "wfpc2", "NAXIS=3 and instrument=%s" % instrument
-                assert int(hdu_card_dict["NAXIS3"]) == 4, (
-                    "NAXIS1=%s, NAXIS2=%s, NAXIS3=%s"
-                    % (
-                        hdu_card_dict["NAXIS1"],
-                        hdu_card_dict["NAXIS2"],
-                        hdu_card_dict["NAXIS3"],
-                    )
-                )
-                assert datSpan % 4 == 0, "datSpan=%d" % datSpan
+                assert instrument == "wfpc2", f"NAXIS=3 and instrument={instrument}"
+                assert (
+                    int(hdu_card_dict["NAXIS3"]) == 4
+                ), f"NAXIS1={hdu_card_dict['NAXIS1']}, NAXIS2={hdu_card_dict['NAXIS2']}, NAXIS3={hdu_card_dict['NAXIS3']}"
+
+                assert datSpan % 4 == 0, "datSpan={datSpan}"
                 layerOffset = datSpan / 4
                 data1 = data_2d_contents(
                     {

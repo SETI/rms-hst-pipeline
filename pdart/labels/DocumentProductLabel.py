@@ -1,6 +1,7 @@
 """
 Functionality to create a label for a document product.
 """
+from typing import Optional
 from datetime import date
 
 from pdart.labels.DocumentProductLabelXml import (
@@ -16,9 +17,12 @@ from pdart.db.BundleDB import BundleDB
 
 
 def make_document_product_label(
-    bundle_db, info, document_product_lidvid, verify, publication_date=None
-):
-    # type: (BundleDB, Citation_Information, str, bool, str) -> bytes
+    bundle_db: BundleDB,
+    info: Citation_Information,
+    document_product_lidvid: str,
+    verify: bool,
+    publication_date: Optional[str] = None,
+) -> bytes:
     """
     Create the label text for the document product in the bundle
     having this :class:`~pdart.pds4.LIDVID` using the database
@@ -27,7 +31,7 @@ def make_document_product_label(
     """
     bundle = bundle_db.get_bundle()
     proposal_id = bundle.proposal_id
-    title = "Summary of the observation plan for HST proposal %d" % proposal_id
+    title = f"Summary of the observation plan for HST proposal {proposal_id}"
 
     product_lid = lidvid_to_lid(document_product_lidvid)
     product_vid = lidvid_to_vid(document_product_lidvid)

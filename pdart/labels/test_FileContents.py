@@ -84,6 +84,6 @@ class Test_FileContents(unittest.TestCase):
         self.assertEqual(expected, str)
 
 
-_fragment_wrapper = interpret_document_template(
+_fragment_wrapper: DocTemplate = interpret_document_template(
     """<Wrapper><FRAGMENT name="frag" /></Wrapper>"""
-)  # type: DocTemplate
+)

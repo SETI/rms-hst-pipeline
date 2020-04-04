@@ -19,9 +19,11 @@ from pdart.db.SqlAlchTables import (
 
 
 def make_browse_product_label(
-    bundle_db, browse_product_lidvid, browse_file_basename, verify
-):
-    # type: (BundleDB, str, str, bool) -> bytes
+    bundle_db: BundleDB,
+    browse_product_lidvid: str,
+    browse_file_basename: str,
+    verify: bool,
+) -> bytes:
     """
     Create the label text for the browse product having the given
     LIDVID using the bundle database.  If verify is True, verify the

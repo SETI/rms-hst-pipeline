@@ -24,6 +24,7 @@ digraph {
     cows[shape=box;color=blue];
     db[color=blue];
     documents[shape=box;color=blue];
+    labels[color=blue];
     multiversioned[color=blue];
     pds4[shape=box;color=blue];
     xml[shape=box;color=blue];

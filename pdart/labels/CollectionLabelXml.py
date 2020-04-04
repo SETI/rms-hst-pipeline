@@ -8,30 +8,30 @@ from pdart.xml.Templates import interpret_document_template, interpret_template
 from pdart.xml.Templates import DocTemplate, NodeBuilderTemplate
 
 
-make_document_collection_title = interpret_template(
+make_document_collection_title: NodeBuilderTemplate = interpret_template(
     """
     <title>This collection contains documentation from \
 HST Observing Program <NODE name="proposal_id"/>.</title>
     """
-)  # type: NodeBuilderTemplate
+)
 
 
-make_non_document_collection_title = interpret_template(
+make_non_document_collection_title: NodeBuilderTemplate = interpret_template(
     """<title>This collection contains the <NODE name="suffix"/> \
 images obtained from HST Observing Program \
 <NODE name="proposal_id"/>.</title>"""
-)  # type: NodeBuilderTemplate
+)
 
 
-make_label = interpret_document_template(
-    """<?xml version="1.0" encoding="utf-8"?>
-%s
-<Product_Collection %s>
+make_label: DocTemplate = interpret_document_template(
+    f"""<?xml version="1.0" encoding="utf-8"?>
+{PDS4_XML_MODEL}
+<Product_Collection {COLLECTION_NAMESPACES}>
   <Identification_Area>
     <logical_identifier><NODE name="collection_lid" /></logical_identifier>
     <version_id><NODE name="collection_vid" /></version_id>
     <NODE name="title"/>
-    <information_model_version>%s</information_model_version>
+    <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Collection</product_class>
 
     <NODE name="Citation_Information" />
@@ -69,8 +69,7 @@ make_label = interpret_document_template(
     </Inventory>
   </File_Area_Inventory>
 </Product_Collection>"""
-    % (PDS4_XML_MODEL, COLLECTION_NAMESPACES, INFORMATION_MODEL_VERSION)
-)  # type: DocTemplate
+)
 """
 An interpreted document template to create a collection label.
 """
