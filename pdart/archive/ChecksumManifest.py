@@ -1,4 +1,4 @@
-from typing import Callable, List, TYPE_CHECKING, Tuple
+from typing import Callable, List, Tuple
 
 import fs.path
 

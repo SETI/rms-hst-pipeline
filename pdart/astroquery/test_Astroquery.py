@@ -1,12 +1,16 @@
 import unittest
 
+from astropy.table import Table
+
 from pdart.astroquery.Astroquery import MastSlice
 
 
 @unittest.skip("really slow: investigate")
 class TestAstroquery(unittest.TestCase):
+    slice: MastSlice
+
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         # It's relatively expensive to make the MAST call, and it
         # never changes, so we're going to reuse the same one for all
         # tests.
@@ -14,7 +18,7 @@ class TestAstroquery(unittest.TestCase):
         end_date = (2018, 3, 26)
         cls.slice = MastSlice(start_date, end_date)
 
-    def test_observation_column_names(self):
+    def test_observation_column_names(self) -> None:
         # This test is just to let us know when the column names for
         # observations returned from MAST changes.  If it fails, no
         # big deal: it's just a heads-up for a human to note the
@@ -57,12 +61,12 @@ class TestAstroquery(unittest.TestCase):
         actual = sorted(TestAstroquery.slice.observations_table.colnames)
         self.assertEqual(expected, actual)
 
-    def test_product_column_names(self):
+    def test_product_column_names(self) -> None:
         # This test is just to let us know when the column names for
         # products returned from MAST changes.  If it fails, no big
         # deal: it's just a heads-up for a human to note the change
         # and verify that it's not significant for us.
-        def get_a_products_table():
+        def get_a_products_table() -> Table:
             slice = TestAstroquery.slice
             proposal_id = slice.get_proposal_ids()[0]
             return slice.get_products(proposal_id)
@@ -91,13 +95,13 @@ class TestAstroquery(unittest.TestCase):
         actual = sorted(get_a_products_table().colnames)
         self.assertEqual(expected, actual)
 
-    def test_init(self):
+    def test_init(self) -> None:
         self.assertTrue(len(TestAstroquery.slice.observations_table) >= 20000)
 
-    def test_get_proposal_ids(self):
+    def test_get_proposal_ids(self) -> None:
         self.assertTrue(len(TestAstroquery.slice.get_proposal_ids()) >= 500)
 
-    def test_get_products(self):
+    def test_get_products(self) -> None:
         proposal_ids = TestAstroquery.slice.get_proposal_ids()
         for proposal_id in proposal_ids:
             # smoke test only: runs it and quits

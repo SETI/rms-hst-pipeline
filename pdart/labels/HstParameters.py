@@ -174,7 +174,7 @@ def get_filter_name(card_dicts: _CARDS, instrument: str) -> str:
 ##############################
 
 
-def get_fine_guidance_system_lock_type(card_dicts: _CARDS):
+def get_fine_guidance_system_lock_type(card_dicts: _CARDS) -> str:
     """
     Return text for the ``<fine_guidance_system_lock_type />`` XML element.
     """

@@ -35,8 +35,12 @@ def vv_lid_path(lid: LID) -> str:
 
 
 class VersionView(FS):
-    def __init__(self, mv, lidvid: LIDVID) -> None:
-        # TODO mv : Multiversioned
+    def __init__(self, mv: Any, lidvid: LIDVID) -> None:
+        # TODO mv should be Multiversioned, but there are circular
+        # imports.  Fix this.
+        from pdart.fs.multiversioned.Multiversioned import Multiversioned
+
+        assert isinstance(mv, Multiversioned)
         FS.__init__(self)
         assert lidvid in mv
         self.multiversioned = mv
@@ -116,7 +120,7 @@ class VersionView(FS):
         return sorted(vv_res)
 
     def openbin(
-        self, path: str, mode: str = "r", buffering: int = -1, **options
+        self, path: str, mode: str = "r", buffering: int = -1, **options: Any
     ) -> BinaryIO:
         self.check()
         if fs.mode.Mode(mode).writing:

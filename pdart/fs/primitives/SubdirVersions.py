@@ -68,7 +68,7 @@ def write_subdir_versions_to_directory(fs: FS, dir: str, d: Dict[str, str]) -> N
     fs.settext(SUBDIR_VERSIONS_FILEPATH, str_subdir_versions(d), encoding="ascii")
 
 
-def write_subdir_versions_to_path(fs: FS, path: str, d: Dict[str, str]):
+def write_subdir_versions_to_path(fs: FS, path: str, d: Dict[str, str]) -> None:
     """
     Given the path to a subdir-versions file, un-parse and write the
     contents of the given subdir-versions dictionary into it.

@@ -2,7 +2,6 @@
 Functionality to create a label for a browse product containing browse
 images.
 """
-from typing import cast
 
 from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import (

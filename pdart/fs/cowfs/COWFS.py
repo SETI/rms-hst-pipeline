@@ -1,4 +1,5 @@
 from typing import (
+    Any,
     BinaryIO,
     Collection,
     Generator,
@@ -283,7 +284,7 @@ class COWFS(FS):
             assert False, f"unknown layer {layer}"
 
     def openbin(
-        self, path: str, mode: str = "r", buffering: int = -1, **options
+        self, path: str, mode: str = "r", buffering: int = -1, **options: Any
     ) -> BinaryIO:
         self.check()
         self.validatepath(path)

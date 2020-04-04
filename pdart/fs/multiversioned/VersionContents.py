@@ -94,7 +94,7 @@ class VersionContents(object):
                 return False
         return True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"VersionContents({self.contains_lidvids}, "
             f"{self.subcomponents}, "
@@ -102,7 +102,7 @@ class VersionContents(object):
             f"{self.filepaths})"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"VersionContents({self.contains_lidvids!r}, "
             f"{self.subcomponents!r}, "

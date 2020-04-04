@@ -1,4 +1,4 @@
-from typing import Optional, Sized
+from typing import Any, Optional, Sized
 
 class HDUList(Sized):
     def close(
@@ -16,5 +16,5 @@ def fitsopen(
     save_backup: Optional[bool] = False,
     cache: Optional[bool] = True,
     lazy_load_hdus: Optional[bool] = None,
-    **kwargs
+    **kwargs: Any
 ) -> HDUList: ...

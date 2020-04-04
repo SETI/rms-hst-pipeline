@@ -82,13 +82,13 @@ def _lidvid_to_instrument(nondoc_collection_lidvid: str) -> str:
     return _sure_match(_COLLECTION_DIRECTORY_PATTERN, collection_id, 3)
 
 
-def _lidvid_to_prefix(nondoc_collection_lidvid) -> str:
+def _lidvid_to_prefix(nondoc_collection_lidvid: str) -> str:
     lid = LIDVID(nondoc_collection_lidvid).lid()
     collection_id = lid.collection_id
     return _sure_match(_COLLECTION_DIRECTORY_PATTERN, collection_id, 2)
 
 
-def _lidvid_to_suffix(nondoc_collection_lidvid) -> str:
+def _lidvid_to_suffix(nondoc_collection_lidvid: str) -> str:
     lid = LIDVID(nondoc_collection_lidvid).lid()
     collection_id = lid.collection_id
     return _sure_match(_COLLECTION_DIRECTORY_PATTERN, collection_id, 4)

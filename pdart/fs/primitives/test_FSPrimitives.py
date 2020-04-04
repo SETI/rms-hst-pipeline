@@ -5,7 +5,7 @@ import os.path
 import shutil
 import tempfile
 import unittest
-from typing import Any, Dict, cast
+from typing import Any, Dict, IO, cast
 
 import fs.path
 from fs.test import FSTestCases
@@ -211,11 +211,9 @@ class OSFSPrimitives(FSPrimitives):
             res[str(filename)] = child_node
         return res
 
-    def get_file_handle(self, node: File, mode: str) -> io.IOBase:
+    def get_file_handle(self, node: File, mode: str) -> IO[Any]:
         sys_path = self._to_sys_path(node.path)
-        return cast(io.IOBase, io.open(sys_path, fs.mode.Mode(mode).to_platform_bin()))
-        # The cast is due to a bug in the mypy, testing, typeshed
-        # environment.
+        return io.open(sys_path, fs.mode.Mode(mode).to_platform_bin())
 
     def is_file(self, node: Node) -> bool:
         sys_path = self._to_sys_path(node.path)

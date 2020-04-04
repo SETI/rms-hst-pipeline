@@ -255,7 +255,7 @@ class Multiversioned(MutableMapping):
                     LID.create_from_parts(lid_parts), VID(vid_part)
                 )
 
-    def __len__(self):
+    def __len__(self) -> int:
         res = 0
         for dir in self.fs.walk.dirs():
             parts = fs.path.parts(dir)

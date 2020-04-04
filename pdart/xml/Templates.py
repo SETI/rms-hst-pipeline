@@ -73,7 +73,7 @@ function from *a* to *b* and *[c]* is a list of *c* s.
 import xml.dom
 import xml.sax
 import xml.sax.handler
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Union, cast
 from xml.dom.minidom import Document, Text
 
 TemplateDict = Dict[str, Any]
@@ -109,10 +109,10 @@ def interpret_document_template(template: str) -> DocTemplate:
 
     def builder(dictionary: TemplateDict) -> Document:
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
-        stack = [doc]
+        stack: List[Union[Node, List[Node]]] = [doc]
 
         class Builder(xml.sax.handler.ContentHandler):
-            def startElement(self, name, attrs):
+            def startElement(self, name: str, attrs: Any) -> None:
                 if name == "NODE":
                     param_name = attrs["name"]
                     param = dictionary[param_name]
@@ -152,29 +152,33 @@ def interpret_document_template(template: str) -> DocTemplate:
                         elmt.setAttribute(name, attrs[name])
                     stack.append(elmt)
 
-            def endElement(self, name):
+            def endElement(self, name: str) -> None:
                 if name == "FRAGMENT":
                     elmts = stack.pop()
                     assert isinstance(elmts, list)
+                    elmt_list: List[xml.dom.Node] = elmts
                     for elmt in elmts:
                         assert isinstance(elmt, xml.dom.Node)
                         elmt.normalize()
-                        stack[-1].appendChild(elmt)
+                        cast(xml.dom.Node, stack[-1]).appendChild(elmt)
                 else:
                     elmt = stack.pop()
                     assert isinstance(elmt, xml.dom.Node)
-                    elmt.normalize()
-                    stack[-1].appendChild(elmt)
+                    node: xml.dom.Node = elmt
+                    node.normalize()
+                    cast(xml.dom.Node, stack[-1]).appendChild(node)
 
-            def characters(self, content):
+            def characters(self, content: str) -> None:
                 node = doc.createTextNode(content)
+                assert isinstance(stack[-1], xml.dom.Node)
                 stack[-1].appendChild(node)
 
-            def ignorableWhitespace(self, content):
+            def ignorableWhitespace(self, content: str) -> None:
                 pass
 
-            def processingInstruction(self, target, data):
+            def processingInstruction(self, target: str, data: str) -> None:
                 pi = doc.createProcessingInstruction(target, data)
+                assert isinstance(stack[-1], xml.dom.Node)
                 stack[-1].appendChild(pi)
 
         xml.sax.parseString(template, Builder())
@@ -196,10 +200,10 @@ def interpret_template(template: str) -> NodeBuilderTemplate:
     def parameterizer(dictionary: TemplateDict) -> NodeBuilder:
         def builder(document: Document) -> Node:
             doc = document
-            stack = []
+            stack: List[Union[Node, List[Node]]] = []
 
             class Builder(xml.sax.handler.ContentHandler):
-                def startElement(self, name, attrs):
+                def startElement(self, name: str, attrs: Any) -> None:
                     if name == "NODE":
                         param_name = attrs["name"]
                         param = dictionary[param_name]
@@ -224,9 +228,10 @@ def interpret_template(template: str) -> NodeBuilderTemplate:
                         )
                         elmts = param(doc)
                         assert isinstance(elmts, list)
-                        for elmt in elmts:
+                        elmt_list: List[Node] = elmts
+                        for elmt in elmt_list:
                             assert isinstance(elmt, xml.dom.Node)
-                        stack.append(elmts)
+                        stack.append(elmt_list)
                     else:
                         elmt = doc.createElement(name)
                         for name in attrs.getNames():
@@ -234,26 +239,28 @@ def interpret_template(template: str) -> NodeBuilderTemplate:
                         assert isinstance(elmt, xml.dom.Node)
                         stack.append(elmt)
 
-                def endElement(self, name):
+                def endElement(self, name: str) -> None:
                     if name == "FRAGMENT":
                         elmts = stack.pop()
-                        for elmt in elmts:
+                        assert isinstance(elmts, list)
+                        elmt_list: List[xml.dom.Node] = elmts
+                        for elmt in elmt_list:
                             elmt.normalize()
                             if stack:
-                                stack[-1].appendChild(elmt)
+                                cast(xml.dom.Node, stack[-1]).appendChild(elmt)
                             else:
                                 stack.append(elmt)
                     else:
-                        elmt = stack.pop()
+                        elmt = cast(xml.dom.Node, stack.pop())
                         elmt.normalize()
                         if stack:
-                            stack[-1].appendChild(elmt)
+                            cast(xml.dom.Node, stack[-1]).appendChild(elmt)
                         else:
                             stack.append(elmt)
 
-                def characters(self, content):
+                def characters(self, content: str) -> None:
                     node = doc.createTextNode(content)
-                    stack[-1].appendChild(node)
+                    cast(xml.dom.Node, stack[-1]).appendChild(node)
 
             try:
                 xml.sax.parseString(template, Builder())

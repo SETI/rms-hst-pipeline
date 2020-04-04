@@ -13,7 +13,7 @@ from pdart.xml.Pretty import pretty_print
 
 class Test_TargetIdentification(unittest.TestCase):
     @unittest.skip("No longer applicable, now that I'm crashing on failures")
-    def test_get_default_target(self):
+    def test_get_default_target(self) -> None:
         card_dicts: List[Dict[str, Any]] = [{"TARGNAME": "JUP"}]
         nb = get_target(card_dicts)
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)

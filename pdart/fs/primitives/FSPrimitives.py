@@ -1,6 +1,5 @@
 import abc
-import io
-from typing import Dict, cast
+from typing import Any, Dict, IO, cast
 
 import fs.errors
 
@@ -22,7 +21,7 @@ class Node(object, metaclass=abc.ABCMeta):
             raise NotImplemented
         return self.path == rhs.path
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self == other
 
 
@@ -88,13 +87,13 @@ class FSPrimitives(object, metaclass=abc.ABCMeta):
         children = self.get_children(parent_node)
         return children[filename]
 
-    def get_handle(self, node: Node, mode: str) -> io.IOBase:
+    def get_handle(self, node: Node, mode: str) -> IO[Any]:
         if self.is_dir(node):
             raise fs.errors.FileExpected(node.path)
         return self.get_file_handle(cast(File, node), mode)
 
     @abc.abstractmethod
-    def get_file_handle(self, node: File, mode: str) -> io.IOBase:
+    def get_file_handle(self, node: File, mode: str) -> IO[Any]:
         pass
 
     @abc.abstractmethod

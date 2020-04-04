@@ -139,7 +139,7 @@ class Citation_Information:
             "<description>",
         )
 
-    def replace_year(self, year: str):
+    def replace_year(self, year: str) -> None:
         """Replaces the year that appears in the citation."""
 
         self.year = year

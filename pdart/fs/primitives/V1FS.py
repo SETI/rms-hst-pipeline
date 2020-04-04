@@ -1,6 +1,6 @@
 import io
 import os
-from typing import Dict, List, Tuple, cast
+from typing import Any, Dict, IO, List, Tuple, cast
 
 import fs.errors
 from fs.osfs import OSFS
@@ -144,21 +144,17 @@ class V1Primitives(FSPrimitives):
             pass
         return File(self, fs.path.join(path, filename))
 
-    def get_file_handle(self, node: File, mode: str) -> io.IOBase:
+    def get_file_handle(self, node: File, mode: str) -> IO[Any]:
         l, parts, path = self._do_path(node)
         if l is 0:
             assert False, "get_file_handle(u'/')"
         elif l is 1:
             sys_path = fs.path.join(self.root, *parts)
-            return cast(
-                io.IOBase, io.open(sys_path, fs.mode.Mode(mode).to_platform_bin())
-            )
+            return io.open(sys_path, fs.mode.Mode(mode).to_platform_bin())
         elif l in [2, 3, 4]:
             sys_parts = [self.root] + parts[:-1] + [_V1_0, parts[-1]]
             sys_path = fs.path.join(*sys_parts)
-            return cast(
-                io.IOBase, io.open(sys_path, fs.mode.Mode(mode).to_platform_bin())
-            )
+            return io.open(sys_path, fs.mode.Mode(mode).to_platform_bin())
         else:
             assert False, f"get_file_handle({path!r})"
 

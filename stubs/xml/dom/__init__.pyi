@@ -1,9 +1,6 @@
 from typing import Optional
 
-from xml.dom.minidom import Document
-
-class Node:
-    pass
+from xml.dom.minidom import Document, Node
 
 class DocumentType(object): ...
 
@@ -16,3 +13,5 @@ class DomImplementation(object):
     ) -> Document: ...
 
 def getDOMImplementation() -> DomImplementation: ...
+
+__all__ = ["Document", "Node"]

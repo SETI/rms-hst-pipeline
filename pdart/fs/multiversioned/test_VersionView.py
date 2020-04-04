@@ -144,7 +144,7 @@ class Test_VersionView(unittest.TestCase):
             LIDVID("urn:nasa:pds:b::2.0"), self.vv2.lid_to_lidvid(LID("urn:nasa:pds:b"))
         )
 
-    def test_getsyspath(self):
+    def test_getsyspath(self) -> None:
         self.assertEqual(
             self.tempfs.getsyspath("/b/v$1.2/foo.txt"),
             self.vv.getsyspath("b$/foo.txt"),

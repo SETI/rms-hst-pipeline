@@ -1,6 +1,6 @@
 import os
 import stat
-from typing import Any, Dict, List, Mapping, Optional, Tuple, cast
+from typing import Any, BinaryIO, Dict, List, Mapping, Optional, Tuple, cast
 
 import fs.mode
 import fs.path
@@ -107,7 +107,9 @@ class FSPrimAdapter(FS):
                 else:
                     raise fs.errors.DirectoryExists(path)
 
-    def openbin(self, path: str, mode: str = "r", buffering: int = -1, **options):
+    def openbin(
+        self, path: str, mode: str = "r", buffering: int = -1, **options: Any
+    ) -> BinaryIO:
         self.check()
         self.validatepath(path)
         if path == "/":
@@ -134,7 +136,7 @@ class FSPrimAdapter(FS):
             m = _remove_exclusive_flag(m)
         else:
             raise fs.errors.ResourceNotFound(path)
-        return prims.get_handle(file, m.to_platform())
+        return cast(BinaryIO, prims.get_handle(file, m.to_platform()))
 
     def remove(self, path: str) -> None:
         self.check()

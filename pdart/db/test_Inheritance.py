@@ -11,7 +11,7 @@ on.  Examples are minimal, to try to debug the issue(s).
 """
 
 import unittest
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -20,7 +20,7 @@ from sqlalchemy.orm import sessionmaker
 Base: Any = declarative_base()
 
 
-def create_tables(engine) -> None:
+def create_tables(engine: Optional[Any]) -> None:
     Base.metadata.create_all(engine)
 
 

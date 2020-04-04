@@ -150,7 +150,7 @@ class TestLIDVID(unittest.TestCase):
         )
 
     @given(pdart_lidvid_strings())
-    def test_str_roundtrip_property(self, lidvid_str) -> None:
+    def test_str_roundtrip_property(self, lidvid_str: str) -> None:
         """
         Creating a LIDVID from a string and turning it back into a
         string should result in the same string.

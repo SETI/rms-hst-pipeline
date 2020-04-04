@@ -20,13 +20,13 @@ def Citation_Information_from_apt(
     doc = md.parse(filename)
 
     # Get proposal number
-    node = doc.getElementsByTagName("HSTProposal")
-    propno = int(node[0].getAttribute("Phase2ID"))
+    nodes: List[md.Node] = doc.getElementsByTagName("HSTProposal")
+    propno = int(nodes[0].getAttribute("Phase2ID"))
 
     # Get category, cycle
-    node = doc.getElementsByTagName("ProposalInformation")
-    category: str = cast(str, node[0].getAttribute("Category"))
-    cycle = int(node[0].getAttribute("Cycle"))
+    nodes = doc.getElementsByTagName("ProposalInformation")
+    category: str = cast(str, nodes[0].getAttribute("Category"))
+    cycle = int(nodes[0].getAttribute("Cycle"))
 
     # Get authors
     authors: List[str] = []
@@ -45,8 +45,8 @@ def Citation_Information_from_apt(
             authors.append(author)
 
     # Get title
-    node = doc.getElementsByTagName("Title")
-    title: str = node[0].childNodes[0].data
+    nodes = doc.getElementsByTagName("Title")
+    title: str = cast(md.Text, nodes[0].childNodes[0]).data
 
     words = title.split()  # clean up whitespace
     title = " ".join(words)

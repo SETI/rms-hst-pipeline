@@ -12,28 +12,28 @@ from pdart.fs.primitives.VersionedFS import ROOT, SUBDIR_VERSIONS_FILENAME
 
 
 class TestSubdirVersions(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.d = {"baz": "666.666", "foo": "1", "bar": "2"}
         self.txt = """bar 2
 baz 666.666
 foo 1
 """
 
-    def testParseSubdirVersions(self):
+    def testParseSubdirVersions(self) -> None:
         self.assertEqual(self.d, parse_subdir_versions(self.txt))
         self.assertEqual({}, parse_subdir_versions(""))
 
-    def testStrSubdirVersions(self):
+    def testStrSubdirVersions(self) -> None:
         self.assertEqual(self.txt, str_subdir_versions(self.d))
         self.assertEqual("", str_subdir_versions({}))
 
-    def testWriteSubdirVersions(self):
+    def testWriteSubdirVersions(self) -> None:
         fs = MemoryFS()
         write_subdir_versions_to_directory(fs, ROOT, self.d)
         self.assertEqual(self.txt, fs.gettext(SUBDIR_VERSIONS_FILENAME))
         fs.close()
 
-    def testReadSubdirVersions(self):
+    def testReadSubdirVersions(self) -> None:
         fs = MemoryFS()
         fs.settext(SUBDIR_VERSIONS_FILENAME, self.txt)
         d = read_subdir_versions_from_directory(fs, ROOT)
