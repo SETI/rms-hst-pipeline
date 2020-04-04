@@ -164,8 +164,7 @@ class ProductSet(object):
     A downloadable collection of MAST products.
     """
 
-    def __init__(self, table):
-        # type: (Table) -> None
+    def __init__(self, table: Table) -> None:
         self.table = table
 
     def product_count(self) -> int:

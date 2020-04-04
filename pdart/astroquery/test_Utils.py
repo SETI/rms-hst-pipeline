@@ -7,8 +7,7 @@ from astropy.table.row import Row
 
 
 class TestUtils(unittest.TestCase):
-    def test_sanity(self):
-        # type: () -> None
+    def test_sanity(self) -> None:
         """
         Just a simple sanity check on converting between MJD and
         dates.
@@ -16,8 +15,7 @@ class TestUtils(unittest.TestCase):
         ymdhms = ymdhms_format_from_mjd(57986.72013889)
         self.assertEqual("2017-08-21T17:17:00", ymdhms)
 
-    def test_filter_table(self):
-        # type: () -> None
+    def test_filter_table(self) -> None:
 
         # I'm using MastSlice to get a table, but it would probably be
         # better to hand-construct one.
