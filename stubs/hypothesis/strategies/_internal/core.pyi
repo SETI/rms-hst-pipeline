@@ -1,4 +1,5 @@
 from typing import Any, AnyStr, Callable, Hashable, List, Pattern, Tuple, Union
+
 from hypothesis.strategies._internal.strategies import Ex, SearchStrategy
 from hypothesis.utils.conventions import InferType
 
