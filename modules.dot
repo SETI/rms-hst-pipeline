@@ -16,8 +16,10 @@ digraph {
     "fs.DirUtils"[color=blue];
     "fs.FSPrimAdapter"[color=blue];
     "fs.FSPrimitives"[shape=box;color=blue];
+    "fs.ISingleVersionBundleFS"[color=blue];
     "fs.SubdirVersions"[color=blue];
     "fs.V1FS"[color=blue];
+    "fs.Versioned"[color=blue];
     "fs.VersionedFS"[shape=box;color=blue];
     archive[color=blue];
     astroquery[shape=box;color=blue];
@@ -28,6 +30,7 @@ digraph {
     labels[color=blue];
     multiversioned[color=blue];
     pds4[shape=box;color=blue];
+    pipeline[color=blue];
     xml[shape=box;color=blue];
 
     "fs.DeliverableFS" -> "fs.DirUtils";
@@ -36,7 +39,6 @@ digraph {
     "fs.DeliverableFS" -> pds4;
     "fs.DirUtils" -> pds4;
     "fs.FSPrimAdapter" -> "fs.FSPrimitives";
-    "fs.ISingleVersionBundleFS" -> pds4;
     "fs.SubdirVersions" -> "fs.VersionedFS";
     "fs.V1FS" -> "fs.FSPrimAdapter";
     "fs.V1FS" -> "fs.FSPrimitives";

@@ -35,7 +35,7 @@ test: venv
 
 .PHONY: t
 t: venv
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/archive
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/pipeline
 
 ############################################################
 # THE VIRTUAL ENVIRONMENT
