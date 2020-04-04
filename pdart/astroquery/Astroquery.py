@@ -1,14 +1,14 @@
+from typing import Iterable, List, Optional, Tuple, cast
+
+from astropy.table import Table
+from astropy.table.row import Row
 from astroquery.mast import Observations
-from typing import cast, Iterable
+
 from pdart.astroquery.Utils import (
     filter_table,
     get_table_with_retries,
     ymd_tuple_to_mjd,
 )
-
-from astropy.table import Table
-from astropy.table.row import Row
-from typing import List, Optional, Tuple
 
 _YMD = Tuple[int, int, int]
 
@@ -61,7 +61,7 @@ def _is_accepted_instrument_product_row(row: Row) -> bool:
     instruments.
     """
 
-    def instrument_key(id):
+    def instrument_key(id: str) -> str:
         """
         Return the first letter of the obs_id, which tells which
         instrument made the observation.

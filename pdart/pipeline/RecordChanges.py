@@ -1,12 +1,10 @@
 import os.path
-import pickle
-from typing import Dict, TYPE_CHECKING
+from typing import Dict
 
 from fs.path import iteratepath
 
-from pdart.fs.multiversioned.VersionView import VersionView
 from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID, LIDVID
+from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.pipeline.Utils import make_mv_osfs, make_sv_osfs, make_version_view
 

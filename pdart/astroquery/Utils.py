@@ -1,11 +1,10 @@
 import time
+from typing import Any, Callable, Dict, List, Tuple
 
 import julian
-from requests.exceptions import ConnectionError
-
 from astropy.table import Table
 from astropy.table.row import Row
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from requests.exceptions import ConnectionError
 
 Julian = float
 

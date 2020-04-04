@@ -1,6 +1,7 @@
 import os
 import os.path
 import shutil
+from typing import Dict
 
 import fs.copy
 
@@ -14,7 +15,7 @@ from pdart.pipeline.Utils import (
 )
 
 
-def read_changes_dict(changes_path):
+def read_changes_dict(changes_path: str) -> Dict[LIDVID, str]:
     changes_dict = dict()
     with open(changes_path, "r") as f:
         for line in f:

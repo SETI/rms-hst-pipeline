@@ -75,7 +75,7 @@ FITS_PRODUCT_NAMESPACES = _NAMESPACES_WITH_HST
 ############################################################
 
 
-def make_xml_model(href):
+def make_xml_model(href: str) -> str:
     return f'<?xml-model href="{href}" \
 schematypens="http://purl.oclc.org/dsdl/schematron"?>'
 

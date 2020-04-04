@@ -1,21 +1,6 @@
 """
 Functionality to build a collection label using a SQLite database.
 """
-from typing import cast
-
-from pdart.labels.CitationInformation import make_citation_information
-from pdart.labels.CollectionInventory import get_collection_inventory_name
-from pdart.labels.CollectionLabelXml import (
-    make_label,
-    make_document_collection_title,
-    make_non_document_collection_title,
-)
-from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
-from pdart.xml.Pretty import pretty_and_verify
-
-from pdart.citations import Citation_Information
-from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import NonDocumentCollection, Collection, DocumentCollection
 
 from typing import cast
 

@@ -1,6 +1,5 @@
 import os
 import os.path
-from typing import TYPE_CHECKING
 
 from pdart.astroquery.Astroquery import MastSlice
 

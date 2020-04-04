@@ -1,3 +1,4 @@
+import abc
 import shutil
 import tempfile
 import unittest
@@ -98,3 +99,18 @@ class Test_V1FS(FSTestCases, unittest.TestCase):
             self.assertTrue(self.fs.hassyspath("foo"))
         # Should not throw an error
         self.fs.hassyspath("a/b/c/foo")
+
+    # These non-overriding overrides exist only to provide type
+    # signatures that are missing in the parent classes.
+
+    def assert_exists(self, path: str) -> None:
+        super().assert_exists(path)  # type: ignore
+
+    def assert_isdir(self, path: str) -> None:
+        super().assert_isdir(path)  # type: ignore
+
+    def assert_not_exists(self, path: str) -> None:
+        super().assert_not_exists(path)  # type: ignore
+
+    def assert_text(self, path: str, txt: str) -> None:
+        super().assert_text(path, txt)  # type: ignore

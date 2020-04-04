@@ -1,6 +1,3 @@
-class HDUList(list):
-    def close(self):
-        pass
+from astropy.io.fits.hdu import HDUList, fitsopen as open
 
-def open(filepath: str) -> HDUList:
-    pass
+__all__ = ["HDUList", "open"]

@@ -1,5 +1,4 @@
 import re
-from typing import TYPE_CHECKING
 
 from fs.base import FS
 from fs.path import parts

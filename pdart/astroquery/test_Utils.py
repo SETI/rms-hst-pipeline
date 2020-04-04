@@ -1,9 +1,8 @@
-from typing import TYPE_CHECKING
 import unittest
 
-from pdart.astroquery.Utils import filter_table, ymdhms_format_from_mjd
-
 from astropy.table.row import Row
+
+from pdart.astroquery.Utils import filter_table, ymdhms_format_from_mjd
 
 
 class TestUtils(unittest.TestCase):

@@ -1,4 +1,4 @@
-from typing import Set, TYPE_CHECKING
+from typing import Set
 
 import fs.path
 
@@ -16,7 +16,6 @@ from pdart.db.SqlAlchTables import (
     DocumentCollection,
     DocumentProduct,
     FitsFile,
-    FitsProduct,
     NonDocumentCollection,
 )
 from pdart.fs.cowfs.COWFS import COWFS

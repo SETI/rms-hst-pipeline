@@ -297,7 +297,7 @@ class Hdu(Base):
     """The data size including padding"""
 
     product: RelationshipProperty = relationship(
-        "FitsProduct", backref=backref("hdus", order_by=hdu_index)
+        "FitsProduct", backref=backref("hdus", order_by=hdu_index)  # type: ignore
     )
 
     def __repr__(self) -> str:
@@ -325,7 +325,7 @@ class Card(Base):
     value = Column(String, nullable=True)
 
     hdu: RelationshipProperty = relationship(
-        "Hdu", backref=backref("cards", order_by=id)
+        "Hdu", backref=backref("cards", order_by=id)  # type: ignore
     )
 
     def __repr__(self) -> str:
