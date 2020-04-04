@@ -11,13 +11,16 @@ all : black mypy test
 
 # Run mypy.
 
-MYPY_FLAGS= --disallow-untyped-calls \
+MYPY_FLAGS=--disallow-any-unimported \
+	--disallow-untyped-calls \
 	--disallow-untyped-defs \
 	--strict-equality \
 	--warn-redundant-casts \
 	--warn-unreachable \
-        # --disallow-any-generics \
-	# --disallow-any-unimported \
+
+# --disallow-any-generics: produces baffling errors.  It seems as if,
+# for example, re.Pattern is both generic and not.  Perhaps a mismatch
+# between the source and typing stubs, or a versioning problem.
 
 # --warn-return-any: not practical because of SqlAlchemy's dynamic magic
 # and because FITS cards are untyped.
