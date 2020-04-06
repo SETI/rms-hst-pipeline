@@ -27,7 +27,7 @@ MYPY_FLAGS=--disallow-any-unimported \
 
 .PHONY: mypy
 mypy : venv
-	$(ACTIVATE) && MYPYPATH=stubs mypy $(MYPY_FLAGS) pdart
+	$(ACTIVATE) && MYPYPATH=stubs mypy $(MYPY_FLAGS) Pipeline.py pdart
 
 ############################################################
 # TESTS
@@ -41,6 +41,31 @@ test: venv
 .PHONY: t
 t: venv
 	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/pipeline
+
+############################################################
+# THE PIPELINE
+############################################################
+
+PROJ_IDS=15419 # 07240 09296
+
+STEPS=download_docs check_downloads copy_primary_files record_changes	\
+insert_changes populate_database build_browse build_labels		\
+update_archive make_deliverable
+
+.PHONY: pipeline
+pipeline : venv
+	-rm -rf tmp-working-dir
+	mkdir tmp-working-dir
+	for project_id in $(PROJ_IDS); do \
+	    for step in $(STEPS); do \
+		echo $$project_id $$step; \
+		$(ACTIVATE) && \
+		    PYTHONPATH=$(HOME)/pds-tools \
+			python Pipeline.py $$project_id $$step; \
+            done; \
+        done; \
+	say pipeline is done
+	open tmp-working-dir
 
 ############################################################
 # THE VIRTUAL ENVIRONMENT

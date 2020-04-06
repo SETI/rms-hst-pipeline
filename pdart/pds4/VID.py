@@ -43,12 +43,12 @@ class VID(object):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, VID):
-            raise NotImplemented
+            return NotImplemented
         return self.major() == other.major() and self.minor() == other.minor()
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, VID):
-            raise NotImplemented
+            return NotImplemented
         if self.major() == other.major():
             return self.minor() < other.minor()
         else:

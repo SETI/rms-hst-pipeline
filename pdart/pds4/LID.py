@@ -52,12 +52,12 @@ class LID(object):
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, LID):
-            raise NotImplemented
+            return NotImplemented
         return str(self) < str(other)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, LID):
-            raise NotImplemented
+            return NotImplemented
         return str(self) == str(other)
 
     def __hash__(self) -> int:

@@ -16,7 +16,7 @@ def filter_table(row_predicate: Callable[[Row], bool], table: Table) -> Table:
     return copy
 
 
-def ymd_to_mjd(y: int, m: int, d: int,) -> Julian:
+def ymd_to_mjd(y: int, m: int, d: int) -> Julian:
     days = julian.day_from_ymd(y, m, d)
     return julian.mjd_from_day(days)
 

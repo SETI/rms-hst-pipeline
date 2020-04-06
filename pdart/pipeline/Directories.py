@@ -5,7 +5,7 @@ import os.path
 # big-data.
 
 
-def make_directories() -> Directories:
+def make_directories() -> "Directories":
     import socket
 
     hostname = socket.gethostname()

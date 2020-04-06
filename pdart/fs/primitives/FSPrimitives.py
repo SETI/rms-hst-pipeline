@@ -18,7 +18,7 @@ class Node(object, metaclass=abc.ABCMeta):
 
     def __eq__(self, rhs: object) -> bool:
         if not isinstance(rhs, Node):
-            raise NotImplemented
+            return NotImplemented
         return self.path == rhs.path
 
     def __ne__(self, other: object) -> bool:

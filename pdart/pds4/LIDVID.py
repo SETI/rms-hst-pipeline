@@ -53,12 +53,12 @@ class LIDVID(object):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, LIDVID):
-            raise NotImplemented
+            return NotImplemented
         return self.lid() == other.lid() and self.vid() == other.vid()
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, LIDVID):
-            raise NotImplemented
+            return NotImplemented
         if self.lid() == other.lid():
             return self.vid() < other.vid()
         else:

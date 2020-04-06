@@ -52,8 +52,8 @@ def _copy_fits_files(
             _, product, filename = parts
             filename = filename.lower()
             hst_filename = HstFilename(filename)
-            instrument_name = (hst_filename.instrument_name(),)
-            suffix = (hst_filename.suffix(),)
+            instrument_name = hst_filename.instrument_name()
+            suffix = hst_filename.suffix()
             coll = f"data_{instrument_name}_{suffix}"
             new_path = fs.path.join(
                 to_segment_dir(bundle_segment),

@@ -11,7 +11,7 @@ from pdart.pds4.VID import VID
 def vid_strings(draw: Any, max_value: int = 9) -> str:
     first = draw(st.integers(min_value=1, max_value=max_value))
     rest = draw(
-        st.lists(st.integers(min_value=0, max_value=max_value), min_size=0, max_size=3,)
+        st.lists(st.integers(min_value=0, max_value=max_value), min_size=0, max_size=3)
     )
     if rest:
         tail = ".".join([str(n) for n in rest])

@@ -210,9 +210,9 @@ class Multiversioned(MutableMapping):
 
         for bundle_seg in bundle_segs:
             lid = LID.create_from_parts([str(bundle_seg)])
-            orig_lidvid = self.latest_lidvid(lid)
-            new_lidvid = update_from_lid(lid)
-            changed = changed or orig_lidvid != new_lidvid
+            orig_lidvid: Optional[LIDVID] = self.latest_lidvid(lid)
+            new_lidvid: LIDVID = update_from_lid(lid)
+            changed = changed or new_lidvid != orig_lidvid
 
         return changed
 
