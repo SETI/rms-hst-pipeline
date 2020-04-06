@@ -19,7 +19,7 @@ An interpreted template to create a ``<Citation_Information
 
 def make_citation_information(info: Citation_Information) -> NodeBuilder:
     """
-    Return a placeholder ``<Citation_Information />`` XML element.
+    Return a ``<Citation_Information />`` XML element.
     """
     return _citation_information(
         {"description": info.description, "publication_year": info.publication_year}

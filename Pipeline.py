@@ -14,6 +14,7 @@ from pdart.pipeline.MakeDeliverable import make_deliverable
 from pdart.pipeline.PopulateDatabase import populate_database
 from pdart.pipeline.RecordChanges import record_changes
 from pdart.pipeline.UpdateArchive import update_archive
+from pdart.pipeline.ValidateBundle import validate_bundle
 
 
 def dispatch(dirs: Directories, proposal_id: int, command: str) -> None:
@@ -113,6 +114,10 @@ def dispatch(dirs: Directories, proposal_id: int, command: str) -> None:
                 dirs.archive_dir(proposal_id),
                 dirs.deliverable_dir(proposal_id),
             )
+        ),
+        # Run the validation tool on the deliverable bundle
+        "validate_bundle": (
+            lambda: validate_bundle(dirs.deliverable_dir(proposal_id),)
         ),
     }
     command_dict[command]()

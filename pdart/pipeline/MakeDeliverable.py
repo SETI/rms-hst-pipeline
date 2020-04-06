@@ -60,5 +60,3 @@ def make_deliverable(
                 tar.add(bundle_dir, arcname=os.path.basename(bundle_dir))
 
             shutil.rmtree(bundle_dir)
-
-        raise Exception("Succeeded but leaving a failure marker to prevent retries.")

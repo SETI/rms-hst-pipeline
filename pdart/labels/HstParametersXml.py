@@ -92,10 +92,6 @@ XML element.
 wrapper: DocTemplate = interpret_document_template("""<NODE name="wrapped" />""")
 
 
-# Not XML, but placeholder code common to both the database- and the
-# read-and-parse-FITS-file code.
-
-
 def get_targeted_detector_id(aperture: str) -> str:
     """
     Return text for the ``<targeted_detector_id />`` XML element.

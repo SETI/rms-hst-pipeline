@@ -1,0 +1,20 @@
+#!/bin/bash
+
+XMLDIR=${HOME}/pdart/xml
+SCHEMAS="${XMLDIR}/PDS4_HST_1D00_1000.xsd.xml, ${XMLDIR}/PDS4_DISP_1B00.xsd.xml"
+SCHEMATRONS="${XMLDIR}/PDS4_HST_1D00_1000.sch.xml, ${XMLDIR}/PDS4_DISP_1B00.sch.xml"
+
+REPORT_NAME='../validation-report.txt'
+
+cd $1
+
+# Note: the -D is in there until we have a tool to remove NaNs from
+# data.
+validate . -M checksum.manifest.txt -R pds4.bundle \
+    -D \
+    -S ${SCHEMATRONS} -x ${SCHEMAS} \
+    -r ${REPORT_NAME}
+
+# 'validate' returns a success error code even if the validation
+# fails, so we have to kludge around that.
+if grep -q FAIL ${REPORT_NAME}; then exit 1; else exit 0; fi

@@ -19,7 +19,6 @@ def make_bundle_label(
     either fails.
     """
     bundle = bundle_db.get_bundle()
-    bundle_lid = lidvid_to_lid(bundle.lidvid)  # Only used in placeholder
     proposal_id = bundle.proposal_id
     reduced_collections = [
         make_bundle_entry_member({"collection_lidvid": collection.lidvid})

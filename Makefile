@@ -50,7 +50,7 @@ PROJ_IDS=15419 # 07240 09296
 
 STEPS=download_docs check_downloads copy_primary_files record_changes	\
 insert_changes populate_database build_browse build_labels		\
-update_archive make_deliverable
+update_archive make_deliverable validate_bundle
 
 .PHONY: pipeline
 pipeline : venv
