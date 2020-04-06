@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Set, Union, cast
+from typing import Any, Callable, Generic, List, Set, TypeVar, Union, cast
 
 from fs.base import FS
 from fs.path import isabs
@@ -6,17 +6,18 @@ from fs.path import isabs
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 
-_SUBCOMPS = Union[Set[LID], Set[LIDVID]]
+
+S = TypeVar("S", LID, LIDVID)
 
 
-def data_consistent(contains_lidvids: bool, subcomponents: _SUBCOMPS) -> bool:
+def _data_consistent(contains_lidvids: bool, subcomponents: Set[S]) -> bool:
     if contains_lidvids:
         return all([isinstance(subcomp, LIDVID) for subcomp in subcomponents])
     else:
         return all([isinstance(subcomp, LID) for subcomp in subcomponents])
 
 
-class VersionContents(object):
+class VersionContents(Generic[S]):
     """
     The contents of a PDS4 versioned component (bundle, collection or
     product) as represented by a set of the LIDs or LIDVIDs of its
@@ -32,18 +33,36 @@ class VersionContents(object):
     def __init__(
         self,
         contains_lidvids: bool,
-        subcomponents: _SUBCOMPS,
+        subcomponents: Set[S],
         fs: FS,
         filepaths: Set[str],
     ) -> None:
-        assert data_consistent(contains_lidvids, subcomponents)
+        """
+        Create a 'VersionContents' object.  DO NOT USE this
+        constructor.  Instead use the static methods
+        VersionContents.createFromLIDs() and
+        VersionContents.createFromLIDVIDs().
+        """
+        assert _data_consistent(contains_lidvids, subcomponents)
         self.contains_lidvids = contains_lidvids
-        self.subcomponents = subcomponents
+        self.subcomponents: Set[S] = subcomponents
         for filepath in filepaths:
             assert isabs(filepath)
             assert fs.isfile(filepath)
         self.fs = fs
         self.filepaths = filepaths
+
+    @staticmethod
+    def createFromLIDs(
+        subcomponents: Set[LID], fs: FS, filepaths: Set[str]
+    ) -> "VersionContents[LID]":
+        return VersionContents[LID](False, subcomponents, fs, filepaths)
+
+    @staticmethod
+    def createFromLIDVIDs(
+        subcomponents: Set[LIDVID], fs: FS, filepaths: Set[str]
+    ) -> "VersionContents[LIDVID]":
+        return VersionContents[LIDVID](True, subcomponents, fs, filepaths)
 
     def lidvids(self) -> List[LIDVID]:
         if self.contains_lidvids:
@@ -57,14 +76,14 @@ class VersionContents(object):
         else:
             return cast(List[LID], list(self.subcomponents))
 
-    def to_lid_version_contents(self) -> "VersionContents":
+    def to_lid_version_contents(self) -> "VersionContents[LID]":
         if self.contains_lidvids:
             lids = {lidvid.lid() for lidvid in self.lidvids()}
-            return VersionContents(False, lids, self.fs, self.filepaths)
+            return VersionContents.createFromLIDs(lids, self.fs, self.filepaths)
         else:
             raise TypeError(f"{self} does not contain LIDVIDs")
 
-    def filter_filepaths(self, filt: Callable[[str], bool]) -> "VersionContents":
+    def filter_filepaths(self, filt: Callable[[str], bool]) -> "VersionContents[S]":
         return VersionContents(
             self.contains_lidvids,
             self.subcomponents,

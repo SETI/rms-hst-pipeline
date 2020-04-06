@@ -68,7 +68,7 @@ class Test_Utils(unittest.TestCase):
             mv = Multiversioned(base_fs)
             lidvid = LIDVID("urn:nasa:pds:b::1.0")
             no_lidvids: Set[LIDVID] = set()
-            mv[lidvid] = VersionContents(True, no_lidvids, TempFS(), set())
+            mv[lidvid] = VersionContents.createFromLIDVIDs(no_lidvids, TempFS(), set())
             names = OSFS(self.temp_dir).walk.dirs()
             self.assertEqual({"/foo-mv", "/foo-mv/b", "/foo-mv/b/v$1.0"}, set(names))
 

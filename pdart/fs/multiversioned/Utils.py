@@ -26,4 +26,4 @@ def dictionary_to_contents(lidvids: Set[LIDVID], d: Dict[Any, Any]) -> VersionCo
     fs = MemoryFS()
     write_dictionary_to_fs(fs, "/", d)
     filepaths = set(fs.walk.files())
-    return VersionContents(True, lidvids, fs, filepaths)
+    return VersionContents.createFromLIDVIDs(lidvids, fs, filepaths)

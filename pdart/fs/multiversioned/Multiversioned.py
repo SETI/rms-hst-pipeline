@@ -192,7 +192,7 @@ class Multiversioned(MutableMapping):
             filepaths = {
                 filepath for filepath in sfs.walk.files() if "$" not in filepath
             }
-            contents = VersionContents(True, child_lidvids, sfs, filepaths)
+            contents = VersionContents.createFromLIDVIDs(child_lidvids, sfs, filepaths)
             return self.add_contents_if(is_new, lid, contents, False)
 
         bundle_segs = [
@@ -243,7 +243,7 @@ class Multiversioned(MutableMapping):
         lidvids = {make_sub_lidvid(segment, vid) for segment, vid in list(d.items())}
         sub_fs = SubFS(self.fs, dirpath)
         filepaths = set(sub_fs.walk.files(exclude=[SUBDIR_VERSIONS_FILENAME]))
-        return VersionContents(True, lidvids, sub_fs, filepaths)
+        return VersionContents.createFromLIDVIDs(lidvids, sub_fs, filepaths)
 
     def __iter__(self) -> Iterator[LIDVID]:
         for dir in self.fs.walk.dirs():

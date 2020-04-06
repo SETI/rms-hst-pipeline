@@ -45,7 +45,9 @@ class Test_Multiversioned(unittest.TestCase):
         # Set empty contents
         mv = Multiversioned(MemoryFS())
         empty_lidvid = LIDVID("urn:nasa:pds:empty-bundle::3.14")
-        empty_contents = VersionContents(True, no_lidvids, MemoryFS(), set())
+        empty_contents = VersionContents.createFromLIDVIDs(
+            no_lidvids, MemoryFS(), set()
+        )
         mv[empty_lidvid] = empty_contents
         self.assertTrue(empty_lidvid in mv)
         self.assertEqual(1, len(mv))
@@ -61,8 +63,8 @@ class Test_Multiversioned(unittest.TestCase):
         single_file_path = "/down/a/lot/of/dirs/text.txt"
         single_file_fs.makedirs(fs.path.dirname(single_file_path), None, True)
         single_file_fs.writetext(single_file_path, "Hello, there!")
-        single_file_contents = VersionContents(
-            True, no_lidvids, single_file_fs, set([single_file_path])
+        single_file_contents = VersionContents.createFromLIDVIDs(
+            no_lidvids, single_file_fs, set([single_file_path])
         )
         mv[single_file_lidvid] = single_file_contents
         self.assertTrue(empty_lidvid in mv)
@@ -78,15 +80,19 @@ class Test_Multiversioned(unittest.TestCase):
         c_lidvid = LIDVID("urn:nasa:pds:b:c::2.5")
         p_lidvid = LIDVID("urn:nasa:pds:b:c:p::333.123")
 
-        p_contents = VersionContents(True, no_lidvids, MemoryFS(), set([]))
+        p_contents = VersionContents.createFromLIDVIDs(no_lidvids, MemoryFS(), set([]))
         hierarchic[p_lidvid] = p_contents
         self.assertEqual(p_contents, hierarchic[p_lidvid])
 
-        c_contents = VersionContents(True, set([p_lidvid]), MemoryFS(), set([]))
+        c_contents = VersionContents.createFromLIDVIDs(
+            set([p_lidvid]), MemoryFS(), set([])
+        )
         hierarchic[c_lidvid] = c_contents
         self.assertEqual(c_contents, hierarchic[c_lidvid])
 
-        b_contents = VersionContents(True, set([c_lidvid]), MemoryFS(), set([]))
+        b_contents = VersionContents.createFromLIDVIDs(
+            set([c_lidvid]), MemoryFS(), set([])
+        )
         hierarchic[b_lidvid] = b_contents
         self.assertEqual(b_contents, hierarchic[b_lidvid])
 

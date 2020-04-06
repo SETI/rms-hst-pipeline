@@ -40,7 +40,7 @@ test: venv
 
 .PHONY: t
 t: venv
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/pipeline
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/fs/multiversioned
 
 ############################################################
 # THE PIPELINE
