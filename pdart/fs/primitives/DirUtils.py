@@ -3,7 +3,7 @@ Utility functions to convert from LIDs and LIDVIDs to their canonical
 paths in a filesystem.
 """
 import re
-from typing import List
+from typing import List, Pattern
 
 from fs.path import iteratepath, join
 
@@ -11,7 +11,9 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 
-_DIR_PART_PATTERN = re.compile("^v\\$(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*))?$")
+_DIR_PART_PATTERN: Pattern[str] = re.compile(
+    "^v\\$(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*))?$"
+)
 
 
 def _lid_to_parts(lid: LID) -> List[str]:

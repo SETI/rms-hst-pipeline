@@ -9,7 +9,7 @@ from fs.osfs import OSFS
 from pdart.archive.ChecksumManifest import make_checksum_manifest
 from pdart.archive.TransferManifest import make_transfer_manifest
 from pdart.db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
-from pdart.fs.primitives.DeliverableFS import DeliverableFS, lidvid_to_dirpath
+from pdart.fs.deliverablefs.DeliverableFS import DeliverableFS, lidvid_to_dirpath
 from pdart.pipeline.Utils import make_osfs, make_version_view
 
 

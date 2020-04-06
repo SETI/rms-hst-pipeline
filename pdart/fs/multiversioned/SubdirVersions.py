@@ -17,7 +17,7 @@ _versionRE: Pattern[str] = re.compile("^[0-9.]+$")
 
 def parse_subdir_versions(txt: str) -> Dict[str, str]:
     """
-    Given the (Str) contents of a subdir-version file, parse it
+    Given the (Unicode) contents of a subdir-version file, parse it
     and return a subdir-version dictionary.
     """
     d = {}
@@ -34,7 +34,7 @@ def parse_subdir_versions(txt: str) -> Dict[str, str]:
 
 def unparse_subdir_versions(d: Dict[str, str]) -> str:
     """
-    Given a subdir-version dictionary, unparse it into a (Str)
+    Given a subdir-version dictionary, unparse it into a (Unicode)
     string to be stored in a subdir-version file.
     """
     for v in d.values():
