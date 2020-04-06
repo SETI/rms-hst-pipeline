@@ -81,9 +81,11 @@ def create_pds4_labels(
             bundle_lidvid = str(bundle.lidvid)
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
             label = make_bundle_label(self.db, info, _VERIFY)
+            assert label[:6] == b"<?xml ", "Not XML"
+
             label_filename = "bundle.xml"
             label_filepath = fs.path.join(bundle_dir_path, label_filename)
-            label_deltas.settext(label_filepath, str(label))
+            label_deltas.setbytes(label_filepath, label)
             bundle_db.create_bundle_label(
                 label_deltas.getsyspath(label_filepath), label_filename, bundle_lidvid
             )
@@ -98,7 +100,7 @@ def create_pds4_labels(
                 self.db, collection_lidvid
             )
             inventory_filepath = fs.path.join(collection_dir_path, inventory_filename)
-            label_deltas.settext(inventory_filepath, str(inventory))
+            label_deltas.setbytes(inventory_filepath, inventory)
             bundle_db.create_collection_inventory(
                 label_deltas.getsyspath(inventory_filepath),
                 inventory_filename,
@@ -108,7 +110,7 @@ def create_pds4_labels(
             label = make_collection_label(self.db, info, collection_lidvid, _VERIFY)
             label_filename = get_collection_label_name(self.db, collection_lidvid)
             label_filepath = fs.path.join(collection_dir_path, label_filename)
-            label_deltas.settext(label_filepath, str(label))
+            label_deltas.setbytes(label_filepath, label)
             bundle_db.create_collection_label(
                 label_deltas.getsyspath(label_filepath),
                 label_filename,
@@ -145,7 +147,7 @@ def create_pds4_labels(
             label_filename = label_base + ".xml"
             product_dir_path = _lidvid_to_dir(product_lidvid)
             label_filepath = fs.path.join(product_dir_path, label_filename)
-            label_deltas.settext(label_filepath, str(label))
+            label_deltas.setbytes(label_filepath, label)
             bundle_db.create_product_label(
                 label_deltas.getsyspath(label_filepath), label_filename, product_lidvid
             )
@@ -162,7 +164,7 @@ def create_pds4_labels(
             product_lidvid = str(browse_file.product_lidvid)
             product_dir_path = _lidvid_to_dir(product_lidvid)
             label_filepath = fs.path.join(product_dir_path, label_filename)
-            label_deltas.settext(label_filepath, str(label))
+            label_deltas.setbytes(label_filepath, label)
             bundle_db.create_product_label(
                 label_deltas.getsyspath(label_filepath), label_filename, product_lidvid
             )
@@ -184,7 +186,7 @@ def create_pds4_labels(
             product_lidvid = str(fits_file.product_lidvid)
             product_dir_path = _lidvid_to_dir(product_lidvid)
             label_filepath = fs.path.join(product_dir_path, label_filename)
-            label_deltas.settext(label_filepath, str(label))
+            label_deltas.setbytes(label_filepath, label)
             bundle_db.create_product_label(
                 label_deltas.getsyspath(label_filepath), label_filename, product_lidvid
             )

@@ -41,4 +41,5 @@ def make_bundle_label(
         .encode()
     )
 
+    assert label[:6] == b"<?xml ", "Not XML"
     return pretty_and_verify(label, verify)
