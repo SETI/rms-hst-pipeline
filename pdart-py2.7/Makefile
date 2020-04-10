@@ -108,7 +108,7 @@ raw-mypy : mypy-venv
 	source mypy-venv/bin/activate && mypy --py2 pdart Citation_Information
 
 mypy-venv : requirements-mypy.txt
-	virtualenv --no-site-packages -p python3 $@
+	virtualenv -p python3 $@
 	source mypy-venv/bin/activate && pip install -r requirements-mypy.txt
 
 clean :
