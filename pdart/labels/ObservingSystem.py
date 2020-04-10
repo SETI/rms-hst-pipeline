@@ -16,7 +16,7 @@ _observing_system: NodeBuilderTemplate = interpret_template(
         <name><NODE name="component_name"/></name>
         <type>Instrument</type>
         <Internal_Reference>
-          <lid_reference>urn:nasa:pds:context:instrument:insthost.acs.\
+          <lid_reference>urn:nasa:pds:context:instrument:insthost.\
 <NODE name="abbreviation"/></lid_reference>
           <reference_type>is_instrument</reference_type>
         </Internal_Reference>
