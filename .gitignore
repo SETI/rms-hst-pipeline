@@ -11,3 +11,9 @@
 # Emacs cruft
 *~
 \#*
+
+# pytest cruft
+.pytest_cache
+
+# virtual environment cruft
+venv

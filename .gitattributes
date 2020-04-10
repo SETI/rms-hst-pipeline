@@ -1,5 +1,5 @@
 * text=auto
 *.apt text eol=crlf
 *.xml text eol=lf
-pdart/new_labels/test_CollectionInventory.golden.txt text eol=crlf
+pdart-py2.7/pdart/new_labels/test_CollectionInventory.golden.txt text eol=crlf
 

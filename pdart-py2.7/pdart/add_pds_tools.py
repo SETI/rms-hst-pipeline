@@ -10,6 +10,6 @@ import os.path
 import sys
 
 
-_PDS_TOOLS_DIR = os.path.join('../pds-tools')
+_PDS_TOOLS_DIR = os.path.join('../../pds-tools')
 
 sys.path.append(_PDS_TOOLS_DIR)

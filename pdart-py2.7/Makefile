@@ -73,7 +73,7 @@ bulk : venv
 	source venv/bin/activate && (python BulkDownload.py | tee bulk.log)
 
 venv : requirements.txt
-	virtualenv --no-site-packages -p python2.7 $@
+	virtualenv -p python2.7 $@
 	# pyfits requires numpy to be installed first; dunno why
 	source venv/bin/activate && pip install numpy==1.16.4
 	source venv/bin/activate && pip install -r requirements.txt
