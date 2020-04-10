@@ -32,7 +32,7 @@ def get_subarray_flag(card_dicts: _CARDS, instrument: str) -> str:
     Return text for the ``<subarray_flag />`` XML element.
     """
     assert instrument != "wfpc2", instrument
-    return card_dicts[0]["SUBARRAY"]
+    return card_dicts[0]["SUBARRAY"].lower()
 
 
 ##############################
@@ -48,11 +48,12 @@ def get_aperture_name(
     """
     if instrument == "wfpc2":
         try:
-            return shm_card_dicts[0]["APERTURE"]
+            res = shm_card_dicts[0]["APERTURE"]
         except KeyError:
-            return shm_card_dicts[0]["APEROBJ"]
+            res = shm_card_dicts[0]["APEROBJ"]
     else:
-        return card_dicts[0]["APERTURE"]
+        res = card_dicts[0]["APERTURE"]
+    return res
 
 
 ##############################
@@ -96,11 +97,12 @@ def get_detector_id(card_dicts: _CARDS, instrument: str) -> str:
     detector = card_dicts[0]["DETECTOR"]
     if instrument == "wfpc2":
         if detector == "1":
-            return "PC1"
+            res = "PC1"
         else:
-            return "WF" + detector
+            res = "WF" + detector
     else:
-        return detector
+        res = detector
+    return res.lower()
 
 
 ##############################
@@ -126,11 +128,12 @@ def get_exposure_type(card_dicts: _CARDS, instrument: str) -> str:
     """
     if instrument == "acs":
         try:
-            return card_dicts[0]["EXPFLAG"]
+            res = card_dicts[0]["EXPFLAG"]
         except KeyError:
-            return "UNK"
+            res = "UNK"
     else:
-        return card_dicts[0]["EXPFLAG"]
+        res = card_dicts[0]["EXPFLAG"]
+    return res.lower()
 
 
 ##############################
@@ -146,27 +149,28 @@ def get_filter_name(card_dicts: _CARDS, instrument: str) -> str:
         filtnam1 = card_dicts[0]["FILTNAM1"].strip()
         filtnam2 = card_dicts[0]["FILTNAM2"].strip()
         if filtnam1 == "":
-            return filtnam2
+            res = filtnam2
         elif filtnam2 == "":
-            return filtnam1
+            res = filtnam1
         else:
-            return f"{filtnam1}+{filtnam2}"
+            res = f"{filtnam1}+{filtnam2}"
     elif instrument == "acs":
         filter1 = card_dicts[0]["FILTER1"].strip()
         filter2 = card_dicts[0]["FILTER2"].strip()
-        if filter1.startswith("CLEAR"):
-            if filter2.startswith("CLEAR"):
-                return "CLEAR"
+        if filter1.startswith("clear"):
+            if filter2.startswith("clear"):
+                res = "clear"
             else:
-                return filter2
+                res = filter2
         else:
-            if filter2.startswith("CLEAR"):
-                return filter1
+            if filter2.startswith("clear"):
+                res = filter1
             else:
-                return f"{filter1}+{filter2}"
+                res = f"{filter1}+{filter2}"
     else:
         assert instrument == "wfc3"
-        return card_dicts[0]["FILTER"]
+        res = card_dicts[0]["FILTER"]
+    return res.lower()
 
 
 ##############################
@@ -179,9 +183,10 @@ def get_fine_guidance_system_lock_type(card_dicts: _CARDS) -> str:
     Return text for the ``<fine_guidance_system_lock_type />`` XML element.
     """
     try:
-        return card_dicts[0]["FGSLOCK"]
+        res = card_dicts[0]["FGSLOCK"]
     except KeyError:
-        return "UNK"
+        res = "UNK"
+    return res.lower()
 
 
 ##############################
@@ -195,13 +200,15 @@ def get_gain_mode_id(card_dicts: _CARDS, instrument: str) -> str:
     """
     try:
         atodgain = card_dicts[0]["ATODGAIN"]
+        if instrument == "acs":
+            res = str(atodgain)
+        elif instrument == "wfpc2":
+            res = "A2D" + str(int(atodgain))
+        else:
+            assert False
     except KeyError:
-        return "N/A"
-    if instrument == "acs":
-        return str(atodgain)
-    elif instrument == "wfpc2":
-        return "A2D" + str(int(atodgain))
-    assert False
+        res = "N/A"
+    return res.lower()
 
 
 ##############################
@@ -257,14 +264,15 @@ def get_instrument_mode_id(card_dicts: _CARDS, instrument: str) -> str:
     """
     if instrument == "acs":
         try:
-            return card_dicts[0]["OBSMODE"]
+            res = card_dicts[0]["OBSMODE"]
         except KeyError:
-            return "UNK"
-    if instrument == "wfpc2":
-        return card_dicts[0]["MODE"]
+            res = "UNK"
+    elif instrument == "wfpc2":
+        res = card_dicts[0]["MODE"]
     else:
         assert instrument == "wfc3"
-        return card_dicts[0]["OBSMODE"]
+        res = card_dicts[0]["OBSMODE"]
+    return res.lower()
 
 
 ##############################
@@ -277,7 +285,7 @@ def get_observation_type(card_dicts: _CARDS, instrument: str) -> str:
     Return text for the ``<observation_type />`` XML element.
     """
     assert instrument != "wfpc2"
-    return card_dicts[0]["OBSTYPE"]
+    return card_dicts[0]["OBSTYPE"].lower()
 
 
 ##############################
@@ -292,11 +300,12 @@ def get_mast_observation_id(card_dicts: _CARDS) -> str:
     try:
         asn_id = card_dicts[0]["ASN_ID"]
         if asn_id == "NONE":
-            return card_dicts[0]["ROOTNAME"]
+            res = card_dicts[0]["ROOTNAME"]
         else:
-            return asn_id
+            res = asn_id
     except KeyError:
-        return card_dicts[0]["ROOTNAME"]
+        res = card_dicts[0]["ROOTNAME"]
+    return res
 
 
 ##############################

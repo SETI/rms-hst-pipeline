@@ -11,6 +11,8 @@ def make_directories() -> "Directories":
     hostname = socket.gethostname()
     if hostname == "Navin.attlocal.net":
         return DevDirectories("tmp-working-dir")
+    if hostname == "JoyceNeComputer.attlocal.net":
+        return DevDirectories("tmp-working-dir")
     if hostname == "Marks-iMac.local":
         return ProductionDirectories("/Volumes/AKBAR/working-dir")
     raise Exception("unknown hostname: " + hostname)
