@@ -13,9 +13,13 @@ from pdart.xml.Templates import NodeBuilder
 def _get_start_stop_times_from_cards(
     fits_product_lidvid: str, card_dicts: List[Dict[str, Any]]
 ) -> Dict[str, str]:
-    date_obs = card_dicts[0]["DATE-OBS"]
-    time_obs = card_dicts[0]["TIME-OBS"]
-    exptime = float(card_dicts[0]["EXPTIME"])
+    try:
+        date_obs = card_dicts[0]["DATE-OBS"]
+        time_obs = card_dicts[0]["TIME-OBS"]
+        exptime = float(card_dicts[0]["EXPTIME"])
+    except KeyError as e:
+        # TODO Replace with LabelError
+        raise ValueError(f"{fits_product_lidvid}: {str(e)}") from e
 
     start_date_time = f"{date_obs}T{time_obs}Z"
     stop_date_time_float = julian.tai_from_iso(start_date_time) + exptime

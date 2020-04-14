@@ -73,11 +73,11 @@
           <hst:moving_target_flag>true</hst:moving_target_flag>
         </hst:Parameters_General>
         <hst:Parameters_ACS>
-          <hst:detector_id>sbc</hst:detector_id>
+          <hst:detector_id>@@@</hst:detector_id>
           <hst:gain_mode_id>n/a</hst:gain_mode_id>
-          <hst:observation_type>imaging</hst:observation_type>
-          <hst:repeat_exposure_count>0</hst:repeat_exposure_count>
-          <hst:subarray_flag>0</hst:subarray_flag>
+          <hst:observation_type>image</hst:observation_type>
+          <hst:repeat_exposure_count>1</hst:repeat_exposure_count>
+          <hst:subarray_flag>@@@</hst:subarray_flag>
         </hst:Parameters_ACS>
       </hst:HST>
     </Mission_Area>

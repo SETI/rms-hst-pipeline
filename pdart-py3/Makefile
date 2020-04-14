@@ -27,7 +27,7 @@ MYPY_FLAGS=--disallow-any-unimported \
 
 .PHONY: mypy
 mypy : venv
-	$(ACTIVATE) && MYPYPATH=stubs mypy $(MYPY_FLAGS) Pipeline.py pdart
+	$(ACTIVATE) && MYPYPATH=stubs mypy $(MYPY_FLAGS) *.py pdart
 
 ############################################################
 # TESTS
@@ -46,16 +46,16 @@ t: venv
 # THE PIPELINE
 ############################################################
 
-PROJ_IDS=15419 # 07240 09296
+PROJ_IDS=07240 09296 15419
 
-STEPS=download_docs check_downloads copy_primary_files record_changes	\
+STEPS=reset_pipeline download_docs check_downloads copy_primary_files record_changes	\
 insert_changes populate_database build_browse build_labels		\
 update_archive make_deliverable validate_bundle
 
 .PHONY: pipeline
 pipeline : venv
-	-rm -rf tmp-working-dir
-	mkdir tmp-working-dir
+	mkdir -p tmp-working-dir
+	-rm tmp-working-dir/*/LAST*.txt  # can't say dollar-sign
 	for project_id in $(PROJ_IDS); do \
 	    for step in $(STEPS); do \
 		echo $$project_id $$step; \

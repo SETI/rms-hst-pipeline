@@ -30,8 +30,8 @@ def _copy_docs_files(
             new_file_path = os.path.join(new_dir_path, file_basename)
             fs.copy.copy_file(documents_fs, file, primary_files_fs, new_file_path)
 
-    shutil.rmtree(documents_dir)
-    assert not os.path.isdir(documents_dir)
+    # shutil.rmtree(documents_dir)
+    # assert not os.path.isdir(documents_dir)
 
 
 def _copy_fits_files(
@@ -66,9 +66,9 @@ def _copy_fits_files(
             fs.copy.copy_file(mast_downloads_fs, filepath, primary_files_fs, new_path)
 
     assert os.path.isdir(primary_files_dir + "-sv"), primary_files_dir + "-sv"
-    # If I made it to here, it should be safe to delete the downloads
-    shutil.rmtree(mast_downloads_dir)
-    assert not os.path.isdir(mast_downloads_dir)
+    # # If I made it to here, it should be safe to delete the downloads
+    # shutil.rmtree(mast_downloads_dir)
+    # assert not os.path.isdir(mast_downloads_dir)
 
 
 def copy_primary_files(

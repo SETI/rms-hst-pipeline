@@ -39,6 +39,7 @@ def _populate_from_document_collection(
 ) -> None:
     db.create_document_collection(collection_lidvid, bundle_lidvid)
     product_lidvid = _extend_initial_lidvid(collection_lidvid, "phase2")
+    db.create_document_product(product_lidvid, collection_lidvid)
     for basename in sv_deltas.listdir(product_path):
         sys_filepath = sv_deltas.getsyspath(fs.path.join(product_path, basename))
         db.create_document_file(sys_filepath, basename, product_lidvid)
