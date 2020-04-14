@@ -11,6 +11,7 @@ from pdart.labels.DocumentProductLabelXml import (
     make_document_edition,
     make_label,
 )
+from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
@@ -36,23 +37,27 @@ def make_document_product_label(
     product_vid = lidvid_to_vid(document_product_lidvid)
     publication_date = publication_date or date.today().isoformat()
 
-    label = (
-        make_label(
-            {
-                "bundle_lidvid": bundle.lidvid,
-                "product_lid": product_lid,
-                "product_vid": product_vid,
-                "title": title,
-                "publication_date": publication_date,
-                "Citation_Information": make_doc_citation_information(info),
-                # TODO don't the arguments to make_document_edition() need to not
-                # be hard-coded?
-                "Document_Edition": make_document_edition(
-                    "0.0", [("phase2.txt", "7-Bit ASCII Text")]
-                ),
-            }
+    try:
+        label = (
+            make_label(
+                {
+                    "bundle_lidvid": bundle.lidvid,
+                    "product_lid": product_lid,
+                    "product_vid": product_vid,
+                    "title": title,
+                    "publication_date": publication_date,
+                    "Citation_Information": make_doc_citation_information(info),
+                    # TODO don't the arguments to make_document_edition() need to not
+                    # be hard-coded?
+                    "Document_Edition": make_document_edition(
+                        "0.0", [("phase2.txt", "7-Bit ASCII Text")]
+                    ),
+                }
+            )
+            .toxml()
+            .encode()
         )
-        .toxml()
-        .encode()
-    )
+    except Exception as e:
+        raise LabelError(str(e), document_product_lidvid)
+
     return pretty_and_verify(label, verify)

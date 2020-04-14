@@ -14,6 +14,7 @@ from pdart.labels.CollectionLabelXml import (
     make_label,
     make_non_document_collection_title,
 )
+from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
@@ -64,20 +65,23 @@ def make_collection_label(
 
     inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
 
-    label = (
-        make_label(
-            {
-                "collection_lid": collection_lid,
-                "collection_vid": collection_vid,
-                "record_count": record_count,
-                "title": title,
-                "proposal_id": str(proposal_id),
-                "Citation_Information": make_citation_information(info),
-                "inventory_name": inventory_name,
-            }
+    try:
+        label = (
+            make_label(
+                {
+                    "collection_lid": collection_lid,
+                    "collection_vid": collection_vid,
+                    "record_count": record_count,
+                    "title": title,
+                    "proposal_id": str(proposal_id),
+                    "Citation_Information": make_citation_information(info),
+                    "inventory_name": inventory_name,
+                }
+            )
+            .toxml()
+            .encode()
         )
-        .toxml()
-        .encode()
-    )
+    except Exception as e:
+        raise LabelError(str(e), collection_lidvid)
 
     return pretty_and_verify(label, verify)

@@ -46,7 +46,11 @@ t: venv
 # THE PIPELINE
 ############################################################
 
-PROJ_IDS=07240 09296 15419
+ACS_IDS=09296 10719 11109
+WFC3_IDS=11536 14491 15419
+WFPC2_IDS=07270 05783 06621
+
+PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
 
 STEPS=reset_pipeline download_docs check_downloads copy_primary_files record_changes	\
 insert_changes populate_database build_browse build_labels		\
