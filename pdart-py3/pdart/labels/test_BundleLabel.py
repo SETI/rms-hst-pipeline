@@ -15,6 +15,7 @@ class Test_BundleLabel(unittest.TestCase):
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
         self.db.create_bundle(_BUNDLE_LIDVID)
+        # TODO add a document collection to check reference_types
         self.db.create_non_document_collection(_COLLECTION_LIDVID, _BUNDLE_LIDVID)
 
         self.db.create_fits_product(_FITS_PRODUCT_LIDVID, _COLLECTION_LIDVID)

@@ -2,6 +2,7 @@
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
+from pdart.db.SqlAlchTables import Collection, DocumentCollection, NonDocumentCollection
 from pdart.labels.BundleLabelXml import make_bundle_entry_member, make_label
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
@@ -20,8 +21,21 @@ def make_bundle_label(
     """
     bundle = bundle_db.get_bundle()
     proposal_id = bundle.proposal_id
+
+    def get_ref_type(collection: Collection) -> str:
+        if isinstance(collection, DocumentCollection):
+            return "bundle_has_document_collection"
+        else:
+            assert isinstance(collection, NonDocumentCollection)
+            return "bundle_has_data_collection"
+
     reduced_collections = [
-        make_bundle_entry_member({"collection_lidvid": collection.lidvid})
+        make_bundle_entry_member(
+            {
+                "collection_lidvid": collection.lidvid,
+                "ref_type": get_ref_type(collection),
+            }
+        )
         for collection in bundle_db.get_bundle_collections(bundle.lidvid)
     ]
 

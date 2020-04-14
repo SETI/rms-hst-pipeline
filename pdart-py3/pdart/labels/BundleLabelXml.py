@@ -36,7 +36,7 @@ make_bundle_entry_member: NodeBuilderTemplate = interpret_template(
     """<Bundle_Member_Entry>
     <lidvid_reference><NODE name="collection_lidvid"/></lidvid_reference>
     <member_status>Primary</member_status>
-    <reference_type>bundle_has_data_collection</reference_type>
+    <reference_type><NODE name="ref_type"/></reference_type>
 </Bundle_Member_Entry>"""
 )
 """
