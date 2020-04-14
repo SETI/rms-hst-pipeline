@@ -5,6 +5,7 @@ from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import Collection, DocumentCollection, NonDocumentCollection
 from pdart.labels.BundleLabelXml import make_bundle_entry_member, make_label
 from pdart.labels.CitationInformation import make_citation_information
+from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import combine_nodes_into_fragment
@@ -39,21 +40,24 @@ def make_bundle_label(
         for collection in bundle_db.get_bundle_collections(bundle.lidvid)
     ]
 
-    label = (
-        make_label(
-            {
-                "bundle_lid": lidvid_to_lid(bundle.lidvid),
-                "bundle_vid": lidvid_to_vid(bundle.lidvid),
-                "proposal_id": str(proposal_id),
-                "Citation_Information": make_citation_information(info),
-                "Bundle_Member_Entries": combine_nodes_into_fragment(
-                    reduced_collections
-                ),
-            }
+    try:
+        label = (
+            make_label(
+                {
+                    "bundle_lid": lidvid_to_lid(bundle.lidvid),
+                    "bundle_vid": lidvid_to_vid(bundle.lidvid),
+                    "proposal_id": str(proposal_id),
+                    "Citation_Information": make_citation_information(info),
+                    "Bundle_Member_Entries": combine_nodes_into_fragment(
+                        reduced_collections
+                    ),
+                }
+            )
+            .toxml()
+            .encode()
         )
-        .toxml()
-        .encode()
-    )
+    except Exception as e:
+        raise LabelError(str(e), bundle.lidvid)
 
     assert label[:6] == b"<?xml ", "Not XML"
     return pretty_and_verify(label, verify)

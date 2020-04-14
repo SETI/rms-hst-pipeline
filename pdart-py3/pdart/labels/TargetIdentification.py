@@ -26,8 +26,4 @@ def get_target(lidvid: str, card_dictionaries: List[Dict[str, Any]]) -> NodeBuil
     Given the FITS header fields for a product, create a
     ``<Target_Identification />`` XML element using heuristics.
     """
-    try:
-        return target_identification(*(_get_target(card_dictionaries)))
-    except ValueError as e:
-        # TODO: replace with LabelError
-        raise ValueError(f"{lidvid}: {str(e)}") from e
+    return target_identification(*(_get_target(card_dictionaries)))

@@ -11,6 +11,7 @@ from pdart.labels.FitsProductLabelXml import (
     mk_Investigation_Area_name,
 )
 from pdart.labels.HstParameters import get_hst_parameters
+from pdart.labels.LabelError import LabelError
 from pdart.labels.ObservingSystem import observing_system
 from pdart.labels.TargetIdentification import get_target
 from pdart.labels.TimeCoordinates import get_time_coordinates
@@ -41,27 +42,32 @@ def make_fits_product_label(
     assert bundle.lidvid == bundle_lidvid
     proposal_id = bundle.proposal_id
 
-    label = (
-        make_label(
-            {
-                "lid": lidvid_to_lid(product_lidvid),
-                "vid": lidvid_to_vid(product_lidvid),
-                "proposal_id": str(proposal_id),
-                "suffix": suffix,
-                "file_name": file_basename,
-                "file_contents": get_file_contents(
-                    bundle_db, card_dicts, instrument, product_lidvid
-                ),
-                "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
-                "investigation_lidvid": mk_Investigation_Area_lidvid(proposal_id),
-                "Observing_System": observing_system(instrument),
-                "Time_Coordinates": get_time_coordinates(product_lidvid, card_dicts),
-                "Target_Identification": get_target(product_lidvid, card_dicts),
-                "HST": get_hst_parameters(card_dicts, shm_card_dicts, instrument),
-            }
+    try:
+        label = (
+            make_label(
+                {
+                    "lid": lidvid_to_lid(product_lidvid),
+                    "vid": lidvid_to_vid(product_lidvid),
+                    "proposal_id": str(proposal_id),
+                    "suffix": suffix,
+                    "file_name": file_basename,
+                    "file_contents": get_file_contents(
+                        bundle_db, card_dicts, instrument, product_lidvid
+                    ),
+                    "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
+                    "investigation_lidvid": mk_Investigation_Area_lidvid(proposal_id),
+                    "Observing_System": observing_system(instrument),
+                    "Time_Coordinates": get_time_coordinates(
+                        product_lidvid, card_dicts
+                    ),
+                    "Target_Identification": get_target(product_lidvid, card_dicts),
+                    "HST": get_hst_parameters(card_dicts, shm_card_dicts, instrument),
+                }
+            )
+            .toxml()
+            .encode()
         )
-        .toxml()
-        .encode()
-    )
+    except Exception as e:
+        raise LabelError(str(e), product_lidvid, file_basename)
 
     return pretty_and_verify(label, verify)
