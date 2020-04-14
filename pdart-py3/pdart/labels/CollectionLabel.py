@@ -43,6 +43,11 @@ def make_collection_label(
     its XML and Schematron schemas.  Raise an exception if either
     fails.
     """
+    # TODO this is sloppy; is there a better way?
+    products = bundle_db.get_collection_products(collection_lidvid)
+    record_count = len(products)
+    assert record_count > 0, f"{collection_lidvid} has no products"
+
     collection_lid = lidvid_to_lid(collection_lidvid)
     collection_vid = lidvid_to_vid(collection_lidvid)
     collection: Collection = bundle_db.get_collection(collection_lidvid)
@@ -64,6 +69,7 @@ def make_collection_label(
             {
                 "collection_lid": collection_lid,
                 "collection_vid": collection_vid,
+                "record_count": record_count,
                 "title": title,
                 "proposal_id": str(proposal_id),
                 "Citation_Information": make_citation_information(info),

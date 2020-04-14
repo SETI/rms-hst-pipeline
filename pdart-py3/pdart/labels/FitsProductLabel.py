@@ -56,7 +56,7 @@ def make_fits_product_label(
                 "investigation_lidvid": mk_Investigation_Area_lidvid(proposal_id),
                 "Observing_System": observing_system(instrument),
                 "Time_Coordinates": get_time_coordinates(product_lidvid, card_dicts),
-                "Target_Identification": get_target(card_dicts),
+                "Target_Identification": get_target(product_lidvid, card_dicts),
                 "HST": get_hst_parameters(card_dicts, shm_card_dicts, instrument),
             }
         )

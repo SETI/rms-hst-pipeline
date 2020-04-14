@@ -47,7 +47,7 @@ make_label: DocTemplate = interpret_document_template(
     <Inventory>
       <offset unit="byte">0</offset>
       <parsing_standard_id>PDS DSV 1</parsing_standard_id>
-      <records>1</records>
+      <records><NODE name="record_count"/></records>
       <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
       <field_delimiter>Comma</field_delimiter>
       <Record_Delimited>

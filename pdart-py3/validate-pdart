@@ -6,12 +6,17 @@ SCHEMATRONS="${XMLDIR}/PDS4_HST_1D00_1000.sch.xml, ${XMLDIR}/PDS4_DISP_1B00.sch.
 
 REPORT_NAME='../validation-report.txt'
 
+PWD=$(pwd)
+CONTEXT_PRODUCTS=${PWD}/context-products.json
+
+echo '****' CONTEXT_PRODUCTS = ${CONTEXT_PRODUCTS}
 cd $1
 
 # Note: the -D is in there until we have a tool to remove NaNs from
 # data.
 validate . -M checksum.manifest.txt -R pds4.bundle \
     -D \
+    --add-context ${CONTEXT_PRODUCTS} \
     -S ${SCHEMATRONS} -x ${SCHEMAS} \
     -r ${REPORT_NAME}
 

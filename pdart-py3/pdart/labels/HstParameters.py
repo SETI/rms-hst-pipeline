@@ -17,20 +17,28 @@ from pdart.xml.Templates import NodeBuilder
 
 _CARDS = List[Dict[str, Any]]
 
+_USING_PLACEHOLDER: bool = True
+
 
 def get_repeat_exposure_count() -> str:
     """
     Return a placeholder integer for the ``<repeat_exposure_count
     />`` XML element, noting the problem.
     """
-    return "0"
-    # TODO Ask Mark and implement this.
+    if _USING_PLACEHOLDER:
+        # TODO-PLACEHOLDER
+        return "1"
+    else:
+        assert False, "implement this"
 
 
 def get_subarray_flag(card_dicts: _CARDS, instrument: str) -> str:
     """
     Return text for the ``<subarray_flag />`` XML element.
     """
+    if _USING_PLACEHOLDER:
+        # TODO-PLACEHOLDER
+        return "@@@"
     assert instrument != "wfpc2", instrument
     return card_dicts[0]["SUBARRAY"].lower()
 
@@ -94,6 +102,9 @@ def get_detector_id(card_dicts: _CARDS, instrument: str) -> str:
     Return text for the ``<detector_id />`` XML element.
     """
 
+    if _USING_PLACEHOLDER:
+        # TODO-PLACEHOLDER
+        return "@@@"
     detector = card_dicts[0]["DETECTOR"]
     if instrument == "wfpc2":
         if detector == "1":
@@ -285,7 +296,11 @@ def get_observation_type(card_dicts: _CARDS, instrument: str) -> str:
     Return text for the ``<observation_type />`` XML element.
     """
     assert instrument != "wfpc2"
-    return card_dicts[0]["OBSTYPE"].lower()
+    raw_value = card_dicts[0]["OBSTYPE"].lower()
+    if raw_value == "imaging":
+        return "image"
+    else:
+        return raw_value
 
 
 ##############################

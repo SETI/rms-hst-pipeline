@@ -1,0 +1,19 @@
+{
+  "Product_Context": [
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.wfc3::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_15419::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:europa.satellite::1.0"
+    }
+  ]
+}

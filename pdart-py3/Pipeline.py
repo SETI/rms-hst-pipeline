@@ -13,6 +13,7 @@ from pdart.pipeline.InsertChanges import insert_changes
 from pdart.pipeline.MakeDeliverable import make_deliverable
 from pdart.pipeline.PopulateDatabase import populate_database
 from pdart.pipeline.RecordChanges import record_changes
+from pdart.pipeline.ResetPipeline import reset_pipeline
 from pdart.pipeline.UpdateArchive import update_archive
 from pdart.pipeline.ValidateBundle import validate_bundle
 
@@ -22,6 +23,14 @@ def dispatch(dirs: Directories, proposal_id: int, command: str) -> None:
 
     # Here's a list of all the commands available.
     command_dict: Dict[str, Callable[[], None]] = {
+        # Clear everything except for the cached downloads
+        "reset_pipeline": (
+            lambda: reset_pipeline(
+                dirs.working_dir(proposal_id),
+                dirs.documents_dir(proposal_id),
+                dirs.mast_downloads_dir(proposal_id),
+            )
+        ),
         # Download document files.
         "download_docs": (
             lambda: download_docs(dirs.documents_dir(proposal_id), proposal_id)

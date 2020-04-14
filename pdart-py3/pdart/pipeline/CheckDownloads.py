@@ -4,9 +4,7 @@ import os.path
 from pdart.astroquery.Astroquery import MastSlice
 
 
-def check_downloads(
-    working_dir: str, mast_downloads_dir: str, proposal_id: int
-) -> None:
+def do_downloads(working_dir: str, mast_downloads_dir: str, proposal_id: int) -> None:
     # first pass, <working_dir> shouldn't exist; second pass
     # <working_dir>/mastDownload should not exist.
     assert not os.path.isdir(mast_downloads_dir)
@@ -21,8 +19,15 @@ def check_downloads(
         os.makedirs(working_dir)
 
     # TODO I should also download the documents here.
-
     product_set.download(working_dir)
+
     # TODO This might fail if there are no files.  Which might not be
     # a bad thing.
     assert os.path.isdir(mast_downloads_dir)
+
+
+def check_downloads(
+    working_dir: str, mast_downloads_dir: str, proposal_id: int
+) -> None:
+    if not os.path.isdir(mast_downloads_dir):
+        do_downloads(working_dir, mast_downloads_dir, proposal_id)
