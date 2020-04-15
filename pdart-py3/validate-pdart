@@ -8,9 +8,9 @@ REPORT_NAME='../validation-report.txt'
 
 # Locate the context-products file.
 PWD=$(pwd)
-CONTEXT_PRODUCTS=${PWD}/context-products.json
+CONTEXT_PRODUCTS="${PWD}"/context-products.json
 
-cd $1
+cd "$1" || exit
 
 # NOTE: the -D is temporary until we have a tool to remove NaNs from
 # data.
@@ -20,9 +20,9 @@ cd $1
 
 validate . -M checksum.manifest.txt -R pds4.bundle \
     -D \
-    --add-context ${CONTEXT_PRODUCTS} \
-    -S ${SCHEMATRONS} -x ${SCHEMAS} \
-    -r ${REPORT_NAME}
+    --add-context "${CONTEXT_PRODUCTS}" \
+    -S "${SCHEMATRONS}" -x "${SCHEMAS}" \
+    -r "${REPORT_NAME}"
 
 # 'validate' returns a success error code even if the validation
 # fails, so we have to kludge around that.
