@@ -27,11 +27,12 @@ def _fix_up_deliverable(dir: str) -> None:
 
 class MakeDeliverable(Stage):
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
-        deliverable_dir: str = self.dirs.deliverable_dir(self.proposal_id)
+        working_dir: str = self.working_dir()
+        archive_dir: str = self.archive_dir()
+        deliverable_dir: str = self.deliverable_dir()
+
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self.bundle_segment
+            archive_osfs, self._bundle_segment
         ) as version_view:
             # Hack-ish: just trying to get everything into place
             os.mkdir(deliverable_dir)
@@ -61,7 +62,7 @@ class MakeDeliverable(Stage):
             # Tar it up.
             TAR_NEEDED: bool = False
             if TAR_NEEDED:
-                bundle_dir = str(fs.path.join(deliverable_dir, self.bundle_segment))
+                bundle_dir = str(fs.path.join(deliverable_dir, self._bundle_segment))
 
                 with tarfile.open(f"{bundle_dir}.tar", "w") as tar:
                     tar.add(bundle_dir, arcname=os.path.basename(bundle_dir))

@@ -6,9 +6,9 @@ from pdart.pipeline.Stage import Stage
 
 class ResetPipeline(Stage):
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        documents_dir: str = self.dirs.documents_dir(self.proposal_id)
-        mast_downloads_dir: str = self.dirs.mast_downloads_dir(self.proposal_id)
+        working_dir: str = self.working_dir()
+        documents_dir: str = self.documents_dir()
+        mast_downloads_dir: str = self.mast_downloads_dir()
 
         if not os.path.isdir(working_dir):
             return

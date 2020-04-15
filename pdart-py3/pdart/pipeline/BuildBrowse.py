@@ -120,25 +120,22 @@ def _build_browse_collection(
 
 class BuildBrowse(Stage):
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
-        archive_primary_deltas_dir: str = self.dirs.archive_primary_deltas_dir(
-            self.proposal_id
-        )
-        archive_browse_deltas_dir: str = self.dirs.archive_browse_deltas_dir(
-            self.proposal_id
-        )
+        working_dir: str = self.working_dir()
+        archive_dir: str = self.archive_dir()
+        archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
+        archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
+
         db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
         db = create_bundle_db_from_os_filepath(db_filepath)
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self.bundle_segment
+            archive_osfs, self._bundle_segment
         ) as version_view, make_sv_deltas(
             version_view, archive_primary_deltas_dir
         ) as sv_deltas, make_sv_deltas(
             sv_deltas, archive_browse_deltas_dir
         ) as browse_deltas:
-            bundle_path = f"/{self.bundle_segment}$/"
+            bundle_path = f"/{self._bundle_segment}$/"
             collection_segments = [
                 str(coll[:-1])
                 for coll in browse_deltas.listdir(bundle_path)
@@ -154,7 +151,7 @@ class BuildBrowse(Stage):
                     _build_browse_collection(
                         db,
                         browse_deltas,
-                        self.bundle_segment,
+                        self._bundle_segment,
                         collection_segment,
                         bundle_path,
                     )

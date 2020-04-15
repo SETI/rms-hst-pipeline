@@ -30,16 +30,14 @@ def read_changes_dict(changes_path: str) -> Dict[LIDVID, str]:
 
 class InsertChanges(Stage):
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        primary_files_dir: str = self.dirs.primary_files_dir(self.proposal_id)
-        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
-        archive_primary_deltas_dir: str = self.dirs.archive_primary_deltas_dir(
-            self.proposal_id
-        )
+        working_dir: str = self.working_dir()
+        primary_files_dir: str = self.primary_files_dir()
+        archive_dir: str = self.archive_dir()
+        archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
 
         changes_path = os.path.join(working_dir, CHANGES_DICT)
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self.bundle_segment
+            archive_osfs, self._bundle_segment
         ) as version_view, make_sv_osfs(
             primary_files_dir
         ) as primary_files_osfs, make_sv_deltas(

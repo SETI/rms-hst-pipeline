@@ -23,9 +23,6 @@ class Directories(object, metaclass=abc.ABCMeta):
     def mast_downloads_dir(self, proposal_id: int) -> str:
         return os.path.join(self.working_dir(proposal_id), "mastDownload")
 
-    def next_version_deltas_dir(self, proposal_id: int) -> str:
-        return os.path.join(self.working_dir(proposal_id), "next-version")
-
     def primary_files_dir(self, proposal_id: int) -> str:
         return os.path.join(self.working_dir(proposal_id), "primary-files")
 

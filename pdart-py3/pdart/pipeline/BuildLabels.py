@@ -42,7 +42,7 @@ _VERIFY = True
 
 
 def _create_citation_info(
-    sv_deltas: COWFS, document_dir: str, document_files: Set[str], proposal_id: int
+    sv_deltas: COWFS, document_dir: str, document_files: Set[str]
 ) -> Citation_Information:
     # We sort only to make '.apt' appear before '.pro' since the
     # algorithm for '.apt' is more reliable.
@@ -197,20 +197,14 @@ def create_pds4_labels(
 
 class BuildLabels(Stage):
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
-        archive_primary_deltas_dir: str = self.dirs.archive_primary_deltas_dir(
-            self.proposal_id
-        )
-        archive_browse_deltas_dir: str = self.dirs.archive_browse_deltas_dir(
-            self.proposal_id
-        )
-        archive_label_deltas_dir: str = self.dirs.archive_label_deltas_dir(
-            self.proposal_id
-        )
+        working_dir: str = self.working_dir()
+        archive_dir: str = self.archive_dir()
+        archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
+        archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
+        archive_label_deltas_dir: str = self.archive_label_deltas_dir()
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self.bundle_segment
+            archive_osfs, self._bundle_segment
         ) as version_view, make_sv_deltas(
             version_view, archive_primary_deltas_dir
         ) as sv_deltas, make_sv_deltas(
@@ -224,13 +218,11 @@ class BuildLabels(Stage):
             db = create_bundle_db_from_os_filepath(db_filepath)
 
             # create labels
-            bundle_lid = LID.create_from_parts([self.bundle_segment])
+            bundle_lid = LID.create_from_parts([self._bundle_segment])
             bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, VID("1.0"))
-            documents_dir = f"/{self.bundle_segment}$/document$/phase2$"
+            documents_dir = f"/{self._bundle_segment}$/document$/phase2$"
             docs = set(sv_deltas.listdir(documents_dir))
 
-            info = _create_citation_info(
-                sv_deltas, documents_dir, docs, self.proposal_id
-            )
+            info = _create_citation_info(sv_deltas, documents_dir, docs)
 
             create_pds4_labels(db, label_deltas, info)

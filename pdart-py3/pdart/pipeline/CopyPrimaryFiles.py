@@ -74,14 +74,14 @@ class CopyPrimaryFiles(Stage):
         # assert not os.path.isdir(mast_downloads_dir)
 
     def _run(self) -> None:
-        documents_dir: str = self.dirs.documents_dir(self.proposal_id)
-        mast_downloads_dir: str = self.dirs.mast_downloads_dir(self.proposal_id)
-        primary_files_dir: str = self.dirs.primary_files_dir(self.proposal_id)
+        documents_dir: str = self.documents_dir()
+        mast_downloads_dir: str = self.mast_downloads_dir()
+        primary_files_dir: str = self.primary_files_dir()
 
-        assert self.bundle_segment.startswith("hst_")
-        assert self.bundle_segment[-5:].isdigit()
+        assert self._bundle_segment.startswith("hst_")
+        assert self._bundle_segment[-5:].isdigit()
 
-        self._copy_docs_files(self.bundle_segment, documents_dir, primary_files_dir)
+        self._copy_docs_files(self._bundle_segment, documents_dir, primary_files_dir)
         self._copy_fits_files(
-            self.bundle_segment, mast_downloads_dir, primary_files_dir
+            self._bundle_segment, mast_downloads_dir, primary_files_dir
         )

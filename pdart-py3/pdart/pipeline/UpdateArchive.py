@@ -10,20 +10,14 @@ from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
 class UpdateArchive(Stage):
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
-        archive_primary_deltas_dir: str = self.dirs.archive_primary_deltas_dir(
-            self.proposal_id
-        )
-        archive_browse_deltas_dir: str = self.dirs.archive_browse_deltas_dir(
-            self.proposal_id
-        )
-        archive_label_deltas_dir: str = self.dirs.archive_label_deltas_dir(
-            self.proposal_id
-        )
+        working_dir: str = self.working_dir()
+        archive_dir: str = self.archive_dir()
+        archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
+        archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
+        archive_label_deltas_dir: str = self.archive_label_deltas_dir()
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self.bundle_segment
+            archive_osfs, self._bundle_segment
         ) as version_view, make_sv_deltas(
             version_view, archive_primary_deltas_dir
         ) as sv_deltas, make_sv_deltas(

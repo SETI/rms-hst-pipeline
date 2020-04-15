@@ -76,11 +76,9 @@ def _populate_from_non_document_collection(
 
 class PopulateDatabase(Stage):
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
-        archive_primary_deltas_dir: str = self.dirs.archive_primary_deltas_dir(
-            self.proposal_id
-        )
+        working_dir: str = self.working_dir()
+        archive_dir: str = self.archive_dir()
+        archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
 
         db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
         if os.path.isfile(db_filepath):
@@ -89,16 +87,16 @@ class PopulateDatabase(Stage):
             db = create_bundle_db_from_os_filepath(db_filepath)
             db.create_tables()
             bundle_lidvid = _create_initial_lidvid_from_parts(
-                [str(self.bundle_segment)]
+                [str(self._bundle_segment)]
             )
             db.create_bundle(bundle_lidvid)
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self.bundle_segment
+            archive_osfs, self._bundle_segment
         ) as version_view, make_sv_deltas(
             version_view, archive_primary_deltas_dir
         ) as sv_deltas:
-            bundle_path = f"/{self.bundle_segment}$/"
+            bundle_path = f"/{self._bundle_segment}$/"
             collection_segments = [
                 str(coll[:-1]) for coll in sv_deltas.listdir(bundle_path) if "$" in coll
             ]

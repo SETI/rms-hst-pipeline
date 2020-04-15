@@ -30,8 +30,8 @@ class CheckDownloads(Stage):
         assert os.path.isdir(mast_downloads_dir)
 
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        mast_downloads_dir: str = self.dirs.mast_downloads_dir(self.proposal_id)
+        working_dir: str = self.working_dir()
+        mast_downloads_dir: str = self.mast_downloads_dir()
 
         if not os.path.isdir(mast_downloads_dir):
-            self._do_downloads(working_dir, mast_downloads_dir, self.proposal_id)
+            self._do_downloads(working_dir, mast_downloads_dir, self._proposal_id)

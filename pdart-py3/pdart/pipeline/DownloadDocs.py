@@ -12,6 +12,6 @@ class DownloadDocs(Stage):
         download_product_documents(proposal_id, documents_dir)
 
     def _run(self) -> None:
-        documents_dir: str = self.dirs.documents_dir(self.proposal_id)
+        documents_dir: str = self.documents_dir()
         if not os.path.isdir(documents_dir):
-            self._do_download_docs(documents_dir, self.proposal_id)
+            self._do_download_docs(documents_dir, self._proposal_id)

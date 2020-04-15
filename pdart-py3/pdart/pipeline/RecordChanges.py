@@ -22,9 +22,9 @@ def dir_to_lid(dir: str) -> LID:
 
 class RecordChanges(Stage):
     def _run(self) -> None:
-        working_dir: str = self.dirs.working_dir(self.proposal_id)
-        primary_files_dir: str = self.dirs.primary_files_dir(self.proposal_id)
-        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
+        working_dir: str = self.working_dir()
+        primary_files_dir: str = self.primary_files_dir()
+        archive_dir: str = self.archive_dir()
 
         assert os.path.isdir(working_dir), working_dir
         assert os.path.isdir(primary_files_dir + "-sv"), primary_files_dir
@@ -34,7 +34,7 @@ class RecordChanges(Stage):
         if os.path.isdir(archive_dir):
             # TODO
             with make_mv_osfs(archive_dir) as archive_osfs, make_version_view(
-                archive_osfs, self.bundle_segment
+                archive_osfs, self._bundle_segment
             ) as latest_version:
                 assert (
                     False
