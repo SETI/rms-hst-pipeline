@@ -35,6 +35,7 @@ from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
+from pdart.pipeline.Stage import Stage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
 _VERIFY = True
@@ -194,35 +195,42 @@ def create_pds4_labels(
     _CreateLabelsWalk(bundle_db).walk()
 
 
-def build_labels(
-    proposal_id: int,
-    bundle_segment: str,
-    working_dir: str,
-    archive_dir: str,
-    archive_primary_deltas_dir: str,
-    archive_browse_deltas_dir: str,
-    archive_label_deltas_dir: str,
-) -> None:
-    with make_osfs(archive_dir) as archive_osfs, make_version_view(
-        archive_osfs, bundle_segment
-    ) as version_view, make_sv_deltas(
-        version_view, archive_primary_deltas_dir
-    ) as sv_deltas, make_sv_deltas(
-        sv_deltas, archive_browse_deltas_dir
-    ) as browse_deltas, make_sv_deltas(
-        browse_deltas, archive_label_deltas_dir
-    ) as label_deltas:
+class BuildLabels(Stage):
+    def _run(self) -> None:
+        working_dir: str = self.dirs.working_dir(self.proposal_id)
+        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
+        archive_primary_deltas_dir: str = self.dirs.archive_primary_deltas_dir(
+            self.proposal_id
+        )
+        archive_browse_deltas_dir: str = self.dirs.archive_browse_deltas_dir(
+            self.proposal_id
+        )
+        archive_label_deltas_dir: str = self.dirs.archive_label_deltas_dir(
+            self.proposal_id
+        )
 
-        # open the database
-        db_filepath = fs.path.join(working_dir, _BUNDLE_DB_NAME)
-        db = create_bundle_db_from_os_filepath(db_filepath)
+        with make_osfs(archive_dir) as archive_osfs, make_version_view(
+            archive_osfs, self.bundle_segment
+        ) as version_view, make_sv_deltas(
+            version_view, archive_primary_deltas_dir
+        ) as sv_deltas, make_sv_deltas(
+            sv_deltas, archive_browse_deltas_dir
+        ) as browse_deltas, make_sv_deltas(
+            browse_deltas, archive_label_deltas_dir
+        ) as label_deltas:
 
-        # create labels
-        bundle_lid = LID.create_from_parts([bundle_segment])
-        bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, VID("1.0"))
-        documents_dir = f"/{bundle_segment}$/document$/phase2$"
-        docs = set(sv_deltas.listdir(documents_dir))
+            # open the database
+            db_filepath = fs.path.join(working_dir, _BUNDLE_DB_NAME)
+            db = create_bundle_db_from_os_filepath(db_filepath)
 
-        info = _create_citation_info(sv_deltas, documents_dir, docs, proposal_id)
+            # create labels
+            bundle_lid = LID.create_from_parts([self.bundle_segment])
+            bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, VID("1.0"))
+            documents_dir = f"/{self.bundle_segment}$/document$/phase2$"
+            docs = set(sv_deltas.listdir(documents_dir))
 
-        create_pds4_labels(db, label_deltas, info)
+            info = _create_citation_info(
+                sv_deltas, documents_dir, docs, self.proposal_id
+            )
+
+            create_pds4_labels(db, label_deltas, info)

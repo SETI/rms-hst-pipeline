@@ -7,6 +7,7 @@ import fs.copy
 
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.RecordChanges import CHANGES_DICT
+from pdart.pipeline.Stage import Stage
 from pdart.pipeline.Utils import (
     make_osfs,
     make_sv_deltas,
@@ -27,37 +28,39 @@ def read_changes_dict(changes_path: str) -> Dict[LIDVID, str]:
     return changes_dict
 
 
-def insert_changes(
-    bundle_segment: str,
-    working_dir: str,
-    primary_files_dir: str,
-    archive_dir: str,
-    archive_primary_deltas_dir: str,
-) -> None:
-    changes_path = os.path.join(working_dir, CHANGES_DICT)
-    with make_osfs(archive_dir) as archive_osfs, make_version_view(
-        archive_osfs, bundle_segment
-    ) as version_view, make_sv_osfs(
-        primary_files_dir
-    ) as primary_files_osfs, make_sv_deltas(
-        version_view, archive_primary_deltas_dir
-    ) as sv_deltas:
+class InsertChanges(Stage):
+    def _run(self) -> None:
+        working_dir: str = self.dirs.working_dir(self.proposal_id)
+        primary_files_dir: str = self.dirs.primary_files_dir(self.proposal_id)
+        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
+        archive_primary_deltas_dir: str = self.dirs.archive_primary_deltas_dir(
+            self.proposal_id
+        )
 
-        archive_dirs = list(archive_osfs.walk.dirs())
-        if archive_dirs:
-            changes_dict = read_changes_dict(changes_path)
-            # TODO write a merge algorithm
-            assert False, "need an algorithm to merge changes into archive"
-        else:
-            # the archive is empty and we can just copy into it
-            for dirpath in primary_files_osfs.walk.dirs():
-                sv_deltas.makedirs(dirpath)
-            for filepath in primary_files_osfs.walk.files():
-                fs.copy.copy_file(primary_files_osfs, filepath, sv_deltas, filepath)
+        changes_path = os.path.join(working_dir, CHANGES_DICT)
+        with make_osfs(archive_dir) as archive_osfs, make_version_view(
+            archive_osfs, self.bundle_segment
+        ) as version_view, make_sv_osfs(
+            primary_files_dir
+        ) as primary_files_osfs, make_sv_deltas(
+            version_view, archive_primary_deltas_dir
+        ) as sv_deltas:
 
-    shutil.rmtree(primary_files_dir + "-sv")
+            archive_dirs = list(archive_osfs.walk.dirs())
+            if archive_dirs:
+                changes_dict = read_changes_dict(changes_path)
+                # TODO write a merge algorithm
+                assert False, "need an algorithm to merge changes into archive"
+            else:
+                # the archive is empty and we can just copy into it
+                for dirpath in primary_files_osfs.walk.dirs():
+                    sv_deltas.makedirs(dirpath)
+                for filepath in primary_files_osfs.walk.files():
+                    fs.copy.copy_file(primary_files_osfs, filepath, sv_deltas, filepath)
 
-    assert os.path.isdir(archive_dir), archive_dir
-    dirpath = archive_primary_deltas_dir + "-deltas-sv"
-    assert os.path.isdir(dirpath), dirpath
-    assert os.path.isfile(changes_path)
+        shutil.rmtree(primary_files_dir + "-sv")
+
+        assert os.path.isdir(archive_dir), archive_dir
+        dirpath = archive_primary_deltas_dir + "-deltas-sv"
+        assert os.path.isdir(dirpath), dirpath
+        assert os.path.isfile(changes_path)

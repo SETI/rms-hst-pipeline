@@ -15,9 +15,17 @@ from pdart.fs.cowfs.COWFS import COWFS
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
+from pdart.pipeline.Stage import Stage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
 _INITIAL_VID: VID = VID("1.0")
+
+_NON_IMAGE_SUFFIXES: Set[str] = {"ASN", "SHM"}
+
+
+_BROWSE_SUFFIXES: List[str] = [
+    suffix for suffix in ACCEPTED_SUFFIXES if suffix not in _NON_IMAGE_SUFFIXES
+]
 
 
 def _create_initial_lidvid_from_parts(parts: List[str]) -> str:
@@ -110,38 +118,43 @@ def _build_browse_collection(
             )
 
 
-_NON_IMAGE_SUFFIXES: Set[str] = {"ASN", "SHM"}
+class BuildBrowse(Stage):
+    def _run(self) -> None:
+        working_dir: str = self.dirs.working_dir(self.proposal_id)
+        archive_dir: str = self.dirs.archive_dir(self.proposal_id)
+        archive_primary_deltas_dir: str = self.dirs.archive_primary_deltas_dir(
+            self.proposal_id
+        )
+        archive_browse_deltas_dir: str = self.dirs.archive_browse_deltas_dir(
+            self.proposal_id
+        )
+        db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
+        db = create_bundle_db_from_os_filepath(db_filepath)
 
-
-_BROWSE_SUFFIXES: List[str] = [
-    suffix for suffix in ACCEPTED_SUFFIXES if suffix not in _NON_IMAGE_SUFFIXES
-]
-
-
-def build_browse(
-    bundle_segment: str,
-    working_dir: str,
-    archive_dir: str,
-    archive_primary_deltas_dir: str,
-    archive_browse_deltas_dir: str,
-) -> None:
-    db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
-    db = create_bundle_db_from_os_filepath(db_filepath)
-
-    with make_osfs(archive_dir) as archive_osfs, make_version_view(
-        archive_osfs, bundle_segment
-    ) as version_view, make_sv_deltas(
-        version_view, archive_primary_deltas_dir
-    ) as sv_deltas, make_sv_deltas(
-        sv_deltas, archive_browse_deltas_dir
-    ) as browse_deltas:
-        bundle_path = f"/{bundle_segment}$/"
-        collection_segments = [
-            str(coll[:-1]) for coll in browse_deltas.listdir(bundle_path) if "$" in coll
-        ]
-        for collection_segment in collection_segments:
-            parts = collection_segment.upper().split("_")
-            if len(parts) == 3 and parts[0] == "data" and parts[2] in _BROWSE_SUFFIXES:
-                _build_browse_collection(
-                    db, browse_deltas, bundle_segment, collection_segment, bundle_path
-                )
+        with make_osfs(archive_dir) as archive_osfs, make_version_view(
+            archive_osfs, self.bundle_segment
+        ) as version_view, make_sv_deltas(
+            version_view, archive_primary_deltas_dir
+        ) as sv_deltas, make_sv_deltas(
+            sv_deltas, archive_browse_deltas_dir
+        ) as browse_deltas:
+            bundle_path = f"/{self.bundle_segment}$/"
+            collection_segments = [
+                str(coll[:-1])
+                for coll in browse_deltas.listdir(bundle_path)
+                if "$" in coll
+            ]
+            for collection_segment in collection_segments:
+                parts = collection_segment.upper().split("_")
+                if (
+                    len(parts) == 3
+                    and parts[0] == "data"
+                    and parts[2] in _BROWSE_SUFFIXES
+                ):
+                    _build_browse_collection(
+                        db,
+                        browse_deltas,
+                        self.bundle_segment,
+                        collection_segment,
+                        bundle_path,
+                    )
