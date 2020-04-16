@@ -1,6 +1,9 @@
 #!/bin/bash
 
+echo "**** validate-pdart $@"
+
 XMLDIR=${HOME}/pdart/pdart-py3/xml
+
 SCHEMAS="${XMLDIR}/PDS4_HST_1D00_1000.xsd.xml, ${XMLDIR}/PDS4_DISP_1B00.xsd.xml"
 SCHEMATRONS="${XMLDIR}/PDS4_HST_1D00_1000.sch.xml, ${XMLDIR}/PDS4_DISP_1B00.sch.xml"
 
@@ -21,7 +24,7 @@ cd "$1" || exit
 validate . -M checksum.manifest.txt -R pds4.bundle \
     -D \
     --add-context "${CONTEXT_PRODUCTS}" \
-    -S "${SCHEMATRONS}" -x "${SCHEMAS}" \
+    -S ${SCHEMATRONS} -x ${SCHEMAS} \
     -r "${REPORT_NAME}"
 
 # 'validate' returns a success error code even if the validation
