@@ -16,7 +16,7 @@ from pdart.db.SqlAlchTables import (
     DocumentCollection,
     DocumentProduct,
     FitsFile,
-    NonDocumentCollection,
+    OtherCollection,
 )
 from pdart.fs.cowfs.COWFS import COWFS
 from pdart.labels.BrowseProductLabel import make_browse_product_label
@@ -125,7 +125,7 @@ def create_pds4_labels(
                 self._post_visit_collection(document_collection)
 
         def visit_non_document_collection(
-            self, non_document_collection: NonDocumentCollection, post: bool
+            self, non_document_collection: OtherCollection, post: bool
         ) -> None:
             if post:
                 self._post_visit_collection(non_document_collection)

@@ -6,7 +6,7 @@ from typing import cast
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import Collection, DocumentCollection, NonDocumentCollection
+from pdart.db.SqlAlchTables import Collection, DocumentCollection, OtherCollection
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.CollectionInventory import get_collection_inventory_name
 from pdart.labels.CollectionLabelXml import (
@@ -28,7 +28,7 @@ def get_collection_label_name(bundle_db: BundleDB, collection_lidvid: str) -> st
         # Document collections won't have prefixes.
         return "collection.xml"
     else:
-        prefix = cast(NonDocumentCollection, collection).prefix
+        prefix = cast(OtherCollection, collection).prefix
         return f"collection_{prefix}.xml"
 
 
@@ -58,7 +58,7 @@ def make_collection_label(
     if is_doc_coll:
         title = make_document_collection_title({"proposal_id": str(proposal_id)})
     else:
-        non_document_collection = cast(NonDocumentCollection, collection)
+        non_document_collection = cast(OtherCollection, collection)
         title = make_non_document_collection_title(
             {"suffix": non_document_collection.suffix, "proposal_id": str(proposal_id)}
         )

@@ -9,7 +9,7 @@ from pdart.db.SqlAlchTables import (
     BrowseProduct,
     Collection,
     File,
-    NonDocumentCollection,
+    OtherCollection,
     Product,
 )
 from pdart.labels.BrowseProductLabelXml import make_label
@@ -43,8 +43,8 @@ def make_browse_product_label(
     browse_collection_lidvid = browse_product.collection_lidvid
     collection: Collection = bundle_db.get_collection(browse_collection_lidvid)
 
-    assert isinstance(collection, NonDocumentCollection)
-    browse_collection: NonDocumentCollection = collection
+    assert isinstance(collection, OtherCollection)
+    browse_collection: OtherCollection = collection
 
     bundle = bundle_db.get_bundle()
 

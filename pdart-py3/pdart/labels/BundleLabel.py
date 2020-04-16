@@ -2,7 +2,7 @@
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import Collection, DocumentCollection, NonDocumentCollection
+from pdart.db.SqlAlchTables import Collection, DocumentCollection, OtherCollection
 from pdart.labels.BundleLabelXml import make_bundle_entry_member, make_label
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.LabelError import LabelError
@@ -27,7 +27,7 @@ def make_bundle_label(
         if isinstance(collection, DocumentCollection):
             return "bundle_has_document_collection"
         else:
-            assert isinstance(collection, NonDocumentCollection)
+            assert isinstance(collection, OtherCollection)
             return "bundle_has_data_collection"
 
     reduced_collections = [

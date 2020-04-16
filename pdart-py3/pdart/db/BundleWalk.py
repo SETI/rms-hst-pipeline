@@ -11,7 +11,7 @@ from pdart.db.SqlAlchTables import (
     DocumentProduct,
     FitsFile,
     FitsProduct,
-    NonDocumentCollection,
+    OtherCollection,
 )
 
 
@@ -58,9 +58,7 @@ class BundleWalk(object):
             if self.db.document_collection_exists(collection_lidvid):
                 self._walk_document_collection(cast(DocumentCollection, collection))
             elif self.db.non_document_collection_exists(collection_lidvid):
-                self._walk_non_document_collection(
-                    cast(NonDocumentCollection, collection)
-                )
+                self._walk_non_document_collection(cast(OtherCollection, collection))
             else:
                 assert False, f"Missing collection case: {collection_lidvid}"
 
@@ -78,7 +76,7 @@ class BundleWalk(object):
         self.visit_document_collection(document_collection, True)
 
     def _walk_non_document_collection(
-        self, non_document_collection: NonDocumentCollection
+        self, non_document_collection: OtherCollection
     ) -> None:
         self.visit_non_document_collection(non_document_collection, False)
 
@@ -140,7 +138,7 @@ class BundleWalk(object):
         pass
 
     def visit_non_document_collection(
-        self, non_document_collection: NonDocumentCollection, post: bool
+        self, non_document_collection: OtherCollection, post: bool
     ) -> None:
         pass
 

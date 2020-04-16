@@ -51,8 +51,8 @@ class DocumentCollection(Collection):
         return f"DocumentCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
 
 
-class NonDocumentCollection(Collection):
-    __tablename__ = "non_document_collections"
+class OtherCollection(Collection):
+    __tablename__ = "other_collections"
 
     collection_lidvid = Column(
         String, ForeignKey("collections.lidvid"), primary_key=True, nullable=False
@@ -63,12 +63,12 @@ class NonDocumentCollection(Collection):
     suffix = Column(String(8), nullable=False)
 
     __mapper_args__ = {
-        "polymorphic_identity": "non_document_collection",
+        "polymorphic_identity": "other_collection",
     }
 
     def __repr__(self) -> str:
         return (
-            f"NonDocumentCollection(lidvid={self.lidvid!r}, "
+            f"OtherCollection(lidvid={self.lidvid!r}, "
             f"bundle_lidvid={self.bundle_lidvid!r}, "
             f"instrument={self.instrument!r}, "
             f"prefix={self.prefix!r}, suffix={self.suffix!r})"

@@ -4,7 +4,7 @@ import unittest
 from typing import Set, cast
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.db.SqlAlchTables import Base, Bundle, NonDocumentCollection
+from pdart.db.SqlAlchTables import Base, Bundle, OtherCollection
 from pdart.db.Utils import file_md5
 from pdart.pds4.LIDVID import LIDVID
 
@@ -12,7 +12,7 @@ _TABLES: Set[str] = {
     "bundles",
     "collections",
     "document_collections",
-    "non_document_collections",
+    "other_collections",
     "products",
     "browse_products",
     "document_products",
@@ -183,8 +183,8 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
 
         collection = self.db.get_collection(collection_lidvid)
-        self.assertTrue(isinstance(collection, NonDocumentCollection))
-        nd_collection = cast(NonDocumentCollection, collection)
+        self.assertTrue(isinstance(collection, OtherCollection))
+        nd_collection = cast(OtherCollection, collection)
         self.assertEqual("acs", nd_collection.instrument)
         self.assertEqual("raw", nd_collection.suffix)
 

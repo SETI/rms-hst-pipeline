@@ -22,7 +22,7 @@ from pdart.db.SqlAlchTables import (
     FitsFile,
     FitsProduct,
     Hdu,
-    NonDocumentCollection,
+    OtherCollection,
     Product,
     ProductLabel,
     ProposalInfo,
@@ -185,7 +185,7 @@ class BundleDB(object):
             prefix = _lidvid_to_prefix(collection_lidvid)
             suffix = _lidvid_to_suffix(collection_lidvid)
             self.session.add(
-                NonDocumentCollection(
+                OtherCollection(
                     lidvid=collection_lidvid,
                     collection_lidvid=collection_lidvid,
                     bundle_lidvid=bundle_lidvid,
@@ -220,7 +220,7 @@ class BundleDB(object):
         LIDVID exists in the database.
         """
         return self.session.query(
-            exists().where(NonDocumentCollection.collection_lidvid == collection_lidvid)
+            exists().where(OtherCollection.collection_lidvid == collection_lidvid)
         ).scalar()
 
     def get_collection(self, lidvid: str) -> Collection:

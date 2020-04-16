@@ -3,7 +3,7 @@ Functionality to create a label for a data product containing a single
 FITS file.
 """
 from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import NonDocumentCollection
+from pdart.db.SqlAlchTables import OtherCollection
 from pdart.labels.FileContents import get_file_contents
 from pdart.labels.FitsProductLabelXml import (
     make_label,
@@ -33,7 +33,7 @@ def make_fits_product_label(
     collection_lidvid = product.collection_lidvid
 
     collection = bundle_db.get_collection(collection_lidvid)
-    assert isinstance(collection, NonDocumentCollection)
+    assert isinstance(collection, OtherCollection)
     instrument = collection.instrument
     suffix = collection.suffix
     bundle_lidvid = collection.bundle_lidvid
