@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, TypeVar
 
 from sqlalchemy import Column, ForeignKey, Index, Integer, String, UniqueConstraint
 from sqlalchemy.engine import Engine
@@ -73,6 +73,25 @@ class OtherCollection(Collection):
             f"instrument={self.instrument!r}, "
             f"prefix={self.prefix!r}, suffix={self.suffix!r})"
         )
+
+
+A = TypeVar("A")
+
+
+def switch_on_collection_subtype(
+    collection: Collection, document_collection_value: A, other_collection_value: A
+) -> A:
+    """
+    We occasionally need to switch on the subtype of the collection.
+    We have this function (instead of using isinstance() calls) so
+    that if we later add a subtype, mypy will catch it for us.
+    """
+    table: Dict[str, A] = {
+        "DocumentCollection": document_collection_value,
+        "OtherCollection": other_collection_value,
+    }
+    type_name = type(collection).__name__
+    return table[type_name]
 
 
 ############################################################

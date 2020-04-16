@@ -5,17 +5,28 @@ Functionality to build a collection inventory using a SQLite database.
 from typing import List, cast
 
 from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import DocumentCollection, OtherCollection
+from pdart.db.SqlAlchTables import (
+    Collection,
+    DocumentCollection,
+    OtherCollection,
+    switch_on_collection_subtype,
+)
 
 
 def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
-
-    collection = bundle_db.get_collection(collection_lidvid)
-    if isinstance(collection, DocumentCollection):
+    def get_document_collection_inventory_name(collection: Collection) -> str:
         return "collection.csv"
-    else:
+
+    def get_other_collection_inventory_name(collection: Collection) -> str:
         prefix = cast(OtherCollection, collection).prefix
         return f"collection_{prefix}.csv"
+
+    collection: Collection = bundle_db.get_collection(collection_lidvid)
+    return switch_on_collection_subtype(
+        collection,
+        get_document_collection_inventory_name,
+        get_other_collection_inventory_name,
+    )(collection)
 
 
 def make_collection_inventory(bundle_db: BundleDB, collection_lidvid: str) -> bytes:

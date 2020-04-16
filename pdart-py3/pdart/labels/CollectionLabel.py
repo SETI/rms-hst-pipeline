@@ -6,7 +6,12 @@ from typing import cast
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import Collection, DocumentCollection, OtherCollection
+from pdart.db.SqlAlchTables import (
+    Collection,
+    DocumentCollection,
+    OtherCollection,
+    switch_on_collection_subtype,
+)
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.CollectionInventory import get_collection_inventory_name
 from pdart.labels.CollectionLabelXml import (
@@ -23,13 +28,17 @@ from pdart.xml.Pretty import pretty_and_verify
 
 
 def get_collection_label_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
-    collection = bundle_db.get_collection(collection_lidvid)
-    if isinstance(collection, DocumentCollection):
-        # Document collections won't have prefixes.
+    def get_document_collection_label_name(collection: Collection) -> str:
         return "collection.xml"
-    else:
+
+    def get_other_collection_label_name(collection: Collection) -> str:
         prefix = cast(OtherCollection, collection).prefix
         return f"collection_{prefix}.xml"
+
+    collection: Collection = bundle_db.get_collection(collection_lidvid)
+    return switch_on_collection_subtype(
+        collection, get_document_collection_label_name, get_other_collection_label_name,
+    )(collection)
 
 
 def make_collection_label(
