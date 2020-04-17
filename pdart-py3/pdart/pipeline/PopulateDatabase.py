@@ -53,7 +53,7 @@ def _populate_from_non_document_collection(
     collection_lidvid: str,
     collection_path: str,
 ) -> None:
-    db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+    db.create_other_collection(collection_lidvid, bundle_lidvid)
 
     product_segments = [
         str(prod[:-1]) for prod in sv_deltas.listdir(collection_path) if "$" in prod

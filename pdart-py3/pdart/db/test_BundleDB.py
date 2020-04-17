@@ -114,7 +114,7 @@ class Test_BundleDB(unittest.TestCase):
         self.assertFalse(self.db.get_bundle_collections(bundle_lidvid))
 
         # test inserting one
-        self.db.create_non_document_collection(non_doc_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(non_doc_collection_lidvid, bundle_lidvid)
         self.assertEqual(
             {non_doc_collection_lidvid},
             {c.lidvid for c in self.db.get_bundle_collections(bundle_lidvid)},
@@ -142,17 +142,17 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_document_collection(collection_lidvid, bundle_lidvid)
         self.assertTrue(self._document_collection_exists(collection_lidvid))
 
-    def test_create_non_document_collection(self) -> None:
+    def test_create_other_collection(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
         self.assertFalse(self._non_document_collection_exists(collection_lidvid))
 
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         self.assertTrue(self._non_document_collection_exists(collection_lidvid))
 
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         self.assertTrue(self._non_document_collection_exists(collection_lidvid))
 
     def test_collection_exists(self) -> None:
@@ -160,7 +160,7 @@ class Test_BundleDB(unittest.TestCase):
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
         self.db.create_bundle(bundle_lidvid)
         self.assertFalse(self.db.collection_exists(collection_lidvid))
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         self.assertTrue(self.db.collection_exists(collection_lidvid))
 
@@ -171,7 +171,7 @@ class Test_BundleDB(unittest.TestCase):
         non_doc_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
         doc_collection_lidvid = "urn:nasa:pds:hst_99999:document::1.1"
 
-        self.db.create_non_document_collection(non_doc_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(non_doc_collection_lidvid, bundle_lidvid)
         self.assertFalse(self._document_collection_exists(doc_collection_lidvid))
 
         self.db.create_document_collection(doc_collection_lidvid, bundle_lidvid)
@@ -191,7 +191,7 @@ class Test_BundleDB(unittest.TestCase):
             self._non_document_collection_exists(non_doc_collection_lidvid)
         )
 
-        self.db.create_non_document_collection(non_doc_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(non_doc_collection_lidvid, bundle_lidvid)
         self.assertTrue(self._non_document_collection_exists(non_doc_collection_lidvid))
 
     def test_get_collection(self) -> None:
@@ -199,7 +199,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         collection = self.db.get_collection(collection_lidvid)
         self.assertTrue(isinstance(collection, OtherCollection))
@@ -215,7 +215,7 @@ class Test_BundleDB(unittest.TestCase):
         p3_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:j6gp03lzq::1.8"
 
         self.db.create_bundle(bundle_lidvid)
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         self.assertFalse(self.db.get_collection_products(collection_lidvid))
 
         self.db.create_fits_product(p1_lidvid, collection_lidvid)
@@ -246,10 +246,10 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         data_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(data_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(data_collection_lidvid, bundle_lidvid)
 
         browse_collection_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw::1.8"
-        self.db.create_non_document_collection(browse_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(browse_collection_lidvid, bundle_lidvid)
 
         fits_product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         browse_product_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw:p::8.1"
@@ -289,7 +289,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         self.assertFalse(self.db.fits_product_exists(product_lidvid))
@@ -306,8 +306,8 @@ class Test_BundleDB(unittest.TestCase):
         data_coll_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
         browse_coll_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw::1.8"
         doc_coll_lidvid = "urn:nasa:pds:hst_99999:document::1.8"
-        self.db.create_non_document_collection(data_coll_lidvid, bundle_lidvid)
-        self.db.create_non_document_collection(browse_coll_lidvid, bundle_lidvid)
+        self.db.create_other_collection(data_coll_lidvid, bundle_lidvid)
+        self.db.create_other_collection(browse_coll_lidvid, bundle_lidvid)
         self.db.create_document_collection(doc_coll_lidvid, bundle_lidvid)
 
         fits_prod_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::1.8"
@@ -342,7 +342,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         fits_prod_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::1.8"
         product_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw:p::1.8"
 
@@ -369,7 +369,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::1.8"
 
         self.assertFalse(self.db.fits_product_exists(product_lidvid))
@@ -381,7 +381,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
@@ -395,7 +395,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
@@ -414,10 +414,10 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         data_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(data_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(data_collection_lidvid, bundle_lidvid)
 
         browse_collection_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw::1.8"
-        self.db.create_non_document_collection(browse_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(browse_collection_lidvid, bundle_lidvid)
 
         fits_product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         self.db.create_fits_product(fits_product_lidvid, data_collection_lidvid)
@@ -460,7 +460,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
@@ -480,8 +480,8 @@ class Test_BundleDB(unittest.TestCase):
         raw_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
         browse_collection_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw::1.8"
         doc_collection_lidvid = "urn:nasa:pds:hst_99999:document::1.8"
-        self.db.create_non_document_collection(raw_collection_lidvid, bundle_lidvid)
-        self.db.create_non_document_collection(browse_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(raw_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(browse_collection_lidvid, bundle_lidvid)
         self.db.create_document_collection(doc_collection_lidvid, bundle_lidvid)
         bad_fits_prod_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:x::1.8"
         fits_prod_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::1.8"
@@ -561,7 +561,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
@@ -579,8 +579,8 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
         raw_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
         collection_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw::1.8"
-        self.db.create_non_document_collection(raw_collection_lidvid, bundle_lidvid)
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(raw_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         fits_product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::1.8"
         product_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw:p::1.8"
         self.db.create_fits_product(fits_product_lidvid, raw_collection_lidvid)
@@ -615,7 +615,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
@@ -631,7 +631,7 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::8.1"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
@@ -680,7 +680,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         self.assertFalse(self.db.collection_label_exists(collection_lidvid))
         basename = "collection.xml"
@@ -697,7 +697,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         self.assertFalse(self.db.collection_label_exists(collection_lidvid))
         basename = "collection.xml"
@@ -712,7 +712,7 @@ class Test_BundleDB(unittest.TestCase):
     #         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
     #         self.db.create_bundle(bundle_lidvid)
     #         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-    #         self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+    #         self.db.create_other_collection(collection_lidvid, bundle_lidvid)
     #
     #         basename = get_collection_label_name(self.db, collection_lidvid)
     #         self.db.create_collection_label(
@@ -727,7 +727,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         self.assertFalse(self.db.collection_inventory_exists(collection_lidvid))
         basename = "collection.xml"
@@ -744,7 +744,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
         self.assertFalse(self.db.collection_inventory_exists(collection_lidvid))
         basename = "collection.xml"
@@ -759,7 +759,7 @@ class Test_BundleDB(unittest.TestCase):
     #         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
     #         self.db.create_bundle(bundle_lidvid)
     #         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-    #         self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+    #         self.db.create_other_collection(collection_lidvid, bundle_lidvid)
     #
     #         basename = get_collection_inventory_name(self.db, collection_lidvid)
     #         self.db.create_collection_inventory(
@@ -776,7 +776,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:j6gp01lzq::1.8"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
 
@@ -791,7 +791,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:j6gp01lzq::1.8"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
 
@@ -804,7 +804,7 @@ class Test_BundleDB(unittest.TestCase):
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
-        self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(collection_lidvid, bundle_lidvid)
         product_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:j6gp01lzq::1.8"
         self.db.create_fits_product(product_lidvid, collection_lidvid)
 

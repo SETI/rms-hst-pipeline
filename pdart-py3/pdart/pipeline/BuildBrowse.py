@@ -60,7 +60,7 @@ def _build_browse_collection(
     browse_collection_lidvid = LIDVID.create_from_lid_and_vid(
         browse_collection_lid, _INITIAL_VID
     )
-    db.create_non_document_collection(str(browse_collection_lidvid), bundle_lidvid)
+    db.create_other_collection(str(browse_collection_lidvid), bundle_lidvid)
     product_segments = [
         str(prod[:-1]) for prod in browse_deltas.listdir(collection_path) if "$" in prod
     ]

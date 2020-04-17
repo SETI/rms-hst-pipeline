@@ -31,9 +31,7 @@ class test_TransferManifest(unittest.TestCase):
         self.assertEqual(expected, manifest)
 
     def test_filled_db(self) -> None:
-        self.bundle_db.create_non_document_collection(
-            _COLLECTION_LIDVID, _BUNDLE_LIDVID
-        )
+        self.bundle_db.create_other_collection(_COLLECTION_LIDVID, _BUNDLE_LIDVID)
         self.bundle_db.create_fits_product(_PRODUCT_LIDVID, _COLLECTION_LIDVID)
 
         expected = """\

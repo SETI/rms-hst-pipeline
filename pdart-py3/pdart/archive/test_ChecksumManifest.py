@@ -50,9 +50,7 @@ class test_ChecksumManifest(unittest.TestCase):
 
     def test_minimal_db(self) -> None:
         # create stuff (top-down)
-        self.bundle_db.create_non_document_collection(
-            _COLLECTION_LIDVID, _BUNDLE_LIDVID
-        )
+        self.bundle_db.create_other_collection(_COLLECTION_LIDVID, _BUNDLE_LIDVID)
         self.bundle_db.create_fits_product(_PRODUCT_LIDVID, _COLLECTION_LIDVID)
         os_filepath = fs.path.join(self.tmpdir, _PRODUCT_BASENAME)
         with open(os_filepath, "w") as f:

@@ -77,20 +77,20 @@ def _lidvid_to_proposal_id(bundle_lidvid: str) -> int:
     return int(_sure_match(_BUNDLE_DIRECTORY_PATTERN, bundle_id, 1))
 
 
-def _lidvid_to_instrument(nondoc_collection_lidvid: str) -> str:
-    lid = LIDVID(nondoc_collection_lidvid).lid()
+def _lidvid_to_instrument(other_collection_lidvid: str) -> str:
+    lid = LIDVID(other_collection_lidvid).lid()
     collection_id = lid.collection_id
     return _sure_match(_COLLECTION_DIRECTORY_PATTERN, collection_id, 3)
 
 
-def _lidvid_to_prefix(nondoc_collection_lidvid: str) -> str:
-    lid = LIDVID(nondoc_collection_lidvid).lid()
+def _lidvid_to_prefix(other_collection_lidvid: str) -> str:
+    lid = LIDVID(other_collection_lidvid).lid()
     collection_id = lid.collection_id
     return _sure_match(_COLLECTION_DIRECTORY_PATTERN, collection_id, 2)
 
 
-def _lidvid_to_suffix(nondoc_collection_lidvid: str) -> str:
-    lid = LIDVID(nondoc_collection_lidvid).lid()
+def _lidvid_to_suffix(other_collection_lidvid: str) -> str:
+    lid = LIDVID(other_collection_lidvid).lid()
     collection_id = lid.collection_id
     return _sure_match(_COLLECTION_DIRECTORY_PATTERN, collection_id, 4)
 
@@ -169,7 +169,7 @@ class BundleDB(object):
             )
             self.session.commit()
 
-    def create_non_document_collection(
+    def create_other_collection(
         self, collection_lidvid: str, bundle_lidvid: str
     ) -> None:
         """

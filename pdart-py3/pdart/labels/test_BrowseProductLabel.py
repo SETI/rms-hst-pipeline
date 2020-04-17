@@ -25,10 +25,10 @@ class Test_BrowseProductLabel(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         fits_collection_lidvid = "urn:nasa:pds:hst_13012:data_acs_raw::3.14159"
-        self.db.create_non_document_collection(fits_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(fits_collection_lidvid, bundle_lidvid)
 
         browse_collection_lidvid = "urn:nasa:pds:hst_13012:browse_acs_raw::3.14159"
-        self.db.create_non_document_collection(browse_collection_lidvid, bundle_lidvid)
+        self.db.create_other_collection(browse_collection_lidvid, bundle_lidvid)
 
         fits_product_lidvid = "urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2.1"
         self.db.create_fits_product(fits_product_lidvid, fits_collection_lidvid)
