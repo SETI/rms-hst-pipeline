@@ -22,11 +22,12 @@ def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -
         return f"collection_{prefix}.csv"
 
     collection: Collection = bundle_db.get_collection(collection_lidvid)
-    return switch_on_collection_subtype(
+    res: str = switch_on_collection_subtype(
         collection,
         get_document_collection_inventory_name,
         get_other_collection_inventory_name,
     )(collection)
+    return res
 
 
 def make_collection_inventory(bundle_db: BundleDB, collection_lidvid: str) -> bytes:

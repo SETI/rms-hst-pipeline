@@ -12,6 +12,7 @@ from pdart.db.SqlAlchTables import (
     FitsFile,
     FitsProduct,
     OtherCollection,
+    switch_on_collection_subtype,
 )
 
 
@@ -54,13 +55,15 @@ class BundleWalk(object):
         self.visit_bundle(bundle, False)
 
         for collection in self.db.get_bundle_collections(bundle_lidvid):
-            collection_lidvid = str(collection.lidvid)
-            if self.db.document_collection_exists(collection_lidvid):
-                self._walk_document_collection(cast(DocumentCollection, collection))
-            elif self.db.non_document_collection_exists(collection_lidvid):
-                self._walk_non_document_collection(cast(OtherCollection, collection))
-            else:
-                assert False, f"Missing collection case: {collection_lidvid}"
+            switch_on_collection_subtype(
+                collection,
+                lambda: self._walk_document_collection(
+                    cast(DocumentCollection, collection)
+                ),
+                lambda: self._walk_non_document_collection(
+                    cast(OtherCollection, collection)
+                ),
+            )
 
         self.visit_bundle(bundle, True)
 

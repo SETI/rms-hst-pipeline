@@ -27,6 +27,7 @@ from pdart.db.SqlAlchTables import (
     ProductLabel,
     ProposalInfo,
     create_tables,
+    switch_on_collection_subtype,
 )
 from pdart.db.Utils import file_md5
 from pdart.pds4.LID import LID
@@ -149,11 +150,15 @@ class BundleDB(object):
         assert LIDVID(collection_lidvid).is_collection_lidvid()
         assert LIDVID(bundle_lidvid).is_bundle_lidvid()
         if self.collection_exists(collection_lidvid):
-            if self.document_collection_exists(collection_lidvid):
+            collection = self.get_collection(collection_lidvid)
+            document_collection_exists = switch_on_collection_subtype(
+                collection, True, False
+            )
+            if document_collection_exists:
                 pass
             else:
                 raise Exception(
-                    f"non-document-collection with "
+                    f"non-document collection with "
                     f"LIDVID {collection_lidvid} already exists"
                 )
         else:
@@ -173,9 +178,11 @@ class BundleDB(object):
         assert LIDVID(collection_lidvid).is_collection_lidvid()
         assert LIDVID(bundle_lidvid).is_bundle_lidvid()
         if self.collection_exists(collection_lidvid):
-            if self.non_document_collection_exists(collection_lidvid):
-                pass
-            else:
+            collection = self.get_collection(collection_lidvid)
+            document_collection_exists = switch_on_collection_subtype(
+                collection, True, False
+            )
+            if document_collection_exists:
                 raise Exception(
                     f"document-collection with "
                     f"LIDVID {collection_lidvid} already exists"
@@ -203,24 +210,6 @@ class BundleDB(object):
         """
         return self.session.query(
             exists().where(Collection.lidvid == collection_lidvid)
-        ).scalar()
-
-    def document_collection_exists(self, collection_lidvid: str) -> bool:
-        """
-        Returns True iff a document collection with the given LIDVID
-        exists in the database.
-        """
-        return self.session.query(
-            exists().where(DocumentCollection.collection_lidvid == collection_lidvid)
-        ).scalar()
-
-    def non_document_collection_exists(self, collection_lidvid: str) -> bool:
-        """
-        Returns True iff a non-document collection with the given
-        LIDVID exists in the database.
-        """
-        return self.session.query(
-            exists().where(OtherCollection.collection_lidvid == collection_lidvid)
         ).scalar()
 
     def get_collection(self, lidvid: str) -> Collection:

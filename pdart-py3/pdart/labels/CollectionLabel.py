@@ -2,7 +2,7 @@
 Functionality to build a collection label using a SQLite database.
 """
 
-from typing import cast
+from typing import cast, Callable
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
@@ -22,6 +22,7 @@ from pdart.labels.CollectionLabelXml import (
 from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
+from pdart.xml.Templates import NodeBuilder
 
 
 # TODO Should probably test document_collection independently.
@@ -61,16 +62,21 @@ def make_collection_label(
     collection_lid = lidvid_to_lid(collection_lidvid)
     collection_vid = lidvid_to_vid(collection_lidvid)
     collection: Collection = bundle_db.get_collection(collection_lidvid)
-    is_doc_coll = bundle_db.document_collection_exists(collection_lidvid)
 
     proposal_id = bundle_db.get_bundle().proposal_id
-    if is_doc_coll:
-        title = make_document_collection_title({"proposal_id": str(proposal_id)})
-    else:
-        non_document_collection = cast(OtherCollection, collection)
-        title = make_non_document_collection_title(
+
+    def make_doc_coll_title(_coll: Collection) -> NodeBuilder:
+        return make_document_collection_title({"proposal_id": str(proposal_id)})
+
+    def make_other_coll_title(coll: Collection) -> NodeBuilder:
+        non_document_collection = cast(OtherCollection, coll)
+        return make_non_document_collection_title(
             {"suffix": non_document_collection.suffix, "proposal_id": str(proposal_id)}
         )
+
+    title: NodeBuilder = switch_on_collection_subtype(
+        collection, make_doc_coll_title, make_other_coll_title,
+    )(collection)
 
     inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
 

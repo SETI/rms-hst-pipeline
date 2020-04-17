@@ -4,7 +4,12 @@ import unittest
 from typing import Set, cast
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.db.SqlAlchTables import Base, Bundle, OtherCollection
+from pdart.db.SqlAlchTables import (
+    Base,
+    Bundle,
+    OtherCollection,
+    switch_on_collection_subtype,
+)
 from pdart.db.Utils import file_md5
 from pdart.pds4.LIDVID import LIDVID
 
@@ -51,6 +56,22 @@ class Test_BundleDB(unittest.TestCase):
         self.assertEqual(set(metadata.tables.keys()), _TABLES)
         db.close()
         self.assertFalse(db.is_open())
+
+    ############################################################
+
+    def _document_collection_exists(self, collection_lidvid: str) -> bool:
+        if self.db.collection_exists(collection_lidvid):
+            coll = self.db.get_collection(collection_lidvid)
+            return switch_on_collection_subtype(coll, True, False)
+        else:
+            return False
+
+    def _non_document_collection_exists(self, collection_lidvid: str) -> bool:
+        if self.db.collection_exists(collection_lidvid):
+            coll = self.db.get_collection(collection_lidvid)
+            return switch_on_collection_subtype(coll, False, True)
+        else:
+            return False
 
     ############################################################
 
@@ -113,26 +134,26 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:document::1.8"
-        self.assertFalse(self.db.document_collection_exists(collection_lidvid))
+        self.assertFalse(self._document_collection_exists(collection_lidvid))
 
         self.db.create_document_collection(collection_lidvid, bundle_lidvid)
-        self.assertTrue(self.db.document_collection_exists(collection_lidvid))
+        self.assertTrue(self._document_collection_exists(collection_lidvid))
 
         self.db.create_document_collection(collection_lidvid, bundle_lidvid)
-        self.assertTrue(self.db.document_collection_exists(collection_lidvid))
+        self.assertTrue(self._document_collection_exists(collection_lidvid))
 
     def test_create_non_document_collection(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
-        self.assertFalse(self.db.non_document_collection_exists(collection_lidvid))
+        self.assertFalse(self._non_document_collection_exists(collection_lidvid))
 
         self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
-        self.assertTrue(self.db.non_document_collection_exists(collection_lidvid))
+        self.assertTrue(self._non_document_collection_exists(collection_lidvid))
 
         self.db.create_non_document_collection(collection_lidvid, bundle_lidvid)
-        self.assertTrue(self.db.non_document_collection_exists(collection_lidvid))
+        self.assertTrue(self._non_document_collection_exists(collection_lidvid))
 
     def test_collection_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
@@ -151,11 +172,11 @@ class Test_BundleDB(unittest.TestCase):
         doc_collection_lidvid = "urn:nasa:pds:hst_99999:document::1.1"
 
         self.db.create_non_document_collection(non_doc_collection_lidvid, bundle_lidvid)
-        self.assertFalse(self.db.document_collection_exists(doc_collection_lidvid))
+        self.assertFalse(self._document_collection_exists(doc_collection_lidvid))
 
         self.db.create_document_collection(doc_collection_lidvid, bundle_lidvid)
 
-        self.assertTrue(self.db.document_collection_exists(doc_collection_lidvid))
+        self.assertTrue(self._document_collection_exists(doc_collection_lidvid))
 
     def test_non_document_collection_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
@@ -167,13 +188,11 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_document_collection(doc_collection_lidvid, bundle_lidvid)
 
         self.assertFalse(
-            self.db.non_document_collection_exists(non_doc_collection_lidvid)
+            self._non_document_collection_exists(non_doc_collection_lidvid)
         )
 
         self.db.create_non_document_collection(non_doc_collection_lidvid, bundle_lidvid)
-        self.assertTrue(
-            self.db.non_document_collection_exists(non_doc_collection_lidvid)
-        )
+        self.assertTrue(self._non_document_collection_exists(non_doc_collection_lidvid))
 
     def test_get_collection(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
