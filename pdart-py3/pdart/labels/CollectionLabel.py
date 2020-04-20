@@ -29,6 +29,8 @@ from pdart.xml.Templates import NodeBuilder
 
 
 def get_collection_label_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
+    # We have to jump through some hoops to apply
+    # switch_on_collection_type().
     def get_document_collection_label_name(collection: Collection) -> str:
         return "collection.xml"
 

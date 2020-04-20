@@ -58,6 +58,8 @@ class BundleWalk(object):
         self.visit_bundle(bundle, False)
 
         for collection in self.db.get_bundle_collections(bundle_lidvid):
+            # We have to jump through some hoops to apply
+            # switch_on_collection_type().
 
             def walk_doc(coll: Collection) -> None:
                 self.__walk_document_collection(cast(DocumentCollection, coll))
