@@ -46,7 +46,7 @@ def _populate_from_document_collection(
         db.create_document_file(sys_filepath, basename, product_lidvid)
 
 
-def _populate_from_non_document_collection(
+def _populate_from_other_collection(
     db: BundleDB,
     sv_deltas: COWFS,
     bundle_lidvid: str,
@@ -112,7 +112,7 @@ class PopulateDatabase(Stage):
                         db, sv_deltas, bundle_lidvid, collection_lidvid, product_path
                     )
                 else:
-                    _populate_from_non_document_collection(
+                    _populate_from_other_collection(
                         db, sv_deltas, bundle_lidvid, collection_lidvid, collection_path
                     )
 

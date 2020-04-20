@@ -17,7 +17,7 @@ HST Observing Program <NODE name="proposal_id"/>.</title>
 )
 
 
-make_non_document_collection_title: NodeBuilderTemplate = interpret_template(
+make_other_collection_title: NodeBuilderTemplate = interpret_template(
     """<title>This collection contains the <NODE name="suffix"/> \
 images obtained from HST Observing Program \
 <NODE name="proposal_id"/>.</title>"""

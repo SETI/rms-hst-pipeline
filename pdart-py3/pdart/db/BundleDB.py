@@ -173,7 +173,7 @@ class BundleDB(object):
         self, collection_lidvid: str, bundle_lidvid: str
     ) -> None:
         """
-        Create a non_document_collection with this LIDVID if none exists.
+        Create an other_collection with this LIDVID if none exists.
         """
         assert LIDVID(collection_lidvid).is_collection_lidvid()
         assert LIDVID(bundle_lidvid).is_bundle_lidvid()
@@ -187,6 +187,9 @@ class BundleDB(object):
                     f"document-collection with "
                     f"LIDVID {collection_lidvid} already exists"
                 )
+            else:
+                # it already exists
+                pass
         else:
             instrument = _lidvid_to_instrument(collection_lidvid)
             prefix = _lidvid_to_prefix(collection_lidvid)

@@ -17,7 +17,7 @@ from pdart.labels.CollectionInventory import get_collection_inventory_name
 from pdart.labels.CollectionLabelXml import (
     make_document_collection_title,
     make_label,
-    make_non_document_collection_title,
+    make_other_collection_title,
 )
 from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
@@ -69,9 +69,9 @@ def make_collection_label(
         return make_document_collection_title({"proposal_id": str(proposal_id)})
 
     def make_other_coll_title(coll: Collection) -> NodeBuilder:
-        non_document_collection = cast(OtherCollection, coll)
-        return make_non_document_collection_title(
-            {"suffix": non_document_collection.suffix, "proposal_id": str(proposal_id)}
+        other_collection = cast(OtherCollection, coll)
+        return make_other_collection_title(
+            {"suffix": other_collection.suffix, "proposal_id": str(proposal_id)}
         )
 
     title: NodeBuilder = switch_on_collection_subtype(

@@ -124,11 +124,11 @@ def create_pds4_labels(
             if post:
                 self._post_visit_collection(document_collection)
 
-        def visit_non_document_collection(
-            self, non_document_collection: OtherCollection, post: bool
+        def visit_other_collection(
+            self, other_collection: OtherCollection, post: bool
         ) -> None:
             if post:
-                self._post_visit_collection(non_document_collection)
+                self._post_visit_collection(other_collection)
 
         def visit_document_product(
             self, document_product: DocumentProduct, post: bool
