@@ -331,7 +331,6 @@ class Test_BundleDB(unittest.TestCase):
         data_coll_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.8"
         browse_coll_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw::1.8"
         doc_coll_lidvid = "urn:nasa:pds:hst_99999:document::1.8"
-        ctxt_coll_lidvid = "urn:nasa:pds:hst_99999:context::1.8"
         self.db.create_other_collection(data_coll_lidvid, bundle_lidvid)
         self.db.create_other_collection(browse_coll_lidvid, bundle_lidvid)
         self.db.create_document_collection(doc_coll_lidvid, bundle_lidvid)
@@ -339,19 +338,16 @@ class Test_BundleDB(unittest.TestCase):
         fits_prod_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw:p::1.8"
         browse_prod_lidvid = "urn:nasa:pds:hst_99999:browse_acs_raw:p::1.8"
         doc_prod_lidvid = "urn:nasa:pds:hst_99999:document:specs::1.8"
-        ctxt_prod_lidvid = "urn:nasa:pds:hst_99999:context:p::1.8"
 
         self.assertFalse(self.db.product_exists(fits_prod_lidvid))
         self.assertFalse(self.db.product_exists(browse_prod_lidvid))
         self.assertFalse(self.db.product_exists(doc_prod_lidvid))
-        self.assertFalse(self.db.product_exists(ctxt_prod_lidvid))
 
         self.db.create_fits_product(fits_prod_lidvid, data_coll_lidvid)
 
         self.assertTrue(self.db.product_exists(fits_prod_lidvid))
         self.assertFalse(self.db.product_exists(browse_prod_lidvid))
         self.assertFalse(self.db.product_exists(doc_prod_lidvid))
-        self.assertFalse(self.db.product_exists(ctxt_prod_lidvid))
 
         self.db.create_browse_product(
             browse_prod_lidvid, fits_prod_lidvid, browse_coll_lidvid
@@ -360,21 +356,12 @@ class Test_BundleDB(unittest.TestCase):
         self.assertTrue(self.db.product_exists(fits_prod_lidvid))
         self.assertTrue(self.db.product_exists(browse_prod_lidvid))
         self.assertFalse(self.db.product_exists(doc_prod_lidvid))
-        self.assertFalse(self.db.product_exists(ctxt_prod_lidvid))
 
         self.db.create_document_product(doc_prod_lidvid, doc_coll_lidvid)
 
         self.assertTrue(self.db.product_exists(fits_prod_lidvid))
         self.assertTrue(self.db.product_exists(browse_prod_lidvid))
         self.assertTrue(self.db.product_exists(doc_prod_lidvid))
-        self.assertFalse(self.db.product_exists(ctxt_prod_lidvid))
-
-        self.db.create_context_product(ctxt_prod_lidvid, ctxt_coll_lidvid)
-
-        self.assertTrue(self.db.product_exists(fits_prod_lidvid))
-        self.assertTrue(self.db.product_exists(browse_prod_lidvid))
-        self.assertTrue(self.db.product_exists(doc_prod_lidvid))
-        self.assertTrue(self.db.product_exists(ctxt_prod_lidvid))
 
     def test_browse_product_exists(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
@@ -393,14 +380,10 @@ class Test_BundleDB(unittest.TestCase):
         self.assertTrue(self.db.browse_product_exists(product_lidvid))
 
     def test_context_product_exists(self) -> None:
-        bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
-        self.db.create_bundle(bundle_lidvid)
-        collection_lidvid = "urn:nasa:pds:hst_99999:context::1.8"
-        self.db.create_context_collection(collection_lidvid, bundle_lidvid)
         product_lidvid = "urn:nasa:pds:hst_99999:context:important_stuff::1.8"
 
         self.assertFalse(self.db.context_product_exists(product_lidvid))
-        self.db.create_context_product(product_lidvid, collection_lidvid)
+        self.db.create_context_product(product_lidvid)
         self.assertTrue(self.db.context_product_exists(product_lidvid))
 
     def test_document_product_exists(self) -> None:

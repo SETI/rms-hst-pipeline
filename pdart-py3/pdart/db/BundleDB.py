@@ -293,29 +293,6 @@ class BundleDB(object):
             )
             self.session.commit()
 
-    def create_context_product(
-        self, product_lidvid: str, collection_lidvid: str
-    ) -> None:
-        """
-        Create a product with this LIDVID if none exists.
-        """
-        assert LIDVID(product_lidvid).is_product_lidvid()
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
-        if self.product_exists(product_lidvid):
-            if self.context_product_exists(product_lidvid):
-                pass
-            else:
-                raise Exception(
-                    f"non-context product with LIDVID {product_lidvid} already exists"
-                )
-        else:
-            self.session.add(
-                ContextProduct(
-                    lidvid=product_lidvid, collection_lidvid=collection_lidvid
-                )
-            )
-            self.session.commit()
-
     def create_document_product(
         self, product_lidvid: str, collection_lidvid: str
     ) -> None:
@@ -376,15 +353,6 @@ class BundleDB(object):
             exists().where(BrowseProduct.product_lidvid == product_lidvid)
         ).scalar()
 
-    def context_product_exists(self, product_lidvid: str) -> bool:
-        """
-        Returns True iff a context product with the given LIDVID exists
-        in the database.
-        """
-        return self.session.query(
-            exists().where(ContextProduct.product_lidvid == product_lidvid)
-        ).scalar()
-
     def document_product_exists(self, product_lidvid: str) -> bool:
         """
         Returns True iff a document product with the given LIDVID
@@ -416,6 +384,25 @@ class BundleDB(object):
         return (
             self.session.query(File).filter(File.product_lidvid == product_lidvid).all()
         )
+
+    ############################################################
+    def create_context_product(self, lidvid: str) -> None:
+        """
+        Create a context product with this LIDVID if none exists.
+        """
+        assert LIDVID(lidvid).is_product_lidvid()
+        if not self.context_product_exists(lidvid):
+            self.session.add(ContextProduct(lidvid=lidvid))
+            self.session.commit()
+
+    def context_product_exists(self, lidvid: str) -> bool:
+        """
+        Returns True iff a context product with the given LIDVID exists
+        in the database.
+        """
+        return self.session.query(
+            exists().where(ContextProduct.lidvid == lidvid)
+        ).scalar()
 
     ############################################################
 

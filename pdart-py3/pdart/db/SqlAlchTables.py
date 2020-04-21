@@ -155,29 +155,6 @@ class BrowseProduct(Product):
         )
 
 
-class ContextProduct(Product):
-    """
-    A database representation of a PDS4 product consisting of
-    contexts.
-    """
-
-    __tablename__ = "context_products"
-
-    product_lidvid = Column(
-        String, ForeignKey("products.lidvid"), primary_key=True, nullable=False
-    )
-
-    __mapper_args__ = {
-        "polymorphic_identity": "context_product",
-    }
-
-    def __repr__(self) -> str:
-        return (
-            f"ContextProduct(lidvid={self.lidvid!r}, "
-            f"collection_lidvid={self.collection_lidvid!r})"
-        )
-
-
 class DocumentProduct(Product):
     """
     A database representation of a PDS4 product consisting of
@@ -222,6 +199,23 @@ class FitsProduct(Product):
             f"FitsProduct(lidvid={self.lidvid!r}, "
             f"collection_lidvid={self.collection_lidvid!r})"
         )
+
+
+############################################################
+
+
+class ContextProduct(Base):
+    """
+    A database representation of LIDVIDs for context products.
+    Context products are odd in that the collections and bundles they
+    are part of do not exist in the database.
+    """
+
+    __tablename__ = "context_products"
+    lidvid = Column(String, primary_key=True, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"ContextProduct(lidvid={self.lidvid!r})"
 
 
 ############################################################
