@@ -7,6 +7,8 @@ from pdart.db.SqlAlchTables import (
     BrowseProduct,
     Bundle,
     Collection,
+    ContextCollection,
+    ContextProduct,
     DocumentCollection,
     DocumentFile,
     DocumentProduct,
@@ -61,15 +63,29 @@ class BundleWalk(object):
             # We have to jump through some hoops to apply
             # switch_on_collection_type().
 
+            def walk_context(coll: Collection) -> None:
+                self.__walk_context_collection(cast(ContextCollection, coll))
+
             def walk_doc(coll: Collection) -> None:
                 self.__walk_document_collection(cast(DocumentCollection, coll))
 
             def walk_other(coll: Collection) -> None:
                 self.__walk_other_collection(cast(OtherCollection, coll))
 
-            switch_on_collection_subtype(collection, walk_doc, walk_other)(collection)
+            switch_on_collection_subtype(
+                collection, walk_context, walk_doc, walk_other
+            )(collection)
 
         self.visit_bundle(bundle, True)
+
+    def __walk_context_collection(self, context_collection: ContextCollection) -> None:
+        self.visit_context_collection(context_collection, False)
+
+        collection_lidvid = str(context_collection.lidvid)
+        for product in self.db.get_collection_products(collection_lidvid):
+            self.__walk_context_product(cast(ContextProduct, product))
+
+        self.visit_context_collection(context_collection, True)
 
     def __walk_document_collection(
         self, document_collection: DocumentCollection
@@ -106,6 +122,10 @@ class BundleWalk(object):
 
         self.visit_browse_product(browse_product, True)
 
+    def __walk_context_product(self, context_product: ContextProduct) -> None:
+        self.visit_context_product(context_product, False)
+        self.visit_context_product(context_product, True)
+
     def __walk_document_product(self, document_product: DocumentProduct) -> None:
         self.visit_document_product(document_product, False)
 
@@ -137,6 +157,11 @@ class BundleWalk(object):
 
     ############################################################
 
+    def visit_context_collection(
+        self, context_collection: ContextCollection, post: bool
+    ) -> None:
+        pass
+
     def visit_document_collection(
         self, document_collection: DocumentCollection, post: bool
     ) -> None:
@@ -150,6 +175,11 @@ class BundleWalk(object):
     ############################################################
 
     def visit_browse_product(self, browse_product: BrowseProduct, post: bool) -> None:
+        pass
+
+    def visit_context_product(
+        self, context_product: ContextProduct, post: bool
+    ) -> None:
         pass
 
     def visit_document_product(

@@ -75,11 +75,29 @@ class OtherCollection(Collection):
         )
 
 
+class ContextCollection(Collection):
+    __tablename__ = "context_collections"
+
+    collection_lidvid = Column(
+        String, ForeignKey("collections.lidvid"), primary_key=True, nullable=False
+    )
+
+    __mapper_args__ = {
+        "polymorphic_identity": "context_collection",
+    }
+
+    def __repr__(self) -> str:
+        return f"ContextCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
+
+
 A = TypeVar("A")
 
 
 def switch_on_collection_subtype(
-    collection: Collection, document_collection_value: A, other_collection_value: A
+    collection: Collection,
+    context_collection_value: A,
+    document_collection_value: A,
+    other_collection_value: A,
 ) -> A:
     """
     We occasionally need to switch on the subtype of the collection.
@@ -87,6 +105,7 @@ def switch_on_collection_subtype(
     that if we later add a subtype, mypy will catch it for us.
     """
     table: Dict[str, A] = {
+        "ContextCollection": context_collection_value,
         "DocumentCollection": document_collection_value,
         "OtherCollection": other_collection_value,
     }
@@ -133,6 +152,29 @@ class BrowseProduct(Product):
             f"BrowseProduct(lidvid={self.lidvid!r}, "
             f"collection_lidvid={self.collection_lidvid!r}, "
             f"fits_product_lidvid={self.fits_product_lidvid!r})"
+        )
+
+
+class ContextProduct(Product):
+    """
+    A database representation of a PDS4 product consisting of
+    contexts.
+    """
+
+    __tablename__ = "context_products"
+
+    product_lidvid = Column(
+        String, ForeignKey("products.lidvid"), primary_key=True, nullable=False
+    )
+
+    __mapper_args__ = {
+        "polymorphic_identity": "context_product",
+    }
+
+    def __repr__(self) -> str:
+        return (
+            f"ContextProduct(lidvid={self.lidvid!r}, "
+            f"collection_lidvid={self.collection_lidvid!r})"
         )
 
 

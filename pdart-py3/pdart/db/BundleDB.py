@@ -15,6 +15,8 @@ from pdart.db.SqlAlchTables import (
     Collection,
     CollectionInventory,
     CollectionLabel,
+    ContextCollection,
+    ContextProduct,
     DocumentCollection,
     DocumentFile,
     DocumentProduct,
@@ -141,6 +143,32 @@ class BundleDB(object):
 
     ############################################################
 
+    def create_context_collection(
+        self, collection_lidvid: str, bundle_lidvid: str
+    ) -> None:
+        """
+        Create a context collection with this LIDVID if none exists.
+        """
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if self.collection_exists(collection_lidvid):
+            collection = self.get_collection(collection_lidvid)
+            context_collection_exists = switch_on_collection_subtype(
+                collection, True, False, False
+            )
+            if context_collection_exists:
+                pass
+            else:
+                raise Exception(
+                    f"non-context collection with "
+                    f"LIDVID {collection_lidvid} already exists"
+                )
+        else:
+            self.session.add(
+                ContextCollection(lidvid=collection_lidvid, bundle_lidvid=bundle_lidvid)
+            )
+            self.session.commit()
+
     def create_document_collection(
         self, collection_lidvid: str, bundle_lidvid: str
     ) -> None:
@@ -152,7 +180,7 @@ class BundleDB(object):
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             document_collection_exists = switch_on_collection_subtype(
-                collection, True, False
+                collection, False, True, False
             )
             if document_collection_exists:
                 pass
@@ -180,7 +208,7 @@ class BundleDB(object):
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             document_collection_exists = switch_on_collection_subtype(
-                collection, True, False
+                collection, False, True, False
             )
             if document_collection_exists:
                 raise Exception(
@@ -265,6 +293,29 @@ class BundleDB(object):
             )
             self.session.commit()
 
+    def create_context_product(
+        self, product_lidvid: str, collection_lidvid: str
+    ) -> None:
+        """
+        Create a product with this LIDVID if none exists.
+        """
+        assert LIDVID(product_lidvid).is_product_lidvid()
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if self.product_exists(product_lidvid):
+            if self.context_product_exists(product_lidvid):
+                pass
+            else:
+                raise Exception(
+                    f"non-context product with LIDVID {product_lidvid} already exists"
+                )
+        else:
+            self.session.add(
+                ContextProduct(
+                    lidvid=product_lidvid, collection_lidvid=collection_lidvid
+                )
+            )
+            self.session.commit()
+
     def create_document_product(
         self, product_lidvid: str, collection_lidvid: str
     ) -> None:
@@ -323,6 +374,15 @@ class BundleDB(object):
         """
         return self.session.query(
             exists().where(BrowseProduct.product_lidvid == product_lidvid)
+        ).scalar()
+
+    def context_product_exists(self, product_lidvid: str) -> bool:
+        """
+        Returns True iff a context product with the given LIDVID exists
+        in the database.
+        """
+        return self.session.query(
+            exists().where(ContextProduct.product_lidvid == product_lidvid)
         ).scalar()
 
     def document_product_exists(self, product_lidvid: str) -> bool:

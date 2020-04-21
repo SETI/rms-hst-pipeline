@@ -32,7 +32,10 @@ def make_bundle_label(
 
     def get_ref_type(collection: Collection) -> str:
         return switch_on_collection_subtype(
-            collection, "bundle_has_document_collection", "bundle_has_data_collection"
+            collection,
+            "bundle_has_context_collection",
+            "bundle_has_document_collection",
+            "bundle_has_data_collection",
         )
 
     reduced_collections = [

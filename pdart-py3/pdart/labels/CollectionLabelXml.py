@@ -9,6 +9,14 @@ from pdart.xml.Templates import (
     interpret_template,
 )
 
+make_context_collection_title: NodeBuilderTemplate = interpret_template(
+    """
+    <title>This collection contains context products from \
+HST Observing Program <NODE name="proposal_id"/>.</title>
+    """
+)
+
+
 make_document_collection_title: NodeBuilderTemplate = interpret_template(
     """
     <title>This collection contains documentation from \

@@ -16,6 +16,9 @@ from pdart.db.SqlAlchTables import (
 def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
     # We have to jump through some hoops to apply
     # switch_on_collection_type().
+    def get_context_collection_inventory_name(collection: Collection) -> str:
+        return "collection_context.csv"
+
     def get_document_collection_inventory_name(collection: Collection) -> str:
         return "collection.csv"
 
@@ -26,6 +29,7 @@ def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -
     collection: Collection = bundle_db.get_collection(collection_lidvid)
     return switch_on_collection_subtype(
         collection,
+        get_context_collection_inventory_name,
         get_document_collection_inventory_name,
         get_other_collection_inventory_name,
     )(collection)

@@ -15,6 +15,7 @@ from pdart.db.SqlAlchTables import (
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.CollectionInventory import get_collection_inventory_name
 from pdart.labels.CollectionLabelXml import (
+    make_context_collection_title,
     make_document_collection_title,
     make_label,
     make_other_collection_title,
@@ -31,6 +32,9 @@ from pdart.xml.Templates import NodeBuilder
 def get_collection_label_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
     # We have to jump through some hoops to apply
     # switch_on_collection_type().
+    def get_context_collection_label_name(collection: Collection) -> str:
+        return "collection_context.xml"
+
     def get_document_collection_label_name(collection: Collection) -> str:
         return "collection.xml"
 
@@ -40,7 +44,10 @@ def get_collection_label_name(bundle_db: BundleDB, collection_lidvid: str) -> st
 
     collection: Collection = bundle_db.get_collection(collection_lidvid)
     return switch_on_collection_subtype(
-        collection, get_document_collection_label_name, get_other_collection_label_name,
+        collection,
+        get_context_collection_label_name,
+        get_document_collection_label_name,
+        get_other_collection_label_name,
     )(collection)
 
 
@@ -67,6 +74,9 @@ def make_collection_label(
 
     proposal_id = bundle_db.get_bundle().proposal_id
 
+    def make_ctxt_coll_title(_coll: Collection) -> NodeBuilder:
+        return make_context_collection_title({"proposal_id": str(proposal_id)})
+
     def make_doc_coll_title(_coll: Collection) -> NodeBuilder:
         return make_document_collection_title({"proposal_id": str(proposal_id)})
 
@@ -77,7 +87,7 @@ def make_collection_label(
         )
 
     title: NodeBuilder = switch_on_collection_subtype(
-        collection, make_doc_coll_title, make_other_coll_title,
+        collection, make_ctxt_coll_title, make_doc_coll_title, make_other_coll_title,
     )(collection)
 
     inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
