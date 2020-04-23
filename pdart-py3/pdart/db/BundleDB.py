@@ -423,6 +423,9 @@ class BundleDB(object):
             exists().where(ContextProduct.lidvid == lidvid)
         ).scalar()
 
+    def get_context_products(self) -> List[ContextProduct]:
+        return self.session.query(ContextProduct).all()
+
     ############################################################
 
     def create_bad_fits_file(

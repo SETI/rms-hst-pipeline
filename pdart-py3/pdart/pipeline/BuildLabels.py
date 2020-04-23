@@ -72,13 +72,43 @@ def lid_to_dir(lid: LID) -> str:
     return fs.path.join(*[part + "$" for part in lid.parts()])
 
 
+# TODO Cut-and-pasted from PopulateDatabase.  Refactor this.
+_INITIAL_VID: VID = VID("1.0")
+
+
+def _extend_initial_lidvid(lidvid: str, segment: str) -> str:
+    lid = LIDVID(lidvid).lid().extend_lid(segment)
+    new_lidvid = LIDVID.create_from_lid_and_vid(lid, _INITIAL_VID)
+    return str(new_lidvid)
+
+
+# END TODO
+
+
 def create_pds4_labels(
     bundle_db: BundleDB, label_deltas: COWFS, info: Citation_Information
 ) -> None:
     class _CreateLabelsWalk(BundleWalk):
         def visit_bundle(self, bundle: Bundle, post: bool) -> None:
-            if not post:
+            if post:
+                self._create_context_collection(bundle)
+                self._post_visit_bundle(bundle)
+
+        def _create_context_collection(self, bundle: Bundle) -> None:
+            context_products = bundle_db.get_context_products()
+            if not context_products:
                 return
+            bundle_lidvid = str(bundle.lidvid)
+            collection_lidvid = _extend_initial_lidvid(bundle_lidvid, "context")
+            bundle_db.create_context_collection(collection_lidvid, bundle_lidvid)
+
+            bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
+            context_coll_dir_path = fs.path.join(bundle_dir_path, "context$")
+            label_deltas.makedir(context_coll_dir_path)
+            collection = bundle_db.get_collection(collection_lidvid)
+            self._post_visit_collection(collection)
+
+        def _post_visit_bundle(self, bundle: Bundle) -> None:
             bundle_lidvid = str(bundle.lidvid)
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
             label = make_bundle_label(self.db, info, _VERIFY)
