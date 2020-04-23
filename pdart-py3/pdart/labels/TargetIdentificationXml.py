@@ -16,6 +16,11 @@ def target_identification(
     a document and returns a filled-out ``<Target_Identification />``
     XML node, used in product labels.
     """
+
+    def munge(name: str) -> str:
+        """Munge the string to act as part of a LID."""
+        return name.replace(" ", "_").lower()
+
     func = interpret_template(
         """<Target_Identification>
         <name><NODE name="name"/></name>
@@ -32,8 +37,8 @@ def target_identification(
             "name": target_name,
             "type": target_type,
             "description": target_description,
-            "lower_name": target_name.lower(),
-            "lower_type": target_type.lower(),
+            "lower_name": munge(target_name),
+            "lower_type": munge(target_type),
         }
     )
     return func
