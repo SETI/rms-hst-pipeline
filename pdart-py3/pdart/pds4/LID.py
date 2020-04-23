@@ -110,23 +110,36 @@ class LID(object):
         browse_collection_lid = ":".join(lid_parts)
         return LID(browse_collection_lid)
 
+    def to_other_suffixed_lid(self, suffix: str) -> "LID":
+        """
+        Convert a product LID into the corresponding LID for a file
+        with a different suffix.
+        """
+        assert self.collection_id, "to_other_suffixed_lid(): Can't call on bundle LID"
+        collection_id_parts = self.collection_id.split("_")
+        assert (
+            collection_id_parts[0] == "data"
+        ), f"to_other_suffixed_lid: Only legal within data_ collections; had {self}"
+        # replace the suffix
+        collection_id_parts[2] = suffix
+        other_collection_id = "_".join(collection_id_parts)
+
+        lid_parts = self.lid.split(":")
+        lid_parts[4] = other_collection_id
+        other_product_lid = ":".join(lid_parts)
+        return LID(other_product_lid)
+
+    def to_raw_lid(self) -> "LID":
+        """
+        Convert a product LID into the corresponding LID for a RAW file.
+        """
+        return self.to_other_suffixed_lid("raw")
+
     def to_shm_lid(self) -> "LID":
         """
         Convert a product LID into the corresponding LID for a SHM file.
         """
-        assert self.collection_id, "to_shm_lid(): Can't call on bundle LID"
-        collection_id_parts = self.collection_id.split("_")
-        assert (
-            collection_id_parts[0] == "data"
-        ), f"to_shm_lid: Only legal within data_ collections; had {self}"
-        # replace the suffix
-        collection_id_parts[2] = "shm"
-        shm_collection_id = "_".join(collection_id_parts)
-
-        lid_parts = self.lid.split(":")
-        lid_parts[4] = shm_collection_id
-        shm_product_lid = ":".join(lid_parts)
-        return LID(shm_product_lid)
+        return self.to_other_suffixed_lid("shm")
 
     def extend_lid(self, segment: str) -> "LID":
         """

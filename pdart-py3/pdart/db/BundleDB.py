@@ -40,20 +40,39 @@ _BUNDLE_DIRECTORY_PATTERN: str = r"\Ahst_([0-9]{5})\Z"
 _COLLECTION_DIRECTORY_PATTERN: str = r"\A(([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)|document)\Z"
 
 
-def get_shm_basename(filepath: str) -> str:
+def _get_other_suffixed_basename(filepath: str, suffix: str) -> str:
     # TODO BUFFALO A hack.  Make this private and refactor as necessary.
     match = re.match(r"\A([^_]+)_[^\.]+\..*\Z", os.path.basename(filepath))
     assert match
-    return str(match.group(1)) + "_shm.fits"
+    return f"{match.group(1)}_{suffix}.fits"
 
 
-def get_shm_product_lidvid(lidvid_str: str) -> str:
+def _get_shm_basename(filepath: str) -> str:
+    # TODO BUFFALO A hack.  Make this private and refactor as necessary.
+    # match = re.match(r"\A([^_]+)_[^\.]+\..*\Z", os.path.basename(filepath))
+    # assert match
+    # return str(match.group(1)) + "_shm.fits"
+
+    return _get_other_suffixed_basename(filepath, "shm")
+
+
+def _get_other_suffixed_product_lidvid(lidvid_str: str, suffix: str) -> str:
     lidvid = LIDVID(lidvid_str)
     lid = lidvid.lid()
     vid = lidvid.vid()
-    shm_lid = lid.to_shm_lid()
+    other_lid = lid.to_other_suffixed_lid(suffix)
     # TODO BUFFALO A hack: this is only valid for the initial version.
-    return str(LIDVID.create_from_lid_and_vid(shm_lid, vid))
+    return str(LIDVID.create_from_lid_and_vid(other_lid, vid))
+
+
+def _get_shm_product_lidvid(lidvid_str: str) -> str:
+    # lidvid = LIDVID(lidvid_str)
+    # lid = lidvid.lid()
+    # vid = lidvid.vid()
+    # shm_lid = lid.to_shm_lid()
+    # # TODO BUFFALO A hack: this is only valid for the initial version.
+    # return str(LIDVID.create_from_lid_and_vid(shm_lid, vid))
+    return _get_other_suffixed_product_lidvid(lidvid_str, "shm")
 
 
 def create_bundle_db_from_os_filepath(os_filepath: str) -> "BundleDB":
@@ -635,8 +654,8 @@ class BundleDB(object):
         file = cast(FitsFile, self.get_file(basename, fits_product_lidvid))
         return [get_card_dictionary(i) for i in range(file.hdu_count)]
 
-    def get_shm_card_dictionaries(
-        self, fits_product_lidvid: str, basename: str
+    def get_other_suffixed_card_dictionaries(
+        self, fits_product_lidvid: str, basename: str, suffix: str
     ) -> List[Dict[str, Any]]:
         """
         Return a list of dictionaries mapping FITS keys to their
@@ -645,10 +664,33 @@ class BundleDB(object):
         # TODO BUFFALO
         try:
             return self.get_card_dictionaries(
-                get_shm_product_lidvid(fits_product_lidvid), get_shm_basename(basename)
+                _get_other_suffixed_product_lidvid(fits_product_lidvid, suffix),
+                _get_other_suffixed_basename(basename, suffix),
             )
         except:
-            return []
+            return [{}]
+
+    def get_raw_card_dictionaries(
+        self, fits_product_lidvid: str, basename: str
+    ) -> List[Dict[str, Any]]:
+        """
+        Return a list of dictionaries mapping FITS keys to their
+        values, one per Hdu in the FITS file.
+        """
+        return self.get_other_suffixed_card_dictionaries(
+            fits_product_lidvid, basename, "raw"
+        )
+
+    def get_shm_card_dictionaries(
+        self, fits_product_lidvid: str, basename: str
+    ) -> List[Dict[str, Any]]:
+        """
+        Return a list of dictionaries mapping FITS keys to their
+        values, one per Hdu in the FITS file.
+        """
+        return self.get_other_suffixed_card_dictionaries(
+            fits_product_lidvid, basename, "shm"
+        )
 
     ############################################################
 

@@ -25,12 +25,16 @@ def _get_start_stop_times_from_cards(
 
 
 def get_time_coordinates(
-    fits_product_lidvid: str, card_dicts: List[Dict[str, Any]]
+    fits_product_lidvid: str,
+    card_dicts: List[Dict[str, Any]],
+    raw_card_dicts: List[Dict[str, Any]],
 ) -> NodeBuilder:
     """
     Create and return a ``<Time_Coordinates />`` XML element for the
     product.
     """
-    return time_coordinates(
-        _get_start_stop_times_from_cards(fits_product_lidvid, card_dicts)
-    )
+    try:
+        times = _get_start_stop_times_from_cards(fits_product_lidvid, card_dicts)
+    except KeyError:
+        times = _get_start_stop_times_from_cards(fits_product_lidvid, raw_card_dicts)
+    return time_coordinates(times)
