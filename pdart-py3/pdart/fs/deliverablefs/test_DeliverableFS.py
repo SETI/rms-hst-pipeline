@@ -154,8 +154,8 @@ class Test_DeliverablePrimitives(unittest.TestCase, FSPrimitives_TestBase):
             ("/b/document/label.xml", "/b/document/label.xml"),
             ("/b/c/visit_01", "/b/c/u2mu0101j"),
             ("/b/c/visit_01/label.xml", "/b/c/u2mu0101j/label.xml"),
-            ("/b/document/phase2", "/b/document/phase2"),
-            ("/b/document/phase2/info.pdf", "/b/document/phase2/info.pdf"),
+            ("/b/document/no_visit/phase2", "/b/document/phase2"),
+            ("/b/document/no_visit/phase2/info.pdf", "/b/document/phase2/info.pdf"),
             ("/b/c/no_visit/p", "/b/c/p"),
             ("/b/c/no_visit/p/label.xml", "/b/c/p/label.xml"),
         ]

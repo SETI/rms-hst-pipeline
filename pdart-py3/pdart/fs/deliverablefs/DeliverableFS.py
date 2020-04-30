@@ -70,9 +70,6 @@ def _translate_path_to_base_path(path: str, is_file_hint: Optional[bool] = None)
             # It's a path to a collection file, perhaps a label or
             # inventory, and is fine as is.
             return fs.path.abspath(path)
-        elif c == "document":
-            # It's a path in a document collection.  Leave it as is.
-            return fs.path.abspath(path)
         else:
             # It's a path to a directory.  Does it look like a PDS4
             # product directory?
@@ -90,10 +87,6 @@ def _translate_path_to_base_path(path: str, is_file_hint: Optional[bool] = None)
     else:
         # l_ > 3.  Let's name the first three parts.
         b, c, p = parts[:3]
-        # Is this path part of a document collection?
-        if c == "document":
-            # no change needed
-            return fs.path.abspath(path)
 
         # Does the third part look like a PDS4 product directory or
         # not: does it encode a visit?
@@ -217,8 +210,6 @@ class DeliverablePrimitives(FSPrimitives):
         parts = fs.path.iteratepath(path)
         assert len(parts) == 2
         b, c = parts
-        if c == "document":
-            return {}
         new_path = fs.path.join(path, _NO_VISIT)
         if not self.base_fs.isdir(new_path):
             return {}
