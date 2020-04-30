@@ -405,13 +405,17 @@ class BundleDB(object):
         )
 
     ############################################################
-    def create_context_product(self, lidvid: str) -> None:
+    def create_context_product(self, id: str) -> None:
         """
         Create a context product with this LIDVID if none exists.
         """
-        assert LIDVID(lidvid).is_product_lidvid()
-        if not self.context_product_exists(lidvid):
-            self.session.add(ContextProduct(lidvid=lidvid))
+        if "::" in id:
+            assert LIDVID(id).is_product_lidvid()
+        else:
+            assert LID(id).is_product_lid()
+
+        if not self.context_product_exists(id):
+            self.session.add(ContextProduct(lidvid=id))
             self.session.commit()
 
     def context_product_exists(self, lidvid: str) -> bool:

@@ -8,8 +8,13 @@ from typing import Dict, Tuple
 from pdart.xml.Templates import NodeBuilder, interpret_template
 
 
+def _munge(name: str) -> str:
+    """Munge the string to act as part of a LID."""
+    return name.replace(" ", "_").lower()
+
+
 def target_identification(
-    target_name: str, target_type: str, target_description: str
+    target_name: str, target_type: str, target_description: str, target_lid: str
 ) -> NodeBuilder:
     """
     Given a target name and target type, return a function that takes
@@ -17,18 +22,13 @@ def target_identification(
     XML node, used in product labels.
     """
 
-    def munge(name: str) -> str:
-        """Munge the string to act as part of a LID."""
-        return name.replace(" ", "_").lower()
-
     func = interpret_template(
         """<Target_Identification>
         <name><NODE name="name"/></name>
         <type><NODE name="type"/></type>
         <description><NODE name="description"/></description>
         <Internal_Reference>
-            <lid_reference>urn:nasa:pds:context:target:\
-<NODE name="lower_name"/>.<NODE name="lower_type"/></lid_reference>
+            <lid_reference><NODE name="target_lid"/></lid_reference>
             <reference_type>data_to_target</reference_type>
         </Internal_Reference>
         </Target_Identification>"""
@@ -37,18 +37,24 @@ def target_identification(
             "name": target_name,
             "type": target_type,
             "description": target_description,
-            "lower_name": munge(target_name),
-            "lower_type": munge(target_type),
+            "target_lid": target_lid,
         }
     )
     return func
 
 
+def target_lid(target_name: str, target_type: str) -> str:
+    return f"urn:nasa:pds:context:target:{_munge(target_name)}.{_munge(target_type)}"
+
+
 approximate_target_table: Dict[str, Tuple[str, str]] = {
+    "VENUS": ("Venus", "Planet"),
+    "MARS": ("Mars", "Planet"),
     "JUP": ("Jupiter", "Planet"),
     "SAT": ("Saturn", "Planet"),
     "URA": ("Uranus", "Planet"),
     "NEP": ("Neptune", "Planet"),
+    "CERES": ("Ceres", "Dwarf Planet"),
     "PLU": ("Pluto", "Dwarf Planet"),
     "PLCH": ("Pluto", "Dwarf Planet"),
     "IO": ("Io", "Satellite"),

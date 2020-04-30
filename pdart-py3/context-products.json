@@ -128,7 +128,42 @@
     {
       "name": [],
       "type": [],
+      "lidvid": "urn:nasa:pds:context:target:mercury.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:venus.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:mars.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:jupiter.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:saturn.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
       "lidvid": "urn:nasa:pds:context:target:uranus.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:neptune.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:ceres.dwarf_planet::1.0"
     },
     {
       "name": [],

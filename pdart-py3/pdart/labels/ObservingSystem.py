@@ -16,8 +16,7 @@ _observing_system: NodeBuilderTemplate = interpret_template(
         <name><NODE name="component_name"/></name>
         <type>Instrument</type>
         <Internal_Reference>
-          <lid_reference>urn:nasa:pds:context:instrument:insthost.\
-<NODE name="abbreviation"/></lid_reference>
+          <lid_reference><NODE name="instrument_lid"/></lid_reference>
           <reference_type>is_instrument</reference_type>
         </Internal_Reference>
       </Observing_System_Component>
@@ -33,7 +32,8 @@ acs_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Advanced Camera for Surveys",
         "component_name": "Advanced Camera for Surveys",
-        "abbreviation": "acs",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.acs",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
 """
@@ -45,7 +45,8 @@ wfc3_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Wide Field Camera 3",
         "component_name": "Wide Field Camera 3",
-        "abbreviation": "wfc3",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.wfc3",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
 """
@@ -57,13 +58,22 @@ wfpc2_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Wide-Field Planetary Camera 2",
         "component_name": "Wide-Field Planetary Camera 2",
-        "abbreviation": "wfpc2",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.wfpc2",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
 """
 An interpreted fragment template to create an ``<Observing_System />``
 XML element.
 """
+
+
+def observing_system_lid(instrument: str) -> str:
+    return f"urn:nasa:pds:context:instrument:insthost.{instrument}"
+
+
+def instrument_host_lid() -> str:
+    return "urn:nasa:pds:context:instrument_host:spacecraft.hst"
 
 
 def observing_system(instrument: str) -> NodeBuilder:

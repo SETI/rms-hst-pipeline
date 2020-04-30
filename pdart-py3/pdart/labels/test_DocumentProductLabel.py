@@ -1,3 +1,5 @@
+import os.path
+import tempfile
 import unittest
 
 from pdart.citations import Citation_Information
@@ -20,6 +22,17 @@ class Test_DocumentProductLabel(unittest.TestCase):
         self.db.create_document_collection(collection_lidvid, bundle_lidvid)
 
         document_product_lidvid = "urn:nasa:pds:hst_13012:document:phase2::1.0"
+        self.db.create_document_product(document_product_lidvid, collection_lidvid)
+
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            filename = "phase2.txt"
+            os_filepath = os.path.join(tmpdirname, filename)
+            with open(os_filepath, "w") as f:
+                f.write("Hi!")
+
+            self.db.create_document_file(
+                os_filepath, "phase2.txt", document_product_lidvid
+            )
 
         label = make_document_product_label(
             self.db, self.info, document_product_lidvid, True, "2017-02-31"

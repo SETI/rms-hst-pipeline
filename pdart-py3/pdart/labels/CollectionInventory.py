@@ -40,6 +40,35 @@ def make_collection_inventory(bundle_db: BundleDB, collection_lidvid: str) -> by
     Create the inventory text for the collection having this LIDVID
     using the bundle database.
     """
+    collection = bundle_db.get_collection(collection_lidvid)
+    return switch_on_collection_subtype(
+        collection,
+        make_context_collection_inventory,
+        make_other_collection_inventory,
+        make_other_collection_inventory,
+    )(bundle_db, collection_lidvid)
+
+
+def make_context_collection_inventory(
+    bundle_db: BundleDB, collection_lidvid: str
+) -> bytes:
+    """
+    Create the inventory text for the collection having this LIDVID
+    using the bundle database.
+    """
+    products = bundle_db.get_context_products()
+    inventory_lines: List[str] = [f"S,{product.lidvid}\r\n" for product in products]
+    res: str = "".join(inventory_lines)
+    return res.encode()
+
+
+def make_other_collection_inventory(
+    bundle_db: BundleDB, collection_lidvid: str
+) -> bytes:
+    """
+    Create the inventory text for the collection having this LIDVID
+    using the bundle database.
+    """
     products = bundle_db.get_collection_products(collection_lidvid)
     inventory_lines: List[str] = [f"P,{product.lidvid}\r\n" for product in products]
     res: str = "".join(inventory_lines)

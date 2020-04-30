@@ -12,8 +12,12 @@ from pdart.labels.FitsProductLabelXml import (
 )
 from pdart.labels.HstParameters import get_hst_parameters
 from pdart.labels.LabelError import LabelError
-from pdart.labels.ObservingSystem import observing_system
-from pdart.labels.TargetIdentification import get_target
+from pdart.labels.ObservingSystem import (
+    instrument_host_lid,
+    observing_system,
+    observing_system_lid,
+)
+from pdart.labels.TargetIdentification import get_target, get_target_info
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
@@ -43,6 +47,13 @@ def make_fits_product_label(
     assert bundle.lidvid == bundle_lidvid
     proposal_id = bundle.proposal_id
 
+    investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
+    bundle_db.create_context_product(investigation_area_lidvid)
+    bundle_db.create_context_product(instrument_host_lid())
+    bundle_db.create_context_product(observing_system_lid(instrument))
+    target_info = get_target_info(card_dicts)
+    bundle_db.create_context_product(target_info["lid"])
+
     try:
         label = (
             make_label(
@@ -56,12 +67,12 @@ def make_fits_product_label(
                         bundle_db, card_dicts, instrument, product_lidvid
                     ),
                     "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
-                    "investigation_lidvid": mk_Investigation_Area_lidvid(proposal_id),
+                    "investigation_lidvid": investigation_area_lidvid,
                     "Observing_System": observing_system(instrument),
                     "Time_Coordinates": get_time_coordinates(
                         product_lidvid, card_dicts, raw_card_dicts
                     ),
-                    "Target_Identification": get_target(product_lidvid, card_dicts),
+                    "Target_Identification": get_target(target_info),
                     "HST": get_hst_parameters(card_dicts, shm_card_dicts, instrument),
                 }
             )

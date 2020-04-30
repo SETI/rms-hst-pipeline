@@ -63,6 +63,78 @@ def make_collection_label(
     its XML and Schematron schemas.  Raise an exception if either
     fails.
     """
+    collection = bundle_db.get_collection(collection_lidvid)
+    return switch_on_collection_subtype(
+        collection,
+        make_context_collection_label,
+        make_other_collection_label,
+        make_other_collection_label,
+    )(bundle_db, info, collection_lidvid, verify)
+
+
+def make_context_collection_label(
+    bundle_db: BundleDB,
+    info: Citation_Information,
+    collection_lidvid: str,
+    verify: bool,
+) -> bytes:
+    """
+    Create the label text for the collection having this LIDVID using
+    the bundle database.  If verify is True, verify the label against
+    its XML and Schematron schemas.  Raise an exception if either
+    fails.
+    """
+    # TODO this is sloppy; is there a better way?
+    products = bundle_db.get_context_products()
+    record_count = len(products)
+    assert record_count > 0, f"{collection_lidvid} has no context products"
+
+    collection_lid = lidvid_to_lid(collection_lidvid)
+    collection_vid = lidvid_to_vid(collection_lidvid)
+    collection: Collection = bundle_db.get_collection(collection_lidvid)
+
+    proposal_id = bundle_db.get_bundle().proposal_id
+
+    title: NodeBuilder = make_context_collection_title(
+        {"proposal_id": str(proposal_id)}
+    )
+
+    inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
+
+    try:
+        label = (
+            make_label(
+                {
+                    "collection_lid": collection_lid,
+                    "collection_vid": collection_vid,
+                    "record_count": record_count,
+                    "title": title,
+                    "proposal_id": str(proposal_id),
+                    "Citation_Information": make_citation_information(info),
+                    "inventory_name": inventory_name,
+                }
+            )
+            .toxml()
+            .encode()
+        )
+    except Exception as e:
+        raise LabelError(str(e), collection_lidvid)
+
+    return pretty_and_verify(label, verify)
+
+
+def make_other_collection_label(
+    bundle_db: BundleDB,
+    info: Citation_Information,
+    collection_lidvid: str,
+    verify: bool,
+) -> bytes:
+    """
+    Create the label text for the collection having this LIDVID using
+    the bundle database.  If verify is True, verify the label against
+    its XML and Schematron schemas.  Raise an exception if either
+    fails.
+    """
     # TODO this is sloppy; is there a better way?
     products = bundle_db.get_collection_products(collection_lidvid)
     record_count = len(products)

@@ -38,7 +38,7 @@ from pdart.pds4.VID import VID
 from pdart.pipeline.Stage import Stage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
-_VERIFY = True
+_VERIFY = False
 
 
 def _create_citation_info(
@@ -98,6 +98,7 @@ def create_pds4_labels(
             context_products = bundle_db.get_context_products()
             if not context_products:
                 return
+
             bundle_lidvid = str(bundle.lidvid)
             collection_lidvid = _extend_initial_lidvid(bundle_lidvid, "context")
             bundle_db.create_context_collection(collection_lidvid, bundle_lidvid)
