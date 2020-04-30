@@ -163,6 +163,11 @@
     {
       "name": [],
       "type": [],
+      "lidvid": "urn:nasa:pds:context:target:magrathea.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
       "lidvid": "urn:nasa:pds:context:target:ceres.dwarf_planet::1.0"
     },
     {
