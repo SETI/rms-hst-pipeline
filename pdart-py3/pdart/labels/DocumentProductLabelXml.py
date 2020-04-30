@@ -1,6 +1,7 @@
 """A document template to create a label for a document product."""
 
 from typing import List, Tuple
+import os.path
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
@@ -36,7 +37,7 @@ make_label: DocTemplate = interpret_document_template(
   </Identification_Area>
   <Reference_List>
     <Internal_Reference>
-      <lidvid_reference><NODE name="bundle_lidvid" /></lidvid_reference>
+      <lidvid_reference><NODE name="investigation_lidvid" /></lidvid_reference>
       <reference_type>document_to_investigation</reference_type>
     </Internal_Reference>
   </Reference_List>
@@ -108,24 +109,17 @@ def make_doc_citation_information2(
 # making <Document_Edition>
 # ----------------
 
-_make_file: NodeBuilderTemplate = interpret_template(
-    '<file_name><NODE name="file_name" />\
-</file_name>'
-)
-
-_make_document_standard_id: NodeBuilderTemplate = interpret_template(
-    '<document_standard_id>\
-<NODE name="document_standard_id" />\
-</document_standard_id>'
+_make_document_file_node: NodeBuilderTemplate = interpret_template(
+    """<Document_File>
+<file_name><NODE name="file_name" /></file_name>
+<document_standard_id><NODE name="document_standard_id" /></document_standard_id>
+</Document_File>"""
 )
 
 
-def _make_document_file_entry(file_name: str, document_standard_id: str) -> FragBuilder:
-    return combine_nodes_into_fragment(
-        [
-            _make_file({"file_name": file_name}),
-            _make_document_standard_id({"document_standard_id": document_standard_id}),
-        ]
+def _make_document_file(file_name: str, document_standard_id: str) -> FragBuilder:
+    return _make_document_file_node(
+        {"file_name": file_name, "document_standard_id": document_standard_id}
     )
 
 
@@ -134,27 +128,34 @@ _make_document_edition: NodeBuilderTemplate = interpret_template(
             <edition_name><NODE name="edition_name" /></edition_name>
             <language><NODE name="language" /></language>
             <files><NODE name="files" /></files>
-            <Document_File>
-            <FRAGMENT name="document_file_entries" />
-            </Document_File>
+            <FRAGMENT name="document_files" />
         </Document_Edition>"""
 )
 
 
-def make_document_edition(
-    edition_name: str, file_stds: List[Tuple[str, str]]
-) -> NodeBuilder:
+def _get_document_standard_id(file_basename: str) -> str:
+    (_, ext) = os.path.splitext(file_basename)
+    return {
+        ".apt": "UTF-8 Text",  # it's XML
+        ".pdf": "PDF",
+        ".pro": "7-Bit ASCII Text",
+        ".prop": "7-Bit ASCII Text",
+        ".txt": "7-Bit ASCII Text",
+    }[ext]
 
-    fragments: List[FragBuilder] = [
-        _make_document_file_entry(file_name, document_standard_id)
-        for (file_name, document_standard_id) in file_stds
+
+def make_document_edition(edition_name: str, file_basenames: List[str]) -> NodeBuilder:
+
+    nodes: List[NodeBuilder] = [
+        _make_document_file(file_basename, _get_document_standard_id(file_basename))
+        for file_basename in file_basenames
     ]
 
     return _make_document_edition(
         {
             "edition_name": edition_name,
             "language": "English",
-            "files": len(file_stds),
-            "document_file_entries": combine_fragments_into_fragment(fragments),
+            "files": len(file_basenames),
+            "document_files": combine_nodes_into_fragment(nodes),
         }
     )

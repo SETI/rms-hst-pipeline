@@ -3,7 +3,112 @@
     {
       "name": [],
       "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.acs::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
       "lidvid": "urn:nasa:pds:context:instrument:insthost.wfc3::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.wfpc2::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05167::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05238::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05640::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05783::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_06621::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_07240::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_09296::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_09678::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_09985::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_10719::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_11109::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_11497::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_11536::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_12436::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_13012::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_13713::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_13936::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_14491::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_15098::1.0"
     },
     {
       "name": [],
@@ -13,7 +118,22 @@
     {
       "name": [],
       "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_15581::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
       "lidvid": "urn:nasa:pds:context:target:europa.satellite::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:uranus.planet::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:target:pluto.dwarf_planet::1.0"
     }
   ]
 }
