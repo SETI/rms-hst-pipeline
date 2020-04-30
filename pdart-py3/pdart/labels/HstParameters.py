@@ -283,7 +283,14 @@ def get_instrument_mode_id(card_dicts: _CARDS, instrument: str) -> str:
     else:
         assert instrument == "wfc3"
         res = card_dicts[0]["OBSMODE"]
-    return res.lower()
+    res = res.lower()
+
+    # TODO Temporary hack until I get updated XML schemas to allow 'multiaccum' as a value
+    if _USING_PLACEHOLDER and res == "multiaccum":
+        # TODO-PLACEHOLDER
+        res = "accum"
+
+    return res
 
 
 ##############################
