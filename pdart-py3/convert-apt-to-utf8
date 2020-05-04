@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# I need usage; I need to put the result into the right place.  But
+# xsltproc and xmllint do the trick.
+xsltproc xml/convert-to-utf8.xslt $@ | xmllint --format - | more
+
