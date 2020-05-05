@@ -1,6 +1,31 @@
 #!/bin/bash
 
-# I need usage; I need to put the result into the right place.  But
-# xsltproc and xmllint do the trick.
-xsltproc xml/convert-to-utf8.xslt $@ | xmllint --format - | more
+die(){
+    echo $@ >&2
+    exit 1
+}
 
+usage(){
+    die Usage: "$(basename $0)" '<apt-file>'
+}
+
+if [ $# -ne 1 ]; then
+    usage
+fi
+
+APT_FILE=$1
+shift
+
+TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp/}$(basename $0).XXXXXXXXXXXX")
+trap "rm -rf $TEMP_DIR" EXIT
+
+TEMP_FILE1=$TEMP_DIR/$(basename $APT_FILE).utf8
+TEMP_FILE2=$TEMP_DIR/$(basename $APT_FILE).pretty
+
+xsltproc xml/convert-to-utf8.xslt $APT_FILE > $TEMP_FILE1 || die xsltproc failed
+
+xmllint --format --output $TEMP_FILE2 $TEMP_FILE1 || die xmllint failed
+
+mv $TEMP_FILE2 $APT_FILE || die mv failed
+
+exit 0
