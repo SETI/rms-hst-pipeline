@@ -19,6 +19,13 @@ class Test_MarkerFile(unittest.TestCase):
         # Test that get on nothing returns None
         self.assertIsNone(mf.get_marker())
 
+        # Test that empty text gets canonicalized to None
+        mf.set_marker(MarkerInfo("foo", "bar", ""))
+        m = mf.get_marker()
+        # Superfluous test to let mypy know m != None
+        if m is not None:
+            self.assertIsNone(m.text)
+
     def test_clear_marker(self) -> None:
         mf: MarkerFile = self.mf
         # Test that clear on nothing is harmless

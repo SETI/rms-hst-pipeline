@@ -48,8 +48,12 @@ class BasicMarkerFile(MarkerFile):
         m = re.match(_RE, os.path.basename(path))
         if m:
             with open(os.path.join(self._directory, path), "r") as f:
-                text = f.read()
-            return MarkerInfo(m.group(1), m.group(2), text)
+                text: str = f.read()
+                # canonicalize empty contents to None
+                if len(text) == 0:
+                    return MarkerInfo(m.group(1), m.group(2), None)
+                else:
+                    return MarkerInfo(m.group(1), m.group(2), text)
         else:
             return None
 
