@@ -70,6 +70,11 @@ class BasicMarkerFile(MarkerFile):
             old_path: str = os.path.join(self._directory, _info_to_path(old_info))
             os.remove(old_path)
 
+    def set_marker_info(
+        self, phase: str, state: str, text: Optional[str] = None
+    ) -> None:
+        self.set_marker(MarkerInfo(phase, state, text))
+
     def set_marker(self, new_info: MarkerInfo) -> None:
         self.clear_marker()
         with open(os.path.join(self._directory, _info_to_path(new_info)), "w") as f:

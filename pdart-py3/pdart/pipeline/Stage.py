@@ -3,6 +3,7 @@ import os
 import traceback
 
 from pdart.pipeline.Directories import Directories
+from pdart.pipeline.MarkerFile import BasicMarkerFile
 
 FAILURE_MARKER: str = "LAST$FAILURE.txt"
 
@@ -12,6 +13,7 @@ class Stage(metaclass=abc.ABCMeta):
         self._bundle_segment = f"hst_{proposal_id:05}"
         self._dirs = dirs
         self._proposal_id = proposal_id
+        self._marker_file = BasicMarkerFile(self.working_dir())
 
     def class_name(self) -> str:
         return type(self).__name__
@@ -22,8 +24,11 @@ class Stage(metaclass=abc.ABCMeta):
         failure_marker_filepath = os.path.join(self.working_dir(), FAILURE_MARKER)
         if not os.path.isfile(failure_marker_filepath):
             try:
+                self._marker_file.set_marker_info(self.class_name(), "running")
                 self._run()
+                self._marker_file.set_marker_info(self.class_name(), "success")
             except Exception as e:
+                self._marker_file.set_marker_info(self.class_name(), "failure")
                 with open(failure_marker_filepath, "w") as f:
                     header = (
                         f"EXCEPTION raised by {self._bundle_segment}, "
