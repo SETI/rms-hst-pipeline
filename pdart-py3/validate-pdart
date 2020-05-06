@@ -2,31 +2,51 @@
 
 echo "**** validate-pdart $@"
 
-XMLDIR=${HOME}/pdart/pdart-py3/xml
-
+BASE_DIR=${HOME}/pdart/pdart-py3
+CONTEXT_PRODUCTS="${BASE_DIR}"/context-products.json
+XMLDIR=${BASE_DIR}/xml
 SCHEMAS="${XMLDIR}/PDS4_HST_1D00_1000.xsd.xml, ${XMLDIR}/PDS4_DISP_1B00.xsd.xml"
 SCHEMATRONS="${XMLDIR}/PDS4_HST_1D00_1000.sch.xml, ${XMLDIR}/PDS4_DISP_1B00.sch.xml"
 
-REPORT_NAME='../validation-report.txt'
+die(){
+    echo $@ >&2
+}
 
-# Locate the context-products file.
-PWD=$(pwd)
-CONTEXT_PRODUCTS="${PWD}"/context-products.json
+usage(){
+    die Usage: "$(basename $0)" "<bundle-dir>" "<manifest-dir>" "<report-dir>"
+}
 
-cd "$1" || exit
+if [ $# -ne 3 ]; then
+    usage
+    exit 1
+fi
+
+BUNDLE_DIR=$1
+MANIFEST_DIR=$2
+REPORT_DIR=$3
+REPORT_FILEPATH="${REPORT_DIR}"/validation-report.txt
 
 # NOTE: the -D is temporary until we have a tool to remove NaNs from
 # data.
 
 # NOTE: the --add-context line is also temporary until we have context
 # products ready.
-
-validate . -M checksum.manifest.txt -R pds4.bundle \
+validate "${BUNDLE_DIR}" -M "${MANIFEST_DIR}"/checksum.manifest.txt -R pds4.bundle \
     -D \
     --add-context "${CONTEXT_PRODUCTS}" \
     -S ${SCHEMATRONS} -x ${SCHEMAS} \
-    -r "${REPORT_NAME}"
+    -r "${REPORT_FILEPATH}"
 
-# 'validate' returns a success error code even if the validation
-# fails, so we have to kludge around that.
-if grep -q FAIL ${REPORT_NAME}; then exit 1; else exit 0; fi
+if [ ! -f "${REPORT_FILEPATH}" ]; then
+    die A PDS4 validation report was not generated.
+    exit 1
+fi
+
+# The validation tool returns a success error code even if the
+# validation fails, so we have to kludge around that.
+if grep -q FAIL "${REPORT_FILEPATH}"; then
+    die Validation contains failures.
+    exit 1
+fi
+
+exit 0

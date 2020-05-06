@@ -65,3 +65,12 @@ class Stage(metaclass=abc.ABCMeta):
 
     def deliverable_dir(self) -> str:
         return self._dirs.deliverable_dir(self._proposal_id)
+
+    def deliverable_bundle_dir(self) -> str:
+        return self._dirs.deliverable_bundle_dir(self._proposal_id)
+
+    def manifest_dir(self) -> str:
+        return self._dirs.manifest_dir(self._proposal_id)
+
+    def validation_report_dir(self) -> str:
+        return self._dirs.validation_report_dir(self._proposal_id)

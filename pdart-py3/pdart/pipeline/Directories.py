@@ -42,9 +42,20 @@ class Directories(object, metaclass=abc.ABCMeta):
         return os.path.join(self.working_dir(proposal_id), "archive")
 
     def deliverable_dir(self, proposal_id: int) -> str:
+        bundle_segment = f"hst_{proposal_id:05}"
         return os.path.join(
-            self.working_dir(proposal_id), f"hst_{proposal_id:05}-deliverable"
+            self.working_dir(proposal_id), f"{bundle_segment}-deliverable"
         )
+
+    def deliverable_bundle_dir(self, proposal_id: int) -> str:
+        bundle_segment = f"hst_{proposal_id:05}"
+        return os.path.join(self.deliverable_dir(proposal_id), bundle_segment)
+
+    def manifest_dir(self, proposal_id: int) -> str:
+        return self.deliverable_dir(proposal_id)
+
+    def validation_report_dir(self, proposal_id: int) -> str:
+        return self.working_dir(proposal_id)
 
 
 class DevDirectories(Directories):

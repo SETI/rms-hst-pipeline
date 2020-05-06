@@ -15,6 +15,12 @@ from pdart.pds4.LIDVID import LIDVID
 _LTD = Callable[[LIDVID], str]
 
 
+def plain_lidvid_to_dirpath(lidvid: LIDVID) -> str:
+    lid = lidvid.lid()
+    parts = lid.parts()[1:]
+    return fs.path.join("/", *parts)
+
+
 def make_checksum_manifest(bundle_db: BundleDB, lidvid_to_dirpath: _LTD) -> str:
     files: List[File] = []
 

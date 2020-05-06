@@ -2,7 +2,6 @@
 
 die(){
     echo $@ >&2
-    exit 1
 }
 
 usage(){
@@ -22,10 +21,23 @@ trap "rm -rf $TEMP_DIR" EXIT
 TEMP_FILE1=$TEMP_DIR/$(basename $APT_FILE).utf8
 TEMP_FILE2=$TEMP_DIR/$(basename $APT_FILE).pretty
 
-xsltproc xml/convert-to-utf8.xslt $APT_FILE > $TEMP_FILE1 || die xsltproc failed
+xsltproc xml/convert-to-utf8.xslt $APT_FILE > $TEMP_FILE1
+if [[ $? -ne 0 ]]; then
+    die xsltproc failed
+    exit 1
+fi
 
-xmllint --format --output $TEMP_FILE2 $TEMP_FILE1 || die xmllint failed
 
-mv $TEMP_FILE2 $APT_FILE || die mv failed
+xmllint --format --output $TEMP_FILE2 $TEMP_FILE1
+if [[ $? -ne 0 ]]; then
+    die xmllint failed
+    exit 1
+fi
+
+mv $TEMP_FILE2 $APT_FILE
+if [[ $? -ne 0 ]]; then
+    die mv failed
+    exit 1
+fi
 
 exit 0
