@@ -1,5 +1,6 @@
 import abc
 import os
+import os.path
 import traceback
 
 from pdart.pipeline.Directories import Directories
@@ -21,6 +22,8 @@ class Stage(metaclass=abc.ABCMeta):
     ##############################
 
     def __call__(self) -> None:
+        if not os.path.exists(self.working_dir()):
+            os.makedirs(self.working_dir())
         failure_marker_filepath = os.path.join(self.working_dir(), FAILURE_MARKER)
         if not os.path.isfile(failure_marker_filepath):
             try:

@@ -14,4 +14,3 @@ class ValidateBundle(Stage):
             ]
         )
         completed_process.check_returncode()
-        raise Exception("Succeeded but leaving a failure marker to prevent retries.")

@@ -46,9 +46,9 @@ t: venv
 # THE PIPELINE
 ############################################################
 
-ACS_IDS=09296 09678 09985 10719 11109 13012 15098
-WFC3_IDS=11536 12436 13713 13936 14491 15419 15581
-WFPC2_IDS=05167 05238 05640 05783 06621 07240 11497 
+ACS_IDS=09059 09296 09678 09985 10719 11109 13012 15098
+WFC3_IDS=11536 12436 13713 13936 14136 14491 15419 15581
+WFPC2_IDS=05167 05238 05640 05783 05824 06621 07240 11497
 
 PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
 # PROJ_IDS=12436 15419 15581  # these make it as far as validation
@@ -71,6 +71,10 @@ pipeline : venv
         done; \
 	say pipeline is done
 	open tmp-working-dir
+
+.PHONY: results
+results :
+	find tmp-working-dir -name '#*' | sort | more
 
 ############################################################
 # THE VIRTUAL ENVIRONMENT

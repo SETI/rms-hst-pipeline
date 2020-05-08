@@ -38,6 +38,11 @@
     {
       "name": [],
       "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05824::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
       "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_06621::1.0"
     },
     {
@@ -99,6 +104,11 @@
       "name": [],
       "type": [],
       "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_13936::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_14136::1.0"
     },
     {
       "name": [],
