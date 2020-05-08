@@ -75,7 +75,7 @@ pipeline : venv
 
 .PHONY: results
 results :
-	find tmp-working-dir -name '#*' | sort | more
+	find tmp-working-dir -name '#*' | sort
 
 .PHONY: clean-results
 clear-results :

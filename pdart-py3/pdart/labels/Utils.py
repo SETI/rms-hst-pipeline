@@ -49,7 +49,7 @@ def assert_golden_file_equal(
     filepath = _golden_filepath(basename)
     if isfile(filepath):
         contents = _golden_file_contents(filepath)
-        testcase.assertEqual(contents, calculated_contents)
+        testcase.assertEqual(contents, calculated_contents, f"golden file {filepath!r}")
     else:
         with open(filepath, "wb") as f:
             f.write(calculated_contents)

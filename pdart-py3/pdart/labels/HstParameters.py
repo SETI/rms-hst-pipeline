@@ -208,6 +208,9 @@ def get_gain_mode_id(card_dicts: _CARDS, instrument: str) -> str:
     """
     Return text for the ``<gain_mode_id />`` XML element.
     """
+    if _USING_PLACEHOLDER:
+        # TODO-PLACEHOLDER
+        return "@@@"
     try:
         atodgain = card_dicts[0]["ATODGAIN"]
         if instrument == "acs":

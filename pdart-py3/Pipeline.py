@@ -16,7 +16,6 @@ from pdart.pipeline.RecordChanges import RecordChanges
 from pdart.pipeline.ResetPipeline import ResetPipeline
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.ValidateBundle import ValidateBundle
-from pdart.pipeline.Stage import FAILURE_MARKER
 
 
 _STAGE = Callable[[], None]

@@ -6,8 +6,6 @@ import traceback
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.MarkerFile import BasicMarkerFile
 
-FAILURE_MARKER: str = "LAST$FAILURE.txt"
-
 
 class Stage(metaclass=abc.ABCMeta):
     def __init__(self, dirs: Directories, proposal_id: int) -> None:
@@ -24,22 +22,19 @@ class Stage(metaclass=abc.ABCMeta):
     def __call__(self) -> None:
         if not os.path.exists(self.working_dir()):
             os.makedirs(self.working_dir())
-        failure_marker_filepath = os.path.join(self.working_dir(), FAILURE_MARKER)
-        if not os.path.isfile(failure_marker_filepath):
-            try:
-                self._marker_file.set_marker_info(self.class_name(), "running")
-                self._run()
-                self._marker_file.set_marker_info(self.class_name(), "success")
-            except Exception as e:
-                self._marker_file.set_marker_info(self.class_name(), "failure")
-                with open(failure_marker_filepath, "w") as f:
-                    header = (
-                        f"EXCEPTION raised by {self._bundle_segment}, "
-                        f"stage {self.class_name()}:"
-                    )
-                    print("****", header, str(e))
-                    print(header, file=f)
-                    print(traceback.format_exc(), file=f)
+        marker_info = self._marker_file.get_marker()
+        if marker_info and marker_info.state == "FAILURE":
+            return
+        try:
+            self._marker_file.set_marker_info(self.class_name(), "running")
+            self._run()
+            self._marker_file.set_marker_info(self.class_name(), "success")
+        except Exception as e:
+            error_text = f"""EXCEPTION raised by {self._bundle_segment}, stage {self.class_name()}: {e}
+{traceback.format_exc()}
+"""
+            print("****", error_text)
+            self._marker_file.set_marker_info(self.class_name(), "failure", error_text)
 
     @abc.abstractmethod
     def _run(self) -> None:
