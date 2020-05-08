@@ -46,12 +46,13 @@ t: venv
 # THE PIPELINE
 ############################################################
 
-ACS_IDS=09059 09296 09678 09985 10719 11109 13012 15098
-WFC3_IDS=11536 12436 13713 13936 14136 14491 15419 15581
-WFPC2_IDS=05167 05238 05640 05783 05824 06621 07240 11497
+ACS_IDS=09059 09296 09678 09985 10461 10719 10774 11109 13012 13199 15098
+WFC3_IDS=11536 12436 13713 13716 13936 14136 14491 15142 15233 15419 15581
+WFPC2_IDS=05219 05167 05238 05640 05633 05783 05824 06145 06621 07240 11497
 
 PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
-# PROJ_IDS=12436 15419 15581  # these make it as far as validation
+# PROJ_IDS=11536 12436 13713 14136 14491 15142 15419 15581
+# these make it as far as validation
 
 STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
     record_changes insert_changes populate_database build_browse	\
@@ -75,6 +76,10 @@ pipeline : venv
 .PHONY: results
 results :
 	find tmp-working-dir -name '#*' | sort | more
+
+.PHONY: clean-results
+clear-results :
+	find tmp-working-dir -name '#*' -delete
 
 ############################################################
 # THE VIRTUAL ENVIRONMENT

@@ -20,16 +20,15 @@ _CARDS = List[Dict[str, Any]]
 _USING_PLACEHOLDER: bool = True
 
 
-def get_repeat_exposure_count() -> str:
+def get_repeat_exposure_count(card_dicts: _CARDS) -> str:
     """
     Return a placeholder integer for the ``<repeat_exposure_count
     />`` XML element, noting the problem.
     """
-    if _USING_PLACEHOLDER:
-        # TODO-PLACEHOLDER
+    try:
+        return card_dicts[0]["NRPTEXP"]
+    except KeyError:
         return "1"
-    else:
-        assert False, "implement this"
 
 
 def get_subarray_flag(card_dicts: _CARDS, instrument: str) -> str:
@@ -359,7 +358,7 @@ def get_hst_parameters(
                 "detector_id": get_detector_id(card_dicts, instrument),
                 "gain_mode_id": get_gain_mode_id(card_dicts, instrument),
                 "observation_type": get_observation_type(card_dicts, instrument),
-                "repeat_exposure_count": get_repeat_exposure_count(),
+                "repeat_exposure_count": get_repeat_exposure_count(card_dicts),
                 "subarray_flag": get_subarray_flag(card_dicts, instrument),
             }
         )
@@ -381,7 +380,7 @@ def get_hst_parameters(
             {
                 "detector_id": get_detector_id(card_dicts, instrument),
                 "observation_type": get_observation_type(card_dicts, instrument),
-                "repeat_exposure_count": get_repeat_exposure_count(),
+                "repeat_exposure_count": get_repeat_exposure_count(card_dicts),
                 "subarray_flag": get_subarray_flag(card_dicts, instrument),
             }
         )
