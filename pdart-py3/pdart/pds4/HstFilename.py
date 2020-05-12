@@ -53,6 +53,16 @@ class HstFilename(object):
         """
         return str(self._basename()[1:4].lower())
 
+    def rootname(self) -> str:
+        """
+        Return the "rootname" of the filename, that is all characters
+        before the underscore of the suffix.  This is used in
+        association tables.
+        """
+        match = re.match(r"\A([^_]+)_.*\Z", self._basename())
+        assert match
+        return str(match.group(1))
+
     def suffix(self) -> str:
         """
         Return the suffix of the filename, that is all characters

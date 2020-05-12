@@ -28,6 +28,10 @@ class TestHstFilename(unittest.TestCase):
         hst = HstFilename(_TEST_FILENAME)
         self.assertEqual("acs", hst.instrument_name())
 
+    def test_rootname(self) -> None:
+        hst = HstFilename(_TEST_FILENAME)
+        self.assertEqual("j6gp01mmq", hst.rootname())
+
     def test_hst_internal_proposal_id(self) -> None:
         hst = HstFilename(_TEST_FILENAME)
         self.assertEqual("6gp", hst.hst_internal_proposal_id())
