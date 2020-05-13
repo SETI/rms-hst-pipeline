@@ -6,6 +6,7 @@ from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
 
 from pdart.db.SqlAlchTables import (
+    Association,
     BadFitsFile,
     BrowseFile,
     BrowseProduct,

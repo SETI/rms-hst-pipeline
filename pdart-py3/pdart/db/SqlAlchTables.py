@@ -4,6 +4,7 @@ from sqlalchemy import Column, ForeignKey, Index, Integer, String, UniqueConstra
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import RelationshipProperty, backref, relationship
+from sqlalchemy.types import Boolean
 
 Base: Any = declarative_base()
 
@@ -363,6 +364,42 @@ class Hdu(Base):
             f"dat_loc={self.dat_loc}, "
             f"dat_span={self.dat_span})"
         )
+
+
+class Association(Base):
+    """
+    A database representation of a binary association table entry.
+    """
+
+    __tablename__ = "associations"
+    id = Column(Integer, primary_key=True, nullable=False)
+    product_lidvid = Column(String, ForeignKey("products.lidvid"), nullable=False)
+    association_index = Column(Integer, nullable=False)
+    hdu_index = Column(Integer, ForeignKey("hdus.hdu_index"), nullable=False)
+    memname = Column(String, nullable=False)
+    memtype = Column(String, nullable=False)
+    memprsnt = Column(Boolean, nullable=False)
+
+    hdu: RelationshipProperty = relationship(
+        "Hdu", backref=backref("associations", order_by=id)  # type: ignore
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"Association(product_lidvid={self.product_lidvid!r}, "
+            f"hdu_index={self.hdu_index}, "
+            f"association_index={self.association_index}, "
+            f"memname={self.memname!r}, "
+            f"memtype={self.memtype!r})"
+            f"memprsnt={self.memprsnt})"
+        )
+
+
+Index(
+    "idx_associations_product_hdu_index",
+    Association.product_lidvid,
+    Association.hdu_index,
+)
 
 
 class Card(Base):

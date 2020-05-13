@@ -1,4 +1,10 @@
 from typing import Any, Optional, Sized
+from astropy.io.fits.column import ColDefs
+
+class BinTableHDU(Sized):
+    columns: ColDefs
+    data: Any
+    def __len__(self) -> int: ...
 
 class HDUList(Sized):
     def close(

@@ -5,11 +5,46 @@ import astropy.io.fits.card
 from fs.path import basename
 
 from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import Card, Hdu
+from pdart.db.SqlAlchTables import Association, Card, Hdu
+from pdart.pds4.HstFilename import HstFilename
 
 _PYFITS_CARD = Any
 _PYFITS_HDU = Any
 _PYFITS_OBJ = Any
+
+
+def _populate_associations(
+    db: BundleDB, fits_product_lidvid: str, pyfits_obj: _PYFITS_OBJ
+) -> None:
+    # Here we blindly assert that the second HDU is a binary
+    # table.
+    ASSOC_HDU_INDEX = 1
+    bin_table = pyfits_obj[ASSOC_HDU_INDEX]  # type: ignore
+    assert isinstance(bin_table, astropy.io.fits.BinTableHDU), type(bin_table)
+
+    # Asserting for now that the three columns are named MEMNAME,
+    # MEMTYPE and MEMPRSNT.
+    column_names = [col.name for col in bin_table.columns]
+    assert ["MEMNAME", "MEMTYPE", "MEMPRSNT"] == column_names, column_names
+
+    def create_assoc_dict(
+        assoc_indx: int, memname: str, memtype: str, memprsnt: bool
+    ) -> Dict[str, Any]:
+        return {
+            "product_lidvid": fits_product_lidvid,
+            "association_index": assoc_indx,
+            "hdu_index": ASSOC_HDU_INDEX,
+            "memname": memname,
+            "memtype": memtype,
+            "memprsnt": memprsnt,
+        }
+
+    assoc_dicts: List[Dict[str, Any]] = [
+        create_assoc_dict(assoc_indx, memname, memtype, memprsnt)
+        for (assoc_indx, (memname, memtype, memprsnt)) in enumerate(bin_table.data)
+    ]
+
+    db.session.bulk_insert_mappings(Association, assoc_dicts)
 
 
 def populate_database_from_fits_file(
@@ -23,7 +58,9 @@ def populate_database_from_fits_file(
             db.create_fits_file(
                 os_filepath, file_basename, fits_product_lidvid, len(fits)
             )
-            _populate_hdus_and_cards(db, fits, file_basename, fits_product_lidvid)
+            _populate_hdus_associations_and_cards(
+                db, fits, file_basename, fits_product_lidvid
+            )
         finally:
             fits.close()
 
@@ -31,7 +68,7 @@ def populate_database_from_fits_file(
         db.create_bad_fits_file(os_filepath, file_basename, fits_product_lidvid, str(e))
 
 
-def _populate_hdus_and_cards(
+def _populate_hdus_associations_and_cards(
     db: BundleDB, pyfits_obj: _PYFITS_OBJ, file_basename: str, fits_product_lidvid: str
 ) -> None:
     def create_hdu_dict(index: int, hdu: _PYFITS_HDU) -> Dict[str, Any]:
@@ -76,6 +113,10 @@ def _populate_hdus_and_cards(
         for card_index, card in enumerate(hdu.header.cards)
     ]
     db.session.bulk_insert_mappings(Card, card_dicts)
+
+    if HstFilename(file_basename).suffix() == "asn":
+        _populate_associations(db, fits_product_lidvid, pyfits_obj)
+
     db.session.commit()
 
 

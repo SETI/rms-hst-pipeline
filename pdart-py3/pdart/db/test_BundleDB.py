@@ -14,6 +14,7 @@ from pdart.db.Utils import file_md5
 from pdart.pds4.LIDVID import LIDVID
 
 _TABLES: Set[str] = {
+    "associations",
     "bundles",
     "collections",
     "context_collections",

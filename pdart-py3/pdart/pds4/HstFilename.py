@@ -61,7 +61,7 @@ class HstFilename(object):
         """
         match = re.match(r"\A([^_]+)_.*\Z", self._basename())
         assert match
-        return str(match.group(1))
+        return str(match.group(1)).lower()
 
     def suffix(self) -> str:
         """
@@ -71,7 +71,7 @@ class HstFilename(object):
         """
         match = re.match(r"\A[^_]+_([^.]+)\..*\Z", self._basename())
         assert match
-        return str(match.group(1))
+        return str(match.group(1)).lower()
 
     def visit(self) -> str:
         """
