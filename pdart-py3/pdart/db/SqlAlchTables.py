@@ -190,6 +190,7 @@ class FitsProduct(Product):
     product_lidvid = Column(
         String, ForeignKey("products.lidvid"), primary_key=True, nullable=False
     )
+    rootname = Column(String, nullable=False)
 
     __mapper_args__ = {
         "polymorphic_identity": "fits_product",
@@ -313,6 +314,7 @@ class FitsFile(File):
     __tablename__ = "fits_files"
 
     file_id = Column(Integer, ForeignKey("files.id"), primary_key=True, nullable=False)
+    rootname = Column(String, nullable=False)
     hdu_count = Column(Integer, nullable=False)
 
     __mapper_args__ = {"polymorphic_identity": "fits_file"}
@@ -322,6 +324,7 @@ class FitsFile(File):
             f"FitsFile(id={self.id}, "
             f"product_lidvid={self.product_lidvid!r}, "
             f"basename={self.basename!r}, "
+            f"rootname={self.rootname!r}, "
             f"hdu_count={self.hdu_count})"
         )
 
@@ -358,7 +361,7 @@ class Hdu(Base):
 
     def __repr__(self) -> str:
         return (
-            f"Hdu(product_lid={self.product.lid!r}, "
+            f"Hdu(product_lidvid={self.product_lidvid!r}, "
             f"hdu_index={self.hdu_index}, "
             f"hdr_loc={self.hdr_loc}, "
             f"dat_loc={self.dat_loc}, "

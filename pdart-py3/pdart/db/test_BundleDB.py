@@ -44,7 +44,7 @@ class Test_BundleDB(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
-        (handle, filepath) = tempfile.mkstemp()
+        (handle, filepath) = tempfile.mkstemp(suffix="_raw.fits", prefix="i")
         os.write(handle, os.urandom(32))
         os.close(handle)
         self.dummy_os_filepath = filepath

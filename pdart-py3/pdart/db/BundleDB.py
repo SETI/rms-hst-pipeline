@@ -33,6 +33,7 @@ from pdart.db.SqlAlchTables import (
     switch_on_collection_subtype,
 )
 from pdart.db.Utils import file_md5
+from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 
@@ -340,7 +341,9 @@ class BundleDB(object):
         """
         Create a product with this LIDVID if none exists.
         """
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        product_lidvid2 = LIDVID(product_lidvid)
+        assert product_lidvid2.is_product_lidvid(), product_lidvid
+        rootname: str = cast(str, product_lidvid2.lid().product_id)
         LIDVID(collection_lidvid)
         if self.product_exists(product_lidvid):
             if self.fits_product_exists(product_lidvid):
@@ -351,7 +354,11 @@ class BundleDB(object):
                 )
         else:
             self.session.add(
-                FitsProduct(lidvid=product_lidvid, collection_lidvid=collection_lidvid)
+                FitsProduct(
+                    lidvid=product_lidvid,
+                    collection_lidvid=collection_lidvid,
+                    rootname=rootname,
+                )
             )
             self.session.commit()
 
@@ -517,6 +524,7 @@ class BundleDB(object):
                     basename=basename,
                     md5_hash=file_md5(os_filepath),
                     product_lidvid=product_lidvid,
+                    rootname=HstFilename(os_filepath).rootname(),
                     hdu_count=hdu_count,
                 )
             )

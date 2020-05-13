@@ -61,7 +61,8 @@ STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
 .PHONY: pipeline
 pipeline : venv
 	mkdir -p tmp-working-dir
-	-rm tmp-working-dir/*/LAST*.txt  # can't say dollar-sign
+	# -rm tmp-working-dir/*/LAST*.txt  # can't say dollar-sign
+	-rm tmp-working-dir/*/\#*.txt
 	for project_id in $(PROJ_IDS); do \
 	    for step in $(STEPS); do \
 		echo $$project_id $$step; \
