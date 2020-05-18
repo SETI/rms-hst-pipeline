@@ -15,26 +15,45 @@ fi
 APT_FILE=$1
 shift
 
+# Backup the APT file.
+# cp $APT_FILE $APT_FILE.orig
+
+# Check the original encoding and set the comment to insert.
+if grep -q '<?xml version="1.0" encoding="UTF-8"?>' $APT_FILE; then
+    # It's already UTF-8
+    ACTION="File reformatted"
+else
+    # It's not UTF-8
+    ACTION="File encoding converted to UTF-8 and reformatted"
+fi
+COMMENT="<!-- $ACTION by the PDS RMS Node -->"
+
+# Make a temporary directory for conversion.
 TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp/}$(basename $0).XXXXXXXXXXXX")
 trap "rm -rf $TEMP_DIR" EXIT
 
-TEMP_FILE1=$TEMP_DIR/$(basename $APT_FILE).utf8
-TEMP_FILE2=$TEMP_DIR/$(basename $APT_FILE).pretty
-
-xsltproc xml/convert-to-utf8.xslt $APT_FILE > $TEMP_FILE1
+# Reencode.
+UTF8_FILE=$TEMP_DIR/$(basename $APT_FILE).utf8
+xsltproc xml/convert-to-utf8.xslt $APT_FILE > $UTF8_FILE
 if [[ $? -ne 0 ]]; then
     die xsltproc failed
     exit 1
 fi
 
+# Comment.
+COMMENTED_FILE=$TEMP_DIR/$(basename $APT_FILE).commented
+sed "s/<?xml .*/&$COMMENT/" < $UTF8_FILE > $COMMENTED_FILE
 
-xmllint --format --output $TEMP_FILE2 $TEMP_FILE1
+# Reformat.
+PRETTY_FILE=$TEMP_DIR/$(basename $APT_FILE).pretty
+xmllint --format --output $PRETTY_FILE $COMMENTED_FILE
 if [[ $? -ne 0 ]]; then
     die xmllint failed
     exit 1
 fi
 
-mv $TEMP_FILE2 $APT_FILE
+# Copy back.
+mv $PRETTY_FILE $APT_FILE
 if [[ $? -ne 0 ]]; then
     die mv failed
     exit 1
