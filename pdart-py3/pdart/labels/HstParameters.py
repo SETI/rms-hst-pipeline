@@ -120,11 +120,11 @@ def get_detector_id(card_dicts: _CARDS, instrument: str) -> str:
 ##############################
 
 
-def get_exposure_duration(card_dicts: _CARDS) -> str:
+def get_exposure_duration(start_stop_times: Dict[str, str]) -> str:
     """
     Return a float for the ``<exposure_duration />`` XML element.
     """
-    return str(card_dicts[0]["EXPTIME"])
+    return start_stop_times["exposure_duration"]
 
 
 ##############################
@@ -348,7 +348,11 @@ def get_mast_observation_id(card_dicts: _CARDS) -> str:
 
 
 def get_hst_parameters(
-    card_dicts: _CARDS, raw_card_dicts: _CARDS, shm_card_dicts: _CARDS, instrument: str
+    card_dicts: _CARDS,
+    raw_card_dicts: _CARDS,
+    shm_card_dicts: _CARDS,
+    instrument: str,
+    start_stop_times: Dict[str, str],
 ) -> NodeBuilder:
     """Return an ``<hst:HST />`` XML element."""
     d = {
@@ -357,7 +361,7 @@ def get_hst_parameters(
         "hst_pi_name": get_hst_pi_name(card_dicts, raw_card_dicts, shm_card_dicts),
         "hst_target_name": get_hst_target_name(card_dicts),
         "aperture_name": get_aperture_name(card_dicts, shm_card_dicts, instrument),
-        "exposure_duration": get_exposure_duration(card_dicts),
+        "exposure_duration": get_exposure_duration(start_stop_times),
         "exposure_type": get_exposure_type(card_dicts, instrument),
         "filter_name": get_filter_name(card_dicts, instrument),
         "fine_guidance_system_lock_type": get_fine_guidance_system_lock_type(

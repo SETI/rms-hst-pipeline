@@ -5,7 +5,7 @@ from fs.path import basename
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
-from pdart.labels.TimeCoordinates import dict_to_start_stop_times, get_time_coordinates
+from pdart.labels.TimeCoordinates import dicts_to_start_stop_times, get_time_coordinates
 from pdart.labels.Utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
@@ -16,7 +16,7 @@ class Test_TimeCoordinates(unittest.TestCase):
         card_dicts = [
             {"DATE-OBS": "2001-01-02", "TIME-OBS": "08:20:00", "EXPTIME": "1.0"}
         ]
-        nb = get_time_coordinates(dict_to_start_stop_times(card_dicts))
+        nb = get_time_coordinates(dicts_to_start_stop_times(card_dicts))
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str: bytes = nb(doc).toxml().encode()
         str = pretty_print(str)
@@ -40,7 +40,7 @@ class Test_TimeCoordinates(unittest.TestCase):
 
         card_dicts = db.get_card_dictionaries(fits_product_lidvid, file_basename)
 
-        nb = get_time_coordinates(dict_to_start_stop_times(card_dicts))
+        nb = get_time_coordinates(dicts_to_start_stop_times(card_dicts))
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str: bytes = nb(doc).toxml().encode()
         str = pretty_print(str)

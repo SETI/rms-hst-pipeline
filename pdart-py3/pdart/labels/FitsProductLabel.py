@@ -116,7 +116,11 @@ def make_fits_product_label(
                     "Time_Coordinates": get_time_coordinates(start_stop_times),
                     "Target_Identification": get_target(target_info),
                     "HST": get_hst_parameters(
-                        card_dicts, raw_card_dicts, shm_card_dicts, instrument
+                        card_dicts,
+                        raw_card_dicts,
+                        shm_card_dicts,
+                        instrument,
+                        start_stop_times,
                     ),
                 }
             )
