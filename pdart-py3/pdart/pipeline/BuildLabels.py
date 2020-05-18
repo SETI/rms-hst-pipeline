@@ -86,7 +86,10 @@ def _extend_initial_lidvid(lidvid: str, segment: str) -> str:
 
 
 def create_pds4_labels(
-    bundle_db: BundleDB, label_deltas: COWFS, info: Citation_Information
+    working_dir: str,
+    bundle_db: BundleDB,
+    label_deltas: COWFS,
+    info: Citation_Information,
 ) -> None:
     class _CreateLabelsWalk(BundleWalk):
         def visit_bundle(self, bundle: Bundle, post: bool) -> None:
@@ -211,7 +214,11 @@ def create_pds4_labels(
 
         def visit_fits_file(self, fits_file: FitsFile) -> None:
             label = make_fits_product_label(
-                self.db, str(fits_file.product_lidvid), str(fits_file.basename), _VERIFY
+                working_dir,
+                self.db,
+                str(fits_file.product_lidvid),
+                str(fits_file.basename),
+                _VERIFY,
             )
             label_base = fs.path.splitext(fits_file.basename)[0]
             label_filename = label_base + ".xml"
@@ -256,4 +263,4 @@ class BuildLabels(Stage):
 
             info = _create_citation_info(sv_deltas, documents_dir, docs)
 
-            create_pds4_labels(db, label_deltas, info)
+            create_pds4_labels(working_dir, db, label_deltas, info)

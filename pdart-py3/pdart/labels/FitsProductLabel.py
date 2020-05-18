@@ -2,6 +2,9 @@
 Functionality to create a label for a data product containing a single
 FITS file.
 """
+from typing import Any, Dict, List
+import os.path
+
 from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import OtherCollection
 from pdart.labels.FileContents import get_file_contents
@@ -22,9 +25,47 @@ from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
+_MISSING: str = "MISSING_KEYS.txt"
+
+
+def _look_for_values(
+    working_dir: str,
+    product_lidvid: str,
+    file_basename: str,
+    missing_key: str,
+    raw_card_dicts: List[Dict[str, Any]],
+    shm_card_dicts: List[Dict[str, Any]],
+) -> None:
+    try:
+        raw_value = raw_card_dicts[0][missing_key]
+    except:
+        raw_value = None
+
+    try:
+        shm_value = shm_card_dicts[0][missing_key]
+    except:
+        shm_value = None
+
+    if raw_value or shm_value:
+        msg = (
+            f"{product_lidvid}/{file_basename} missing {missing_key}:"
+            f"raw={raw_value!r}; shm={shm_value!r}\n"
+        )
+    else:
+        msg = (
+            f"{product_lidvid}/{file_basename} missing {missing_key}: "
+            "no value is raw or shm\n"
+        )
+    with open(os.path.join(working_dir, _MISSING), "a") as f:
+        f.write(msg)
+
 
 def make_fits_product_label(
-    bundle_db: BundleDB, product_lidvid: str, file_basename: str, verify: bool
+    working_dir: str,
+    bundle_db: BundleDB,
+    product_lidvid: str,
+    file_basename: str,
+    verify: bool,
 ) -> bytes:
     """
     Create the label text for the product having this LIDVID using the
@@ -73,12 +114,25 @@ def make_fits_product_label(
                         product_lidvid, card_dicts, raw_card_dicts
                     ),
                     "Target_Identification": get_target(target_info),
-                    "HST": get_hst_parameters(card_dicts, shm_card_dicts, instrument),
+                    "HST": get_hst_parameters(
+                        card_dicts, raw_card_dicts, shm_card_dicts, instrument
+                    ),
                 }
             )
             .toxml()
             .encode()
         )
+    #    except KeyError as e:
+    #        missing_key: str = e.args[0]
+    #        _look_for_values(
+    #            working_dir,
+    #            product_lidvid,
+    #            file_basename,
+    #            missing_key,
+    #            raw_card_dicts,
+    #            shm_card_dicts,
+    #        )
+    #        raise LabelError(str(e), product_lidvid, file_basename)
     except Exception as e:
         raise LabelError(str(e), product_lidvid, file_basename)
 

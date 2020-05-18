@@ -229,17 +229,29 @@ def get_gain_mode_id(card_dicts: _CARDS, instrument: str) -> str:
 ##############################
 
 
-def get_hst_pi_name(card_dicts: _CARDS) -> str:
+def get_hst_pi_name(
+    card_dicts: _CARDS, raw_card_dicts: _CARDS, shm_card_dicts: _CARDS
+) -> str:
     """
     Return text for the ``<hst_pi_name />`` XML element.
     """
-    pr_inv_l = card_dicts[0]["PR_INV_L"]
-    pr_inv_f = card_dicts[0]["PR_INV_F"]
+
+    def get_from_dicts(dicts: _CARDS) -> str:
+        pr_inv_l = dicts[0]["PR_INV_L"]
+        pr_inv_f = dicts[0]["PR_INV_F"]
+        try:
+            pr_inv_m = dicts[0]["PR_INV_M"]
+            return f"{pr_inv_l}, {pr_inv_f} {pr_inv_m}"
+        except KeyError:
+            return f"{pr_inv_l}, {pr_inv_f}"
+
     try:
-        pr_inv_m = card_dicts[0]["PR_INV_M"]
-        return f"{pr_inv_l}, {pr_inv_f} {pr_inv_m}"
-    except KeyError:
-        return f"{pr_inv_l}, {pr_inv_f}"
+        return get_from_dicts(card_dicts)
+    except:
+        try:
+            return get_from_dicts(raw_card_dicts)
+        except:
+            return get_from_dicts(shm_card_dicts)
 
 
 ##############################
@@ -336,13 +348,13 @@ def get_mast_observation_id(card_dicts: _CARDS) -> str:
 
 
 def get_hst_parameters(
-    card_dicts: _CARDS, shm_card_dicts: _CARDS, instrument: str
+    card_dicts: _CARDS, raw_card_dicts: _CARDS, shm_card_dicts: _CARDS, instrument: str
 ) -> NodeBuilder:
     """Return an ``<hst:HST />`` XML element."""
     d = {
         "mast_observation_id": get_mast_observation_id(card_dicts),
         "hst_proposal_id": get_hst_proposal_id(card_dicts),
-        "hst_pi_name": get_hst_pi_name(card_dicts),
+        "hst_pi_name": get_hst_pi_name(card_dicts, raw_card_dicts, shm_card_dicts),
         "hst_target_name": get_hst_target_name(card_dicts),
         "aperture_name": get_aperture_name(card_dicts, shm_card_dicts, instrument),
         "exposure_duration": get_exposure_duration(card_dicts),

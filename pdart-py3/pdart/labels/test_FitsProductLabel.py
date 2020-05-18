@@ -1,3 +1,4 @@
+import tempfile
 import unittest
 
 from fs.path import basename
@@ -30,7 +31,7 @@ class Test_FitsProductLabel(unittest.TestCase):
         file_basename = basename(os_filepath)
 
         label = make_fits_product_label(
-            self.db, fits_product_lidvid, file_basename, True
+            tempfile.gettempdir(), self.db, fits_product_lidvid, file_basename, True
         )
 
         assert_golden_file_equal(self, "test_FitsProductLabel.golden.xml", label)

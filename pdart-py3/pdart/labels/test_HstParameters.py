@@ -30,9 +30,10 @@ class Test_HstParameters(unittest.TestCase):
         file_basename = basename(os_filepath)
 
         card_dicts = db.get_card_dictionaries(fits_product_lidvid, file_basename)
+        raw_card_dicts: List[Dict[str, Any]] = []
         shm_card_dicts: List[Dict[str, Any]] = []
 
-        nb = get_hst_parameters(card_dicts, shm_card_dicts, "acs")
+        nb = get_hst_parameters(card_dicts, raw_card_dicts, shm_card_dicts, "acs")
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str: bytes = nb(doc).toxml().encode()
         str = pretty_print(str)
