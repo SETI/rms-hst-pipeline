@@ -629,6 +629,11 @@ class BundleDB(object):
     def get_file_offsets(
         self, fits_product_lidvid: str
     ) -> List[Tuple[int, int, int, int]]:
+        """
+        Returns a list of 4-tuples of (hdu_index, hdr_loc, dat_loc and
+        dat_span), one tuple for each HDU in the file.
+        """
+
         hdus = (
             self.session.query(Hdu)
             .filter(Hdu.product_lidvid == fits_product_lidvid)
