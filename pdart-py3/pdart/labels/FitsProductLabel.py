@@ -21,7 +21,7 @@ from pdart.labels.ObservingSystem import (
     observing_system_lid,
 )
 from pdart.labels.TargetIdentification import get_target, get_target_info
-from pdart.labels.TimeCoordinates import get_time_coordinates
+from pdart.labels.TimeCoordinates import get_start_stop_times, get_time_coordinates
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
@@ -95,6 +95,9 @@ def make_fits_product_label(
     target_info = get_target_info(card_dicts)
     bundle_db.create_context_product(target_info["lid"])
 
+    # expanding to check SHM files doesn't help
+    start_stop_times = get_start_stop_times(card_dicts, raw_card_dicts)
+
     try:
         label = (
             make_label(
@@ -110,9 +113,7 @@ def make_fits_product_label(
                     "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
                     "investigation_lidvid": investigation_area_lidvid,
                     "Observing_System": observing_system(instrument),
-                    "Time_Coordinates": get_time_coordinates(
-                        product_lidvid, card_dicts, raw_card_dicts
-                    ),
+                    "Time_Coordinates": get_time_coordinates(start_stop_times),
                     "Target_Identification": get_target(target_info),
                     "HST": get_hst_parameters(
                         card_dicts, raw_card_dicts, shm_card_dicts, instrument

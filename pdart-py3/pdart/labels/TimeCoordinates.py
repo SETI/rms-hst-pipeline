@@ -10,9 +10,7 @@ from pdart.labels.TimeCoordinatesXml import time_coordinates
 from pdart.xml.Templates import NodeBuilder
 
 
-def _get_start_stop_times_from_cards(
-    fits_product_lidvid: str, card_dicts: List[Dict[str, Any]]
-) -> Dict[str, str]:
+def dict_to_start_stop_times(card_dicts: List[Dict[str, Any]]) -> Dict[str, str]:
     date_obs = card_dicts[0]["DATE-OBS"]
     time_obs = card_dicts[0]["TIME-OBS"]
     exptime = float(card_dicts[0]["EXPTIME"])
@@ -24,17 +22,18 @@ def _get_start_stop_times_from_cards(
     return {"start_date_time": start_date_time, "stop_date_time": stop_date_time}
 
 
-def get_time_coordinates(
-    fits_product_lidvid: str,
-    card_dicts: List[Dict[str, Any]],
-    raw_card_dicts: List[Dict[str, Any]],
-) -> NodeBuilder:
+def get_start_stop_times(
+    card_dicts: List[Dict[str, Any]], raw_card_dicts: List[Dict[str, Any]]
+) -> Dict[str, str]:
+    try:
+        return dict_to_start_stop_times(card_dicts)
+    except KeyError:
+        return dict_to_start_stop_times(raw_card_dicts)
+
+
+def get_time_coordinates(start_stop_times: Dict[str, str]) -> NodeBuilder:
     """
     Create and return a ``<Time_Coordinates />`` XML element for the
     product.
     """
-    try:
-        times = _get_start_stop_times_from_cards(fits_product_lidvid, card_dicts)
-    except KeyError:
-        times = _get_start_stop_times_from_cards(fits_product_lidvid, raw_card_dicts)
-    return time_coordinates(times)
+    return time_coordinates(start_stop_times)
