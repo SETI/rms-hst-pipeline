@@ -51,8 +51,7 @@ WFC3_IDS=11536 12436 13713 13716 13936 14136 14491 15142 15233 15419 15581
 WFPC2_IDS=05219 05167 05238 05640 05633 05783 05824 06145 06621 07240 11497
 
 PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
-# PROJ_IDS=11536 12436 13713 14136 14491 15142 15419 15581
-# these make it as far as validation
+# PROJ_IDS=09296
 
 STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
     record_changes insert_changes populate_database build_browse	\

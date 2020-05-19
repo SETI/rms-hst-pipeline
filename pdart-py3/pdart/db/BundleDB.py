@@ -159,6 +159,7 @@ class BundleDB(object):
         return (
             self.session.query(Collection)
             .filter(Collection.bundle_lidvid == bundle_lidvid)
+            .order_by(Collection.lidvid)
             .all()
         )
 
@@ -271,6 +272,7 @@ class BundleDB(object):
         return (
             self.session.query(Product)
             .filter(Product.collection_lidvid == collection_lidvid)
+            .order_by(Product.lidvid)
             .all()
         )
 
@@ -409,7 +411,10 @@ class BundleDB(object):
 
     def get_product_files(self, product_lidvid: str) -> List[File]:
         return (
-            self.session.query(File).filter(File.product_lidvid == product_lidvid).all()
+            self.session.query(File)
+            .filter(File.product_lidvid == product_lidvid)
+            .order_by(File.basename)
+            .all()
         )
 
     ############################################################
@@ -436,7 +441,7 @@ class BundleDB(object):
         ).scalar()
 
     def get_context_products(self) -> List[ContextProduct]:
-        return self.session.query(ContextProduct).all()
+        return self.session.query(ContextProduct).order_by(ContextProduct.lidvid).all()
 
     ############################################################
 
@@ -937,3 +942,31 @@ class BundleDB(object):
         been closed.
         """
         return self.session is not None
+
+    ############################################################
+
+    # the associations nightmare
+    def get_associations(self, product_lidvid: str) -> List[Association]:
+        return (
+            self.session.query(Association)
+            .filter(Association.product_lidvid == product_lidvid)
+            .order_by(Association.association_index)
+            .all()
+        )
+
+    def get_fits_products_by_rootname(self, rootname: str) -> List[FitsProduct]:
+        return (
+            self.session.query(FitsProduct)
+            .filter(FitsProduct.rootname == rootname)
+            .order_by(Product.lidvid)
+            .all()
+        )
+
+    def get_associated_products(self, product_lidvid: str) -> List[FitsProduct]:
+        return [
+            fits_prod
+            for association in self.get_associations(product_lidvid)
+            for fits_prod in self.get_fits_products_by_rootname(
+                association.memname.lower()
+            )
+        ]
