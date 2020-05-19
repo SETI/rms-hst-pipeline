@@ -8,6 +8,7 @@ import os.path
 from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import File, OtherCollection
 from pdart.labels.FileContents import get_file_contents
+from pdart.labels.Lookup import TripleDictLookup
 from pdart.labels.FitsProductLabelXml import (
     make_label,
     mk_Investigation_Area_lidvid,
@@ -41,9 +42,14 @@ def make_fits_product_label(
     bundle database.  If verify is True, verify the label against its
     XML and Schematron schemas.  Raise an exception if either fails.
     """
+
     card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
-    raw_card_dicts = bundle_db.get_raw_card_dictionaries(product_lidvid, file_basename)
-    shm_card_dicts = bundle_db.get_shm_card_dictionaries(product_lidvid, file_basename)
+    lookup = TripleDictLookup(
+        card_dicts,
+        bundle_db.get_raw_card_dictionaries(product_lidvid, file_basename),
+        bundle_db.get_shm_card_dictionaries(product_lidvid, file_basename),
+    )
+
     product = bundle_db.get_product(product_lidvid)
     collection_lidvid = product.collection_lidvid
 
@@ -61,12 +67,11 @@ def make_fits_product_label(
     bundle_db.create_context_product(investigation_area_lidvid)
     bundle_db.create_context_product(instrument_host_lid())
     bundle_db.create_context_product(observing_system_lid(instrument))
-    target_info = get_target_info(card_dicts)
+    target_info = get_target_info(lookup)
     bundle_db.create_context_product(target_info["lid"])
 
     try:
-        # expanding to check SHM files doesn't help
-        start_stop_times = get_start_stop_times(card_dicts, raw_card_dicts)
+        start_stop_times = get_start_stop_times(lookup)
         label = (
             make_label(
                 {
@@ -83,13 +88,7 @@ def make_fits_product_label(
                     "Observing_System": observing_system(instrument),
                     "Time_Coordinates": get_time_coordinates(start_stop_times),
                     "Target_Identification": get_target(target_info),
-                    "HST": get_hst_parameters(
-                        card_dicts,
-                        raw_card_dicts,
-                        shm_card_dicts,
-                        instrument,
-                        start_stop_times,
-                    ),
+                    "HST": get_hst_parameters(lookup, instrument, start_stop_times),
                 }
             )
             .toxml()

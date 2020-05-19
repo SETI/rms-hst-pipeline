@@ -7,6 +7,7 @@ from fs.path import basename
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.labels.HstParameters import get_hst_parameters
+from pdart.labels.Lookup import DictLookup
 from pdart.labels.TimeCoordinates import get_start_stop_times
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
 from pdart.xml.Pretty import pretty_print
@@ -31,13 +32,10 @@ class Test_HstParameters(unittest.TestCase):
         file_basename = basename(os_filepath)
 
         card_dicts = db.get_card_dictionaries(fits_product_lidvid, file_basename)
-        raw_card_dicts: List[Dict[str, Any]] = []
-        shm_card_dicts: List[Dict[str, Any]] = []
 
-        start_stop_times = get_start_stop_times(card_dicts, raw_card_dicts)
-        nb = get_hst_parameters(
-            card_dicts, raw_card_dicts, shm_card_dicts, "acs", start_stop_times
-        )
+        start_stop_times = get_start_stop_times(DictLookup(card_dicts))
+        lookup = DictLookup(card_dicts)
+        nb = get_hst_parameters(lookup, "acs", start_stop_times)
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str: bytes = nb(doc).toxml().encode()
         str = pretty_print(str)

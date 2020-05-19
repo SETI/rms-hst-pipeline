@@ -6,6 +6,7 @@ from fs.path import basename
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
+from pdart.labels.Lookup import DictLookup
 from pdart.labels.TargetIdentification import get_target, get_target_info
 from pdart.labels.Utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
@@ -26,7 +27,7 @@ class Test_TargetIdentification(unittest.TestCase):
 
         card_dicts = db.get_card_dictionaries(fits_product_lidvid, file_basename)
 
-        nb = get_target(get_target_info(card_dicts))
+        nb = get_target(get_target_info(DictLookup(card_dicts)))
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str: bytes = nb(doc).toxml().encode()
         str = pretty_print(str)

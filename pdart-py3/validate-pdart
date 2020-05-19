@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "**** validate-pdart $@"
-
 BASE_DIR=${HOME}/pdart/pdart-py3
 CONTEXT_PRODUCTS="${BASE_DIR}"/context-products.json
 XMLDIR=${BASE_DIR}/xml

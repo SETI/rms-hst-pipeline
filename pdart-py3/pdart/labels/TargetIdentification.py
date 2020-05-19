@@ -6,6 +6,7 @@ a product label using a SQLite database.
 from typing import Any, Dict, List, Tuple
 
 from pdart.db.BundleDB import BundleDB
+from pdart.labels.Lookup import Lookup
 from pdart.labels.TargetIdentificationXml import (
     approximate_target_table,
     target_identification,
@@ -16,8 +17,8 @@ from pdart.xml.Templates import NodeBuilder
 _USING_PLACEHOLDER: bool = True
 
 
-def get_target_info(card_dictionaries: List[Dict[str, Any]]) -> Dict[str, str]:
-    targname = card_dictionaries[0]["TARGNAME"]
+def get_target_info(lookup: Lookup) -> Dict[str, str]:
+    targname = lookup["TARGNAME"]
 
     for prefix, (name, type) in approximate_target_table.items():
         if targname.startswith(prefix):
