@@ -27,7 +27,7 @@ class Test_TargetIdentification(unittest.TestCase):
 
         card_dicts = db.get_card_dictionaries(fits_product_lidvid, file_basename)
 
-        nb = get_target(get_target_info(DictLookup(card_dicts)))
+        nb = get_target(get_target_info(DictLookup("test_get_target", card_dicts)))
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str: bytes = nb(doc).toxml().encode()
         str = pretty_print(str)

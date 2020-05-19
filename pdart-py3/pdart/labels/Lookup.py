@@ -1,12 +1,12 @@
-from typing import Any, Callable, Dict, List, TypeVar
+from typing import Any, Callable, Dict, List, TextIO, Tuple, TypeVar
 import abc
 
 
 class Lookup(abc.ABC):
     """
     A strategy for looking up a key value.  Subclasses may look in a
-    single set of cards from a file, or may look at multiple files, or
-    do something completely different.
+    single set of cards from a single file, or may look at multiple
+    files, or do something completely different.
     """
 
     @abc.abstractmethod
@@ -17,18 +17,66 @@ class Lookup(abc.ABC):
         """Default implementation is to look up each key separated."""
         return list(map(self.__getitem__, keys))
 
+    def dump_key(self, key: str, dump_file: TextIO) -> None:
+        self.dump_keys([key], dump_file)
+
+    @abc.abstractmethod
+    def dump_keys(self, keys: List[str], dump_file: TextIO) -> None:
+        pass
+
+
+############################################################
+
+CARD_SET = List[Dict[str, Any]]
+
 
 class DictLookup(Lookup):
     """
-    Look up a key value in a set of card dictionaries from one file.
+    Look up a key value in a set of cards from one file.
     """
 
-    def __init__(self, card_dicts: List[Dict[str, Any]]) -> None:
+    def __init__(self, label: str, card_dicts: CARD_SET) -> None:
+        self.label = label
         self.card_dicts = card_dicts
 
     def __getitem__(self, key: str) -> Any:
         return self.card_dicts[0][key]
 
+    def dump_keys(self, keys: List[str], dump_file: TextIO) -> None:
+        d = dict()
+        for key in keys:
+            try:
+                val = self.__getitem__(key)
+            except KeyError:
+                val = None
+            d[key] = val
+        print(str(d), file=dump_file)
+
+
+############################################################
+
+
+class _DefaultDictLookup(Lookup):
+    """
+    Look up a key value in a set of cards from one file.
+    """
+
+    def __init__(self, label: str, card_dicts: CARD_SET) -> None:
+        self.label = label
+        self.card_dicts = card_dicts
+
+    def __getitem__(self, key: str) -> Any:
+        try:
+            return self.card_dicts[0][key]
+        except KeyError:
+            return None
+
+    def dump_keys(self, keys: List[str], f: TextIO) -> None:
+        d = {key: self.__getitem__(key) for key in keys}
+        print(f"{self.label}: {d}", file=f)
+
+
+############################################################
 
 R = TypeVar("R")
 D = TypeVar("D")
@@ -50,38 +98,29 @@ def _multi_lookup(f: Callable[[D], R], args: List[D]) -> R:
     return f(last_arg)
 
 
-class TripleDictLookup(Lookup):
-    """
-    Look up a key value over sets of card dictionaries from three
-    files.
-    """
+################################
 
-    def __init__(
-        self,
-        card_dicts: List[Dict[str, Any]],
-        raw_card_dicts: List[Dict[str, Any]],
-        shm_card_dicts: List[Dict[str, Any]],
-    ) -> None:
-        self.card_dicts = card_dicts
-        self.raw_card_dicts = raw_card_dicts
-        self.shm_card_dicts = shm_card_dicts
+
+class MultiDictLookup(Lookup):
+    def __init__(self, labeled_card_sets: List[Tuple[str, CARD_SET]]):
+        self.labeled_card_sets = labeled_card_sets
 
     def __getitem__(self, key: str) -> Any:
         """Returns the first successful lookup."""
 
-        def find_key(d: List[Dict[str, Any]]) -> Any:
-            return d[0][key]
+        def find_key(d: Tuple[str, CARD_SET]) -> Any:
+            return d[1][0][key]
 
-        return _multi_lookup(
-            find_key, [self.card_dicts, self.raw_card_dicts, self.shm_card_dicts]
-        )
+        return _multi_lookup(find_key, self.labeled_card_sets)
 
     def keys(self, keys: List[str]) -> List[Any]:
         """Returns the first successful lookup."""
 
-        def find_keys(d: List[Dict[str, Any]]) -> List[Any]:
-            return DictLookup(d).keys(keys)
+        def find_keys(d: Tuple[str, CARD_SET]) -> List[Any]:
+            return DictLookup(d[0], d[1]).keys(keys)
 
-        return _multi_lookup(
-            find_keys, [self.card_dicts, self.raw_card_dicts, self.shm_card_dicts]
-        )
+        return _multi_lookup(find_keys, self.labeled_card_sets)
+
+    def dump_keys(self, keys: List[str], f: TextIO) -> None:
+        for label, card_set in self.labeled_card_sets:
+            _DefaultDictLookup(label, card_set).dump_keys(keys, f)

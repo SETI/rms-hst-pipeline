@@ -2,13 +2,13 @@
 Functionality to create a label for a data product containing a single
 FITS file.
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import os.path
 
 from pdart.db.BundleDB import BundleDB
 from pdart.db.SqlAlchTables import File, OtherCollection
 from pdart.labels.FileContents import get_file_contents
-from pdart.labels.Lookup import TripleDictLookup
+from pdart.labels.Lookup import Lookup, MultiDictLookup
 from pdart.labels.FitsProductLabelXml import (
     make_label,
     mk_Investigation_Area_lidvid,
@@ -27,7 +27,48 @@ from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.pds4.LIDVID import LIDVID
 from pdart.xml.Pretty import pretty_and_verify
 
-_ASSOCIATION: str = "ASSOCIATIONS.txt"
+_KEY_ERROR_DUMP: str = "KEY_ERROR_DUMP.txt"
+
+
+def _association_card_dicts_and_lookup(
+    bundle_db: BundleDB, product_lidvid: str, file_basename: str
+) -> Tuple[List[Dict[str, Any]], Lookup]:
+
+    card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
+
+    dicts: List[Tuple[str, List[Dict[str, Any]]]] = [(product_lidvid, card_dicts)]
+
+    associated_dicts = [
+        (
+            prod.lidvid,
+            bundle_db.get_card_dictionaries(
+                prod.lidvid, bundle_db.get_product_file(prod.lidvid).basename
+            ),
+        )
+        for prod in bundle_db.get_associated_products(product_lidvid)
+    ]
+    dicts.extend(associated_dicts)
+
+    lookup = MultiDictLookup(dicts)
+    return card_dicts, lookup
+
+
+def _triple_card_dicts_and_lookup(
+    bundle_db: BundleDB, product_lidvid: str, file_basename: str
+) -> Tuple[List[Dict[str, Any]], Lookup]:
+    card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
+    lookup = MultiDictLookup(
+        [
+            (product_lidvid, card_dicts),
+            bundle_db.get_other_suffixed_card_dictionaries_and_lidvid(
+                product_lidvid, file_basename, "raw"
+            ),
+            bundle_db.get_other_suffixed_card_dictionaries_and_lidvid(
+                product_lidvid, file_basename, "shm"
+            ),
+        ]
+    )
+    return card_dicts, lookup
 
 
 def make_fits_product_label(
@@ -43,13 +84,6 @@ def make_fits_product_label(
     XML and Schematron schemas.  Raise an exception if either fails.
     """
 
-    card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
-    lookup = TripleDictLookup(
-        card_dicts,
-        bundle_db.get_raw_card_dictionaries(product_lidvid, file_basename),
-        bundle_db.get_shm_card_dictionaries(product_lidvid, file_basename),
-    )
-
     product = bundle_db.get_product(product_lidvid)
     collection_lidvid = product.collection_lidvid
 
@@ -58,6 +92,15 @@ def make_fits_product_label(
     instrument = collection.instrument
     suffix = collection.suffix
     bundle_lidvid = collection.bundle_lidvid
+
+    if suffix == "asn":
+        card_dicts, lookup = _association_card_dicts_and_lookup(
+            bundle_db, product_lidvid, file_basename
+        )
+    else:
+        card_dicts, lookup = _triple_card_dicts_and_lookup(
+            bundle_db, product_lidvid, file_basename
+        )
 
     bundle = bundle_db.get_bundle()
     assert bundle.lidvid == bundle_lidvid
@@ -96,33 +139,12 @@ def make_fits_product_label(
         )
     except KeyError as e:
         key = e.args[0]
-        if suffix == "asn":
-
-            def get_associated_files(product_lidvid: str) -> List[File]:
-                return [
-                    bundle_db.get_product_file(prod.lidvid)
-                    for prod in bundle_db.get_associated_products(product_lidvid)
-                ]
-
-            def get_associated_raw_files(product_lidvid: str) -> List[File]:
-                return [
-                    file
-                    for file in get_associated_files(product_lidvid)
-                    if file.basename.lower().endswith("_raw.fits")
-                ]
-
-            def get_key_value(key: str, file: File) -> Optional[str]:
-                dicts = bundle_db.get_raw_card_dictionaries(
-                    file.product_lidvid, file.basename
-                )
-                try:
-                    return dicts[0][key]
-                except KeyError:
-                    return None
-
-            with open(os.path.join(working_dir, _ASSOCIATION), "w") as f:
-                for assoc_file in get_associated_raw_files(product_lidvid):
-                    print(key, get_key_value(key, assoc_file), assoc_file, file=f)
+        with open(os.path.join(working_dir, _KEY_ERROR_DUMP), "w") as dump_file:
+            print(f"**** MISSING KEY(S) FOR {product_lidvid}:", file=dump_file)
+            if key == "DATE-OBS":
+                lookup.dump_keys(["DATE-OBS", "TIME-OBS", "EXPTIME"], dump_file)
+            else:
+                lookup.dump_key(key, dump_file)
 
         raise LabelError(str(e), product_lidvid, file_basename)
     except Exception as e:

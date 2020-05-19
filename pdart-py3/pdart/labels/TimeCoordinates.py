@@ -12,9 +12,7 @@ from pdart.xml.Templates import NodeBuilder
 
 
 def get_start_stop_times(lookup: Lookup) -> Dict[str, str]:
-    date_obs = lookup["DATE-OBS"]
-    time_obs = lookup["TIME-OBS"]
-    exptime = lookup["EXPTIME"]
+    date_obs, time_obs, exptime = lookup.keys(["DATE-OBS", "TIME-OBS", "EXPTIME"])
 
     start_date_time = f"{date_obs}T{time_obs}Z"
     stop_date_time_float = julian.tai_from_iso(start_date_time) + float(exptime)

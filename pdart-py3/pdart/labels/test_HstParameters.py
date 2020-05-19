@@ -33,8 +33,8 @@ class Test_HstParameters(unittest.TestCase):
 
         card_dicts = db.get_card_dictionaries(fits_product_lidvid, file_basename)
 
-        start_stop_times = get_start_stop_times(DictLookup(card_dicts))
-        lookup = DictLookup(card_dicts)
+        lookup = DictLookup("test_get_acs_parameters", card_dicts)
+        start_stop_times = get_start_stop_times(lookup)
         nb = get_hst_parameters(lookup, "acs", start_stop_times)
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         str: bytes = nb(doc).toxml().encode()

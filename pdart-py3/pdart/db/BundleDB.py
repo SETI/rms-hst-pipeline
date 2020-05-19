@@ -696,6 +696,27 @@ class BundleDB(object):
         except:
             return [{}]
 
+    def get_other_suffixed_card_dictionaries_and_lidvid(
+        self, fits_product_lidvid: str, basename: str, suffix: str
+    ) -> Tuple[str, List[Dict[str, Any]]]:
+        """
+        Return a list of dictionaries mapping FITS keys to their
+        values, one per Hdu in the FITS file.
+        """
+        # TODO BUFFALO
+        other_lidvid = _get_other_suffixed_product_lidvid(fits_product_lidvid, suffix)
+
+        try:
+            return (
+                other_lidvid,
+                self.get_card_dictionaries(
+                    other_lidvid, _get_other_suffixed_basename(basename, suffix)
+                ),
+            )
+
+        except:
+            return (other_lidvid, [{}])
+
     def get_raw_card_dictionaries(
         self, fits_product_lidvid: str, basename: str
     ) -> List[Dict[str, Any]]:
