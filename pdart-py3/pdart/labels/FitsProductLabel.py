@@ -30,6 +30,18 @@ from pdart.xml.Pretty import pretty_and_verify
 _KEY_ERROR_DUMP: str = "KEY_ERROR_DUMP.txt"
 
 
+def _directory_siblings(
+    working_dir: str, bundle_db: BundleDB, product_lidvid: str
+) -> List[str]:
+    for dirpath, dirnames, filenames in os.walk(
+        os.path.join(working_dir, "mastDownload")
+    ):
+        basename = bundle_db.get_product_file(product_lidvid).basename
+        if basename in filenames:
+            return sorted(filenames)
+    return []
+
+
 def _association_card_dicts_and_lookup(
     bundle_db: BundleDB, product_lidvid: str, file_basename: str
 ) -> Tuple[List[Dict[str, Any]], Lookup]:
@@ -141,6 +153,11 @@ def make_fits_product_label(
         key = e.args[0]
         with open(os.path.join(working_dir, _KEY_ERROR_DUMP), "w") as dump_file:
             print(f"**** MISSING KEY(S) FOR {product_lidvid}:", file=dump_file)
+            print(
+                "directory_siblings =",
+                " ".join(_directory_siblings(working_dir, bundle_db, product_lidvid)),
+                file=dump_file,
+            )
             if key == "DATE-OBS":
                 lookup.dump_keys(["DATE-OBS", "TIME-OBS", "EXPTIME"], dump_file)
             else:
