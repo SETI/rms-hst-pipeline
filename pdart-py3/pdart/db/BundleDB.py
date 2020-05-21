@@ -227,8 +227,8 @@ class BundleDB(object):
         """
         Create a schema_collection with this LIDVID if none exists.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        assert LIDVID(collection_lidvid).is_collection_lidvid(), collection_lidvid
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid(), bundle_lidvid
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             schema_collection_exists = switch_on_collection_subtype(

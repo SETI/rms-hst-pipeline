@@ -15,6 +15,7 @@ from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.pipeline.Stage import Stage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
+from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
 
 _INITIAL_VID: VID = VID("1.0")
 
@@ -29,6 +30,15 @@ def _extend_initial_lidvid(lidvid: str, segment: str) -> str:
     lid = LIDVID(lidvid).lid().extend_lid(segment)
     new_lidvid = LIDVID.create_from_lid_and_vid(lid, _INITIAL_VID)
     return str(new_lidvid)
+
+
+def _populate_schema_collection(db: BundleDB, bundle_lidvid: str) -> None:
+    collection_lidvid = _extend_initial_lidvid(bundle_lidvid, "schema")
+    db.create_schema_collection(collection_lidvid, bundle_lidvid)
+
+    # TODO Hardcoded here. Is this what we want to do?
+    for lidvid in [DISP_LIDVID, HST_LIDVID, PDS4_LIDVID]:
+        db.create_schema_product(lidvid)
 
 
 def _populate_from_document_collection(
@@ -115,6 +125,7 @@ class PopulateDatabase(Stage):
                     _populate_from_other_collection(
                         db, sv_deltas, bundle_lidvid, collection_lidvid, collection_path
                     )
+            _populate_schema_collection(db, bundle_lidvid)
 
         assert db
 

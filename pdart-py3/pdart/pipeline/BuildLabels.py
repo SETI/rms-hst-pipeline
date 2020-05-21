@@ -95,6 +95,7 @@ def create_pds4_labels(
         def visit_bundle(self, bundle: Bundle, post: bool) -> None:
             if post:
                 self._create_context_collection(bundle)
+                self._create_schema_collection(bundle)
                 self._post_visit_bundle(bundle)
 
         def _create_context_collection(self, bundle: Bundle) -> None:
@@ -109,6 +110,21 @@ def create_pds4_labels(
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
             context_coll_dir_path = fs.path.join(bundle_dir_path, "context$")
             label_deltas.makedir(context_coll_dir_path)
+            collection = bundle_db.get_collection(collection_lidvid)
+            self._post_visit_collection(collection)
+
+        def _create_schema_collection(self, bundle: Bundle) -> None:
+            schema_products = bundle_db.get_schema_products()
+            if not schema_products:
+                return
+
+            bundle_lidvid = str(bundle.lidvid)
+            collection_lidvid = _extend_initial_lidvid(bundle_lidvid, "schema")
+            bundle_db.create_schema_collection(collection_lidvid, bundle_lidvid)
+
+            bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
+            schema_coll_dir_path = fs.path.join(bundle_dir_path, "schema$")
+            label_deltas.makedir(schema_coll_dir_path)
             collection = bundle_db.get_collection(collection_lidvid)
             self._post_visit_collection(collection)
 
