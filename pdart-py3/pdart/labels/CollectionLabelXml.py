@@ -25,6 +25,14 @@ HST Observing Program <NODE name="proposal_id"/>.</title>
 )
 
 
+make_schema_collection_title: NodeBuilderTemplate = interpret_template(
+    """
+    <title>This collection contains schema products from \
+HST Observing Program <NODE name="proposal_id"/>.</title>
+    """
+)
+
+
 make_other_collection_title: NodeBuilderTemplate = interpret_template(
     """<title>This collection contains the <NODE name="suffix"/> \
 images obtained from HST Observing Program \

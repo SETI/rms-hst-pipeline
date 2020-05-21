@@ -35,6 +35,7 @@ def make_bundle_label(
             collection,
             "bundle_has_context_collection",
             "bundle_has_document_collection",
+            "bundle_has_schema_collection",
             "bundle_has_data_collection",
         )
 

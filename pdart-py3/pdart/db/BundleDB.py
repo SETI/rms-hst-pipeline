@@ -29,6 +29,8 @@ from pdart.db.SqlAlchTables import (
     Product,
     ProductLabel,
     ProposalInfo,
+    SchemaCollection,
+    SchemaProduct,
     create_tables,
     switch_on_collection_subtype,
 )
@@ -176,7 +178,7 @@ class BundleDB(object):
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             context_collection_exists = switch_on_collection_subtype(
-                collection, True, False, False
+                collection, True, False, False, False
             )
             if context_collection_exists:
                 pass
@@ -202,7 +204,7 @@ class BundleDB(object):
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             document_collection_exists = switch_on_collection_subtype(
-                collection, False, True, False
+                collection, False, True, False, False
             )
             if document_collection_exists:
                 pass
@@ -219,6 +221,32 @@ class BundleDB(object):
             )
             self.session.commit()
 
+    def create_schema_collection(
+        self, collection_lidvid: str, bundle_lidvid: str
+    ) -> None:
+        """
+        Create a schema_collection with this LIDVID if none exists.
+        """
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if self.collection_exists(collection_lidvid):
+            collection = self.get_collection(collection_lidvid)
+            schema_collection_exists = switch_on_collection_subtype(
+                collection, False, False, True, False
+            )
+            if schema_collection_exists:
+                pass
+            else:
+                raise Exception(
+                    f"non-schema collection with "
+                    f"LIDVID {collection_lidvid} already exists"
+                )
+        else:
+            self.session.add(
+                SchemaCollection(lidvid=collection_lidvid, bundle_lidvid=bundle_lidvid)
+            )
+            self.session.commit()
+
     def create_other_collection(
         self, collection_lidvid: str, bundle_lidvid: str
     ) -> None:
@@ -229,17 +257,17 @@ class BundleDB(object):
         assert LIDVID(bundle_lidvid).is_bundle_lidvid()
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
-            document_collection_exists = switch_on_collection_subtype(
-                collection, False, True, False
+            other_collection_exists = switch_on_collection_subtype(
+                collection, False, False, False, True
             )
-            if document_collection_exists:
-                raise Exception(
-                    f"document-collection with "
-                    f"LIDVID {collection_lidvid} already exists"
-                )
-            else:
+            if other_collection_exists:
                 # it already exists
                 pass
+            else:
+                raise Exception(
+                    f"non-other-collection with "
+                    f"LIDVID {collection_lidvid} already exists"
+                )
         else:
             instrument = _lidvid_to_instrument(collection_lidvid)
             prefix = _lidvid_to_prefix(collection_lidvid)
@@ -442,6 +470,32 @@ class BundleDB(object):
 
     def get_context_products(self) -> List[ContextProduct]:
         return self.session.query(ContextProduct).order_by(ContextProduct.lidvid).all()
+
+    ############################################################
+    def create_schema_product(self, id: str) -> None:
+        """
+        Create a schema product with this LIDVID if none exists.
+        """
+        if "::" in id:
+            assert LIDVID(id).is_product_lidvid()
+        else:
+            assert LID(id).is_product_lid()
+
+        if not self.schema_product_exists(id):
+            self.session.add(SchemaProduct(lidvid=id))
+            self.session.commit()
+
+    def schema_product_exists(self, lidvid: str) -> bool:
+        """
+        Returns True iff a schema product with the given LIDVID exists
+        in the database.
+        """
+        return self.session.query(
+            exists().where(SchemaProduct.lidvid == lidvid)
+        ).scalar()
+
+    def get_schema_products(self) -> List[SchemaProduct]:
+        return self.session.query(SchemaProduct).order_by(SchemaProduct.lidvid).all()
 
     ############################################################
 

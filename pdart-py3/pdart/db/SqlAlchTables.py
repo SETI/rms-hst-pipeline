@@ -52,6 +52,36 @@ class DocumentCollection(Collection):
         return f"DocumentCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
 
 
+class ContextCollection(Collection):
+    __tablename__ = "context_collections"
+
+    collection_lidvid = Column(
+        String, ForeignKey("collections.lidvid"), primary_key=True, nullable=False
+    )
+
+    __mapper_args__ = {
+        "polymorphic_identity": "context_collection",
+    }
+
+    def __repr__(self) -> str:
+        return f"ContextCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
+
+
+class SchemaCollection(Collection):
+    __tablename__ = "schema_collections"
+
+    collection_lidvid = Column(
+        String, ForeignKey("collections.lidvid"), primary_key=True, nullable=False
+    )
+
+    __mapper_args__ = {
+        "polymorphic_identity": "schema_collection",
+    }
+
+    def __repr__(self) -> str:
+        return f"SchemaCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
+
+
 class OtherCollection(Collection):
     __tablename__ = "other_collections"
 
@@ -76,21 +106,6 @@ class OtherCollection(Collection):
         )
 
 
-class ContextCollection(Collection):
-    __tablename__ = "context_collections"
-
-    collection_lidvid = Column(
-        String, ForeignKey("collections.lidvid"), primary_key=True, nullable=False
-    )
-
-    __mapper_args__ = {
-        "polymorphic_identity": "context_collection",
-    }
-
-    def __repr__(self) -> str:
-        return f"ContextCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
-
-
 A = TypeVar("A")
 
 
@@ -98,6 +113,7 @@ def switch_on_collection_subtype(
     collection: Collection,
     context_collection_value: A,
     document_collection_value: A,
+    schema_collection_value: A,
     other_collection_value: A,
 ) -> A:
     """
@@ -108,6 +124,7 @@ def switch_on_collection_subtype(
     table: Dict[str, A] = {
         "ContextCollection": context_collection_value,
         "DocumentCollection": document_collection_value,
+        "SchemaCollection": schema_collection_value,
         "OtherCollection": other_collection_value,
     }
     type_name = type(collection).__name__
@@ -218,6 +235,20 @@ class ContextProduct(Base):
 
     def __repr__(self) -> str:
         return f"ContextProduct(lidvid={self.lidvid!r})"
+
+
+class SchemaProduct(Base):
+    """
+    A database representation of LIDVIDs for schema products.
+    Schema products are odd in that the collections and bundles they
+    are part of do not exist in the database.
+    """
+
+    __tablename__ = "schema_products"
+    lidvid = Column(String, primary_key=True, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"SchemaProduct(lidvid={self.lidvid!r})"
 
 
 ############################################################

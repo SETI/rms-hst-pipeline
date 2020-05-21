@@ -14,6 +14,8 @@ from pdart.db.SqlAlchTables import (
     DocumentProduct,
     FitsFile,
     FitsProduct,
+    SchemaCollection,
+    SchemaProduct,
     OtherCollection,
     switch_on_collection_subtype,
 )
@@ -69,11 +71,14 @@ class BundleWalk(object):
             def walk_doc(coll: Collection) -> None:
                 self.__walk_document_collection(cast(DocumentCollection, coll))
 
+            def walk_sch(coll: Collection) -> None:
+                self.__walk_schema_collection(cast(SchemaCollection, coll))
+
             def walk_other(coll: Collection) -> None:
                 self.__walk_other_collection(cast(OtherCollection, coll))
 
             switch_on_collection_subtype(
-                collection, walk_context, walk_doc, walk_other
+                collection, walk_context, walk_doc, walk_sch, walk_other
             )(collection)
 
         self.visit_bundle(bundle, True)
@@ -97,6 +102,15 @@ class BundleWalk(object):
             self.__walk_document_product(cast(DocumentProduct, product))
 
         self.visit_document_collection(document_collection, True)
+
+    def __walk_schema_collection(self, schema_collection: SchemaCollection) -> None:
+        self.visit_schema_collection(schema_collection, False)
+
+        collection_lidvid = str(schema_collection.lidvid)
+        for product in self.db.get_collection_products(collection_lidvid):
+            self.__walk_schema_product(cast(SchemaProduct, product))
+
+        self.visit_schema_collection(schema_collection, True)
 
     def __walk_other_collection(self, other_collection: OtherCollection) -> None:
         self.visit_other_collection(other_collection, False)
@@ -125,6 +139,10 @@ class BundleWalk(object):
     def __walk_context_product(self, context_product: ContextProduct) -> None:
         self.visit_context_product(context_product, False)
         self.visit_context_product(context_product, True)
+
+    def __walk_schema_product(self, schema_product: SchemaProduct) -> None:
+        self.visit_schema_product(schema_product, False)
+        self.visit_schema_product(schema_product, True)
 
     def __walk_document_product(self, document_product: DocumentProduct) -> None:
         self.visit_document_product(document_product, False)
@@ -167,6 +185,11 @@ class BundleWalk(object):
     ) -> None:
         pass
 
+    def visit_schema_collection(
+        self, schema_collection: SchemaCollection, post: bool
+    ) -> None:
+        pass
+
     def visit_other_collection(
         self, other_collection: OtherCollection, post: bool
     ) -> None:
@@ -185,6 +208,9 @@ class BundleWalk(object):
     def visit_document_product(
         self, document_product: DocumentProduct, post: bool
     ) -> None:
+        pass
+
+    def visit_schema_product(self, schema_product: SchemaProduct, post: bool) -> None:
         pass
 
     def visit_fits_product(self, fits_product: FitsProduct, post: bool) -> None:

@@ -22,6 +22,9 @@ def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -
     def get_document_collection_inventory_name(collection: Collection) -> str:
         return "collection.csv"
 
+    def get_schema_collection_inventory_name(collection: Collection) -> str:
+        return "collection_schema.csv"
+
     def get_other_collection_inventory_name(collection: Collection) -> str:
         prefix = cast(OtherCollection, collection).prefix
         return f"collection_{prefix}.csv"
@@ -31,6 +34,7 @@ def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -
         collection,
         get_context_collection_inventory_name,
         get_document_collection_inventory_name,
+        get_schema_collection_inventory_name,
         get_other_collection_inventory_name,
     )(collection)
 
@@ -45,6 +49,7 @@ def make_collection_inventory(bundle_db: BundleDB, collection_lidvid: str) -> by
         collection,
         make_context_collection_inventory,
         make_other_collection_inventory,
+        make_schema_collection_inventory,
         make_other_collection_inventory,
     )(bundle_db, collection_lidvid)
 
@@ -57,6 +62,19 @@ def make_context_collection_inventory(
     using the bundle database.
     """
     products = bundle_db.get_context_products()
+    inventory_lines: List[str] = [f"S,{product.lidvid}\r\n" for product in products]
+    res: str = "".join(inventory_lines)
+    return res.encode()
+
+
+def make_schema_collection_inventory(
+    bundle_db: BundleDB, collection_lidvid: str
+) -> bytes:
+    """
+    Create the inventory text for the collection having this LIDVID
+    using the bundle database.
+    """
+    products = bundle_db.get_schema_products()
     inventory_lines: List[str] = [f"S,{product.lidvid}\r\n" for product in products]
     res: str = "".join(inventory_lines)
     return res.encode()

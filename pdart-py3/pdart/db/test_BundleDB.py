@@ -19,10 +19,12 @@ _TABLES: Set[str] = {
     "collections",
     "context_collections",
     "document_collections",
+    "schema_collections",
     "other_collections",
     "products",
     "browse_products",
     "context_products",
+    "schema_products",
     "document_products",
     "fits_products",
     "files",
@@ -65,21 +67,28 @@ class Test_BundleDB(unittest.TestCase):
     def _context_collection_exists(self, collection_lidvid: str) -> bool:
         if self.db.collection_exists(collection_lidvid):
             coll = self.db.get_collection(collection_lidvid)
-            return switch_on_collection_subtype(coll, True, False, False)
+            return switch_on_collection_subtype(coll, True, False, False, False)
         else:
             return False
 
     def _document_collection_exists(self, collection_lidvid: str) -> bool:
         if self.db.collection_exists(collection_lidvid):
             coll = self.db.get_collection(collection_lidvid)
-            return switch_on_collection_subtype(coll, False, True, False)
+            return switch_on_collection_subtype(coll, False, True, False, False)
+        else:
+            return False
+
+    def _schema_collection_exists(self, collection_lidvid: str) -> bool:
+        if self.db.collection_exists(collection_lidvid):
+            coll = self.db.get_collection(collection_lidvid)
+            return switch_on_collection_subtype(coll, False, False, True, False)
         else:
             return False
 
     def _other_collection_exists(self, collection_lidvid: str) -> bool:
         if self.db.collection_exists(collection_lidvid):
             coll = self.db.get_collection(collection_lidvid)
-            return switch_on_collection_subtype(coll, False, False, True)
+            return switch_on_collection_subtype(coll, False, False, False, True)
         else:
             return False
 
@@ -119,6 +128,7 @@ class Test_BundleDB(unittest.TestCase):
         other_collection_lidvid = "urn:nasa:pds:hst_99999:data_acs_raw::1.1"
         doc_collection_lidvid = "urn:nasa:pds:hst_99999:document::1.1"
         ctxt_collection_lidvid = "urn:nasa:pds:hst_99999:context::1.1"
+        sche_collection_lidvid = "urn:nasa:pds:hst_99999:schema::1.1"
 
         # test empty
         self.db.create_bundle(bundle_lidvid)
@@ -142,6 +152,18 @@ class Test_BundleDB(unittest.TestCase):
         self.db.create_context_collection(ctxt_collection_lidvid, bundle_lidvid)
         self.assertEqual(
             {other_collection_lidvid, doc_collection_lidvid, ctxt_collection_lidvid},
+            {c.lidvid for c in self.db.get_bundle_collections(bundle_lidvid)},
+        )
+
+        # test inserting a fourth kind
+        self.db.create_schema_collection(sche_collection_lidvid, bundle_lidvid)
+        self.assertEqual(
+            {
+                other_collection_lidvid,
+                doc_collection_lidvid,
+                ctxt_collection_lidvid,
+                sche_collection_lidvid,
+            },
             {c.lidvid for c in self.db.get_bundle_collections(bundle_lidvid)},
         )
 
