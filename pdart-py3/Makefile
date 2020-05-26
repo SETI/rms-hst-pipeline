@@ -38,6 +38,7 @@ mypy : venv
 test: venv
 	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart
 
+# Run some subset of the tests.  Hack as needed.
 .PHONY: t
 t: venv
 	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/pipeline
@@ -46,19 +47,19 @@ t: venv
 # THE PIPELINE
 ############################################################
 
-ACS_IDS=09059 09296 09678 09985 10461 10719 10774 11109 13012 13199 15098
-WFC3_IDS=11536 12436 13713 13716 13936 14136 14491 15142 15233 15419 15581
-WFPC2_IDS=05219 05167 05238 05640 05633 05783 05824 06145 06621 07240 11497
+ACS_IDS=09059 09296 09678 09985 10461 10719 10774 11109 13012 13199 15098 10506
+WFC3_IDS=11536 12436 13713 13716 13936 14136 14491 15142 15233 15419 15581 13118
+WFPC2_IDS=05219 05167 05238 05640 05633 05783 05824 06145 06621 07240 11497 11361
 
 PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
-# PROJ_IDS=09296
+
 
 STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
     record_changes insert_changes populate_database build_browse	\
     build_labels update_archive make_deliverable validate_bundle
 
 .PHONY: pipeline
-pipeline : venv
+pipeline : venv clean-results
 	mkdir -p tmp-working-dir
 	-rm tmp-working-dir/*/\#*.txt
 	-rm tmp-working-dir/*/KEY_ERROR_DUMP.txt
@@ -75,10 +76,10 @@ pipeline : venv
 
 .PHONY: results
 results :
-	find tmp-working-dir -name '#*' | sort
+	@find tmp-working-dir -name '#*' | sort
 
 .PHONY: clean-results
-clear-results :
+clean-results :
 	find tmp-working-dir -name '#*' -delete
 
 ############################################################
