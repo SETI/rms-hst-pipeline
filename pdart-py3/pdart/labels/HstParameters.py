@@ -284,8 +284,15 @@ def get_instrument_mode_id(lookup: Lookup, instrument: str) -> str:
         res = lookup["OBSMODE"]
     res = res.lower()
 
-    # TODO Temporary hack until I get updated XML schemas to allow 'multiaccum' as a value
+    # TODO Temporary hack until I get updated XML schemas to allow
+    # 'multiaccum' as a value
     if _USING_PLACEHOLDER and res == "multiaccum":
+        # TODO-PLACEHOLDER
+        res = "accum"
+
+    # TODO Temporary hack to pass validation: not sure what's needed
+    # here, so I'm randoming adding a legal value.
+    if _USING_PLACEHOLDER and res == "full":
         # TODO-PLACEHOLDER
         res = "accum"
 

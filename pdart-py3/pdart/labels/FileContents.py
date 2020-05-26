@@ -117,7 +117,7 @@ def get_file_contents(
                 ), f"NAXIS1={hdu_card_dict['NAXIS1']}, NAXIS2={hdu_card_dict['NAXIS2']}, NAXIS3={hdu_card_dict['NAXIS3']}"
 
                 assert datSpan % 4 == 0, "datSpan={datSpan}"
-                layerOffset = datSpan / 4
+                layerOffset = datSpan // 4
                 data1 = data_2d_contents(
                     {
                         "offset": str(datLoc),

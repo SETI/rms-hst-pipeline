@@ -18,9 +18,10 @@ MYPY_FLAGS=--disallow-any-unimported \
 	--warn-redundant-casts \
 	--warn-unreachable \
 
-# --disallow-any-generics: produces baffling errors.  It seems as if,
-# for example, re.Pattern is both generic and not.  Perhaps a mismatch
-# between the source and typing stubs, or a versioning problem.
+# --disallow-any-generics: produces baffling errors.  At first, it
+# seemed as if, for example, re.Pattern was both generic and not.
+# Turns out re.Pattern and typing.Pattern are difference.  But it
+# hasn't been worth following this path right now.  Maybe later.
 
 # --warn-return-any: not practical because of SqlAlchemy's dynamic magic
 # and because FITS cards are untyped.

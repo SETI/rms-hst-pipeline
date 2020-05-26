@@ -2058,6 +2058,11 @@
     {
       "name": [],
       "type": [],
+      "lidvid": "urn:nasa:pds:context:target:ganymede.satellite::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
       "lidvid": "urn:nasa:pds:context:target:mercury.planet::1.0"
     },
     {

@@ -44,6 +44,9 @@ _BUNDLE_DIRECTORY_PATTERN: str = r"\Ahst_([0-9]{5})\Z"
 _COLLECTION_DIRECTORY_PATTERN: str = r"\A(([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)|document)\Z"
 
 
+KEY_SUFFIXES = ["d0f", "raw"]
+
+
 def _get_other_suffixed_basename(filepath: str, suffix: str) -> str:
     # TODO BUFFALO A hack.  Make this private and refactor as necessary.
     match = re.match(r"\A([^_]+)_[^\.]+\..*\Z", os.path.basename(filepath))
@@ -1037,11 +1040,20 @@ class BundleDB(object):
             .all()
         )
 
-    def get_associated_products(self, product_lidvid: str) -> List[FitsProduct]:
+    def get_associated_key_products(self, product_lidvid: str) -> List[FitsProduct]:
         return [
             fits_prod
             for association in self.get_associations(product_lidvid)
             for fits_prod in self.get_fits_products_by_rootname(
                 association.memname.lower()
             )
+            if self._is_key_product(fits_prod)
         ]
+
+    def _is_key_product(self, fits_product: FitsProduct) -> bool:
+        collection_lidvid = fits_product.collection_lidvid
+        collection = self.get_collection(collection_lidvid)
+        is_other_collection = switch_on_collection_subtype(
+            collection, False, False, False, True
+        )
+        return cast(OtherCollection, collection).suffix in KEY_SUFFIXES

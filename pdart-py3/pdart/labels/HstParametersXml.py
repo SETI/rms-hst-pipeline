@@ -97,14 +97,14 @@ def get_targeted_detector_id(aperture: str) -> str:
     Return text for the ``<targeted_detector_id />`` XML element.
     """
     general_cases = {
-        "PC1": "PC1",
-        "WF2": "WF2",
-        "WF3": "WF3",
-        "WF4": "WF4",
-        "ALL": "WF3",
-        "W2": "WF2",
-        "W3": "WF3",
-        "W4": "WF4",
+        "PC1": "pc1",
+        "WF2": "wf2",
+        "WF3": "wf3",
+        "WF4": "wf4",
+        "ALL": "wf3",
+        "W2": "wf2",
+        "W3": "wf3",
+        "W4": "wf4",
     }
     for k, v in list(general_cases.items()):
         if k in aperture:
@@ -112,16 +112,16 @@ def get_targeted_detector_id(aperture: str) -> str:
 
     # quad or polarizing filters
     special_cases = {
-        "FQUVN33": "WF2",
-        "POLQN33": "WF2",
-        "POLQN18": "WF2",
-        "POLQP15P": "PC1",
-        "POLQP15W": "WF2",
-        "FQCH4N33": "WF2",
-        "FQCH4N15": "PC1",
-        "FQCH4P15": "PC1",
-        "FQCH4N15": "WF3",
-        "F160BN15": "WF3",
+        "FQUVN33": "wf2",
+        "POLQN33": "wf2",
+        "POLQN18": "wf2",
+        "POLQP15P": "pc1",
+        "POLQP15W": "wf2",
+        "FQCH4N33": "wf2",
+        "FQCH4N15": "pc1",
+        "FQCH4P15": "pc1",
+        "FQCH4N15": "wf3",
+        "F160BN15": "wf3",
     }
 
     for k, v in list(special_cases.items()):

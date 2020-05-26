@@ -2,7 +2,7 @@
 Functionality to create a label for a data product containing a single
 FITS file.
 """
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 import os.path
 
 from pdart.db.BundleDB import BundleDB
@@ -30,6 +30,14 @@ from pdart.xml.Pretty import pretty_and_verify
 _KEY_ERROR_DUMP: str = "KEY_ERROR_DUMP.txt"
 
 
+# TODO: Note this only works in the original case where all VIDs =
+# "1.0".
+def _to_asn_lidvid(product_lidvid: str) -> str:
+    lidvid = LIDVID(product_lidvid)
+    asn_lid = lidvid.lid().to_other_suffixed_lid("asn")
+    return LIDVID.create_from_lid_and_vid(asn_lid, lidvid.vid()).__str__()
+
+
 def _directory_siblings(
     working_dir: str, bundle_db: BundleDB, product_lidvid: str
 ) -> List[str]:
@@ -42,10 +50,24 @@ def _directory_siblings(
     return []
 
 
+def _sibling_file(siblings: List[str], suffix: str) -> Optional[str]:
+    ending = f"_{suffix.lower()}.fits"
+    for basename in siblings:
+        if basename.lower().endswith(ending):
+            return basename
+    return None
+
+
 def _association_card_dicts_and_lookup(
-    bundle_db: BundleDB, product_lidvid: str, file_basename: str
+    bundle_db: BundleDB,
+    product_lidvid: str,
+    file_basename: str,
+    asn_product_lidvid: str,
 ) -> Tuple[List[Dict[str, Any]], Lookup]:
 
+    # First check in the actual file, then check *any* of the
+    # associated files.  TODO That is probably overkill.  Also, some
+    # values need to be combined (like date-time).  Fix it.
     card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
 
     dicts: List[Tuple[str, List[Dict[str, Any]]]] = [(product_lidvid, card_dicts)]
@@ -57,7 +79,7 @@ def _association_card_dicts_and_lookup(
                 prod.lidvid, bundle_db.get_product_file(prod.lidvid).basename
             ),
         )
-        for prod in bundle_db.get_associated_products(product_lidvid)
+        for prod in bundle_db.get_associated_key_products(asn_product_lidvid)
     ]
     dicts.extend(associated_dicts)
 
@@ -74,6 +96,9 @@ def _triple_card_dicts_and_lookup(
             (product_lidvid, card_dicts),
             bundle_db.get_other_suffixed_card_dictionaries_and_lidvid(
                 product_lidvid, file_basename, "raw"
+            ),
+            bundle_db.get_other_suffixed_card_dictionaries_and_lidvid(
+                product_lidvid, file_basename, "d0f"
             ),
             bundle_db.get_other_suffixed_card_dictionaries_and_lidvid(
                 product_lidvid, file_basename, "shm"
@@ -105,11 +130,16 @@ def make_fits_product_label(
     suffix = collection.suffix
     bundle_lidvid = collection.bundle_lidvid
 
-    if suffix == "asn":
+    siblings = _directory_siblings(working_dir, bundle_db, product_lidvid)
+    asn_sib = _sibling_file(siblings, "asn")
+
+    if asn_sib != None:
+        asn_product_lidvid = _to_asn_lidvid(product_lidvid)
         card_dicts, lookup = _association_card_dicts_and_lookup(
-            bundle_db, product_lidvid, file_basename
+            bundle_db, product_lidvid, file_basename, asn_product_lidvid
         )
     else:
+        # TODO isn't this quadruple now?
         card_dicts, lookup = _triple_card_dicts_and_lookup(
             bundle_db, product_lidvid, file_basename
         )
@@ -151,13 +181,21 @@ def make_fits_product_label(
         )
     except KeyError as e:
         key = e.args[0]
+
         with open(os.path.join(working_dir, _KEY_ERROR_DUMP), "w") as dump_file:
-            print(f"**** MISSING KEY(S) FOR {product_lidvid}:", file=dump_file)
+            print(f"**** LIDVID {product_lidvid}:", file=dump_file)
             print(
-                "directory_siblings =",
-                " ".join(_directory_siblings(working_dir, bundle_db, product_lidvid)),
-                file=dump_file,
+                "**** SIBLINGS:", ", ".join(siblings), file=dump_file,
             )
+            asn_sib = _sibling_file(siblings, "asn")
+            d0f_sib = _sibling_file(siblings, "d0f")
+            raw_sib = _sibling_file(siblings, "raw")
+            print("**** ASN FILE:", asn_sib, file=dump_file)
+            print("**** D0F FILE:", d0f_sib, file=dump_file)
+            print("**** RAW FILE:", raw_sib, file=dump_file)
+            if asn_sib is None and d0f_sib is None and raw_sib is None:
+                print("**** AY CARAMBA: none of asn, d0f, or raw", file=dump_file)
+
             if key == "DATE-OBS":
                 lookup.dump_keys(["DATE-OBS", "TIME-OBS", "EXPTIME"], dump_file)
             else:
