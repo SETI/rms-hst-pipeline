@@ -83,6 +83,17 @@ results :
 clean-results :
 	find tmp-working-dir -name '#*' -delete
 
+TARGET_DIR=$(HOME)/zips
+
+.PHONY : copy-results
+copy-results :
+	rm -rf $(TARGET_DIR)/*
+	for dir in `find tmp-working-dir -name '*-deliverable'`; do \
+	    pushd $$dir; \
+	    zip -X -r $(TARGET_DIR)/`basename $$dir`.zip . ;\
+	    popd; \
+	done
+
 ############################################################
 # THE VIRTUAL ENVIRONMENT
 ############################################################
