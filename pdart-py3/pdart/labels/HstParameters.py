@@ -140,7 +140,13 @@ def get_exposure_type(lookup: Lookup, instrument: str) -> str:
             res = "UNK"
     else:
         res = lookup["EXPFLAG"]
-    return res.lower()
+    res = res.lower()
+
+    if _USING_PLACEHOLDER and res == "excessive downtime":
+        # TODO-PLACEHOLDER
+        return "@@@"
+
+    return res
 
 
 ##############################
