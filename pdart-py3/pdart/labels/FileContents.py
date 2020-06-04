@@ -109,44 +109,29 @@ def get_file_contents(
                 )
                 node_functions = [header, data]
             elif axes == 3:
-                # "3-D" images from WFPC2 are really four separate
-                # 2-D images.  We document them as such.
+                # "3-D" images from WFPC2 are really four separate 2-D
+                # images.  We document them as such.  Well, four or
+                # two.  Well, four or two or maybe something else...
+                # Aw, we'll say four or two for now.
                 assert instrument == "wfpc2", f"NAXIS=3 and instrument={instrument}"
-                assert (
-                    int(hdu_card_dict["NAXIS3"]) == 4
-                ), f"NAXIS1={hdu_card_dict['NAXIS1']}, NAXIS2={hdu_card_dict['NAXIS2']}, NAXIS3={hdu_card_dict['NAXIS3']}"
+                naxis3 = int(hdu_card_dict["NAXIS3"])
+                assert naxis3 in [
+                    2,
+                    4,
+                ], f"NAXIS1={hdu_card_dict['NAXIS1']}, NAXIS2={hdu_card_dict['NAXIS2']}, NAXIS3={hdu_card_dict['NAXIS3']}"
 
-                assert datSpan % 4 == 0, "datSpan={datSpan}"
-                layerOffset = datSpan // 4
-                data1 = data_2d_contents(
-                    {
-                        "offset": str(datLoc),
-                        "Element_Array": elmt_arr,
-                        "Axis_Arrays": _mk_axis_arrays(card_dicts, hdu_index, 2),
-                    }
-                )
-                data2 = data_2d_contents(
-                    {
-                        "offset": str(datLoc + layerOffset),
-                        "Element_Array": elmt_arr,
-                        "Axis_Arrays": _mk_axis_arrays(card_dicts, hdu_index, 2),
-                    }
-                )
-                data3 = data_2d_contents(
-                    {
-                        "offset": str(datLoc + 2 * layerOffset),
-                        "Element_Array": elmt_arr,
-                        "Axis_Arrays": _mk_axis_arrays(card_dicts, hdu_index, 2),
-                    }
-                )
-                data4 = data_2d_contents(
-                    {
-                        "offset": str(datLoc + 3 * layerOffset),
-                        "Element_Array": elmt_arr,
-                        "Axis_Arrays": _mk_axis_arrays(card_dicts, hdu_index, 2),
-                    }
-                )
-                node_functions = [header, data1, data2, data3, data4]
+                assert datSpan % naxis3 == 0, "datSpan={datSpan}"
+                layerOffset = datSpan // naxis3
+                node_functions = [header]
+                for n in range(0, naxis3):
+                    data = data_2d_contents(
+                        {
+                            "offset": str(datLoc + n * layerOffset),
+                            "Element_Array": elmt_arr,
+                            "Axis_Arrays": _mk_axis_arrays(card_dicts, hdu_index, 2),
+                        }
+                    )
+                    node_functions.append(data)
         else:
             node_functions = [header]
 
