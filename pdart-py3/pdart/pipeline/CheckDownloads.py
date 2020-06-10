@@ -2,10 +2,10 @@ import os
 import os.path
 
 from pdart.astroquery.Astroquery import MastSlice
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 
 
-class CheckDownloads(Stage):
+class CheckDownloads(MarkedStage):
     def _do_downloads(
         self, working_dir: str, mast_downloads_dir: str, proposal_id: int
     ) -> None:

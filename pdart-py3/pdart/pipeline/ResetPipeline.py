@@ -1,10 +1,10 @@
 import os
 import os.path
 import shutil
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 
 
-class ResetPipeline(Stage):
+class ResetPipeline(MarkedStage):
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         documents_dir: str = self.documents_dir()

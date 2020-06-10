@@ -4,7 +4,7 @@ import shutil
 import fs.path
 
 from pdart.pds4.HstFilename import HstFilename
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import *
 
 
@@ -12,7 +12,7 @@ def to_segment_dir(name: str) -> str:
     return name + "$"
 
 
-class CopyPrimaryFiles(Stage):
+class CopyPrimaryFiles(MarkedStage):
     def _copy_docs_files(
         self, bundle_segment: str, documents_dir: str, primary_files_dir: str
     ) -> None:

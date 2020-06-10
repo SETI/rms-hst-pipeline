@@ -13,7 +13,7 @@ from pdart.fs.cowfs.COWFS import COWFS
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
 
@@ -84,7 +84,7 @@ def _populate_from_other_collection(
             populate_database_from_fits_file(db, fits_os_path, product_lidvid)
 
 
-class PopulateDatabase(Stage):
+class PopulateDatabase(MarkedStage):
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()

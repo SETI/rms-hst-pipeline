@@ -12,29 +12,25 @@ class Stage(metaclass=abc.ABCMeta):
         self._bundle_segment = f"hst_{proposal_id:05}"
         self._dirs = dirs
         self._proposal_id = proposal_id
-        self._marker_file = BasicMarkerFile(self.working_dir())
-
-    def class_name(self) -> str:
-        return type(self).__name__
 
     ##############################
 
     def __call__(self) -> None:
-        if not os.path.exists(self.working_dir()):
-            os.makedirs(self.working_dir())
-        marker_info = self._marker_file.get_marker()
-        if marker_info and marker_info.state == "FAILURE":
-            return
+        self.begin_transaction()
         try:
-            self._marker_file.set_marker_info(self.class_name(), "running")
             self._run()
-            self._marker_file.set_marker_info(self.class_name(), "success")
+            self.commit_transaction()
         except Exception as e:
-            error_text = f"""EXCEPTION raised by {self._bundle_segment}, stage {self.class_name()}: {e}
-{traceback.format_exc()}
-"""
-            print("****", error_text)
-            self._marker_file.set_marker_info(self.class_name(), "failure", error_text)
+            self.rollback_transaction(e)
+
+    def begin_transaction(self) -> None:
+        pass
+
+    def commit_transaction(self) -> None:
+        pass
+
+    def rollback_transaction(self, e: Exception) -> None:
+        pass
 
     @abc.abstractmethod
     def _run(self) -> None:
@@ -77,3 +73,36 @@ class Stage(metaclass=abc.ABCMeta):
 
     def validation_report_dir(self) -> str:
         return self._dirs.validation_report_dir(self._proposal_id)
+
+
+class MarkedStage(Stage):
+    def __init__(self, dirs: Directories, proposal_id: int) -> None:
+        Stage.__init__(self, dirs, proposal_id)
+        if not os.path.exists(self.working_dir()):
+            os.makedirs(self.working_dir())
+        self._marker_file = BasicMarkerFile(self.working_dir())
+
+    def class_name(self) -> str:
+        return type(self).__name__
+
+    def __call__(self) -> None:
+        marker_info = self._marker_file.get_marker()
+        if marker_info and marker_info.state == "FAILURE":
+            return
+        Stage.__call__(self)
+
+    def begin_transaction(self) -> None:
+        self._marker_file.set_marker_info(self.class_name(), "running")
+
+    def commit_transaction(self) -> None:
+        self._marker_file.set_marker_info(self.class_name(), "success")
+
+    def rollback_transaction(self, e: Exception) -> None:
+        error_text = (
+            f"EXCEPTION raised by {self._bundle_segment}, "
+            f"stage {self.class_name()}: {e}\n"
+            f"{traceback.format_exc()}"
+        )
+
+        print("****", error_text)
+        self._marker_file.set_marker_info(self.class_name(), "failure", error_text)

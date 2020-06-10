@@ -35,7 +35,7 @@ from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
 _VERIFY = False
@@ -249,7 +249,7 @@ def create_pds4_labels(
     _CreateLabelsWalk(bundle_db).walk()
 
 
-class BuildLabels(Stage):
+class BuildLabels(MarkedStage):
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()

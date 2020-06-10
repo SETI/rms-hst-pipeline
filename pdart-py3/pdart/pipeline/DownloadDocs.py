@@ -3,10 +3,10 @@ import os.path
 
 from pdart.documents.ConvertToUtf8 import convert_documents_to_utf8
 from pdart.documents.Downloads import download_product_documents
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 
 
-class DownloadDocs(Stage):
+class DownloadDocs(MarkedStage):
     def _do_download_docs(self, documents_dir: str, proposal_id: int) -> None:
         assert not os.path.isdir(documents_dir)
         os.makedirs(documents_dir)

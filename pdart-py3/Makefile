@@ -49,16 +49,16 @@ t: venv
 ############################################################
 
 ACS_IDS=09059 09296 09440 09678 09725 09745 09746 09985 10192 10461	\
-10502 10506 10545 10719 10774 10783 11055 11109 12601 13012 13199	\
-13632 13795 15098
+10502 10506 10508 10545 10719 10774 10783 11055 11109 12601 13012	\
+13199 13632 13795 15098
 
 WFC3_IDS=11536 11656 12237 12245 12436 12894 13118 13713 13716 13873	\
-13936 14044 14113 14136 14491 14928 14939 15142 15143 15233 15419	\
-15456 15505 15581
+13936 14044 14045 14113 14136 14491 14928 14939 15142 15143 15233	\
+15419 15456 15505 15581
 
 WFPC2_IDS=05167 05219 05220 05238 05493 05508 05633 05640 05783 05824	\
 05828 05829 06025 06145 06215 06295 06621 06736 06842 07240 07276	\
-11361 11497 11956
+11102 11361 11497 11956
 
 PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
 
@@ -80,6 +80,19 @@ pipeline : venv clean-results
 			python Pipeline.py $$project_id $$step; \
             done; \
         done; \
+	say pipeline is done
+	open tmp-working-dir
+
+.PHONY: new-pipeline
+new-pipeline : venv clean-results
+	mkdir -p tmp-working-dir
+	-rm tmp-working-dir/*/\#*.txt
+	-rm tmp-working-dir/*/KEY_ERROR_DUMP.txt
+	for project_id in $(PROJ_IDS); do \
+	    echo '****' hst_$$project_id '****'; \
+	    $(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools \
+		python NewPipeline.py $$project_id; \
+	done;
 	say pipeline is done
 	open tmp-working-dir
 

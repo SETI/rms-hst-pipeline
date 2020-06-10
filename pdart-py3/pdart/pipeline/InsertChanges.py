@@ -7,7 +7,7 @@ import fs.copy
 
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.RecordChanges import CHANGES_DICT
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import (
     make_osfs,
     make_sv_deltas,
@@ -28,7 +28,7 @@ def read_changes_dict(changes_path: str) -> Dict[LIDVID, str]:
     return changes_dict
 
 
-class InsertChanges(Stage):
+class InsertChanges(MarkedStage):
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         primary_files_dir: str = self.primary_files_dir()

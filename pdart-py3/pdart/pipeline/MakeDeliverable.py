@@ -14,7 +14,7 @@ from pdart.archive.TransferManifest import make_transfer_manifest
 from pdart.db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
 from pdart.fs.deliverablefs.DeliverableFS import DeliverableFS, lidvid_to_dirpath
 from pdart.pds4.LIDVID import LIDVID
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_version_view
 
 _TAR_NEEDED: bool = False
@@ -31,7 +31,7 @@ def _fix_up_deliverable(dir: str) -> None:
             os.rename(path, path[:-1])
 
 
-class MakeDeliverable(Stage):
+class MakeDeliverable(MarkedStage):
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()

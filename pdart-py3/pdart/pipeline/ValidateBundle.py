@@ -1,9 +1,9 @@
 from subprocess import CompletedProcess, run
 import fs.path
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 
 
-class ValidateBundle(Stage):
+class ValidateBundle(MarkedStage):
     def _run(self) -> None:
         completed_process: CompletedProcess = run(
             [

@@ -7,7 +7,7 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.pipeline.Utils import make_mv_osfs, make_sv_osfs, make_version_view
-from pdart.pipeline.Stage import Stage
+from pdart.pipeline.Stage import MarkedStage
 
 CHANGES_DICT: str = "changes$dict.txt"
 
@@ -20,7 +20,7 @@ def dir_to_lid(dir: str) -> LID:
     return LID.create_from_parts(parts)
 
 
-class RecordChanges(Stage):
+class RecordChanges(MarkedStage):
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         primary_files_dir: str = self.primary_files_dir()
