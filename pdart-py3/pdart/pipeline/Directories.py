@@ -12,7 +12,7 @@ def make_directories() -> "Directories":
     if hostname == "Marks-iMac.local":
         return ProductionDirectories("/Volumes/AKBAR/working-dir")
     else:
-        return DevDirectories("tmp-working-dir")
+        return DevDirectories("/Volumes/Eric's-5TB/tmp-working-dir")
 
 
 class Directories(object, metaclass=abc.ABCMeta):

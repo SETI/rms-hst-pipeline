@@ -48,6 +48,9 @@ t: venv
 # THE PIPELINE
 ############################################################
 
+TWD="/Volumes/Eric's-5TB/tmp-working-dir"
+ZIPS="/Volumes/Eric's-5TB/zips"
+
 ACS_IDS=09059 09296 09440 09678 09725 09745 09746 09985 10192 10461	\
 10502 10506 10508 10545 10719 10774 10783 11055 11109 12601 13012	\
 13199 13632 13795 15098
@@ -69,9 +72,9 @@ STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
 
 .PHONY: pipeline
 pipeline : venv clean-results
-	mkdir -p tmp-working-dir
-	-rm tmp-working-dir/*/\#*.txt
-	-rm tmp-working-dir/*/KEY_ERROR_DUMP.txt
+	mkdir -p $(TWD)
+	-rm $(TWD)/*/\#*.txt
+	-rm $(TWD)/*/KEY_ERROR_DUMP.txt
 	for project_id in $(PROJ_IDS); do \
 	    for step in $(STEPS); do \
 		echo $$project_id $$step; \
@@ -81,37 +84,37 @@ pipeline : venv clean-results
             done; \
         done; \
 	say pipeline is done
-	open tmp-working-dir
+	open $(TWD)
 
 .PHONY: new-pipeline
 new-pipeline : venv clean-results
-	mkdir -p tmp-working-dir
-	-rm tmp-working-dir/*/\#*.txt
-	-rm tmp-working-dir/*/KEY_ERROR_DUMP.txt
+	mkdir -p $(TWD)
+	-rm $(TWD)/*/\#*.txt
+	-rm $(TWD)/*/KEY_ERROR_DUMP.txt
 	for project_id in $(PROJ_IDS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools \
 		python NewPipeline.py $$project_id; \
 	done;
 	say pipeline is done
-	open tmp-working-dir
+	open $(TWD)
 
 .PHONY: results
 results :
-	@find tmp-working-dir -name '#*' | sort
+	@find $(TWD) -name '#*' | sort
 
 .PHONY: clean-results
 clean-results :
-	find tmp-working-dir -name '#*' -delete
+	find $(TWD) -name '#*' -delete
 
-TARGET_DIR=$(HOME)/zips
 
 .PHONY : copy-results
 copy-results :
-	rm -rf $(TARGET_DIR)/*
-	for dir in `find tmp-working-dir -name '*-deliverable'`; do \
+	rm -rf $(ZIPS)/
+	mkdir -p $(ZIPS)/
+	for dir in `find $(TWD) -name '*-deliverable'`; do \
 	    pushd $$dir; \
-	    zip -X -r $(TARGET_DIR)/`basename $$dir`.zip . ;\
+	    zip -X -r $(ZIPS)/`basename $$dir`.zip . ;\
 	    popd; \
 	done
 
