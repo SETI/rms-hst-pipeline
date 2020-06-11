@@ -1,4 +1,4 @@
-from typing import Callable, List, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import fs.path
 
@@ -18,6 +18,24 @@ _LTD = Callable[[LIDVID], str]
 def plain_lidvid_to_dirpath(lidvid: LIDVID) -> str:
     lid = lidvid.lid()
     parts = lid.parts()[1:]
+    return fs.path.join("/", *parts)
+
+
+def _visit_of(dirname_segment: str) -> Optional[str]:
+    if len(dirname_segment) == 9:
+        return "visit_" + dirname_segment[4:6].lower()
+    else:
+        return None
+
+
+def plain_lidvid_to_visits_dirpath(lidvid: LIDVID) -> str:
+    # This is only run on directories, and always relative to /hst_NNNNN.
+    lid = lidvid.lid()
+    parts = lid.parts()[1:]
+    if len(parts) == 2:
+        visit = _visit_of(parts[1])
+        if visit is not None:
+            parts[1] = visit
     return fs.path.join("/", *parts)
 
 

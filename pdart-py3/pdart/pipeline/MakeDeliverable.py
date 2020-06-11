@@ -4,11 +4,13 @@ import shutil
 import tarfile
 
 import fs.path
+from fs.base import FS
 from fs.osfs import OSFS
+import fs.walk
 
 from pdart.archive.ChecksumManifest import (
     make_checksum_manifest,
-    plain_lidvid_to_dirpath,
+    plain_lidvid_to_visits_dirpath,
 )
 from pdart.archive.TransferManifest import make_transfer_manifest
 from pdart.db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
@@ -31,6 +33,31 @@ def _fix_up_deliverable(dir: str) -> None:
             os.rename(path, path[:-1])
 
 
+def copy_fs(version_view: FS, deliverable: FS) -> None:
+    # TODO I could (and used to) just do a fs.copy.copy_fs() from the
+    # version_view to a DeliverableFS.  I removed it to debug issues
+    # with the validation tool.  Now I find this hack is just as easy
+    # (though I wonder about efficiency).  It bothers me that this
+    # visits hack parallels a visits hack in
+    # plain_lidvid_to_visits_dirpath().  I should figure this out and
+    # make it clean.  For now, though, this works.
+
+    # Uses dollar-terminated paths
+    for path, dirs, files in version_view.walk():
+        parts = fs.path.parts(path)
+        if len(parts) == 4:
+            if len(parts[3]) == 10:
+                visit = "visit_" + parts[3][4:6].lower() + "$"
+                parts[3] = visit
+        new_path = fs.path.join(*parts)
+        if not deliverable.isdir(new_path):
+            deliverable.makedir(new_path)
+        for file in files:
+            old_filepath = fs.path.join(path, file.name)
+            new_filepath = fs.path.join(new_path, file.name)
+            fs.copy.copy_file(version_view, old_filepath, deliverable, new_filepath)
+
+
 class MakeDeliverable(MarkedStage):
     def _run(self) -> None:
         working_dir: str = self.working_dir()
@@ -45,7 +72,7 @@ class MakeDeliverable(MarkedStage):
 
             os.mkdir(deliverable_dir)
             deliverable_osfs = OSFS(deliverable_dir)
-            fs.copy.copy_fs(version_view, deliverable_osfs)
+            copy_fs(version_view, deliverable_osfs)
             _fix_up_deliverable(deliverable_dir)
 
             # open the database
@@ -55,11 +82,11 @@ class MakeDeliverable(MarkedStage):
             # add manifests
             checksum_manifest_path = fs.path.join(manifest_dir, "checksum.manifest.txt")
             with open(checksum_manifest_path, "w") as f:
-                f.write(make_checksum_manifest(db, plain_lidvid_to_dirpath))
+                f.write(make_checksum_manifest(db, plain_lidvid_to_visits_dirpath))
 
             transfer_manifest_path = fs.path.join(manifest_dir, "transfer.manifest.txt")
             with open(transfer_manifest_path, "w") as f:
-                f.write(make_transfer_manifest(db, plain_lidvid_to_dirpath))
+                f.write(make_transfer_manifest(db, plain_lidvid_to_visits_dirpath))
 
             # Tar it up.
             if _TAR_NEEDED:

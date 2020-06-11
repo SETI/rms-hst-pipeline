@@ -118,6 +118,21 @@ copy-results :
 	    popd; \
 	done
 
+.PHONY: lil-pipeline
+LIL-TWD=tmp-working-dir
+lil-pipeline : venv
+	mkdir -p $(LIL-TWD)
+	-rm $(LIL-TWD)/*/\#*.txt
+	-rm $(LIL-TWD)/*/KEY_ERROR_DUMP.txt
+	for project_id in 09059; do \
+	    echo '****' hst_$$project_id '****'; \
+	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
+		python NewPipeline.py $$project_id; \
+	done;
+	say pipeline is done
+	open $(LIL-TWD)
+
+
 ############################################################
 # THE VIRTUAL ENVIRONMENT
 ############################################################
