@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_DIR=${HOME}/pdart/pdart-py3
+BASE_DIR=${HOME}/pdart
 CONTEXT_PRODUCTS="${BASE_DIR}"/context-products.json
 XMLDIR=${BASE_DIR}/xml
 SCHEMAS="${XMLDIR}/PDS4_HST_1D00_1000.xsd.xml, ${XMLDIR}/PDS4_DISP_1B00.xsd.xml"
