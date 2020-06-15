@@ -66,9 +66,9 @@ WFPC2_IDS=05167 05219 05220 05238 05493 05508 05633 05640 05783 05824	\
 PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
 
 
-STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
-    record_changes insert_changes populate_database build_browse	\
-    build_labels update_archive make_deliverable validate_bundle
+# STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
+#     record_changes insert_changes populate_database build_browse	\
+#     build_labels update_archive make_deliverable validate_bundle
 
 .PHONY: pipeline
 pipeline : venv clean-results
@@ -76,25 +76,9 @@ pipeline : venv clean-results
 	-rm $(TWD)/*/\#*.txt
 	-rm $(TWD)/*/KEY_ERROR_DUMP.txt
 	for project_id in $(PROJ_IDS); do \
-	    for step in $(STEPS); do \
-		echo $$project_id $$step; \
-		$(ACTIVATE) && \
-		    PYTHONPATH=$(HOME)/pds-tools \
-			python Pipeline.py $$project_id $$step; \
-            done; \
-        done; \
-	say pipeline is done
-	open $(TWD)
-
-.PHONY: new-pipeline
-new-pipeline : venv clean-results
-	mkdir -p $(TWD)
-	-rm $(TWD)/*/\#*.txt
-	-rm $(TWD)/*/KEY_ERROR_DUMP.txt
-	for project_id in $(PROJ_IDS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools \
-		python NewPipeline.py $$project_id; \
+		python Pipeline.py $$project_id; \
 	done;
 	say pipeline is done
 	open $(TWD)
@@ -118,18 +102,22 @@ copy-results :
 	    popd; \
 	done
 
+##############################
+# smaller version for testing
+##############################
+
 .PHONY: lil-pipeline
 LIL-TWD=tmp-working-dir
 lil-pipeline : venv
 	mkdir -p $(LIL-TWD)
 	-rm $(LIL-TWD)/*/\#*.txt
 	-rm $(LIL-TWD)/*/KEY_ERROR_DUMP.txt
-	for project_id in 09059; do \
+	for project_id in 09059 15505; do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
-		python NewPipeline.py $$project_id; \
+		python Pipeline.py $$project_id; \
 	done;
-	say pipeline is done
+	say lil pipeline is done
 	open $(LIL-TWD)
 
 
