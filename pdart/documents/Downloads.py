@@ -14,7 +14,8 @@ def _retrieve_doc(url: str, filepath: str) -> bool:
         with open(filepath, "wb") as f:
             f.write(contents)
             return True
-    except urllib.error.URLError:
+    except urllib.error.URLError as e:
+        print(e)
         return False
 
 

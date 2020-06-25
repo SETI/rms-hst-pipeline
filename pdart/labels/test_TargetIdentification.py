@@ -37,7 +37,7 @@ class Test_TargetIdentification(unittest.TestCase):
   <type>Planet</type>
   <description>The planet Uranus</description>
   <Internal_Reference>
-    <lid_reference>urn:nasa:pds:context:target:uranus.planet</lid_reference>
+    <lid_reference>urn:nasa:pds:context:target:planet.uranus</lid_reference>
     <reference_type>data_to_target</reference_type>
   </Internal_Reference>
 </Target_Identification>

@@ -3,7 +3,7 @@ Templates to create a ``<Target_Identification />`` XML node for
 product labels.
 """
 
-from typing import Dict, Tuple
+from typing import Dict, List
 
 from pdart.xml.Templates import NodeBuilder, interpret_template
 
@@ -43,26 +43,27 @@ def target_identification(
     return func
 
 
-def target_lid(target_name: str, target_type: str) -> str:
-    return f"urn:nasa:pds:context:target:{_munge(target_name)}.{_munge(target_type)}"
+def target_lid(target_parts: List[str]) -> str:
+    target = ".".join(_munge(target_part) for target_part in target_parts)
+    return f"urn:nasa:pds:context:target:{target}"
 
 
-approximate_target_table: Dict[str, Tuple[str, str]] = {
-    "VENUS": ("Venus", "Planet"),
-    "MARS": ("Mars", "Planet"),
-    "JUP": ("Jupiter", "Planet"),
-    "SAT": ("Saturn", "Planet"),
-    "URA": ("Uranus", "Planet"),
-    "NEP": ("Neptune", "Planet"),
-    "CERES": ("Ceres", "Dwarf Planet"),
-    "PLU": ("Pluto", "Dwarf Planet"),
-    "PLCH": ("Pluto", "Dwarf Planet"),
-    "IO": ("Io", "Satellite"),
-    "EUR": ("Europa", "Satellite"),
-    "GAN": ("Ganymede", "Satellite"),
-    "CALL": ("Callisto", "Satellite"),
-    "TITAN": ("Titan", "Satellite"),
-    "TRIT": ("Triton", "Satellite"),
-    "DIONE": ("Dione", "Satellite"),
-    "IAPETUS": ("Iapetus", "Satellite"),
+approximate_target_table: Dict[str, List[str]] = {
+    "VENUS": ["Venus", "Planet"],
+    "MARS": ["Mars", "Planet"],
+    "JUP": ["Jupiter", "Planet"],
+    "SAT": ["Saturn", "Planet"],
+    "URA": ["Uranus", "Planet"],
+    "NEP": ["Neptune", "Planet"],
+    "CERES": ["Ceres", "Dwarf Planet"],
+    "PLU": ["Pluto", "Dwarf Planet"],
+    "PLCH": ["Pluto", "Dwarf Planet"],
+    "IO": ["Io", "Satellite", "Jupiter"],
+    "EUR": ["Europa", "Satellite", "Jupiter"],
+    "GAN": ["Ganymede", "Satellite", "Jupiter"],
+    "CALL": ["Callisto", "Satellite", "Jupiter"],
+    "TITAN": ["Titan", "Satellite", "Saturn"],
+    "TRIT": ["Triton", "Satellite", "Neptune"],
+    "DIONE": ["Dione", "Satellite", "Saturn"],
+    "IAPETUS": ["Iapetus", "Satellite", "Saturn"],
 }

@@ -2053,72 +2053,72 @@
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:europa.satellite::1.0"
+      "lidvid": "urn:nasa:pds:context:target:satellite.jupiter.europa::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:ganymede.satellite::1.0"
+      "lidvid": "urn:nasa:pds:context:target:satellite.jupiter.ganymede::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:io.satellite::1.0"
+      "lidvid": "urn:nasa:pds:context:target:satellite.jupiter.io::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:titan.satellite::1.0"
+      "lidvid": "urn:nasa:pds:context:target:satellite.saturn.titan::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:mercury.planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:planet.mercury::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:venus.planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:planet.venus::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:mars.planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:planet.mars::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:jupiter.planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:planet.jupiter::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:saturn.planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:planet.saturn::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:uranus.planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:planet.uranus::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:neptune.planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:planet.neptune::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:magrathea.planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:planet.magrathea::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:ceres.dwarf_planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:dwarf_planet.ceres::1.0"
     },
     {
       "name": [],
       "type": [],
-      "lidvid": "urn:nasa:pds:context:target:pluto.dwarf_planet::1.0"
+      "lidvid": "urn:nasa:pds:context:target:dwarf_planet.pluto::1.0"
     }
   ]
 }
