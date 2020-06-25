@@ -1,3 +1,4 @@
+from typing import List
 import abc
 import os.path
 
@@ -10,7 +11,9 @@ def make_directories() -> "Directories":
 
     hostname = socket.gethostname()
     if hostname == "Marks-iMac.local":
-        return ProductionDirectories("/Volumes/AKBAR/working-dir")
+        return ProductionDirectories(
+            ["/Volumes/AKBAR/working-dir", "/Volumes/PDART-8TB/working-dir"]
+        )
     else:
         if "LIL" in os.environ:
             # Use this machine; for little tests
@@ -80,9 +83,10 @@ class ProductionDirectories(Directories):
     For production use running on Mark's IMac.
     """
 
-    def __init__(self, base_dirpath: str) -> None:
-        self.base_dirpath = base_dirpath
+    def __init__(self, base_dirpaths: List[str]) -> None:
+        self.base_dirpaths = base_dirpaths
 
     def working_dir(self, proposal_id: int) -> str:
         hst_segment = f"hst_{proposal_id:05}"
-        return os.path.join(self.base_dirpath, hst_segment)
+        indx = proposal_id % len(self.base_dirpaths)
+        return os.path.join(self.base_dirpaths[indx], hst_segment)
