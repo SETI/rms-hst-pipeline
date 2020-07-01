@@ -1,0 +1,24 @@
+9793
+['Andrea Cimatti', 'Anna Pasquali', 'Anton Koekemoer', 'Caryl Gronwall', 'Emanuele Daddi', 'Hao-Jing Yan', 'Henry C. Ferguson', 'James Rhoads', 'Jeremy R. Walsh', 'Joel Vernet', 'Jonathan P. Gardner', 'Larry D. Petro', 'Leonidas Moustakas', 'Massimo Stiavelli', 'Nino Panagia', 'Norbert Pirzkal', 'Rogier A. Windhorst', 'Sangeeta Malhotra', 'Sperello Di Serego Alighie', 'Zlatan I. Tsvetanov', 'Zoltan Haiman']
+['Andrea Cimatti', 'Anna Pasquali', 'Anton Koekemoer', 'Caryl Gronwall', 'Emanuele Daddi', 'Hao-Jing Yan', 'Henry C. Ferguson', 'James Rhoads', 'Jeremy R. Walsh', 'Joel Vernet', 'Jonathan P. Gardner', 'Larry D. Petro', 'Leonidas Moustakas', 'Massimo Stiavelli', 'Nino Panagia', 'Norbert Pirzkal', 'Rogier A. Windhorst', 'Sangeeta Malhotra', 'Sperello Di Serego Alighieri', 'Zlatan I. Tsvetanov', 'Zoltan Haiman']
+10530
+['Anna Pasquali', 'Anton Koekemoer', 'Caryl Gronwall', 'Chun Xu', 'Emanuele Daddi', 'Gerhardt R. Meurer', 'Hao-Jing Yan', 'Ignacio Ferreras', 'James Rhoads', 'Jeremy R. Walsh', 'Jonathan P. Gardner', 'Kailash Sahu', 'Leonidas Moustakas', 'Mark Dickinson', 'Martin Kuemmel', 'Nino Panagia', 'Norbert Pirzkal', 'Rachel S. Somerville', 'Rogier A. Windhorst', 'Sangeeta Malhotra', 'Sperello di Serego Alighie', 'Tamas Budavari', 'Zoltan Haiman']
+['Anna Pasquali', 'Anton Koekemoer', 'Caryl Gronwall', 'Chun Xu', 'Emanuele Daddi', 'Gerhardt R. Meurer', 'Hao-Jing Yan', 'Ignacio Ferreras', 'James Rhoads', 'Jeremy R. Walsh', 'Jonathan P. Gardner', 'Kailash Sahu', 'Leonidas Moustakas', 'Mark Dickinson', 'Martin Kuemmel', 'Nino Panagia', 'Norbert Pirzkal', 'Rachel S. Somerville', 'Rogier A. Windhorst', 'Sangeeta Malhotra', 'Sperello di Serego Alighieri', 'Tamas Budavari', 'Zoltan Haiman']
+13178
+['Charles A. Beichman', 'Christopher R. Gelino', 'Christopher Tinney', 'Edward L. Wright', 'J. Davy Kirkpatrick', 'Jacqueline Kelly Faherty', 'Michael C. Cushing', 'Patrick J. Lowrance', 'Richard Smart']
+['Charles A. Beichman', 'Christopher R. Gelino', 'Christopher Tinney', 'Edward L. Wright', 'J. Davy Kirkpatrick', 'Jaqueline Faherty', 'Michael C. Cushing', 'Patrick J. Lowrance', 'Richard Smart']
+14191
+['Andrew A. Cole', 'Andrew Eugene Dolphin', 'Daniel R. Weisz', 'Dustin Lang', 'Evan D. Skillman', 'Michael Boylan-Kolchin']
+['Andrew A. Cole', 'Andrew Dolphin', 'Daniel R. Weisz', 'Dustin Lang', 'Evan D. Skillman', 'Michael Boylan-Kolchin']
+15099
+['Christy A. Tremonti', 'Claus Leitherer', 'John Chisholm']
+['Christy A. Tremonti', 'Claus Leitherer', 'John P. Chisholm']
+15120
+['Brian Williams', 'Eileen T. Meyer', 'Knox S. Long', 'P. Frank Winkler', 'William B. Sparks']
+['Brian J. Williams', 'Eileen T. Meyer', 'Knox S. Long', 'P. Frank Winkler', 'William B. Sparks']
+15184
+['Edward M. Sion', 'Matthew James Darnley', 'Patrick Godon', 'R. Mark Wagner', 'Robert E. Williams', 'Stella Kafka', 'Sumner G. Starrfield']
+['Edward M. Sion', 'Matt James Darnley', 'Patrick Godon', 'R. Mark Wagner', 'Robert E. Williams', 'Stella Kafka', 'Sumner G. Starrfield']
+15241
+['Aaron S. Evans', 'Anne Medling', 'Antonija Oklopcic', 'David Cook', 'Janice Lee', 'Kirsten L. Larson', 'Lee Armus', 'Philip F. Hopkins', 'Tanio Diaz Diaz-Santos']
+['Aaron S. Evans', 'Anne Medling', 'Antonija Oklopcic', 'David Cook', 'Janice C. Lee', 'Kirsten L. Larson', 'Lee Armus', 'Philip F. Hopkins', 'Tanio Diaz Diaz-Santos']

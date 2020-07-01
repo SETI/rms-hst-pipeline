@@ -1,6 +1,8 @@
 import re
 from typing import List, Tuple
 
+DEBUG = False       # set True for useful debugging info printed to stdout.
+
 ################################################################################
 # This is the top of a sample .PRO file after c. 1995
 ################################################################################
@@ -84,266 +86,310 @@ from typing import List, Tuple
 # ------------------------------------------------------------------------------------
 # ...
 
+CATEGORIES = r"(GO|GTO|gto|AUG|SMC|SME|SNAP|CAL|RPT|AR|ENG|SM2|SM3|NASA)"
+
 # This pattern matches the proposal ID
-PROPNO_PATTERN: re.Pattern = re.compile(r" +ID:? +([0-9]{4})\s*")
+PROPNO_REGEX1 = re.compile(r" +ID:? +([0-9]{4,5})\s*")
+PROPNO_REGEX2 = re.compile(
+    r" *HUBBLE SPACE TELESCOPE OBSERVING PROGRAM ([0-9]+)\s*"
+)
 
 # Sometimes "2. Scientific Category" appears in front of the category and cycle
 # number, sometimes not
-INFO_HEADER1: re.Pattern = re.compile(
+INFO_HEADER1 = re.compile(
     r"2\. *Scientific Category +3\. *Proposal For +4\. *Cycle\s*"
 )
-INFO_PATTERN1: re.Pattern = re.compile(r".{22} *(GO|GTO)[^ ]* +([1-9])\s*")
-INFO_HEADER2: re.Pattern = re.compile(r"2\.  *Proposal For +3\. *Cycle\s*")
-INFO_PATTERN2: re.Pattern = re.compile(r" *(GO|GTO)[^ ]* +([1-9])\s*")
-INFO_HEADER3: re.Pattern = re.compile(
-    r"2\. *Scientific Category +3\. *Proposal For +4\. *Proposal Type\s*"
+INFO_REGEX1 = re.compile(
+    r".{22} *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*",
 )
-INFO_PATTERN3: re.Pattern = re.compile(r".{22} *(GO|GTO).*")
+INFO_HEADER2  = re.compile(r"2\.  *Proposal For +3\. *Cycle\s*")
+INFO_HEADER2a = re.compile(r"Type +Cycle +.*")
+INFO_REGEX2   = re.compile(r" *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*")
+INFO_HEADER3 = re.compile(
+    r"2\. *Scientific Category +3\. *Proposal For +4\. *Proposal Type   .*"
+)
+INFO_REGEX3 = re.compile(r".{22} *" + CATEGORIES + ".*")
 
-CYCLE_PATTERN: re.Pattern = re.compile(r".*CYCLE ([0-9]).*")
+CYCLE_HEADER1 = re.compile(r" *Type +Cycle.*")
+CYCLE_REGEX1  = re.compile(r".*   ([0-9]+).*")
 
-# Authors are always one PI followed by zero or more CoI lines
-AUTHOR_PATTERN1: re.Pattern = re.compile(r" *PI?i?:? +(.*?)($|  .*)")
-AUTHOR_PATTERN2: re.Pattern = re.compile(r" *CoI?n?:? +(.*?)   .*")
+CYCLE_REGEX2 = re.compile(r".*CYCLE ([0-9]+).*")
+
+CYCLE_IN_TITLE = re.compile(".*(?:CYCLE|CYC\.|CYC) *([0-9]+).*", re.I)
+
+# Authors are usually one PI/Pi followed by zero or more CoI/Con lines
+PI_REGEX  = re.compile(r" *PI: *(.*?)(?:\n|   .*)")
+COI_REGEX = re.compile(r" *CoI: *(.*?)(?:\n|   .*)")
+LONGNAME_REGEX = re.compile(r" {8}([^ ].*?)(?:\n|   .*)")
+
+# However, first check for a "Proposers" section
+AUTHOR_HEADER = re.compile(r" *Proposers +Institution +.*")
+AUTHOR_REGEX  = re.compile(r"(.*?)   .*")
 
 # The title is always after this line
-TITLE_HEADER: re.Pattern = re.compile(r"1\. *Proposal Title:\s*")
+TITLE_HEADER = re.compile(r"(1\. *Proposal |)Title:?\s*")
 
 # The first option below usually provides the check-in date of the Phase II
 # program. However, sometimes it fails, in which case the check-in date is in
 # the header line for page 2. For very old files, there's a "Report Date"
 # instead.
-YEAR1_PATTERN: re.Pattern = re.compile(r" *Check-in Date: .*?-.*?-([0-9]{4})\s*")
-YEAR2_PATTERN: re.Pattern = re.compile(
-    r".* [01][0-9]/[0-3][0-9]/([0-9]{2}) .*\[  2\]\s*"
-)
-YEAR3_PATTERN: re.Pattern = re.compile(
-    r" *Report Date: [0-9]{2}-...-([0-9]{2})[^0-9].*"
-)
+YEAR1_REGEX = re.compile(r" *Check-in Date: .*?-.*?-([0-9]{4})\s*")
+YEAR2_REGEX = re.compile(r".* [01][0-9]/[0-3][0-9]/([0-9]{2}) .*\[  2\]\s*")
+YEAR3_REGEX = re.compile(r" *Report Date: [0-9]{2}-...-([0-9]{2})[^0-9].*")
+YEAR4_REGEX = re.compile(r" *Check-in Time: [0-9]{2}-...-([0-9]{2})[^0-9].*")
 
 # This pattern matches any year used in a timing constraint, where the format is
-# dd-MON-yy.
-REQ_PATTERN: re.Pattern = re.compile(
-    r".*[0-9]{1,2}-(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-([0-9]{2})[^0-9].*"
+# dd-MON-yy or yyyy-MON-dd
+MONTHS = r"(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)"
+YMD_REGEX = re.compile(
+    r"(?:^|.*[^0-9])((?:19|20)[0-9]{2})-" + MONTHS +
+    r"-[0-9]{1,2}(?:\n|[^0-9].*)"
 )
-
-# Ideally, the year returned should be the year of the last observation obtained
-# in an HST program. Unfortunately, there is no guaranteed way to get this
-# information from a .PRO file. Instead we return the check-in year or the year
-# of the latest timing constraint, whichever is greater. I think this is the
-# best we can do.
+DMY_REGEX = re.compile(
+    r"(?:^|.*[^0-9])[0-9]{1,2}-" + MONTHS +
+    r"-(?:|19|20)([0-9]{2})(?:$|[^0-9].*)"
+)
 
 ################################################################################
 
+MISSING_CYCLES = {
+    5211: 4,
+    6141: 4,
+    6806: 6,
+}
+
+################################################################################
 
 def Citation_Information_from_pro(
     filename: str,
-) -> Tuple[int, str, int, List[str], str, str]:
+) -> Tuple[int, str, int, List[str], str, int, int]:
 
-    # Quick and dirty function to standardize program titles
-    def fix_title(title: str) -> str:
+    # A quick and dirty function to merge author lists
+    # Sometimes the PI is in the author list, sometimes not!
+    def merge_authors(authors, pi_author, cois):
 
-        # Fix known weirdness
-        title = title.replace("\\\\cotwo\\\\", "CO2")
+        def letters_only(author):
+            letters = []
+            for c in author:
+                if c.isalpha():
+                    letters.append(c)
+            return ''.join(letters).upper()
 
-        # Fix double-blanks
-        title = title.replace("  ", " ")
+        # Author list found
+        if authors and not pi_author:
+            return authors
 
-        # Standardize capitalization if necessary
-        if not title.isupper():
-            return title
+        # No author list found
+        if not authors:
+            return [pi_author] + cois
 
-        words = title.split()
-        title = " ".join([w.capitalize() for w in words])
+        # See if PI is first in the author list; if so, return
+        pi_letters = letters_only(pi_author)
+        letters = letters_only(authors[0])
+        if pi_letters in letters or letters in pi_letters:
+            return authors
 
-        for test in (
-            "a",
-            "an",
-            "the",
-            "for",
-            "and",
-            "or",
-            "at",
-            "by",
-            "from",
-            "of",
-            "on",
-            "to",
-            "with",
-        ):
-            title = title.replace(" " + test.capitalize() + " ", " " + test + " ")
-
-        return title
-
-    # A quick and dirty function to standardize author names
-    def fix_authors(authors: List[str]) -> List[str]:
-
+        # See if the PI is further down the list; if so, move it to top
+        pi_found_in_authors = False
         for k, author in enumerate(authors):
+            letters = letters_only(author)
+            if letters in pi_letters or pi_letters in letters:
+                pi_found_in_authors = True
+                pi_name = authors.pop(k)
+                break
 
-            # Strip titles if any
-            author = author.replace("Prof. ", "")
-            author = author.replace("Dr. ", "")
-            author = author.replace("Mr. ", "")
-            author = author.replace("Ms. ", "")
+        if pi_found_in_authors:
+            if DEBUG:
+                print("PI moved to top: " + pi_name)
 
-            # Fix known weirdness
-            author = author.replace('GR"U N', "Gruen")
+            return [pi_name] + authors
 
-            # Standarize case of last names, which are sometimes all caps
-            if author[-1].isupper():
-                words = author.split()
-                for w, word in enumerate(words):  # handles "A'Hearn" correctly!
-                    chars = list(word)
-                    c = len(chars) - 1
-                    while c > 0 and chars[c].isupper() and chars[c - 1].isupper():
-                        chars[c] = chars[c].lower()
-                        c -= 1
-                    words[w] = "".join(chars)
+        # PI is not in author list, but other authors are OK
+        if DEBUG:
+            print("PI %s inserted before co-I %s" % (pi_author, authors[0]))
 
-                # But then there are Roman numerals. Yikes!
-                if words[-1] in ("Ii", "Iii", "Iv"):
-                    words[-1] = words[-1].upper()
-
-                author = " ".join(words)
-
-            authors[k] = author
-
-        return authors
+        return [pi_author] + authors
 
     # Read file
-    with open(filename) as f:
+    with open(filename, 'r', encoding='latin-1') as f:
         recs = f.readlines()
 
-    # Initialize the info we seek
+    # Get proposal number
     propno = 0
-    category = ""
-    authors: List[str] = []
-    title = ""
-    year = 0
-    needed = 5  # tracks when to stop searching for citation info
+    for rec in recs:
+        match = PROPNO_REGEX1.match(rec)
+        if match:
+            propno = int(match.group(1))
+            break
 
-    cycle = None  # cycle number sometimes needs to be handled separately
-
-    # Loop through records, allowing for skipped records
-    k = -1
-    while needed > 0:
-        k += 1
-
-        try:
-            rec = recs[k]
-        except IndexError:  # we got to the end and some info wasn't found
-            if not propno:
-                raise ValueError("missing proposal number in " + filename)
-            elif not category:
-                raise ValueError("missing proposal category in " + filename)
-            elif not authors:
-                raise ValueError("missing authors in " + filename)
-            elif not title:
-                raise ValueError("missing title in " + filename)
-            else:
-                raise ValueError("missing year in " + filename)
-
-        # Try to get proposal number if still needed
-        if not propno:
-            match = re.match(PROPNO_PATTERN, rec)
+    if not propno:
+        for rec in recs:
+            match = PROPNO_REGEX2.match(rec)
             if match:
                 propno = int(match.group(1))
-                needed -= 1
-                next
+                break
 
-        # Try to get proposal type and cycle number if still needed
-        if not category:
-            if re.match(INFO_HEADER1, rec):
-                match = re.match(INFO_PATTERN1, recs[k + 1])
-            elif re.match(INFO_HEADER2, rec):
-                match = re.match(INFO_PATTERN2, recs[k + 1])
-            elif re.match(INFO_HEADER3, rec):
-                match = re.match(INFO_PATTERN3, recs[k + 1])
-            else:
-                match = None
+    # Get proposal type and cycle number
+    category = ''
+    cycle = 0
+    for k, rec in enumerate(recs):
+        if INFO_HEADER1.match(rec):
+            match = INFO_REGEX1.match(recs[k+1])
+        elif INFO_HEADER2.match(rec):
+            match = INFO_REGEX2.match(recs[k+1])
+        elif INFO_HEADER2a.match(rec):
+            match = INFO_REGEX2.match(recs[k+1])
+        elif INFO_HEADER3.match(rec):
+            match = re.match(INFO_REGEX3, recs[k+1])
+        else:
+            match = None
 
-            if match:
-                category = match.group(1)
-                try:
-                    cycle = int(match.group(2))
-                except IndexError:
-                    pass  # no cycle value in INFO_PATTERN3
-                k += 1
-                needed -= 1
-                next
-
-        # Try to get author list if still needed
-        if not authors:
-            match = re.match(AUTHOR_PATTERN1, rec)
-            if match:
-                authors.append(match.group(1))
-
-                match = re.match(AUTHOR_PATTERN2, recs[k + 1])
-                while match:
-                    authors.append(match.group(1))
-                    k += 1
-                    match = re.match(AUTHOR_PATTERN2, recs[k + 1])
-
-                needed -= 1
-                next
-
-        # Try to get title if still needed
-        if not title:
-            match = re.match(TITLE_HEADER, rec)
-            if match:
-                title = recs[k + 1].strip()
-                k += 1
-                if recs[k + 1][:4] != "----":  # in case title has a second line
-                    title += " " + recs[k + 1].strip()
-                    k += 1
-
-                needed -= 1
-                next
-
-        # Try to get year if still needed
-        if not year:
-            match = re.match(YEAR1_PATTERN, rec)
-            if match:
-                year = int(match.group(1))
-                needed -= 1
-                next
-
-            match = re.match(YEAR2_PATTERN, rec)
-            if match:
-                year = 1900 + int(match.group(1))
-                if year < 1950:
-                    year += 100
-                needed -= 1
-                next
-
-            match = re.match(YEAR3_PATTERN, rec)
-            if match:
-                year = 1900 + int(match.group(1))
-                if year < 1950:
-                    year += 100
-                needed -= 1
-                next
-
-    # Now we update the year with the latest date from any timing constraint
-    # We also fill in a cycle number if it is still missing
-    for rec in recs[k + 1 :]:
-        match = re.match(REQ_PATTERN, rec)
         if match:
-            req_year = 1900 + int(match.group(1))
-            if year < 1950:
-                year += 100
-            year = max(year, 1900 + int(match.group(1)))
+            category = match.group(1).upper()
+            try:
+                cycle = int(match.group(2))
+            except IndexError:
+                pass    # no cycle value in INFO_REGEX3
 
-        if not cycle:
-            match = re.match(CYCLE_PATTERN, rec)
+            break
+
+    # Get title
+    title = ""
+    for k, rec in enumerate(recs):
+        match = TITLE_HEADER.match(rec)
+        if match:
+            title = recs[k+1].strip()
+            if recs[k+2][:4] != "----":         # title has a second line
+                # If there's no space before a final dash, don't put one after
+                if title.endswith("-") and not title.endswith(" -"):
+                    title += recs[k+2].strip()
+                else:
+                    title += " " + recs[k+2].strip()
+
+                if recs[k+3][:4] != "----":     # title has a third line
+                    if title.endswith("-") and not title.endswith(" -"):
+                        title += recs[k+3].strip()
+                    else:
+                        title += " " + recs[k+3].strip()
+
+            break
+
+    # Get the authors from a "Proposers" section
+    authors = []
+    for k, rec in enumerate(recs):
+        match = AUTHOR_HEADER.match(rec)
+        if match and '----' in recs[k+1]:
+            for next_rec in recs[k+2:]:
+                match = AUTHOR_REGEX.match(next_rec)
+                if match:
+                    author = match.group(1).strip()
+                    if author:
+                        authors.append(author)
+                elif '----' in next_rec:
+                    break
+
+    # Also look for PI/CoI prefixes
+    pi_author = ''
+    for k, rec in enumerate(recs):
+        rec = rec[:42] + "   "  # wipe out the Institution
+        match = PI_REGEX.match(rec)
+        if match:
+            pi_author = match.group(1).strip()
+            match = LONGNAME_REGEX.match(recs[k+1][:42])
+            if match:
+                pi_author += " " + match.group(1).strip()
+
+            break
+
+    cois = []
+    coi_found = False
+    for k, rec in enumerate(recs):
+        rec = rec[:42] + "   "  # wipe out the Institution
+        match = COI_REGEX.match(rec)
+        if match:
+            coi_found = True
+            name = match.group(1).strip()
+            if not name:        # sometimes it's empty. Weird.
+                continue
+
+            match = LONGNAME_REGEX.match(recs[k+1][:42])
+            if match:
+                name += " " + match.group(1).strip()
+
+            cois.append(name)
+        elif coi_found:
+            if '----' in rec:   # end of Co-Is
+                break
+
+    authors = merge_authors(authors, pi_author, cois)
+
+    # Get the submission year
+    submission_year = 0
+    for rec in recs:
+        match = (YEAR1_REGEX.match(rec) or
+                 YEAR2_REGEX.match(rec) or
+                 YEAR3_REGEX.match(rec) or
+                 YEAR4_REGEX.match(rec))
+        if match:
+            submission_year = int(match.group(1))
+            if submission_year < 50:
+                submission_year += 2000
+            elif submission_year < 100:
+                submission_year += 1900
+
+            break
+
+    # Get the timing year, containing the latest date from any timing constraint
+    timing_year = 0
+    for rec in recs:
+        match = DMY_REGEX.match(rec) or YMD_REGEX.match(rec)
+        if match:
+            alt_year = int(match.group(1))
+            if alt_year < 50:
+                alt_year += 2000
+            elif alt_year < 100:
+                alt_year += 1900
+
+            timing_year = max(alt_year, timing_year)
+
+    # Fill in a cycle number if it is still missing
+    if not cycle:
+        for k, rec in enumerate(recs):
+            match = CYCLE_HEADER1.match(rec)
+            if match:
+                match = CYCLE_REGEX1.match(recs[k+1])
+                if match:
+                    cycle = int(match.group(1))
+
+                break
+
+    if not cycle:
+        for rec in recs:
+            match = CYCLE_REGEX2.match(rec)
             if match:
                 cycle = int(match.group(1))
+                break
 
-    if cycle is None:
+    # Sometimes the cycle is embedded in the title
+    if not cycle:
+        match = CYCLE_IN_TITLE.match(title)
+        if match:
+            cycle = int(match.group(1))
+
+    # Deal with known cases of missing cycle
+    if not cycle:
+        if propno in MISSING_CYCLES:
+            cycle = MISSING_CYCLES[propno]
+
+    # Check for complete results
+    if not propno:
+        raise ValueError("missing proposal number in " + filename)
+    elif not authors:
+        raise ValueError("missing authors in " + filename)
+    elif not title:
+        raise ValueError("missing title in " + filename)
+    elif not cycle:
         raise ValueError("missing cycle number in " + filename)
 
-    # Misc. cleanup
-    authors = fix_authors(authors)
-    title = fix_title(title)
-
-    return (propno, category, cycle, authors, title, str(year))
+    return (propno, category, cycle, authors, title,
+            submission_year, timing_year)
