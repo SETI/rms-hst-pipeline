@@ -1,4 +1,4 @@
-from typing import Any, Optional, Sized
+from typing import Any, Iterable, Iterator, Optional, Sized
 from astropy.io.fits.column import ColDefs
 
 class BinTableHDU(Sized):
@@ -6,7 +6,7 @@ class BinTableHDU(Sized):
     data: Any
     def __len__(self) -> int: ...
 
-class HDUList(Sized):
+class HDUList(Iterable[Any], Sized):
     def close(
         self,
         output_verify: str = "exception",
@@ -14,6 +14,7 @@ class HDUList(Sized):
         closed: bool = True,
     ) -> None: ...
     def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator[Any]: ...
 
 def fitsopen(
     name: str,

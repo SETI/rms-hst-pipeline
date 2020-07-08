@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!-- PDS4 XML product label for PDS4 V1.13.0.0  Mon Dec 16 15:07:52 EST 2019 -->
+  <!-- PDS4 XML product label for PDS4 V1.13.0.0  Thu Jul 02 15:18:00 EDT 2020 -->
   <!-- Generated from the PDS4 Information Model V1.13.0.0 - System Build 10a -->
   <!-- *** This PDS4 XML product label is an operational deliverable. *** -->
 <?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch"
@@ -17,7 +17,7 @@
         <product_class>Product_XML_Schema</product_class>
         <Modification_History>
             <Modification_Detail>
-                <modification_date>2019-12-16</modification_date>
+                <modification_date>2020-07-02</modification_date>
                 <version_id>1.0</version_id>
                 <description>This is the system generated PDS4 product label for PDS4 XML Schema and Schematron files.</description>
             </Modification_Detail>
@@ -26,8 +26,8 @@
     <File_Area_XML_Schema>
         <File>
             <file_name>PDS4_HST_1D00_1000.xsd</file_name>
-            <creation_date_time>2019-12-16T12:07:52</creation_date_time>
-            <file_size unit="byte">16999</file_size>
+            <creation_date_time>2020-07-02T12:18:00</creation_date_time>
+            <file_size unit="byte">17428</file_size>
             <records>379</records>
         </File>
         <XML_Schema>
@@ -40,8 +40,8 @@
     <File_Area_XML_Schema>
         <File>
             <file_name>PDS4_HST_1D00_1000.sch</file_name>
-            <creation_date_time>2019-12-16T12:07:52</creation_date_time>
-            <file_size unit="byte">6498</file_size>
+            <creation_date_time>2020-07-02T12:18:00</creation_date_time>
+            <file_size unit="byte">7428</file_size>
             <records>123</records>
         </File>
         <XML_Schema>

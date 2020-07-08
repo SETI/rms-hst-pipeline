@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!-- PDS4 XML/Schema for Name Space Id:hst  Version:1.0.0.0 - Mon Dec 16 15:07:52 EST 2019 -->
+  <!-- PDS4 XML/Schema for Name Space Id:hst  Version:1.0.0.0 - Thu Jul 02 15:18:00 EDT 2020 -->
   <!-- Generated from the PDS4 Information Model Version 1.13.0.0 - System Build 10a -->
   <!-- *** This PDS4 product schema is an operational deliverable. *** -->
   <!--                                                                           -->
@@ -57,8 +57,8 @@
       <xs:element name="subarray_flag" type="hst:subarray_flag" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
     <!-- Begin assert statements for schematron - Enumerated Values -->
-    <!-- <xs:assert test="hst:detector_id = ('@@@')"/> -->
-    <!-- <xs:assert test="hst:gain_mode_id = ('@@@')"/> -->
+    <!-- <xs:assert test="hst:detector_id = ('CCD', 'FUV-MAMA', 'HRC', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV-MAMA', 'SBC', 'UVIS', 'WFC')"/> -->
+    <!-- <xs:assert test="hst:gain_mode_id = ('A2D0.', 'A2D1.', 'A2D4.', 'N/A')"/> -->
     <!-- <xs:assert test="hst:observation_type = ('image', 'spectrum')"/> -->
     <!-- <xs:assert test="hst:subarray_flag = ('@@@')"/> -->
     <!-- End assert statements for schematron - Enumerated Values -->
@@ -84,9 +84,9 @@
       <xs:element name="moving_target_flag" type="hst:moving_target_flag" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
     <!-- Begin assert statements for schematron - Enumerated Values -->
-    <!-- <xs:assert test="hst:exposure_type = ('@@@', '@@@', '@@@', '@@@', 'extended', 'incomplete', 'indeterminate', 'interrupted', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain')"/> -->
+    <!-- <xs:assert test="hst:exposure_type = ('TDF-down at expstart', 'excessive downtime', 'excessive downtime', 'extended', 'incomplete', 'incomplete', 'indeterminate', 'indeterminate', 'indeterminate', 'interrupted', 'interrupted', 'interupted', 'interupted', 'normal', 'normal', 'normal', 'normal', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain')"/> -->
     <!-- <xs:assert test="hst:fine_guidance_system_lock_type = ('course', 'fine', 'fine/gyro', 'gyros', 'unknown')"/> -->
-    <!-- <xs:assert test="hst:instrument_mode_id = ('accum', 'acq')"/> -->
+    <!-- <xs:assert test="hst:instrument_mode_id = ('accum', 'acq', 'acq/peak', 'multiaccum', 'time-tag')"/> -->
     <!-- <xs:assert test="hst:moving_target_flag = ('false', 'true')"/> -->
     <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
@@ -104,7 +104,7 @@
       <xs:element name="subarray_flag" type="hst:subarray_flag" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
     <!-- Begin assert statements for schematron - Enumerated Values -->
-    <!-- <xs:assert test="hst:detector_id = ('@@@')"/> -->
+    <!-- <xs:assert test="hst:detector_id = ('CCD', 'FUV-MAMA', 'HRC', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV-MAMA', 'SBC', 'UVIS', 'WFC')"/> -->
     <!-- <xs:assert test="hst:observation_type = ('image', 'spectrum')"/> -->
     <!-- <xs:assert test="hst:subarray_flag = ('@@@')"/> -->
     <!-- End assert statements for schematron - Enumerated Values -->
@@ -124,7 +124,7 @@
     </xs:sequence>
     <!-- Begin assert statements for schematron - Enumerated Values -->
     <!-- <xs:assert test="hst:targeted_detector_id = ('pc1', 'wf2', 'wf3', 'wf4')"/> -->
-    <!-- <xs:assert test="hst:gain_mode_id = ('@@@')"/> -->
+    <!-- <xs:assert test="hst:gain_mode_id = ('A2D0.', 'A2D1.', 'A2D4.', 'N/A')"/> -->
     <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
 

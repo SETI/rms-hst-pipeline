@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!-- PDS4 Schematron for Name Space Id:hst  Version:1.0.0.0 - Mon Dec 16 15:07:52 EST 2019 -->
+  <!-- PDS4 Schematron for Name Space Id:hst  Version:1.0.0.0 - Thu Jul 02 15:18:00 EDT 2020 -->
   <!-- Generated from the PDS4 Information Model Version 1.13.0.0 - System Build 10a -->
   <!-- *** This PDS4 schematron file is an operational deliverable. *** -->
 <sch:schema xmlns:sch="http://purl.oclc.org/dsdl/schematron" queryBinding="xslt2">
@@ -20,14 +20,14 @@
 		   <!-- ================================================ -->
   <sch:pattern>
     <sch:rule context="hst:Parameters_ACS/hst:detector_id">
-      <sch:assert test=". = ('@@@')">
-        The attribute hst:detector_id must be equal to the value '@@@'.</sch:assert>
+      <sch:assert test=". = ('CCD', 'FUV-MAMA', 'HRC', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV-MAMA', 'SBC', 'UVIS', 'WFC')">
+        The attribute hst:detector_id must be equal to one of the following values 'CCD', 'FUV-MAMA', 'HRC', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV-MAMA', 'SBC', 'UVIS', 'WFC'.</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
     <sch:rule context="hst:Parameters_ACS/hst:gain_mode_id">
-      <sch:assert test=". = ('@@@')">
-        The attribute hst:gain_mode_id must be equal to the value '@@@'.</sch:assert>
+      <sch:assert test=". = ('A2D0.', 'A2D1.', 'A2D4.', 'N/A')">
+        The attribute hst:gain_mode_id must be equal to one of the following values 'A2D0.', 'A2D1.', 'A2D4.', 'N/A'.</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -56,8 +56,8 @@
   </sch:pattern>
   <sch:pattern>
     <sch:rule context="hst:Parameters_General/hst:exposure_type">
-      <sch:assert test=". = ('@@@', '@@@', '@@@', '@@@', 'extended', 'incomplete', 'indeterminate', 'interrupted', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain')">
-        The attribute hst:exposure_type must be equal to one of the following values '@@@', '@@@', '@@@', '@@@', 'extended', 'incomplete', 'indeterminate', 'interrupted', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain'.</sch:assert>
+      <sch:assert test=". = ('TDF-down at expstart', 'excessive downtime', 'excessive downtime', 'extended', 'incomplete', 'incomplete', 'indeterminate', 'indeterminate', 'indeterminate', 'interrupted', 'interrupted', 'interupted', 'interupted', 'normal', 'normal', 'normal', 'normal', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain')">
+        The attribute hst:exposure_type must be equal to one of the following values 'TDF-down at expstart', 'excessive downtime', 'excessive downtime', 'extended', 'incomplete', 'incomplete', 'indeterminate', 'indeterminate', 'indeterminate', 'interrupted', 'interrupted', 'interupted', 'interupted', 'normal', 'normal', 'normal', 'normal', 'normal', 'predicted', 'tdf-down at expstart', 'uncertain'.</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -68,8 +68,8 @@
   </sch:pattern>
   <sch:pattern>
     <sch:rule context="hst:Parameters_General/hst:instrument_mode_id">
-      <sch:assert test=". = ('accum', 'acq')">
-        The attribute hst:instrument_mode_id must be equal to one of the following values 'accum', 'acq'.</sch:assert>
+      <sch:assert test=". = ('accum', 'acq', 'acq/peak', 'multiaccum', 'time-tag')">
+        The attribute hst:instrument_mode_id must be equal to one of the following values 'accum', 'acq', 'acq/peak', 'multiaccum', 'time-tag'.</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -80,8 +80,8 @@
   </sch:pattern>
   <sch:pattern>
     <sch:rule context="hst:Parameters_WFC3/hst:detector_id">
-      <sch:assert test=". = ('@@@')">
-        The attribute hst:detector_id must be equal to the value '@@@'.</sch:assert>
+      <sch:assert test=". = ('CCD', 'FUV-MAMA', 'HRC', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV-MAMA', 'SBC', 'UVIS', 'WFC')">
+        The attribute hst:detector_id must be equal to one of the following values 'CCD', 'FUV-MAMA', 'HRC', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV-MAMA', 'SBC', 'UVIS', 'WFC'.</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -110,8 +110,8 @@
   </sch:pattern>
   <sch:pattern>
     <sch:rule context="hst:Parameters_WFPC2/hst:gain_mode_id">
-      <sch:assert test=". = ('@@@')">
-        The attribute hst:gain_mode_id must be equal to the value '@@@'.</sch:assert>
+      <sch:assert test=". = ('A2D0.', 'A2D1.', 'A2D4.', 'N/A')">
+        The attribute hst:gain_mode_id must be equal to one of the following values 'A2D0.', 'A2D1.', 'A2D4.', 'N/A'.</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>

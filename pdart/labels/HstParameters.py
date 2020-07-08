@@ -16,7 +16,7 @@ from pdart.labels.HstParametersXml import (
 from pdart.labels.Lookup import Lookup
 from pdart.xml.Templates import NodeBuilder
 
-_USING_PLACEHOLDER: bool = True
+_USING_SUBARRAY_PLACEHOLDER: bool = True
 
 
 def get_repeat_exposure_count(lookup: Lookup) -> str:
@@ -34,7 +34,7 @@ def get_subarray_flag(lookup: Lookup, instrument: str) -> str:
     """
     Return text for the ``<subarray_flag />`` XML element.
     """
-    if _USING_PLACEHOLDER:
+    if _USING_SUBARRAY_PLACEHOLDER:
         # TODO-PLACEHOLDER
         return "@@@"
     assert instrument != "wfpc2", instrument
@@ -98,9 +98,6 @@ def get_detector_id(lookup: Lookup, instrument: str) -> str:
     Return text for the ``<detector_id />`` XML element.
     """
 
-    if _USING_PLACEHOLDER:
-        # TODO-PLACEHOLDER
-        return "@@@"
     detector = lookup["DETECTOR"]
     if instrument == "wfpc2":
         if detector == "1":
@@ -141,10 +138,6 @@ def get_exposure_type(lookup: Lookup, instrument: str) -> str:
     else:
         res = lookup["EXPFLAG"]
     res = res.lower()
-
-    if _USING_PLACEHOLDER and res == "excessive downtime":
-        # TODO-PLACEHOLDER
-        return "@@@"
 
     return res
 
@@ -211,9 +204,6 @@ def get_gain_mode_id(lookup: Lookup, instrument: str) -> str:
     """
     Return text for the ``<gain_mode_id />`` XML element.
     """
-    if _USING_PLACEHOLDER:
-        # TODO-PLACEHOLDER
-        return "@@@"
     try:
         atodgain = lookup["ATODGAIN"]
         if instrument == "acs":
@@ -289,18 +279,6 @@ def get_instrument_mode_id(lookup: Lookup, instrument: str) -> str:
         assert instrument == "wfc3"
         res = lookup["OBSMODE"]
     res = res.lower()
-
-    # TODO Temporary hack until I get updated XML schemas to allow
-    # 'multiaccum' as a value
-    if _USING_PLACEHOLDER and res == "multiaccum":
-        # TODO-PLACEHOLDER
-        res = "accum"
-
-    # TODO Temporary hack to pass validation: not sure what's needed
-    # here, so I'm randoming adding a legal value.
-    if _USING_PLACEHOLDER and res == "full":
-        # TODO-PLACEHOLDER
-        res = "accum"
 
     return res
 
