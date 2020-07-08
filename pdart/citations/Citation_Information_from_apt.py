@@ -3,19 +3,14 @@ import xml.dom.minidom as md
 from typing import List, Tuple
 
 # This is how we find a date embedded inside a comment
-DATE_REGEX1 = re.compile(
-    r" *--.*Submission.*[^0-9](19[7-9][0-9]|20[0-3][0-9])[^0-9].*"
-)
+DATE_REGEX1 = re.compile(r" *--.*Submission.*[^0-9](19[7-9][0-9]|20[0-3][0-9])[^0-9].*")
 
-DATE_REGEX2 = re.compile(
-    r".*<!-.*Date.*[^0-9](19[7-9][0-9]|20[0-3][0-9])[^0-9].*"
-)
+DATE_REGEX2 = re.compile(r".*<!-.*Date.*[^0-9](19[7-9][0-9]|20[0-3][0-9])[^0-9].*")
 
-DATE_REGEX3 = re.compile(
-    r" *:date .*?-(20[0-3][0-9]) .*"
-)
+DATE_REGEX3 = re.compile(r" *:date .*?-(20[0-3][0-9]) .*")
 
 ################################################################################
+
 
 def Citation_Information_from_apt(
     filename: str,
@@ -69,9 +64,11 @@ def Citation_Information_from_apt(
             recs = f.readlines()
 
         for rec in recs:
-            match = (DATE_REGEX1.match(rec) or
-                     DATE_REGEX2.match(rec) or
-                     DATE_REGEX3.match(rec))
+            match = (
+                DATE_REGEX1.match(rec)
+                or DATE_REGEX2.match(rec)
+                or DATE_REGEX3.match(rec)
+            )
             if match:
                 submission_year = max(submission_year, int(match.group(1)))
 
@@ -84,5 +81,4 @@ def Citation_Information_from_apt(
             if year_str:
                 timing_year = max(timing_year, int(year_str))
 
-    return (propno, category, cycle, authors, title,
-            submission_year, timing_year)
+    return (propno, category, cycle, authors, title, submission_year, timing_year)

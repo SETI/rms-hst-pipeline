@@ -7,40 +7,73 @@ from typing import List
 
 # Possible titles to omit from author names
 TITLES = {
-    "Prof.", "PROF. ", "Prof", "PROF",
-    "Assoc.", "ASSOC.", "Assoc", "ASSOC",
-    "Dr.", "DR.", "Dr", "DR",
-    "Drs.", "DRS.", "Drs", "DRS",
-    "Dra.", "DRA.", "Dra", "DRA",
-    "Mr.", "MR.", "Mr", "MR",
-    "Pr.", "PR.", "Pr", "PR",
-    "Ms.", "MS.", "Ms", "MS",
-    "Mrs.", "MRS.", "Mrs", "MRS",
-    "Lcda.", "LCDA.", "Lcda", "LCDA",
-    "A/Prof", "Co-I", "(Esa)", "Col.",
+    "Prof.",
+    "PROF. ",
+    "Prof",
+    "PROF",
+    "Assoc.",
+    "ASSOC.",
+    "Assoc",
+    "ASSOC",
+    "Dr.",
+    "DR.",
+    "Dr",
+    "DR",
+    "Drs.",
+    "DRS.",
+    "Drs",
+    "DRS",
+    "Dra.",
+    "DRA.",
+    "Dra",
+    "DRA",
+    "Mr.",
+    "MR.",
+    "Mr",
+    "MR",
+    "Pr.",
+    "PR.",
+    "Pr",
+    "PR",
+    "Ms.",
+    "MS.",
+    "Ms",
+    "MS",
+    "Mrs.",
+    "MRS.",
+    "Mrs",
+    "MRS",
+    "Lcda.",
+    "LCDA.",
+    "Lcda",
+    "LCDA",
+    "A/Prof",
+    "Co-I",
+    "(Esa)",
+    "Col.",
 }
 
 PI_FLAGS = ["P.I.", "PI ", "Pi "]
 
 # Various TeX-isms in names need to be fixed
 NAME_TRANSLATIONS = [
-    (r"\-"  , "" ),
-    (r"\ n" , "ñ"),
-    (r"\~n" , "ñ"),
+    (r"\-", ""),
+    (r"\ n", "ñ"),
+    (r"\~n", "ñ"),
     (r"'\i ", "í"),
-    (r"'\i" , "í"),
-    (r"\^e" , "ê"),
-    (r"\^o" , "ô"),
-    (r"\'e" , "é"),
-    (r"\o " , "ø"),
-    (r"e\'" , "é"),
-    (r"\.z" , "ż"),
-    (r"\c " , "ç"),
-    ("'o "  , "ó"),
-    (r"'O"  , "Ó"),
-    (r".\ " , ". "),
-    (r"``"  , "\""),
-    (r"''"  , "\""),
+    (r"'\i", "í"),
+    (r"\^e", "ê"),
+    (r"\^o", "ô"),
+    (r"\'e", "é"),
+    (r"\o ", "ø"),
+    (r"e\'", "é"),
+    (r"\.z", "ż"),
+    (r"\c ", "ç"),
+    ("'o ", "ó"),
+    (r"'O", "Ó"),
+    (r".\ ", ". "),
+    (r"``", '"'),
+    (r"''", '"'),
     (r"^\dag", ""),
     ("M?rcio", "Márcio"),
     ('GR"U N', "Grün"),
@@ -65,6 +98,7 @@ NAME_TRANSLATIONS = [
     ("Ken'Ichi", "Ken'ichi"),
 ]
 
+
 def fix_authors(authors: List[str]) -> List[str]:
     """Standardize a list of names"""
 
@@ -74,8 +108,7 @@ def fix_authors(authors: List[str]) -> List[str]:
             _ = authors.pop(k)
             break
 
-
-    pi_index = 0    # Index of a name that begins with "Pi "
+    pi_index = 0  # Index of a name that begins with "Pi "
     for k, author in enumerate(authors):
 
         # General cleanup
@@ -86,10 +119,10 @@ def fix_authors(authors: List[str]) -> List[str]:
 
         for flag in PI_FLAGS:
             if author.startswith(flag):
-                author = author[len(flag):].lstrip()
+                author = author[len(flag) :].lstrip()
 
         author = author.replace(".", ". ")  # ensure spaces after periods
-        author = author.replace(". -", ".-")# but not just before a dash
+        author = author.replace(". -", ".-")  # but not just before a dash
         author = author.replace("--", "-")  # remove double-dashes
 
         # Remove titles and roles
@@ -104,19 +137,19 @@ def fix_authors(authors: List[str]) -> List[str]:
 
         # Convert to mixed case if necessary
         for j, word in enumerate(words):
-            if word.isupper() and word not in ('II', 'III', 'IV'):
+            if word.isupper() and word not in ("II", "III", "IV"):
                 # Lower case any letter preceeded by an uppercase letter.
                 # This handles "A'Hearn", "O'Dell" and hyphenated names.
                 chars = list(word)
-                for i in range(len(word)-1):
+                for i in range(len(word) - 1):
                     if word[i].isupper():
-                        chars[i+1] = chars[i+1].lower()
+                        chars[i + 1] = chars[i + 1].lower()
                 words[j] = "".join(chars)
 
         # Ensure periods after initials
         for j, word in enumerate(words):
             if len(word) == 1 and word.isalpha() and word != "Ó":
-                words[j] = word + '.'
+                words[j] = word + "."
 
         # Ensure no space, then a capital after "O'", "D'", "A'", "Mc"
         for prefix in ("O'", "D'", "A'", "Mc"):
@@ -132,7 +165,7 @@ def fix_authors(authors: List[str]) -> List[str]:
         author = " ".join(words)
 
         # Swap last, first
-        if ',' in author:
+        if "," in author:
             parts = author.partition(",")
 
             # Don't remove the comma before a suffix, but anything after the
@@ -148,7 +181,7 @@ def fix_authors(authors: List[str]) -> List[str]:
                     head_words.append(word)
 
             if tail_words:
-                words = head_words + [parts[0] + ','] + tail_words
+                words = head_words + [parts[0] + ","] + tail_words
             else:
                 words = head_words + [parts[0]]
 
@@ -162,5 +195,6 @@ def fix_authors(authors: List[str]) -> List[str]:
         authors = [pi_name] + authors
 
     return authors
+
 
 ################################################################################

@@ -9,9 +9,9 @@
     <information_model_version>1.13.0.0</information_model_version>
     <product_class>Product_Document</product_class>
     <Citation_Information>
-      <author_list>&lt;author_list&gt;</author_list>
-      <publication_year>2001</publication_year>
-      <description>&lt;description&gt;</description>
+      <author_list>{author_1}, {author_2}</author_list>
+      <publication_year>1992</publication_year>
+      <description>{author_1}, {author_2}, "{title}", HST Cycle 1 Program 99999, 1992.</description>
     </Citation_Information>
   </Identification_Area>
   <Reference_List>

@@ -7,32 +7,50 @@ from typing import Any, List
 
 from .Citation_Information_from_apt import Citation_Information_from_apt
 from .Citation_Information_from_pro import Citation_Information_from_pro
-from .fix_title   import fix_title
+from .fix_title import fix_title
 from .fix_authors import fix_authors
 
-YEARS_FOR_CYCLE = {     # YEARS_FOR_CYCLE[cycle_number] = (start_year, end_year)
-     1: (1991, 1992),   # https://books.google.com/books?id=iy7HKCO9vO0C
-     2: (1992, 1993),
-     3: (1993, 1993),   # https://www.google.com/books/edition/Hubble_Space_Telescope/xnPvAAAAMAAJ
-# SM1 = December 1993
-     4: (1994, 1995),   # http://s92034.eos-intl.net/elibsql11_S92034_Documents/04_Call%20for%20Proposals.pdf
-     5: (1995, 1996),
-     6: (1996, 1997),   # http://s92034.eos-intl.net/elibsql11_S92034_Documents/02_Call%20for%20proposals.pdf
-# SM2 = February 1997
-     7: (1997, 1999),   # https://mars.nasa.gov/MPF/mpf/hst.html
-# SM3a = December 1999
-     8: (1999, 2000),   # http://s92034.eos-intl.net/elibsql11_S92034_Documents/02_Phase%20I%20Proposal%20Instructions.pdf
-     9: (2000, 2001),
+YEARS_FOR_CYCLE = {  # YEARS_FOR_CYCLE[cycle_number] = (start_year, end_year)
+    1: (1991, 1992),  # https://books.google.com/books?id=iy7HKCO9vO0C
+    2: (1992, 1993),
+    3: (
+        1993,
+        1993,
+    ),  # https://www.google.com/books/edition/Hubble_Space_Telescope/xnPvAAAAMAAJ
+    # SM1 = December 1993
+    4: (
+        1994,
+        1995,
+    ),  # http://s92034.eos-intl.net/elibsql11_S92034_Documents/04_Call%20for%20Proposals.pdf
+    5: (1995, 1996),
+    6: (
+        1996,
+        1997,
+    ),  # http://s92034.eos-intl.net/elibsql11_S92034_Documents/02_Call%20for%20proposals.pdf
+    # SM2 = February 1997
+    7: (1997, 1999),  # https://mars.nasa.gov/MPF/mpf/hst.html
+    # SM3a = December 1999
+    8: (
+        1999,
+        2000,
+    ),  # http://s92034.eos-intl.net/elibsql11_S92034_Documents/02_Phase%20I%20Proposal%20Instructions.pdf
+    9: (2000, 2001),
     10: (2001, 2002),
-# SM3b = March 2002
-    11: (2002, 2003),   # https://books.google.com/books?id=B3HvAAAAMAAJ&pg=RA13-PA1
-    12: (2003, 2004),   # https://sci.esa.int/web/hubble/-/33851-begin-of-cycle-12-observations
+    # SM3b = March 2002
+    11: (2002, 2003),  # https://books.google.com/books?id=B3HvAAAAMAAJ&pg=RA13-PA1
+    12: (
+        2003,
+        2004,
+    ),  # https://sci.esa.int/web/hubble/-/33851-begin-of-cycle-12-observations
     13: (2004, 2005),
-    14: (2005, 2006),   # https://sci.esa.int/web/hubble/-/36784-hubble-status-report
+    14: (2005, 2006),  # https://sci.esa.int/web/hubble/-/36784-hubble-status-report
     15: (2006, 2007),
     16: (2008, 2009),
-    17: (2009, 2010),   # http://documents.stsci.edu/hst/proposing/documents/cp_cy17/1_General_Information3.html
-# SM4 = May 2009
+    17: (
+        2009,
+        2010,
+    ),  # http://documents.stsci.edu/hst/proposing/documents/cp_cy17/1_General_Information3.html
+    # SM4 = May 2009
     18: (2010, 2011),
     19: (2011, 2012),
     20: (2012, 2013),
@@ -67,6 +85,7 @@ PUBLICATION_YEARS = {
 ################################################################################
 ################################################################################
 
+
 class Citation_Information:
     """This class encapsulates the information needed for the PDS4
     Citation_Information object, as extracted from either an APT file or a
@@ -100,7 +119,7 @@ class Citation_Information:
     3. Otherwise, the end year of the cycle will be used.
     """
 
-    PIPELINE_VERSION = ""       # Global definition
+    PIPELINE_VERSION = ""  # Global definition
 
     def __init__(
         self,
@@ -125,7 +144,7 @@ class Citation_Information:
         self.submission_year = submission_year
 
         # Latest year defined by a BEFORE/AFTER/BETWEEN limit, otherwise zero
-        self.timing_year = timing_year      # defined by BEFORE/AFTER/BETWEEN
+        self.timing_year = timing_year  # defined by BEFORE/AFTER/BETWEEN
 
         # Year set externally via a call to set_publication_year
         self.pub_year = 0
@@ -144,8 +163,7 @@ class Citation_Information:
         else:
             raise ValueError("unrecognized file format: " + filename)
 
-        (propno, category, cycle, authors, title,
-         submission_year, timing_year) = info
+        (propno, category, cycle, authors, title, submission_year, timing_year) = info
 
         # Cleanup
         title = fix_title(title)
@@ -203,16 +221,17 @@ class Citation_Information:
     def description(self) -> str:
         """The complete citation description, for use in XML."""
 
-        return (self.author_list
-                + ', "'
-                + self.title
-                + '", HST Cycle '
-                + str(self.cycle)
-                + " Program "
-                + str(self.propno)
-                + ", "
-                + self.publication_year
-                + "."
+        return (
+            self.author_list
+            + ', "'
+            + self.title
+            + '", HST Cycle '
+            + str(self.cycle)
+            + " Program "
+            + str(self.propno)
+            + ", "
+            + self.publication_year
+            + "."
         )
 
     def set_publication_year(self, year: int) -> None:
@@ -227,31 +246,22 @@ class Citation_Information:
         return "Citation_Information(" + self.description + ")"
 
     @staticmethod
-    def set_pipeline_version(version: str):
+    def set_pipeline_version(version: str) -> None:
         """Set the version of the pipeline, to be used in the returned
         editor_list. Note that this is a class method."""
 
-        global PIPELINE_VERSION
+        Citation_Information.PIPELINE_VERSION = version
 
-        PIPELINE_VERSION = version
-
-# This is no longer valid...
-#    @staticmethod
-#     def create_test_citation_information() -> "Citation_Information":
-#         """For testing."""
-#         return Citation_Information(
-#             "<filename>",
-#             "<propno>",
-#             "<category>",
-#             "<cycle>",
-#             "<authors>",
-#             "<title>",
-#             "2001",
-#             "<author_list>",
-#             "<editor_list>",
-#             "2001",
-#             "<keyword>",
-#             "<description>",
-#         )
-
-################################################################################
+    @staticmethod
+    def create_test_citation_information() -> "Citation_Information":
+        """For testing."""
+        return Citation_Information(
+            "{filename}",
+            99999,
+            "{category}",
+            1,
+            ["{author_1}", "{author_2}"],
+            "{title}",
+            2001,
+            2001,
+        )

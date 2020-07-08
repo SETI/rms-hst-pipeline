@@ -26,25 +26,26 @@
 
 import os
 from citation_info import Citation_Information
-PREFIX = '/Users/mark/Desktop/HST-pro-apt-files/'
 
-for k in range(5000,16101):
-    filename1 = PREFIX + str(k) + '.pro'
-    filename2 = PREFIX + str(k) + '.apt'
+PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
+
+for k in range(5000, 16101):
+    filename1 = PREFIX + str(k) + ".pro"
+    filename2 = PREFIX + str(k) + ".apt"
 
     if os.path.exists(filename1):
         try:
             c1 = Citation_Information.create_from_file(filename1)
-            print(k, 'PRO', c1.description)
+            print(k, "PRO", c1.description)
         except Exception as e:
-            print('*****', k, '*****', e)
+            print("*****", k, "*****", e)
 
     if os.path.exists(filename2):
         try:
             c2 = Citation_Information.create_from_file(filename2)
-            print(k, 'APT', c2.description)
+            print(k, "APT", c2.description)
         except Exception as e:
-            print('*****', k, '*****', e)
+            print("*****", k, "*****", e)
 
 ################################################################################
 # Print every unique title
@@ -52,12 +53,13 @@ for k in range(5000,16101):
 
 import os
 from citation_info import Citation_Information
-PREFIX = '/Users/mark/Desktop/HST-pro-apt-files/'
+
+PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
 
 titles = set()
-for k in range(5000,16101):
-    filename1 = PREFIX + str(k) + '.pro'
-    filename2 = PREFIX + str(k) + '.apt'
+for k in range(5000, 16101):
+    filename1 = PREFIX + str(k) + ".pro"
+    filename2 = PREFIX + str(k) + ".apt"
 
     if os.path.exists(filename1):
         try:
@@ -67,7 +69,7 @@ for k in range(5000,16101):
                 titles.add(c1.title)
 
         except Exception as e:
-            print('*****', k, '*****', e)
+            print("*****", k, "*****", e)
 
     if os.path.exists(filename2):
         try:
@@ -77,7 +79,7 @@ for k in range(5000,16101):
                 titles.add(c2.title)
 
         except Exception as e:
-            print('*****', k, '*****', e)
+            print("*****", k, "*****", e)
 
 ################################################################################
 # Print every unique author
@@ -85,12 +87,13 @@ for k in range(5000,16101):
 
 import os
 from citation_info import Citation_Information
-PREFIX = '/Users/mark/Desktop/HST-pro-apt-files/'
+
+PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
 
 authors = set()
-for k in range(5000,16101):
-    filename1 = PREFIX + str(k) + '.pro'
-    filename2 = PREFIX + str(k) + '.apt'
+for k in range(5000, 16101):
+    filename1 = PREFIX + str(k) + ".pro"
+    filename2 = PREFIX + str(k) + ".apt"
 
     if os.path.exists(filename1):
         try:
@@ -101,7 +104,7 @@ for k in range(5000,16101):
                     authors.add(author)
 
         except Exception as e:
-            print('*****', k, '*****', e)
+            print("*****", k, "*****", e)
 
     if os.path.exists(filename2):
         try:
@@ -112,7 +115,7 @@ for k in range(5000,16101):
                     authors.add(author)
 
         except Exception as e:
-            print('*****', k, '*****', e)
+            print("*****", k, "*****", e)
 
 ################################################################################
 # Check that titles match from .pro and .apt files
@@ -120,13 +123,16 @@ for k in range(5000,16101):
 
 import os
 from citation_info import Citation_Information
-PREFIX = '/Users/mark/Desktop/HST-pro-apt-files/'
 
-for k in range(9730,16101):
-    filename1 = PREFIX + str(k) + '.pro'
-    filename2 = PREFIX + str(k) + '.apt'
-    if not os.path.exists(filename1): continue
-    if not os.path.exists(filename2): continue
+PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
+
+for k in range(9730, 16101):
+    filename1 = PREFIX + str(k) + ".pro"
+    filename2 = PREFIX + str(k) + ".apt"
+    if not os.path.exists(filename1):
+        continue
+    if not os.path.exists(filename2):
+        continue
 
     try:
         c1 = Citation_Information.create_from_file(filename1)
@@ -137,7 +143,7 @@ for k in range(9730,16101):
             print(c1.title)
             print(c2.title)
     except Exception as e:
-        print('*****', k, '*****', e)
+        print("*****", k, "*****", e)
 
 ################################################################################
 # Check that sorted lists of authors match from .pro and .apt files
@@ -145,13 +151,16 @@ for k in range(9730,16101):
 
 import os
 from citation_info import Citation_Information
-PREFIX = '/Users/mark/Desktop/HST-pro-apt-files/'
 
-for k in range(9730,16101):
-    filename1 = PREFIX + str(k) + '.pro'
-    filename2 = PREFIX + str(k) + '.apt'
-    if not os.path.exists(filename1): continue
-    if not os.path.exists(filename2): continue
+PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
+
+for k in range(9730, 16101):
+    filename1 = PREFIX + str(k) + ".pro"
+    filename2 = PREFIX + str(k) + ".apt"
+    if not os.path.exists(filename1):
+        continue
+    if not os.path.exists(filename2):
+        continue
 
     try:
         c1 = Citation_Information.create_from_file(filename1)
@@ -167,7 +176,7 @@ for k in range(9730,16101):
             print(authors1)
             print(authors2)
     except Exception as e:
-        print('*****', k, '*****', e)
+        print("*****", k, "*****", e)
 
 ################################################################################
 # Check that first authors match from .pro and .apt files
@@ -175,13 +184,16 @@ for k in range(9730,16101):
 
 import os
 from citation_info import Citation_Information
-PREFIX = '/Users/mark/Desktop/HST-pro-apt-files/'
 
-for k in range(9730,16101):
-    filename1 = PREFIX + str(k) + '.pro'
-    filename2 = PREFIX + str(k) + '.apt'
-    if not os.path.exists(filename1): continue
-    if not os.path.exists(filename2): continue
+PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
+
+for k in range(9730, 16101):
+    filename1 = PREFIX + str(k) + ".pro"
+    filename2 = PREFIX + str(k) + ".apt"
+    if not os.path.exists(filename1):
+        continue
+    if not os.path.exists(filename2):
+        continue
 
     try:
         c1 = Citation_Information.create_from_file(filename1)
@@ -192,7 +204,7 @@ for k in range(9730,16101):
             print(c1.authors[0])
             print(c2.authors[0])
     except Exception as e:
-        print('*****', k, '*****', e)
+        print("*****", k, "*****", e)
 
 ################################################################################
 # Check that years match from .pro and .apt files
@@ -200,13 +212,16 @@ for k in range(9730,16101):
 
 import os
 from citation_info import Citation_Information
-PREFIX = '/Users/mark/Desktop/HST-pro-apt-files/'
 
-for k in range(9730,16101):
-    filename1 = PREFIX + str(k) + '.pro'
-    filename2 = PREFIX + str(k) + '.apt'
-    if not os.path.exists(filename1): continue
-    if not os.path.exists(filename2): continue
+PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
+
+for k in range(9730, 16101):
+    filename1 = PREFIX + str(k) + ".pro"
+    filename2 = PREFIX + str(k) + ".apt"
+    if not os.path.exists(filename1):
+        continue
+    if not os.path.exists(filename2):
+        continue
 
     try:
         c1 = Citation_Information.create_from_file(filename1)
@@ -215,6 +230,6 @@ for k in range(9730,16101):
         if c1.publication_year != c2.publication_year:
             print(k, c1.publication_year, c2.publication_year)
     except Exception as e:
-        print('*****', k, '*****', e)
+        print("*****", k, "*****", e)
 
 ################################################################################

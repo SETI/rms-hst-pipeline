@@ -62,7 +62,7 @@ TRANSLATIONS = [
     ("<=", "≤"),
     (">~", "≳"),
     ("<~", "≲"),
-    ("1998\_WW31", "1998 WW31"),
+    ("1998_WW31", "1998 WW31"),
     (r"\\ ", " "),
     (r"\ ", " "),
     ("_", "-"),
@@ -84,13 +84,73 @@ TRANSLATIONS = [
 # title. This only affects isolated words of more than two letters. For the
 # change to be applied, the word must appear in lower case here.
 ALLCAPS_WORDS = [
-    "afm", "agb", "agn", "ast", "bal", "ccd", "civ", "cno", "cos", "costar",
-    "cte", "dob", "dqe", "euv", "fgs", "fhst", "foc", "fos", "fsc", "fsm",
-    "fuv", "ghrs", "gimp", "grb", "grs", "gto", "hdf", "hii", "hopr", "hst",
-    "iii", "imf", "iras", "ism", "lbds", "lmc", "lmxb", "lrf", "mama", "msmt",
-    "mwc", "ngc", "nicmos", "npn", "ofad", "ota", "ovv", "pagb", "pans", "pdr",
-    "psf", "qso", "sed", "sins", "smc", "smov", "snr", "sofa", "ssa", "std",
-    "stis", "tacq", "uvis", "wfc", "wfpc", "yso", "zams",
+    "afm",
+    "agb",
+    "agn",
+    "ast",
+    "bal",
+    "ccd",
+    "civ",
+    "cno",
+    "cos",
+    "costar",
+    "cte",
+    "dob",
+    "dqe",
+    "euv",
+    "fgs",
+    "fhst",
+    "foc",
+    "fos",
+    "fsc",
+    "fsm",
+    "fuv",
+    "ghrs",
+    "gimp",
+    "grb",
+    "grs",
+    "gto",
+    "hdf",
+    "hii",
+    "hopr",
+    "hst",
+    "iii",
+    "imf",
+    "iras",
+    "ism",
+    "lbds",
+    "lmc",
+    "lmxb",
+    "lrf",
+    "mama",
+    "msmt",
+    "mwc",
+    "ngc",
+    "nicmos",
+    "npn",
+    "ofad",
+    "ota",
+    "ovv",
+    "pagb",
+    "pans",
+    "pdr",
+    "psf",
+    "qso",
+    "sed",
+    "sins",
+    "smc",
+    "smov",
+    "snr",
+    "sofa",
+    "ssa",
+    "std",
+    "stis",
+    "tacq",
+    "uvis",
+    "wfc",
+    "wfpc",
+    "yso",
+    "zams",
 ]
 
 # These are the only two-letter words not necessarily capitalized, other than
@@ -103,21 +163,44 @@ TWO_LETTER_NOT_ALL_CAPS = ["ia", "ib", "io", "is", "ly", "no", "up", "vs", "zw"]
 # These are words that are not capitalized unless at the beginning of the title
 # or after a colon, semicolon, dash or period.
 NOCAPS_WORDS = [
-    "a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "into",
-    "like", "nor", "of", "on", "or", "over", "so", "the", "to", "upon", "with",
+    "a",
+    "an",
+    "and",
+    "as",
+    "at",
+    "but",
+    "by",
+    "for",
+    "from",
+    "in",
+    "into",
+    "like",
+    "nor",
+    "of",
+    "on",
+    "or",
+    "over",
+    "so",
+    "the",
+    "to",
+    "upon",
+    "with",
     "yet",
-    "cm", "km", "nm",
+    "cm",
+    "km",
+    "nm",
 ]
 
 # This is used to address weirdness in some titles during Cycles 3, 4, and 5.
 CYCLE345_REGEX = re.compile(r"c(ycl?e?)([345])(|medium|high)", re.I)
+
 
 def fix_title(title: str) -> str:
     """Standardize case and punctuation in titles. If the title is all upper
     case, it gets converted to mixed case.
     """
 
-    def capitalize1(word):
+    def capitalize1(word: str) -> str:
         """Fix capitalization of words from titles all in lower case.
         We start with everything in lower case. Characters get capitalized
         as appropriate.
@@ -133,7 +216,7 @@ def fix_title(title: str) -> str:
                 return capitalize1(word[:-2]) + "'s"
 
             # Handle other common punctuation
-            for punc in (".,;:-/()'?"):
+            for punc in ".,;:-/()'?":
                 if punc in word:
                     wordlets = word.split(punc)
                     wordlets = [capitalize1(w) for w in wordlets]
@@ -142,9 +225,14 @@ def fix_title(title: str) -> str:
             # The text "Cycle" + [345] is a special case
             match = CYCLE345_REGEX.match(word)
             if match:
-                replacement = ('C' + match.group(1) +
-                               ' ' + match.group(2) +
-                               ' ' + match.group(3).capitalize())
+                replacement = (
+                    "C"
+                    + match.group(1)
+                    + " "
+                    + match.group(2)
+                    + " "
+                    + match.group(3).capitalize()
+                )
                 return replacement.rstrip()
 
             # Probably some sort of acronym then
@@ -188,11 +276,11 @@ def fix_title(title: str) -> str:
 
     # Repair dashes and quotes
     title = title.replace("--", "-")
-    title = title.replace("--", "-")    # handle triple-dashes too
+    title = title.replace("--", "-")  # handle triple-dashes too
     title = title.replace("``", "'")
-    title = title.replace("`" , "'")
+    title = title.replace("`", "'")
     title = title.replace("''", "'")
-    title = title.replace("\"", "'")
+    title = title.replace('"', "'")
 
     # No space before a period, comma or colon; space after unless it's a number
     # (Avoid "30,000" -> "30, 000", "2:1" -> "2: 1", "3.14" -> "3. 14")
@@ -221,7 +309,7 @@ def fix_title(title: str) -> str:
         if DEBUG:
             print("Re-capitalizing lower-case:", title)
 
-    else:       # already mixed case
+    else:  # already mixed case
         recapitalize = []
 
         # If most words are lower-case after the first letter, there's no need
@@ -237,11 +325,11 @@ def fix_title(title: str) -> str:
             elif word[1:].islower():
                 lowers += 1
                 recapitalize.append(False)
-            else:               # don't re-capitalize if it's already mixed case
+            else:  # don't re-capitalize if it's already mixed case
                 recapitalize.append(False)
 
-        if lowers >= uppers - 2:   # already mixed-case; don't worry about up to
-                                   # two uppercase words--that's common
+        if lowers >= uppers - 2:  # already mixed-case; don't worry about up to
+            # two uppercase words--that's common
             return " ".join(words)
 
         elif DEBUG:
@@ -273,5 +361,6 @@ def fix_title(title: str) -> str:
         print("Case repaired:", title)
 
     return title
+
 
 ################################################################################

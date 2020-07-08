@@ -1,7 +1,7 @@
 import re
 from typing import List, Tuple
 
-DEBUG = False       # set True for useful debugging info printed to stdout.
+DEBUG = False  # set True for useful debugging info printed to stdout.
 
 ################################################################################
 # This is the top of a sample .PRO file after c. 1995
@@ -90,41 +90,35 @@ CATEGORIES = r"(GO|GTO|gto|AUG|SMC|SME|SNAP|CAL|RPT|AR|ENG|SM2|SM3|NASA)"
 
 # This pattern matches the proposal ID
 PROPNO_REGEX1 = re.compile(r" +ID:? +([0-9]{4,5})\s*")
-PROPNO_REGEX2 = re.compile(
-    r" *HUBBLE SPACE TELESCOPE OBSERVING PROGRAM ([0-9]+)\s*"
-)
+PROPNO_REGEX2 = re.compile(r" *HUBBLE SPACE TELESCOPE OBSERVING PROGRAM ([0-9]+)\s*")
 
 # Sometimes "2. Scientific Category" appears in front of the category and cycle
 # number, sometimes not
-INFO_HEADER1 = re.compile(
-    r"2\. *Scientific Category +3\. *Proposal For +4\. *Cycle\s*"
-)
-INFO_REGEX1 = re.compile(
-    r".{22} *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*",
-)
-INFO_HEADER2  = re.compile(r"2\.  *Proposal For +3\. *Cycle\s*")
+INFO_HEADER1 = re.compile(r"2\. *Scientific Category +3\. *Proposal For +4\. *Cycle\s*")
+INFO_REGEX1 = re.compile(r".{22} *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*",)
+INFO_HEADER2 = re.compile(r"2\.  *Proposal For +3\. *Cycle\s*")
 INFO_HEADER2a = re.compile(r"Type +Cycle +.*")
-INFO_REGEX2   = re.compile(r" *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*")
+INFO_REGEX2 = re.compile(r" *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*")
 INFO_HEADER3 = re.compile(
     r"2\. *Scientific Category +3\. *Proposal For +4\. *Proposal Type   .*"
 )
 INFO_REGEX3 = re.compile(r".{22} *" + CATEGORIES + ".*")
 
 CYCLE_HEADER1 = re.compile(r" *Type +Cycle.*")
-CYCLE_REGEX1  = re.compile(r".*   ([0-9]+).*")
+CYCLE_REGEX1 = re.compile(r".*   ([0-9]+).*")
 
 CYCLE_REGEX2 = re.compile(r".*CYCLE ([0-9]+).*")
 
-CYCLE_IN_TITLE = re.compile(".*(?:CYCLE|CYC\.|CYC) *([0-9]+).*", re.I)
+CYCLE_IN_TITLE = re.compile(".*(?:CYCLE|CYC.|CYC) *([0-9]+).*", re.I)
 
 # Authors are usually one PI/Pi followed by zero or more CoI/Con lines
-PI_REGEX  = re.compile(r" *PI: *(.*?)(?:\n|   .*)")
+PI_REGEX = re.compile(r" *PI: *(.*?)(?:\n|   .*)")
 COI_REGEX = re.compile(r" *CoI: *(.*?)(?:\n|   .*)")
 LONGNAME_REGEX = re.compile(r" {8}([^ ].*?)(?:\n|   .*)")
 
 # However, first check for a "Proposers" section
 AUTHOR_HEADER = re.compile(r" *Proposers +Institution +.*")
-AUTHOR_REGEX  = re.compile(r"(.*?)   .*")
+AUTHOR_REGEX = re.compile(r"(.*?)   .*")
 
 # The title is always after this line
 TITLE_HEADER = re.compile(r"(1\. *Proposal |)Title:?\s*")
@@ -142,12 +136,10 @@ YEAR4_REGEX = re.compile(r" *Check-in Time: [0-9]{2}-...-([0-9]{2})[^0-9].*")
 # dd-MON-yy or yyyy-MON-dd
 MONTHS = r"(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)"
 YMD_REGEX = re.compile(
-    r"(?:^|.*[^0-9])((?:19|20)[0-9]{2})-" + MONTHS +
-    r"-[0-9]{1,2}(?:\n|[^0-9].*)"
+    r"(?:^|.*[^0-9])((?:19|20)[0-9]{2})-" + MONTHS + r"-[0-9]{1,2}(?:\n|[^0-9].*)"
 )
 DMY_REGEX = re.compile(
-    r"(?:^|.*[^0-9])[0-9]{1,2}-" + MONTHS +
-    r"-(?:|19|20)([0-9]{2})(?:$|[^0-9].*)"
+    r"(?:^|.*[^0-9])[0-9]{1,2}-" + MONTHS + r"-(?:|19|20)([0-9]{2})(?:$|[^0-9].*)"
 )
 
 ################################################################################
@@ -160,20 +152,20 @@ MISSING_CYCLES = {
 
 ################################################################################
 
+
 def Citation_Information_from_pro(
     filename: str,
 ) -> Tuple[int, str, int, List[str], str, int, int]:
 
     # A quick and dirty function to merge author lists
     # Sometimes the PI is in the author list, sometimes not!
-    def merge_authors(authors, pi_author, cois):
-
-        def letters_only(author):
+    def merge_authors(authors: List[str], pi_author: str, cois: List[str]) -> List[str]:
+        def letters_only(author: str) -> str:
             letters = []
             for c in author:
                 if c.isalpha():
                     letters.append(c)
-            return ''.join(letters).upper()
+            return "".join(letters).upper()
 
         # Author list found
         if authors and not pi_author:
@@ -211,7 +203,7 @@ def Citation_Information_from_pro(
         return [pi_author] + authors
 
     # Read file
-    with open(filename, 'r', encoding='latin-1') as f:
+    with open(filename, "r", encoding="latin-1") as f:
         recs = f.readlines()
 
     # Get proposal number
@@ -230,17 +222,17 @@ def Citation_Information_from_pro(
                 break
 
     # Get proposal type and cycle number
-    category = ''
+    category = ""
     cycle = 0
     for k, rec in enumerate(recs):
         if INFO_HEADER1.match(rec):
-            match = INFO_REGEX1.match(recs[k+1])
+            match = INFO_REGEX1.match(recs[k + 1])
         elif INFO_HEADER2.match(rec):
-            match = INFO_REGEX2.match(recs[k+1])
+            match = INFO_REGEX2.match(recs[k + 1])
         elif INFO_HEADER2a.match(rec):
-            match = INFO_REGEX2.match(recs[k+1])
+            match = INFO_REGEX2.match(recs[k + 1])
         elif INFO_HEADER3.match(rec):
-            match = re.match(INFO_REGEX3, recs[k+1])
+            match = re.match(INFO_REGEX3, recs[k + 1])
         else:
             match = None
 
@@ -249,7 +241,7 @@ def Citation_Information_from_pro(
             try:
                 cycle = int(match.group(2))
             except IndexError:
-                pass    # no cycle value in INFO_REGEX3
+                pass  # no cycle value in INFO_REGEX3
 
             break
 
@@ -258,19 +250,19 @@ def Citation_Information_from_pro(
     for k, rec in enumerate(recs):
         match = TITLE_HEADER.match(rec)
         if match:
-            title = recs[k+1].strip()
-            if recs[k+2][:4] != "----":         # title has a second line
+            title = recs[k + 1].strip()
+            if recs[k + 2][:4] != "----":  # title has a second line
                 # If there's no space before a final dash, don't put one after
                 if title.endswith("-") and not title.endswith(" -"):
-                    title += recs[k+2].strip()
+                    title += recs[k + 2].strip()
                 else:
-                    title += " " + recs[k+2].strip()
+                    title += " " + recs[k + 2].strip()
 
-                if recs[k+3][:4] != "----":     # title has a third line
+                if recs[k + 3][:4] != "----":  # title has a third line
                     if title.endswith("-") and not title.endswith(" -"):
-                        title += recs[k+3].strip()
+                        title += recs[k + 3].strip()
                     else:
-                        title += " " + recs[k+3].strip()
+                        title += " " + recs[k + 3].strip()
 
             break
 
@@ -278,24 +270,24 @@ def Citation_Information_from_pro(
     authors = []
     for k, rec in enumerate(recs):
         match = AUTHOR_HEADER.match(rec)
-        if match and '----' in recs[k+1]:
-            for next_rec in recs[k+2:]:
+        if match and "----" in recs[k + 1]:
+            for next_rec in recs[k + 2 :]:
                 match = AUTHOR_REGEX.match(next_rec)
                 if match:
                     author = match.group(1).strip()
                     if author:
                         authors.append(author)
-                elif '----' in next_rec:
+                elif "----" in next_rec:
                     break
 
     # Also look for PI/CoI prefixes
-    pi_author = ''
+    pi_author = ""
     for k, rec in enumerate(recs):
         rec = rec[:42] + "   "  # wipe out the Institution
         match = PI_REGEX.match(rec)
         if match:
             pi_author = match.group(1).strip()
-            match = LONGNAME_REGEX.match(recs[k+1][:42])
+            match = LONGNAME_REGEX.match(recs[k + 1][:42])
             if match:
                 pi_author += " " + match.group(1).strip()
 
@@ -309,16 +301,16 @@ def Citation_Information_from_pro(
         if match:
             coi_found = True
             name = match.group(1).strip()
-            if not name:        # sometimes it's empty. Weird.
+            if not name:  # sometimes it's empty. Weird.
                 continue
 
-            match = LONGNAME_REGEX.match(recs[k+1][:42])
+            match = LONGNAME_REGEX.match(recs[k + 1][:42])
             if match:
                 name += " " + match.group(1).strip()
 
             cois.append(name)
         elif coi_found:
-            if '----' in rec:   # end of Co-Is
+            if "----" in rec:  # end of Co-Is
                 break
 
     authors = merge_authors(authors, pi_author, cois)
@@ -326,10 +318,12 @@ def Citation_Information_from_pro(
     # Get the submission year
     submission_year = 0
     for rec in recs:
-        match = (YEAR1_REGEX.match(rec) or
-                 YEAR2_REGEX.match(rec) or
-                 YEAR3_REGEX.match(rec) or
-                 YEAR4_REGEX.match(rec))
+        match = (
+            YEAR1_REGEX.match(rec)
+            or YEAR2_REGEX.match(rec)
+            or YEAR3_REGEX.match(rec)
+            or YEAR4_REGEX.match(rec)
+        )
         if match:
             submission_year = int(match.group(1))
             if submission_year < 50:
@@ -357,7 +351,7 @@ def Citation_Information_from_pro(
         for k, rec in enumerate(recs):
             match = CYCLE_HEADER1.match(rec)
             if match:
-                match = CYCLE_REGEX1.match(recs[k+1])
+                match = CYCLE_REGEX1.match(recs[k + 1])
                 if match:
                     cycle = int(match.group(1))
 
@@ -391,5 +385,4 @@ def Citation_Information_from_pro(
     elif not cycle:
         raise ValueError("missing cycle number in " + filename)
 
-    return (propno, category, cycle, authors, title,
-            submission_year, timing_year)
+    return (propno, category, cycle, authors, title, submission_year, timing_year)
