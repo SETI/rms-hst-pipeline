@@ -106,13 +106,16 @@ copy-results :
 # smaller version for testing
 ##############################
 
+# LILS=09059 09748 15505
+LILS=09748
+
 .PHONY: lil-pipeline
 LIL-TWD=tmp-working-dir
 lil-pipeline : venv
 	mkdir -p $(LIL-TWD)
 	-rm $(LIL-TWD)/*/\#*.txt
 	-rm $(LIL-TWD)/*/KEY_ERROR_DUMP.txt
-	for project_id in 09059 15505; do \
+	for project_id in $(LILS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
 		python Pipeline.py $$project_id; \

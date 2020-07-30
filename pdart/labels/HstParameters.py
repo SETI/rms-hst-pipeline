@@ -106,7 +106,7 @@ def get_detector_id(lookup: Lookup, instrument: str) -> str:
             res = "WF" + detector
     else:
         res = detector
-    return res.lower()
+    return res.upper()
 
 
 ##############################
@@ -209,12 +209,18 @@ def get_gain_mode_id(lookup: Lookup, instrument: str) -> str:
         if instrument == "acs":
             res = str(atodgain)
         elif instrument == "wfpc2":
-            res = "A2D" + str(int(atodgain))
+            # The value is stored as a float, but is supposed to be a
+            # integer, so we jump through some hoops here to ensure
+            # all is okay.
+            fval = float(atodgain)
+            ival = int(fval)
+            assert ival == fval
+            res = "A2D" + str(ival)
         else:
             assert False
     except KeyError:
         res = "N/A"
-    return res.lower()
+    return res.upper()
 
 
 ##############################
