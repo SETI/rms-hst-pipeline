@@ -24,6 +24,10 @@ class Lookup(abc.ABC):
     def dump_keys(self, keys: List[str], dump_file: TextIO) -> None:
         pass
 
+    @abc.abstractmethod
+    def __str__(self) -> str:
+        pass
+
 
 ############################################################
 
@@ -52,6 +56,9 @@ class DictLookup(Lookup):
             d[key] = val
         print(str(d), file=dump_file)
 
+    def __str__(self) -> str:
+        return f"DictLookup({self.label})"
+
 
 ############################################################
 
@@ -74,6 +81,9 @@ class _DefaultDictLookup(Lookup):
     def dump_keys(self, keys: List[str], f: TextIO) -> None:
         d = {key: self.__getitem__(key) for key in keys}
         print(f"{self.label}: {d}", file=f)
+
+    def __str__(self) -> str:
+        return f"_DefaultDictLookup({self.label})"
 
 
 ############################################################
@@ -124,3 +134,8 @@ class MultiDictLookup(Lookup):
     def dump_keys(self, keys: List[str], f: TextIO) -> None:
         for label, card_set in self.labeled_card_sets:
             _DefaultDictLookup(label, card_set).dump_keys(keys, f)
+
+    def __str__(self) -> str:
+        return (
+            f"MultiDictLookup({[label for label, card_set in self.labeled_card_sets]})"
+        )
