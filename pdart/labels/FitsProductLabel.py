@@ -24,6 +24,7 @@ from pdart.labels.ObservingSystem import (
 from pdart.labels.TargetIdentification import get_target, get_target_info
 from pdart.labels.TimeCoordinates import get_start_stop_times, get_time_coordinates
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
+from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.xml.Pretty import pretty_and_verify
 
@@ -32,15 +33,22 @@ _KEY_ERROR_DUMP: str = "KEY_ERROR_DUMP.txt"
 
 # TODO: Note this only works in the original case where all VIDs =
 # "1.0".
-def _to_asn_lidvid(product_lidvid: str) -> str:
+def to_asn_lidvid(product_lidvid: str) -> str:
     lidvid = LIDVID(product_lidvid)
-    asn_lid = lidvid.lid().to_other_suffixed_lid("asn")
-    return LIDVID.create_from_lid_and_vid(asn_lid, lidvid.vid()).__str__()
+    raw_asn_lid = lidvid.lid().to_other_suffixed_lid("asn")
+    asn_lid_as_list: List[str] = list(str(raw_asn_lid))
+    # force the last digit of the product part to '0'
+    asn_lid_as_list[-1] = "0"
+    asn_lid = LID("".join(asn_lid_as_list))
+    return str(LIDVID.create_from_lid_and_vid(asn_lid, lidvid.vid()))
 
 
 def _directory_siblings(
     working_dir: str, bundle_db: BundleDB, product_lidvid: str
 ) -> List[str]:
+    # Look in the mastDownload directory and search for the file with
+    # the product_lidvid's basename.  Then return all its siblings'
+    # basenames.
     for dirpath, dirnames, filenames in os.walk(
         os.path.join(working_dir, "mastDownload")
     ):
@@ -51,6 +59,8 @@ def _directory_siblings(
 
 
 def _sibling_file(siblings: List[str], suffix: str) -> Optional[str]:
+    # Given a list of siblings, return the first one that ends with
+    # "_<suffix>.fits".
     ending = f"_{suffix.lower()}.fits"
     for basename in siblings:
         if basename.lower().endswith(ending):
@@ -133,8 +143,11 @@ def make_fits_product_label(
     siblings = _directory_siblings(working_dir, bundle_db, product_lidvid)
     asn_sib = _sibling_file(siblings, "asn")
 
-    if asn_sib != None:
-        asn_product_lidvid = _to_asn_lidvid(product_lidvid)
+    if asn_sib is not None:
+        asn_product_lidvid = to_asn_lidvid(product_lidvid)
+        assert (
+            list(cast(str, LIDVID(asn_product_lidvid).lid().product_id))[-1] == "0"
+        ), asn_product_lidvid
         card_dicts, lookup = _association_card_dicts_and_lookup(
             bundle_db, product_lidvid, file_basename, asn_product_lidvid
         )
@@ -184,6 +197,7 @@ def make_fits_product_label(
 
         with open(os.path.join(working_dir, _KEY_ERROR_DUMP), "w") as dump_file:
             print(f"**** LIDVID {product_lidvid}:", file=dump_file)
+            print("**** LOOKUP:", lookup, file=dump_file)
             print(
                 "**** SIBLINGS:", ", ".join(siblings), file=dump_file,
             )
@@ -195,6 +209,20 @@ def make_fits_product_label(
             print("**** RAW FILE:", raw_sib, file=dump_file)
             if asn_sib is None and d0f_sib is None and raw_sib is None:
                 print("**** AY CARAMBA: none of asn, d0f, or raw", file=dump_file)
+
+            if asn_sib is not None:
+                assoc_key_prods = bundle_db.get_associated_key_products(
+                    asn_product_lidvid
+                )
+                if assoc_key_prods:
+                    print("**** ASSOCIATED KEY PRODUCTS: ****", file=dump_file)
+                    for prod in assoc_key_prods:
+                        print(prod, file=dump_file)
+                else:
+                    print(
+                        f"**** NO ASSOCIATED KEY PRODUCTS FOR {asn_product_lidvid} ****",
+                        file=dump_file,
+                    )
 
             if key == "DATE-OBS":
                 lookup.dump_keys(["DATE-OBS", "TIME-OBS", "EXPTIME"], dump_file)

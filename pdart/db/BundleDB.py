@@ -1051,6 +1051,7 @@ class BundleDB(object):
         ]
 
     def _is_key_product(self, fits_product: FitsProduct) -> bool:
+        # A "key" product is a raw data file (with suffix RAW or C0F).
         collection_lidvid = fits_product.collection_lidvid
         collection = self.get_collection(collection_lidvid)
         is_other_collection = switch_on_collection_subtype(

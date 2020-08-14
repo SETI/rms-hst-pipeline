@@ -5,7 +5,7 @@ from fs.path import basename
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
-from pdart.labels.FitsProductLabel import make_fits_product_label
+from pdart.labels.FitsProductLabel import make_fits_product_label, to_asn_lidvid
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
 
 
@@ -13,6 +13,12 @@ class Test_FitsProductLabel(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
+
+    def test_to_asn_lidvid(self) -> None:
+        self.assertEqual(
+            "urn:nasa:pds:hst_09748:data_acs_asn:j8p501010::1.0",
+            to_asn_lidvid("urn:nasa:pds:hst_09748:data_acs_drz:j8p501011::1.0"),
+        )
 
     def test_make_fits_product_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_13012::123.90201"

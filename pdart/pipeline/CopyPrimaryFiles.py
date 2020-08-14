@@ -7,6 +7,8 @@ from pdart.pds4.HstFilename import HstFilename
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import *
 
+_OLD_IMPL = False
+
 
 def to_segment_dir(name: str) -> str:
     return name + "$"
@@ -50,9 +52,19 @@ class CopyPrimaryFiles(MarkedStage):
                 parts = fs.path.iteratepath(filepath)
                 depth = len(parts)
                 assert depth == 3, parts
-                _, product, filename = parts
-                filename = filename.lower()
-                hst_filename = HstFilename(filename)
+                if _OLD_IMPL:
+                    # Old way: product name is the directory name from
+                    # MAST. TODO Remove this when the new version is
+                    # tested on more bundles.
+                    _, product, filename = parts
+                    filename = filename.lower()
+                    hst_filename = HstFilename(filename)
+                else:
+                    # New way: product name comes from the filename
+                    _, _, filename = parts
+                    filename = filename.lower()
+                    hst_filename = HstFilename(filename)
+                    product = hst_filename.rootname()
                 instrument_name = hst_filename.instrument_name()
                 suffix = hst_filename.suffix()
                 coll = f"data_{instrument_name}_{suffix}"
