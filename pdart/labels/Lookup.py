@@ -63,6 +63,42 @@ class DictLookup(Lookup):
 ############################################################
 
 
+class HduLookup(Lookup):
+    """
+    Look up a key value in a set of cards from one file.
+    """
+
+    def __init__(self, label: str, card_dict: Dict[str, Any]) -> None:
+        self.label = label
+        self.card_dict = card_dict
+
+    def __getitem__(self, key: str) -> Any:
+        return self.card_dict[key]
+
+    def dump_keys(self, keys: List[str], dump_file: TextIO) -> None:
+        d = dict()
+        for key in keys:
+            try:
+                val = self.__getitem__(key)
+            except KeyError:
+                val = None
+            d[key] = val
+        print(str(d), file=dump_file)
+
+    def __str__(self) -> str:
+        return f"HduLookup({self.label})"
+
+
+def make_hdu_lookups(label: str, card_dicts: CARD_SET) -> List[Lookup]:
+    return [
+        HduLookup(f"label[{indx}]", card_dict)
+        for indx, card_dict in enumerate(card_dicts)
+    ]
+
+
+############################################################
+
+
 class _DefaultDictLookup(Lookup):
     """
     Look up a key value in a set of cards from one file.

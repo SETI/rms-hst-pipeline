@@ -2,13 +2,17 @@
 Functionality to build an ``<hst:HST />`` XML element using a SQLite
 database.
 """
+import julian
 from typing import Any, Dict, List
-
-from pdart.labels.HstParametersXml import (
-    # get_targeted_detector_id,
-    hst,
-    # parameters_acs, parameters_general, parameters_wfc3,
-    # parameters_wfpc2,
+from pdart.labels.HstParametersNewXml import (
+    hst_parameters,
+    program_parameters,
+    instrument_parameters,
+    pointing_parameters,
+    tracking_parameters,
+    exposure_parameters,
+    wavelength_filter_grating_parameters,
+    operational_parameters,
 )
 from pdart.labels.Lookup import Lookup
 from pdart.xml.Templates import NodeBuilder
@@ -17,11 +21,23 @@ from pdart.xml.Templates import NodeBuilder
 #   data_lookups: List[Lookup]
 #           a list of all the FITS headers in a data file (raw, d0f, drz, etc.)
 #   shf_lookup: Lookup
-#           the first fits header of the associated _shf.fits file. (Sometimes
-#           named _shm.fits).
+#           the first fits header of the associated _shf.fits file (sometimes
+#           named _shm.fits) or _spt.fits file.
 # The second argument is needed because sometimes the data file does not contain
 # all the info we need.
-# Internal function used for error messages
+
+
+def _julian_tai_from_mjd(tai: float) -> float:
+    """
+    A placeholder.  The code below calls julian.tai_from_mjd() but
+    that function doesn't exist, so instead I routed the calls here
+    for now.
+
+    TODO Replace this.
+    """
+    return 0.0
+
+
 def fname(lookup: Lookup) -> str:
     """
     Not used as an attribute but needed for error messages
@@ -315,10 +331,11 @@ def get_filter_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
         return lookup["GRATING"].strip()
     if instrument == "STIS":
         opt_elem = lookup["OPT_ELEM"].strip()
-        parts = lookup["PHOTMODE"].strip().split()
-        assert parts[0] == "STIS", "PHOTMODE parsing failure, " + fname(lookup)
-        filter = parts.split()[1]
-        return opt_elem + "+" + filter
+        filter = lookup["FILTER"].strip().upper().replace(" ", "_")
+        if filter == "CLEAR":
+            return opt_elem
+        else:
+            return opt_elem + "+" + filter
     if instrument in ("WF/PC", "WFPC2"):
         filtnam1 = lookup["FILTNAM1"].strip()
         filtnam2 = lookup["FILTNAM2"].strip()
@@ -488,6 +505,54 @@ def get_mast_observation_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> s
 
 
 ##############################
+# get_moving_target_descriptions
+##############################
+def get_moving_target_descriptions(
+    data_lookups: List[Lookup], shf_lookup: Lookup
+) -> List[str]:
+    """
+    Return text for the ``<moving_target_description />`` XML element.
+    """
+    # Defined by "MT_LV_n" keyword values in the _shf.fits files
+    descs = []
+    for k in range(1, 10):
+        keyword = "MT_LV_" + str(k)
+        try:
+            value = shf_lookup[keyword].strip()
+            descs.append(value)
+        except KeyError:
+            break
+    if descs:
+        return descs
+    else:
+        return ["Not applicable"]
+
+
+##############################
+# get_moving_target_keywords
+##############################
+def get_moving_target_keywords(
+    data_lookups: List[Lookup], shf_lookup: Lookup
+) -> List[str]:
+    """
+    Return text for the ``<moving_target_keywords />`` XML element.
+    """
+    # Defined by "TARKEYn" keyword values in the _shf.fits files
+    keywords = []
+    for k in range(1, 10):
+        keyword = "TARKEY" + str(k)
+        try:
+            value = shf_lookup[keyword].strip()
+            keywords.append(value)
+        except KeyError:
+            break
+    if keywords:
+        return keywords
+    else:
+        return ["Not applicable"]
+
+
+##############################
 # get_moving_target_flag
 ##############################
 def get_moving_target_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
@@ -636,6 +701,46 @@ def get_spectral_resolution(data_lookups: List[Lookup], shf_lookup: Lookup) -> s
 
 
 ##############################
+# get_start_date_time
+##############################
+def get_start_date_time(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+    """
+    Return text for the ``<start_date_time />`` XML element.
+    """
+    lookup = data_lookups[0]
+    mjd = float(lookup["EXPSTART"])
+    # tai = julian.tai_from_mjd(mjd)
+    tai = _julian_tai_from_mjd(mjd)  # placeholder
+    iso = julian.iso_from_tai(tai, suffix="Z")
+    # Internal self check...
+    try:
+        ymd = data_lookups[0]["DATE-OBS"]
+        hms = data_lookups[0]["TIME-OBS"]
+    except KeyError:
+        return iso
+    ymdhms = ymd + "T" + hms + "Z"
+    if iso != ymdhms:
+        raise ValueError(
+            "time mismatch, %s vs. %s in %s" % (ymdhms, iso, fname(lookup))
+        )
+    return iso
+
+
+##############################
+# get_stop_date_time
+##############################
+def get_stop_date_time(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+    """
+    Return text for the ``<stop_date_time />`` XML element.
+    """
+    lookup = data_lookups[0]
+    mjd = float(lookup["EXPEND"])
+    # tai = julian.tai_from_mjd(mjd)
+    tai = _julian_tai_from_mjd(mjd)  # placeholder
+    return julian.iso_from_tai(tai, suffix="Z")
+
+
+##############################
 # get_subarray_flag
 ##############################
 def get_subarray_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
@@ -657,14 +762,14 @@ def get_subarray_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 
 
 ##############################
-# get_targeted_detector_id
+# get_targeted_detector_ids
 ##############################
-def get_targeted_detector_id(
+def get_targeted_detector_ids(
     data_lookups: List[Lookup], shf_lookup: Lookup
 ) -> List[str]:
     """
     Return a list of one or more text values for the
-    ``<targeted_detector_id />`` XML element.
+    ``<targeted_detector_ids />`` XML element.
     """
     lookup = data_lookups[0]
     instrument = get_instrument_id(data_lookups, shf_lookup)
@@ -755,62 +860,122 @@ def get_targeted_detector_id(
     return get_detector_ids(data_lookups, shf_lookup)
 
 
-##### Mark has not changed anything below this line
-##############################
-# def get_hst_parameters(data_lookups: List[Lookup]) -> NodeBuilder:
-#     """Return an ``<hst:HST />`` XML element."""
-#     lookup = data_lookups[0]
-#     instrument = lookup["INSTRUME"]
-#     d = {
-#         "mast_observation_id": get_mast_observation_id(lookup),
-#         "hst_proposal_id": get_hst_proposal_id(lookup),
-#         "hst_pi_name": get_hst_pi_name(lookup),
-#         "hst_target_name": get_hst_target_name(lookup),
-#         "aperture_name": get_aperture_name(lookup, instrument),
-#         "exposure_duration": get_exposure_duration(start_stop_times),
-#         "exposure_type": get_exposure_type(lookup, instrument),
-#         "filter_name": get_filter_name(lookup, instrument),
-#         "fine_guidance_system_lock_type": get_fine_guidance_system_lock_type(lookup),
-#         "instrument_mode_id": get_instrument_mode_id(lookup, instrument),
-#         "moving_target_flag": "true",
-#     }
-#     if instrument == "acs":
-#         parameters_instrument = parameters_acs(
-#             {
-#                 "detector_id": get_detector_id(lookup, instrument),
-#                 "gain_mode_id": get_gain_mode_id(lookup, instrument),
-#                 "observation_type": get_observation_type(lookup, instrument),
-#                 "repeat_exposure_count": get_repeat_exposure_count(lookup),
-#                 "subarray_flag": get_subarray_flag(lookup, instrument),
-#             }
-#         )
-#     elif instrument == "wfpc2":
-#         parameters_instrument = parameters_wfpc2(
-#             {
-#                 "bandwidth": get_bandwidth(lookup, instrument),
-#                 "center_filter_wavelength": get_center_filter_wavelength(
-#                     lookup, instrument
-#                 ),
-#                 "targeted_detector_id": get_targeted_detector_id(
-#                     get_aperture_name(lookup, instrument)
-#                 ),
-#                 "gain_mode_id": get_gain_mode_id(lookup, instrument),
-#             }
-#         )
-#     elif instrument == "wfc3":
-#         parameters_instrument = parameters_wfc3(
-#             {
-#                 "detector_id": get_detector_id(lookup, instrument),
-#                 "observation_type": get_observation_type(lookup, instrument),
-#                 "repeat_exposure_count": get_repeat_exposure_count(lookup),
-#                 "subarray_flag": get_subarray_flag(lookup, instrument),
-#             }
-#         )
-#     else:
-#         assert False, f"Bad instrument value: {instrument}"
-#     return hst(
-#         {
-#             "parameters_general": parameters_general(d),
-#             "parameters_instrument": parameters_instrument,
-#         }
-#     )
+############################################################
+
+
+def _get_program_parameters(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> Dict[Any, Any]:
+    return {
+        "mast_observation_id": get_mast_observation_id(data_lookup, shf_lookup),
+        "hst_proposal_id": get_hst_proposal_id(data_lookup, shf_lookup),
+        "hst_pi_name": get_hst_pi_name(data_lookup, shf_lookup),
+    }
+
+
+def _get_instrument_parameters(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> Dict[Any, Any]:
+    return {
+        "instrument_id": get_instrument_id(data_lookup, shf_lookup),
+        "channel_id": get_channel_id(data_lookup, shf_lookup),
+        "detector_id": get_detector_ids(data_lookup, shf_lookup),
+        "observation_type": get_observation_type(data_lookup, shf_lookup),
+    }
+
+
+def _get_pointing_parameters(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> Dict[Any, Any]:
+    return {
+        "hst_target_name": get_hst_target_name(data_lookup, shf_lookup),
+        "moving_target_flag": get_moving_target_flag(data_lookup, shf_lookup),
+        "moving_target_keywords": get_moving_target_keywords(data_lookup, shf_lookup),
+        "moving_target_description": get_moving_target_descriptions(
+            data_lookup, shf_lookup
+        ),
+        "aperture_name": get_aperture_name(data_lookup, shf_lookup),
+        "proposed_aperture_name": get_proposed_aperture_name(data_lookup, shf_lookup),
+        "targeted_detector_id": get_targeted_detector_ids(data_lookup, shf_lookup),
+    }
+
+
+def _get_tracking_parameters(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> Dict[Any, Any]:
+    return {
+        "fine_guidance_sensor_lock_type": get_fine_guidance_sensor_lock_type(
+            data_lookup, shf_lookup
+        ),
+        "gyroscope_mode": get_gyroscope_mode(data_lookup, shf_lookup),
+    }
+
+
+def _get_exposure_parameters(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> Dict[Any, Any]:
+    return {
+        "exposure_duration": get_exposure_duration(data_lookup, shf_lookup),
+        "exposure_type": get_exposure_type(data_lookup, shf_lookup),
+    }
+
+
+def _get_wavelength_filter_grating_parameters(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> Dict[Any, Any]:
+    return {
+        "filter_name": get_filter_name(data_lookup, shf_lookup),
+        "center_filter_wavelength": get_center_filter_wavelength(
+            data_lookup, shf_lookup
+        ),
+        "bandwidth": get_bandwidth(data_lookup, shf_lookup),
+        "spectral_resolution": get_spectral_resolution(data_lookup, shf_lookup),
+    }
+
+
+def _get_operational_parameters(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> Dict[Any, Any]:
+    return {
+        "instrument_mode_id": get_instrument_mode_id(data_lookup, shf_lookup),
+        "gain_setting": get_gain_setting(data_lookup, shf_lookup),
+        "coronagraph_flag": get_coronagraph_flag(data_lookup, shf_lookup),
+        "cosmic_ray_split_count": get_cosmic_ray_split_count(data_lookup, shf_lookup),
+        "repeat_exposure_count": get_repeat_exposure_count(data_lookup, shf_lookup),
+        "subarray_flag": get_subarray_flag(data_lookup, shf_lookup),
+        "binning_mode": get_binning_mode(data_lookup, shf_lookup),
+        "plate_scale": get_plate_scale(data_lookup, shf_lookup),
+    }
+
+
+def get_hst_parameters_dict(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> Dict[Any, Any]:
+    sub_dicts: List[Dict[Any, Any]] = [
+        _get_program_parameters(data_lookup, shf_lookup),
+        _get_instrument_parameters(data_lookup, shf_lookup),
+        _get_pointing_parameters(data_lookup, shf_lookup),
+        _get_tracking_parameters(data_lookup, shf_lookup),
+        _get_exposure_parameters(data_lookup, shf_lookup),
+        _get_wavelength_filter_grating_parameters(data_lookup, shf_lookup),
+        _get_operational_parameters(data_lookup, shf_lookup),
+    ]
+    return {key: val for d in sub_dicts for key, val in d.items()}
+
+
+############################################################
+def get_hst_parameters(data_lookup: List[Lookup], shf_lookup: Lookup) -> NodeBuilder:
+    d: Dict[Any, Any] = get_hst_parameters_dict(data_lookup, shf_lookup)
+    return hst_parameters(
+        {
+            "program_parameters": program_parameters(d),
+            "instrument_parameters": instrument_parameters(d),
+            "pointing_parameters": pointing_parameters(d),
+            "tracking_parameters": tracking_parameters(d),
+            "exposure_parameters": exposure_parameters(d),
+            "wavelength_filter_grating_parameters": wavelength_filter_grating_parameters(
+                d
+            ),
+            "operational_parameters": operational_parameters(d),
+        }
+    )

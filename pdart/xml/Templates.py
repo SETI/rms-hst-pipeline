@@ -116,7 +116,7 @@ def interpret_document_template(template: str) -> DocTemplate:
                 if name == "NODE":
                     param_name = attrs["name"]
                     param = dictionary[param_name]
-                    if type(param) in [str, str]:
+                    if type(param) in [str]:
                         elmt = doc.createTextNode(param)
                         assert isinstance(elmt, xml.dom.Node), param_name
                         stack.append(elmt)
@@ -207,7 +207,7 @@ def interpret_template(template: str) -> NodeBuilderTemplate:
                     if name == "NODE":
                         param_name = attrs["name"]
                         param = dictionary[param_name]
-                        if type(param) in [str, str]:
+                        if type(param) in [str]:
                             elmt = doc.createTextNode(param)
                         elif type(param) in [int, float]:
                             elmt = doc.createTextNode(str(param))
