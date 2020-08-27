@@ -3,7 +3,8 @@ Functionality to build an ``<hst:HST />`` XML element using a SQLite
 database.
 """
 import julian
-from typing import Any, Dict, List
+
+from typing import Any, Dict, List, Tuple
 from pdart.labels.HstParametersNewXml import (
     hst_parameters,
     program_parameters,
@@ -14,6 +15,7 @@ from pdart.labels.HstParametersNewXml import (
     wavelength_filter_grating_parameters,
     operational_parameters,
 )
+
 from pdart.labels.Lookup import Lookup
 from pdart.xml.Templates import NodeBuilder
 
@@ -25,17 +27,6 @@ from pdart.xml.Templates import NodeBuilder
 #           named _shm.fits) or _spt.fits file.
 # The second argument is needed because sometimes the data file does not contain
 # all the info we need.
-
-
-def _julian_tai_from_mjd(tai: float) -> float:
-    """
-    A placeholder.  The code below calls julian.tai_from_mjd() but
-    that function doesn't exist, so instead I routed the calls here
-    for now.
-
-    TODO Replace this.
-    """
-    return 0.0
 
 
 def fname(lookup: Lookup) -> str:
@@ -701,43 +692,88 @@ def get_spectral_resolution(data_lookups: List[Lookup], shf_lookup: Lookup) -> s
 
 
 ##############################
-# get_start_date_time
+# get_start_stop_date_time
 ##############################
-def get_start_date_time(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_start_stop_date_times(
+    data_lookups: List[Lookup], shf_lookup: Lookup
+) -> Tuple[str, str]:
     """
-    Return text for the ``<start_date_time />`` XML element.
+    Return text for the ``<start_date_time />`` and ``<stop_date_time />`` XML
+    elements.
     """
+
     lookup = data_lookups[0]
-    mjd = float(lookup["EXPSTART"])
-    # tai = julian.tai_from_mjd(mjd)
-    tai = _julian_tai_from_mjd(mjd)  # placeholder
-    iso = julian.iso_from_tai(tai, suffix="Z")
-    # Internal self check...
+
+    # HST documents indicate that times are only accurate to a second or so.
+    # This is consistent with the fact that start times indicated by DATE-OBS
+    # and TIME-OBS often disagree with the times as indicated by EXPSTART at the
+    # level of a second or so. For any individual time, this is fine, but we
+    # want to be sure that the difference between the start and stop times is
+    # compatible with the exposure time, whenever appropriate.
+    #
+    # I say "whenever appropriate" because there are times when multiple images
+    # have been drizzled or otherwise merged. In this case, the start and stop
+    # times refer to the first and last of the set of images, respectively, and
+    # their difference can be much greater than the exposure time.
+    #
+    # It takes some careful handling to get the behavior we want.
+
+    # Figure out what's available in the header
     try:
-        ymd = data_lookups[0]["DATE-OBS"]
-        hms = data_lookups[0]["TIME-OBS"]
+        date_obs = lookup["DATE-OBS"]
     except KeyError:
-        return iso
-    ymdhms = ymd + "T" + hms + "Z"
-    if iso != ymdhms:
-        raise ValueError(
-            "time mismatch, %s vs. %s in %s" % (ymdhms, iso, fname(lookup))
-        )
-    return iso
+        date_obs = None
 
+    try:
+        time_obs = lookup["TIME-OBS"]
+    except KeyError:
+        time_obs = None
 
-##############################
-# get_stop_date_time
-##############################
-def get_stop_date_time(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
-    """
-    Return text for the ``<stop_date_time />`` XML element.
-    """
-    lookup = data_lookups[0]
-    mjd = float(lookup["EXPEND"])
-    # tai = julian.tai_from_mjd(mjd)
-    tai = _julian_tai_from_mjd(mjd)  # placeholder
-    return julian.iso_from_tai(tai, suffix="Z")
+    exptime = float(lookup["EXPTIME"])
+
+    try:  # either EXPSTART or TEXPSTART should be available
+        expstart = float(lookup["EXPSTART"])
+    except KeyError:
+        expstart = float(lookup["TEXPSTART"])
+
+    try:  # either EXPEND or TEXPEND should be available
+        expend = float(lookup["EXPEND"])
+    except KeyError:
+        expend = float(lookup["TEXPEND"])
+
+    # Decide which delta-time to use
+    # Our start and stop times are only ever good to the nearest second, but we
+    # want to ensure that the difference looks right. For this purpose,
+    # non-integral exposure times should be rounded up to the next integer.
+    delta_from_mjd = (expend - expstart) * 86400.0
+    if delta_from_mjd > exptime + 2.0:  # if the delta is too large, we know
+        # multiple images were combined
+        delta = delta_from_mjd
+    else:
+        delta = -(-exptime // 1.0)  # rounded up to nearest int
+
+    # Fill in the start time; update the expstart in MJD units if necessary.
+    # If DATE-OBS and TIME-OBS values are provided, we use this as the start
+    # time because it is the value our users would expect. There exist cases
+    # when these values are not provided, and in that case we use EXPSTART,
+    # converted from MJD. Note that these MJD values are in UTC, not TAI. In
+    # other words, we need to ignore leapseconds in these time conversions.
+    if date_obs and time_obs:
+        start_time = date_obs + "T" + time_obs + "Z"
+        day = julian.day_from_iso(date_obs)
+        sec = julian.sec_from_iso(time_obs)
+        expstart = julian.mjd_from_day_sec(day, sec, leapseconds=False)
+    else:
+        (day, sec) = julian.day_sec_from_mjd(expstart, leapseconds=False)
+        start_time = julian.ymdhms_format_from_day_sec(day, sec, suffix="Z")
+
+    # Fill in the stop time. We ensure that this differs from the start time by
+    # the expected amount.
+    expend = expstart + delta / 86400.0
+    (day, sec) = julian.day_sec_from_mjd(expend, leapseconds=False)
+    stop_time = julian.ymdhms_format_from_day_sec(day, sec, suffix="Z")
+
+    return (start_time, stop_time)
 
 
 ##############################
@@ -879,7 +915,7 @@ def _get_instrument_parameters(
     return {
         "instrument_id": get_instrument_id(data_lookup, shf_lookup),
         "channel_id": get_channel_id(data_lookup, shf_lookup),
-        "detector_id": get_detector_ids(data_lookup, shf_lookup),
+        "detector_id": get_detector_ids(data_lookup, shf_lookup),  # MULT
         "observation_type": get_observation_type(data_lookup, shf_lookup),
     }
 
@@ -890,13 +926,17 @@ def _get_pointing_parameters(
     return {
         "hst_target_name": get_hst_target_name(data_lookup, shf_lookup),
         "moving_target_flag": get_moving_target_flag(data_lookup, shf_lookup),
-        "moving_target_keywords": get_moving_target_keywords(data_lookup, shf_lookup),
+        "moving_target_keywords": get_moving_target_keywords(
+            data_lookup, shf_lookup
+        ),  # MULT
         "moving_target_description": get_moving_target_descriptions(
             data_lookup, shf_lookup
-        ),
+        ),  # MULT
         "aperture_name": get_aperture_name(data_lookup, shf_lookup),
         "proposed_aperture_name": get_proposed_aperture_name(data_lookup, shf_lookup),
-        "targeted_detector_id": get_targeted_detector_ids(data_lookup, shf_lookup),
+        "targeted_detector_id": get_targeted_detector_ids(
+            data_lookup, shf_lookup
+        ),  # MULT
     }
 
 
