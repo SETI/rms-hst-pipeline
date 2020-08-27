@@ -27,11 +27,15 @@ exposure_parameters: NodeBuilderTemplate = interpret_template(
 </hst:Exposure_Parameters>"""
 )
 
+detector_id: NodeBuilderTemplate = interpret_template(
+    """ <hst:detector_id><NODE name="detector_id"/></hst:detector_id>"""
+)
+
 instrument_parameters: NodeBuilderTemplate = interpret_template(
     """<hst:Instrument_Parameters>
   <hst:instrument_id><NODE name="instrument_id"/></hst:instrument_id>
   <hst:channel_id><NODE name="channel_id"/></hst:channel_id>
-  <hst:detector_id><NODE name="detector_id"/></hst:detector_id>
+  <FRAGMENT name="detector_ids"/>
   <hst:observation_type><NODE name="observation_type"/></hst:observation_type>
 </hst:Instrument_Parameters>"""
 )
@@ -53,23 +57,35 @@ operational_parameters: NodeBuilderTemplate = interpret_template(
 </hst:Operational_Parameters>"""
 )
 
+moving_target_keyword: NodeBuilderTemplate = interpret_template(
+    """<hst:moving_target_keyword>
+  <NODE name="moving_target_keyword"/>
+</hst:moving_target_keyword>"""
+)
+
+moving_target_description: NodeBuilderTemplate = interpret_template(
+    """<hst:moving_target_description>
+  <NODE name="moving_target_description"/>
+</hst:moving_target_description>"""
+)
+
+targeted_detector_id: NodeBuilderTemplate = interpret_template(
+    """<hst:targeted_detector_id>
+  <NODE name="targeted_detector_id"/>
+</hst:targeted_detector_id>"""
+)
+
 pointing_parameters: NodeBuilderTemplate = interpret_template(
     """<hst:Pointing_Parameters>
   <hst:hst_target_name><NODE name="hst_target_name"/></hst:hst_target_name>
   <hst:moving_target_flag><NODE name="moving_target_flag"/></hst:moving_target_flag>
-  <hst:moving_target_keywords>
-    <NODE name="moving_target_keywords"/>
-  </hst:moving_target_keywords>
-  <hst:moving_target_description>
-    <NODE name="moving_target_description"/>
-  </hst:moving_target_description>
+  <FRAGMENT name="moving_target_keywords"/>
+  <FRAGMENT name="moving_target_descriptions"/>
   <hst:aperture_name><NODE name="aperture_name"/></hst:aperture_name>
   <hst:proposed_aperture_name>
     <NODE name="proposed_aperture_name"/>
   </hst:proposed_aperture_name>
-  <hst:targeted_detector_id>
-    <NODE name="targeted_detector_id"/>
-  </hst:targeted_detector_id>
+  <FRAGMENT name="targeted_detector_ids"/>
 </hst:Pointing_Parameters>"""
 )
 

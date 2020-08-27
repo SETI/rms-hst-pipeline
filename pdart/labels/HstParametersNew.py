@@ -6,6 +6,10 @@ import julian
 
 from typing import Any, Dict, List, Tuple
 from pdart.labels.HstParametersNewXml import (
+    detector_id,
+    moving_target_description,
+    moving_target_keyword,
+    targeted_detector_id,
     hst_parameters,
     program_parameters,
     instrument_parameters,
@@ -17,7 +21,12 @@ from pdart.labels.HstParametersNewXml import (
 )
 
 from pdart.labels.Lookup import Lookup
-from pdart.xml.Templates import NodeBuilder
+from pdart.xml.Templates import (
+    FragBuilder,
+    NodeBuilder,
+    NodeBuilderTemplate,
+    combine_nodes_into_fragment,
+)
 
 # All functions have the same input arguments:
 #   data_lookups: List[Lookup]
@@ -899,6 +908,55 @@ def get_targeted_detector_ids(
 ############################################################
 
 
+def _make_fragment(
+    param_name: str, param_values: List[str], node_builder: NodeBuilderTemplate
+) -> FragBuilder:
+    return combine_nodes_into_fragment(
+        [node_builder({param_name: value}) for value in param_values]
+    )
+
+
+def _get_detector_ids_fragment(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> FragBuilder:
+    return _make_fragment(
+        "detector_id", get_detector_ids(data_lookup, shf_lookup), detector_id
+    )
+
+
+def _get_moving_target_descriptions_fragment(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> FragBuilder:
+    return _make_fragment(
+        "moving_target_description",
+        get_moving_target_descriptions(data_lookup, shf_lookup),
+        moving_target_description,
+    )
+
+
+def _get_moving_target_keywords_fragment(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> FragBuilder:
+    return _make_fragment(
+        "moving_target_keyword",
+        get_moving_target_keywords(data_lookup, shf_lookup),
+        moving_target_keyword,
+    )
+
+
+def _get_targeted_detector_ids_fragment(
+    data_lookup: List[Lookup], shf_lookup: Lookup
+) -> FragBuilder:
+    return _make_fragment(
+        "targeted_detector_id",
+        get_targeted_detector_ids(data_lookup, shf_lookup),
+        targeted_detector_id,
+    )
+
+
+############################################################
+
+
 def _get_program_parameters(
     data_lookup: List[Lookup], shf_lookup: Lookup
 ) -> Dict[Any, Any]:
@@ -915,7 +973,7 @@ def _get_instrument_parameters(
     return {
         "instrument_id": get_instrument_id(data_lookup, shf_lookup),
         "channel_id": get_channel_id(data_lookup, shf_lookup),
-        "detector_id": get_detector_ids(data_lookup, shf_lookup),  # MULT
+        "detector_ids": _get_detector_ids_fragment(data_lookup, shf_lookup),  # FRAGMENT
         "observation_type": get_observation_type(data_lookup, shf_lookup),
     }
 
@@ -926,17 +984,17 @@ def _get_pointing_parameters(
     return {
         "hst_target_name": get_hst_target_name(data_lookup, shf_lookup),
         "moving_target_flag": get_moving_target_flag(data_lookup, shf_lookup),
-        "moving_target_keywords": get_moving_target_keywords(
+        "moving_target_keywords": _get_moving_target_keywords_fragment(
             data_lookup, shf_lookup
-        ),  # MULT
-        "moving_target_description": get_moving_target_descriptions(
+        ),  # FRAGMENT
+        "moving_target_descriptions": _get_moving_target_descriptions_fragment(
             data_lookup, shf_lookup
-        ),  # MULT
+        ),  # FRAGMENT
         "aperture_name": get_aperture_name(data_lookup, shf_lookup),
         "proposed_aperture_name": get_proposed_aperture_name(data_lookup, shf_lookup),
-        "targeted_detector_id": get_targeted_detector_ids(
+        "targeted_detector_ids": _get_targeted_detector_ids_fragment(
             data_lookup, shf_lookup
-        ),  # MULT
+        ),  # FRAGMENT
     }
 
 
