@@ -140,11 +140,7 @@ def get_channel_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
         return "NIC" + str(lookup["CAMERA"])
     if instrument == "WF/PC":
         return lookup["CAMERA"].strip()
-    # Default behavior
-    try:
-        return lookup["DETECTOR"].strip()
-    except KeyError:
-        return instrument
+    return instrument
 
 
 ##############################

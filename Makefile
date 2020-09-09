@@ -177,3 +177,8 @@ tidy : black
 .PHONY: clean
 clean : tidy
 	-rm -rf venv
+
+
+.PHONY: target_files
+target_files : venv
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools python3 DownloadTargetFiles.py

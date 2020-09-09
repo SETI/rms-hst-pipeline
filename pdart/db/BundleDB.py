@@ -35,6 +35,7 @@ from pdart.db.SqlAlchTables import (
     switch_on_collection_subtype,
 )
 from pdart.db.Utils import file_md5
+from pdart.labels.RawSuffixes import RAW_SUFFIXES
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -42,9 +43,6 @@ from pdart.pds4.LIDVID import LIDVID
 _BUNDLE_DB_NAME: str = "bundle$database.db"
 _BUNDLE_DIRECTORY_PATTERN: str = r"\Ahst_([0-9]{5})\Z"
 _COLLECTION_DIRECTORY_PATTERN: str = r"\A(([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)|document)\Z"
-
-
-KEY_SUFFIXES = ["d0f", "raw"]
 
 
 def _get_other_suffixed_basename(filepath: str, suffix: str) -> str:
@@ -1057,4 +1055,4 @@ class BundleDB(object):
         is_other_collection = switch_on_collection_subtype(
             collection, False, False, False, True
         )
-        return cast(OtherCollection, collection).suffix in KEY_SUFFIXES
+        return cast(OtherCollection, collection).suffix in RAW_SUFFIXES

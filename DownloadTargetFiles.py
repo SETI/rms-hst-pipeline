@@ -1,3 +1,5 @@
+import os
+import os.path
 from typing import Iterable, List, Optional, Tuple, cast
 
 from astropy.table import Table
@@ -12,45 +14,15 @@ from pdart.astroquery.Utils import (
 
 _YMD = Tuple[int, int, int]
 
-_ACCEPTED_INSTRUMENTS: str = "IJU"
+_ACCEPTED_INSTRUMENTS: str = "IJLNOSUVWXYZ"
 """
 We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
 """
-
 ACCEPTED_SUFFIXES: List[str] = [
-    "A1F",
-    "A2F",
-    "A3F",
-    "ASC",
-    "ASN",
-    "C0F",
-    "C1F",
-    "C2F",
-    "C3F",
-    "CAL",
-    "CLB",
-    "CLF",
-    "CORRTAG",
-    "CQF",
-    "CRC",
-    "CRJ",
-    "D0F",
-    "DRC",
-    "DRZ",
-    "FLC",
-    "FLT",
-    "FLTSUM",
-    "MOS",
-    "RAW",
     "SHF",
     "SHM",
     "SPT",
-    "SX2",
-    "SXL",
-    "X1D",
-    "X1DSUM",
-    "X2D",
 ]
 """
 For now, we limit the types of the products to those with these
@@ -133,29 +105,20 @@ class MastSlice(object):
             self.proposal_ids = sorted(list(set(result)))
         return self.proposal_ids
 
-    def get_products(self, proposal_id: int) -> Table:
-        def proposal_id_matches(row: Row) -> bool:
-            return int(row["proposal_id"]) == proposal_id
-
-        proposal_table = filter_table(proposal_id_matches, self.observations_table)
-
-        result = Observations.get_product_list(proposal_table)
+    def get_products(self) -> Table:
+        result = Observations.get_product_list(self.observations_table)
         result = filter_table(_is_accepted_instrument_product_row, result)
         result = filter_table(_is_accepted_product_type_product_row, result)
         return result
 
-    def to_product_set(self, proposal_id: int) -> "ProductSet":
-        return ProductSet(self.get_products(proposal_id))
+    def to_product_set(self) -> "ProductSet":
+        return ProductSet(self.get_products())
 
     def download_products(self, products_table: Table, download_dir: str) -> None:
         if len(products_table) > 0:
             Observations.download_products(
                 products_table, mrp_only=False, download_dir=download_dir
             )
-
-    def download_products_by_id(self, proposal_id: int, download_dir: str) -> None:
-        products_table = self.get_products(proposal_id)
-        self.download_products(products_table, download_dir=download_dir)
 
 
 def products_size(table: Table) -> int:
@@ -179,3 +142,14 @@ class ProductSet(object):
     def download(self, download_dir: str) -> None:
         if len(self.table) > 0:
             Observations.download_products(self.table, download_dir=download_dir)
+
+
+if __name__ == "__main__":
+    working_dir = "/Volumes/CassiniArchives/TargetFiles"
+    slice = MastSlice((1900, 1, 1), (2025, 1, 1))
+
+    product_set = slice.to_product_set()
+    print(f"{product_set.product_count()} products, size {product_set.download_size()}")
+    # if not os.path.isdir(working_dir):
+    #   os.makedirs(working_dir)
+    # product_set.download(working_dir)

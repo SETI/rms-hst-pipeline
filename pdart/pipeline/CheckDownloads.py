@@ -48,7 +48,7 @@ class CheckDownloads(MarkedStage):
 
         def _is_new_product_row(row: Row) -> bool:
             desc = str(row["productSubGroupDescription"])
-            return desc.upper() in ["SHF", "SPT"]
+            return desc.upper() in ["CRC", "SHF", "SPT"]
 
         table = filter_table(_is_new_product_row, table)
         product_set = ProductSet(table)
