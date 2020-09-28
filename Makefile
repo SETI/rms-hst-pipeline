@@ -30,6 +30,10 @@ MYPY_FLAGS=--disallow-any-unimported \
 mypy : venv
 	$(ACTIVATE) && MYPYPATH=stubs mypy $(MYPY_FLAGS) *.py pdart
 
+experiment : venv black mypy
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools python3 Experiment.py
+
+
 ############################################################
 # TESTS
 ############################################################
@@ -42,7 +46,8 @@ test: venv
 # Run some subset of the tests.  Hack as needed.
 .PHONY: t
 t: venv
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/pipeline
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/test_FitsProductLabel.py
+#	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/test_RawSuffixes.py
 
 ############################################################
 # THE PIPELINE
@@ -64,6 +69,7 @@ WFPC2_IDS=05167 05219 05220 05238 05493 05508 05633 05640 05783 05824	\
 11102 11361 11497 11956
 
 PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
+# PROJ_IDS=09296
 
 
 # STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
@@ -89,7 +95,7 @@ results :
 
 .PHONY: clean-results
 clean-results :
-	find $(TWD) -name '#*' -delete
+	-find $(TWD) -name '#*' -delete
 
 
 .PHONY : copy-results
@@ -106,8 +112,7 @@ copy-results :
 # smaller version for testing
 ##############################
 
-# LILS=09059 09748 15505
-LILS=09748
+LILS=09059 09748 15505
 
 .PHONY: lil-pipeline
 LIL-TWD=tmp-working-dir

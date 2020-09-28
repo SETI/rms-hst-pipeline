@@ -2,33 +2,25 @@ from pdart.xml.Templates import NodeBuilderTemplate, interpret_template
 
 hst_parameters: NodeBuilderTemplate = interpret_template(
     """<hst:HST_Parameters>
-  <hst:program_parameters><NODE name="program_parameters"/></hst:program_parameters>
-  <hst:instrument_parameters>
-    <NODE name="instrument_parameters"/>
-  </hst:instrument_parameters>
-  <hst:pointing_parameters><NODE name="pointing_parameters"/></hst:pointing_parameters>
-  <hst:tracking_parameters><NODE name="tracking_parameters"/></hst:tracking_parameters>
-  <hst:exposure_parameters><NODE name="exposure_parameters"/></hst:exposure_parameters>
-  <hst:wavelength_filter_grating_parameters>
-    <NODE name="wavelength_filter_grating_parameters"/>
-  </hst:wavelength_filter_grating_parameters>
-  <hst:operational_parameters>
-    <NODE name="operational_parameters"/>
-  </hst:operational_parameters>
+  <NODE name="program_parameters"/>
+  <NODE name="instrument_parameters"/>
+  <NODE name="pointing_parameters"/>
+  <NODE name="tracking_parameters"/>
+  <NODE name="exposure_parameters"/>
+  <NODE name="wavelength_filter_grating_parameters"/>
+  <NODE name="operational_parameters"/>
 </hst:HST_Parameters>"""
 )
 
 exposure_parameters: NodeBuilderTemplate = interpret_template(
     """<hst:Exposure_Parameters>
-  <hst:exposure_duration unit="s">
-    <NODE name="exposure_duration"/>
-  </hst:exposure_duration>
+  <hst:exposure_duration unit="s"><NODE name="exposure_duration"/></hst:exposure_duration>
   <hst:exposure_type><NODE name="exposure_type"/></hst:exposure_type>
 </hst:Exposure_Parameters>"""
 )
 
 detector_id: NodeBuilderTemplate = interpret_template(
-    """ <hst:detector_id><NODE name="detector_id"/></hst:detector_id>"""
+    """<hst:detector_id><NODE name="detector_id"/></hst:detector_id>"""
 )
 
 instrument_parameters: NodeBuilderTemplate = interpret_template(
@@ -58,9 +50,7 @@ operational_parameters: NodeBuilderTemplate = interpret_template(
 )
 
 moving_target_keyword: NodeBuilderTemplate = interpret_template(
-    """<hst:moving_target_keyword>
-  <NODE name="moving_target_keyword"/>
-</hst:moving_target_keyword>"""
+    """<hst:moving_target_keywords><NODE name="moving_target_keyword"/></hst:moving_target_keywords>"""
 )
 
 moving_target_description: NodeBuilderTemplate = interpret_template(

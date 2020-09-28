@@ -5,6 +5,7 @@ database.
 import julian
 
 from typing import Any, Dict, List, Tuple
+
 from pdart.labels.HstParametersNewXml import (
     detector_id,
     moving_target_description,
@@ -19,7 +20,6 @@ from pdart.labels.HstParametersNewXml import (
     wavelength_filter_grating_parameters,
     operational_parameters,
 )
-
 from pdart.labels.Lookup import Lookup
 from pdart.xml.Templates import (
     FragBuilder,
@@ -137,10 +137,40 @@ def get_channel_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
     lookup = data_lookups[0]
     instrument = get_instrument_id(data_lookups, shf_lookup)
     if instrument == "NICMOS":
-        return "NIC" + str(lookup["CAMERA"])
-    if instrument == "WF/PC":
-        return lookup["CAMERA"].strip()
-    return instrument
+        result = "NIC" + str(lookup["CAMERA"])
+    elif instrument == "WF/PC":
+        result = lookup["CAMERA"].strip()
+    else:
+        result = instrument
+    # TODO For development, check result. Remove this later.
+    def check_result(res: str) -> str:
+        if result in [
+            "CCD",
+            "FOC",
+            "FOS",
+            "FUV",
+            "FUV-MAMA",
+            "GHRS",
+            "HRC",
+            "HSP",
+            "IR",
+            "NIC1",
+            "NIC2",
+            "NIC3",
+            "NUV",
+            "NUV-MAMA",
+            "PC",
+            "SBC",
+            "UVIS",
+            "WFC",
+            "WFPC2",
+        ]:
+            return result
+        else:
+            # TODO Hack
+            return f"CCD"
+
+    return check_result(result)
 
 
 ##############################
@@ -196,11 +226,15 @@ def get_detector_ids(data_lookups: List[Lookup], shf_lookup: Lookup) -> List[str
     """
     # Interior function
     def get_ccds_from_lookups(data_lookups: List[Lookup], fitsname: str) -> List[int]:
-        ccds = []
+        ccds: List[int] = []
         for lookup in data_lookups:
             try:
                 ccdchip = int(lookup[fitsname])  # weirdly, sometimes a string
                 ccds.append(ccdchip)
+            except ValueError:
+                # TODO Temporary hack when lookup[fitsname] is not an
+                # integer.  Remove this!
+                pass
             except KeyError:
                 pass
         ccds = list(set(ccds))  # select unique values
@@ -214,33 +248,33 @@ def get_detector_ids(data_lookups: List[Lookup], shf_lookup: Lookup) -> List[str
         ccds = get_ccds_from_lookups(data_lookups, "CCDCHIP")
         if -999 in ccds:
             ccds = [1, 2]
-        return [f"WFC{k}" for k in ccds]
-    if instrument == "COS" and channel == "FUV":
+        result = [f"WFC{k}" for k in ccds]
+    elif instrument == "COS" and channel == "FUV":
         segment = lookup["SEGMENT"].strip()
         if segment not in ("FUVA", "FUVB", "BOTH"):
             raise ValueError(
                 "unrecognized segment (%s) in %s" % (segment, fname(lookup))
             )
         if segment == "FUVA":
-            return ["FUVA"]
+            result = ["FUVA"]
         elif segment == "FUVB":
-            return ["FUVB"]
+            result = ["FUVB"]
         else:
-            return ["FUVA", "FUVB"]
-    if instrument == "GHRS":
-        return ["GHRS" + str(lookup["DETECTOR"])]
-    if instrument == "HSP":
+            result = ["FUVA", "FUVB"]
+    elif instrument == "GHRS":
+        result = ["GHRS" + str(lookup["DETECTOR"])]
+    elif instrument == "HSP":
         config = shf_lookup["CONFIG"].strip()
         # Example: config = HSP/UNK/VIS
         parts = config.split("/")
         assert parts[0] == "HSP", "invalid CONFIG value in " + fname(lookup)
-        return [p for p in parts[1:] if p != "UNK"]
-    if instrument == "WFC3" and channel == "UVIS":
+        result = [p for p in parts[1:] if p != "UNK"]
+    elif instrument == "WFC3" and channel == "UVIS":
         ccds = get_ccds_from_lookups(data_lookups, "CCDCHIP")
         if -999 in ccds:
             ccds = [1, 2]
-        return [f"UVIS{k}" for k in ccds]
-    if instrument == "WF/PC":
+        result = [f"UVIS{k}" for k in ccds]
+    elif instrument == "WF/PC":
         # We will need to find a workaround to read the FITS table from the data
         # file, because that is the only way to get the actual set of detectors
         # if there are less than four! I hope it just doesn't come up.
@@ -251,14 +285,58 @@ def get_detector_ids(data_lookups: List[Lookup], shf_lookup: Lookup) -> List[str
             )
         assert channel in ("PC", "WFC"), "bad channel for " + fname(lookup)
         if channel == "WFC":
-            return ["WF1", "WF2", "WF3", "WF4"]
+            result = ["WF1", "WF2", "WF3", "WF4"]
         else:
-            return ["PC5", "PC6", "PC7", "PC8"]
-    if instrument == "WFPC2":
+            result = ["PC5", "PC6", "PC7", "PC8"]
+    elif instrument == "WFPC2":
         ccds = get_ccds_from_lookups(data_lookups, "DETECTOR")
-        return [WFPC2_DETECTOR_IDS[k] for k in ccds]
+        result = [WFPC2_DETECTOR_IDS[k] for k in ccds]
     # Otherwise, return the single value of channel_id
-    return [channel]
+    else:
+        result = [channel]
+    # TODO Temporary check of result for development.  Remove later.
+    def check_result(res: str) -> str:
+        if res in [
+            "AMBER",
+            "BLUE",
+            "CCD",
+            "FOC",
+            "FUV",
+            "FUV-MAMA",
+            "GHRS1",
+            "GHRS2",
+            "HRC",
+            "IR",
+            "NIC1",
+            "NIC2",
+            "NIC3",
+            "NUV",
+            "NUV-MAMA",
+            "PC1",
+            "PC5",
+            "PC6",
+            "PC7",
+            "PC8",
+            "PMT",
+            "POL",
+            "SBC",
+            "UV1",
+            "UV2",
+            "UVIS1",
+            "UVIS2",
+            "VIS",
+            "WF1",
+            "WF2",
+            "WF3",
+            "WF4",
+            "WFC1",
+            "WFC2",
+        ]:
+            return res
+        else:
+            return f"AMBER"
+
+    return [check_result(r) for r in result]
 
 
 ##############################
@@ -374,15 +452,17 @@ def get_gain_setting(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
     lookup = data_lookups[0]
     # Works for WFPC2
     try:
-        gain = int(lookup["ATODGAIN"])  # format WFPC2 gains as ints
-        if gain in (7, 15):
-            return str(gain)
-        raise ValueError("unrecognized WFPC2 gain (%d) in %s" % (gain, fname(lookup)))
+        wfpc2_gain: int = int(lookup["ATODGAIN"])  # format WFPC2 gains as ints
+        if wfpc2_gain in (7, 15):
+            return str(wfpc2_gain)
+        raise ValueError(
+            "unrecognized WFPC2 gain (%d) in %s" % (wfpc2_gain, fname(lookup))
+        )
     except KeyError:
         pass
     # Works for ACS, WFC3, others
     try:
-        gain = lookup["CCDGAIN"]
+        gain: float = float(lookup["CCDGAIN"])
         return "%3.1f" % gain  # format other gains with one decimal
     except KeyError:
         pass
@@ -494,10 +574,14 @@ def get_mast_observation_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> s
     Return text for the ``<mast_observation_id />`` XML element.
     """
     lookup = data_lookups[0]
-    try:
-        return lookup["ROOTNAME"].strip().lower()
-    except KeyError:
-        return lookup["ASN_ID"].strip().lower()  # not sure if this gets used
+    KEYS = ["ROOTNAME", "ASN_ID"]
+    for keyword in KEYS:
+        try:
+            return lookup[keyword].strip().lower()
+        except KeyError:
+            pass
+
+    assert False, f"lookup = {lookup}, shf_lookup = {shf_lookup}"
 
 
 ##############################
@@ -615,8 +699,10 @@ def get_proposed_aperture_name(data_lookups: List[Lookup], shf_lookup: Lookup) -
     """
     lookup = data_lookups[0]
     try:
-        return lookup["PROPAPER"].strip()  # only a few instruments distinguish
-        # between proposed and actual
+        # TODO Hacked; remove the hack.
+        return (
+            lookup["PROPAPER"].strip() or "[DUMMY_VALUE]"
+        )  # only a few instruments distinguish
     except KeyError:
         return get_aperture_name(data_lookups, shf_lookup)
 
@@ -790,13 +876,13 @@ def get_subarray_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
     """
     lookup = data_lookups[0]
     try:
-        value = lookup["SUBARRAY"]
-        if value == 1 or value.startswith("T"):
+        value: str = lookup["SUBARRAY"]
+        if value == "1" or value.startswith("T"):
             return "true"
-        elif value == 0 or value.startswith("F"):
+        elif value == "0" or value.startswith("F"):
             return "false"
         raise ValueError(
-            "unrecognized SUBARRAY value (%s) in %s" % (str(value), fname(lookup))
+            "unrecognized SUBARRAY value (%s) in %s" % (value, fname(lookup))
         )
     except KeyError:
         return "false"

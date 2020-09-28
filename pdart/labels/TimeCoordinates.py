@@ -12,6 +12,18 @@ from pdart.xml.Templates import NodeBuilder
 
 
 def get_start_stop_times(lookup: Lookup) -> Dict[str, str]:
+    try:
+        return get_start_stop_times_old(lookup)
+    except KeyError:
+        # TODO return dummy values
+        return {
+            "start_date_time": "2001-01-01T00:00:28Z",
+            "stop_date_time": "2001-01-01T00:00:30Z",
+            "exposure_duration": "2.0",
+        }
+
+
+def get_start_stop_times_old(lookup: Lookup) -> Dict[str, str]:
     date_obs, time_obs, exptime = lookup.keys(["DATE-OBS", "TIME-OBS", "EXPTIME"])
 
     start_date_time = f"{date_obs}T{time_obs}Z"

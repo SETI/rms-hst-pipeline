@@ -1,3 +1,7 @@
+from typing import Tuple
+import os
+import os.path
+import shutil
 import tempfile
 import unittest
 
@@ -5,7 +9,7 @@ from fs.path import basename
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
-from pdart.labels.FitsProductLabel import make_fits_product_label, to_asn_lidvid
+from pdart.labels.FitsProductLabel import make_fits_product_label_new, to_asn_lidvid
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
 
 
@@ -20,24 +24,38 @@ class Test_FitsProductLabel(unittest.TestCase):
             to_asn_lidvid("urn:nasa:pds:hst_09748:data_acs_drz:j8p501011::1.0"),
         )
 
-    def test_make_fits_product_label(self) -> None:
+    def test_make_fits_product_label_new(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_13012::123.90201"
         self.db.create_bundle(bundle_lidvid)
 
         collection_lidvid = "urn:nasa:pds:hst_13012:data_acs_raw::3.14159"
         self.db.create_other_collection(collection_lidvid, bundle_lidvid)
 
-        fits_product_lidvid = "urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2.13"
-        self.db.create_fits_product(fits_product_lidvid, collection_lidvid)
+        with tempfile.TemporaryDirectory() as working_dir:
+            mast_dir = os.path.join(working_dir, "mastDownload")
+            os.mkdir(mast_dir)
 
-        os_filepath = path_to_testfile("jbz504eoq_raw.fits")
+            def make_lidvid(suffix: str) -> Tuple[str, str]:
+                fits_product_lidvid = (
+                    f"urn:nasa:pds:hst_13012:data_acs_{suffix}:jbz504eoq::1.0"
+                )
+                self.db.create_fits_product(fits_product_lidvid, collection_lidvid)
 
-        populate_database_from_fits_file(self.db, os_filepath, fits_product_lidvid)
+                file_basename = f"jbz504eoq_{suffix}.fits"
+                os_filepath = path_to_testfile(file_basename)
+                temp_filepath = os.path.join(mast_dir, file_basename)
+                shutil.copyfile(os_filepath, temp_filepath)
+                populate_database_from_fits_file(
+                    self.db, temp_filepath, fits_product_lidvid
+                )
+                return (fits_product_lidvid, file_basename)
 
-        file_basename = basename(os_filepath)
+            RAWish_product_lidvid, RAWish_file_basename = [
+                make_lidvid(suffix) for suffix in ["raw", "spt"]
+            ][0]
 
-        label = make_fits_product_label(
-            tempfile.gettempdir(), self.db, fits_product_lidvid, file_basename, True
-        )
+            label = make_fits_product_label_new(
+                working_dir, self.db, RAWish_product_lidvid, RAWish_file_basename, True
+            )
 
-        assert_golden_file_equal(self, "test_FitsProductLabel.golden.xml", label)
+            assert_golden_file_equal(self, "test_FitsProductLabel.golden.xml", label)

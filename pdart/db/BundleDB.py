@@ -579,6 +579,9 @@ class BundleDB(object):
         if self.fits_file_exists(basename, product_lidvid):
             pass
         else:
+            print(
+                f"**** create_fits_file({os_filepath!r}, {basename!r}, {product_lidvid!r}, {hdu_count!r})"
+            )
             self.session.add(
                 FitsFile(
                     basename=basename,
@@ -651,11 +654,19 @@ class BundleDB(object):
         ).scalar()
 
     def get_file(self, basename: str, product_lidvid: str) -> File:
-        return (
-            self.session.query(File)
-            .filter(File.product_lidvid == product_lidvid, File.basename == basename)
-            .one()
-        )
+        try:
+            return (
+                self.session.query(File)
+                .filter(
+                    File.product_lidvid == product_lidvid, File.basename == basename
+                )
+                .one()
+            )
+        except Exception as e:
+            print(
+                f"**** BundleDB.get_file({basename!r}, {product_lidvid!r}) raises {e!r}"
+            )
+            raise
 
     ############################################################
 
@@ -722,18 +733,29 @@ class BundleDB(object):
         Return a list of dictionaries mapping FITS keys to their
         values, one per Hdu in the FITS file.
         """
+        try:
 
-        def get_card_dictionary(index: int) -> Dict[str, Any]:
-            cards = (
-                self.session.query(Card)
-                .filter(Card.product_lidvid == fits_product_lidvid)
-                .filter(Card.hdu_index == index)
+            def get_card_dictionary(index: int) -> Dict[str, Any]:
+                cards = (
+                    self.session.query(Card)
+                    .filter(Card.product_lidvid == fits_product_lidvid)
+                    .filter(Card.hdu_index == index)
+                )
+                return {card.keyword: card.value for card in cards}
+
+            # TODO The cast is a hack.  How should it properly be done?
+            file = cast(FitsFile, self.get_file(basename, fits_product_lidvid))
+            return [get_card_dictionary(i) for i in range(file.hdu_count)]
+        except Exception as e:
+            print(
+                f"""**** BundleDB.get_card_dictionaries(
+    fits_product_lidvid={fits_product_lidvid},
+    basename={basename}
+    )
+raised exception = {e} ****
+"""
             )
-            return {card.keyword: card.value for card in cards}
-
-        # TODO The cast is a hack.  How should it properly be done?
-        file = cast(FitsFile, self.get_file(basename, fits_product_lidvid))
-        return [get_card_dictionary(i) for i in range(file.hdu_count)]
+            raise
 
     def get_other_suffixed_card_dictionaries(
         self, fits_product_lidvid: str, basename: str, suffix: str
@@ -743,13 +765,9 @@ class BundleDB(object):
         values, one per Hdu in the FITS file.
         """
         # TODO BUFFALO
-        try:
-            return self.get_card_dictionaries(
-                _get_other_suffixed_product_lidvid(fits_product_lidvid, suffix),
-                _get_other_suffixed_basename(basename, suffix),
-            )
-        except:
-            return [{}]
+        other_lidvid = _get_other_suffixed_product_lidvid(fits_product_lidvid, suffix)
+        other_basename = _get_other_suffixed_basename(basename, suffix)
+        return self.get_card_dictionaries(other_lidvid, other_basename)
 
     def get_other_suffixed_card_dictionaries_and_lidvid(
         self, fits_product_lidvid: str, basename: str, suffix: str
@@ -761,16 +779,12 @@ class BundleDB(object):
         # TODO BUFFALO
         other_lidvid = _get_other_suffixed_product_lidvid(fits_product_lidvid, suffix)
 
-        try:
-            return (
-                other_lidvid,
-                self.get_card_dictionaries(
-                    other_lidvid, _get_other_suffixed_basename(basename, suffix)
-                ),
-            )
-
-        except:
-            return (other_lidvid, [{}])
+        return (
+            other_lidvid,
+            self.get_card_dictionaries(
+                other_lidvid, _get_other_suffixed_basename(basename, suffix)
+            ),
+        )
 
     def get_raw_card_dictionaries(
         self, fits_product_lidvid: str, basename: str
@@ -1049,7 +1063,7 @@ class BundleDB(object):
         ]
 
     def _is_key_product(self, fits_product: FitsProduct) -> bool:
-        # A "key" product is a raw data file (with suffix RAW or C0F).
+        # A "key" product is a raw data file (e.g., with suffix RAW or C0F).
         collection_lidvid = fits_product.collection_lidvid
         collection = self.get_collection(collection_lidvid)
         is_other_collection = switch_on_collection_subtype(

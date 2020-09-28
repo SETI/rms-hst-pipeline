@@ -91,7 +91,7 @@ class HduLookup(Lookup):
 
 def make_hdu_lookups(label: str, card_dicts: CARD_SET) -> List[Lookup]:
     return [
-        HduLookup(f"label[{indx}]", card_dict)
+        HduLookup(f"{label}[{indx}]", card_dict)
         for indx, card_dict in enumerate(card_dicts)
     ]
 

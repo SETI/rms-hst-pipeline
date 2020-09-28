@@ -48,7 +48,16 @@ class CheckDownloads(MarkedStage):
 
         def _is_new_product_row(row: Row) -> bool:
             desc = str(row["productSubGroupDescription"])
-            return desc.upper() in ["CRC", "SHF", "SPT"]
+            return desc.upper() in [
+                "CRC",
+                "C0M",
+                "C1M",
+                "C2M",
+                "C3M",
+                "D0M",
+                "SHF",
+                "SPT",
+            ]
 
         table = filter_table(_is_new_product_row, table)
         product_set = ProductSet(table)
@@ -62,4 +71,4 @@ class CheckDownloads(MarkedStage):
         if not os.path.isdir(mast_downloads_dir):
             self._do_downloads(working_dir, mast_downloads_dir, self._proposal_id)
 
-        self._fix_up_old_downloads(working_dir, mast_downloads_dir, self._proposal_id)
+        # self._fix_up_old_downloads(working_dir, mast_downloads_dir, self._proposal_id)
