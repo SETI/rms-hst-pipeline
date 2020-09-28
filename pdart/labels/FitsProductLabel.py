@@ -40,30 +40,6 @@ from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.xml.Pretty import pretty_and_verify
 
-_KEY_ERROR_DUMP: str = "KEY_ERROR_DUMP.txt"
-
-
-# TODO: Note this only works in the original case where all VIDs =
-# "1.0".
-def associated_raw_data_lidvid(
-    db: BundleDB, association_lidvid: LIDVID, memname: str
-) -> Generator[LIDVID, None, None]:
-    for lidvid in associated_lidvids(association_lidvid, memname):
-        if db.product_exists(str(lidvid)):
-            yield lidvid
-
-
-# TODO: Note this only works in the original case where all VIDs =
-# "1.0".
-def to_asn_lidvid(product_lidvid: str) -> str:
-    lidvid = LIDVID(product_lidvid)
-    raw_asn_lid = lidvid.lid().to_other_suffixed_lid("asn")
-    asn_lid_as_list: List[str] = list(str(raw_asn_lid))
-    # force the last digit of the product part to '0'
-    asn_lid_as_list[-1] = "0"
-    asn_lid = LID("".join(asn_lid_as_list))
-    return str(LIDVID.create_from_lid_and_vid(asn_lid, lidvid.vid()))
-
 
 def _directory_siblings(
     working_dir: str, bundle_db: BundleDB, product_lidvid: str
@@ -105,88 +81,6 @@ def _sibling_file(siblings: List[str], suffix: str) -> Optional[str]:
         if basename.lower().endswith(ending):
             return basename
     return None
-
-
-def _association_card_dicts_and_lookup_old(
-    bundle_db: BundleDB,
-    product_lidvid: str,
-    file_basename: str,
-    asn_product_lidvid: str,
-) -> Tuple[List[Dict[str, Any]], Lookup]:
-
-    # First check in the actual file, then check *any* of the
-    # associated files.  TODO That is probably overkill.  Also, some
-    # values need to be combined (like date-time).  Fix it.
-    card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
-
-    dicts: List[Tuple[str, List[Dict[str, Any]]]] = [(product_lidvid, card_dicts)]
-
-    associated_dicts = [
-        (
-            prod.lidvid,
-            bundle_db.get_card_dictionaries(
-                prod.lidvid, bundle_db.get_product_file(prod.lidvid).basename
-            ),
-        )
-        for prod in bundle_db.get_associated_key_products(asn_product_lidvid)
-    ]
-    dicts.extend(associated_dicts)
-
-    lookup = MultiDictLookup(dicts)
-    return card_dicts, lookup
-
-
-def _association_card_dicts_and_basename(
-    bundle_db: BundleDB,
-    product_lidvid: str,
-    file_basename: str,
-    asn_product_lidvid: str,
-) -> Tuple[List[Dict[str, Any]], str]:
-    raw_data_lidvid = str(
-        _associated_raw_data_lidvid(bundle_db, LIDVID(asn_product_lidvid))
-    )
-    raw_data_basename = bundle_db.get_product_file(raw_data_lidvid).basename
-    raw_data_card_dicts = bundle_db.get_card_dictionaries(
-        raw_data_lidvid, raw_data_basename
-    )
-    return (raw_data_card_dicts, raw_data_basename)
-
-
-def _triple_card_dicts_and_lookup(
-    bundle_db: BundleDB, product_lidvid: str, file_basename: str
-) -> Tuple[List[Dict[str, Any]], Lookup]:
-    card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
-    dicts = [(product_lidvid, card_dicts)]
-    # TODO Should this be RAW_SUFFIXES?
-    for suffix in ["raw", "d0f", "shm"]:
-        try:
-            dicts.append(
-                bundle_db.get_other_suffixed_card_dictionaries_and_lidvid(
-                    product_lidvid, file_basename, suffix
-                )
-            )
-        except:
-            pass
-    lookup = MultiDictLookup(dicts)
-
-    return card_dicts, lookup
-
-
-def _associated_raw_data_lidvid(db: BundleDB, asn_product_lidvid: LIDVID) -> LIDVID:
-    """
-    Return the first raw data lidvid associated to the
-    asn_product_lidvid that exists as a file.
-
-    TODO This is probably wrong; don't I want to rank the suffix first?
-    """
-    associations = db.get_associations(str(asn_product_lidvid))
-    memnames = set(association.memname for association in associations)
-    for memname in memnames:
-        for raw_data_lidvid in associated_raw_data_lidvid(
-            db, asn_product_lidvid, memname
-        ):
-            return raw_data_lidvid
-    raise Exception(f"no associated raw data lidvids for {asn_product_lidvid} exist")
 
 
 def _munge_lidvid(product_lidvid: str, suffix: str, new_basename: str) -> str:
@@ -268,7 +162,7 @@ raised exception = {e} ****
     return DictLookup(SHFish_basename, card_dicts)
 
 
-def make_fits_product_label_new(
+def make_fits_product_label(
     working_dir: str,
     bundle_db: BundleDB,
     product_lidvid: str,

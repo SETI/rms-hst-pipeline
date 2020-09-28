@@ -9,7 +9,7 @@ from fs.path import basename
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
-from pdart.labels.FitsProductLabel import make_fits_product_label_new, to_asn_lidvid
+from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
 
 
@@ -18,13 +18,7 @@ class Test_FitsProductLabel(unittest.TestCase):
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
 
-    def test_to_asn_lidvid(self) -> None:
-        self.assertEqual(
-            "urn:nasa:pds:hst_09748:data_acs_asn:j8p501010::1.0",
-            to_asn_lidvid("urn:nasa:pds:hst_09748:data_acs_drz:j8p501011::1.0"),
-        )
-
-    def test_make_fits_product_label_new(self) -> None:
+    def test_make_fits_product_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_13012::123.90201"
         self.db.create_bundle(bundle_lidvid)
 
@@ -54,7 +48,7 @@ class Test_FitsProductLabel(unittest.TestCase):
                 make_lidvid(suffix) for suffix in ["raw", "spt"]
             ][0]
 
-            label = make_fits_product_label_new(
+            label = make_fits_product_label(
                 working_dir, self.db, RAWish_product_lidvid, RAWish_file_basename, True
             )
 

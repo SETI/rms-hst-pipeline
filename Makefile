@@ -80,7 +80,6 @@ PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
 pipeline : venv clean-results
 	mkdir -p $(TWD)
 	-rm $(TWD)/*/\#*.txt
-	-rm $(TWD)/*/KEY_ERROR_DUMP.txt
 	for project_id in $(PROJ_IDS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools \
@@ -119,7 +118,6 @@ LIL-TWD=tmp-working-dir
 lil-pipeline : venv
 	mkdir -p $(LIL-TWD)
 	-rm $(LIL-TWD)/*/\#*.txt
-	-rm $(LIL-TWD)/*/KEY_ERROR_DUMP.txt
 	for project_id in $(LILS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
