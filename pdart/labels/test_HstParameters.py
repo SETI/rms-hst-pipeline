@@ -6,7 +6,7 @@ from fs.path import basename
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
-from pdart.labels.HstParametersNew import get_new_hst_parameters
+from pdart.labels.HstParameters import get_hst_parameters
 from pdart.labels.Lookup import CARD_SET, DictLookup, make_hdu_lookups
 from pdart.labels.TimeCoordinates import get_start_stop_times
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
@@ -36,7 +36,7 @@ class Test_HstParameters(unittest.TestCase):
             "test_get_acs_parameters:RAW", get_card_dicts("raw")
         )
         SHFish_lookup = DictLookup("test_get_acs_parameters:SHF", get_card_dicts("spt"))
-        nb = get_new_hst_parameters(RAWish_lookups, SHFish_lookup)
+        nb = get_hst_parameters(RAWish_lookups, SHFish_lookup)
 
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
         text: bytes = nb(doc).toxml().encode()

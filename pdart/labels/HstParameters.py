@@ -6,7 +6,7 @@ import julian
 
 from typing import Any, Dict, List, Tuple
 
-from pdart.labels.HstParametersNewXml import (
+from pdart.labels.HstParametersXml import (
     detector_id,
     moving_target_description,
     moving_target_keyword,
@@ -1144,9 +1144,7 @@ def get_hst_parameters_dict(
 
 
 ############################################################
-def get_new_hst_parameters(
-    data_lookup: List[Lookup], shf_lookup: Lookup
-) -> NodeBuilder:
+def get_hst_parameters(data_lookup: List[Lookup], shf_lookup: Lookup) -> NodeBuilder:
     d: Dict[Any, Any] = get_hst_parameters_dict(data_lookup, shf_lookup)
     return hst_parameters(
         {

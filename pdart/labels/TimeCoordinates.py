@@ -24,6 +24,7 @@ def get_start_stop_times(lookup: Lookup) -> Dict[str, str]:
 
 
 def get_start_stop_times_old(lookup: Lookup) -> Dict[str, str]:
+    # TODO Remove this after get_start_stop_times() is fixed.
     date_obs, time_obs, exptime = lookup.keys(["DATE-OBS", "TIME-OBS", "EXPTIME"])
 
     start_date_time = f"{date_obs}T{time_obs}Z"

@@ -75,21 +75,13 @@
           <hst:moving_target_flag>true</hst:moving_target_flag>
           <hst:moving_target_keywords>PLANET</hst:moving_target_keywords>
           <hst:moving_target_keywords>PLANET URANUS</hst:moving_target_keywords>
-          <hst:moving_target_description>
-  Not applicable
-</hst:moving_target_description>
+          <hst:moving_target_description>Not applicable</hst:moving_target_description>
           <hst:aperture_name>SBC</hst:aperture_name>
-          <hst:proposed_aperture_name>
-    SBC
-  </hst:proposed_aperture_name>
-          <hst:targeted_detector_id>
-  CCD
-</hst:targeted_detector_id>
+          <hst:proposed_aperture_name>SBC</hst:proposed_aperture_name>
+          <hst:targeted_detector_id>CCD</hst:targeted_detector_id>
         </hst:Pointing_Parameters>
         <hst:Tracking_Parameters>
-          <hst:fine_guidance_sensor_lock_type>
-    FINE
-  </hst:fine_guidance_sensor_lock_type>
+          <hst:fine_guidance_sensor_lock_type>FINE</hst:fine_guidance_sensor_lock_type>
           <hst:gyroscope_mode>3</hst:gyroscope_mode>
         </hst:Tracking_Parameters>
         <hst:Exposure_Parameters>
@@ -98,24 +90,16 @@
         </hst:Exposure_Parameters>
         <hst:Wavelength_Filter_Grating_Parameters>
           <hst:filter_name>F165LP+N/A</hst:filter_name>
-          <hst:center_filter_wavelength unit="micrometer">
-    0.
-  </hst:center_filter_wavelength>
+          <hst:center_filter_wavelength unit="micrometer">0.</hst:center_filter_wavelength>
           <hst:bandwidth unit="micrometer">0.</hst:bandwidth>
-          <hst:spectral_resolution unit="micrometer">
-    0.
-  </hst:spectral_resolution>
+          <hst:spectral_resolution unit="micrometer">0.</hst:spectral_resolution>
         </hst:Wavelength_Filter_Grating_Parameters>
         <hst:Operational_Parameters>
           <hst:instrument_mode_id>ACCUM</hst:instrument_mode_id>
           <hst:gain_setting>0.</hst:gain_setting>
           <hst:coronagraph_flag>false</hst:coronagraph_flag>
-          <hst:cosmic_ray_split_count>
-    1
-  </hst:cosmic_ray_split_count>
-          <hst:repeat_exposure_count>
-    1
-  </hst:repeat_exposure_count>
+          <hst:cosmic_ray_split_count>1</hst:cosmic_ray_split_count>
+          <hst:repeat_exposure_count>1</hst:repeat_exposure_count>
           <hst:subarray_flag>false</hst:subarray_flag>
           <hst:binning_mode>1</hst:binning_mode>
           <hst:plate_scale>0.0</hst:plate_scale>
