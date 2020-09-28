@@ -39,7 +39,6 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.xml.Pretty import pretty_and_verify
-from pdart.xml.Schema import USE_NEW_SCHEMA
 
 _KEY_ERROR_DUMP: str = "KEY_ERROR_DUMP.txt"
 

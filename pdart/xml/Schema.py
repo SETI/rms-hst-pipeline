@@ -21,13 +21,14 @@ from pdart.xml.Pds4Version import (
 
 _Cmd = Union[str, Sequence[str]]
 
-USE_NEW_SCHEMA: bool = True
 
 PDS_XML_SCHEMA: str = f"./xml/PDS4_PDS_{PDS4_SHORT_VERSION}.xsd.xml"
 
 PDS_SCHEMATRON_SCHEMA: str = f"./xml/PDS4_PDS_{PDS4_SHORT_VERSION}.sch.xml"
 
-if USE_NEW_SCHEMA:
+_USE_NEW_SCHEMA: bool = True
+
+if _USE_NEW_SCHEMA:
 
     HST_XML_SCHEMA: str = f"./xml/PDS4_HST_{HST_SHORT_VERSION}-new.xsd.xml"
 
