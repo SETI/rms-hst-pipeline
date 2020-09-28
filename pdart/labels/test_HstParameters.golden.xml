@@ -1,23 +1,48 @@
 <?xml version="1.0"?>
-<hst:HST>
-  <hst:Parameters_General>
+<hst:HST_Parameters>
+  <hst:Program_Parameters>
     <hst:mast_observation_id>jbz504eoq</hst:mast_observation_id>
     <hst:hst_proposal_id>13012</hst:hst_proposal_id>
-    <hst:hst_pi_name>Lamy, Laurent </hst:hst_pi_name>
-    <hst:exposure_duration unit="s">270.0</hst:exposure_duration>
+    <hst:hst_pi_name>Lamy, Laurent</hst:hst_pi_name>
+  </hst:Program_Parameters>
+  <hst:Instrument_Parameters>
+    <hst:instrument_id>ACS</hst:instrument_id>
+    <hst:channel_id>CCD</hst:channel_id>
+    <hst:detector_id>CCD</hst:detector_id>
+    <hst:observation_type>IMAGING</hst:observation_type>
+  </hst:Instrument_Parameters>
+  <hst:Pointing_Parameters>
     <hst:hst_target_name>URANUS</hst:hst_target_name>
-    <hst:aperture_name>SBC</hst:aperture_name>
-    <hst:exposure_type>normal</hst:exposure_type>
-    <hst:filter_name>f165lp+n/a</hst:filter_name>
-    <hst:fine_guidance_system_lock_type>fine</hst:fine_guidance_system_lock_type>
-    <hst:instrument_mode_id>accum</hst:instrument_mode_id>
     <hst:moving_target_flag>true</hst:moving_target_flag>
-  </hst:Parameters_General>
-  <hst:Parameters_ACS>
-    <hst:detector_id>SBC</hst:detector_id>
-    <hst:gain_mode_id>N/A</hst:gain_mode_id>
-    <hst:observation_type>image</hst:observation_type>
+    <hst:moving_target_keywords>PLANET</hst:moving_target_keywords>
+    <hst:moving_target_keywords>PLANET URANUS</hst:moving_target_keywords>
+    <hst:moving_target_description>Not applicable</hst:moving_target_description>
+    <hst:aperture_name>SBC</hst:aperture_name>
+    <hst:proposed_aperture_name>SBC</hst:proposed_aperture_name>
+    <hst:targeted_detector_id>CCD</hst:targeted_detector_id>
+  </hst:Pointing_Parameters>
+  <hst:Tracking_Parameters>
+    <hst:fine_guidance_sensor_lock_type>FINE</hst:fine_guidance_sensor_lock_type>
+    <hst:gyroscope_mode>3</hst:gyroscope_mode>
+  </hst:Tracking_Parameters>
+  <hst:Exposure_Parameters>
+    <hst:exposure_duration unit="s">270.0</hst:exposure_duration>
+    <hst:exposure_type>NORMAL</hst:exposure_type>
+  </hst:Exposure_Parameters>
+  <hst:Wavelength_Filter_Grating_Parameters>
+    <hst:filter_name>F165LP+N/A</hst:filter_name>
+    <hst:center_filter_wavelength unit="micrometer">0.</hst:center_filter_wavelength>
+    <hst:bandwidth unit="micrometer">0.</hst:bandwidth>
+    <hst:spectral_resolution unit="micrometer">0.</hst:spectral_resolution>
+  </hst:Wavelength_Filter_Grating_Parameters>
+  <hst:Operational_Parameters>
+    <hst:instrument_mode_id>ACCUM</hst:instrument_mode_id>
+    <hst:gain_setting>0.</hst:gain_setting>
+    <hst:coronagraph_flag>false</hst:coronagraph_flag>
+    <hst:cosmic_ray_split_count>1</hst:cosmic_ray_split_count>
     <hst:repeat_exposure_count>1</hst:repeat_exposure_count>
-    <hst:subarray_flag>@@@</hst:subarray_flag>
-  </hst:Parameters_ACS>
-</hst:HST>
+    <hst:subarray_flag>false</hst:subarray_flag>
+    <hst:binning_mode>1</hst:binning_mode>
+    <hst:plate_scale>0.0</hst:plate_scale>
+  </hst:Operational_Parameters>
+</hst:HST_Parameters>

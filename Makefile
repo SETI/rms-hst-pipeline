@@ -46,8 +46,8 @@ test: venv
 # Run some subset of the tests.  Hack as needed.
 .PHONY: t
 t: venv
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/test_FitsProductLabel.py
-#	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/test_RawSuffixes.py
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/test_HstParameters.py
+
 
 ############################################################
 # THE PIPELINE

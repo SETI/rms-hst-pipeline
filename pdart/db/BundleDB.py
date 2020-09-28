@@ -579,9 +579,6 @@ class BundleDB(object):
         if self.fits_file_exists(basename, product_lidvid):
             pass
         else:
-            print(
-                f"**** create_fits_file({os_filepath!r}, {basename!r}, {product_lidvid!r}, {hdu_count!r})"
-            )
             self.session.add(
                 FitsFile(
                     basename=basename,

@@ -37,12 +37,10 @@ operational_parameters: NodeBuilderTemplate = interpret_template(
   <hst:instrument_mode_id><NODE name="instrument_mode_id"/></hst:instrument_mode_id>
   <hst:gain_setting><NODE name="gain_setting"/></hst:gain_setting>
   <hst:coronagraph_flag><NODE name="coronagraph_flag"/></hst:coronagraph_flag>
-  <hst:cosmic_ray_split_count>
-    <NODE name="cosmic_ray_split_count"/>
-  </hst:cosmic_ray_split_count>
-  <hst:repeat_exposure_count>
-    <NODE name="repeat_exposure_count"/>
-  </hst:repeat_exposure_count>
+  <hst:cosmic_ray_split_count><NODE name="cosmic_ray_split_count"/>"""
+    """</hst:cosmic_ray_split_count>
+  <hst:repeat_exposure_count><NODE name="repeat_exposure_count"/>"""
+    """</hst:repeat_exposure_count>
   <hst:subarray_flag><NODE name="subarray_flag"/></hst:subarray_flag>
   <hst:binning_mode><NODE name="binning_mode"/></hst:binning_mode>
   <hst:plate_scale><NODE name="plate_scale"/></hst:plate_scale>
@@ -50,19 +48,18 @@ operational_parameters: NodeBuilderTemplate = interpret_template(
 )
 
 moving_target_keyword: NodeBuilderTemplate = interpret_template(
-    """<hst:moving_target_keywords><NODE name="moving_target_keyword"/></hst:moving_target_keywords>"""
+    """<hst:moving_target_keywords><NODE name="moving_target_keyword"/>"""
+    """</hst:moving_target_keywords>"""
 )
 
 moving_target_description: NodeBuilderTemplate = interpret_template(
-    """<hst:moving_target_description>
-  <NODE name="moving_target_description"/>
-</hst:moving_target_description>"""
+    """<hst:moving_target_description><NODE name="moving_target_description"/>"""
+    """</hst:moving_target_description>"""
 )
 
 targeted_detector_id: NodeBuilderTemplate = interpret_template(
-    """<hst:targeted_detector_id>
-  <NODE name="targeted_detector_id"/>
-</hst:targeted_detector_id>"""
+    """<hst:targeted_detector_id><NODE name="targeted_detector_id"/>"""
+    """</hst:targeted_detector_id>"""
 )
 
 pointing_parameters: NodeBuilderTemplate = interpret_template(
@@ -72,9 +69,8 @@ pointing_parameters: NodeBuilderTemplate = interpret_template(
   <FRAGMENT name="moving_target_keywords"/>
   <FRAGMENT name="moving_target_descriptions"/>
   <hst:aperture_name><NODE name="aperture_name"/></hst:aperture_name>
-  <hst:proposed_aperture_name>
-    <NODE name="proposed_aperture_name"/>
-  </hst:proposed_aperture_name>
+  <hst:proposed_aperture_name><NODE name="proposed_aperture_name"/>"""
+    """</hst:proposed_aperture_name>
   <FRAGMENT name="targeted_detector_ids"/>
 </hst:Pointing_Parameters>"""
 )
@@ -89,9 +85,8 @@ program_parameters: NodeBuilderTemplate = interpret_template(
 
 tracking_parameters: NodeBuilderTemplate = interpret_template(
     """<hst:Tracking_Parameters>
-  <hst:fine_guidance_sensor_lock_type>
-    <NODE name="fine_guidance_sensor_lock_type"/>
-  </hst:fine_guidance_sensor_lock_type>
+  <hst:fine_guidance_sensor_lock_type><NODE name="fine_guidance_sensor_lock_type"/>"""
+    """</hst:fine_guidance_sensor_lock_type>
   <hst:gyroscope_mode><NODE name="gyroscope_mode"/></hst:gyroscope_mode>
 </hst:Tracking_Parameters>"""
 )
@@ -99,12 +94,10 @@ tracking_parameters: NodeBuilderTemplate = interpret_template(
 wavelength_filter_grating_parameters: NodeBuilderTemplate = interpret_template(
     """<hst:Wavelength_Filter_Grating_Parameters>
   <hst:filter_name><NODE name="filter_name"/></hst:filter_name>
-  <hst:center_filter_wavelength unit="micrometer">
-    <NODE name="center_filter_wavelength"/>
-  </hst:center_filter_wavelength>
+  <hst:center_filter_wavelength unit="micrometer">"""
+    """<NODE name="center_filter_wavelength"/></hst:center_filter_wavelength>
   <hst:bandwidth unit="micrometer"><NODE name="bandwidth"/></hst:bandwidth>
-  <hst:spectral_resolution unit="micrometer">
-    <NODE name="spectral_resolution"/>
-  </hst:spectral_resolution>
+  <hst:spectral_resolution unit="micrometer"><NODE name="spectral_resolution"/>"""
+    """</hst:spectral_resolution>
 </hst:Wavelength_Filter_Grating_Parameters>"""
 )

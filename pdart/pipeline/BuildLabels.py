@@ -31,7 +31,7 @@ from pdart.labels.CollectionLabel import (
     make_collection_label,
 )
 from pdart.labels.DocumentProductLabel import make_document_product_label
-from pdart.labels.FitsProductLabel import make_fits_product_label
+from pdart.labels.FitsProductLabel import make_fits_product_label_new
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -229,7 +229,7 @@ def create_pds4_labels(
             )
 
         def visit_fits_file(self, fits_file: FitsFile) -> None:
-            label = make_fits_product_label(
+            label = make_fits_product_label_new(
                 working_dir,
                 self.db,
                 str(fits_file.product_lidvid),
