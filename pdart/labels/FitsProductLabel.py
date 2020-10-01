@@ -64,8 +64,8 @@ def _raw_sibling_file(siblings: List[str]) -> Tuple[str, str]:
     assert False, f"siblings={siblings}; RAW_SUFFIXES={RAW_SUFFIXES}"
 
 
-def _shf_sibling_file(siblings: List[str]) -> Tuple[str, str]:
-    suffixes: List[str] = ["shf", "shm", "spt"]
+def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
+    suffixes: List[str] = ["shm", "spt"]  # "shf", # waivered file
     for suffix in suffixes:
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
@@ -130,27 +130,27 @@ raised exception = {e} ****
     return make_hdu_lookups(RAWish_basename, card_dicts)
 
 
-def _find_SHFish_lookup(
+def _find_SHMish_lookup(
     bundle_db: BundleDB, product_lidvid: str, file_basename: str, siblings: List[str]
 ) -> Lookup:
     # TODO Fix this
-    def _find_SHFish_suffix_and_basename() -> Tuple[str, str]:
-        return _shf_sibling_file(siblings)
+    def _find_SHMish_suffix_and_basename() -> Tuple[str, str]:
+        return _shm_sibling_file(siblings)
 
-    suffix, SHFish_basename = _find_SHFish_suffix_and_basename()
-    SHFish_product_lidvid = _munge_lidvid(product_lidvid, suffix, SHFish_basename)
+    suffix, SHMish_basename = _find_SHMish_suffix_and_basename()
+    SHMish_product_lidvid = _munge_lidvid(product_lidvid, suffix, SHMish_basename)
 
-    def _find_SHFish_card_dicts() -> CARD_SET:
+    def _find_SHMish_card_dicts() -> CARD_SET:
         card_dicts = bundle_db.get_card_dictionaries(
-            SHFish_product_lidvid, SHFish_basename
+            SHMish_product_lidvid, SHMish_basename
         )
         return card_dicts
 
     try:
-        card_dicts = _find_SHFish_card_dicts()
+        card_dicts = _find_SHMish_card_dicts()
     except NoResultFound as e:
         print(
-            f"""**** _find_SHFish_lookups(
+            f"""**** _find_SHMish_lookups(
     product_lidvid={product_lidvid},
     file_basename={file_basename},
     siblings={siblings}
@@ -159,7 +159,7 @@ raised exception = {e} ****
 """
         )
         raise
-    return DictLookup(SHFish_basename, card_dicts)
+    return DictLookup(SHMish_basename, card_dicts)
 
 
 def make_fits_product_label(
@@ -184,18 +184,18 @@ def make_fits_product_label(
     hdu_lookups = _find_RAWish_lookups(
         bundle_db, product_lidvid, file_basename, siblings
     )
-    shf_lookup = _find_SHFish_lookup(bundle_db, product_lidvid, file_basename, siblings)
+    shm_lookup = _find_SHMish_lookup(bundle_db, product_lidvid, file_basename, siblings)
 
     # TODO This is a hack.  I need to have get_start_stop_date_times
     # to include an exposure time.
-    start_date_time, stop_date_time = get_start_stop_date_times(hdu_lookups, shf_lookup)
+    start_date_time, stop_date_time = get_start_stop_date_times(hdu_lookups, shm_lookup)
     start_stop_times = {
         "start_date_time": start_date_time,
         "stop_date_time": stop_date_time,
         "exposure_duration": "0.1",  # TODO A totally bogus value
     }
 
-    hst_parameters = get_hst_parameters(hdu_lookups, shf_lookup)
+    hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)
     bundle = bundle_db.get_bundle()
     assert bundle.lidvid == bundle_lidvid
     proposal_id = bundle.proposal_id

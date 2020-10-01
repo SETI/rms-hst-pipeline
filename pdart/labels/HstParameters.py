@@ -31,9 +31,9 @@ from pdart.xml.Templates import (
 # All functions have the same input arguments:
 #   data_lookups: List[Lookup]
 #           a list of all the FITS headers in a data file (raw, d0f, drz, etc.)
-#   shf_lookup: Lookup
-#           the first fits header of the associated _shf.fits file (sometimes
-#           named _shm.fits) or _spt.fits file.
+#   shm_lookup: Lookup
+#           the first fits header of the associated _shm.fits file
+#           or _spt.fits file.
 # The second argument is needed because sometimes the data file does not contain
 # all the info we need.
 
@@ -53,27 +53,27 @@ def fname(lookup: Lookup) -> str:
 ##############################
 # get_aperture_name
 ##############################
-def get_aperture_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_aperture_name(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<aperture_name />`` XML element.
     """
-    instrument = get_instrument_id(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
     if instrument in ("WF/PC", "WFPC2", "HSP"):
-        return shf_lookup["APER_1"].strip()
+        return shm_lookup["APER_1"].strip()
     if instrument == "FOS":
-        return shf_lookup["APER_ID"]
+        return shm_lookup["APER_ID"]
     # This is valid for most instruments
     try:
         return data_lookups[0]["APERTURE"].strip()
     except KeyError:
         pass
-    raise ValueError("missing aperture for " + fname(shf_lookup))
+    raise ValueError("missing aperture for " + fname(shm_lookup))
 
 
 ##############################
 # get_bandwidth
 ##############################
-def get_bandwidth(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_bandwidth(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return a float for the ``<bandwidth />`` XML element.
     """
@@ -88,12 +88,12 @@ def get_bandwidth(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_binning_mode
 ##############################
-def get_binning_mode(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_binning_mode(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<binning_mode />`` XML element.
     """
     lookup = data_lookups[0]
-    instrument = get_instrument_id(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
     # WF/PC and WFPC2 are special cases
     if instrument in ("WF/PC", "WFPC2"):
         obsmode = lookup["MODE"].strip()
@@ -115,7 +115,7 @@ def get_binning_mode(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_center_filter_wavelength
 ##############################
-def get_center_filter_wavelength(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_center_filter_wavelength(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return a float for the ``<center_filter_wavelength />`` XML element.
     """
@@ -130,12 +130,12 @@ def get_center_filter_wavelength(data_lookups: List[Lookup], shf_lookup: Lookup)
 ##############################
 # get_channel_id
 ##############################
-def get_channel_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_channel_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<channel_id />`` XML element.
     """
     lookup = data_lookups[0]
-    instrument = get_instrument_id(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
     if instrument == "NICMOS":
         result = "NIC" + str(lookup["CAMERA"])
     elif instrument == "WF/PC":
@@ -176,12 +176,12 @@ def get_channel_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_coronagraph_flag
 ##############################
-def get_coronagraph_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_coronagraph_flag(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<coronagraph_flag />`` XML element.
     """
-    instrument = get_instrument_id(data_lookups, shf_lookup)
-    aperture = get_aperture_name(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
+    aperture = get_aperture_name(data_lookups, shm_lookup)
     if instrument == "ACS":
         if aperture.startswith("HRC-CORON") or aperture.startswith("HRC-OCCULT"):
             return "true"
@@ -202,7 +202,7 @@ def get_coronagraph_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_cosmic_ray_split_count
 ##############################
-def get_cosmic_ray_split_count(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_cosmic_ray_split_count(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<cosmic_ray_split_count />`` XML element.
     """
@@ -219,7 +219,7 @@ def get_cosmic_ray_split_count(data_lookups: List[Lookup], shf_lookup: Lookup) -
 WFPC2_DETECTOR_IDS = {1: "PC1", 2: "WF2", 3: "WF3", 4: "WF4"}
 
 
-def get_detector_ids(data_lookups: List[Lookup], shf_lookup: Lookup) -> List[str]:
+def get_detector_ids(data_lookups: List[Lookup], shm_lookup: Lookup) -> List[str]:
     """
     Return a list of zero or more text values for the ``<detector_id />``
     XML elements.
@@ -242,8 +242,8 @@ def get_detector_ids(data_lookups: List[Lookup], shf_lookup: Lookup) -> List[str
         return ccds
 
     lookup = data_lookups[0]
-    instrument = get_instrument_id(data_lookups, shf_lookup)
-    channel = get_channel_id(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
+    channel = get_channel_id(data_lookups, shm_lookup)
     if instrument == "ACS" and channel == "WFC":
         ccds = get_ccds_from_lookups(data_lookups, "CCDCHIP")
         if -999 in ccds:
@@ -264,7 +264,7 @@ def get_detector_ids(data_lookups: List[Lookup], shf_lookup: Lookup) -> List[str
     elif instrument == "GHRS":
         result = ["GHRS" + str(lookup["DETECTOR"])]
     elif instrument == "HSP":
-        config = shf_lookup["CONFIG"].strip()
+        config = shm_lookup["CONFIG"].strip()
         # Example: config = HSP/UNK/VIS
         parts = config.split("/")
         assert parts[0] == "HSP", "invalid CONFIG value in " + fname(lookup)
@@ -342,7 +342,7 @@ def get_detector_ids(data_lookups: List[Lookup], shf_lookup: Lookup) -> List[str
 ##############################
 # get_exposure_duration
 ##############################
-def get_exposure_duration(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_exposure_duration(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return a float for the ``<exposure_duration />`` XML element.
     """
@@ -356,7 +356,7 @@ def get_exposure_duration(data_lookups: List[Lookup], shf_lookup: Lookup) -> str
 ##############################
 # get_exposure_type
 ##############################
-def get_exposure_type(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_exposure_type(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<exposure_type />`` XML element.
     """
@@ -367,12 +367,12 @@ def get_exposure_type(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_filter_name
 ##############################
-def get_filter_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_filter_name(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<filter_name />`` XML element.
     """
     lookup = data_lookups[0]
-    instrument = get_instrument_id(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
     if instrument == "ACS":
         filter1 = lookup["FILTER1"].strip()
         filter2 = lookup["FILTER2"].strip()
@@ -400,7 +400,7 @@ def get_filter_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
         filters.sort()
         return "+".join(filters)
     if instrument in ("FOS", "HSP"):
-        return shf_lookup["SPEC_1"].strip()
+        return shm_lookup["SPEC_1"].strip()
     if instrument == "GHRS":
         return lookup["GRATING"].strip()
     if instrument == "STIS":
@@ -433,7 +433,7 @@ def get_filter_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 # get_fine_guidance_sensor_lock_type
 ##############################
 def get_fine_guidance_sensor_lock_type(
-    data_lookups: List[Lookup], shf_lookup: Lookup
+    data_lookups: List[Lookup], shm_lookup: Lookup
 ) -> str:
     """
     Return text for the ``<fine_guidance_system_lock_type />`` XML element.
@@ -445,7 +445,7 @@ def get_fine_guidance_sensor_lock_type(
 ##############################
 # get_gain_setting
 ##############################
-def get_gain_setting(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_gain_setting(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<gain_mode_id />`` XML element.
     """
@@ -472,7 +472,7 @@ def get_gain_setting(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_gyroscope_mode
 ##############################
-def get_gyroscope_mode(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_gyroscope_mode(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<gyroscope_mode />`` XML element.
     """
@@ -486,12 +486,12 @@ def get_gyroscope_mode(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_hst_pi_name
 ##############################
-def get_hst_pi_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_hst_pi_name(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<hst_pi_name />`` XML element.
     """
-    # Usually in the first FITS header, but in the shf header for GHRS
-    for lookup in (data_lookups[0], shf_lookup):
+    # Usually in the first FITS header, but in the shm header for GHRS
+    for lookup in (data_lookups[0], shm_lookup):
         try:
             pr_inv_l = lookup["PR_INV_L"].strip()
             pr_inv_f = lookup["PR_INV_F"].strip()
@@ -508,7 +508,7 @@ def get_hst_pi_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_hst_proposal_id
 ##############################
-def get_hst_proposal_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_hst_proposal_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<hst_proposal_id />`` XML element.
     """
@@ -519,7 +519,7 @@ def get_hst_proposal_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_hst_target_name
 ##############################
-def get_hst_target_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_hst_target_name(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<hst_target_name />`` XML element.
     """
@@ -530,7 +530,7 @@ def get_hst_target_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_instrument_id
 ##############################
-def get_instrument_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_instrument_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<instrument_id />`` XML element.
     """
@@ -546,18 +546,18 @@ def get_instrument_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_instrument_mode_id
 ##############################
-def get_instrument_mode_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_instrument_mode_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<instrument_mode_id />`` XML element.
     """
     lookup = data_lookups[0]
-    instrument = get_instrument_id(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
     if instrument in ("WF/PC", "WFPC2"):
         return lookup["MODE"].strip()
     if instrument == "FOC":
         return lookup["OPTCRLY"].strip()
     if instrument == "HSP":
-        return shf_lookup["OPMODE"].strip()
+        return shm_lookup["OPMODE"].strip()
     # For most HST instrumnents, this should work...
     try:
         return lookup["OBSMODE"].strip()
@@ -569,7 +569,7 @@ def get_instrument_mode_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> st
 ##############################
 # get_mast_observation_id
 ##############################
-def get_mast_observation_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_mast_observation_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<mast_observation_id />`` XML element.
     """
@@ -581,24 +581,24 @@ def get_mast_observation_id(data_lookups: List[Lookup], shf_lookup: Lookup) -> s
         except KeyError:
             pass
 
-    assert False, f"lookup = {lookup}, shf_lookup = {shf_lookup}"
+    assert False, f"lookup = {lookup}, shm_lookup = {shm_lookup}"
 
 
 ##############################
 # get_moving_target_descriptions
 ##############################
 def get_moving_target_descriptions(
-    data_lookups: List[Lookup], shf_lookup: Lookup
+    data_lookups: List[Lookup], shm_lookup: Lookup
 ) -> List[str]:
     """
     Return text for the ``<moving_target_description />`` XML element.
     """
-    # Defined by "MT_LV_n" keyword values in the _shf.fits files
+    # Defined by "MT_LV_n" keyword values in the _shm.fits files
     descs = []
     for k in range(1, 10):
         keyword = "MT_LV_" + str(k)
         try:
-            value = shf_lookup[keyword].strip()
+            value = shm_lookup[keyword].strip()
             descs.append(value)
         except KeyError:
             break
@@ -612,17 +612,17 @@ def get_moving_target_descriptions(
 # get_moving_target_keywords
 ##############################
 def get_moving_target_keywords(
-    data_lookups: List[Lookup], shf_lookup: Lookup
+    data_lookups: List[Lookup], shm_lookup: Lookup
 ) -> List[str]:
     """
     Return text for the ``<moving_target_keywords />`` XML element.
     """
-    # Defined by "TARKEYn" keyword values in the _shf.fits files
+    # Defined by "TARKEYn" keyword values in the _shm.fits files
     keywords = []
     for k in range(1, 10):
         keyword = "TARKEY" + str(k)
         try:
-            value = shf_lookup[keyword].strip()
+            value = shm_lookup[keyword].strip()
             keywords.append(value)
         except KeyError:
             break
@@ -635,12 +635,12 @@ def get_moving_target_keywords(
 ##############################
 # get_moving_target_flag
 ##############################
-def get_moving_target_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_moving_target_flag(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<instrument_id />`` XML element.
     """
-    # Usually in the first FITS header, but in the shm/shf header for GHRS
-    for lookup in (data_lookups[0], shf_lookup):
+    # Usually in the first FITS header, but in the shm header for GHRS
+    for lookup in (data_lookups[0], shm_lookup):
         try:
             value = lookup["MTFLAG"].strip()
             if value in ("T", "1"):
@@ -659,7 +659,7 @@ def get_moving_target_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> st
 ##############################
 # get_observation_type
 ##############################
-def get_observation_type(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_observation_type(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<observation_type />`` XML element.
     """
@@ -671,7 +671,7 @@ def get_observation_type(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
     except KeyError:
         obstype = ""
     if not obstype:
-        instrument = get_instrument_id(data_lookups, shf_lookup)
+        instrument = get_instrument_id(data_lookups, shm_lookup)
         if instrument in ("ACS", "NICMOS", "WFC3", "WF/PC", "WFPC2"):
             obstype = "IMAGING"
         elif instrument in ("COS", "FOS", "GHRS"):
@@ -686,7 +686,7 @@ def get_observation_type(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_proposed_aperture_name
 ##############################
-def get_proposed_aperture_name(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_proposed_aperture_name(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<proposed_aperture_name />`` XML element.
     """
@@ -697,13 +697,13 @@ def get_proposed_aperture_name(data_lookups: List[Lookup], shf_lookup: Lookup) -
             lookup["PROPAPER"].strip() or "[DUMMY_VALUE]"
         )  # only a few instruments distinguish
     except KeyError:
-        return get_aperture_name(data_lookups, shf_lookup)
+        return get_aperture_name(data_lookups, shm_lookup)
 
 
 ##############################
 # get_repeat_exposure_count
 ##############################
-def get_repeat_exposure_count(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_repeat_exposure_count(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<repeat_exposure_count />`` XML element.
     """
@@ -735,7 +735,7 @@ PLATE_SCALES = {  # plate scales in arcsec/pixel
 }
 
 
-def get_plate_scale(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_plate_scale(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<plate_scale />`` XML element.
     """
@@ -746,15 +746,15 @@ def get_plate_scale(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
     except KeyError:
         pass
     # Works for any instrument tabulated in the PLATE_SCALEs dictionary above
-    instrument = get_instrument_id(data_lookups, shf_lookup)
-    detectors = get_detector_ids(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
+    detectors = get_detector_ids(data_lookups, shm_lookup)
     scale = SCALE_MAX = 1.0e99
     for detector in detectors:
         key = (instrument, detector)
         if key in PLATE_SCALES:
             scale = min(scale, PLATE_SCALES[key])
     if scale < SCALE_MAX:
-        scale *= int(get_binning_mode(data_lookups, shf_lookup))
+        scale *= int(get_binning_mode(data_lookups, shm_lookup))
         formatted = "%.4f" % scale  # up to 4 decimal places
         return formatted.rstrip("0")  # don't include trailing zeros
     return "0.0"
@@ -763,7 +763,7 @@ def get_plate_scale(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 ##############################
 # get_spectral_resolution
 ##############################
-def get_spectral_resolution(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_spectral_resolution(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<spectral_resolution />`` XML element.
     """
@@ -779,7 +779,7 @@ def get_spectral_resolution(data_lookups: List[Lookup], shf_lookup: Lookup) -> s
 # get_start_stop_date_time
 ##############################
 def get_start_stop_date_times(
-    data_lookups: List[Lookup], shf_lookup: Lookup
+    data_lookups: List[Lookup], shm_lookup: Lookup
 ) -> Tuple[str, str]:
     """
     Return text for the ``<start_date_time />`` and ``<stop_date_time />`` XML
@@ -863,7 +863,7 @@ def get_start_stop_date_times(
 ##############################
 # get_subarray_flag
 ##############################
-def get_subarray_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
+def get_subarray_flag(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<subarray_flag />`` XML element.
     """
@@ -885,15 +885,15 @@ def get_subarray_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
 # get_targeted_detector_ids
 ##############################
 def get_targeted_detector_ids(
-    data_lookups: List[Lookup], shf_lookup: Lookup
+    data_lookups: List[Lookup], shm_lookup: Lookup
 ) -> List[str]:
     """
     Return a list of one or more text values for the
     ``<targeted_detector_ids />`` XML element.
     """
     lookup = data_lookups[0]
-    instrument = get_instrument_id(data_lookups, shf_lookup)
-    aperture = get_aperture_name(data_lookups, shf_lookup)
+    instrument = get_instrument_id(data_lookups, shm_lookup)
+    aperture = get_aperture_name(data_lookups, shm_lookup)
     if instrument == "WFPC2":
         if aperture in ("WFALL", "WFALL-FIX"):
             return ["PC1", "WF2", "WF3", "WF4"]
@@ -919,7 +919,7 @@ def get_targeted_detector_ids(
         raise ValueError(
             "unrecognized WFPC2 aperture (%s) for %s", (aperture, fname(lookup))
         )
-    channel = get_channel_id(data_lookups, shf_lookup)
+    channel = get_channel_id(data_lookups, shm_lookup)
     if instrument == "ACS" and channel == "WFC":
         if aperture.startswith("WFC1"):
             return ["WFC1"]
@@ -972,12 +972,12 @@ def get_targeted_detector_ids(
                 "unknown WF/PC aperture (%s) in %s" % (aperture, fname(lookup))
             )
         if aperture == "ALL":
-            return get_detector_ids(data_lookups, shf_lookup)  # all detectors
+            return get_detector_ids(data_lookups, shm_lookup)  # all detectors
         elif aperture.startswith("W"):
             return [aperture[0] + "F" + aperture[1]]  # WFn
         else:
             return [aperture[0] + "C" + aperture[1]]  # PCn
-    return get_detector_ids(data_lookups, shf_lookup)
+    return get_detector_ids(data_lookups, shm_lookup)
 
 
 ############################################################
@@ -992,39 +992,39 @@ def _make_fragment(
 
 
 def _get_detector_ids_fragment(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> FragBuilder:
     return _make_fragment(
-        "detector_id", get_detector_ids(data_lookup, shf_lookup), detector_id
+        "detector_id", get_detector_ids(data_lookup, shm_lookup), detector_id
     )
 
 
 def _get_moving_target_descriptions_fragment(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> FragBuilder:
     return _make_fragment(
         "moving_target_description",
-        get_moving_target_descriptions(data_lookup, shf_lookup),
+        get_moving_target_descriptions(data_lookup, shm_lookup),
         moving_target_description,
     )
 
 
 def _get_moving_target_keywords_fragment(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> FragBuilder:
     return _make_fragment(
         "moving_target_keyword",
-        get_moving_target_keywords(data_lookup, shf_lookup),
+        get_moving_target_keywords(data_lookup, shm_lookup),
         moving_target_keyword,
     )
 
 
 def _get_targeted_detector_ids_fragment(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> FragBuilder:
     return _make_fragment(
         "targeted_detector_id",
-        get_targeted_detector_ids(data_lookup, shf_lookup),
+        get_targeted_detector_ids(data_lookup, shm_lookup),
         targeted_detector_id,
     )
 
@@ -1033,112 +1033,112 @@ def _get_targeted_detector_ids_fragment(
 
 
 def _get_program_parameters(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> Dict[Any, Any]:
     return {
-        "mast_observation_id": get_mast_observation_id(data_lookup, shf_lookup),
-        "hst_proposal_id": get_hst_proposal_id(data_lookup, shf_lookup),
-        "hst_pi_name": get_hst_pi_name(data_lookup, shf_lookup),
+        "mast_observation_id": get_mast_observation_id(data_lookup, shm_lookup),
+        "hst_proposal_id": get_hst_proposal_id(data_lookup, shm_lookup),
+        "hst_pi_name": get_hst_pi_name(data_lookup, shm_lookup),
     }
 
 
 def _get_instrument_parameters(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> Dict[Any, Any]:
     return {
-        "instrument_id": get_instrument_id(data_lookup, shf_lookup),
-        "channel_id": get_channel_id(data_lookup, shf_lookup),
-        "detector_ids": _get_detector_ids_fragment(data_lookup, shf_lookup),  # FRAGMENT
-        "observation_type": get_observation_type(data_lookup, shf_lookup),
+        "instrument_id": get_instrument_id(data_lookup, shm_lookup),
+        "channel_id": get_channel_id(data_lookup, shm_lookup),
+        "detector_ids": _get_detector_ids_fragment(data_lookup, shm_lookup),  # FRAGMENT
+        "observation_type": get_observation_type(data_lookup, shm_lookup),
     }
 
 
 def _get_pointing_parameters(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> Dict[Any, Any]:
     return {
-        "hst_target_name": get_hst_target_name(data_lookup, shf_lookup),
-        "moving_target_flag": get_moving_target_flag(data_lookup, shf_lookup),
+        "hst_target_name": get_hst_target_name(data_lookup, shm_lookup),
+        "moving_target_flag": get_moving_target_flag(data_lookup, shm_lookup),
         "moving_target_keywords": _get_moving_target_keywords_fragment(
-            data_lookup, shf_lookup
+            data_lookup, shm_lookup
         ),  # FRAGMENT
         "moving_target_descriptions": _get_moving_target_descriptions_fragment(
-            data_lookup, shf_lookup
+            data_lookup, shm_lookup
         ),  # FRAGMENT
-        "aperture_name": get_aperture_name(data_lookup, shf_lookup),
-        "proposed_aperture_name": get_proposed_aperture_name(data_lookup, shf_lookup),
+        "aperture_name": get_aperture_name(data_lookup, shm_lookup),
+        "proposed_aperture_name": get_proposed_aperture_name(data_lookup, shm_lookup),
         "targeted_detector_ids": _get_targeted_detector_ids_fragment(
-            data_lookup, shf_lookup
+            data_lookup, shm_lookup
         ),  # FRAGMENT
     }
 
 
 def _get_tracking_parameters(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> Dict[Any, Any]:
     return {
         "fine_guidance_sensor_lock_type": get_fine_guidance_sensor_lock_type(
-            data_lookup, shf_lookup
+            data_lookup, shm_lookup
         ),
-        "gyroscope_mode": get_gyroscope_mode(data_lookup, shf_lookup),
+        "gyroscope_mode": get_gyroscope_mode(data_lookup, shm_lookup),
     }
 
 
 def _get_exposure_parameters(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> Dict[Any, Any]:
     return {
-        "exposure_duration": get_exposure_duration(data_lookup, shf_lookup),
-        "exposure_type": get_exposure_type(data_lookup, shf_lookup),
+        "exposure_duration": get_exposure_duration(data_lookup, shm_lookup),
+        "exposure_type": get_exposure_type(data_lookup, shm_lookup),
     }
 
 
 def _get_wavelength_filter_grating_parameters(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> Dict[Any, Any]:
     return {
-        "filter_name": get_filter_name(data_lookup, shf_lookup),
+        "filter_name": get_filter_name(data_lookup, shm_lookup),
         "center_filter_wavelength": get_center_filter_wavelength(
-            data_lookup, shf_lookup
+            data_lookup, shm_lookup
         ),
-        "bandwidth": get_bandwidth(data_lookup, shf_lookup),
-        "spectral_resolution": get_spectral_resolution(data_lookup, shf_lookup),
+        "bandwidth": get_bandwidth(data_lookup, shm_lookup),
+        "spectral_resolution": get_spectral_resolution(data_lookup, shm_lookup),
     }
 
 
 def _get_operational_parameters(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> Dict[Any, Any]:
     return {
-        "instrument_mode_id": get_instrument_mode_id(data_lookup, shf_lookup),
-        "gain_setting": get_gain_setting(data_lookup, shf_lookup),
-        "coronagraph_flag": get_coronagraph_flag(data_lookup, shf_lookup),
-        "cosmic_ray_split_count": get_cosmic_ray_split_count(data_lookup, shf_lookup),
-        "repeat_exposure_count": get_repeat_exposure_count(data_lookup, shf_lookup),
-        "subarray_flag": get_subarray_flag(data_lookup, shf_lookup),
-        "binning_mode": get_binning_mode(data_lookup, shf_lookup),
-        "plate_scale": get_plate_scale(data_lookup, shf_lookup),
+        "instrument_mode_id": get_instrument_mode_id(data_lookup, shm_lookup),
+        "gain_setting": get_gain_setting(data_lookup, shm_lookup),
+        "coronagraph_flag": get_coronagraph_flag(data_lookup, shm_lookup),
+        "cosmic_ray_split_count": get_cosmic_ray_split_count(data_lookup, shm_lookup),
+        "repeat_exposure_count": get_repeat_exposure_count(data_lookup, shm_lookup),
+        "subarray_flag": get_subarray_flag(data_lookup, shm_lookup),
+        "binning_mode": get_binning_mode(data_lookup, shm_lookup),
+        "plate_scale": get_plate_scale(data_lookup, shm_lookup),
     }
 
 
 def get_hst_parameters_dict(
-    data_lookup: List[Lookup], shf_lookup: Lookup
+    data_lookup: List[Lookup], shm_lookup: Lookup
 ) -> Dict[Any, Any]:
     sub_dicts: List[Dict[Any, Any]] = [
-        _get_program_parameters(data_lookup, shf_lookup),
-        _get_instrument_parameters(data_lookup, shf_lookup),
-        _get_pointing_parameters(data_lookup, shf_lookup),
-        _get_tracking_parameters(data_lookup, shf_lookup),
-        _get_exposure_parameters(data_lookup, shf_lookup),
-        _get_wavelength_filter_grating_parameters(data_lookup, shf_lookup),
-        _get_operational_parameters(data_lookup, shf_lookup),
+        _get_program_parameters(data_lookup, shm_lookup),
+        _get_instrument_parameters(data_lookup, shm_lookup),
+        _get_pointing_parameters(data_lookup, shm_lookup),
+        _get_tracking_parameters(data_lookup, shm_lookup),
+        _get_exposure_parameters(data_lookup, shm_lookup),
+        _get_wavelength_filter_grating_parameters(data_lookup, shm_lookup),
+        _get_operational_parameters(data_lookup, shm_lookup),
     ]
     return {key: val for d in sub_dicts for key, val in d.items()}
 
 
 ############################################################
-def get_hst_parameters(data_lookup: List[Lookup], shf_lookup: Lookup) -> NodeBuilder:
-    d: Dict[Any, Any] = get_hst_parameters_dict(data_lookup, shf_lookup)
+def get_hst_parameters(data_lookup: List[Lookup], shm_lookup: Lookup) -> NodeBuilder:
+    d: Dict[Any, Any] = get_hst_parameters_dict(data_lookup, shm_lookup)
     return hst_parameters(
         {
             "program_parameters": program_parameters(d),
