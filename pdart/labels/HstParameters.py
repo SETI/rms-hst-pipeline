@@ -452,7 +452,7 @@ def get_gain_setting(data_lookups: List[Lookup], shf_lookup: Lookup) -> str:
     lookup = data_lookups[0]
     # Works for WFPC2
     try:
-        wfpc2_gain: int = int(lookup["ATODGAIN"])  # format WFPC2 gains as ints
+        wfpc2_gain: int = int(float(lookup["ATODGAIN"]))  # format WFPC2 gains as ints
         if wfpc2_gain in (7, 15):
             return str(wfpc2_gain)
         raise ValueError(
@@ -642,21 +642,14 @@ def get_moving_target_flag(data_lookups: List[Lookup], shf_lookup: Lookup) -> st
     # Usually in the first FITS header, but in the shm/shf header for GHRS
     for lookup in (data_lookups[0], shf_lookup):
         try:
-            value = lookup["MTFLAG"]
-            if value == 0:
-                return "false"
-            if value == 1:
+            value = lookup["MTFLAG"].strip()
+            if value in ("T", "1"):
                 return "true"
-            # should be a string
-            value == value.strip()
-            if value == "T":
-                return "true"
-            if value in ("F", ""):
+            if value in ("F", "", "0"):
                 return "false"
             else:
                 raise ValueError(
-                    "unrecognized MTFLAG value (%s) for %s"
-                    % (value, fname(data_lookups[0]))
+                    f"unrecognized MTFLAG value ({value}: {type(value)}) for {fname(data_lookups[0])}"
                 )
         except KeyError:
             pass

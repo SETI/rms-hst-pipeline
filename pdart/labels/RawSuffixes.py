@@ -6,7 +6,16 @@ from pdart.pds4.VID import VID
 
 
 """The suffixes considered raw data, in order of preference."""
-RAW_SUFFIXES: List[str] = ["raw", "flt", "drz", "crj", "d0f", "d0m", "c0f", "c0m"]
+RAW_SUFFIXES: List[str] = [
+    "raw",
+    "flt",
+    "drz",
+    "crj",
+    "d0m",
+    # "d0f", # waivered
+    "c0m",
+    # "c0f" # waivered
+]
 
 
 def associated_lids(association_lid: LID, memname: str) -> Generator[LID, None, None]:

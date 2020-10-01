@@ -11,9 +11,9 @@ class Test_RawSuffixes(unittest.TestCase):
                 LID("urn:nasa:pds:hst_09296:data_acs_flt:j8m3b1blq"),
                 LID("urn:nasa:pds:hst_09296:data_acs_drz:j8m3b1blq"),
                 LID("urn:nasa:pds:hst_09296:data_acs_crj:j8m3b1blq"),
-                LID("urn:nasa:pds:hst_09296:data_acs_d0f:j8m3b1blq"),
+                # LID("urn:nasa:pds:hst_09296:data_acs_d0f:j8m3b1blq"),
                 LID("urn:nasa:pds:hst_09296:data_acs_d0m:j8m3b1blq"),
-                LID("urn:nasa:pds:hst_09296:data_acs_c0f:j8m3b1blq"),
+                # LID("urn:nasa:pds:hst_09296:data_acs_c0f:j8m3b1blq"),
                 LID("urn:nasa:pds:hst_09296:data_acs_c0m:j8m3b1blq"),
             ],
             list(
@@ -30,9 +30,9 @@ class Test_RawSuffixes(unittest.TestCase):
                 LIDVID("urn:nasa:pds:hst_09296:data_acs_flt:j8m3b1blq::1.0"),
                 LIDVID("urn:nasa:pds:hst_09296:data_acs_drz:j8m3b1blq::1.0"),
                 LIDVID("urn:nasa:pds:hst_09296:data_acs_crj:j8m3b1blq::1.0"),
-                LIDVID("urn:nasa:pds:hst_09296:data_acs_d0f:j8m3b1blq::1.0"),
+                # LIDVID("urn:nasa:pds:hst_09296:data_acs_d0f:j8m3b1blq::1.0"),
                 LIDVID("urn:nasa:pds:hst_09296:data_acs_d0m:j8m3b1blq::1.0"),
-                LIDVID("urn:nasa:pds:hst_09296:data_acs_c0f:j8m3b1blq::1.0"),
+                # LIDVID("urn:nasa:pds:hst_09296:data_acs_c0f:j8m3b1blq::1.0"),
                 LIDVID("urn:nasa:pds:hst_09296:data_acs_c0m:j8m3b1blq::1.0"),
             ],
             list(
