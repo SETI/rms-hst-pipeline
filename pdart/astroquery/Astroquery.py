@@ -24,10 +24,10 @@ ACCEPTED_SUFFIXES: List[str] = [
     "A3F",
     "ASC",
     "ASN",
-    "C0F",
-    "C1F",
-    "C2F",
-    "C3F",
+    # "C0F", # waivered
+    # "C1F", # waivered
+    # "C2F", # waivered
+    # "C3F", # waivered
     "C0M",
     "C1M",
     "C2M",
@@ -39,7 +39,7 @@ ACCEPTED_SUFFIXES: List[str] = [
     "CQF",
     "CRC",
     "CRJ",
-    "D0F",
+    # "D0F", # waivered
     "D0M",
     "DRC",
     "DRZ",
@@ -48,7 +48,7 @@ ACCEPTED_SUFFIXES: List[str] = [
     "FLTSUM",
     "MOS",
     "RAW",
-    "SHF",
+    # "SHF", # waivered
     "SHM",
     "SPT",
     "SX2",
