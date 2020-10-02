@@ -116,6 +116,7 @@ def _find_RAWish_lookups(
     try:
         card_dicts = _find_RAWish_card_dicts()
     except NoResultFound as e:
+        # TODO Remove this instrumentation
         print(
             f"""**** _find_RAWish_lookups(
     product_lidvid={product_lidvid},
@@ -148,6 +149,7 @@ def _find_SHMish_lookup(
     try:
         card_dicts = _find_SHMish_card_dicts()
     except NoResultFound as e:
+        # TODO Remove this instrumentation
         print(
             f"""**** _find_SHMish_lookups(
     product_lidvid={product_lidvid},
@@ -168,64 +170,72 @@ def make_fits_product_label(
     file_basename: str,
     verify: bool,
 ) -> bytes:
-    product = bundle_db.get_product(product_lidvid)
-    collection_lidvid = product.collection_lidvid
+    try:
+        product = bundle_db.get_product(product_lidvid)
+        collection_lidvid = product.collection_lidvid
 
-    collection = bundle_db.get_collection(collection_lidvid)
-    assert isinstance(collection, OtherCollection)
-    instrument = collection.instrument
-    suffix = collection.suffix
-    bundle_lidvid = collection.bundle_lidvid
+        collection = bundle_db.get_collection(collection_lidvid)
+        assert isinstance(collection, OtherCollection)
+        instrument = collection.instrument
+        suffix = collection.suffix
+        bundle_lidvid = collection.bundle_lidvid
 
-    card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
-    lookup = DictLookup(file_basename, card_dicts)
-    siblings = _directory_siblings(working_dir, bundle_db, product_lidvid)
-    hdu_lookups = _find_RAWish_lookups(
-        bundle_db, product_lidvid, file_basename, siblings
-    )
-    shm_lookup = _find_SHMish_lookup(bundle_db, product_lidvid, file_basename, siblings)
-
-    # TODO This is a hack.  I need to have get_start_stop_date_times
-    # to include an exposure time.
-    start_date_time, stop_date_time = get_start_stop_date_times(hdu_lookups, shm_lookup)
-    start_stop_times = {
-        "start_date_time": start_date_time,
-        "stop_date_time": stop_date_time,
-        "exposure_duration": "0.1",  # TODO A totally bogus value
-    }
-
-    hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)
-    bundle = bundle_db.get_bundle()
-    assert bundle.lidvid == bundle_lidvid
-    proposal_id = bundle.proposal_id
-
-    investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
-    bundle_db.create_context_product(investigation_area_lidvid)
-    bundle_db.create_context_product(instrument_host_lid())
-    bundle_db.create_context_product(observing_system_lid(instrument))
-    target_info = get_target_info(lookup)
-    bundle_db.create_context_product(target_info["lid"])
-
-    label = (
-        make_label(
-            {
-                "lid": lidvid_to_lid(product_lidvid),
-                "vid": lidvid_to_vid(product_lidvid),
-                "proposal_id": str(proposal_id),
-                "suffix": suffix,
-                "file_name": file_basename,
-                "file_contents": get_file_contents(
-                    bundle_db, card_dicts, instrument, product_lidvid
-                ),
-                "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
-                "investigation_lidvid": investigation_area_lidvid,
-                "Observing_System": observing_system(instrument),
-                "Time_Coordinates": get_time_coordinates(start_stop_times),
-                "Target_Identification": get_target(target_info),
-                "HST": hst_parameters,
-            }
+        card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
+        lookup = DictLookup(file_basename, card_dicts)
+        siblings = _directory_siblings(working_dir, bundle_db, product_lidvid)
+        hdu_lookups = _find_RAWish_lookups(
+            bundle_db, product_lidvid, file_basename, siblings
         )
-        .toxml()
-        .encode()
-    )
+        shm_lookup = _find_SHMish_lookup(
+            bundle_db, product_lidvid, file_basename, siblings
+        )
+
+        # TODO This is a hack.  I need to have get_start_stop_date_times
+        # to include an exposure time.
+        start_date_time, stop_date_time = get_start_stop_date_times(
+            hdu_lookups, shm_lookup
+        )
+        start_stop_times = {
+            "start_date_time": start_date_time,
+            "stop_date_time": stop_date_time,
+            "exposure_duration": "0.1",  # TODO A totally bogus value
+        }
+
+        hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)
+        bundle = bundle_db.get_bundle()
+        assert bundle.lidvid == bundle_lidvid
+        proposal_id = bundle.proposal_id
+
+        investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
+        bundle_db.create_context_product(investigation_area_lidvid)
+        bundle_db.create_context_product(instrument_host_lid())
+        bundle_db.create_context_product(observing_system_lid(instrument))
+        target_info = get_target_info(lookup)
+        bundle_db.create_context_product(target_info["lid"])
+
+        label = (
+            make_label(
+                {
+                    "lid": lidvid_to_lid(product_lidvid),
+                    "vid": lidvid_to_vid(product_lidvid),
+                    "proposal_id": str(proposal_id),
+                    "suffix": suffix,
+                    "file_name": file_basename,
+                    "file_contents": get_file_contents(
+                        bundle_db, card_dicts, instrument, product_lidvid
+                    ),
+                    "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
+                    "investigation_lidvid": investigation_area_lidvid,
+                    "Observing_System": observing_system(instrument),
+                    "Time_Coordinates": get_time_coordinates(start_stop_times),
+                    "Target_Identification": get_target(target_info),
+                    "HST": hst_parameters,
+                }
+            )
+            .toxml()
+            .encode()
+        )
+    except Exception as e:
+        raise LabelError(product_lidvid, file_basename) from e
+
     return pretty_and_verify(label, verify)

@@ -65,6 +65,6 @@ def make_browse_product_label(
             .encode()
         )
     except Exception as e:
-        raise LabelError(str(e), browse_product_lidvid, browse_file_basename)
+        raise LabelError(browse_product_lidvid, browse_file_basename) from e
 
     return pretty_and_verify(label, verify)

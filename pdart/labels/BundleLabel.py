@@ -66,7 +66,7 @@ def make_bundle_label(
             .encode()
         )
     except Exception as e:
-        raise LabelError(str(e), bundle.lidvid)
+        raise LabelError(bundle.lidvid) from e
 
     assert label[:6] == b"<?xml ", "Not XML"
     return pretty_and_verify(label, verify)

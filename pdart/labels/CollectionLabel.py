@@ -124,7 +124,7 @@ def make_context_collection_label(
             .encode()
         )
     except Exception as e:
-        raise LabelError(str(e), collection_lidvid)
+        raise LabelError(collection_lidvid) from e
 
     return pretty_and_verify(label, verify)
 
@@ -173,7 +173,7 @@ def make_schema_collection_label(
             .encode()
         )
     except Exception as e:
-        raise LabelError(str(e), collection_lidvid)
+        raise LabelError(collection_lidvid) from e
 
     return pretty_and_verify(label, verify)
 
@@ -243,6 +243,6 @@ def make_other_collection_label(
             .encode()
         )
     except Exception as e:
-        raise LabelError(str(e), collection_lidvid)
+        raise LabelError(collection_lidvid) from e
 
     return pretty_and_verify(label, verify)

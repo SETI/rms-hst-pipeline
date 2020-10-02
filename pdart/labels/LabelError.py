@@ -8,15 +8,12 @@ class LabelError(Exception):
     and optionally the name of the file.
     """
 
-    def __init__(
-        self, prev_msg: str, lidvid: str, filename: Optional[str] = None
-    ) -> None:
-        self.prev_msg = prev_msg
+    def __init__(self, lidvid: str, filename: Optional[str] = None) -> None:
         self.lidvid = lidvid
         self.filename = filename
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         if self.filename:
-            return f"{self.lidvid}/{self.filename}: {self.prev_msg}"
+            return f"LabelError({self.lidvid!r}, {self.filename!r})"
         else:
-            return f"{self.lidvid}: {self.prev_msg}"
+            return f"LabelError({self.lidvid!r})"

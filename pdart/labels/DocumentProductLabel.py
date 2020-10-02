@@ -63,6 +63,6 @@ def make_document_product_label(
             .encode()
         )
     except Exception as e:
-        raise LabelError(str(e), document_product_lidvid)
+        raise LabelError(document_product_lidvid) from e
 
     return pretty_and_verify(label, verify)
