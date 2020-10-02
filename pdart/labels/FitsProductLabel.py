@@ -31,7 +31,7 @@ from pdart.labels.ObservingSystem import (
     observing_system,
     observing_system_lid,
 )
-from pdart.labels.RawSuffixes import RAW_SUFFIXES, associated_lidvids
+from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
 from pdart.labels.TargetIdentification import get_target, get_target_info
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
@@ -65,8 +65,7 @@ def _raw_sibling_file(siblings: List[str]) -> Tuple[str, str]:
 
 
 def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
-    suffixes: List[str] = ["shm", "spt"]  # "shf", # waivered file
-    for suffix in suffixes:
+    for suffix in SHM_SUFFIXES:
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)

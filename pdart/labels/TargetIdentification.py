@@ -16,9 +16,25 @@ from pdart.xml.Templates import NodeBuilder
 
 _USING_PLACEHOLDER: bool = True
 
+if _USING_PLACEHOLDER:
+    _PLACEHOLDER_NAME = "Magrathea"
+    _PLACEHOLDER_TYPE = "Planet"
+    _PLACEHOLDER: Dict[str, str] = {
+        "name": _PLACEHOLDER_NAME,
+        "type": _PLACEHOLDER_TYPE,
+        "description": f"The {_PLACEHOLDER_TYPE.lower()} {_PLACEHOLDER_NAME}",
+        "lid": target_lid([_PLACEHOLDER_TYPE, _PLACEHOLDER_NAME]),
+    }
+
 
 def get_target_info(lookup: Lookup) -> Dict[str, str]:
-    targname = lookup["TARGNAME"]
+    try:
+        targname = lookup["TARGNAME"]
+    except KeyError:
+        if _USING_PLACEHOLDER:
+            return _PLACEHOLDER
+        else:
+            raise ValueError(f"No value for TARGNAME in {lookup}")
 
     for prefix, info in approximate_target_table.items():
         if targname.startswith(prefix):
@@ -42,17 +58,9 @@ def get_target_info(lookup: Lookup) -> Dict[str, str]:
                 }
 
     if _USING_PLACEHOLDER:
-        # TODO-PLACEHOLER
-        name = "Magrathea"
-        type = "Planet"
-        return {
-            "name": name,
-            "type": type,
-            "description": f"The {type.lower()} {name}",
-            "lid": target_lid([type, name]),
-        }
-
-    raise ValueError(f"TARGNAME {targname} doesn't match approximations")
+        return _PLACEHOLDER
+    else:
+        raise ValueError(f"TARGNAME {targname} doesn't match approximations")
 
 
 def get_target(target_info: Dict[str, str]) -> NodeBuilder:

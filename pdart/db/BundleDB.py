@@ -35,7 +35,7 @@ from pdart.db.SqlAlchTables import (
     switch_on_collection_subtype,
 )
 from pdart.db.Utils import file_md5
-from pdart.labels.RawSuffixes import RAW_SUFFIXES
+from pdart.labels.Suffixes import RAW_SUFFIXES
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -1060,7 +1060,7 @@ raised exception = {e} ****
         ]
 
     def _is_key_product(self, fits_product: FitsProduct) -> bool:
-        # A "key" product is a raw data file (e.g., with suffix RAW or C0F).
+        # A "key" product is a raw data file (e.g., with suffix RAW or C0M).
         collection_lidvid = fits_product.collection_lidvid
         collection = self.get_collection(collection_lidvid)
         is_other_collection = switch_on_collection_subtype(
