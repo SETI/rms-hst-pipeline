@@ -7,8 +7,8 @@
   </hst:Program_Parameters>
   <hst:Instrument_Parameters>
     <hst:instrument_id>ACS</hst:instrument_id>
-    <hst:channel_id>CCD</hst:channel_id>
-    <hst:detector_id>CCD</hst:detector_id>
+    <hst:channel_id>SBC</hst:channel_id>
+    <hst:detector_id>SBC</hst:detector_id>
     <hst:observation_type>IMAGING</hst:observation_type>
   </hst:Instrument_Parameters>
   <hst:Pointing_Parameters>
@@ -19,7 +19,7 @@
     <hst:moving_target_description>Not applicable</hst:moving_target_description>
     <hst:aperture_name>SBC</hst:aperture_name>
     <hst:proposed_aperture_name>SBC</hst:proposed_aperture_name>
-    <hst:targeted_detector_id>CCD</hst:targeted_detector_id>
+    <hst:targeted_detector_id>SBC</hst:targeted_detector_id>
   </hst:Pointing_Parameters>
   <hst:Tracking_Parameters>
     <hst:fine_guidance_sensor_lock_type>FINE</hst:fine_guidance_sensor_lock_type>
@@ -43,6 +43,6 @@
     <hst:repeat_exposure_count>1</hst:repeat_exposure_count>
     <hst:subarray_flag>false</hst:subarray_flag>
     <hst:binning_mode>1</hst:binning_mode>
-    <hst:plate_scale>0.0</hst:plate_scale>
+    <hst:plate_scale>0.032</hst:plate_scale>
   </hst:Operational_Parameters>
 </hst:HST_Parameters>

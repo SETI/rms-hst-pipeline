@@ -1,4 +1,6 @@
-from typing import Optional
+from typing import Optional, Tuple
+
+from pdart.labels.Lookup import Lookup
 
 
 class LabelError(Exception):
@@ -8,12 +10,22 @@ class LabelError(Exception):
     and optionally the name of the file.
     """
 
-    def __init__(self, lidvid: str, filename: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        lidvid: str,
+        filename: Optional[str] = None,
+        lookups: Tuple[Lookup, Lookup, Lookup] = None,
+    ) -> None:
         self.lidvid = lidvid
         self.filename = filename
+        self.lookups = lookups
 
     def __repr__(self) -> str:
+        res = f"LabelError({self.lidvid!r}"
         if self.filename:
-            return f"LabelError({self.lidvid!r}, {self.filename!r})"
-        else:
-            return f"LabelError({self.lidvid!r})"
+            res = res + f", {self.filename!r}"
+        if self.lookups:
+            res = res + f", {self.lookups}"
+        res = res + ")"
+
+        return res

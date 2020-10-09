@@ -146,20 +146,7 @@ def _find_SHMish_lookup(
         )
         return card_dicts
 
-    try:
-        card_dicts = _find_SHMish_card_dicts()
-    except NoResultFound as e:
-        # TODO Remove this instrumentation
-        print(
-            f"""**** _find_SHMish_lookups(
-    product_lidvid={product_lidvid},
-    file_basename={file_basename},
-    siblings={siblings}
-    )
-raised exception = {e} ****
-"""
-        )
-        raise
+    card_dicts = _find_SHMish_card_dicts()
     return DictLookup(SHMish_basename, card_dicts)
 
 
@@ -236,6 +223,8 @@ def make_fits_product_label(
             .encode()
         )
     except Exception as e:
-        raise LabelError(product_lidvid, file_basename) from e
+        raise LabelError(
+            product_lidvid, file_basename, (lookup, hdu_lookups[0], shm_lookup)
+        ) from e
 
     return pretty_and_verify(label, verify)

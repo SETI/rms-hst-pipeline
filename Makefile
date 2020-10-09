@@ -69,7 +69,7 @@ WFPC2_IDS=05167 05219 05220 05238 05493 05508 05633 05640 05783 05824	\
 11102 11361 11497 11956
 
 PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
-# PROJ_IDS=09296
+# PROJ_IDS=09296 15098 11536 15581 05167 11956
 
 
 # STEPS=reset_pipeline download_docs check_downloads copy_primary_files	\
@@ -79,7 +79,7 @@ PROJ_IDS=$(ACS_IDS) $(WFC3_IDS) $(WFPC2_IDS)
 .PHONY: pipeline
 pipeline : venv clean-results
 	mkdir -p $(TWD)
-	-rm $(TWD)/*/\#*.txt
+	-rm $(TWD)/hst_*/\#*.txt
 	for project_id in $(PROJ_IDS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools \
@@ -90,11 +90,11 @@ pipeline : venv clean-results
 
 .PHONY: results
 results :
-	@find $(TWD) -name '#*' | sort
+	@ls $(TWD)/hst_*/\#* | sort
 
 .PHONY: clean-results
 clean-results :
-	-find $(TWD) -name '#*' -delete
+	-rm $(TWD)/hst_*/\#*
 
 
 .PHONY : copy-results

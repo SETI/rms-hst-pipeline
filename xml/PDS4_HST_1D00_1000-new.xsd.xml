@@ -467,7 +467,7 @@
         </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Integer">
-     <xs:minInclusive value="2"/>
+     <xs:minInclusive value="1"/>
      <xs:maxInclusive value="3"/>
 	   </xs:restriction>
   </xs:simpleType>

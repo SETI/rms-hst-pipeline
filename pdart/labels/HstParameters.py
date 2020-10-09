@@ -141,7 +141,11 @@ def get_channel_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     elif instrument == "WF/PC":
         result = lookup["CAMERA"].strip()
     else:
-        result = instrument
+        try:
+            return lookup["DETECTOR"].strip()
+        except KeyError:
+            result = instrument
+
     # TODO For development, check result. Remove this later.
     def check_result(res: str) -> str:
         if result in [
@@ -168,7 +172,8 @@ def get_channel_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
             return result
         else:
             # TODO Hack
-            return f"CCD"
+            assert False, f"get_channel_id() == {result}"
+            # return f"CCD"
 
     return check_result(result)
 
@@ -334,7 +339,8 @@ def get_detector_ids(data_lookups: List[Lookup], shm_lookup: Lookup) -> List[str
         ]:
             return res
         else:
-            return f"AMBER"
+            assert False, f"get_detector_id() == {res}"
+            # return f"AMBER"
 
     return [check_result(r) for r in result]
 
@@ -692,10 +698,12 @@ def get_proposed_aperture_name(data_lookups: List[Lookup], shm_lookup: Lookup) -
     """
     lookup = data_lookups[0]
     try:
-        # TODO Hacked; remove the hack.
-        return (
-            lookup["PROPAPER"].strip() or "[DUMMY_VALUE]"
-        )  # only a few instruments distinguish
+        res = lookup["PROPAPER"].strip()  # only a few instruments distinguish
+        # TODO Hack for empty values.  Or do we change the schema to accept them?
+        if res:
+            return res
+        else:
+            return get_aperture_name(data_lookups, shm_lookup)
     except KeyError:
         return get_aperture_name(data_lookups, shm_lookup)
 
@@ -907,17 +915,23 @@ def get_targeted_detector_ids(
             "POLQN18",
             "POLQP15W",
             "FQCH4NW2",
-            "FQCH4N33",
         ):
             return ["WF2"]
+        if aperture == "FQCH4N33":
+            return ["WF2", "WF3"]
         if aperture in ("WF3", "WF3-FIX", "FQCH4NW3", "F160BN15"):
             return ["WF3"]
         if aperture in ("WF4", "WF4-FIX", "FQCH4NW4"):
             return ["WF4"]
         if aperture == "FQCH4N1":
             return ["PC1", "WF3"]
+        if aperture == "FQCH4N15":
+            return ["PC1"]
+        if aperture == "FQCH4W3":
+            return ["WF3"]
         raise ValueError(
-            "unrecognized WFPC2 aperture (%s) for %s", (aperture, fname(lookup))
+            "unrecognized WFPC2 aperture (%s) for %s [%s]",
+            (aperture, fname(lookup), lookup),
         )
     channel = get_channel_id(data_lookups, shm_lookup)
     if instrument == "ACS" and channel == "WFC":
