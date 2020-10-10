@@ -146,36 +146,7 @@ def get_channel_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
         except KeyError:
             result = instrument
 
-    # TODO For development, check result. Remove this later.
-    def check_result(res: str) -> str:
-        if result in [
-            "CCD",
-            "FOC",
-            "FOS",
-            "FUV",
-            "FUV-MAMA",
-            "GHRS",
-            "HRC",
-            "HSP",
-            "IR",
-            "NIC1",
-            "NIC2",
-            "NIC3",
-            "NUV",
-            "NUV-MAMA",
-            "PC",
-            "SBC",
-            "UVIS",
-            "WFC",
-            "WFPC2",
-        ]:
-            return result
-        else:
-            # TODO Hack
-            assert False, f"get_channel_id() == {result}"
-            # return f"CCD"
-
-    return check_result(result)
+    return result
 
 
 ##############################
@@ -234,12 +205,8 @@ def get_detector_ids(data_lookups: List[Lookup], shm_lookup: Lookup) -> List[str
         ccds: List[int] = []
         for lookup in data_lookups:
             try:
-                ccdchip = int(lookup[fitsname])  # weirdly, sometimes a string
+                ccdchip = int(lookup[fitsname])
                 ccds.append(ccdchip)
-            except ValueError:
-                # TODO Temporary hack when lookup[fitsname] is not an
-                # integer.  Remove this!
-                pass
             except KeyError:
                 pass
         ccds = list(set(ccds))  # select unique values
@@ -299,50 +266,8 @@ def get_detector_ids(data_lookups: List[Lookup], shm_lookup: Lookup) -> List[str
     # Otherwise, return the single value of channel_id
     else:
         result = [channel]
-    # TODO Temporary check of result for development.  Remove later.
-    def check_result(res: str) -> str:
-        if res in [
-            "AMBER",
-            "BLUE",
-            "CCD",
-            "FOC",
-            "FUV",
-            "FUV-MAMA",
-            "GHRS1",
-            "GHRS2",
-            "HRC",
-            "IR",
-            "NIC1",
-            "NIC2",
-            "NIC3",
-            "NUV",
-            "NUV-MAMA",
-            "PC1",
-            "PC5",
-            "PC6",
-            "PC7",
-            "PC8",
-            "PMT",
-            "POL",
-            "SBC",
-            "UV1",
-            "UV2",
-            "UVIS1",
-            "UVIS2",
-            "VIS",
-            "WF1",
-            "WF2",
-            "WF3",
-            "WF4",
-            "WFC1",
-            "WFC2",
-        ]:
-            return res
-        else:
-            assert False, f"get_detector_id() == {res}"
-            # return f"AMBER"
 
-    return [check_result(r) for r in result]
+    return result
 
 
 ##############################
@@ -699,7 +624,6 @@ def get_proposed_aperture_name(data_lookups: List[Lookup], shm_lookup: Lookup) -
     lookup = data_lookups[0]
     try:
         res = lookup["PROPAPER"].strip()  # only a few instruments distinguish
-        # TODO Hack for empty values.  Or do we change the schema to accept them?
         if res:
             return res
         else:

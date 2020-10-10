@@ -197,7 +197,7 @@ def make_fits_product_label(
         bundle_db.create_context_product(investigation_area_lidvid)
         bundle_db.create_context_product(instrument_host_lid())
         bundle_db.create_context_product(observing_system_lid(instrument))
-        target_info = get_target_info(lookup)
+        target_info = get_target_info(shm_lookup)
         bundle_db.create_context_product(target_info["lid"])
 
         label = (

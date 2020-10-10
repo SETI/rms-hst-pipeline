@@ -31,10 +31,7 @@ def get_target_info(lookup: Lookup) -> Dict[str, str]:
     try:
         targname = lookup["TARGNAME"]
     except KeyError as e:
-        if _USING_PLACEHOLDER:
-            return _PLACEHOLDER
-        else:
-            raise ValueError(f"No value for TARGNAME in {lookup}") from e
+        raise ValueError(f"No value for TARGNAME in {lookup}") from e
 
     for prefix, info in approximate_target_table.items():
         if targname.startswith(prefix):
