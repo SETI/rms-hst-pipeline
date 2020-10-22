@@ -59,6 +59,12 @@ def copy_fs(version_view: FS, deliverable: FS) -> None:
 
 
 class MakeDeliverable(MarkedStage):
+    """
+    Create a new directory with the bundle contents, organized in a
+    more human-friendly hierarchy.  Create manifests for the
+    deliverable and optionally tar it up into a tarball.
+    """
+
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()

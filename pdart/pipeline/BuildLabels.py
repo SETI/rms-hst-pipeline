@@ -250,6 +250,12 @@ def create_pds4_labels(
 
 
 class BuildLabels(MarkedStage):
+    """
+    Walk through the bundle in the database and create labels for the
+    bundle, all collections and products, and collection inventories
+    for all collections.
+    """
+
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()

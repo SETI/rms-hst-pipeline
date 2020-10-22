@@ -119,6 +119,11 @@ def _build_browse_collection(
 
 
 class BuildBrowse(MarkedStage):
+    """
+    Walk through the data collections and build corresponding browse
+    collections for them.
+    """
+
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()

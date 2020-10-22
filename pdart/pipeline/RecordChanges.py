@@ -21,6 +21,16 @@ def dir_to_lid(dir: str) -> LID:
 
 
 class RecordChanges(MarkedStage):
+    """
+    We compare the downloaded files with the latest versions in the
+    archive.  We make a list of the LIDVIDs that have changed and
+    write them into the CHANGES_DICT.
+
+    Note that when we have a technique to tell which files on MAST
+    have changed, so we can download only the changed files, then this
+    stage will not be needed.
+    """
+
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         primary_files_dir: str = self.primary_files_dir()

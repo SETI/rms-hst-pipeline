@@ -7,6 +7,11 @@ from pdart.pipeline.Stage import MarkedStage
 
 
 class DownloadDocs(MarkedStage):
+    """
+    This stage downloads document files to the documents directory,
+    creating the directory if necessary.
+    """
+
     def _do_download_docs(self, documents_dir: str, proposal_id: int) -> None:
         assert not os.path.isdir(documents_dir)
         os.makedirs(documents_dir)

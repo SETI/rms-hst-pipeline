@@ -15,6 +15,16 @@ def to_segment_dir(name: str) -> str:
 
 
 class CopyPrimaryFiles(MarkedStage):
+    """
+    Documentation files and data files are "primary files" (as opposed
+    to browse files or label files that are derived from primary
+    files).  This stage copies primary files from the directories
+    where they are downloaded to, to the primary_files_dir, putting
+    them into their proper locations.
+
+    MAST downloads files into different locations than we use.
+    """
+
     def _copy_docs_files(
         self, bundle_segment: str, documents_dir: str, primary_files_dir: str
     ) -> None:

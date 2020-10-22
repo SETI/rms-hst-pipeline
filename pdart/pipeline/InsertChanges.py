@@ -29,6 +29,13 @@ def read_changes_dict(changes_path: str) -> Dict[LIDVID, str]:
 
 
 class InsertChanges(MarkedStage):
+    """
+    Using the CHANGES_DICT, we insert changed files into the archive.
+
+    TODO The insertion is currently unimplemented except in the case
+    that this is the first version and so the archive is empty.
+    """
+
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         primary_files_dir: str = self.primary_files_dir()
