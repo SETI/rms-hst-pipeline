@@ -20,6 +20,12 @@ from pdart.pipeline.ValidateBundle import ValidateBundle
 
 
 class StateMachine(object):
+    """
+    This object runs a list of pipeline stages, hardcoded into
+    self.stages.  It uses a BasicMarkerFile to show progress and
+    record the final state.
+    """
+
     def __init__(self, dirs: Directories, proposal_id: int) -> None:
         self.marker_file = BasicMarkerFile(dirs.working_dir(proposal_id))
         self.stages = [

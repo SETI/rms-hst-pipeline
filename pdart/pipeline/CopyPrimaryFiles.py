@@ -23,6 +23,13 @@ class CopyPrimaryFiles(MarkedStage):
     them into their proper locations.
 
     MAST downloads files into different locations than we use.
+
+    When this stage finishes, there should be a primary_files_dir with
+    the document and data files in it.
+
+    During development, we are keeping the documents_dir and the
+    mast_download_dir so we don't have to keep downloading the files,
+    but in production, you could delete them.
     """
 
     def _copy_docs_files(
@@ -107,3 +114,5 @@ class CopyPrimaryFiles(MarkedStage):
         self._copy_fits_files(
             self._bundle_segment, mast_downloads_dir, primary_files_dir
         )
+
+        assert os.path.isdir(primary_files_dir)

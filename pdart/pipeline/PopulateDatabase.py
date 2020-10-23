@@ -90,7 +90,8 @@ class PopulateDatabase(MarkedStage):
     database, then walk through the new collections in the filesystem
     and create them in the database.
 
-    TODO List the directories created.
+    When this stage finishes, there should be a database, populated
+    with data from the primary files.
     """
 
     def _run(self) -> None:

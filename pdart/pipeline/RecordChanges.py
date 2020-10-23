@@ -29,6 +29,9 @@ class RecordChanges(MarkedStage):
     Note that when we have a technique to tell which files on MAST
     have changed, so we can download only the changed files, then this
     stage will not be needed.
+
+    When this stage finishes, there should (still) be a
+    primary_files_dir, but we have added a CHANGES_DICT.
     """
 
     def _run(self) -> None:
@@ -58,3 +61,6 @@ class RecordChanges(MarkedStage):
                         lid = dir_to_lid(dir)
                         lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
                         print(lidvid, "True", file=changes_file)
+
+        assert os.path.isdir(primary_files_dir)
+        assert os.path.isfile(os.path.join(working_dir, CHANGES_DICT))

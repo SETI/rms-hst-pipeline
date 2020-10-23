@@ -19,6 +19,9 @@ class CheckDownloads(MarkedStage):
 
     Currently, we have nothing implemented to do that, so we just
     download everything and then check the contents of the files.
+
+    After this stage runs, there should be a mast_downloads_dir and it
+    should contain some datafiles.
     """
 
     def _do_downloads(

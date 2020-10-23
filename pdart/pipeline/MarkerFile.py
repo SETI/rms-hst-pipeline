@@ -7,6 +7,15 @@ from typing import Optional
 
 
 class MarkerInfo(object):
+    """
+    We want to keep track of where we are in the pipeline stages.  The
+    key information is (1) what phase we're in, (2) whether it's
+    running or completed, either successfully or in failure, and
+    possibly (3) some information on why it failed.
+
+    We store that information in a MarkerInfo object.
+    """
+
     def __init__(self, phase: str, state: str, text: Optional[str]):
         self.phase = phase.upper()
         self.state = state.upper()
@@ -20,6 +29,11 @@ class MarkerInfo(object):
 
 
 class MarkerFile(metaclass=abc.ABCMeta):
+    """
+    A MarkerFile provides a way to record MarkerInfo into a
+    filesystem.
+    """
+
     @abc.abstractmethod
     def clear_marker(self) -> None:
         pass
@@ -41,6 +55,18 @@ def _info_to_path(info: MarkerInfo) -> str:
 
 
 class BasicMarkerFile(MarkerFile):
+    """
+    A BasicMarkerFile provides a way to record MarkerInfo into a
+    filesystem by writing a file into a directory.  The name of the
+    file will show the phase and current state, and if there is
+    information on how the stage failed, it will be stored in the
+    file.
+
+    This provides both a basic GUI while running (if you watch the
+    directory in a Finder window) and also provides documentation of
+    the stage's completion.
+    """
+
     def __init__(self, directory: str) -> None:
         self._directory = directory
 

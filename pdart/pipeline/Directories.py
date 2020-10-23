@@ -23,6 +23,17 @@ def make_directories() -> "Directories":
 
 
 class Directories(object, metaclass=abc.ABCMeta):
+    """
+    An abstract class that provides a list of directories that stages
+    can use.  By centralizing them, they can be edited in one place.
+    If some part of the process uses too much disk space, part of it
+    can be moved onto a different external disk just by editing this
+    class.
+
+    The default implementation though is to have all the directories
+    live within the working_dir for the bundle.
+    """
+
     @abc.abstractmethod
     def working_dir(self, proposal_id: int) -> str:
         pass

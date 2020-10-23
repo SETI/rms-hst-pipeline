@@ -34,6 +34,8 @@ class InsertChanges(MarkedStage):
 
     TODO The insertion is currently unimplemented except in the case
     that this is the first version and so the archive is empty.
+
+    TODO When this stage finishes, there should be...what?
     """
 
     def _run(self) -> None:
