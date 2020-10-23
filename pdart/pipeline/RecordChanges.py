@@ -62,5 +62,5 @@ class RecordChanges(MarkedStage):
                         lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
                         print(lidvid, "True", file=changes_file)
 
-        assert os.path.isdir(primary_files_dir)
+        assert os.path.isdir(primary_files_dir + "-sv")
         assert os.path.isfile(os.path.join(working_dir, CHANGES_DICT))

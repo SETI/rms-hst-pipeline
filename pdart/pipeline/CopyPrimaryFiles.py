@@ -115,4 +115,4 @@ class CopyPrimaryFiles(MarkedStage):
             self._bundle_segment, mast_downloads_dir, primary_files_dir
         )
 
-        assert os.path.isdir(primary_files_dir)
+        assert os.path.isdir(primary_files_dir + "-sv")
