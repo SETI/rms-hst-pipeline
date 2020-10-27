@@ -216,8 +216,7 @@ class FSPrimAdapter(FS):
 
     @classmethod
     def _make_details_from_stat(cls, stat_result: Any) -> Dict[str, Any]:
-        """Make a *details* info dict from an `os.stat_result` object.
-        """
+        """Make a *details* info dict from an `os.stat_result` object."""
         details: Dict[str, Any] = {
             "_write": ["accessed", "modified"],
             "accessed": stat_result.st_atime,
@@ -255,8 +254,7 @@ class FSPrimAdapter(FS):
 
     @classmethod
     def _get_type_from_stat(cls, _stat: Any) -> ResourceType:
-        """Get the resource type from an `os.stat_result` object.
-        """
+        """Get the resource type from an `os.stat_result` object."""
         st_mode = _stat.st_mode
         st_type = stat.S_IFMT(st_mode)
         return cls.STAT_TO_RESOURCE_TYPE.get(st_type, ResourceType.unknown)

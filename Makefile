@@ -3,6 +3,7 @@ PIP=python3 -m pip
 
 # Format, typecheck, and test.
 .PHONY: all
+# all : phome
 all : black mypy test
 
 ############################################################
@@ -26,12 +27,19 @@ MYPY_FLAGS=--disallow-any-unimported \
 # --warn-return-any: not practical because of SqlAlchemy's dynamic magic
 # and because FITS cards are untyped.
 
+.PHONY: phome
+phome:
+	@echo $(HOME)
+	@echo $(TMP_WORKING_DIR)/zips
+	@echo $(PDSTOOLS_PATH)
+	@echo $(PATH)
+
 .PHONY: mypy
 mypy : venv
 	$(ACTIVATE) && MYPYPATH=stubs mypy $(MYPY_FLAGS) *.py pdart
 
 experiment : venv black mypy
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools python3 Experiment.py
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) python3 Experiment.py
 
 
 ############################################################
@@ -41,20 +49,20 @@ experiment : venv black mypy
 # Run the tests.
 .PHONY: test
 test: venv
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) pytest pdart
 
 # Run some subset of the tests.  Hack as needed.
 .PHONY: t
 t: venv
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools pytest pdart/labels/test_HstParameters.py
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) pytest pdart/labels/test_HstParameters.py
 
 
 ############################################################
 # THE PIPELINE
 ############################################################
 
-TWD="/Volumes/Eric's-5TB/tmp-working-dir"
-ZIPS="/Volumes/Eric's-5TB/zips"
+TWD=$(TMP_WORKING_DIR)
+ZIPS=$(TMP_WORKING_DIR)/zips
 
 ACS_IDS=09059 09296 09440 09678 09725 09745 09746 09985 10192 10461	\
 10502 10506 10508 10545 10719 10774 10783 11055 11109 12601 13012	\
@@ -82,7 +90,7 @@ pipeline : venv clean-results
 	-rm $(TWD)/hst_*/\#*.txt
 	for project_id in $(PROJ_IDS); do \
 	    echo '****' hst_$$project_id '****'; \
-	    $(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools \
+	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
 	done;
 	say pipeline is done
@@ -114,13 +122,13 @@ copy-results :
 LILS=09059 09748 15505
 
 .PHONY: lil-pipeline
-LIL-TWD=tmp-working-dir
+LIL-TWD=$(TMP_WORKING_DIR)
 lil-pipeline : venv
 	mkdir -p $(LIL-TWD)
 	-rm $(LIL-TWD)/*/\#*.txt
 	for project_id in $(LILS); do \
 	    echo '****' hst_$$project_id '****'; \
-	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
+	    $(ACTIVATE) && LIL=True PYTHONPATH=$(PDSTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
 	done;
 	say lil pipeline is done
@@ -184,4 +192,4 @@ clean : tidy
 
 .PHONY: target_files
 target_files : venv
-	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools python3 DownloadTargetFiles.py
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) python3 DownloadTargetFiles.py

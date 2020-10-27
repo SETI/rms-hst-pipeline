@@ -24,6 +24,7 @@ from pdart.labels.FitsProductLabelXml import (
 from pdart.labels.HstParameters import (
     get_hst_parameters,
     get_start_stop_date_times,
+    get_exposure_duration,
 )
 from pdart.labels.LabelError import LabelError
 from pdart.labels.ObservingSystem import (
@@ -182,10 +183,11 @@ def make_fits_product_label(
         start_date_time, stop_date_time = get_start_stop_date_times(
             hdu_lookups, shm_lookup
         )
+        exposure_duration = get_exposure_duration(hdu_lookups, shm_lookup)
         start_stop_times = {
             "start_date_time": start_date_time,
             "stop_date_time": stop_date_time,
-            "exposure_duration": "0.1",  # TODO A totally bogus value
+            "exposure_duration": exposure_duration,  # TODO A totally bogus value
         }
 
         hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)

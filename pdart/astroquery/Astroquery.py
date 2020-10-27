@@ -13,11 +13,12 @@ from pdart.astroquery.Utils import (
 _YMD = Tuple[int, int, int]
 
 _ACCEPTED_INSTRUMENTS: str = "IJU"
+# _ACCEPTED_INSTRUMENTS: str = "IJUN"
 """
 We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
 """
-
+# SHM, SPT
 ACCEPTED_SUFFIXES: List[str] = [
     "A1F",
     "A2F",

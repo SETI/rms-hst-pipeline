@@ -36,3 +36,5 @@ urllib3==1.25.8
 wcwidth==0.1.9
 webencodings==0.5.1
 zipp==3.1.0
+black==20.8b1
+julian==0.14
