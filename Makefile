@@ -134,6 +134,14 @@ lil-pipeline : venv
 	say lil pipeline is done
 	open $(LIL-TWD)
 
+##############################
+# Pipeline for NICMOS ONLY
+##############################
+LILS=07885
+
+.PHONY: nicmos-pipeline
+nicmos-pipeline : lil-pipeline
+
 
 ############################################################
 # CHECK SUBARRAY FLAG

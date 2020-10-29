@@ -17,7 +17,7 @@ class HstFilename(object):
         ), "Filename must be at least six characters long"
         basename2 = basename(filename)
         assert (
-            basename2[0].lower() in "iju"
+            basename2[0].lower() in "ijnu"
         ), f"First char of filename {basename2!r} must be i, j, or u."
 
     def __str__(self) -> str:
@@ -36,11 +36,13 @@ class HstFilename(object):
         """
         filename = self._basename()
         i = filename[0].lower()
-        assert i in "iju", f"First char of filename {filename!r} must be i, j, or u."
+        assert i in "ijnu", f"First char of filename {filename!r} must be i, j, or u."
         if i == "i":
             return "wfc3"
         elif i == "j":
             return "acs"
+        elif i == "n":
+            return "nicmos"
         elif i == "u":
             return "wfpc2"
         else:
