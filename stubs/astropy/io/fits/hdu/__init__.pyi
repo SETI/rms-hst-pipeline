@@ -6,6 +6,10 @@ class BinTableHDU(Sized):
     data: Any
     def __len__(self) -> int: ...
 
+class PrimaryHDU:
+    def __init__(self, image: Any) -> None: ...
+    def writeto(self, filepath: str) -> None: ...
+
 class HDUList(Sequence[Any], Sized):
     def close(
         self,

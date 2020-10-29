@@ -16,7 +16,7 @@ def touch_fits(filepath: str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("usage: python3 TouchFits.py <filepath>")
+        print("usage: python3 TouchFits.py <filepath>", file=sys.stderr)
         sys.exit(1)
     filepath = sys.argv[1]
     touch_fits(filepath)
