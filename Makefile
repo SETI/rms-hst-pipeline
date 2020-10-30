@@ -142,6 +142,20 @@ LILS=07885
 .PHONY: nicmos-pipeline
 nicmos-pipeline : lil-pipeline
 
+##############################
+# Download shm & spt from mast
+##############################
+LILS=07885 09059
+
+.PHONY: download-shm-spt
+download-shm-spt : venv
+	mkdir -p $(LIL-TWD)
+	for project_id in $(LILS); do \
+		echo '****' hst_$$project_id '****'; \
+		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
+		python Download_SHM_SPT.py $$project_id; \
+	done;
+
 
 ############################################################
 # CHECK SUBARRAY FLAG

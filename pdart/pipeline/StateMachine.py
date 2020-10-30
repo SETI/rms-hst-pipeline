@@ -20,12 +20,17 @@ from pdart.pipeline.ValidateBundle import ValidateBundle
 
 
 class StateMachine(object):
-    def __init__(self, dirs: Directories, proposal_id: int) -> None:
+    def __init__(
+        self,
+        dirs: Directories,
+        proposal_id: int,
+        selected_suffixes: Optional[bool] = False,
+    ) -> None:
         self.marker_file = BasicMarkerFile(dirs.working_dir(proposal_id))
         self.stages = [
             ("RESETPIPELINE", ResetPipeline(dirs, proposal_id)),
             ("DOWNLOADDOCS", DownloadDocs(dirs, proposal_id)),
-            ("CHECKDOWNLOADS", CheckDownloads(dirs, proposal_id)),
+            ("CHECKDOWNLOADS", CheckDownloads(dirs, proposal_id, selected_suffixes)),
             ("COPYPRIMARYFILES", CopyPrimaryFiles(dirs, proposal_id)),
             ("RECORDCHANGES", RecordChanges(dirs, proposal_id)),
             ("INSERTCHANGES", InsertChanges(dirs, proposal_id)),

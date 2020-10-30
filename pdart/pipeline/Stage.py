@@ -2,16 +2,23 @@ import abc
 import os
 import os.path
 import traceback
+from typing import Optional
 
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.MarkerFile import BasicMarkerFile
 
 
 class Stage(metaclass=abc.ABCMeta):
-    def __init__(self, dirs: Directories, proposal_id: int) -> None:
+    def __init__(
+        self,
+        dirs: Directories,
+        proposal_id: int,
+        selected_suffixes: Optional[bool] = False,
+    ) -> None:
         self._bundle_segment = f"hst_{proposal_id:05}"
         self._dirs = dirs
         self._proposal_id = proposal_id
+        self._selected_suffixes = selected_suffixes
 
     ##############################
 
@@ -76,8 +83,13 @@ class Stage(metaclass=abc.ABCMeta):
 
 
 class MarkedStage(Stage):
-    def __init__(self, dirs: Directories, proposal_id: int) -> None:
-        Stage.__init__(self, dirs, proposal_id)
+    def __init__(
+        self,
+        dirs: Directories,
+        proposal_id: int,
+        selected_suffixes: Optional[bool] = False,
+    ) -> None:
+        Stage.__init__(self, dirs, proposal_id, selected_suffixes)
         if not os.path.exists(self.working_dir()):
             os.makedirs(self.working_dir())
         self._marker_file = BasicMarkerFile(self.working_dir())
