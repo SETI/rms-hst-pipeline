@@ -152,7 +152,7 @@ nicmos-pipeline : setup_dir
 ##############################
 # Download shm & spt from mast
 ##############################
-TEST_ID:=07885 09059
+TEST_ID=07885 09059
 
 .PHONY: download-shm-spt
 download-shm-spt : setup_dir
