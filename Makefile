@@ -119,7 +119,7 @@ copy-results :
 # smaller version for testing
 ##############################
 
-LILS=09059 09748 15505
+LILS=07885 09059 09748 15505
 
 .PHONY: lil-pipeline
 LIL-TWD=$(TMP_WORKING_DIR)
@@ -150,26 +150,13 @@ nicmos-pipeline : setup_dir
 	open $(LIL-TWD)
 
 ##############################
-# Pipeline for shm & spt ONLY
-##############################
-SHM_SPT_PIPELINE_ID:=09059
-
-.PHONY: shm-spt-pipeline
-shm-spt-pipeline : setup_dir
-	for project_id in $(SHM_SPT_PIPELINE_ID); do \
-	    echo '****' hst_$$project_id '****'; \
-	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
-		python Pipeline.py $$project_id -c; \
-	done;
-
-##############################
 # Download shm & spt from mast
 ##############################
 TEST_ID:=07885 09059
 
 .PHONY: download-shm-spt
 download-shm-spt : setup_dir
-	for project_id in $(TEST_ID); do \
+	for project_id in $(PROJ_IDS); do \
 		echo '****' hst_$$project_id '****'; \
 		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 		python Download_SHM_SPT.py $$project_id; \
