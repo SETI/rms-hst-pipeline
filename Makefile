@@ -137,25 +137,50 @@ lil-pipeline : venv
 ##############################
 # Pipeline for NICMOS ONLY
 ##############################
-LILS=07885
+NICMOS_ID=07885
 
 .PHONY: nicmos-pipeline
-nicmos-pipeline : lil-pipeline
+nicmos-pipeline : setup_dir
+	for project_id in $(NICMOS_ID); do \
+	    echo '****' hst_$$project_id '****'; \
+	    $(ACTIVATE) && LIL=True PYTHONPATH=$(PDSTOOLS_PATH) \
+		python Pipeline.py $$project_id; \
+	done;
+	say lil pipeline is done
+	open $(LIL-TWD)
+
+##############################
+# Pipeline for shm & spt ONLY
+##############################
+SHM_SPT_PIPELINE_ID:=09059
+
+.PHONY: shm-spt-pipeline
+shm-spt-pipeline : setup_dir
+	for project_id in $(SHM_SPT_PIPELINE_ID); do \
+	    echo '****' hst_$$project_id '****'; \
+	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
+		python Pipeline.py $$project_id -c; \
+	done;
 
 ##############################
 # Download shm & spt from mast
 ##############################
-LILS=07885 09059
+TEST_ID:=07885 09059
 
 .PHONY: download-shm-spt
-download-shm-spt : venv
-	mkdir -p $(LIL-TWD)
-	for project_id in $(LILS); do \
+download-shm-spt : setup_dir
+	for project_id in $(TEST_ID); do \
 		echo '****' hst_$$project_id '****'; \
 		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 		python Download_SHM_SPT.py $$project_id; \
 	done;
 
+############################################################
+# Setup
+############################################################
+setup_dir : venv
+	mkdir -p $(LIL-TWD)
+	-rm $(LIL-TWD)/*/\#*.txt
 
 ############################################################
 # CHECK SUBARRAY FLAG
