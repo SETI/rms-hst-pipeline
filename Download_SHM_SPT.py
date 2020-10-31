@@ -16,6 +16,4 @@ if __name__ == "__main__":
     working_dir = dirs.working_dir(proposal_id)
     slice = MastSlice((1900, 1, 1), (2025, 1, 1), proposal_id)
     product_set = slice.to_product_set(proposal_id, True)
-    # if not os.path.isdir(working_dir):
-    #     os.makedirs(working_dir)
     product_set.download(working_dir)

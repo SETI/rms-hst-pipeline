@@ -187,7 +187,7 @@ def make_fits_product_label(
         start_stop_times = {
             "start_date_time": start_date_time,
             "stop_date_time": stop_date_time,
-            "exposure_duration": exposure_duration,  # TODO A totally bogus value
+            "exposure_duration": exposure_duration,
         }
 
         hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)
