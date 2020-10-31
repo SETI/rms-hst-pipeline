@@ -3,7 +3,6 @@ PIP=python3 -m pip
 
 # Format, typecheck, and test.
 .PHONY: all
-# all : phome
 all : black mypy test
 
 ############################################################
@@ -27,12 +26,11 @@ MYPY_FLAGS=--disallow-any-unimported \
 # --warn-return-any: not practical because of SqlAlchemy's dynamic magic
 # and because FITS cards are untyped.
 
-.PHONY: phome
-phome:
+.PHONY: print-var
+print-var:
 	@echo $(HOME)
-	@echo $(TMP_WORKING_DIR)/zips
+	@echo $(TMP_WORKING_DIR)
 	@echo $(PDSTOOLS_PATH)
-	@echo $(PATH)
 
 .PHONY: mypy
 mypy : venv

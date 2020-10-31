@@ -18,54 +18,9 @@ from pdart.astroquery.Utils import (
 _YMD = Tuple[int, int, int]
 
 _ACCEPTED_INSTRUMENTS: str = "IJNU"
-# _ACCEPTED_INSTRUMENTS: str = "IJU"
-
 """
 We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
-"""
-# ACCEPTED_SUFFIXES: List[str] = [
-#     "A1F",
-#     "A2F",
-#     "A3F",
-#     "ASC",
-#     "ASN",
-#     # "C0F", # waivered
-#     # "C1F", # waivered
-#     # "C2F", # waivered
-#     # "C3F", # waivered
-#     "C0M",
-#     "C1M",
-#     "C2M",
-#     "C3M",
-#     "CAL",
-#     "CLB",
-#     "CLF",
-#     "CORRTAG",
-#     "CQF",
-#     "CRC",
-#     "CRJ",
-#     # "D0F", # waivered
-#     "D0M",
-#     "DRC",
-#     "DRZ",
-#     "FLC",
-#     "FLT",
-#     "FLTSUM",
-#     "MOS",
-#     "RAW",
-#     # "SHF", # waivered
-#     "SHM",
-#     "SPT",
-#     "SX2",
-#     "SXL",
-#     "X1D",
-#     "X1DSUM",
-#     "X2D",
-# ]
-"""
-For now, we limit the types of the products to those with these
-suffixes.
 """
 
 
