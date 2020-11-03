@@ -111,7 +111,7 @@ copy-results :
 # smaller version for testing
 ##############################
 
-LILS=09059 09748 15505
+LILS=09059 # 09748 15505
 
 .PHONY: lil-pipeline
 LIL-TWD=tmp-working-dir
@@ -126,6 +126,18 @@ lil-pipeline : venv
 	say lil pipeline is done
 	open $(LIL-TWD)
 
+CHANGES=09059
+changes : venv black mypy
+	mkdir -p $(LIL-TWD)
+	-rm $(LIL-TWD)/*/\#*.txt
+	for project_id in $(CHANGES); do \
+	    echo '****' hst_$$project_id '****'; \
+	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
+		python Pipeline.py $$project_id; \
+	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
+		python Pipeline2.py $$project_id; \
+	done;
+	say change pipeline is done
 
 ############################################################
 # CHECK SUBARRAY FLAG
