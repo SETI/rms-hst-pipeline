@@ -1,8 +1,6 @@
 #!/bin/bash
-TOOLDIR=${HOME}/Desktop/seti/workspace
-BASE_DIR=${TOOLDIR}/pdart
-CONTEXT_PRODUCTS="${BASE_DIR}"/context-products.json
-XMLDIR=${BASE_DIR}/xml
+CONTEXT_PRODUCTS=./context-products.json
+XMLDIR=./xml
 # Remove this scaffolding when switching to the new HST_Parameters implementation.
 NEW=-new
 SCHEMAS="${XMLDIR}/PDS4_HST_1D00_1000${NEW}.xsd.xml, ${XMLDIR}/PDS4_DISP_1B00.xsd.xml"
