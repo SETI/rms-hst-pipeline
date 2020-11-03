@@ -7,6 +7,14 @@ from pdart.pipeline.Stage import MarkedStage
 
 
 class DownloadDocs(MarkedStage):
+    """
+    This stage downloads document files to the documents directory,
+    creating the directory if necessary.
+
+    After this stage runs, there should be a documents directory that
+    contains at least one document file.
+    """
+
     def _do_download_docs(self, documents_dir: str, proposal_id: int) -> None:
         assert not os.path.isdir(documents_dir)
         os.makedirs(documents_dir)
@@ -17,3 +25,5 @@ class DownloadDocs(MarkedStage):
         documents_dir: str = self.documents_dir()
         if not os.path.isdir(documents_dir):
             self._do_download_docs(documents_dir, self._proposal_id)
+
+        assert os.path.isdir(documents_dir)

@@ -85,6 +85,15 @@ def _populate_from_other_collection(
 
 
 class PopulateDatabase(MarkedStage):
+    """
+    We create the database if necessary, create the bundle in the
+    database, then walk through the new collections in the filesystem
+    and create them in the database.
+
+    When this stage finishes, there should be a database, populated
+    with data from the primary files.
+    """
+
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()

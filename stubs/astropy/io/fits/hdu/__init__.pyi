@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Iterator, Optional, Sized
+from typing import Any, Iterable, Iterator, Optional, Sequence, Sized
 from astropy.io.fits.column import ColDefs
 
 class BinTableHDU(Sized):
@@ -6,7 +6,11 @@ class BinTableHDU(Sized):
     data: Any
     def __len__(self) -> int: ...
 
-class HDUList(Iterable[Any], Sized):
+class PrimaryHDU:
+    def __init__(self, image: Any) -> None: ...
+    def writeto(self, filepath: str) -> None: ...
+
+class HDUList(Sequence[Any], Sized):
     def close(
         self,
         output_verify: str = "exception",
@@ -14,6 +18,9 @@ class HDUList(Iterable[Any], Sized):
         closed: bool = True,
     ) -> None: ...
     def __len__(self) -> int: ...
+    # Here __getitem__() could also take a slice but we don't care, so we
+    # tell mypy to shut up.
+    def __getitem__(self, index: int) -> Any: ...  # type: ignore[override]
     def __iter__(self) -> Iterator[Any]: ...
 
 def fitsopen(

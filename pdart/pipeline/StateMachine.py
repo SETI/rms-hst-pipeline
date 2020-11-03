@@ -26,11 +26,7 @@ class StateMachine(object):
     record the final state.
     """
 
-    def __init__(
-        self,
-        dirs: Directories,
-        proposal_id: int,
-    ) -> None:
+    def __init__(self, dirs: Directories, proposal_id: int) -> None:
         self.marker_file = BasicMarkerFile(dirs.working_dir(proposal_id))
         self.stages = [
             ("RESETPIPELINE", ResetPipeline(dirs, proposal_id)),

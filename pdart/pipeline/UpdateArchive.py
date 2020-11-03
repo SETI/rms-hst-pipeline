@@ -9,6 +9,10 @@ from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
 
 class UpdateArchive(MarkedStage):
+    """
+    Insert all new files into the archive as a new version.
+    """
+
     def _run(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()

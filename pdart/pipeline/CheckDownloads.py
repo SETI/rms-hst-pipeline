@@ -9,6 +9,22 @@ from pdart.pipeline.Stage import MarkedStage
 
 
 class CheckDownloads(MarkedStage):
+    """
+    This stage downloads all the data files for this bundle
+    (equivalently, proposal_id) into the mast_downloads_dir, creating
+    it if possible.
+
+    This is called CheckDownloads instead of DownloadData because in
+    the future we would like to first check what has changed, and then
+    download only those files that have changed.
+
+    Currently, we have nothing implemented to do that, so we just
+    download everything and then check the contents of the files.
+
+    After this stage runs, there should be a mast_downloads_dir and it
+    should contain some datafiles.
+    """
+
     def _do_downloads(
         self,
         working_dir: str,
@@ -19,8 +35,8 @@ class CheckDownloads(MarkedStage):
         # <working_dir>/mastDownload should not exist.
         assert not os.path.isdir(mast_downloads_dir)
 
-        # TODO These dates are wrong.  Do I need to do some optimization
-        # here?
+        # TODO These dates are wrong; they potentially collect too
+        # much.  Do I need to reduce the range of dates here?
         slice = MastSlice((1900, 1, 1), (2025, 1, 1), proposal_id)
         proposal_ids = slice.get_proposal_ids()
         assert proposal_id in proposal_ids, f"{proposal_id} in {proposal_ids}"

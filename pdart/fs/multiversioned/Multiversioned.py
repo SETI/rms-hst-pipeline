@@ -17,6 +17,9 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 
+# An IS_NEW_TEST is a function on a proposed LIDVID with the given
+# VersionContents, and a Multiversioned that returns True iff the
+# contents would be changed from the last version of the LID.
 IS_NEW_TEST = Callable[[LIDVID, VersionContents, "Multiversioned"], bool]
 
 ############################################################
@@ -31,6 +34,11 @@ def fits_filter(filepath: str) -> bool:
 
 
 def std_is_new(lidvid: LIDVID, contents: VersionContents, mv: "Multiversioned") -> bool:
+    """
+    The standard IS_NEW_TEST function.  If it's a document collection,
+    it checks the document files for changes; otherwise, it checks
+    only FITS files.
+    """
     lid = lidvid.lid()
     if lid.is_collection_lid() and lid.collection_id == "document":
         filt = doc_filter
@@ -182,17 +190,39 @@ class Multiversioned(MutableMapping):
         # filesystem format.  Document them.
 
         def update_from_lid(lid: LID) -> LIDVID:
+            # Find the path corresponding to this LID.
             path = vv_lid_path(lid)
-            child_lidvids = {
+
+            # First, update all the children recursively.  Get their
+            # LIDs by extending this LID with the names of the
+            # subdirectories of path.  That handles directories.
+            child_lidvids: Set[LIDVID] = {
                 update_from_lid(lid.extend_lid(strip_segment(name)))
                 for name in single_version_fs.listdir(path)
                 if is_segment(name)
             }
+            # Now look at files.  We recurse over all contained files
+            # and collect up their filepaths.
+
+            # We recurse over all the contained files (rather than
+            # only those in the directory of path) because PDS4 allows
+            # nested files.  For instance, a bundle could contain a
+            # file with path a/b/c/d/e.txt.  If there's no $ in the
+            # filepath, it's in the bundle, not in a collection of the
+            # bundle.
             sfs = SubFS(single_version_fs, path)
-            filepaths = {
+            filepaths: Set[str] = {
                 filepath for filepath in sfs.walk.files() if "$" not in filepath
             }
+
+            # We create a VersionContents object from the set of new
+            # LIDVIDs and filepath.
             contents = VersionContents.createFromLIDVIDs(child_lidvids, sfs, filepaths)
+
+            # Now we ask the Multiversioned to insert these contents
+            # as a new version if needed.  It returns the new LIDVID
+            # if a new LIDVID is needed, otherwise it returns the old
+            # one.
             return self.add_contents_if(is_new, lid, contents, False)
 
         bundle_segs = [
