@@ -18,6 +18,11 @@
     {
       "name": [],
       "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.nicmos::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
       "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05167::1.0"
     },
     {
@@ -494,6 +499,11 @@
       "name": [],
       "type": [],
       "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_07717::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_07885::1.0"
     },
     {
       "name": [],

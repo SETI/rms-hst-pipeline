@@ -2,6 +2,7 @@ import abc
 import os
 import os.path
 import traceback
+from typing import Optional
 
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.MarkerFile import BasicMarkerFile

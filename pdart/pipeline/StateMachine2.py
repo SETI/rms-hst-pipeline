@@ -38,7 +38,6 @@ class SaveDownloads(MarkedStage):
                 fs.path.dirname(dir_to_compress),
                 fs.path.basename(dir_to_compress),
             ]
-            print(f"**** running {' '.join(cmd)} ****")
             completed_process: CompletedProcess = run(cmd)
             completed_process.check_returncode()
 

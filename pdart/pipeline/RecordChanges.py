@@ -49,9 +49,14 @@ class RecordChanges(MarkedStage):
             with make_mv_osfs(archive_dir) as archive_osfs, make_version_view(
                 archive_osfs, self._bundle_segment
             ) as latest_version:
-                assert (
-                    False
-                ), "record_changes for existing archive not fully implemented"
+                if False:
+                    assert (
+                        False
+                    ), "record_changes for existing archive not fully implemented"
+                else:
+                    with open(changes_path, "w") as changes_file:
+                        # Do nothing with it for now. TODO Fix this.
+                        pass
         else:
             # There is no archive, so all the LIDVIDs are new.
             vid = VID("1.0")

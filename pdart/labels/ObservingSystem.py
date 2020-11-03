@@ -67,6 +67,15 @@ An interpreted fragment template to create an ``<Observing_System />``
 XML element.
 """
 
+nicmos_observing_system: NodeBuilder = _observing_system(
+    {
+        "name": "Hubble Space Telescope Near Infrared Camera and Multi-Object Spectrometer",
+        "component_name": "Near Infrared Camera and Multi-Object Spectrometer",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.nicmos",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
+    }
+)
+
 
 def observing_system_lid(instrument: str) -> str:
     return f"urn:nasa:pds:context:instrument:insthost.{instrument}"
@@ -85,4 +94,5 @@ def observing_system(instrument: str) -> NodeBuilder:
         "acs": acs_observing_system,
         "wfc3": wfc3_observing_system,
         "wfpc2": wfpc2_observing_system,
+        "nicmos": nicmos_observing_system,
     }[instrument]

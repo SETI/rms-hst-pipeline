@@ -5,7 +5,11 @@ from typing import List, Set
 import fs.path
 import picmaker
 
-from pdart.astroquery.Astroquery import ACCEPTED_SUFFIXES
+# from pdart.astroquery.Astroquery import ACCEPTED_SUFFIXES
+from pdart.astroquery.AcceptedSuffixes import (
+    ACCEPTED_SUFFIXES,
+    PART_OF_ACCEPTED_SUFFIXES,
+)
 from pdart.db.BundleDB import (
     BundleDB,
     _BUNDLE_DB_NAME,
