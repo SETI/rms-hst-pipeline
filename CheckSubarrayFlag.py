@@ -10,13 +10,13 @@ from pdart.db.BundleDB import (
 from pdart.db.SqlAlchTables import Card, switch_on_collection_subtype
 from pdart.pds4.LIDVID import LIDVID
 
-TWD = "/Volumes/Eric's-5TB/tmp-working-dir"
+TWD = os.environ["TMP_WORKING_DIR"]
 
 
 def has_subarray(db: BundleDB) -> bool:
-    subarray_cards: List[Card] = db.session.query(Card).filter(
-        Card.keyword == "SUBARRAY"
-    ).all()
+    subarray_cards: List[Card] = (
+        db.session.query(Card).filter(Card.keyword == "SUBARRAY").all()
+    )
     return len(subarray_cards) != 0
 
 

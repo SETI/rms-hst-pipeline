@@ -1,6 +1,9 @@
 from typing import List
 import abc
+import os
 import os.path
+
+TWD = os.environ["TMP_WORKING_DIR"]
 
 # TODO Make this abstract and implement for development and also for
 # big-data.
@@ -15,11 +18,8 @@ def make_directories() -> "Directories":
             ["/Volumes/AKBAR/working-dir", "/Volumes/PDART-8TB/working-dir"]
         )
     else:
-        if "LIL" in os.environ:
-            # Use this machine; for little tests
-            return DevDirectories("tmp-working-dir")
-        else:
-            return DevDirectories("/Volumes/Eric's-5TB/tmp-working-dir")
+        # Working path, it is pointing to external drive now
+        return DevDirectories(TWD)
 
 
 class Directories(object, metaclass=abc.ABCMeta):

@@ -4,6 +4,11 @@ from astropy.table import Table
 from astropy.table.row import Row
 from astroquery.mast import Observations
 
+from pdart.astroquery.AcceptedSuffixes import (
+    ACCEPTED_SUFFIXES,
+    PART_OF_ACCEPTED_SUFFIXES,
+)
+
 from pdart.astroquery.Utils import (
     filter_table,
     get_table_with_retries,
@@ -12,54 +17,10 @@ from pdart.astroquery.Utils import (
 
 _YMD = Tuple[int, int, int]
 
-_ACCEPTED_INSTRUMENTS: str = "IJU"
+_ACCEPTED_INSTRUMENTS: str = "IJNU"
 """
 We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
-"""
-
-ACCEPTED_SUFFIXES: List[str] = [
-    "A1F",
-    "A2F",
-    "A3F",
-    "ASC",
-    "ASN",
-    # "C0F", # waivered
-    # "C1F", # waivered
-    # "C2F", # waivered
-    # "C3F", # waivered
-    "C0M",
-    "C1M",
-    "C2M",
-    "C3M",
-    "CAL",
-    "CLB",
-    "CLF",
-    "CORRTAG",
-    "CQF",
-    "CRC",
-    "CRJ",
-    # "D0F", # waivered
-    "D0M",
-    "DRC",
-    "DRZ",
-    "FLC",
-    "FLT",
-    "FLTSUM",
-    "MOS",
-    "RAW",
-    # "SHF", # waivered
-    "SHM",
-    "SPT",
-    "SX2",
-    "SXL",
-    "X1D",
-    "X1DSUM",
-    "X2D",
-]
-"""
-For now, we limit the types of the products to those with these
-suffixes.
 """
 
 
@@ -86,6 +47,15 @@ def _is_accepted_product_type_product_row(row: Row) -> bool:
     """
     desc = str(row["productSubGroupDescription"])
     return desc.upper() in ACCEPTED_SUFFIXES
+
+
+def _is_selected_accepted_product_type_product_row(row: Row) -> bool:
+    """
+    We currently only handle products from a limited set of
+    instruments with selected suffixes.
+    """
+    desc = str(row["productSubGroupDescription"])
+    return desc.upper() in PART_OF_ACCEPTED_SUFFIXES
 
 
 class MastSlice(object):
@@ -138,7 +108,7 @@ class MastSlice(object):
             self.proposal_ids = sorted(list(set(result)))
         return self.proposal_ids
 
-    def get_products(self, proposal_id: int) -> Table:
+    def get_products(self, proposal_id: int, selected_suffixes: bool = False) -> Table:
         def proposal_id_matches(row: Row) -> bool:
             return int(row["proposal_id"]) == proposal_id
 
@@ -146,11 +116,18 @@ class MastSlice(object):
 
         result = Observations.get_product_list(proposal_table)
         result = filter_table(_is_accepted_instrument_product_row, result)
-        result = filter_table(_is_accepted_product_type_product_row, result)
+        if selected_suffixes:
+            result = filter_table(
+                _is_selected_accepted_product_type_product_row, result
+            )
+        else:
+            result = filter_table(_is_accepted_product_type_product_row, result)
         return result
 
-    def to_product_set(self, proposal_id: int) -> "ProductSet":
-        return ProductSet(self.get_products(proposal_id))
+    def to_product_set(
+        self, proposal_id: int, selected_suffixes: bool = False
+    ) -> "ProductSet":
+        return ProductSet(self.get_products(proposal_id, selected_suffixes))
 
     def download_products(self, products_table: Table, download_dir: str) -> None:
         if len(products_table) > 0:

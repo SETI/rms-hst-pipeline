@@ -149,3 +149,6 @@ dmypy.json
 # MacOS
 .DS_Store
 >>>>>>> pdart3-repo/master
+
+# Output from make
+tmp*.xml
