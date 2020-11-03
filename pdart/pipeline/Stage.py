@@ -9,22 +9,23 @@ from pdart.pipeline.MarkerFile import BasicMarkerFile
 
 
 class Stage(metaclass=abc.ABCMeta):
+    """
+    Abstract class representing a stage of processing in the pipeline.
+    The stage is intended to run as a transaction: that is, if it
+    fails while running, it should roll back the state of the
+    directory to what it looked like when the stage started.  This
+    keeps garbage from one failed attempt from affecting future
+    attempts.
+
+    The class also accepts a list of directory paths that the stages
+    will use and provides them to the operation of the stage.
+    """
+
     def __init__(
         self,
         dirs: Directories,
         proposal_id: int,
     ) -> None:
-        """
-        Abstract class representing a stage of processing in the pipeline.
-        The stage is intended to run as a transaction: that is, if it
-        fails while running, it should roll back the state of the
-        directory to what it looked like when the stage started.  This
-        keeps garbage from one failed attempt from affecting future
-        attempts.
-
-        The class also accepts a list of directory paths that the stages
-        will use and provides them to the operation of the stage.
-        """
         self._bundle_segment = f"hst_{proposal_id:05}"
         self._dirs = dirs
         self._proposal_id = proposal_id
@@ -92,15 +93,16 @@ class Stage(metaclass=abc.ABCMeta):
 
 
 class MarkedStage(Stage):
+    """
+    A MarkedStage is a Stage that runs with a BasicMarkerFile to show
+    its progress.
+    """
+
     def __init__(
         self,
         dirs: Directories,
         proposal_id: int,
     ) -> None:
-        """
-        A MarkedStage is a Stage that runs with a BasicMarkerFile to show
-        its progress.
-        """
         Stage.__init__(self, dirs, proposal_id)
         if not os.path.exists(self.working_dir()):
             os.makedirs(self.working_dir())
