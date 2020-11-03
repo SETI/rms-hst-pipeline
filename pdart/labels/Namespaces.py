@@ -2,17 +2,25 @@ from pdart.xml.Pds4Version import HST_SHORT_VERSION, PDS4_SHORT_VERSION
 
 _PDS4_SCHEMA_LOCATION: str = "http://pds.nasa.gov/pds4/pds/v1"
 
-_VERSIONED_PDS4_SCHEMA_LOCATION: str = f"https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_{PDS4_SHORT_VERSION}.xsd"
+_VERSIONED_PDS4_SCHEMA_LOCATION: str = (
+    f"https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_{PDS4_SHORT_VERSION}.xsd"
+)
 
-_VERSIONED_PDS4_SCHEMATRON_LOCATION: str = f"https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_{PDS4_SHORT_VERSION}.sch"
+_VERSIONED_PDS4_SCHEMATRON_LOCATION: str = (
+    f"https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_{PDS4_SHORT_VERSION}.sch"
+)
 
 
 _HST_SCHEMA_LOCATION: str = f"http://pds.nasa.gov/pds4/mission/hst/v1"
 
-_VERSIONED_HST_SCHEMA_LOCATION: str = f"https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_{HST_SHORT_VERSION}.xsd"
+_VERSIONED_HST_SCHEMA_LOCATION: str = (
+    f"https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_{HST_SHORT_VERSION}.xsd"
+)
 
 
-_VERSIONED_HST_SCHEMATRON_LOCATION: str = f"https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_{HST_SHORT_VERSION}.sch"
+_VERSIONED_HST_SCHEMATRON_LOCATION: str = (
+    f"https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_{HST_SHORT_VERSION}.sch"
+)
 
 
 ############################################################

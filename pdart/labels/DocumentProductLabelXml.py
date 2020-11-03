@@ -57,7 +57,7 @@ def _make_proposal_description(
 ) -> str:
     """
     Return a string the describes the proposal.
-     """
+    """
     return (
         "This document provides a summary of the observation "
         f"plan for HST proposal {proposal_id}, {proposal_title}, "

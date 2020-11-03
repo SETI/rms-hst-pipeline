@@ -95,7 +95,9 @@ PROPNO_REGEX2 = re.compile(r" *HUBBLE SPACE TELESCOPE OBSERVING PROGRAM ([0-9]+)
 # Sometimes "2. Scientific Category" appears in front of the category and cycle
 # number, sometimes not
 INFO_HEADER1 = re.compile(r"2\. *Scientific Category +3\. *Proposal For +4\. *Cycle\s*")
-INFO_REGEX1 = re.compile(r".{22} *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*",)
+INFO_REGEX1 = re.compile(
+    r".{22} *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*",
+)
 INFO_HEADER2 = re.compile(r"2\.  *Proposal For +3\. *Cycle\s*")
 INFO_HEADER2a = re.compile(r"Type +Cycle +.*")
 INFO_REGEX2 = re.compile(r" *" + CATEGORIES + r"(?:|/[\w/]+) +([0-9]+)\s*")

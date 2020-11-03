@@ -164,8 +164,8 @@ modules:
 
 # Format the Python source with black: https://black.readthedocs.io/
 .PHONY: black
-black :
-	black .
+black : venv
+	$(ACTIVATE) && black .
 
 # Remove cruft.
 .PHONY: tidy

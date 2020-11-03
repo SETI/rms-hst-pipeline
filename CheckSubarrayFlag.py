@@ -14,9 +14,9 @@ TWD = "/Volumes/Eric's-5TB/tmp-working-dir"
 
 
 def has_subarray(db: BundleDB) -> bool:
-    subarray_cards: List[Card] = db.session.query(Card).filter(
-        Card.keyword == "SUBARRAY"
-    ).all()
+    subarray_cards: List[Card] = (
+        db.session.query(Card).filter(Card.keyword == "SUBARRAY").all()
+    )
     return len(subarray_cards) != 0
 
 
