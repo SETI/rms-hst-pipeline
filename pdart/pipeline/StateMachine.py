@@ -25,6 +25,11 @@ class StateMachine(object):
         dirs: Directories,
         proposal_id: int,
     ) -> None:
+        """
+        This object runs a list of pipeline stages, hardcoded into
+        self.stages.  It uses a BasicMarkerFile to show progress and
+        record the final state.
+        """
         self.marker_file = BasicMarkerFile(dirs.working_dir(proposal_id))
         self.stages = [
             ("RESETPIPELINE", ResetPipeline(dirs, proposal_id)),
