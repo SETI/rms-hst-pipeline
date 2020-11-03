@@ -13,12 +13,10 @@ class Stage(metaclass=abc.ABCMeta):
         self,
         dirs: Directories,
         proposal_id: int,
-        selected_suffixes: Optional[bool] = False,
     ) -> None:
         self._bundle_segment = f"hst_{proposal_id:05}"
         self._dirs = dirs
         self._proposal_id = proposal_id
-        self._selected_suffixes = selected_suffixes
 
     ##############################
 
@@ -87,9 +85,8 @@ class MarkedStage(Stage):
         self,
         dirs: Directories,
         proposal_id: int,
-        selected_suffixes: Optional[bool] = False,
     ) -> None:
-        Stage.__init__(self, dirs, proposal_id, selected_suffixes)
+        Stage.__init__(self, dirs, proposal_id)
         if not os.path.exists(self.working_dir()):
             os.makedirs(self.working_dir())
         self._marker_file = BasicMarkerFile(self.working_dir())

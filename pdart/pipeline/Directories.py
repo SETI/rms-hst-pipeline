@@ -18,14 +18,8 @@ def make_directories() -> "Directories":
             ["/Volumes/AKBAR/working-dir", "/Volumes/PDART-8TB/working-dir"]
         )
     else:
-        # For now, working path is pointing to external drive, but leave the
-        # condition here for now in case we want to separate the working path
-        # for lil pipeline and pipline
-        if "LIL" in os.environ:
-            # Use this machine; for little tests
-            return DevDirectories(TWD)
-        else:
-            return DevDirectories(TWD)
+        # Working path, it is pointing to external drive now
+        return DevDirectories(TWD)
 
 
 class Directories(object, metaclass=abc.ABCMeta):

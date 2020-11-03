@@ -126,7 +126,7 @@ lil-pipeline : venv
 	-rm $(LIL-TWD)/*/\#*.txt
 	for project_id in $(LILS); do \
 	    echo '****' hst_$$project_id '****'; \
-	    $(ACTIVATE) && LIL=True PYTHONPATH=$(PDSTOOLS_PATH) \
+	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
 	done;
 	say lil pipeline is done
@@ -141,7 +141,7 @@ NICMOS_ID=07885
 nicmos-pipeline : setup_dir
 	for project_id in $(NICMOS_ID); do \
 	    echo '****' hst_$$project_id '****'; \
-	    $(ACTIVATE) && LIL=True PYTHONPATH=$(PDSTOOLS_PATH) \
+	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
 	done;
 	say lil pipeline is done
@@ -150,7 +150,7 @@ nicmos-pipeline : setup_dir
 ##############################
 # Download shm & spt from mast
 ##############################
-TEST_ID=09748 15505
+TEST_ID=07885 09059 09748 15505
 
 .PHONY: download-shm-spt
 download-shm-spt : setup_dir

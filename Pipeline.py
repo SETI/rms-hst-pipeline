@@ -4,14 +4,10 @@ from pdart.pipeline.StateMachine import StateMachine
 
 
 def run() -> None:
-    assert len(sys.argv) <= 3, sys.argv
+    assert len(sys.argv) == 2, sys.argv
     proposal_id = int(sys.argv[1])
-    selected_suffixes = False
-    if len(sys.argv) == 3:
-        use_selected_suffixes = sys.argv[2]
-        selected_suffixes = True if use_selected_suffixes == "-c" else False
     dirs = make_directories()
-    state_machine = StateMachine(dirs, proposal_id, selected_suffixes)
+    state_machine = StateMachine(dirs, proposal_id)
     state_machine.run()
 
 

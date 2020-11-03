@@ -108,9 +108,7 @@ class MastSlice(object):
             self.proposal_ids = sorted(list(set(result)))
         return self.proposal_ids
 
-    def get_products(
-        self, proposal_id: int, selected_suffixes: Optional[bool] = False
-    ) -> Table:
+    def get_products(self, proposal_id: int, selected_suffixes: bool = False) -> Table:
         def proposal_id_matches(row: Row) -> bool:
             return int(row["proposal_id"]) == proposal_id
 
@@ -127,7 +125,7 @@ class MastSlice(object):
         return result
 
     def to_product_set(
-        self, proposal_id: int, selected_suffixes: Optional[bool] = False
+        self, proposal_id: int, selected_suffixes: bool = False
     ) -> "ProductSet":
         return ProductSet(self.get_products(proposal_id, selected_suffixes))
 

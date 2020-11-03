@@ -14,7 +14,6 @@ class CheckDownloads(MarkedStage):
         working_dir: str,
         mast_downloads_dir: str,
         proposal_id: int,
-        selected_suffixes: Optional[bool] = False,
     ) -> None:
         # first pass, <working_dir> shouldn't exist; second pass
         # <working_dir>/mastDownload should not exist.
@@ -25,7 +24,8 @@ class CheckDownloads(MarkedStage):
         slice = MastSlice((1900, 1, 1), (2025, 1, 1), proposal_id)
         proposal_ids = slice.get_proposal_ids()
         assert proposal_id in proposal_ids, f"{proposal_id} in {proposal_ids}"
-        product_set = slice.to_product_set(proposal_id, selected_suffixes)
+        # get files from full list of ACCEPTED_SUFFIXES
+        product_set = slice.to_product_set(proposal_id)
         if not os.path.isdir(working_dir):
             os.makedirs(working_dir)
 
@@ -45,5 +45,4 @@ class CheckDownloads(MarkedStage):
                 working_dir,
                 mast_downloads_dir,
                 self._proposal_id,
-                self._selected_suffixes,
             )
