@@ -8,3 +8,6 @@ from typing import Any
 ndarray: Any
 isnan: Any
 sum: Any
+
+def arange(n: float) -> Any: ...
+def full(shape: Any, fill_value: Any) -> Any: ...
