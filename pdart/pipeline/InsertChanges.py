@@ -30,7 +30,9 @@ def read_changes_dict(changes_path: str) -> Dict[LIDVID, str]:
 
 class InsertChanges(MarkedStage):
     """
-    Using the CHANGES_DICT, we insert changed files into the archive.
+    In this stage, we insert changed files into the primary-deltas
+    directory.  (The CHANGES_DICT seems to be unused.  TODO Verify and
+    if so, remove it.)
 
     TODO The insertion is currently unimplemented except in the case
     that this is the first version and so the archive is empty.
@@ -52,7 +54,6 @@ class InsertChanges(MarkedStage):
         ) as primary_files_osfs, make_sv_deltas(
             version_view, archive_primary_deltas_dir
         ) as sv_deltas:
-
             archive_dirs = list(archive_osfs.walk.dirs())
             if archive_dirs:
                 changes_dict = read_changes_dict(changes_path)
