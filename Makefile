@@ -160,6 +160,16 @@ download-shm-spt : setup_dir
 		python Download_SHM_SPT.py $$project_id; \
 	done;
 
+##############################
+# Get the list of proposal ids
+##############################
+.PHONY: get-proposal-ids
+get-proposal-ids : venv
+	mkdir -p $(LIL-TWD)
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
+	python GetProposalIds.py; \
+	echo '**** List of Proposal Ids is created under' $(LIL-TWD) '****'; \
+
 ############################################################
 # Setup
 ############################################################
