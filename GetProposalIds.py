@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # Store the list of proposal ids as a text file in TWD
     working_dir = TWD
     if not os.path.isdir(working_dir):
-      os.makedirs(working_dir)
+        os.makedirs(working_dir)
     list_dir = f"{TWD}/proposal_ids.txt"
     slice = MastSlice((1900, 1, 1), (2025, 1, 1))
     proposal_ids_list = slice.get_proposal_ids()
@@ -24,5 +24,5 @@ if __name__ == "__main__":
         count = 0
         for proposal_id in proposal_ids_list:
             f.write("%s\n" % proposal_id)
-            count +=1
+            count += 1
         f.write("Totol number of proposal ids: %s\n" % count)

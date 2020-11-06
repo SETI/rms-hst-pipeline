@@ -129,23 +129,57 @@ lil-pipeline : venv
 	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
 	done;
-	say lil pipeline is done
-	open $(LIL-TWD)
+	# say lil pipeline is done
+	# open $(LIL-TWD)
 
 ##############################
 # Pipeline for NICMOS ONLY
 ##############################
-NICMOS_ID=07885
-
+nicmos-pipeline : LILS=07885
 .PHONY: nicmos-pipeline
-nicmos-pipeline : setup_dir
-	for project_id in $(NICMOS_ID); do \
-	    echo '****' hst_$$project_id '****'; \
-	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
-		python Pipeline.py $$project_id; \
-	done;
-	say lil pipeline is done
-	open $(LIL-TWD)
+nicmos-pipeline : lil-pipeline
+
+##############################
+# Pipeline for FOC ONLY
+##############################
+foc-pipeline: LILS=05150
+.PHONY: foc-pipeline
+foc-pipeline : lil-pipeline
+
+##############################
+# Pipeline for COS ONLY
+##############################
+cos-pipeline: LILS=12037
+.PHONY: cos-pipeline
+cos-pipeline : lil-pipeline
+
+##############################
+# Pipeline for WFPC ONLY
+##############################
+wfpc-pipeline: LILS=04521
+.PHONY: wfpc-pipeline
+wfpc-pipeline : lil-pipeline
+
+##############################
+# Pipeline for STIS ONLY
+##############################
+stis-pipeline: LILS=07313
+.PHONY: stis-pipeline
+stis-pipeline : lil-pipeline
+
+##############################
+# Pipeline for FOS ONLY
+##############################
+fos-pipeline: LILS=03744
+.PHONY: fos-pipeline
+fos-pipeline : lil-pipeline
+
+##############################
+# Pipeline for GHRS ONLY
+##############################
+ghrs-pipeline: LILS=05844
+.PHONY: ghrs-pipeline
+ghrs-pipeline : lil-pipeline
 
 ##############################
 # Download shm & spt from mast

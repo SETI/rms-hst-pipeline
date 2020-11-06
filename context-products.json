@@ -23,6 +23,66 @@
     {
       "name": [],
       "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.foc::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.cos::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.wfpc::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.stis::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.fos::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:instrument:insthost.ghrs::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05150::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_12037::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_07313::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_03744::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05844::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
+      "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_04521::1.0"
+    },
+    {
+      "name": [],
+      "type": [],
       "lidvid": "urn:nasa:pds:context:investigation:investigation.hst_05167::1.0"
     },
     {
