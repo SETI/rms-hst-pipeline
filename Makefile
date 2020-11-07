@@ -160,14 +160,24 @@ download-shm-spt : setup_dir
 		python Download_SHM_SPT.py $$project_id; \
 	done;
 
-##############################
-# Get the list of proposal ids
-##############################
+############################################################
+# Get the list of proposal ids with moving target = true
+############################################################
 .PHONY: get-proposal-ids
 get-proposal-ids : venv
 	mkdir -p $(LIL-TWD)
 	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
-	python GetProposalIds.py; \
+	python GetProposalIds.py all; \
+	echo '**** List of Proposal Ids is created under' $(LIL-TWD) '****'; \
+
+############################################################
+# Get the list of proposal ids with image product type & moving target = true
+############################################################
+.PHONY: get-image-proposal-ids
+get-image-proposal-ids : venv
+	mkdir -p $(LIL-TWD)
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
+	python GetProposalIds.py image; \
 	echo '**** List of Proposal Ids is created under' $(LIL-TWD) '****'; \
 
 ############################################################
