@@ -16,7 +16,7 @@ class VID(object):
 
         # Check requirements
         assert len(vid_str) <= 255, "VID is too long"
-        assert len(vs) is 2, f"VID {vid_str} does not have two components"
+        assert len(vs) == 2, f"VID {vid_str} does not have two components"
         for v in vs:
             assert re.match("\\A(0|[1-9][0-9]*)\\Z", v), f"VID is non-numeric: {v}"
 

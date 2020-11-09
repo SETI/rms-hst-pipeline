@@ -58,7 +58,7 @@ def _translate_path_to_base_path(path: str, is_file_hint: Optional[bool] = None)
     l_ = len(parts)
     if l_ in [0, 1, 2]:
         return path
-    elif l_ is 3:
+    elif l_ == 3:
 
         # There are three cases.  First, are we looking at a path for
         # a file or for a directory?
@@ -250,7 +250,7 @@ class DeliverablePrimitives(FSPrimitives):
                 else:
                     res[str(filename)] = Dir(self, child_path)
             return res
-        elif l_ is 2:
+        elif l_ == 2:
             # note that path == base_path for l_ == 2
             return _union_dicts(
                 self._file_contents(path),
@@ -259,7 +259,7 @@ class DeliverablePrimitives(FSPrimitives):
                 self._doc_contents(path),
             )
         else:
-            assert l_ is 3
+            assert l_ == 3
             product_dir_name = path_parts[2]
             v = _visit_of(product_dir_name)
             if v:
@@ -297,7 +297,7 @@ class DeliverablePrimitives(FSPrimitives):
         path = fs.path.join(parent_node.path, filename)
         parts = list(fs.path.iteratepath(path))
         l_ = len(parts)
-        if l_ is 3:
+        if l_ == 3:
             if _visit_of(parts[2]):
                 # it's of the form /bundle/collection/product
                 self._rm_product_dir(path)
