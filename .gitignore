@@ -153,5 +153,5 @@ dmypy.json
 # Output from make
 tmp*.xml
 
-# testing script
+# Testing script
 TestMastResult.py
