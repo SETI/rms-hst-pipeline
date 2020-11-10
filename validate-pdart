@@ -1,6 +1,4 @@
 #!/bin/bash
-TOOLDIR=${HOME}/Desktop/seti/workspace
-BASE_DIR=${TOOLDIR}/pdart
 CONTEXT_PRODUCTS=./context-products.json
 XMLDIR=./xml
 # Remove this scaffolding when switching to the new HST_Parameters implementation.
