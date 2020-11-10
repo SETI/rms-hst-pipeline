@@ -25,7 +25,7 @@ def parse_subdir_versions(txt: str) -> Dict[str, str]:
         line = line.strip()
         if line:
             fields = line.split(" ")
-            assert len(fields) is 2, f"line #{n} = {line!r}"
+            assert len(fields) == 2, f"line #{n} = {line!r}"
             # TODO assert format of each field
             assert _versionRE.match(str(fields[1]))
             d[str(fields[0])] = str(fields[1])

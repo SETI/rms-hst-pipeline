@@ -1,5 +1,16 @@
+# The Python that gets used within the virtual environment is the
+# Python you use to create the virtual environment.  It's usually
+# called "python3", but if you need to use a different one, you can
+# override it here.
+#
+# The variable $(PYTHON) only used in the goal "venv" when creating
+# the virtual environment. After that, we always activate the virtual
+# environment before running Python, so we don't have to specific
+# which one.
+PYTHON=python3
+
 ACTIVATE=source venv/bin/activate
-PIP=python3 -m pip
+PIP=python -m pip
 
 # Format, typecheck, and test.
 .PHONY: all
@@ -37,7 +48,7 @@ mypy : venv
 	$(ACTIVATE) && MYPYPATH=stubs mypy $(MYPY_FLAGS) *.py pdart
 
 experiment : venv black mypy
-	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) python3 Experiment.py
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) python Experiment.py
 
 
 ############################################################
@@ -186,7 +197,7 @@ setup_dir : venv
 
 .PHONY : check
 check :
-	$(ACTIVATE) && (python3 CheckSubarrayFlag.py | tee check.out)
+	$(ACTIVATE) && (python CheckSubarrayFlag.py | tee check.out)
 
 ############################################################
 # THE VIRTUAL ENVIRONMENT
@@ -194,7 +205,7 @@ check :
 
 # Install the virtual environment.
 venv : requirements.txt
-	python3 -m venv venv
+	$(PYTHON) -m venv venv
 	$(ACTIVATE) && \
 	    $(PIP) install --upgrade pip && $(PIP) install -r requirements.txt
 
@@ -237,4 +248,4 @@ clean : tidy
 
 .PHONY: target_files
 target_files : venv
-	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) python3 DownloadTargetFiles.py
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) python DownloadTargetFiles.py

@@ -173,4 +173,4 @@ class VersionView(FS):
         }
         sfs = SubFS(self, dirpath)
         filepaths = {file for file in sfs.walk.files() if "$" not in file}
-        return VersionContents.createFromLIDs(subcomps, sfs, filepaths)
+        return VersionContents.create_from_lids(subcomps, sfs, filepaths)

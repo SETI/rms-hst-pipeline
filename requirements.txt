@@ -20,7 +20,6 @@ packaging==20.3
 Pillow==7.1.1
 pluggy==0.13.1
 py==1.8.1
-pyfits==3.5
 pyparsing==2.4.6
 pytest==5.4.1
 pytz==2019.3
