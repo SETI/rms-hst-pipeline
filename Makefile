@@ -140,8 +140,8 @@ lil-pipeline : venv
 	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
 	done;
-	# say lil pipeline is done
-	# open $(LIL-TWD)
+	say lil pipeline is done
+	open $(LIL-TWD)
 
 ##############################
 # Pipeline for NICMOS ONLY

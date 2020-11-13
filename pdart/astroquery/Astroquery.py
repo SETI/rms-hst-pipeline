@@ -169,8 +169,6 @@ class CustomizedQueryMastSlice(MastSlice):
         self.proposal_ids: Optional[List[int]] = None
 
     # Don't restrict the file suffixes, get all files.
-    # Need to use #type: ignore so that mypy won't complain about
-
     def get_products(self, proposal_id: int, selected_suffixes: bool = False) -> Table:
         def proposal_id_matches(row: Row) -> bool:
             return int(row["proposal_id"]) == proposal_id
