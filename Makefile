@@ -183,9 +183,9 @@ get-image-proposal-ids : venv
 	python GetProposalIds.py image; \
 	echo '**** List of Proposal Ids is created under' $(LIL-TWD) '****'; \
 
-########################################
+############################################################
 # Get file names and unique suffixes
-########################################
+############################################################
 get-file-names-suffixes : TEST_IDS=05150 12037 04521 07313 03744 05844
 get-file-names-suffixes : FILES_PATH=$(LIL-TWD)/files_from_mast
 .PHONY: get-file-names-suffixes
@@ -198,9 +198,27 @@ get-file-names-suffixes : venv
 	done;
 	echo '**** List of file names & suffixes is created under' $(FILES_PATH) '****'; \
 
-########################################
+
+############################################################
+# Get file names and unique suffixes for all proposal ids with mflag=True
+############################################################
+ID_LIST=proposal_ids_all.txt
+get-file-names-suffixes-all : get-proposal-ids
+get-file-names-suffixes-all : TEST_IDS=$(shell cat ${ID_LIST})
+get-file-names-suffixes-all : FILES_PATH=$(LIL-TWD)/files_from_mast
+.PHONY: get-file-names-suffixes
+get-file-names-suffixes-all : venv
+	mkdir -p $(LIL-TWD)
+	for project_id in $(TEST_IDS); do \
+		echo '****' hst_$$project_id '****'; \
+		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
+		python DownloadAllFilesForOneProposalId.py $$project_id; \
+	done;
+	echo '**** List of file names & suffixes is created under' $(FILES_PATH) '****'; \
+
+############################################################
 # Download all files for one proposal id
-########################################
+############################################################
 download-all-files : TEST_IDS=05150 12037 04521 07313 03744 05844
 download-all-files : FILES_PATH=$(LIL-TWD)/files_from_mast
 .PHONY: get-file-names-suffixes

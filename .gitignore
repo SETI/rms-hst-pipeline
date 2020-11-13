@@ -155,3 +155,6 @@ tmp*.xml
 
 # Testing script
 TestMastResult.py
+
+# proposal ids
+proposal_ids_all.txt
