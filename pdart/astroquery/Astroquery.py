@@ -140,6 +140,49 @@ class MastSlice(object):
         self.download_products(products_table, download_dir=download_dir)
 
 
+# MastSlice with cutomized query criteria
+class CustomizedQueryMastSlice(MastSlice):
+    def __init__(
+        self, start_date: _YMD, end_date: _YMD, proposal_id: Optional[int] = None
+    ) -> None:
+        super().__init__(start_date, end_date, proposal_id)
+
+        # Don't restrict product type to image
+        def mast_call() -> Table:
+            if proposal_id is not None:
+                return Observations.query_criteria(
+                    dataRights="PUBLIC",
+                    obs_collection=["HST"],
+                    proposal_id=str(proposal_id),
+                    t_obs_release=(self.start_date, self.end_date),
+                    mtFlag=True,
+                )
+            else:
+                return Observations.query_criteria(
+                    dataRights="PUBLIC",
+                    obs_collection=["HST"],
+                    t_obs_release=(self.start_date, self.end_date),
+                    mtFlag=True,
+                )
+
+        self.observations_table = get_table_with_retries(mast_call, 1)
+        self.proposal_ids: Optional[List[int]] = None
+
+    # Don't restrict the file suffixes, get all files.
+    # Need to use #type: ignore so that mypy won't complain about
+
+    def get_products(self, proposal_id: int, selected_suffixes: bool = False) -> Table:
+        def proposal_id_matches(row: Row) -> bool:
+            return int(row["proposal_id"]) == proposal_id
+
+        proposal_table = filter_table(proposal_id_matches, self.observations_table)
+
+        result = Observations.get_product_list(proposal_table)
+        result = filter_table(_is_accepted_instrument_product_row, result)
+
+        return result
+
+
 def products_size(table: Table) -> int:
     return sum(cast(Iterable[int], table["size"]))
 

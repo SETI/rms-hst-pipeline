@@ -140,48 +140,6 @@ nicmos-pipeline : LILS=07885
 nicmos-pipeline : lil-pipeline
 
 ##############################
-# Pipeline for FOC ONLY
-##############################
-foc-pipeline: LILS=05150
-.PHONY: foc-pipeline
-foc-pipeline : lil-pipeline
-
-##############################
-# Pipeline for COS ONLY
-##############################
-cos-pipeline: LILS=12037
-.PHONY: cos-pipeline
-cos-pipeline : lil-pipeline
-
-##############################
-# Pipeline for WFPC ONLY
-##############################
-wfpc-pipeline: LILS=04521
-.PHONY: wfpc-pipeline
-wfpc-pipeline : lil-pipeline
-
-##############################
-# Pipeline for STIS ONLY
-##############################
-stis-pipeline: LILS=07313
-.PHONY: stis-pipeline
-stis-pipeline : lil-pipeline
-
-##############################
-# Pipeline for FOS ONLY
-##############################
-fos-pipeline: LILS=03744
-.PHONY: fos-pipeline
-fos-pipeline : lil-pipeline
-
-##############################
-# Pipeline for GHRS ONLY
-##############################
-ghrs-pipeline: LILS=05844
-.PHONY: ghrs-pipeline
-ghrs-pipeline : lil-pipeline
-
-##############################
 # Download shm & spt from mast
 ##############################
 TEST_ID=07885 09059 09748 15505
@@ -213,6 +171,36 @@ get-image-proposal-ids : venv
 	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 	python GetProposalIds.py image; \
 	echo '**** List of Proposal Ids is created under' $(LIL-TWD) '****'; \
+
+########################################
+# Get file names and unique suffixes
+########################################
+get-file-names-suffixes : TEST_IDS=05150 12037 04521 07313 03744 05844
+get-file-names-suffixes : FILES_PATH=$(LIL-TWD)/files_from_mast
+.PHONY: get-file-names-suffixes
+get-file-names-suffixes : venv
+	mkdir -p $(LIL-TWD)
+	for project_id in $(TEST_IDS); do \
+		echo '****' hst_$$project_id '****'; \
+		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
+		python DownloadAllFilesForOneProposalId.py $$project_id; \
+	done;
+	echo '**** List of file names & suffixes is created under' $(FILES_PATH) '****'; \
+
+########################################
+# Download all files for one proposal id
+########################################
+download-all-files : TEST_IDS=05150 12037 04521 07313 03744 05844
+download-all-files : FILES_PATH=$(LIL-TWD)/files_from_mast
+.PHONY: get-file-names-suffixes
+download-all-files : venv
+	mkdir -p $(LIL-TWD)
+	for project_id in $(TEST_IDS); do \
+		echo '****' hst_$$project_id '****'; \
+		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
+		python DownloadAllFilesForOneProposalId.py $$project_id -d; \
+	done;
+	echo '**** Files are under' $(FILES_PATH) '****'; \
 
 ############################################################
 # Setup

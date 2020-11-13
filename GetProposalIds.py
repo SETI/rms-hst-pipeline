@@ -1,43 +1,10 @@
-from typing import Optional, Tuple
 import os
 import sys
-from pdart.astroquery.AcceptedSuffixes import (
-    ACCEPTED_SUFFIXES,
-    PART_OF_ACCEPTED_SUFFIXES,
+
+from pdart.astroquery.Astroquery import (
+    MastSlice,
+    CustomizedQueryMastSlice,
 )
-from pdart.astroquery.Astroquery import *
-from pdart.pipeline.Directories import DevDirectories
-
-_YMD = Tuple[int, int, int]
-
-# Customize MastSlice to use cutomized query criteria
-# Don't restrict product type to image
-class CustomizedQueryMastSlice(MastSlice):
-    def __init__(
-        self, start_date: _YMD, end_date: _YMD, proposal_id: Optional[int] = None
-    ) -> None:
-        super().__init__(start_date, end_date, proposal_id)
-
-        def mast_call() -> Table:
-            if proposal_id is not None:
-                return Observations.query_criteria(
-                    dataRights="PUBLIC",
-                    obs_collection=["HST"],
-                    proposal_id=str(proposal_id),
-                    t_obs_release=(self.start_date, self.end_date),
-                    mtFlag=True,
-                )
-            else:
-                return Observations.query_criteria(
-                    dataRights="PUBLIC",
-                    obs_collection=["HST"],
-                    t_obs_release=(self.start_date, self.end_date),
-                    mtFlag=True,
-                )
-
-        self.observations_table = get_table_with_retries(mast_call, 1)
-        self.proposal_ids: Optional[List[int]] = None
-
 
 # Download from Mast
 if __name__ == "__main__":
