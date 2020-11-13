@@ -5,7 +5,12 @@ set -eu
 # state from tarballs.  Used while developing the pipeline to handle
 # changed files.
 
-rm -rf tmp-working-dir/hst_09059/documentDownload || exit 0
-open -W tmp-working-dir/hst_09059/documentDownload.tar.gz 
-rm -rf tmp-working-dir/hst_09059/mastDownload || exit 0
-open -W tmp-working-dir/hst_09059/mastDownload.tar.gz
+if [ -f tmp-working-dir/hst_09059/documentDownload.tar.gz ]; then
+    rm -rf tmp-working-dir/hst_09059/documentDownload || exit 0
+    open -W tmp-working-dir/hst_09059/documentDownload.tar.gz 
+fi
+
+if [ -f tmp-working-dir/hst_09059/mastDownload.tar.gz ]; then
+    rm -rf tmp-working-dir/hst_09059/mastDownload || exit 0
+    open -W tmp-working-dir/hst_09059/mastDownload.tar.gz
+fi

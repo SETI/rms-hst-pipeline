@@ -114,6 +114,9 @@ class Multiversioned(MutableMapping):
     def __init__(self, fs: FS) -> None:
         self.fs = fs
 
+    def __str__(self) -> str:
+        return f"Multiversioned({self.fs})"
+
     def make_lidvid_dir(self, lidvid: LIDVID) -> str:
         dir_path = lidvid_path(lidvid)
         self.fs.makedirs(dir_path, None, True)

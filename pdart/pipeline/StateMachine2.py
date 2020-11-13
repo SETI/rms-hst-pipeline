@@ -63,10 +63,14 @@ class ChangeFiles(MarkedStage):
             touch_fits(abs_path)
 
         with make_osfs(self.mast_downloads_dir()) as mast_fs:
+            first_time = True
             for path in mast_fs.walk.files(filter=["*.fits"]):
                 # change only the first FITS file then return
-                change_fits_file(path)
-                return
+                if not first_time:
+                    change_fits_file(path)
+                    print(f"#### CHANGED {path}! ####")
+                    return
+                first_time = False
 
 
 class StateMachine2(object):

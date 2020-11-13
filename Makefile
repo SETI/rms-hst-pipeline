@@ -162,6 +162,7 @@ CHANGES=09059
 changes : venv black mypy
 	mkdir -p $(LIL-TWD)
 	-rm $(LIL-TWD)/*/\#*.txt
+	./reset-downloads
 	for project_id in $(CHANGES); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
