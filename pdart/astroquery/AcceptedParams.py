@@ -44,3 +44,5 @@ PART_OF_ACCEPTED_SUFFIXES: List[str] = [
     "SHM",
     "SPT",
 ]
+
+ACCEPTED_INSTRUMENTS: str = "IJLNOUWXYZ"

@@ -4,9 +4,10 @@ from astropy.table import Table
 from astropy.table.row import Row
 from astroquery.mast import Observations
 
-from pdart.astroquery.AcceptedSuffixes import (
+from pdart.astroquery.AcceptedParams import (
     ACCEPTED_SUFFIXES,
     PART_OF_ACCEPTED_SUFFIXES,
+    ACCEPTED_INSTRUMENTS,
 )
 
 from pdart.astroquery.Utils import (
@@ -17,7 +18,6 @@ from pdart.astroquery.Utils import (
 
 _YMD = Tuple[int, int, int]
 
-_ACCEPTED_INSTRUMENTS: str = "IJLNOUWXYZ"
 """
 We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
@@ -37,7 +37,7 @@ def _is_accepted_instrument_product_row(row: Row) -> bool:
         """
         return id[0].upper()
 
-    return instrument_key(row["obs_id"]) in _ACCEPTED_INSTRUMENTS
+    return instrument_key(row["obs_id"]) in ACCEPTED_INSTRUMENTS
 
 
 def _is_accepted_product_type_product_row(row: Row) -> bool:

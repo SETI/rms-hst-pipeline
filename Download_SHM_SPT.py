@@ -1,6 +1,6 @@
 import os
 import sys
-from pdart.astroquery.AcceptedSuffixes import (
+from pdart.astroquery.AcceptedParams import (
     ACCEPTED_SUFFIXES,
     PART_OF_ACCEPTED_SUFFIXES,
 )
