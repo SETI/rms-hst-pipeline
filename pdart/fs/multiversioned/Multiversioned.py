@@ -217,7 +217,9 @@ class Multiversioned(MutableMapping):
 
             # We create a VersionContents object from the set of new
             # LIDVIDs and filepath.
-            contents = VersionContents.createFromLIDVIDs(child_lidvids, sfs, filepaths)
+            contents = VersionContents.create_from_lidvids(
+                child_lidvids, sfs, filepaths
+            )
 
             # Now we ask the Multiversioned to insert these contents
             # as a new version if needed.  It returns the new LIDVID
@@ -273,7 +275,7 @@ class Multiversioned(MutableMapping):
         lidvids = {make_sub_lidvid(segment, vid) for segment, vid in list(d.items())}
         sub_fs = SubFS(self.fs, dirpath)
         filepaths = set(sub_fs.walk.files(exclude=[SUBDIR_VERSIONS_FILENAME]))
-        return VersionContents.createFromLIDVIDs(lidvids, sub_fs, filepaths)
+        return VersionContents.create_from_lidvids(lidvids, sub_fs, filepaths)
 
     def __iter__(self) -> Iterator[LIDVID]:
         for dir in self.fs.walk.dirs():

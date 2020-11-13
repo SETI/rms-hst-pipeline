@@ -40,8 +40,8 @@ class VersionContents(Generic[S]):
         """
         Create a 'VersionContents' object.  DO NOT USE this
         constructor.  Instead use the static methods
-        VersionContents.createFromLIDs() and
-        VersionContents.createFromLIDVIDs().
+        VersionContents.create_from_lids() and
+        VersionContents.create_from_lidvids().
         """
         assert _data_consistent(contains_lidvids, subcomponents)
         self.contains_lidvids = contains_lidvids
@@ -53,13 +53,13 @@ class VersionContents(Generic[S]):
         self.filepaths = filepaths
 
     @staticmethod
-    def createFromLIDs(
+    def create_from_lids(
         subcomponents: Set[LID], fs: FS, filepaths: Set[str]
     ) -> "VersionContents[LID]":
         return VersionContents[LID](False, subcomponents, fs, filepaths)
 
     @staticmethod
-    def createFromLIDVIDs(
+    def create_from_lidvids(
         subcomponents: Set[LIDVID], fs: FS, filepaths: Set[str]
     ) -> "VersionContents[LIDVID]":
         return VersionContents[LIDVID](True, subcomponents, fs, filepaths)
@@ -79,7 +79,7 @@ class VersionContents(Generic[S]):
     def to_lid_version_contents(self) -> "VersionContents[LID]":
         if self.contains_lidvids:
             lids = {lidvid.lid() for lidvid in self.lidvids()}
-            return VersionContents.createFromLIDs(lids, self.fs, self.filepaths)
+            return VersionContents.create_from_lids(lids, self.fs, self.filepaths)
         else:
             raise TypeError(f"{self} does not contain LIDVIDs")
 
