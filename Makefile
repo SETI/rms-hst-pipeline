@@ -170,7 +170,6 @@ changes : venv black mypy
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
 		python Pipeline2.py $$project_id; \
 	done;
-	say change pipeline is done
 
 ##############################
 # Download shm & spt from mast

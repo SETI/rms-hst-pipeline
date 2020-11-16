@@ -7,7 +7,7 @@ set -eu
 
 if [ -f tmp-working-dir/hst_09059/documentDownload.tar.gz ]; then
     rm -rf tmp-working-dir/hst_09059/documentDownload || exit 0
-    open -W tmp-working-dir/hst_09059/documentDownload.tar.gz 
+    open -W tmp-working-dir/hst_09059/documentDownload.tar.gz
 fi
 
 if [ -f tmp-working-dir/hst_09059/mastDownload.tar.gz ]; then

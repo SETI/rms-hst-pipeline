@@ -68,7 +68,7 @@ class ChangeFiles(MarkedStage):
                 # change only the first FITS file then return
                 if not first_time:
                     change_fits_file(path)
-                    print(f"#### CHANGED {path}! ####")
+                    print(f"#### CHANGED {path} ####")
                     return
                 first_time = False
 

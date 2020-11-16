@@ -13,11 +13,11 @@ def read_changes_dict(changes_path: str) -> Dict[LID, bool]:
                 assert len(parts) == 2, parts
                 lid, changed = parts
                 assert changed in ["False", "True"]
-                changes_dict[LID(lid)] = bool(changed)
+                changes_dict[LID(lid)] = changed == "True"
     return changes_dict
 
 
 def write_changes_dict(d: Dict[LID, bool], changes_path: str) -> None:
     with open(changes_path, "w") as changes_file:
-        for lid, changed in d.items():
+        for lid, changed in sorted(d.items()):
             print(lid, changed, file=changes_file)

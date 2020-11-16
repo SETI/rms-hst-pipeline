@@ -82,9 +82,7 @@ def _get_primary_changes(primary_fs: FS, latest_version_fs: FS) -> Dict[LID, boo
         for filename in primary_files:
             filepath = join(dirpath, relpath(filename))
             if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(filepath):
-                print(
-                    f"################ MISMATCH ON {filepath}; DIRPATH = {dirpath} ####"
-                )
+                print(f"#### ON {filepath}; DIRPATH = {dirpath} ####")
                 return False
         return True
 
@@ -92,7 +90,8 @@ def _get_primary_changes(primary_fs: FS, latest_version_fs: FS) -> Dict[LID, boo
         lid = dir_to_lid(dirpath)
         if _lid_is_primary(lid):
             if latest_version_fs.isdir(dirpath):
-                result[lid] = not (files_match(dirpath) and dirs_match(dirpath))
+                matches = files_match(dirpath) and dirs_match(dirpath)
+                result[lid] = not matches
             else:
                 result[lid] = True
         else:
