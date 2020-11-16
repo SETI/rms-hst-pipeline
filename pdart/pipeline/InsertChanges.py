@@ -37,13 +37,17 @@ def _is_component_path(dirpath: str) -> bool:
 
 
 def _merge_primaries(changes_dict: Dict[LID, bool], src_fs: FS, dst_fs: FS) -> None:
+    # TODO Not sure that this hits all cases, including removal of
+    # files and directories.  Think about it.
     for dirpath in src_fs.walk.dirs(search="depth"):
         if _is_component_path(dirpath):
             lid = dir_to_lid(dirpath)
             changed = changes_dict[lid]
             if changed:
-                # delete the files in the destination
+                if not dst_fs.isdir(dirpath):
+                    dst_fs.makedirs(dirpath)
                 dst_sub_fs = SubFS(dst_fs, dirpath)
+                # delete the files in the destination (if any)
                 for filepath in dst_sub_fs.walk.files():
                     if "$" not in filepath:
                         dst_sub_fs.remove(filepath)
@@ -80,15 +84,7 @@ class InsertChanges(MarkedStage):
         ) as sv_deltas:
             archive_dirs = list(archive_osfs.walk.dirs())
             changes_dict = read_changes_dict(changes_path)
-            # TODO Combine these legs.
-            if archive_dirs:
-                _merge_primaries(changes_dict, primary_files_osfs, sv_deltas)
-            else:
-                # the archive is empty and we can just copy into it
-                for dirpath in primary_files_osfs.walk.dirs():
-                    sv_deltas.makedirs(dirpath)
-                for filepath in primary_files_osfs.walk.files():
-                    fs.copy.copy_file(primary_files_osfs, filepath, sv_deltas, filepath)
+            _merge_primaries(changes_dict, primary_files_osfs, sv_deltas)
 
         shutil.rmtree(primary_files_dir + "-sv")
 
