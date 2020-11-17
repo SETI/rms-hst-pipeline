@@ -22,8 +22,6 @@ from pdart.pipeline.Utils import (
 )
 from pdart.pipeline.Stage import MarkedStage
 
-_VID = VID("1.0")
-
 
 def _is_primary_file(filepath: str) -> bool:
     PRIMARY_SUFFIXES = [".fits", ".apt", ".pdf", ".pro", ".prop", ".txt"]
@@ -100,14 +98,29 @@ def _get_primary_changes(
                 return False
         return True
 
+    def next_vid(lid: LID, changed: bool) -> VID:
+        # TODO If you want to allow minor changes, here is where you
+        # decide which VID to use.  Set a test here, then add a
+        # parameter that decides between major and minor and thread it
+        # up through the call stack.
+        latest_lidvid = mv.latest_lidvid(lid)
+        if latest_lidvid is None:
+            return VID("1.0")
+        elif changed:
+            return latest_lidvid.vid().next_major_vid()
+        else:
+            return latest_lidvid.vid()
+
     for dirpath in primary_fs.walk.dirs(filter=["*\$$"], search="depth"):
         lid = dir_to_lid(dirpath)
+
         if _lid_is_primary(lid):
+            latest_lidvid = mv.latest_lidvid(lid)
             if latest_version_fs.isdir(dirpath):
                 matches = files_match(dirpath) and dirs_match(dirpath)
-                result.set(lid, _VID, not matches)
+                result.set(lid, next_vid(lid, not matches), not matches)
             else:
-                result.set(lid, _VID, True)
+                result.set(lid, next_vid(lid, True), True)
         else:
             pass
     return result
