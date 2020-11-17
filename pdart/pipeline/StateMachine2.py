@@ -9,6 +9,7 @@ from pdart.pipeline.MarkerFile import BasicMarkerFile
 from pdart.pipeline.Utils import make_osfs
 from pdart.pipeline.CopyPrimaryFiles import CopyPrimaryFiles
 from pdart.pipeline.InsertChanges import InsertChanges
+from pdart.pipeline.PopulateDatabase import PopulateDatabase
 from pdart.pipeline.RecordChanges import RecordChanges
 
 # from pdart.pipeline.BuildBrowse import BuildBrowse
@@ -17,7 +18,6 @@ from pdart.pipeline.RecordChanges import RecordChanges
 # from pdart.pipeline.Directories import Directories, make_directories
 # from pdart.pipeline.DownloadDocs import DownloadDocs
 # from pdart.pipeline.MakeDeliverable import MakeDeliverable
-# from pdart.pipeline.PopulateDatabase import PopulateDatabase
 # from pdart.pipeline.ResetPipeline import ResetPipeline
 # from pdart.pipeline.UpdateArchive import UpdateArchive
 # from pdart.pipeline.ValidateBundle import ValidateBundle
@@ -91,7 +91,7 @@ class StateMachine2(object):
             ("COPYPRIMARYFILES", CopyPrimaryFiles(dirs, proposal_id)),
             ("RECORDCHANGES", RecordChanges(dirs, proposal_id)),
             ("INSERTCHANGES", InsertChanges(dirs, proposal_id)),
-            # ("POPULATEDATABASE", PopulateDatabase(dirs, proposal_id)),
+            ("POPULATEDATABASE", PopulateDatabase(dirs, proposal_id)),
             # ("BUILDBROWSE", BuildBrowse(dirs, proposal_id)),
             # ("BUILDLABELS", BuildLabels(dirs, proposal_id)),
             # ("UPDATEARCHIVE", UpdateArchive(dirs, proposal_id)),

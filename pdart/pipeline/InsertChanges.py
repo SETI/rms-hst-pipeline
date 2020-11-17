@@ -10,7 +10,7 @@ from fs.subfs import SubFS
 
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
-from pdart.pipeline.ChangesDict import CHANGES_DICT, read_changes_dict
+from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import (
     make_osfs,
@@ -74,7 +74,7 @@ class InsertChanges(MarkedStage):
         archive_dir: str = self.archive_dir()
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
 
-        changes_path = os.path.join(working_dir, CHANGES_DICT)
+        changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
             archive_osfs, self._bundle_segment
         ) as version_view, make_sv_osfs(

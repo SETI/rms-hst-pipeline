@@ -5,11 +5,17 @@ from fs.base import FS
 from fs.subfs import SubFS
 from fs.path import iteratepath, join, relpath, splitext
 
+from pdart.fs.multiversioned.Multiversioned import Multiversioned
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from pdart.pipeline.ChangesDict import CHANGES_DICT, write_changes_dict
-from pdart.pipeline.Utils import make_osfs, make_sv_osfs, make_version_view
+from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, write_changes_dict
+from pdart.pipeline.Utils import (
+    make_osfs,
+    make_mv_osfs,
+    make_sv_osfs,
+    make_version_view,
+)
 from pdart.pipeline.Stage import MarkedStage
 
 
@@ -38,7 +44,9 @@ def _lid_is_primary(lid: LID) -> bool:
         return True
 
 
-def _get_primary_changes(primary_fs: FS, latest_version_fs: FS) -> Dict[LID, bool]:
+def _get_primary_changes(
+    mv: Multiversioned, primary_fs: FS, latest_version_fs: FS
+) -> Dict[LID, bool]:
     result: Dict[LID, bool] = {}
 
     def filter_to_primary_files(filenames: Iterator[str]) -> Set[str]:
@@ -82,7 +90,7 @@ def _get_primary_changes(primary_fs: FS, latest_version_fs: FS) -> Dict[LID, boo
         for filename in primary_files:
             filepath = join(dirpath, relpath(filename))
             if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(filepath):
-                print(f"#### ON {filepath}; DIRPATH = {dirpath} ####")
+                print(f"#### CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath} ####")
                 return False
         return True
 
@@ -103,14 +111,14 @@ class RecordChanges(MarkedStage):
     """
     We compare the downloaded files with the latest versions in the
     archive.  We make a list of the LIDVIDs that have changed and
-    write them into the CHANGES_DICT.
+    write them into the CHANGES_DICT_NAME.
 
     Note that when we have a technique to tell which files on MAST
     have changed, so we can download only the changed files, then this
     stage will not be needed.
 
     When this stage finishes, there should (still) be a
-    primary_files_dir, but we have added a CHANGES_DICT.
+    primary_files_dir, but we have added a CHANGES_DICT_NAME.
     """
 
     def _run(self) -> None:
@@ -122,13 +130,14 @@ class RecordChanges(MarkedStage):
         assert os.path.isdir(primary_files_dir + "-sv"), primary_files_dir
 
         changes: Dict[LIDVID, bool] = dict()
-        changes_path = os.path.join(working_dir, CHANGES_DICT)
+        changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
             archive_osfs, self._bundle_segment
         ) as latest_version:
             with make_sv_osfs(primary_files_dir) as primary_fs:
-                d = _get_primary_changes(primary_fs, latest_version)
+                mv = Multiversioned(archive_osfs)
+                d = _get_primary_changes(mv, primary_fs, latest_version)
                 write_changes_dict(d, changes_path)
 
         assert os.path.isdir(primary_files_dir + "-sv")
-        assert os.path.isfile(os.path.join(working_dir, CHANGES_DICT))
+        assert os.path.isfile(os.path.join(working_dir, CHANGES_DICT_NAME))
