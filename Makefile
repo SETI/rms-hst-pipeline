@@ -164,7 +164,7 @@ download-shm-spt : setup_dir
 	done;
 
 ############################################################
-# Download shm & spt from mast for all proposal ids with mflag=True
+# Download shm & spt from mast for all proposal ids with mtflag=True
 ############################################################
 ID_LIST=proposal_ids_all.txt
 download-shm-spt-all : get-proposal-ids
@@ -209,7 +209,7 @@ get-file-names-suffixes : venv
 
 
 ############################################################
-# Get file names and unique suffixes for all proposal ids with mflag=True
+# Get file names and unique suffixes for all proposal ids with mtflag=True
 ############################################################
 ID_LIST=proposal_ids_all.txt
 get-file-names-suffixes-all : get-proposal-ids
