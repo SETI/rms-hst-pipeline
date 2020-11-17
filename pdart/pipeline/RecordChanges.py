@@ -9,7 +9,11 @@ from pdart.fs.multiversioned.Multiversioned import Multiversioned
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, write_changes_dict
+from pdart.pipeline.ChangesDict import (
+    CHANGES_DICT_NAME,
+    ChangesDict,
+    write_changes_dict,
+)
 from pdart.pipeline.Utils import (
     make_osfs,
     make_mv_osfs,
@@ -17,6 +21,8 @@ from pdart.pipeline.Utils import (
     make_version_view,
 )
 from pdart.pipeline.Stage import MarkedStage
+
+_VID = VID("1.0")
 
 
 def _is_primary_file(filepath: str) -> bool:
@@ -46,8 +52,8 @@ def _lid_is_primary(lid: LID) -> bool:
 
 def _get_primary_changes(
     mv: Multiversioned, primary_fs: FS, latest_version_fs: FS
-) -> Dict[LID, bool]:
-    result: Dict[LID, bool] = {}
+) -> ChangesDict:
+    result = ChangesDict()
 
     def filter_to_primary_files(filenames: Iterator[str]) -> Set[str]:
         return {filename for filename in filenames if _is_primary_file(filename)}
@@ -66,8 +72,8 @@ def _get_primary_changes(
             for dir in primary_dirs:
                 full_dirpath = join(dirpath, relpath(dir))
                 lid = dir_to_lid(full_dirpath)
-                assert lid in result
-                if result[lid]:
+                assert lid in result.changes_dict
+                if result.changed(lid):
                     return False
             return True
         else:
@@ -99,9 +105,9 @@ def _get_primary_changes(
         if _lid_is_primary(lid):
             if latest_version_fs.isdir(dirpath):
                 matches = files_match(dirpath) and dirs_match(dirpath)
-                result[lid] = not matches
+                result.set(lid, _VID, not matches)
             else:
-                result[lid] = True
+                result.set(lid, _VID, True)
         else:
             pass
     return result

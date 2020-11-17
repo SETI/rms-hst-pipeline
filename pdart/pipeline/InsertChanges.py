@@ -10,7 +10,7 @@ from fs.subfs import SubFS
 
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
-from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
+from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, ChangesDict, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import (
     make_osfs,
@@ -36,13 +36,13 @@ def _is_component_path(dirpath: str) -> bool:
     return True
 
 
-def _merge_primaries(changes_dict: Dict[LID, bool], src_fs: FS, dst_fs: FS) -> None:
+def _merge_primaries(changes_dict: ChangesDict, src_fs: FS, dst_fs: FS) -> None:
     # TODO Not sure that this hits all cases, including removal of
     # files and directories.  Think about it.
     for dirpath in src_fs.walk.dirs(search="depth"):
         if _is_component_path(dirpath):
             lid = dir_to_lid(dirpath)
-            changed = changes_dict[lid]
+            changed = changes_dict.changed(lid)
             if changed:
                 if not dst_fs.isdir(dirpath):
                     dst_fs.makedirs(dirpath)
