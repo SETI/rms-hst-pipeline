@@ -178,6 +178,11 @@ class CustomizedQueryMastSlice(MastSlice):
         result = Observations.get_product_list(proposal_table)
         result = filter_table(_is_accepted_instrument_product_row, result)
 
+        if selected_suffixes:
+            result = filter_table(
+                _is_selected_accepted_product_type_product_row, result
+            )
+
         return result
 
 

@@ -164,6 +164,15 @@ download-shm-spt : setup_dir
 	done;
 
 ############################################################
+# Download shm & spt from mast for all proposal ids with mflag=True
+############################################################
+ID_LIST=proposal_ids_all.txt
+download-shm-spt-all : get-proposal-ids
+download-shm-spt-all : PROJ_IDS=$(shell cat ${ID_LIST})
+.PHONY: download-shm-spt-all
+download-shm-spt-all : download-shm-spt
+
+############################################################
 # Get the list of proposal ids with moving target = true
 ############################################################
 .PHONY: get-proposal-ids
