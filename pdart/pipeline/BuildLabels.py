@@ -169,19 +169,22 @@ def create_pds4_labels(
             )
 
         def visit_document_collection(
-            self, document_collection: DocumentCollection, post: bool
+            self,
+            bundle_lidvid: str,
+            document_collection: DocumentCollection,
+            post: bool,
         ) -> None:
             if post:
                 self._post_visit_collection(document_collection)
 
         def visit_other_collection(
-            self, other_collection: OtherCollection, post: bool
+            self, bundle_lidvid: str, other_collection: OtherCollection, post: bool
         ) -> None:
             if post:
                 self._post_visit_collection(other_collection)
 
         def visit_document_product(
-            self, document_product: DocumentProduct, post: bool
+            self, collection_lidvid: str, document_product: DocumentProduct, post: bool
         ) -> None:
             if not post:
                 return
