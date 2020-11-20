@@ -90,12 +90,15 @@ def _populate_from_other_collection(
             populate_database_from_fits_file(db, fits_os_path, product_lidvid)
 
 
-def _populate_bundle(changes_dict: ChangesDict, db: BundleDB) -> None:
+def _populate_bundle(changes_dict: ChangesDict, db: BundleDB) -> LIDVID:
     for lid, (vid, changed) in changes_dict.items():
         if changed and lid.is_bundle_lid():
             lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
             print(f"%%%% db.create_bundle({lidvid})")
             db.create_bundle(str(lidvid))
+            # there's only one, so return it
+            return lidvid
+    assert False, "No changed bundle LID in changes_dict"
 
 
 def _populate_collections(changes_dict: ChangesDict, db: BundleDB) -> None:
@@ -220,52 +223,19 @@ class PopulateDatabase(MarkedStage):
             version_view, archive_primary_deltas_dir
         ) as sv_deltas:
             if db_exists:
-                # second time through
+                # dump the changes_dict
                 for lid, (vid, changed) in changes_dict.items():
                     print("####", lid, vid, changed)
                 print("")
-                _populate_bundle(changes_dict, db)
-                _populate_collections(changes_dict, db)
-                _populate_products(changes_dict, db, sv_deltas)
-                assert False, "PopulateDatabase._run() not fully implemented"
             else:
-                # first time through
                 db.create_tables()
-                bundle_lidvid = _create_initial_lidvid_from_parts(
-                    [str(self._bundle_segment)]
-                )
-                db.create_bundle(bundle_lidvid)
 
-                bundle_path = f"/{self._bundle_segment}$/"
-                collection_segments = [
-                    str(coll[:-1])
-                    for coll in sv_deltas.listdir(bundle_path)
-                    if "$" in coll
-                ]
-                for collection_segment in collection_segments:
-                    is_document_collection = collection_segment == "document"
-                    collection_path = f"{bundle_path}{collection_segment}$/"
-                    collection_lidvid = _extend_initial_lidvid(
-                        bundle_lidvid, collection_segment
-                    )
-                    if is_document_collection:
-                        product_path = f"{collection_path}phase2$/"
-                        _populate_from_document_collection(
-                            db,
-                            sv_deltas,
-                            bundle_lidvid,
-                            collection_lidvid,
-                            product_path,
-                        )
-                    else:
-                        _populate_from_other_collection(
-                            db,
-                            sv_deltas,
-                            bundle_lidvid,
-                            collection_lidvid,
-                            collection_path,
-                        )
-                _populate_schema_collection(db, bundle_lidvid)
+            bundle_lidvid = _populate_bundle(changes_dict, db)
+            _populate_schema_collection(db, str(bundle_lidvid))
+            _populate_collections(changes_dict, db)
+            _populate_products(changes_dict, db, sv_deltas)
+            if db_exists:
+                assert False, "PopulateDatabase._run() not fully implemented"
 
         assert db
 
