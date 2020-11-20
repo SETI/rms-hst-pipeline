@@ -55,7 +55,11 @@ class Test_BrowseProductLabel(unittest.TestCase):
         browse_file = self.db.get_file(browse_file_basename, browse_product_lidvid)
 
         label = make_browse_product_label(
-            self.db, browse_product_lidvid, browse_file_basename, True
+            self.db,
+            browse_collection_lidvid,
+            browse_product_lidvid,
+            browse_file_basename,
+            True,
         )
 
         assert_golden_file_equal(self, "test_BrowseProductLabel.golden.xml", label)

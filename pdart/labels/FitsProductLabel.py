@@ -154,14 +154,13 @@ def _find_SHMish_lookup(
 def make_fits_product_label(
     working_dir: str,
     bundle_db: BundleDB,
+    collection_lidvid: str,
     product_lidvid: str,
     file_basename: str,
     verify: bool,
 ) -> bytes:
     try:
         product = bundle_db.get_product(product_lidvid)
-        collection_lidvid = product.collection_lidvid
-
         collection = bundle_db.get_collection(collection_lidvid)
         assert isinstance(collection, OtherCollection)
         instrument = collection.instrument

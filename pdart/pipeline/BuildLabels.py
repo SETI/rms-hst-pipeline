@@ -211,6 +211,7 @@ def create_pds4_labels(
         ) -> None:
             label = make_browse_product_label(
                 self.db,
+                collection_lidvid,
                 str(browse_file.product_lidvid),
                 str(browse_file.basename),
                 _VERIFY,
@@ -239,6 +240,7 @@ def create_pds4_labels(
             label = make_fits_product_label(
                 working_dir,
                 self.db,
+                collection_lidvid,
                 str(fits_file.product_lidvid),
                 str(fits_file.basename),
                 _VERIFY,
