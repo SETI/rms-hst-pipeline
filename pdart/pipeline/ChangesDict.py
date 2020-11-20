@@ -1,5 +1,6 @@
-from typing import Dict, Optional, Tuple
+from typing import Dict, ItemsView, Optional, Tuple
 from pdart.pds4.LID import LID
+from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 
 
@@ -17,6 +18,17 @@ class ChangesDict(object):
 
     def changed(self, lid: LID) -> bool:
         return self.changes_dict[lid][1]
+
+    def items(self) -> ItemsView[LID, Tuple[VID, bool]]:
+        return self.changes_dict.items()
+
+    def parent_lidvid(self, lidvid: LIDVID) -> LIDVID:
+        lid = lidvid.lid()
+        assert lid in self.changes_dict, f"lidvid={lidvid}"
+        parent_lid = lid.parent_lid()
+        assert parent_lid in self.changes_dict, f"parent_lid={parent_lid}"
+        parent_vid = self.vid(parent_lid)
+        return LIDVID.create_from_lid_and_vid(parent_lid, parent_vid)
 
 
 CHANGES_DICT = ChangesDict

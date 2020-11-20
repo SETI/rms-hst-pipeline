@@ -2,7 +2,7 @@ import os.path
 import re
 from typing import Any, Dict, List, Optional, Tuple, cast
 
-from sqlalchemy import create_engine, exists
+from sqlalchemy import and_, create_engine, exists
 from sqlalchemy.orm import sessionmaker
 
 from pdart.db.SqlAlchTables import (
@@ -135,6 +135,58 @@ class BundleDB(object):
 
     def create_tables(self) -> None:
         create_tables(self.engine)
+
+    ############################################################
+
+    def create_bundle_collection_link(
+        self, bundle_lidvid: str, collection_lidvid: str
+    ) -> None:
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not self.bundle_collection_link_exists(bundle_lidvid, collection_lidvid):
+            self.session.add(
+                BundleCollectionLink(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
+                )
+            )
+            self.session.commit()
+
+    def bundle_collection_link_exists(
+        self, bundle_lidvid: str, collection_lidvid: str
+    ) -> bool:
+        return self.session.query(
+            exists().where(
+                and_(
+                    BundleCollectionLink.bundle_lidvid == bundle_lidvid,
+                    BundleCollectionLink.collection_lidvid == collection_lidvid,
+                )
+            )
+        ).scalar()
+
+    def create_collection_product_link(
+        self, collection_lidvid: str, product_lidvid: str
+    ) -> None:
+        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not self.collection_product_link_exists(collection_lidvid, product_lidvid):
+            self.session.add(
+                CollectionProductLink(
+                    collection_lidvid=collection_lidvid, product_lidvid=product_lidvid
+                )
+            )
+            self.session.commit()
+
+    def collection_product_link_exists(
+        self, collection_lidvid: str, product_lidvid: str
+    ) -> bool:
+        return self.session.query(
+            exists().where(
+                and_(
+                    CollectionProductLink.collection_lidvid == collection_lidvid,
+                    CollectionProductLink.product_lidvid == product_lidvid,
+                )
+            )
+        ).scalar()
 
     ############################################################
 
