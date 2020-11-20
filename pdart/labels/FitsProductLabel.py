@@ -166,7 +166,6 @@ def make_fits_product_label(
         assert isinstance(collection, OtherCollection)
         instrument = collection.instrument
         suffix = collection.suffix
-        bundle_lidvid = collection.bundle_lidvid
 
         card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
         lookup = DictLookup(file_basename, card_dicts)
@@ -178,8 +177,6 @@ def make_fits_product_label(
             bundle_db, product_lidvid, file_basename, siblings
         )
 
-        # TODO This is a hack.  I need to have get_start_stop_date_times
-        # to include an exposure time.
         start_date_time, stop_date_time = get_start_stop_date_times(
             hdu_lookups, shm_lookup
         )
@@ -192,7 +189,6 @@ def make_fits_product_label(
 
         hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)
         bundle = bundle_db.get_bundle()
-        assert bundle.lidvid == bundle_lidvid
         proposal_id = bundle.proposal_id
 
         investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)

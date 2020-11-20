@@ -16,7 +16,9 @@ from pdart.pds4.LIDVID import LIDVID
 _TABLES: Set[str] = {
     "associations",
     "bundles",
+    "bundle_collection_links",
     "collections",
+    "collection_product_links",
     "context_collections",
     "document_collections",
     "schema_collections",

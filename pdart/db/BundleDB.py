@@ -11,6 +11,7 @@ from pdart.db.SqlAlchTables import (
     BrowseFile,
     BrowseProduct,
     Bundle,
+    BundleCollectionLinks,
     BundleLabel,
     Card,
     Collection,
@@ -159,12 +160,17 @@ class BundleDB(object):
         return self.session.query(Bundle).one()
 
     def get_bundle_collections(self, bundle_lidvid: str) -> List[Collection]:
-        return (
+        # TODO There's probably better ways to do this.  Use a SQL
+        # join?
+        return [
             self.session.query(Collection)
-            .filter(Collection.bundle_lidvid == bundle_lidvid)
-            .order_by(Collection.lidvid)
+            .filter(Collection.lidvid == link.collection_lidvid)
+            .one()
+            for link in self.session.query(BundleCollectionLinks)
+            .filter(BundleCollectionLinks.bundle_lidvid == bundle_lidvid)
+            .order_by(BundleCollectionLinks.collection_lidvid)
             .all()
-        )
+        ]
 
     ############################################################
 
@@ -189,8 +195,11 @@ class BundleDB(object):
                     f"LIDVID {collection_lidvid} already exists"
                 )
         else:
+            self.session.add(ContextCollection(lidvid=collection_lidvid))
             self.session.add(
-                ContextCollection(lidvid=collection_lidvid, bundle_lidvid=bundle_lidvid)
+                BundleCollectionLinks(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
+                )
             )
             self.session.commit()
 
@@ -215,11 +224,13 @@ class BundleDB(object):
                     f"LIDVID {collection_lidvid} already exists"
                 )
         else:
+            self.session.add(DocumentCollection(lidvid=collection_lidvid))
             self.session.add(
-                DocumentCollection(
-                    lidvid=collection_lidvid, bundle_lidvid=bundle_lidvid
+                BundleCollectionLinks(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
                 )
             )
+
             self.session.commit()
 
     def create_schema_collection(
@@ -243,8 +254,11 @@ class BundleDB(object):
                     f"LIDVID {collection_lidvid} already exists"
                 )
         else:
+            self.session.add(SchemaCollection(lidvid=collection_lidvid))
             self.session.add(
-                SchemaCollection(lidvid=collection_lidvid, bundle_lidvid=bundle_lidvid)
+                BundleCollectionLinks(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
+                )
             )
             self.session.commit()
 
@@ -277,10 +291,14 @@ class BundleDB(object):
                 OtherCollection(
                     lidvid=collection_lidvid,
                     collection_lidvid=collection_lidvid,
-                    bundle_lidvid=bundle_lidvid,
                     instrument=instrument,
                     prefix=prefix,
                     suffix=suffix,
+                )
+            )
+            self.session.add(
+                BundleCollectionLinks(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
                 )
             )
             self.session.commit()
