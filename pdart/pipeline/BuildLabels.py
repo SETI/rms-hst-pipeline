@@ -206,7 +206,9 @@ def create_pds4_labels(
                 label_deltas.getsyspath(label_filepath), label_filename, product_lidvid
             )
 
-        def visit_browse_file(self, browse_file: BrowseFile) -> None:
+        def visit_browse_file(
+            self, collection_lidvid: str, browse_file: BrowseFile
+        ) -> None:
             label = make_browse_product_label(
                 self.db,
                 str(browse_file.product_lidvid),
@@ -223,7 +225,9 @@ def create_pds4_labels(
                 label_deltas.getsyspath(label_filepath), label_filename, product_lidvid
             )
 
-        def visit_bad_fits_file(self, bad_fits_file: BadFitsFile) -> None:
+        def visit_bad_fits_file(
+            self, collection_lidvid: str, bad_fits_file: BadFitsFile
+        ) -> None:
             basename = bad_fits_file.basename
             product_lidvid = bad_fits_file.product_lidvid
             assert False, (
@@ -231,7 +235,7 @@ def create_pds4_labels(
                 f"in product {product_lidvid}"
             )
 
-        def visit_fits_file(self, fits_file: FitsFile) -> None:
+        def visit_fits_file(self, collection_lidvid: str, fits_file: FitsFile) -> None:
             label = make_fits_product_label(
                 working_dir,
                 self.db,

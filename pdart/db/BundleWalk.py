@@ -152,7 +152,7 @@ class BundleWalk(object):
 
         product_lidvid = str(browse_product.lidvid)
         browse_file = self.db.get_product_file(product_lidvid)
-        self.visit_browse_file(cast(BrowseFile, browse_file))
+        self.visit_browse_file(collection_lidvid, cast(BrowseFile, browse_file))
 
         self.visit_browse_product(collection_lidvid, browse_product, True)
 
@@ -175,7 +175,9 @@ class BundleWalk(object):
 
         product_lidvid = str(document_product.lidvid)
         for document_file in self.db.get_product_files(product_lidvid):
-            self.visit_document_file(cast(DocumentFile, document_file))
+            self.visit_document_file(
+                collection_lidvid, cast(DocumentFile, document_file)
+            )
 
         self.visit_document_product(collection_lidvid, document_product, True)
 
@@ -188,9 +190,9 @@ class BundleWalk(object):
         fits_file = self.db.get_product_file(product_lidvid)
         basename = str(fits_file.basename)
         if self.db.bad_fits_file_exists(basename, product_lidvid):
-            self.visit_bad_fits_file(cast(BadFitsFile, fits_file))
+            self.visit_bad_fits_file(collection_lidvid, cast(BadFitsFile, fits_file))
         elif self.db.fits_file_exists(basename, product_lidvid):
-            self.visit_fits_file(cast(FitsFile, fits_file))
+            self.visit_fits_file(collection_lidvid, cast(FitsFile, fits_file))
         else:
             assert False, "Missing FITS product case: {basename} in {product_lidvid}u"
 
@@ -252,14 +254,20 @@ class BundleWalk(object):
 
     ############################################################
 
-    def visit_browse_file(self, browse_file: BrowseFile) -> None:
+    def visit_browse_file(
+        self, collection_lidvid: str, browse_file: BrowseFile
+    ) -> None:
         pass
 
-    def visit_document_file(self, document_file: DocumentFile) -> None:
+    def visit_document_file(
+        self, collection_lidvid: str, document_file: DocumentFile
+    ) -> None:
         pass
 
-    def visit_fits_file(self, fits_file: FitsFile) -> None:
+    def visit_fits_file(self, collection_lidvid: str, fits_file: FitsFile) -> None:
         pass
 
-    def visit_bad_fits_file(self, bad_fits_file: BadFitsFile) -> None:
+    def visit_bad_fits_file(
+        self, collection_lidvid: str, bad_fits_file: BadFitsFile
+    ) -> None:
         pass
