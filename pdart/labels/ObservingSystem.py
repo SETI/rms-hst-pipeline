@@ -76,6 +76,60 @@ nicmos_observing_system: NodeBuilder = _observing_system(
     }
 )
 
+foc_observing_system: NodeBuilder = _observing_system(
+    {
+        "name": "Hubble Space Telescope Faint Object Camera",
+        "component_name": "Faint Object Camera",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.foc",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
+    }
+)
+
+cos_observing_system: NodeBuilder = _observing_system(
+    {
+        "name": "Hubble Space Telescope Cosmic Origins Spectrograph",
+        "component_name": "Cosmic Origins Spectrograph",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.cos",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
+    }
+)
+
+wfpc_observing_system: NodeBuilder = _observing_system(
+    {
+        "name": "Hubble Space Telescope Wide-Field Planetary Camera 1",
+        "component_name": "Wide-Field Planetary Camera 1",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.wfpc",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
+    }
+)
+
+stis_observing_system: NodeBuilder = _observing_system(
+    {
+        "name": "Hubble Space Telescope Space Telescope Imaging Spectrograph",
+        "component_name": "Space Telescope Imaging Spectrograph",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.stis",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
+    }
+)
+
+fos_observing_system: NodeBuilder = _observing_system(
+    {
+        "name": "Hubble Space Telescope Faint Object Spectrograph",
+        "component_name": "Faint Object Spectrograph",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.fos",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
+    }
+)
+
+ghrs_observing_system: NodeBuilder = _observing_system(
+    {
+        "name": "Hubble Space Telescope Faint Object Spectrograph",
+        "component_name": "Faint Object Spectrograph",
+        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.ghrs",
+        "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
+    }
+)
+
 
 def observing_system_lid(instrument: str) -> str:
     return f"urn:nasa:pds:context:instrument:insthost.{instrument}"
@@ -95,4 +149,10 @@ def observing_system(instrument: str) -> NodeBuilder:
         "wfc3": wfc3_observing_system,
         "wfpc2": wfpc2_observing_system,
         "nicmos": nicmos_observing_system,
+        "foc": foc_observing_system,
+        "cos": cos_observing_system,
+        "wfpc": wfpc_observing_system,
+        "stis": stis_observing_system,
+        "fos": fos_observing_system,
+        "ghrs": ghrs_observing_system,
     }[instrument]

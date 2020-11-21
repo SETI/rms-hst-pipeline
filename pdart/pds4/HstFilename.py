@@ -3,6 +3,8 @@ import re
 
 from fs.path import basename
 
+from pdart.astroquery.AcceptedParams import ACCEPTED_INSTRUMENTS
+
 
 class HstFilename(object):
     """
@@ -17,8 +19,8 @@ class HstFilename(object):
         ), "Filename must be at least six characters long"
         basename2 = basename(filename)
         assert (
-            basename2[0].lower() in "ijnu"
-        ), f"First char of filename {basename2!r} must be i, j, or u."
+            basename2[0].upper() in ACCEPTED_INSTRUMENTS
+        ), f"First char of filename {basename2!r} must be in {ACCEPTED_INSTRUMENTS!r}."
 
     def __str__(self) -> str:
         return self.filename.__str__()
@@ -36,17 +38,33 @@ class HstFilename(object):
         """
         filename = self._basename()
         i = filename[0].lower()
-        assert i in "ijnu", f"First char of filename {filename!r} must be i, j, or u."
+        assert (
+            i in ACCEPTED_INSTRUMENTS.lower()
+        ), f"First char of filename {filename!r} must be in {ACCEPTED_INSTRUMENTS!r}."
         if i == "i":
             return "wfc3"
         elif i == "j":
             return "acs"
+        elif i == "l":
+            return "cos"
         elif i == "n":
             return "nicmos"
+        elif i == "o":
+            return "stis"
         elif i == "u":
             return "wfpc2"
+        elif i == "w":
+            return "wfpc"
+        elif i == "x":
+            return "foc"
+        elif i == "y":
+            return "fos"
+        elif i == "z":
+            return "ghrs"
         else:
-            raise Exception("First char of filename must be i, j, or u.")
+            raise Exception(
+                f"First char of filename {filename!r} must be in {ACCEPTED_INSTRUMENTS!r}."
+            )
 
     def hst_internal_proposal_id(self) -> str:
         """
