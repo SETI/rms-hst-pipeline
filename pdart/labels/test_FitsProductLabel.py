@@ -49,7 +49,12 @@ class Test_FitsProductLabel(unittest.TestCase):
             ][0]
 
             label = make_fits_product_label(
-                working_dir, self.db, RAWish_product_lidvid, RAWish_file_basename, True
+                working_dir,
+                self.db,
+                collection_lidvid,
+                RAWish_product_lidvid,
+                RAWish_file_basename,
+                True,
             )
 
             assert_golden_file_equal(self, "test_FitsProductLabel.golden.xml", label)

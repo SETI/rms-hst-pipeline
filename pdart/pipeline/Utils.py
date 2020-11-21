@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from typing import Generator
 
 from fs.osfs import OSFS
+from fs.wrap import read_only
 
 from pdart.fs.cowfs.COWFS import COWFS
 from pdart.fs.multiversioned.Multiversioned import Multiversioned
@@ -70,7 +71,9 @@ def make_sv_deltas(base_fs: FS, cow_dirpath: str) -> Generator[COWFS, None, None
     the COW directory path as the root for the changes (also called
     the delta).  Intended to be used in a with-statement.
     """
-    fs = SingleVersionedCOWFS.create_cowfs_suffixed(base_fs, cow_dirpath, True)
+    fs = SingleVersionedCOWFS.create_cowfs_suffixed(
+        read_only(base_fs), cow_dirpath, True
+    )
     cat_base_fs = categorize_filesystem(base_fs)
     cat_fs = categorize_filesystem(fs)
     if (

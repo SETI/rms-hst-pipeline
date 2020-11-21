@@ -8,6 +8,7 @@ from pdart.db.BundleDB import (
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
+from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.fs.cowfs.COWFS import COWFS
 from pdart.pds4.LID import LID
@@ -100,15 +101,20 @@ class PopulateDatabase(MarkedStage):
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
 
         db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
-        if os.path.isfile(db_filepath):
-            db = create_bundle_db_from_os_filepath(db_filepath)
-        else:
+        db_exists = os.path.isfile(db_filepath)
+        db = create_bundle_db_from_os_filepath(db_filepath)
+        if not db_exists:
             db = create_bundle_db_from_os_filepath(db_filepath)
             db.create_tables()
             bundle_lidvid = _create_initial_lidvid_from_parts(
                 [str(self._bundle_segment)]
             )
             db.create_bundle(bundle_lidvid)
+
+        changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
+        changes_dict = read_changes_dict(changes_path)
+
+        assert not db_exists, "PopulateDatabase._run() not fully unimplemented"
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
             archive_osfs, self._bundle_segment

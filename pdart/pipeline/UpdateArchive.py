@@ -3,7 +3,7 @@ import os.path
 import shutil
 
 from pdart.fs.multiversioned.Multiversioned import Multiversioned, std_is_new
-from pdart.pipeline.RecordChanges import CHANGES_DICT
+from pdart.pipeline.RecordChanges import CHANGES_DICT_NAME
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
@@ -39,7 +39,7 @@ class UpdateArchive(MarkedStage):
         shutil.rmtree(archive_primary_deltas_dir + "-deltas-sv")
         shutil.rmtree(archive_browse_deltas_dir + "-deltas-sv")
         shutil.rmtree(archive_label_deltas_dir + "-deltas-sv")
-        changes_dict_path = os.path.join(working_dir, CHANGES_DICT)
+        changes_dict_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         os.remove(changes_dict_path)
 
         assert not os.path.isdir(archive_primary_deltas_dir + "-deltas-sv")

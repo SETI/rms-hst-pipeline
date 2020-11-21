@@ -116,10 +116,13 @@ class COWFS(FS):
         deletions_paths = {
             fs.path.dirname(file) for file in self.deletions_fs.walk.files()
         }
-        assert additions_paths <= deletions_paths, (
-            f"additions_paths {additions_paths} is not "
-            f"a subset of deletions_path {deletions_paths}"
-        )
+        assert (
+            additions_paths <= deletions_paths
+        ), f"""Additions_paths {additions_paths}
+is not a subset of
+deletions_path {deletions_paths}.
+Extras are {additions_paths - deletions_paths}.
+"""
 
         return True
 

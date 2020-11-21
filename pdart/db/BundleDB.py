@@ -11,11 +11,13 @@ from pdart.db.SqlAlchTables import (
     BrowseFile,
     BrowseProduct,
     Bundle,
+    BundleCollectionLink,
     BundleLabel,
     Card,
     Collection,
     CollectionInventory,
     CollectionLabel,
+    CollectionProductLink,
     ContextCollection,
     ContextProduct,
     DocumentCollection,
@@ -159,12 +161,17 @@ class BundleDB(object):
         return self.session.query(Bundle).one()
 
     def get_bundle_collections(self, bundle_lidvid: str) -> List[Collection]:
-        return (
+        # TODO There's probably better ways to do this.  Use a SQL
+        # join?
+        return [
             self.session.query(Collection)
-            .filter(Collection.bundle_lidvid == bundle_lidvid)
-            .order_by(Collection.lidvid)
+            .filter(Collection.lidvid == link.collection_lidvid)
+            .one()
+            for link in self.session.query(BundleCollectionLink)
+            .filter(BundleCollectionLink.bundle_lidvid == bundle_lidvid)
+            .order_by(BundleCollectionLink.collection_lidvid)
             .all()
-        )
+        ]
 
     ############################################################
 
@@ -189,8 +196,11 @@ class BundleDB(object):
                     f"LIDVID {collection_lidvid} already exists"
                 )
         else:
+            self.session.add(ContextCollection(lidvid=collection_lidvid))
             self.session.add(
-                ContextCollection(lidvid=collection_lidvid, bundle_lidvid=bundle_lidvid)
+                BundleCollectionLink(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
+                )
             )
             self.session.commit()
 
@@ -215,11 +225,13 @@ class BundleDB(object):
                     f"LIDVID {collection_lidvid} already exists"
                 )
         else:
+            self.session.add(DocumentCollection(lidvid=collection_lidvid))
             self.session.add(
-                DocumentCollection(
-                    lidvid=collection_lidvid, bundle_lidvid=bundle_lidvid
+                BundleCollectionLink(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
                 )
             )
+
             self.session.commit()
 
     def create_schema_collection(
@@ -243,8 +255,11 @@ class BundleDB(object):
                     f"LIDVID {collection_lidvid} already exists"
                 )
         else:
+            self.session.add(SchemaCollection(lidvid=collection_lidvid))
             self.session.add(
-                SchemaCollection(lidvid=collection_lidvid, bundle_lidvid=bundle_lidvid)
+                BundleCollectionLink(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
+                )
             )
             self.session.commit()
 
@@ -277,10 +292,14 @@ class BundleDB(object):
                 OtherCollection(
                     lidvid=collection_lidvid,
                     collection_lidvid=collection_lidvid,
-                    bundle_lidvid=bundle_lidvid,
                     instrument=instrument,
                     prefix=prefix,
                     suffix=suffix,
+                )
+            )
+            self.session.add(
+                BundleCollectionLink(
+                    bundle_lidvid=bundle_lidvid, collection_lidvid=collection_lidvid
                 )
             )
             self.session.commit()
@@ -298,12 +317,17 @@ class BundleDB(object):
         return self.session.query(Collection).filter(Collection.lidvid == lidvid).one()
 
     def get_collection_products(self, collection_lidvid: str) -> List[Product]:
-        return (
+        # TODO There's probably better ways to do this.  Use a SQL
+        # join?
+        return [
             self.session.query(Product)
-            .filter(Product.collection_lidvid == collection_lidvid)
-            .order_by(Product.lidvid)
+            .filter(Product.lidvid == link.product_lidvid)
+            .one()
+            for link in self.session.query(CollectionProductLink)
+            .filter(CollectionProductLink.collection_lidvid == collection_lidvid)
+            .order_by(CollectionProductLink.product_lidvid)
             .all()
-        )
+        ]
 
     ############################################################
 
@@ -339,10 +363,16 @@ class BundleDB(object):
             self.session.add(
                 BrowseProduct(
                     lidvid=browse_product_lidvid,
-                    collection_lidvid=collection_lidvid,
                     fits_product_lidvid=fits_product_lidvid,
                 )
             )
+            self.session.add(
+                CollectionProductLink(
+                    collection_lidvid=collection_lidvid,
+                    product_lidvid=browse_product_lidvid,
+                )
+            )
+
             self.session.commit()
 
     def create_document_product(
@@ -361,9 +391,10 @@ class BundleDB(object):
                     f"non-document product with LIDVID {product_lidvid} already exists"
                 )
         else:
+            self.session.add(DocumentProduct(lidvid=product_lidvid))
             self.session.add(
-                DocumentProduct(
-                    lidvid=product_lidvid, collection_lidvid=collection_lidvid
+                CollectionProductLink(
+                    collection_lidvid=collection_lidvid, product_lidvid=product_lidvid
                 )
             )
             self.session.commit()
@@ -387,8 +418,12 @@ class BundleDB(object):
             self.session.add(
                 FitsProduct(
                     lidvid=product_lidvid,
-                    collection_lidvid=collection_lidvid,
                     rootname=rootname,
+                )
+            )
+            self.session.add(
+                CollectionProductLink(
+                    collection_lidvid=collection_lidvid, product_lidvid=product_lidvid
                 )
             )
             self.session.commit()
@@ -1048,22 +1083,3 @@ raised exception = {e} ****
             .order_by(Product.lidvid)
             .all()
         )
-
-    def get_associated_key_products(self, product_lidvid: str) -> List[FitsProduct]:
-        return [
-            fits_prod
-            for association in self.get_associations(product_lidvid)
-            for fits_prod in self.get_fits_products_by_rootname(
-                association.memname.lower()
-            )
-            if self._is_key_product(fits_prod)
-        ]
-
-    def _is_key_product(self, fits_product: FitsProduct) -> bool:
-        # A "key" product is a raw data file (e.g., with suffix RAW or C0M).
-        collection_lidvid = fits_product.collection_lidvid
-        collection = self.get_collection(collection_lidvid)
-        is_other_collection = switch_on_collection_subtype(
-            collection, False, False, False, True
-        )
-        return cast(OtherCollection, collection).suffix in RAW_SUFFIXES

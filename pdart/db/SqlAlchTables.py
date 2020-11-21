@@ -13,6 +13,68 @@ def create_tables(engine: Engine) -> None:
     Base.metadata.create_all(engine)
 
 
+############################################################
+
+
+class BundleCollectionLink(Base):
+    """
+    A table to connect bundles to the collections within them.  If
+    bundle B contains collection C, then there is a
+    BundleCollectionLink(B, C).
+
+    Note that this is a many-to-many relation: any bundle contains a
+    fixed set of collections.  Also a collection can be part of many
+    bundles.  For instance, a documents collection could be part of
+    many bundles (i.e, bundle versions) if other collections changed
+    but the documents did not.
+
+    This is a pure SQL implementation of the many-to-many
+    relationship.  There are other ways to do this in SqlAlchemy
+    (Table, relationship) but I'm starting with this
+    simple-to-understand implementation.
+    """
+
+    __tablename__ = "bundle_collection_links"
+    id = Column(Integer, primary_key=True)
+    bundle_lidvid = Column(
+        String, ForeignKey("bundles.lidvid"), nullable=False, index=True
+    )
+    collection_lidvid = Column(
+        String, ForeignKey("collections.lidvid"), nullable=False, index=True
+    )
+
+
+class CollectionProductLink(Base):
+    """
+    A table to connect collections to the products within them.  If
+    collection C contains product P, then there is a
+    CollectionProductLink(C, P).
+
+    Note that this is a many-to-many relation: any collection contains
+    a fixed set of products.  Also a product can be part of many
+    collections.  For instance, a product could be part of many
+    collections (i.e, collection versions) if other sibling products
+    changed but this one did not.
+
+    This is a pure SQL implementation of the many-to-many
+    relationship.  There are other ways to do this in SqlAlchemy
+    (Table, relationship) but I'm starting with this
+    simple-to-understand implementation.
+    """
+
+    __tablename__ = "collection_product_links"
+    id = Column(Integer, primary_key=True)
+    collection_lidvid = Column(
+        String, ForeignKey("collections.lidvid"), nullable=False, index=True
+    )
+    product_lidvid = Column(
+        String, ForeignKey("products.lidvid"), nullable=False, index=True
+    )
+
+
+############################################################
+
+
 class Bundle(Base):
     __tablename__ = "bundles"
     lidvid = Column(String, primary_key=True, nullable=False)
@@ -29,9 +91,6 @@ class Collection(Base):
     __tablename__ = "collections"
 
     lidvid = Column(String, primary_key=True, nullable=False)
-    bundle_lidvid = Column(
-        String, ForeignKey("bundles.lidvid"), nullable=False, index=True
-    )
     type = Column(String(24), nullable=False)
 
     __mapper_args__ = {"polymorphic_identity": "collection", "polymorphic_on": type}
@@ -49,7 +108,7 @@ class DocumentCollection(Collection):
     }
 
     def __repr__(self) -> str:
-        return f"DocumentCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
+        return f"DocumentCollection(lidvid={self.lidvid!r})"
 
 
 class ContextCollection(Collection):
@@ -64,7 +123,7 @@ class ContextCollection(Collection):
     }
 
     def __repr__(self) -> str:
-        return f"ContextCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
+        return f"ContextCollection(lidvid={self.lidvid!r})"
 
 
 class SchemaCollection(Collection):
@@ -79,7 +138,7 @@ class SchemaCollection(Collection):
     }
 
     def __repr__(self) -> str:
-        return f"SchemaCollection(lidvid={self.lidvid!r}, bundle_lidvid={self.bundle_lidvid!r})"
+        return f"SchemaCollection(lidvid={self.lidvid!r})"
 
 
 class OtherCollection(Collection):
@@ -100,7 +159,6 @@ class OtherCollection(Collection):
     def __repr__(self) -> str:
         return (
             f"OtherCollection(lidvid={self.lidvid!r}, "
-            f"bundle_lidvid={self.bundle_lidvid!r}, "
             f"instrument={self.instrument!r}, "
             f"prefix={self.prefix!r}, suffix={self.suffix!r})"
         )
@@ -138,9 +196,9 @@ class Product(Base):
     __tablename__ = "products"
 
     lidvid = Column(String, primary_key=True, nullable=False)
-    collection_lidvid = Column(
-        String, ForeignKey("collections.lidvid"), nullable=False, index=True
-    )
+    #     collection_lidvid = Column(
+    #         String, ForeignKey("collections.lidvid"), nullable=False, index=True
+    #     )
     type = Column(String(16), nullable=False)
 
     __mapper_args__ = {"polymorphic_identity": "product", "polymorphic_on": type}
@@ -168,7 +226,6 @@ class BrowseProduct(Product):
     def __repr__(self) -> str:
         return (
             f"BrowseProduct(lidvid={self.lidvid!r}, "
-            f"collection_lidvid={self.collection_lidvid!r}, "
             f"fits_product_lidvid={self.fits_product_lidvid!r})"
         )
 
@@ -190,10 +247,7 @@ class DocumentProduct(Product):
     }
 
     def __repr__(self) -> str:
-        return (
-            f"DocumentProduct(lidvid={self.lidvid!r}, "
-            f"collection_lidvid={self.collection_lidvid!r})"
-        )
+        return f"DocumentProduct(lidvid={self.lidvid!r})"
 
 
 class FitsProduct(Product):
@@ -214,10 +268,7 @@ class FitsProduct(Product):
     }
 
     def __repr__(self) -> str:
-        return (
-            f"FitsProduct(lidvid={self.lidvid!r}, "
-            f"collection_lidvid={self.collection_lidvid!r})"
-        )
+        return f"FitsProduct(lidvid={self.lidvid!r}"
 
 
 ############################################################

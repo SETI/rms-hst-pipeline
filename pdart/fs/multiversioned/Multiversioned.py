@@ -52,7 +52,7 @@ def std_is_new(lidvid: LIDVID, contents: VersionContents, mv: "Multiversioned") 
 
 def lid_path(lid: LID) -> str:
     """
-    Return the directory path co`rresponding to this LID.
+    Return the directory path corresponding to this LID.
     """
 
     def lid_to_segments(lid: LID) -> List[str]:
@@ -113,6 +113,9 @@ class Multiversioned(MutableMapping):
 
     def __init__(self, fs: FS) -> None:
         self.fs = fs
+
+    def __str__(self) -> str:
+        return f"Multiversioned({self.fs})"
 
     def make_lidvid_dir(self, lidvid: LIDVID) -> str:
         dir_path = lidvid_path(lidvid)

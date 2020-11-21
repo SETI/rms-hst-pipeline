@@ -67,3 +67,7 @@ class StateMachine(object):
                 stage = self.next_stage(marker_info.phase)
             else:
                 stage = None
+
+        # Throw an exception if the machine failed
+        marker_info = self.marker_file.get_marker()
+        assert marker_info and marker_info.state == "SUCCESS"

@@ -169,19 +169,22 @@ def create_pds4_labels(
             )
 
         def visit_document_collection(
-            self, document_collection: DocumentCollection, post: bool
+            self,
+            bundle_lidvid: str,
+            document_collection: DocumentCollection,
+            post: bool,
         ) -> None:
             if post:
                 self._post_visit_collection(document_collection)
 
         def visit_other_collection(
-            self, other_collection: OtherCollection, post: bool
+            self, bundle_lidvid: str, other_collection: OtherCollection, post: bool
         ) -> None:
             if post:
                 self._post_visit_collection(other_collection)
 
         def visit_document_product(
-            self, document_product: DocumentProduct, post: bool
+            self, collection_lidvid: str, document_product: DocumentProduct, post: bool
         ) -> None:
             if not post:
                 return
@@ -203,9 +206,12 @@ def create_pds4_labels(
                 label_deltas.getsyspath(label_filepath), label_filename, product_lidvid
             )
 
-        def visit_browse_file(self, browse_file: BrowseFile) -> None:
+        def visit_browse_file(
+            self, collection_lidvid: str, browse_file: BrowseFile
+        ) -> None:
             label = make_browse_product_label(
                 self.db,
+                collection_lidvid,
                 str(browse_file.product_lidvid),
                 str(browse_file.basename),
                 _VERIFY,
@@ -220,7 +226,9 @@ def create_pds4_labels(
                 label_deltas.getsyspath(label_filepath), label_filename, product_lidvid
             )
 
-        def visit_bad_fits_file(self, bad_fits_file: BadFitsFile) -> None:
+        def visit_bad_fits_file(
+            self, collection_lidvid: str, bad_fits_file: BadFitsFile
+        ) -> None:
             basename = bad_fits_file.basename
             product_lidvid = bad_fits_file.product_lidvid
             assert False, (
@@ -228,10 +236,11 @@ def create_pds4_labels(
                 f"in product {product_lidvid}"
             )
 
-        def visit_fits_file(self, fits_file: FitsFile) -> None:
+        def visit_fits_file(self, collection_lidvid: str, fits_file: FitsFile) -> None:
             label = make_fits_product_label(
                 working_dir,
                 self.db,
+                collection_lidvid,
                 str(fits_file.product_lidvid),
                 str(fits_file.basename),
                 _VERIFY,

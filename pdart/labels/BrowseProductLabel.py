@@ -20,6 +20,7 @@ from pdart.xml.Pretty import pretty_and_verify
 
 def make_browse_product_label(
     bundle_db: BundleDB,
+    browse_collection_lidvid: str,
     browse_product_lidvid: str,
     browse_file_basename: str,
     verify: bool,
@@ -40,7 +41,6 @@ def make_browse_product_label(
     assert isinstance(file, BrowseFile)
     browse_file: BrowseFile = file
 
-    browse_collection_lidvid = browse_product.collection_lidvid
     collection: Collection = bundle_db.get_collection(browse_collection_lidvid)
 
     assert isinstance(collection, OtherCollection)

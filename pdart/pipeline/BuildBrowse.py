@@ -5,7 +5,6 @@ from typing import List, Set
 import fs.path
 import picmaker
 
-# from pdart.astroquery.Astroquery import ACCEPTED_SUFFIXES
 from pdart.astroquery.AcceptedParams import (
     ACCEPTED_SUFFIXES,
     PART_OF_ACCEPTED_SUFFIXES,
@@ -24,8 +23,7 @@ from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
 _INITIAL_VID: VID = VID("1.0")
 
-_NON_IMAGE_SUFFIXES: Set[str] = {"ASN", "SHM"}
-
+_NON_IMAGE_SUFFIXES: Set[str] = {"ASN", "SHM", "SPT"}
 
 _BROWSE_SUFFIXES: List[str] = [
     suffix for suffix in ACCEPTED_SUFFIXES if suffix not in _NON_IMAGE_SUFFIXES
@@ -51,6 +49,7 @@ def _build_browse_collection(
     collection_segment: str,
     bundle_path: str,
 ) -> None:
+
     bundle_lidvid = _create_initial_lidvid_from_parts([bundle_segment])
     data_collection_lidvid = _create_initial_lidvid_from_parts(
         [bundle_segment, collection_segment]
@@ -58,7 +57,7 @@ def _build_browse_collection(
     browse_collection_lid = LIDVID(data_collection_lidvid).lid().to_browse_lid()
     collection_path = f"{bundle_path}{collection_segment}$/"
     browse_collection_segment = browse_collection_lid.collection_id
-    browse_collection_path = "{bundle_path}{browse_collection_segment}$/"
+    browse_collection_path = f"{bundle_path}{browse_collection_segment}$/"
 
     browse_deltas.makedirs(browse_collection_path, recreate=True)
     browse_collection_lidvid = LIDVID.create_from_lid_and_vid(
@@ -151,11 +150,11 @@ class BuildBrowse(MarkedStage):
                 if "$" in coll
             ]
             for collection_segment in collection_segments:
-                parts = collection_segment.upper().split("_")
+                parts = collection_segment.lower().split("_")
                 if (
                     len(parts) == 3
                     and parts[0] == "data"
-                    and parts[2] in _BROWSE_SUFFIXES
+                    and parts[2].upper() in _BROWSE_SUFFIXES
                 ):
                     _build_browse_collection(
                         db,

@@ -16,7 +16,9 @@ from pdart.pds4.LIDVID import LIDVID
 _TABLES: Set[str] = {
     "associations",
     "bundles",
+    "bundle_collection_links",
     "collections",
+    "collection_product_links",
     "context_collections",
     "document_collections",
     "schema_collections",
@@ -443,7 +445,6 @@ class Test_BundleDB(unittest.TestCase):
 
         product = self.db.get_product(product_lidvid)
         self.assertEqual(product_lidvid, product.lidvid)
-        self.assertEqual(collection_lidvid, product.collection_lidvid)
 
     def test_get_product_files(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
