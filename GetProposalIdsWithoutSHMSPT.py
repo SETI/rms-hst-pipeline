@@ -1,13 +1,7 @@
 import os
 import sys
 
-from pdart.astroquery.Astroquery import (
-    MastSlice,
-    CustomizedQueryMastSlice,
-    ProductSet,
-)
-
-from pdart.pipeline.Directories import DevDirectories
+from pdart.astroquery.Astroquery import CustomizedQueryMastSlice
 
 # Download All files from Mast
 if __name__ == "__main__":
