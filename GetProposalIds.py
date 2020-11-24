@@ -13,12 +13,12 @@ if __name__ == "__main__":
     product_type = str(sys.argv[1])
     if product_type == "all":
         # Get the list of proposal ids with moving target = true
-        list_dir = f"./proposal_ids_all.txt"
+        list_dir = "./proposal_ids_all.txt"
         customized_query_slice = CustomizedQueryMastSlice((1900, 1, 1), (2025, 1, 1))
         proposal_ids_list = customized_query_slice.get_proposal_ids()
     elif product_type == "image":
         # Get the list of proposal ids with image product type & moving target = true
-        list_dir = f"./proposal_ids_image.txt"
+        list_dir = "./proposal_ids_image.txt"
         slice = MastSlice((1900, 1, 1), (2025, 1, 1))
         proposal_ids_list = slice.get_proposal_ids()
     else:

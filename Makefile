@@ -174,7 +174,7 @@ download-shm-spt : setup_dir
 	for project_id in $(PROJ_IDS); do \
 		echo '****' hst_$$project_id '****'; \
 		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
-		python Download_SHM_SPT.py $$project_id; \
+		python DownloadSHMSPT.py $$project_id; \
 	done;
 
 ############################################################
@@ -205,6 +205,22 @@ get-image-proposal-ids : venv
 	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
 	python GetProposalIds.py image; \
 	echo '**** List of Proposal Ids is created under' $(LIL-TWD) '****'; \
+
+############################################################
+# Get the list of proposal ids (mtfalg=True) without SHM & SPT files
+############################################################
+ID_LIST=proposal_ids_all.txt
+get-proposal-ids-without-shm-spt : get-proposal-ids
+get-proposal-ids-without-shm-spt : TEST_IDS=$(shell cat ${ID_LIST})
+.PHONY: get-proposal-ids-without-shm-spt
+get-proposal-ids-without-shm-spt : venv
+	mkdir -p $(LIL-TWD)
+	-rm $(LIL-TWD)/proposal_ids_without_shm_spt.txt
+	for project_id in $(TEST_IDS); do \
+		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) \
+		python GetProposalIdsWithoutSHMSPT.py $$project_id; \
+	done;
+	echo '**** List of Proposal Ids without SHM & SPT files is created under' $(LIL-TWD) '****'; \
 
 ############################################################
 # Get file names and unique suffixes
