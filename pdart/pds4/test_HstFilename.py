@@ -13,7 +13,7 @@ class TestHstFilename(unittest.TestCase):
 
         # test instrument name
         with self.assertRaises(Exception):
-            HstFilename("x123456")
+            HstFilename("e123456")
         HstFilename("I123456")  # case-less
 
     def test_str(self) -> None:
