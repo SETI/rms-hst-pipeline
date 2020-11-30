@@ -3,16 +3,16 @@ import fs.path
 from subprocess import CompletedProcess, run
 from typing import List, Optional
 
-from pdart.pipeline.Stage import MarkedStage, Stage
-from pdart.pipeline.Directories import Directories
-from pdart.pipeline.MarkerFile import BasicMarkerFile
-from pdart.pipeline.Utils import make_osfs
+from pdart.pipeline.BuildBrowse import BuildBrowse
 from pdart.pipeline.CopyPrimaryFiles import CopyPrimaryFiles
+from pdart.pipeline.Directories import Directories
 from pdart.pipeline.InsertChanges import InsertChanges
+from pdart.pipeline.MarkerFile import BasicMarkerFile
 from pdart.pipeline.PopulateDatabase import PopulateDatabase
 from pdart.pipeline.RecordChanges import RecordChanges
+from pdart.pipeline.Stage import MarkedStage, Stage
+from pdart.pipeline.Utils import make_osfs
 
-# from pdart.pipeline.BuildBrowse import BuildBrowse
 # from pdart.pipeline.BuildLabels import BuildLabels
 # from pdart.pipeline.CheckDownloads import CheckDownloads
 # from pdart.pipeline.Directories import Directories, make_directories
@@ -93,7 +93,7 @@ class StateMachine2(object):
             ("RECORDCHANGES", RecordChanges(dirs, proposal_id)),
             ("INSERTCHANGES", InsertChanges(dirs, proposal_id)),
             ("POPULATEDATABASE", PopulateDatabase(dirs, proposal_id)),
-            # ("BUILDBROWSE", BuildBrowse(dirs, proposal_id)),
+            ("BUILDBROWSE", BuildBrowse(dirs, proposal_id)),
             # ("BUILDLABELS", BuildLabels(dirs, proposal_id)),
             # ("UPDATEARCHIVE", UpdateArchive(dirs, proposal_id)),
             # ("MAKEDELIVERABLE", MakeDeliverable(dirs, proposal_id)),

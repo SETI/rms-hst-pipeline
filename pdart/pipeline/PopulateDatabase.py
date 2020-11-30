@@ -18,28 +18,18 @@ from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
 
-_INITIAL_VID: VID = VID("1.0")
-
 
 # TODO Cut-and-pasted from BuildLabels.  Refactor this.
 def lid_to_dir(lid: LID) -> str:
     return fs.path.join(*[part + "$" for part in lid.parts()])
 
 
-def _create_initial_lidvid_from_parts(parts: List[str]) -> str:
-    lid = LID.create_from_parts(parts)
-    lidvid = LIDVID.create_from_lid_and_vid(lid, _INITIAL_VID)
-    return str(lidvid)
-
-
-def _extend_initial_lidvid(lidvid: str, segment: str) -> str:
-    lid = LIDVID(lidvid).lid().extend_lid(segment)
-    new_lidvid = LIDVID.create_from_lid_and_vid(lid, _INITIAL_VID)
-    return str(new_lidvid)
-
-
 def _populate_schema_collection(db: BundleDB, bundle_lidvid: str) -> None:
-    collection_lidvid = _extend_initial_lidvid(bundle_lidvid, "schema")
+    # TODO We're assuming here that there will only ever be one schema
+    # collection.  I'm not sure that's true.
+    lid = LIDVID(bundle_lidvid).lid().extend_lid("schema")
+    new_lidvid = LIDVID.create_from_lid_and_vid(lid, VID("1.0"))
+    collection_lidvid = str(new_lidvid)
     db.create_schema_collection(collection_lidvid, bundle_lidvid)
 
     # TODO Hardcoded here. Is this what we want to do?
@@ -47,54 +37,10 @@ def _populate_schema_collection(db: BundleDB, bundle_lidvid: str) -> None:
         db.create_schema_product(lidvid)
 
 
-def _populate_from_document_collection(
-    db: BundleDB,
-    sv_deltas: COWFS,
-    bundle_lidvid: str,
-    collection_lidvid: str,
-    product_path: str,
-) -> None:
-    db.create_document_collection(collection_lidvid, bundle_lidvid)
-    product_lidvid = _extend_initial_lidvid(collection_lidvid, "phase2")
-    db.create_document_product(product_lidvid, collection_lidvid)
-    for basename in sv_deltas.listdir(product_path):
-        sys_filepath = sv_deltas.getsyspath(fs.path.join(product_path, basename))
-        db.create_document_file(sys_filepath, basename, product_lidvid)
-
-
-def _populate_from_other_collection(
-    db: BundleDB,
-    sv_deltas: COWFS,
-    bundle_lidvid: str,
-    collection_lidvid: str,
-    collection_path: str,
-) -> None:
-    db.create_other_collection(collection_lidvid, bundle_lidvid)
-
-    product_segments = [
-        str(prod[:-1]) for prod in sv_deltas.listdir(collection_path) if "$" in prod
-    ]
-    for product_segment in product_segments:
-        product_path = f"{collection_path}{product_segment}$/"
-        product_lidvid = _extend_initial_lidvid(collection_lidvid, product_segment)
-        fits_files = [
-            fits_file
-            for fits_file in sv_deltas.listdir(product_path)
-            if fs.path.splitext(fits_file)[1] == ".fits"
-        ]
-        for fits_file in fits_files:
-            fits_file_path = fs.path.join(product_path, fits_file)
-            db.create_fits_product(product_lidvid, collection_lidvid)
-            fits_os_path = sv_deltas.getsyspath(fits_file_path)
-
-            populate_database_from_fits_file(db, fits_os_path, product_lidvid)
-
-
 def _populate_bundle(changes_dict: ChangesDict, db: BundleDB) -> LIDVID:
     for lid, (vid, changed) in changes_dict.items():
         if changed and lid.is_bundle_lid():
             lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
-            print(f"%%%% db.create_bundle({lidvid})")
             db.create_bundle(str(lidvid))
             # there's only one, so return it
             return lidvid
@@ -108,23 +54,11 @@ def _populate_collections(changes_dict: ChangesDict, db: BundleDB) -> None:
             bundle_lidvid = changes_dict.parent_lidvid(lidvid)
             if changed:
                 if lid.collection_id == "document":
-                    print(
-                        f"%%%% db.create_document_collection({str(lidvid)}, "
-                        f"{str(bundle_lidvid)})"
-                    )
                     db.create_document_collection(str(lidvid), str(bundle_lidvid))
                 else:
-                    print(
-                        f"%%%% db.create_other_collection({str(lidvid)}, "
-                        f"{str(bundle_lidvid)})"
-                    )
                     db.create_other_collection(str(lidvid), str(bundle_lidvid))
             else:
                 if changes_dict.changed(bundle_lidvid.lid()):
-                    print(
-                        f"%%%% db.create_bundle_collection_link({str(bundle_lidvid)}, "
-                        f"{str(lidvid)})"
-                    )
                     db.create_bundle_collection_link(str(bundle_lidvid), str(lidvid))
 
 
@@ -138,10 +72,6 @@ def _populate_products(
             if changed:
                 product_path = lid_to_dir(lidvid.lid())
                 if collection_lidvid.lid().collection_id == "document":
-                    print(
-                        f"%%%% db.create_document_product({str(lidvid)}, "
-                        f"{str(collection_lidvid)})"
-                    )
                     db.create_document_product(str(lidvid), str(collection_lidvid))
 
                     doc_files = [
@@ -157,17 +87,8 @@ def _populate_products(
                         sys_filepath = sv_deltas.getsyspath(
                             fs.path.join(product_path, doc_file)
                         )
-                        print(
-                            f"%%%% db.create_document_file({sys_filepath}, "
-                            f"{doc_file}, "
-                            f"{str(lidvid)})"
-                        )
                         db.create_document_file(sys_filepath, doc_file, str(lidvid))
                 else:
-                    print(
-                        f"%%%% db.create_fits_product({str(lidvid)}, "
-                        f"{str(collection_lidvid)})"
-                    )
                     db.create_fits_product(str(lidvid), str(collection_lidvid))
 
                     fits_files = [
@@ -178,18 +99,9 @@ def _populate_products(
                     for fits_file in fits_files:
                         fits_file_path = fs.path.join(product_path, fits_file)
                         fits_os_path = sv_deltas.getsyspath(fits_file_path)
-                        print(
-                            f"%%%% populate_database_from_fits_file(db, "
-                            f"{fits_os_path}, "
-                            f"{str(lidvid)})"
-                        )
                         populate_database_from_fits_file(db, fits_os_path, str(lidvid))
             else:
                 if changes_dict.changed(collection_lidvid.lid()):
-                    print(
-                        f"%%%% db.create_collection_product_link({str(collection_lidvid)}, "
-                        f"{str(lidvid)})"
-                    )
                     db.create_collection_product_link(
                         str(collection_lidvid), str(lidvid)
                     )
@@ -222,20 +134,13 @@ class PopulateDatabase(MarkedStage):
         ) as version_view, make_sv_deltas(
             version_view, archive_primary_deltas_dir
         ) as sv_deltas:
-            if db_exists:
-                # dump the changes_dict
-                for lid, (vid, changed) in changes_dict.items():
-                    print("####", lid, vid, changed)
-                print("")
-            else:
+            if not db_exists:
                 db.create_tables()
 
             bundle_lidvid = _populate_bundle(changes_dict, db)
             _populate_schema_collection(db, str(bundle_lidvid))
             _populate_collections(changes_dict, db)
             _populate_products(changes_dict, db, sv_deltas)
-            if db_exists:
-                assert False, "PopulateDatabase._run() not fully implemented"
 
         assert db
 
