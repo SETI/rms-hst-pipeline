@@ -15,7 +15,13 @@ from pdart.archive.ChecksumManifest import (
 from pdart.archive.TransferManifest import make_transfer_manifest
 from pdart.db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
 from pdart.fs.deliverablefs.DeliverableFS import DeliverableFS, lidvid_to_dirpath
+from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
+from pdart.pipeline.ChangesDict import (
+    CHANGES_DICT_NAME,
+    ChangesDict,
+    read_changes_dict,
+)
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_version_view
 
@@ -71,10 +77,16 @@ class MakeDeliverable(MarkedStage):
         deliverable_dir: str = self.deliverable_dir()
         manifest_dir: str = self.manifest_dir()
 
+        changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
+        changes_dict = read_changes_dict(changes_path)
+
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
             archive_osfs, self._bundle_segment
         ) as version_view:
             bundle_segment = self._bundle_segment
+            bundle_lid = LID.create_from_parts([bundle_segment])
+            bundle_vid = changes_dict.vid(bundle_lid)
+            bundle_lidvid = str(LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid))
 
             os.mkdir(deliverable_dir)
             deliverable_osfs = OSFS(deliverable_dir)
@@ -88,11 +100,19 @@ class MakeDeliverable(MarkedStage):
             # add manifests
             checksum_manifest_path = fs.path.join(manifest_dir, "checksum.manifest.txt")
             with open(checksum_manifest_path, "w") as f:
-                f.write(make_checksum_manifest(db, plain_lidvid_to_visits_dirpath))
+                f.write(
+                    make_checksum_manifest(
+                        db, bundle_lidvid, plain_lidvid_to_visits_dirpath
+                    )
+                )
 
             transfer_manifest_path = fs.path.join(manifest_dir, "transfer.manifest.txt")
             with open(transfer_manifest_path, "w") as f:
-                f.write(make_transfer_manifest(db, plain_lidvid_to_visits_dirpath))
+                f.write(
+                    make_transfer_manifest(
+                        db, bundle_lidvid, plain_lidvid_to_visits_dirpath
+                    )
+                )
 
             # Tar it up.
             if _TAR_NEEDED:
@@ -102,3 +122,7 @@ class MakeDeliverable(MarkedStage):
                     tar.add(bundle_dir, arcname=os.path.basename(bundle_dir))
 
                 shutil.rmtree(bundle_dir)
+
+        changes_dict_path = os.path.join(working_dir, CHANGES_DICT_NAME)
+        os.remove(changes_dict_path)
+        assert not os.path.isfile(changes_dict_path)

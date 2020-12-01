@@ -23,6 +23,7 @@ def make_browse_product_label(
     browse_collection_lidvid: str,
     browse_product_lidvid: str,
     browse_file_basename: str,
+    bundle_lidvid: str,
     verify: bool,
 ) -> bytes:
     """
@@ -46,7 +47,7 @@ def make_browse_product_label(
     assert isinstance(collection, OtherCollection)
     browse_collection: OtherCollection = collection
 
-    bundle = bundle_db.get_bundle()
+    bundle = bundle_db.get_bundle(bundle_lidvid)
 
     try:
         label = (

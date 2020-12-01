@@ -35,7 +35,12 @@ class Test_DocumentProductLabel(unittest.TestCase):
             )
 
         label = make_document_product_label(
-            self.db, self.info, document_product_lidvid, True, "2017-02-31"
+            self.db,
+            self.info,
+            document_product_lidvid,
+            bundle_lidvid,
+            True,
+            "2017-02-31",
         )
 
         assert_golden_file_equal(self, "test_DocumentProductLabel.golden.xml", label)

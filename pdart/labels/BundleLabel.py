@@ -19,7 +19,7 @@ from pdart.xml.Templates import combine_nodes_into_fragment
 
 
 def make_bundle_label(
-    bundle_db: BundleDB, info: Citation_Information, verify: bool
+    bundle_db: BundleDB, bundle_lidvid: str, info: Citation_Information, verify: bool
 ) -> bytes:
     """
     Create the label text for the bundle in the bundle database using
@@ -27,7 +27,7 @@ def make_bundle_label(
     against its XML and Schematron schemas.  Raise an exception if
     either fails.
     """
-    bundle = bundle_db.get_bundle()
+    bundle = bundle_db.get_bundle(bundle_lidvid)
     proposal_id = bundle.proposal_id
 
     def get_ref_type(collection: Collection) -> str:

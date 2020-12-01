@@ -39,10 +39,12 @@ def plain_lidvid_to_visits_dirpath(lidvid: LIDVID) -> str:
     return fs.path.join("/", *parts)
 
 
-def make_checksum_manifest(bundle_db: BundleDB, lidvid_to_dirpath: _LTD) -> str:
+def make_checksum_manifest(
+    bundle_db: BundleDB, bundle_lidvid: str, lidvid_to_dirpath: _LTD
+) -> str:
     files: List[File] = []
 
-    bundle = bundle_db.get_bundle()
+    bundle = bundle_db.get_bundle(bundle_lidvid)
     bundle_lidvid = str(bundle.lidvid)
     label_pairs = [
         make_bundle_label_pair(

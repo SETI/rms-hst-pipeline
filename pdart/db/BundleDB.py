@@ -209,8 +209,8 @@ class BundleDB(object):
             exists().where(Bundle.lidvid == bundle_lidvid)
         ).scalar()
 
-    def get_bundle(self) -> Bundle:
-        return self.session.query(Bundle).one()
+    def get_bundle(self, lidvid: str) -> Bundle:
+        return self.session.query(Bundle).filter(Bundle.lidvid == lidvid).one()
 
     def get_bundle_collections(self, bundle_lidvid: str) -> List[Collection]:
         # TODO There's probably better ways to do this.  Use a SQL

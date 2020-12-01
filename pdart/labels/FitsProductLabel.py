@@ -156,6 +156,7 @@ def make_fits_product_label(
     bundle_db: BundleDB,
     collection_lidvid: str,
     product_lidvid: str,
+    bundle_lidvid: str,
     file_basename: str,
     verify: bool,
 ) -> bytes:
@@ -187,7 +188,7 @@ def make_fits_product_label(
         }
 
         hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)
-        bundle = bundle_db.get_bundle()
+        bundle = bundle_db.get_bundle(bundle_lidvid)
         proposal_id = bundle.proposal_id
 
         investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)

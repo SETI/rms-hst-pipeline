@@ -29,11 +29,15 @@ class Test_CollectionLabel(unittest.TestCase):
 
     def test_make_collection_label(self) -> None:
         # make a standard collection label
-        label = make_collection_label(self.db, self.info, _COLLECTION_LIDVID, True)
+        label = make_collection_label(
+            self.db, self.info, _COLLECTION_LIDVID, _BUNDLE_LIDVID, True
+        )
         assert_golden_file_equal(self, "test_CollectionLabel.golden.xml", label)
 
     def test_make_doc_collection_label(self) -> None:
         # make a documentation collection label
-        label = make_collection_label(self.db, self.info, _DOC_COLLECTION_LIDVID, True)
+        label = make_collection_label(
+            self.db, self.info, _DOC_COLLECTION_LIDVID, _BUNDLE_LIDVID, True
+        )
 
         assert_golden_file_equal(self, "test_DocCollectionLabel.golden.xml", label)

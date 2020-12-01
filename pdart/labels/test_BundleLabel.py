@@ -22,5 +22,5 @@ class Test_BundleLabel(unittest.TestCase):
         self.info = Citation_Information.create_test_citation_information()
 
     def test_make_bundle_label(self) -> None:
-        label = make_bundle_label(self.db, self.info, True)
+        label = make_bundle_label(self.db, _BUNDLE_LIDVID, self.info, True)
         assert_golden_file_equal(self, "test_BundleLabel.golden.xml", label)

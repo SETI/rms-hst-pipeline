@@ -19,6 +19,7 @@ from pdart.db.SqlAlchTables import (
     OtherCollection,
     switch_on_collection_subtype,
 )
+from pdart.pds4.LIDVID import LIDVID
 
 
 class BundleWalk(object):
@@ -43,11 +44,12 @@ class BundleWalk(object):
     hand and to localize necessary changes in code.
     """
 
-    def __init__(self, bundle_db: BundleDB) -> None:
+    def __init__(self, bundle_db: BundleDB, bundle_lidvid: str) -> None:
         self.db = bundle_db
+        self.bundle_lidvid = bundle_lidvid
 
     def walk(self) -> None:
-        bundle = self.db.get_bundle()
+        bundle = self.db.get_bundle(self.bundle_lidvid)
         self.__walk_bundle(bundle)
 
     ############################################################

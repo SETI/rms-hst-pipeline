@@ -35,6 +35,7 @@ from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
+from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
@@ -88,6 +89,7 @@ def _extend_initial_lidvid(lidvid: str, segment: str) -> str:
 def create_pds4_labels(
     working_dir: str,
     bundle_db: BundleDB,
+    bundle_lidvid: LIDVID,
     label_deltas: COWFS,
     info: Citation_Information,
 ) -> None:
@@ -131,7 +133,7 @@ def create_pds4_labels(
         def _post_visit_bundle(self, bundle: Bundle) -> None:
             bundle_lidvid = str(bundle.lidvid)
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
-            label = make_bundle_label(self.db, info, _VERIFY)
+            label = make_bundle_label(self.db, bundle_lidvid, info, _VERIFY)
             assert label[:6] == b"<?xml ", "Not XML"
 
             label_filename = "bundle.xml"
@@ -158,7 +160,9 @@ def create_pds4_labels(
                 collection_lidvid,
             )
 
-            label = make_collection_label(self.db, info, collection_lidvid, _VERIFY)
+            label = make_collection_label(
+                self.db, info, collection_lidvid, str(bundle_lidvid), _VERIFY
+            )
             label_filename = get_collection_label_name(self.db, collection_lidvid)
             label_filepath = fs.path.join(collection_dir_path, label_filename)
             label_deltas.setbytes(label_filepath, label)
@@ -193,7 +197,12 @@ def create_pds4_labels(
             # TODO publication date left blank
             publication_date = None
             label = make_document_product_label(
-                self.db, info, product_lidvid, _VERIFY, publication_date
+                self.db,
+                info,
+                product_lidvid,
+                str(bundle_lidvid),
+                _VERIFY,
+                publication_date,
             )
 
             label_base = LIDVID(product_lidvid).lid().product_id
@@ -214,6 +223,7 @@ def create_pds4_labels(
                 collection_lidvid,
                 str(browse_file.product_lidvid),
                 str(browse_file.basename),
+                str(bundle_lidvid),
                 _VERIFY,
             )
             label_base = fs.path.splitext(browse_file.basename)[0]
@@ -242,6 +252,7 @@ def create_pds4_labels(
                 self.db,
                 collection_lidvid,
                 str(fits_file.product_lidvid),
+                str(bundle_lidvid),
                 str(fits_file.basename),
                 _VERIFY,
             )
@@ -255,7 +266,7 @@ def create_pds4_labels(
                 label_deltas.getsyspath(label_filepath), label_filename, product_lidvid
             )
 
-    _CreateLabelsWalk(bundle_db).walk()
+    _CreateLabelsWalk(bundle_db, str(bundle_lidvid)).walk()
 
 
 class BuildLabels(MarkedStage):
@@ -271,6 +282,9 @@ class BuildLabels(MarkedStage):
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
         archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
         archive_label_deltas_dir: str = self.archive_label_deltas_dir()
+
+        changes_path = fs.path.join(working_dir, CHANGES_DICT_NAME)
+        changes_dict = read_changes_dict(changes_path)
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
             archive_osfs, self._bundle_segment
@@ -288,10 +302,11 @@ class BuildLabels(MarkedStage):
 
             # create labels
             bundle_lid = LID.create_from_parts([self._bundle_segment])
-            bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, VID("1.0"))
+            bundle_vid = changes_dict.vid(bundle_lid)
+            bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid)
             documents_dir = f"/{self._bundle_segment}$/document$/phase2$"
             docs = set(sv_deltas.listdir(documents_dir))
 
             info = _create_citation_info(sv_deltas, documents_dir, docs)
 
-            create_pds4_labels(working_dir, db, label_deltas, info)
+            create_pds4_labels(working_dir, db, bundle_lidvid, label_deltas, info)

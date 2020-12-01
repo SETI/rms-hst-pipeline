@@ -59,6 +59,7 @@ class Test_BrowseProductLabel(unittest.TestCase):
             browse_collection_lidvid,
             browse_product_lidvid,
             browse_file_basename,
+            bundle_lidvid,
             True,
         )
 

@@ -53,7 +53,9 @@ class test_ChecksumManifest(unittest.TestCase):
         self.bundle_db.create_bundle_label(os_filepath, "bundle.xml", _BUNDLE_LIDVID)
         self.assertEqual(
             "e2309513113b550428af0cf476f1fb67  bundle.xml\n",
-            make_checksum_manifest(self.bundle_db, plain_lidvid_to_dirpath),
+            make_checksum_manifest(
+                self.bundle_db, _BUNDLE_LIDVID, plain_lidvid_to_dirpath
+            ),
         )
 
     def test_minimal_db(self) -> None:
@@ -86,7 +88,9 @@ class test_ChecksumManifest(unittest.TestCase):
         )
         self.bundle_db.create_bundle_label(os_filepath, "bundle.xml", _BUNDLE_LIDVID)
 
-        manifest = make_checksum_manifest(self.bundle_db, plain_lidvid_to_dirpath)
+        manifest = make_checksum_manifest(
+            self.bundle_db, _BUNDLE_LIDVID, plain_lidvid_to_dirpath
+        )
 
         self.assertEqual(
             "ba8a714e47d3c7606c0a2d438f9e4811  bundle.xml\n"
@@ -150,5 +154,7 @@ class test_ChecksumManifest(unittest.TestCase):
             "document/phase2/phase2.xml\n"
         )
 
-        manifest = make_checksum_manifest(self.bundle_db, plain_lidvid_to_dirpath)
+        manifest = make_checksum_manifest(
+            self.bundle_db, _BUNDLE_LIDVID, plain_lidvid_to_dirpath
+        )
         self.assertEqual(expected, manifest)

@@ -34,8 +34,10 @@ def _make_product_pair(product: Product, lidvid_to_dirpath: _LTD) -> Tuple[str, 
     return (lidvid, fs.path.join(dir, filepath))
 
 
-def make_transfer_manifest(bundle_db: BundleDB, lidvid_to_dirpath: _LTD) -> str:
-    bundle = bundle_db.get_bundle()
+def make_transfer_manifest(
+    bundle_db: BundleDB, bundle_lidvid: str, lidvid_to_dirpath: _LTD
+) -> str:
+    bundle = bundle_db.get_bundle(bundle_lidvid)
     pairs = [_make_bundle_pair(bundle, lidvid_to_dirpath)]
     for collection in bundle_db.get_bundle_collections(str(bundle.lidvid)):
         pairs.append(_make_collection_pair(bundle_db, collection, lidvid_to_dirpath))

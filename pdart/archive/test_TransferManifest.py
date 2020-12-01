@@ -27,7 +27,9 @@ class test_TransferManifest(unittest.TestCase):
 
     def test_empty_db(self) -> None:
         expected = "urn:nasa:pds:hst_00001::1.0 hst_00001/bundle.xml\n"
-        manifest = make_transfer_manifest(self.bundle_db, _lidvid_to_dirpath)
+        manifest = make_transfer_manifest(
+            self.bundle_db, _BUNDLE_LIDVID, _lidvid_to_dirpath
+        )
         self.assertEqual(expected, manifest)
 
     def test_filled_db(self) -> None:
@@ -41,7 +43,9 @@ hst_00001/data_wfpc2_raw/collection_data.xml
 urn:nasa:pds:hst_00001:data_wfpc2_raw:u2no0401t::1.0 \
 hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t.xml
 """
-        manifest = make_transfer_manifest(self.bundle_db, _lidvid_to_dirpath)
+        manifest = make_transfer_manifest(
+            self.bundle_db, _BUNDLE_LIDVID, _lidvid_to_dirpath
+        )
         self.assertEqual(expected, manifest)
 
         self.bundle_db.create_document_collection(_COLLECTION2_LIDVID, _BUNDLE_LIDVID)
@@ -59,6 +63,8 @@ hst_00001/document/collection.xml
 urn:nasa:pds:hst_00001:document:phase2::1.0          \
 hst_00001/document/phase2/phase2.xml
 """
-        manifest = make_transfer_manifest(self.bundle_db, _lidvid_to_dirpath)
+        manifest = make_transfer_manifest(
+            self.bundle_db, _BUNDLE_LIDVID, _lidvid_to_dirpath
+        )
 
         self.assertEqual(expected, manifest)

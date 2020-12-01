@@ -21,6 +21,7 @@ def make_document_product_label(
     bundle_db: BundleDB,
     info: Citation_Information,
     document_product_lidvid: str,
+    bundle_lidvid: str,
     verify: bool,
     publication_date: Optional[str] = None,
 ) -> bytes:
@@ -30,7 +31,7 @@ def make_document_product_label(
     connection.  If verify is True, verify the label against its XML
     and Schematron schemas.  Raise an exception if either fails.
     """
-    bundle = bundle_db.get_bundle()
+    bundle = bundle_db.get_bundle(bundle_lidvid)
     proposal_id = bundle.proposal_id
     investigation_lidvid = (
         f"urn:nasa:pds:context:investigation:investigation.hst_{proposal_id:05}::1.0"

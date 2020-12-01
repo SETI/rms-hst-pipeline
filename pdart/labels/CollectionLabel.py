@@ -60,6 +60,7 @@ def make_collection_label(
     bundle_db: BundleDB,
     info: Citation_Information,
     collection_lidvid: str,
+    bundle_lidvid: str,
     verify: bool,
 ) -> bytes:
     """
@@ -75,13 +76,14 @@ def make_collection_label(
         make_other_collection_label,
         make_schema_collection_label,
         make_other_collection_label,
-    )(bundle_db, info, collection_lidvid, verify)
+    )(bundle_db, info, collection_lidvid, bundle_lidvid, verify)
 
 
 def make_context_collection_label(
     bundle_db: BundleDB,
     info: Citation_Information,
     collection_lidvid: str,
+    bundle_lidvid: str,
     verify: bool,
 ) -> bytes:
     """
@@ -99,7 +101,7 @@ def make_context_collection_label(
     collection_vid = lidvid_to_vid(collection_lidvid)
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
-    proposal_id = bundle_db.get_bundle().proposal_id
+    proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
 
     title: NodeBuilder = make_context_collection_title(
         {"proposal_id": str(proposal_id)}
@@ -133,6 +135,7 @@ def make_schema_collection_label(
     bundle_db: BundleDB,
     info: Citation_Information,
     collection_lidvid: str,
+    bundle_lidvid: str,
     verify: bool,
 ) -> bytes:
     """
@@ -150,7 +153,7 @@ def make_schema_collection_label(
     collection_vid = lidvid_to_vid(collection_lidvid)
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
-    proposal_id = bundle_db.get_bundle().proposal_id
+    proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
 
     title: NodeBuilder = make_schema_collection_title({"proposal_id": str(proposal_id)})
 
@@ -182,6 +185,7 @@ def make_other_collection_label(
     bundle_db: BundleDB,
     info: Citation_Information,
     collection_lidvid: str,
+    bundle_lidvid: str,
     verify: bool,
 ) -> bytes:
     """
@@ -199,7 +203,7 @@ def make_other_collection_label(
     collection_vid = lidvid_to_vid(collection_lidvid)
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
-    proposal_id = bundle_db.get_bundle().proposal_id
+    proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
 
     def make_ctxt_coll_title(_coll: Collection) -> NodeBuilder:
         return make_context_collection_title({"proposal_id": str(proposal_id)})

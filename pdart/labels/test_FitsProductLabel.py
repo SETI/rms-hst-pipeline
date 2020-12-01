@@ -53,6 +53,7 @@ class Test_FitsProductLabel(unittest.TestCase):
                 self.db,
                 collection_lidvid,
                 RAWish_product_lidvid,
+                bundle_lidvid,
                 RAWish_file_basename,
                 True,
             )
