@@ -110,6 +110,24 @@ class LID(object):
         browse_collection_lid = ":".join(lid_parts)
         return LID(browse_collection_lid)
 
+    def to_data_lid(self) -> "LID":
+        """
+        Convert a LID within a browse collection into the
+        corresponding LID in the data collection.
+        """
+        assert self.collection_id, "to_data_lid() -> None: Can't call on bundle LID"
+        collection_id_parts = self.collection_id.split("_")
+        assert (
+            collection_id_parts[0] == "browse"
+        ), f"to_data_lid: Only legal within browse_ collections; had {self}"
+        collection_id_parts[0] = "data"
+        data_collection_id = "_".join(collection_id_parts)
+
+        lid_parts = self.lid.split(":")
+        lid_parts[4] = data_collection_id
+        data_collection_lid = ":".join(lid_parts)
+        return LID(data_collection_lid)
+
     def to_other_suffixed_lid(self, suffix: str) -> "LID":
         """
         Convert a product LID into the corresponding LID for a file

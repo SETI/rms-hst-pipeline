@@ -132,6 +132,17 @@ class TestLID(unittest.TestCase):
 
         # TODO Write tests for is_bundle_id, etc.
 
+    def test_to_data_lid(self) -> None:
+        data_coll_lid = LID("urn:nasa:pds:bundle:data_collection_raw")
+        browse_coll_lid = LID("urn:nasa:pds:bundle:browse_collection_raw")
+        self.assertEqual(data_coll_lid, browse_coll_lid.to_data_lid())
+
+        browse_prod_lid = LID("urn:nasa:pds:bundle:browse_collection_raw:data_product")
+        data_prod_lid = LID("urn:nasa:pds:bundle:data_collection_raw:data_product")
+        self.assertEqual(data_prod_lid, browse_prod_lid.to_data_lid())
+
+        # TODO Write tests for is_bundle_id, etc.
+
     def test_to_shm_lid(self) -> None:
         data_coll_lid = LID("urn:nasa:pds:bundle:data_collection_raw:product")
         shm_coll_lid = LID("urn:nasa:pds:bundle:data_collection_shm:product")
