@@ -18,7 +18,12 @@ from pdart.fs.cowfs.COWFS import COWFS
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, ChangesDict, read_changes_dict
+from pdart.pipeline.ChangesDict import (
+    CHANGES_DICT_NAME,
+    ChangesDict,
+    read_changes_dict,
+    write_changes_dict,
+)
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
@@ -28,6 +33,13 @@ _NON_IMAGE_SUFFIXES: Set[str] = {"ASN", "SHM", "SPT"}
 _BROWSE_SUFFIXES: List[str] = [
     suffix for suffix in ACCEPTED_SUFFIXES if suffix not in _NON_IMAGE_SUFFIXES
 ]
+
+
+def _should_make_browse_collection(collection_segment: str) -> bool:
+    parts = collection_segment.lower().split("_")
+    return (
+        len(parts) == 3 and parts[0] == "data" and parts[2].upper() in _BROWSE_SUFFIXES
+    )
 
 
 def _extend_lidvid(lidvid: LIDVID, segment: str) -> str:
@@ -51,10 +63,13 @@ def _build_browse_collection(
     collection_path = f"{bundle_path}{collection_segment}$/"
     browse_collection_segment = browse_collection_lid.collection_id
     browse_collection_path = f"{bundle_path}{browse_collection_segment}$/"
+    browse_collection_vid = data_collection_lidvid.vid()
+
+    changes_dict.set(browse_collection_lid, browse_collection_vid, True)
 
     browse_deltas.makedirs(browse_collection_path, recreate=True)
     browse_collection_lidvid = LIDVID.create_from_lid_and_vid(
-        browse_collection_lid, data_collection_lidvid.vid()
+        browse_collection_lid, browse_collection_vid
     )
     db.create_other_collection(str(browse_collection_lidvid), str(bundle_lidvid))
     product_segments = [
@@ -73,6 +88,9 @@ def _build_browse_collection(
             fits_product_lidvid = _extend_lidvid(
                 data_collection_lidvid, product_segment
             )
+
+            bpl = LIDVID(browse_product_lidvid)
+            changes_dict.set(bpl.lid(), bpl.vid(), True)
 
             browse_deltas.makedirs(browse_product_path, recreate=True)
             db.create_browse_product(
@@ -154,12 +172,7 @@ class BuildBrowse(MarkedStage):
                 if "$" in coll
             ]
             for collection_segment in collection_segments:
-                parts = collection_segment.lower().split("_")
-                if (
-                    len(parts) == 3
-                    and parts[0] == "data"
-                    and parts[2].upper() in _BROWSE_SUFFIXES
-                ):
+                if _should_make_browse_collection(collection_segment):
                     bundle_lid = LID.create_from_parts([self._bundle_segment])
                     bundle_vid = changes_dict.vid(bundle_lid)
                     bundle_lidvid = LIDVID.create_from_lid_and_vid(
@@ -182,3 +195,4 @@ class BuildBrowse(MarkedStage):
                             collection_lidvid,
                             bundle_path,
                         )
+            write_changes_dict(changes_dict, changes_path)

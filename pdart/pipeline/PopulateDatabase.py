@@ -8,7 +8,12 @@ from pdart.db.BundleDB import (
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
-from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, ChangesDict, read_changes_dict
+from pdart.pipeline.ChangesDict import (
+    CHANGES_DICT_NAME,
+    ChangesDict,
+    read_changes_dict,
+    write_changes_dict,
+)
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.fs.cowfs.COWFS import COWFS
 from pdart.pds4.LID import LID
@@ -55,6 +60,9 @@ def _populate_collections(changes_dict: ChangesDict, db: BundleDB) -> None:
             if changed:
                 if lid.collection_id == "document":
                     db.create_document_collection(str(lidvid), str(bundle_lidvid))
+                elif lid.collection_id == "schema":
+                    # it's created separately
+                    _populate_schema_collection(db, str(bundle_lidvid))
                 else:
                     db.create_other_collection(str(lidvid), str(bundle_lidvid))
             else:
@@ -124,6 +132,10 @@ class PopulateDatabase(MarkedStage):
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
+        schema_collection_lid = LID.create_from_parts([self._bundle_segment, "schema"])
+        if not changes_dict.contains(schema_collection_lid):
+            changes_dict.set(schema_collection_lid, VID("1.0"), True)
+            write_changes_dict(changes_dict, changes_path)
 
         db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
         db_exists = os.path.isfile(db_filepath)
@@ -138,7 +150,6 @@ class PopulateDatabase(MarkedStage):
                 db.create_tables()
 
             bundle_lidvid = _populate_bundle(changes_dict, db)
-            _populate_schema_collection(db, str(bundle_lidvid))
             _populate_collections(changes_dict, db)
             _populate_products(changes_dict, db, sv_deltas)
 

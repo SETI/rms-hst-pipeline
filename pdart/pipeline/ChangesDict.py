@@ -10,6 +10,9 @@ class ChangesDict(object):
     ) -> None:
         self.changes_dict = changes_dict if changes_dict else dict()
 
+    def contains(self, lid: LID) -> bool:
+        return lid in self.changes_dict
+
     def set(self, lid: LID, vid: VID, changed: bool) -> None:
         self.changes_dict[lid] = (vid, changed)
 
@@ -29,6 +32,12 @@ class ChangesDict(object):
         assert parent_lid in self.changes_dict, f"parent_lid={parent_lid}"
         parent_vid = self.vid(parent_lid)
         return LIDVID.create_from_lid_and_vid(parent_lid, parent_vid)
+
+    def dump(self, note: str = "") -> None:
+        print(f"**** ChangeDict {note} ****")
+        for lid, (vid, changed) in sorted(self.changes_dict.items()):
+            print(lid, vid, changed)
+        print("****************")
 
 
 CHANGES_DICT = ChangesDict
