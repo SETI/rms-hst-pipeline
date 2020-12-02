@@ -159,9 +159,9 @@ changes : venv black mypy
 	for project_id in $(CHANGES); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
-		python Pipeline.py $$project_id; \
+		python Pipeline.py $$project_id && \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
-		python Pipeline2.py $$project_id; \
+		python Pipeline2.py $$project_id; say ya; \
 	done;
 
 ##############################

@@ -54,16 +54,28 @@ def make_checksum_manifest(
 
     for collection in bundle_db.get_bundle_collections(bundle_lidvid):
         collection_lidvid = str(collection.lidvid)
-        label_pairs.append(
-            make_collection_label_pair(
-                bundle_db.get_collection_label(collection_lidvid), lidvid_to_dirpath
+        try:
+            label_pairs.append(
+                make_collection_label_pair(
+                    bundle_db.get_collection_label(collection_lidvid), lidvid_to_dirpath
+                )
             )
-        )
-        label_pairs.append(
-            make_collection_inventory_pair(
-                bundle_db.get_collection_inventory(collection_lidvid), lidvid_to_dirpath
+        except Exception:
+            # TODO temporary diagnostic
+            print(f"++++ failed getting label for {collection_lidvid}")
+            raise
+        try:
+            label_pairs.append(
+                make_collection_inventory_pair(
+                    bundle_db.get_collection_inventory(collection_lidvid),
+                    lidvid_to_dirpath,
+                )
             )
-        )
+        except Exception:
+            # TODO temporary diagnostic
+            print(f"++++ failed getting inventory for {collection_lidvid}")
+            raise
+
         for product in bundle_db.get_collection_products(collection_lidvid):
             product_lidvid = str(product.lidvid)
             label_pairs.append(

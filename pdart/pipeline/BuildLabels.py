@@ -1,4 +1,4 @@
-from typing import Set
+from typing import cast, Set
 
 import fs.path
 
@@ -11,6 +11,7 @@ from pdart.db.BundleWalk import BundleWalk
 from pdart.db.SqlAlchTables import (
     BadFitsFile,
     BrowseFile,
+    BrowseProduct,
     Bundle,
     Collection,
     DocumentCollection,
@@ -35,11 +36,20 @@ from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
-from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
+from pdart.pipeline.ChangesDict import (
+    CHANGES_DICT_NAME,
+    ChangesDict,
+    read_changes_dict,
+    write_changes_dict,
+)
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
 _VERIFY = False
+
+
+def log_label(tag: str, lidvid: str) -> None:
+    print("^^^^", tag, "label for", lidvid)
 
 
 def _create_citation_info(
@@ -73,31 +83,28 @@ def lid_to_dir(lid: LID) -> str:
     return fs.path.join(*[part + "$" for part in lid.parts()])
 
 
-# TODO Cut-and-pasted from PopulateDatabase.  Refactor this.
-_INITIAL_VID: VID = VID("1.0")
-
-
-def _extend_initial_lidvid(lidvid: str, segment: str) -> str:
-    lid = LIDVID(lidvid).lid().extend_lid(segment)
-    new_lidvid = LIDVID.create_from_lid_and_vid(lid, _INITIAL_VID)
+def _extend_lidvid(lidvid_str: str, segment: str) -> str:
+    lidvid = LIDVID(lidvid_str)
+    lid = lidvid.lid().extend_lid(segment)
+    new_lidvid = LIDVID.create_from_lid_and_vid(lid, lidvid.vid())
     return str(new_lidvid)
-
-
-# END TODO
 
 
 def create_pds4_labels(
     working_dir: str,
     bundle_db: BundleDB,
     bundle_lidvid: LIDVID,
+    changes_dict: ChangesDict,
     label_deltas: COWFS,
     info: Citation_Information,
 ) -> None:
     class _CreateLabelsWalk(BundleWalk):
         def visit_bundle(self, bundle: Bundle, post: bool) -> None:
             if post:
-                self._create_context_collection(bundle)
-                self._create_schema_collection(bundle)
+                first_bundle = LIDVID(bundle.lidvid).vid() == VID("1.0")
+                if first_bundle:
+                    self._create_context_collection(bundle)
+                    self._create_schema_collection(bundle)
                 self._post_visit_bundle(bundle)
 
         def _create_context_collection(self, bundle: Bundle) -> None:
@@ -106,8 +113,10 @@ def create_pds4_labels(
                 return
 
             bundle_lidvid = str(bundle.lidvid)
-            collection_lidvid = _extend_initial_lidvid(bundle_lidvid, "context")
+            collection_lidvid = _extend_lidvid(bundle_lidvid, "context")
             bundle_db.create_context_collection(collection_lidvid, bundle_lidvid)
+            clv = LIDVID(collection_lidvid)
+            changes_dict.set(clv.lid(), clv.vid(), True)
 
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
             context_coll_dir_path = fs.path.join(bundle_dir_path, "context$")
@@ -121,7 +130,7 @@ def create_pds4_labels(
                 return
 
             bundle_lidvid = str(bundle.lidvid)
-            collection_lidvid = _extend_initial_lidvid(bundle_lidvid, "schema")
+            collection_lidvid = _extend_lidvid(bundle_lidvid, "schema")
             bundle_db.create_schema_collection(collection_lidvid, bundle_lidvid)
 
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
@@ -139,13 +148,16 @@ def create_pds4_labels(
             label_filename = "bundle.xml"
             label_filepath = fs.path.join(bundle_dir_path, label_filename)
             label_deltas.setbytes(label_filepath, label)
+            log_label("bundle", bundle_lidvid)
             bundle_db.create_bundle_label(
                 label_deltas.getsyspath(label_filepath), label_filename, bundle_lidvid
             )
 
         def _post_visit_collection(self, collection: Collection) -> None:
             """Common implementation for all collections."""
-            collection_lidvid = str(collection.lidvid)
+            if not changes_dict.changed(LIDVID(collection.lidvid).lid()):
+                return
+            collection_lidvid = collection.lidvid
             collection_dir_path = _lidvid_to_dir(collection_lidvid)
 
             inventory = make_collection_inventory(self.db, collection_lidvid)
@@ -153,6 +165,11 @@ def create_pds4_labels(
                 self.db, collection_lidvid
             )
             inventory_filepath = fs.path.join(collection_dir_path, inventory_filename)
+
+            # TODO Remove this kludge to fix COWFS.setbytes() bug.
+            if label_deltas.exists(inventory_filepath):
+                label_deltas.remove(inventory_filepath)
+
             label_deltas.setbytes(inventory_filepath, inventory)
             bundle_db.create_collection_inventory(
                 label_deltas.getsyspath(inventory_filepath),
@@ -160,11 +177,18 @@ def create_pds4_labels(
                 collection_lidvid,
             )
 
+            log_label("collection", collection_lidvid)
             label = make_collection_label(
                 self.db, info, collection_lidvid, str(bundle_lidvid), _VERIFY
             )
+
             label_filename = get_collection_label_name(self.db, collection_lidvid)
             label_filepath = fs.path.join(collection_dir_path, label_filename)
+
+            # TODO Remove this kludge to fix COWFS.setbytes() bug.
+            if label_deltas.exists(label_filepath):
+                label_deltas.remove(label_filepath)
+
             label_deltas.setbytes(label_filepath, label)
             bundle_db.create_collection_label(
                 label_deltas.getsyspath(label_filepath),
@@ -179,12 +203,16 @@ def create_pds4_labels(
             post: bool,
         ) -> None:
             if post:
+                if not changes_dict.changed(LIDVID(document_collection.lidvid).lid()):
+                    return
                 self._post_visit_collection(document_collection)
 
         def visit_other_collection(
             self, bundle_lidvid: str, other_collection: OtherCollection, post: bool
         ) -> None:
             if post:
+                if not changes_dict.changed(LIDVID(other_collection.lidvid).lid()):
+                    return
                 self._post_visit_collection(other_collection)
 
         def visit_document_product(
@@ -192,10 +220,13 @@ def create_pds4_labels(
         ) -> None:
             if not post:
                 return
+            if not changes_dict.changed(LIDVID(document_product.lidvid).lid()):
+                return
             product_lidvid = str(document_product.lidvid)
 
             # TODO publication date left blank
             publication_date = None
+            log_label("document product", product_lidvid)
             label = make_document_product_label(
                 self.db,
                 info,
@@ -218,6 +249,17 @@ def create_pds4_labels(
         def visit_browse_file(
             self, collection_lidvid: str, browse_file: BrowseFile
         ) -> None:
+            # TODO Problem: browse products are not in the ChangesDict
+            browse_product_lidvid = browse_file.product_lidvid
+            browse_product = cast(
+                BrowseProduct, bundle_db.get_product(browse_product_lidvid)
+            )
+            assert isinstance(browse_product, BrowseProduct)
+            fits_product_lidvid = browse_product.fits_product_lidvid
+            if not changes_dict.changed(LIDVID(fits_product_lidvid).lid()):
+                return
+
+            log_label("browse product", browse_file.product_lidvid)
             label = make_browse_product_label(
                 self.db,
                 collection_lidvid,
@@ -239,14 +281,19 @@ def create_pds4_labels(
         def visit_bad_fits_file(
             self, collection_lidvid: str, bad_fits_file: BadFitsFile
         ) -> None:
-            basename = bad_fits_file.basename
             product_lidvid = bad_fits_file.product_lidvid
+            if not changes_dict.changed(LIDVID(product_lidvid).lid()):
+                return
+            basename = bad_fits_file.basename
             assert False, (
                 f"Not yet handling bad FITS file {basename} "
                 f"in product {product_lidvid}"
             )
 
         def visit_fits_file(self, collection_lidvid: str, fits_file: FitsFile) -> None:
+            if not changes_dict.changed(LIDVID(fits_file.product_lidvid).lid()):
+                return
+            log_label("FITS product", fits_file.product_lidvid)
             label = make_fits_product_label(
                 working_dir,
                 self.db,
@@ -295,6 +342,8 @@ class BuildLabels(MarkedStage):
         ) as browse_deltas, make_sv_deltas(
             browse_deltas, archive_label_deltas_dir
         ) as label_deltas:
+            changes_path = fs.path.join(working_dir, CHANGES_DICT_NAME)
+            changes_dict = read_changes_dict(changes_path)
 
             # open the database
             db_filepath = fs.path.join(working_dir, _BUNDLE_DB_NAME)
@@ -304,9 +353,15 @@ class BuildLabels(MarkedStage):
             bundle_lid = LID.create_from_parts([self._bundle_segment])
             bundle_vid = changes_dict.vid(bundle_lid)
             bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid)
+
             documents_dir = f"/{self._bundle_segment}$/document$/phase2$"
             docs = set(sv_deltas.listdir(documents_dir))
 
             info = _create_citation_info(sv_deltas, documents_dir, docs)
 
-            create_pds4_labels(working_dir, db, bundle_lidvid, label_deltas, info)
+            # create_pds4_labels() may change changes_dict, because we
+            # create the context collection if it doesn't exist.
+            create_pds4_labels(
+                working_dir, db, bundle_lidvid, changes_dict, label_deltas, info
+            )
+            write_changes_dict(changes_dict, changes_path)
