@@ -130,6 +130,10 @@ class PopulateDatabase(MarkedStage):
         archive_dir: str = self.archive_dir()
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
 
+        assert not os.path.isdir(
+            self.deliverable_dir()
+        ), "{deliverable_dir} cannot exist for PopulateDatabase"
+
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
         schema_collection_lid = LID.create_from_parts([self._bundle_segment, "schema"])

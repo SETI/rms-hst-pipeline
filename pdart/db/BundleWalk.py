@@ -65,7 +65,7 @@ class BundleWalk(object):
 
         for collection in self.db.get_bundle_collections(bundle_lidvid):
             # We have to jump through some hoops to apply
-            # switch_on_collection_type().
+            # switch_on_collection_type() (and keep mypy happy).
 
             def walk_context(coll: Collection) -> None:
                 self.__walk_context_collection(

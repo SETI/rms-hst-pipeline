@@ -56,6 +56,10 @@ class CheckDownloads(MarkedStage):
         working_dir: str = self.working_dir()
         mast_downloads_dir: str = self.mast_downloads_dir()
 
+        assert not os.path.isdir(
+            self.deliverable_dir()
+        ), f"{self.deliverable_dir()} cannot exist for CheckDownloads"
+
         if not os.path.isdir(mast_downloads_dir):
             self._do_downloads(
                 working_dir,

@@ -1,5 +1,8 @@
 import abc
 import fs.path
+import os
+import os.path
+import shutil
 from subprocess import CompletedProcess, run
 from typing import List, Optional
 
@@ -8,19 +11,15 @@ from pdart.pipeline.BuildLabels import BuildLabels
 from pdart.pipeline.CopyPrimaryFiles import CopyPrimaryFiles
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.InsertChanges import InsertChanges
+from pdart.pipeline.MakeDeliverable import MakeDeliverable
 from pdart.pipeline.MarkerFile import BasicMarkerFile
 from pdart.pipeline.PopulateDatabase import PopulateDatabase
 from pdart.pipeline.RecordChanges import RecordChanges
+from pdart.pipeline.ResetPipeline import ResetPipeline
 from pdart.pipeline.Stage import MarkedStage, Stage
+from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.Utils import make_osfs
-
-# from pdart.pipeline.CheckDownloads import CheckDownloads
-# from pdart.pipeline.Directories import Directories, make_directories
-# from pdart.pipeline.DownloadDocs import DownloadDocs
-# from pdart.pipeline.MakeDeliverable import MakeDeliverable
-# from pdart.pipeline.ResetPipeline import ResetPipeline
-# from pdart.pipeline.UpdateArchive import UpdateArchive
-# from pdart.pipeline.ValidateBundle import ValidateBundle
+from pdart.pipeline.ValidateBundle import ValidateBundle
 
 
 class SaveDownloads(MarkedStage):
@@ -74,6 +73,38 @@ class ChangeFiles(MarkedStage):
             assert False, "fell off the end of ChangeFiles"
 
 
+class ReResetPipeline(MarkedStage):
+    """
+    A stage in the pipeline for development and debugging.  ****This
+    is not intended to be in the final pipeline.****
+
+    We reset the directory by deleting everything except for the
+    downloaded document and data files, their archived tarballs, and
+    the archive.
+    """
+
+    def _run(self) -> None:
+        working_dir: str = self.working_dir()
+        documents_dir: str = self.documents_dir()
+        mast_downloads_dir: str = self.mast_downloads_dir()
+        archive_dir: str = self.archive_dir()
+
+        if not os.path.isdir(working_dir):
+            return
+        for entry in os.listdir(working_dir):
+            fullpath = os.path.join(working_dir, entry)
+            if not (
+                fullpath in [documents_dir, mast_downloads_dir, archive_dir]
+                or fullpath.endswith(".tar.gz")
+                or fullpath.endswith(".db")
+            ):
+                if os.path.isdir(fullpath):
+                    shutil.rmtree(fullpath)
+                else:
+                    os.unlink(fullpath)
+        print(f"&&&& contents of working_dir after re-reset: {os.listdir(working_dir)}")
+
+
 class StateMachine2(object):
     """
     This object runs a list of pipeline stages, hardcoded into
@@ -85,8 +116,8 @@ class StateMachine2(object):
         self.marker_file = BasicMarkerFile(dirs.working_dir(proposal_id))
         self.stages = [
             ("SAVEDOWNLOADS", SaveDownloads(dirs, proposal_id)),
+            ("RERESETPIPELINE", ReResetPipeline(dirs, proposal_id)),
             ("CHANGEFILES", ChangeFiles(dirs, proposal_id)),
-            # ("RESETPIPELINE", ResetPipeline(dirs, proposal_id)),
             # ("DOWNLOADDOCS", DownloadDocs(dirs, proposal_id)),
             # ("CHECKDOWNLOADS", CheckDownloads(dirs, proposal_id)),
             ("COPYPRIMARYFILES", CopyPrimaryFiles(dirs, proposal_id)),
@@ -95,9 +126,9 @@ class StateMachine2(object):
             ("POPULATEDATABASE", PopulateDatabase(dirs, proposal_id)),
             ("BUILDBROWSE", BuildBrowse(dirs, proposal_id)),
             ("BUILDLABELS", BuildLabels(dirs, proposal_id)),
-            # ("UPDATEARCHIVE", UpdateArchive(dirs, proposal_id)),
-            # ("MAKEDELIVERABLE", MakeDeliverable(dirs, proposal_id)),
-            # ("VALIDATEBUNDLE", ValidateBundle(dirs, proposal_id)),
+            ("UPDATEARCHIVE", UpdateArchive(dirs, proposal_id)),
+            ("MAKEDELIVERABLE", MakeDeliverable(dirs, proposal_id)),
+            ("VALIDATEBUNDLE", ValidateBundle(dirs, proposal_id)),
         ]
 
     def next_stage(self, phase: str) -> Optional[Stage]:
@@ -109,6 +140,7 @@ class StateMachine2(object):
 
         i = phase_index()
         try:
+            print(f"???? {self.stages[i+1][0]} ????")
             return self.stages[i + 1][1]
         except IndexError:
             return None

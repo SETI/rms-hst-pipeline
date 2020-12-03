@@ -22,7 +22,7 @@ class ResetPipeline(MarkedStage):
             return
         for entry in os.listdir(working_dir):
             fullpath = os.path.join(working_dir, entry)
-            if fullpath not in [documents_dir, mast_downloads_dir]:
+            if not fullpath in [documents_dir, mast_downloads_dir]:
                 if os.path.isdir(fullpath):
                     shutil.rmtree(fullpath)
                 else:

@@ -69,19 +69,11 @@ class CopyPrimaryFiles(MarkedStage):
                 parts = fs.path.iteratepath(filepath)
                 depth = len(parts)
                 assert depth == 3, parts
-                if _OLD_IMPL:
-                    # Old way: product name is the directory name from
-                    # MAST. TODO Remove this when the new version is
-                    # tested on more bundles.
-                    _, product, filename = parts
-                    filename = filename.lower()
-                    hst_filename = HstFilename(filename)
-                else:
-                    # New way: product name comes from the filename
-                    _, _, filename = parts
-                    filename = filename.lower()
-                    hst_filename = HstFilename(filename)
-                    product = hst_filename.rootname()
+                # New way: product name comes from the filename
+                _, _, filename = parts
+                filename = filename.lower()
+                hst_filename = HstFilename(filename)
+                product = hst_filename.rootname()
                 instrument_name = hst_filename.instrument_name()
                 suffix = hst_filename.suffix()
                 coll = f"data_{instrument_name}_{suffix}"
@@ -106,6 +98,10 @@ class CopyPrimaryFiles(MarkedStage):
         documents_dir: str = self.documents_dir()
         mast_downloads_dir: str = self.mast_downloads_dir()
         primary_files_dir: str = self.primary_files_dir()
+
+        assert not os.path.isdir(
+            self.deliverable_dir()
+        ), f"{self.deliverable_dir()} cannot exist for CopyPrimaryFiles"
 
         assert self._bundle_segment.startswith("hst_")
         assert self._bundle_segment[-5:].isdigit()

@@ -1,6 +1,7 @@
 from typing import cast, Set
 
 import fs.path
+import os.path
 
 from pdart.db.BundleDB import (
     BundleDB,
@@ -329,6 +330,10 @@ class BuildLabels(MarkedStage):
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
         archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
         archive_label_deltas_dir: str = self.archive_label_deltas_dir()
+
+        assert not os.path.isdir(
+            self.deliverable_dir()
+        ), "{deliverable_dir} cannot exist for BuildLabels"
 
         changes_path = fs.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)

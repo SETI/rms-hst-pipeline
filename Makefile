@@ -157,9 +157,12 @@ changes : venv black mypy
 	-rm $(LIL-TWD)/*/\#*.txt
 	./reset-downloads
 	for project_id in $(CHANGES); do \
-	    echo '****' hst_$$project_id '****'; \
+	    echo '****' hst_$$project_id ' ROUND ONE ****'; \
+	    say round one; \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
 		python Pipeline.py $$project_id && \
+	    echo "**** ROUND TWO ****" && \
+	    say round two && \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
 		python Pipeline2.py $$project_id; say ya; \
 	done;

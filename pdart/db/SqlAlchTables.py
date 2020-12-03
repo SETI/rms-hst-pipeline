@@ -43,6 +43,12 @@ class BundleCollectionLink(Base):
         String, ForeignKey("collections.lidvid"), nullable=False, index=True
     )
 
+    def __repr__(self) -> str:
+        return (
+            f"BundleCollectionLink(bundle_lidvid={self.bundle_lidvid!r}"
+            f", collection_lidvid={self.collection_lidvid!r})"
+        )
+
 
 class CollectionProductLink(Base):
     """
@@ -70,6 +76,12 @@ class CollectionProductLink(Base):
     product_lidvid = Column(
         String, ForeignKey("products.lidvid"), nullable=False, index=True
     )
+
+    def __repr__(self) -> str:
+        return (
+            f"CollectionProductLink(collection_lidvid={self.collection_lidvid!r}"
+            f", product_lidvid={self.product_lidvid!r})"
+        )
 
 
 ############################################################

@@ -72,6 +72,8 @@ def _build_browse_collection(
         browse_collection_lid, browse_collection_vid
     )
     db.create_other_collection(str(browse_collection_lidvid), str(bundle_lidvid))
+    db.create_bundle_collection_link(str(bundle_lidvid), str(browse_collection_lidvid))
+
     product_segments = [
         str(prod[:-1]) for prod in browse_deltas.listdir(collection_path) if "$" in prod
     ]
@@ -79,12 +81,12 @@ def _build_browse_collection(
         product_lid = LID.create_from_parts(
             [bundle_segment, collection_segment, product_segment]
         )
+        product_path = f"{collection_path}{product_segment}$/"
+        browse_product_path = f"{browse_collection_path}{product_segment}$/"
+        browse_product_lidvid = _extend_lidvid(
+            browse_collection_lidvid, product_segment
+        )
         if changes_dict.changed(product_lid):
-            product_path = f"{collection_path}{product_segment}$/"
-            browse_product_path = f"{browse_collection_path}{product_segment}$/"
-            browse_product_lidvid = _extend_lidvid(
-                browse_collection_lidvid, product_segment
-            )
             fits_product_lidvid = _extend_lidvid(
                 data_collection_lidvid, product_segment
             )
@@ -98,6 +100,10 @@ def _build_browse_collection(
                 fits_product_lidvid,
                 str(browse_collection_lidvid),
             )
+            db.create_collection_product_link(
+                str(browse_collection_lidvid), browse_product_lidvid
+            )
+
             for fits_file in browse_deltas.listdir(product_path):
                 fits_filepath = fs.path.join(product_path, fits_file)
                 fits_os_filepath = browse_deltas.getsyspath(fits_filepath)
@@ -151,6 +157,10 @@ class BuildBrowse(MarkedStage):
         archive_dir: str = self.archive_dir()
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
         archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
+
+        assert not os.path.isdir(
+            self.deliverable_dir()
+        ), "{deliverable_dir} cannot exist for BuildBrowse"
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)

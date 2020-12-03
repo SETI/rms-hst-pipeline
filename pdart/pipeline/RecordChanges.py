@@ -145,6 +145,10 @@ class RecordChanges(MarkedStage):
         primary_files_dir: str = self.primary_files_dir()
         archive_dir: str = self.archive_dir()
 
+        assert not os.path.isdir(
+            self.deliverable_dir()
+        ), "{deliverable_dir} cannot exist for RecordChanges"
+
         assert os.path.isdir(working_dir), working_dir
         assert os.path.isdir(primary_files_dir + "-sv"), primary_files_dir
 
@@ -157,6 +161,10 @@ class RecordChanges(MarkedStage):
                 mv = Multiversioned(archive_osfs)
                 d = _get_primary_changes(mv, primary_fs, latest_version)
                 write_changes_dict(d, changes_path)
+                d.dump("after RecordChanges")
+                print(
+                    "----------------------------------------------------------------"
+                )
 
         assert os.path.isdir(primary_files_dir + "-sv")
         assert os.path.isfile(os.path.join(working_dir, CHANGES_DICT_NAME))

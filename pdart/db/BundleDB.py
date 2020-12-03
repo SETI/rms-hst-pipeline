@@ -188,6 +188,19 @@ class BundleDB(object):
             )
         ).scalar()
 
+    def dump_link_tree(self, bundle_lidvid: str) -> None:
+        INDENT = 4 * " "
+
+        def dump_collection_link_tree(collection_lidvid: str) -> None:
+            print(INDENT + collection_lidvid)
+            for product in self.get_collection_products(collection_lidvid):
+                print(2 * INDENT + product.lidvid)
+
+        bundle = self.get_bundle(bundle_lidvid)
+        print(bundle_lidvid)
+        for collection in self.get_bundle_collections(bundle_lidvid):
+            dump_collection_link_tree(collection.lidvid)
+
     ############################################################
 
     def create_bundle(self, bundle_lidvid: str) -> None:
@@ -215,15 +228,38 @@ class BundleDB(object):
     def get_bundle_collections(self, bundle_lidvid: str) -> List[Collection]:
         # TODO There's probably better ways to do this.  Use a SQL
         # join?
-        return [
-            self.session.query(Collection)
-            .filter(Collection.lidvid == link.collection_lidvid)
-            .one()
-            for link in self.session.query(BundleCollectionLink)
-            .filter(BundleCollectionLink.bundle_lidvid == bundle_lidvid)
-            .order_by(BundleCollectionLink.collection_lidvid)
-            .all()
-        ]
+        _False = False
+
+        if _False:
+            return [
+                self.session.query(Collection)
+                .filter(Collection.lidvid == link.collection_lidvid)
+                .one()
+                for link in self.session.query(BundleCollectionLink)
+                .filter(BundleCollectionLink.bundle_lidvid == bundle_lidvid)
+                .order_by(BundleCollectionLink.collection_lidvid)
+                .all()
+            ]
+        else:
+            # for debugging
+            print(f";;;; get_bundle_collections({bundle_lidvid!r})")
+            links = (
+                self.session.query(BundleCollectionLink)
+                .filter(BundleCollectionLink.bundle_lidvid == bundle_lidvid)
+                .order_by(BundleCollectionLink.collection_lidvid)
+                .all()
+            )
+
+            res = list()
+            for link in links:
+                print(f";;;; {link}")
+                coll = (
+                    self.session.query(Collection)
+                    .filter(Collection.lidvid == link.collection_lidvid)
+                    .one()
+                )
+                res.append(coll)
+            return res
 
     ############################################################
 

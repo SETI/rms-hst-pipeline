@@ -1,5 +1,9 @@
 from subprocess import CompletedProcess, run
 import fs.path
+import os.path
+from pdart.pipeline.ChangesDict import (
+    CHANGES_DICT_NAME,
+)
 from pdart.pipeline.Stage import MarkedStage
 
 
@@ -10,6 +14,10 @@ class ValidateBundle(MarkedStage):
     """
 
     def _run(self) -> None:
+        working_dir: str = self.working_dir()
+        assert os.path.isdir(
+            self.deliverable_dir()
+        ), f"Need {self.deliverable_dir()} for ValidateBundle"
         completed_process: CompletedProcess = run(
             [
                 "./validate-pdart",
@@ -19,3 +27,7 @@ class ValidateBundle(MarkedStage):
             ]
         )
         completed_process.check_returncode()
+
+        changes_dict_path = os.path.join(working_dir, CHANGES_DICT_NAME)
+        os.remove(changes_dict_path)
+        assert not os.path.isfile(changes_dict_path)

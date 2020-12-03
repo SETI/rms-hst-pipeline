@@ -17,11 +17,7 @@ from pdart.db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
 from pdart.fs.deliverablefs.DeliverableFS import DeliverableFS, lidvid_to_dirpath
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
-from pdart.pipeline.ChangesDict import (
-    CHANGES_DICT_NAME,
-    ChangesDict,
-    read_changes_dict,
-)
+from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_version_view
 
@@ -77,8 +73,16 @@ class MakeDeliverable(MarkedStage):
         deliverable_dir: str = self.deliverable_dir()
         manifest_dir: str = self.manifest_dir()
 
+        assert not os.path.isdir(
+            deliverable_dir
+        ), "{deliverable_dir} cannot exist for MakeDeliverable"
+
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
+
+        if os.path.isdir(deliverable_dir):
+            OSFS(deliverable_dir).tree()
+            assert False, "wtf?"
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
             archive_osfs, self._bundle_segment
@@ -122,7 +126,3 @@ class MakeDeliverable(MarkedStage):
                     tar.add(bundle_dir, arcname=os.path.basename(bundle_dir))
 
                 shutil.rmtree(bundle_dir)
-
-        changes_dict_path = os.path.join(working_dir, CHANGES_DICT_NAME)
-        os.remove(changes_dict_path)
-        assert not os.path.isfile(changes_dict_path)

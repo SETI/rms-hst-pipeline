@@ -19,6 +19,10 @@ class UpdateArchive(MarkedStage):
         archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
         archive_label_deltas_dir: str = self.archive_label_deltas_dir()
 
+        assert not os.path.isdir(
+            self.deliverable_dir()
+        ), "{deliverable_dir} cannot exist for UpdateArchive"
+
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
             archive_osfs, self._bundle_segment
         ) as version_view, make_sv_deltas(
