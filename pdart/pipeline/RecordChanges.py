@@ -161,10 +161,6 @@ class RecordChanges(MarkedStage):
                 mv = Multiversioned(archive_osfs)
                 d = _get_primary_changes(mv, primary_fs, latest_version)
                 write_changes_dict(d, changes_path)
-                d.dump("after RecordChanges")
-                print(
-                    "----------------------------------------------------------------"
-                )
 
         assert os.path.isdir(primary_files_dir + "-sv")
         assert os.path.isfile(os.path.join(working_dir, CHANGES_DICT_NAME))
