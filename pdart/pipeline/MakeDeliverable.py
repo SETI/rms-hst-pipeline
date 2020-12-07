@@ -79,6 +79,7 @@ class MakeDeliverable(MarkedStage):
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
+        changes_dict.dump("in MakeDeliverable")
 
         if os.path.isdir(deliverable_dir):
             OSFS(deliverable_dir).tree()

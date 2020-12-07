@@ -106,6 +106,20 @@ def create_pds4_labels(
                 if first_bundle:
                     self._create_context_collection(bundle)
                     self._create_schema_collection(bundle)
+                else:
+                    context_collection_lid = (
+                        LIDVID(bundle.lidvid).lid().extend_lid("context")
+                    )
+                    context_collection_lidvid = LIDVID.create_from_lid_and_vid(
+                        context_collection_lid, VID("1.0")
+                    )
+                    bundle_db.create_context_collection(
+                        str(context_collection_lidvid), bundle.lidvid
+                    )
+                    changes_dict.set(context_collection_lid, VID("1.0"), False)
+                    bundle_db.create_bundle_collection_link(
+                        str(bundle_lidvid), str(context_collection_lidvid)
+                    )
                 self._post_visit_bundle(bundle)
 
         def _create_context_collection(self, bundle: Bundle) -> None:
