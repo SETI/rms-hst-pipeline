@@ -136,10 +136,11 @@ class PopulateDatabase(MarkedStage):
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
+        bundle_lid = LID.create_from_parts([self._bundle_segment])
+        first_round = changes_dict.vid(bundle_lid) == VID("1.0")
         schema_collection_lid = LID.create_from_parts([self._bundle_segment, "schema"])
-        if not changes_dict.contains(schema_collection_lid):
-            changes_dict.set(schema_collection_lid, VID("1.0"), True)
-            write_changes_dict(changes_dict, changes_path)
+        changes_dict.set(schema_collection_lid, VID("1.0"), first_round)
+        write_changes_dict(changes_dict, changes_path)
 
         db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
         db_exists = os.path.isfile(db_filepath)

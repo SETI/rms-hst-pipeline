@@ -252,14 +252,3 @@ class BuildBrowse(MarkedStage):
                         )
 
             write_changes_dict(changes_dict, changes_path)
-
-            # TODO Remove this instrumentation.
-            _do_dump = False
-            if _do_dump:
-                print("============================================================")
-                print("---- BEGIN DUMP ------------------------------")
-                changes_dict.dump("changes_dict")
-                print("---- LINK TREE ------------------------------")
-                db.dump_link_tree(str(bundle_lidvid))
-                print("---- END DUMP ------------------------------")
-                print("============================================================")
