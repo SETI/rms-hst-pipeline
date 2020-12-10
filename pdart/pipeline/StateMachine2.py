@@ -82,8 +82,8 @@ class ChangeFiles(MarkedStage):
                         return
                 assert False, "fell off the end of delete_directory in ChangeFiles"
 
-            _change_fits_file()
-            # _delete_directory()
+            # _change_fits_file()
+            _delete_directory()
 
 
 class ReResetPipeline(MarkedStage):

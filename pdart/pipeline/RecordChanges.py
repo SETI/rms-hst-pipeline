@@ -1,5 +1,6 @@
-from typing import Dict, Iterator, Set
+import logging
 import os.path
+from typing import Dict, Iterator, Set
 
 from fs.base import FS
 from fs.subfs import SubFS
@@ -21,6 +22,8 @@ from pdart.pipeline.Utils import (
     make_version_view,
 )
 from pdart.pipeline.Stage import MarkedStage
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def _is_primary_file(filepath: str) -> bool:
@@ -104,12 +107,21 @@ def _get_primary_changes(
                 lid = dir_to_lid(full_dirpath)
                 assert lid in result.changes_dict
                 if result.changed(lid):
-                    print(f"#### CHANGE DETECTED in {dirpath}: {lid} changed")
+                    _LOGGER.info(f"CHANGE DETECTED in {dirpath}: {lid} changed")
                     return False
             return True
         else:
             # list of dirs does not match
-            print(f"#### CHANGE DETECTED IN {dirpath}: {primary_dirs} != {latest_dirs}")
+            added = latest_dirs - primary_dirs
+            removed = primary_dirs - latest_dirs
+            if added and removed:
+                _LOGGER.info(
+                    f"CHANGE DETECTED IN {dirpath}: added {added}; removed {removed}"
+                )
+            elif added:
+                _LOGGER.info(f"CHANGE DETECTED IN {dirpath}: added {added}")
+            else:  # removed
+                _LOGGER.info(f"CHANGE DETECTED IN {dirpath}: removed {removed}")
             return False
 
     def files_match(dirpath: str) -> bool:
@@ -137,14 +149,14 @@ def _get_primary_changes(
         )
 
         if primary_files != latest_files:
-            print(
-                f"#### CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}"
+            _LOGGER.info(
+                f"CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}"
             )
             return False
         for filename in primary_files:
             filepath = join(dirpath, relpath(filename))
             if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(filepath):
-                print(f"#### CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath} ####")
+                _LOGGER.info(f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}")
                 return False
         return True
 

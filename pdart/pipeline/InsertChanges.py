@@ -46,7 +46,12 @@ def _merge_primaries(changes_dict: ChangesDict, src_fs: FS, dst_fs: FS) -> None:
             if changed:
                 if not dst_fs.isdir(dirpath):
                     dst_fs.makedirs(dirpath)
+                src_sub_fs = SubFS(src_fs, dirpath)
                 dst_sub_fs = SubFS(dst_fs, dirpath)
+                # delete directories in dst that don't exist in src
+                for subdirpath in dst_sub_fs.walk.dirs(search="depth"):
+                    if not src_sub_fs.isdir(subdirpath):
+                        dst_sub_fs.removetree(subdirpath)
                 # delete the files in the destination (if any)
                 for filepath in dst_sub_fs.walk.files():
                     if "$" not in filepath:
