@@ -1,3 +1,4 @@
+from logging import Logger
 from typing import Dict, ItemsView, Optional, Tuple
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -38,6 +39,12 @@ class ChangesDict(object):
         for lid, (vid, changed) in sorted(self.changes_dict.items()):
             print(lid, vid, changed)
         print("****************")
+
+    def log(self, logger: Logger, level: int, note: str = "") -> None:
+        logger.log(level, f"**** ChangeDict {note} ****")
+        for lid, (vid, changed) in sorted(self.changes_dict.items()):
+            logger.log(level, f"{lid} {vid} {changed}")
+        logger.log(level, "****************")
 
     def has_changes(self) -> bool:
         res = False

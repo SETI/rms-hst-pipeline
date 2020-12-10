@@ -70,11 +70,14 @@ better; maybe a little worse.)
 I document some types below using Haskell notation: *a -> b* is a
 function from *a* to *b* and *[c]* is a list of *c* s.
 """
+import logging
 import xml.dom
 import xml.sax
 import xml.sax.handler
 from typing import Any, Callable, Dict, List, Union, cast
 from xml.dom.minidom import Document, Text
+
+_LOGGER = logging.getLogger(__name__)
 
 TemplateDict = Dict[str, Any]
 Node = Any  # should be Text
@@ -265,7 +268,7 @@ def interpret_template(template: str) -> NodeBuilderTemplate:
             try:
                 xml.sax.parseString(template, Builder())
             except Exception:
-                print("malformed template:", template)
+                _LOGGER.error(f"malformed template: {template}")
                 raise
             return stack[-1]
 

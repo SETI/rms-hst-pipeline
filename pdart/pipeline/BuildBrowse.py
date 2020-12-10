@@ -207,9 +207,6 @@ class BuildBrowse(MarkedStage):
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
 
-        # TODO remove
-        changes_dict.dump("BEFORE BuildBrowse")
-
         db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
         db = create_bundle_db_from_os_filepath(db_filepath)
 
