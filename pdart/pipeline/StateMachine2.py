@@ -1,5 +1,6 @@
 import abc
 import fs.path
+import logging
 import os
 import os.path
 import shutil
@@ -20,6 +21,8 @@ from pdart.pipeline.Stage import MarkedStage, Stage
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.Utils import make_osfs
 from pdart.pipeline.ValidateBundle import ValidateBundle
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class SaveDownloads(MarkedStage):
@@ -56,9 +59,9 @@ class ChangeFiles(MarkedStage):
                 self.mast_downloads_dir(), fs.path.relpath(rel_path)
             )
 
-            print(f"**** touching {abs_path} ****")
             from TouchFits import touch_fits
 
+            _LOGGER.info(f"touching {abs_path}")
             touch_fits(abs_path)
 
         with make_osfs(self.mast_downloads_dir()) as mast_fs:
@@ -69,7 +72,7 @@ class ChangeFiles(MarkedStage):
                     # change only the n-th FITS file then return
                     if which_file == 0:
                         change_fits_file(path)
-                        print(f"#### CHANGED {path} ####")
+                        _LOGGER.info(f"CHANGED {path}")
                         return
                     which_file = which_file - 1
                 assert False, "fell off the end of change_fits_file in ChangeFiles"
@@ -77,7 +80,7 @@ class ChangeFiles(MarkedStage):
             def _delete_directory() -> None:
                 for path in mast_fs.walk.dirs():
                     if len(fs.path.parts(path)) == 3:
-                        print(f"#### REMOVED {path} ####")
+                        _LOGGER.info(f"REMOVED {path}")
                         mast_fs.removetree(path)
                         return
                 assert False, "fell off the end of delete_directory in ChangeFiles"
@@ -115,7 +118,9 @@ class ReResetPipeline(MarkedStage):
                     shutil.rmtree(fullpath)
                 else:
                     os.unlink(fullpath)
-        print(f"&&&& contents of working_dir after re-reset: {os.listdir(working_dir)}")
+        _LOGGER.info(
+            f"contents of working_dir after re-reset: {os.listdir(working_dir)}"
+        )
 
 
 class StateMachine2(object):
@@ -153,7 +158,7 @@ class StateMachine2(object):
 
         i = phase_index()
         try:
-            print(f"???? {self.stages[i+1][0]} ????")
+            _LOGGER.info(f"{self.stages[i+1][0]}")
             return self.stages[i + 1][1]
         except IndexError:
             return None

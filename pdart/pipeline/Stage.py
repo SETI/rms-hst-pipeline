@@ -1,4 +1,5 @@
 import abc
+import logging
 import os
 import os.path
 import traceback
@@ -6,6 +7,8 @@ from typing import Optional
 
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.MarkerFile import BasicMarkerFile
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Stage(metaclass=abc.ABCMeta):
@@ -122,5 +125,5 @@ class MarkedStage(Stage):
             f"{traceback.format_exc()}"
         )
 
-        print("****", error_text)
+        _LOGGER.error(error_text)
         self._marker_file.set_marker_info(self.class_name(), "failure", error_text)

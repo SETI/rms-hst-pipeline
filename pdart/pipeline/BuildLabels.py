@@ -1,3 +1,4 @@
+import logging
 from typing import cast, Set
 
 import fs.path
@@ -46,11 +47,14 @@ from pdart.pipeline.ChangesDict import (
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
+_LOGGER = logging.getLogger(__name__)
+
+
 _VERIFY = False
 
 
 def log_label(tag: str, lidvid: str) -> None:
-    print("^^^^", tag, "label for", lidvid)
+    _LOGGER.info(f"{tag} label for {lidvid}")
 
 
 def _create_citation_info(
