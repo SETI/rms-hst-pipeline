@@ -27,9 +27,8 @@ class TestCOWFS(FSTestCases, unittest.TestCase):
         self.fs.writetext("/b$/c.txt", "Buggy?")
         self.fs.invariant()
 
-    @unittest.skip("newly discovered, not worked on yet")
-    def test_remove_bug(self) -> None:
-        # These two commands disclosed a bug in COWFS.openbin().  This
+    def test_listdir_bug(self) -> None:
+        # Removing a file disclosed a bug in COWFS.listdir().  This
         # serves as a regression test.
         self.tempfs.makedirs("/b/d")
         self.tempfs.writetext("/b/d/c1.txt", "hmmm")
