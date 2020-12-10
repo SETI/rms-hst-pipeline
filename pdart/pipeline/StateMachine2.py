@@ -62,15 +62,28 @@ class ChangeFiles(MarkedStage):
             touch_fits(abs_path)
 
         with make_osfs(self.mast_downloads_dir()) as mast_fs:
-            which_file = 0
-            for path in mast_fs.walk.files(filter=["*.fits"]):
-                # change only the n-th FITS file then return
-                if which_file == 0:
-                    change_fits_file(path)
-                    print(f"#### CHANGED {path} ####")
-                    return
-                which_file = which_file - 1
-            assert False, "fell off the end of ChangeFiles"
+
+            def _change_fits_file() -> None:
+                which_file = 0
+                for path in mast_fs.walk.files(filter=["*.fits"]):
+                    # change only the n-th FITS file then return
+                    if which_file == 0:
+                        change_fits_file(path)
+                        print(f"#### CHANGED {path} ####")
+                        return
+                    which_file = which_file - 1
+                assert False, "fell off the end of change_fits_file in ChangeFiles"
+
+            def _delete_directory() -> None:
+                for path in mast_fs.walk.dirs():
+                    if len(fs.path.parts(path)) == 3:
+                        print(f"#### REMOVED {path} ####")
+                        mast_fs.removetree(path)
+                        return
+                assert False, "fell off the end of delete_directory in ChangeFiles"
+
+            _change_fits_file()
+            # _delete_directory()
 
 
 class ReResetPipeline(MarkedStage):

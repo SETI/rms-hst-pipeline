@@ -39,6 +39,12 @@ class ChangesDict(object):
             print(lid, vid, changed)
         print("****************")
 
+    def has_changes(self) -> bool:
+        res = False
+        for lid, (vid, changed) in self.changes_dict.items():
+            res = res or changed
+        return res
+
 
 CHANGES_DICT = ChangesDict
 CHANGES_DICT_NAME: str = "changes$dict.txt"
