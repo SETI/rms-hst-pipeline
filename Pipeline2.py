@@ -6,7 +6,8 @@ from pdart.pipeline.StateMachine2 import StateMachine2
 
 def init_logging() -> None:
     logging.basicConfig(
-        format="[%(levelname)-8s at %(asctime)s in %(name)r]: %(message)s",
+        format="[%(levelname)s %(asctime)s %(name)r]: %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S",
         level=logging.DEBUG,
     )
 

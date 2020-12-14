@@ -112,8 +112,8 @@ def _get_primary_changes(
             return True
         else:
             # list of dirs does not match
-            added = latest_dirs - primary_dirs
-            removed = primary_dirs - latest_dirs
+            added = primary_dirs - latest_dirs
+            removed = latest_dirs - primary_dirs
             if added and removed:
                 _LOGGER.info(
                     f"CHANGE DETECTED IN {dirpath}: added {added}; removed {removed}"
