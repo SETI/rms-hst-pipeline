@@ -1,15 +1,8 @@
-import logging
 import sys
+
+from pdart.Logging import init_logging
 from pdart.pipeline.Directories import Directories, make_directories
 from pdart.pipeline.StateMachine2 import StateMachine2
-
-
-def init_logging() -> None:
-    logging.basicConfig(
-        format="[%(levelname)s %(asctime)s %(name)r]: %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S",
-        level=logging.DEBUG,
-    )
 
 
 def run() -> None:

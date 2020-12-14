@@ -45,10 +45,6 @@ def plain_lidvid_to_visits_dirpath(lidvid: LIDVID) -> str:
 def make_checksum_manifest(
     bundle_db: BundleDB, bundle_lidvid: str, lidvid_to_dirpath: _LTD
 ) -> str:
-    _LOGGER.info("LINK TREE:")
-    bundle_db.log_link_tree(_LOGGER, logging.INFO, bundle_lidvid)
-    _LOGGER.info("END LINK TREE")
-
     files: List[File] = []
 
     bundle = bundle_db.get_bundle(bundle_lidvid)
