@@ -35,17 +35,6 @@ def short_lidvid_to_dirpath(lidvid: LIDVID) -> str:
     return fs.path.join(*parts)
 
 
-def _fix_up_deliverable(dir: str) -> None:
-    # TODO DeliverableFS was written with an older directory
-    # structure.  When used with the new, we get trailing dollar signs
-    # on directories representing bundles, collections, and products.
-    # No time to fix it right now, so we just patch up the resulting
-    # directory tree.  TODO But *do* fix it.
-    for path, _, _ in os.walk(dir, topdown=False):
-        if path[-1] == "$":
-            os.rename(path, path[:-1])
-
-
 def copy_fs(version_view: FS, deliverable: FS) -> None:
     # TODO I could (and used to) just do a fs.copy.copy_fs() from the
     # version_view to a DeliverableFS.  I removed it to debug issues

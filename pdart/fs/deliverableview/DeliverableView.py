@@ -1,3 +1,4 @@
+from abc import ABCMeta
 import io
 from typing import (
     Any,
@@ -34,6 +35,10 @@ NO_VISIT_COLLECTIONS = ["context", "document", "schema"]
 
 
 def _first_index(pred: Callable[[str], bool], parts: List[str]) -> int:
+    """
+    Return the index to the first string in the list that satisfies
+    the predicate.  Return the length of the list if no string does.
+    """
     for i, part in enumerate(parts):
         if pred(part):
             return i
@@ -41,6 +46,12 @@ def _first_index(pred: Callable[[str], bool], parts: List[str]) -> int:
 
 
 def translate_filepath(archive_filepath: str) -> str:
+    """
+    Translate an archive-style filepath (with "$" after bundle,
+    collection and product directory names) into a deliverable-style
+    filepath (with no "$"s and products organized into visit_NN
+    directories instead of their own).
+    """
     # The first part is always "/", so we drop it.
     parts = fs.path.parts(archive_filepath)[1:]
     # Special case for the root.
@@ -77,28 +88,52 @@ def translate_filepath(archive_filepath: str) -> str:
     raise ValueError(f"unexpected number of pds4 parts in {archive_filepath}")
 
 
-class _Entry(object):
+class _Entry(object, metaclass=ABCMeta):
+    """
+    Entries in the DeliverableView's path dictionary.
+    """
+
     pass
 
 
-class _FileInfo(_Entry):
+class _FileInfo(_Entry, metaclass=ABCMeta):
+    """
+    Entries that represent a file.
+    """
+
     def __init__(self) -> None:
         _Entry.__init__(self)
 
 
 class _BaseFileInfo(_FileInfo):
+    """
+    Entries that represent a file living in the base filesystem (the
+    archive).
+    """
+
     def __init__(self, archive_filepath: str) -> None:
         _FileInfo.__init__(self)
         self.archive_filepath = archive_filepath
 
 
 class _SynthFileInfo(_FileInfo):
+    """
+    Entries that represent a synthetic file that doesn't live
+    anywhere.  We use these to create the manifests on demand.
+    """
+
     def __init__(self, contents: bytes) -> None:
         _FileInfo.__init__(self)
         self.contents = contents
 
 
 class _DirInfo(_Entry):
+    """
+    Entries that represent a directory.  A directory may correspond to
+    one in the base filesystem (like "/hst_12345"), but it also may be
+    purely synthetic (like "/hst_12345/acs_data_raw/visit_89").
+    """
+
     def __init__(self) -> None:
         _Entry.__init__(self)
         self.children: Dict[str, _Entry] = {}
@@ -114,6 +149,17 @@ class _DirInfo(_Entry):
 
 
 class DeliverableView(FS):
+    """
+    A human-friendly read-only view on a version of a bundle, possibly
+    supplemented with some synthetic files that do not exist in the
+    archive.  (We can use this facility to create manifest files on
+    demand.)  Product files are collected into visit directories.
+
+    Since the transfer manifest file encodes the layout of the
+    deliverable, if we store it into the archive, we've hard-coded the
+    layour permanently.  We're trying to avoid doing that.
+    """
+
     def __init__(
         self, base_fs: VersionView, synth_files: Optional[Dict[str, bytes]] = None
     ) -> None:
@@ -128,6 +174,11 @@ class DeliverableView(FS):
         self._populate_path_dict_from_synth_files(synth_files)
 
     def _insert_dirpath(self, dirpath: str) -> _DirInfo:
+        """
+        Insert a directory path into the path dictionary and return
+        its _DirInfo.  In doing this, we will create entries for any
+        parent directories as necessary.
+        """
         if dirpath == "/":
             # We've recursed to the top and just return the
             # _DirInfo value we initialized path_dict with.
@@ -145,6 +196,11 @@ class DeliverableView(FS):
         self, synth_files: Dict[str, bytes]
     ) -> None:
         def insert_synth_file(filepath: str, contents: bytes) -> None:
+            """
+            Insert a file path into the path dictionary and its
+            contents.  In doing this, we will create entries for any
+            parent directories as necessary.
+            """
             dirpath, filename = fs.path.split(filepath)
             file_info = _SynthFileInfo(contents)
             # Make an entry for the parent directory (recursively),
@@ -157,7 +213,18 @@ class DeliverableView(FS):
             insert_synth_file(filepath, contents)
 
     def _populate_path_dict_from_base_fs(self) -> None:
+        """
+        Recursively walk through all the filepaths for the VersionView
+        and add them to the path dictionary.
+        """
+
         def insert_filepaths(deliverable_filepath: str, archive_filepath: str) -> None:
+            """
+            Insert a file path into the path dictionary and the path
+            to the file in the base filesystem.  In doing this, we
+            will create entries for any parent directories as
+            necessary.
+            """
             file_info = _BaseFileInfo(archive_filepath)
             dirpath, filename = fs.path.split(deliverable_filepath)
             # Make an entry for the parent directory (recursively),
@@ -167,14 +234,15 @@ class DeliverableView(FS):
             self.path_dict[deliverable_filepath] = file_info
 
         def insert_archive_filepath(archive_filepath: str) -> None:
-            # Translate the filepath to the human-friendly deliverable
-            # format, and insert the two paths into the path
-            # dictionary.
+            """
+            Translate the filepath to the human-friendly deliverable
+            format, and insert the two paths into the path dictionary.
+            In doing this, we will create entries for any parent
+            directories as necessary.
+            """
             deliverable_filepath = translate_filepath(archive_filepath)
             insert_filepaths(deliverable_filepath, archive_filepath)
 
-        # Recursively walk through all the filepaths for the
-        # VersionView and add them to this DeliverableView.
         for archive_filepath in self.base_fs.walk.files():
             insert_archive_filepath(archive_filepath)
 
