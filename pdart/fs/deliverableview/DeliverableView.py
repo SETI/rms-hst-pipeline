@@ -1,3 +1,4 @@
+import io
 from typing import (
     Any,
     BinaryIO,
@@ -18,6 +19,7 @@ import fs.path
 from fs.permissions import Permissions
 from fs.subfs import SubFS
 
+from pdart.db.BundleDB import BundleDB
 from pdart.fs.multiversioned.Multiversioned import Multiversioned
 from pdart.fs.multiversioned.VersionView import VersionView
 from pdart.pds4.HstFilename import HstFilename
@@ -27,14 +29,8 @@ from pdart.pds4.VID import VID
 
 _INFO_DICT = Mapping[str, Mapping[str, object]]
 
-_NO_VISIT_COLLECTIONS = ["context", "document", "schema"]  # Do not
-# convert
-# paths
-# within
-# these
-# collections
-# to use
-# "visit_NN"
+_NO_VISIT_COLLECTIONS = ["context", "document", "schema"]
+# Do not convert paths within these collections to use "visit_NN"
 
 
 def _first_index(pred: Callable[[str], bool], parts: List[str]) -> int:
@@ -86,9 +82,20 @@ class _Entry(object):
 
 
 class _FileInfo(_Entry):
-    def __init__(self, archive_filepath: str) -> None:
+    def __init__(self) -> None:
         _Entry.__init__(self)
+
+
+class _BaseFileInfo(_FileInfo):
+    def __init__(self, archive_filepath: str) -> None:
+        _FileInfo.__init__(self)
         self.archive_filepath = archive_filepath
+
+
+class _SynthFileInfo(_FileInfo):
+    def __init__(self, contents: bytes) -> None:
+        _FileInfo.__init__(self)
+        self.contents = contents
 
 
 class _DirInfo(_Entry):
@@ -107,34 +114,54 @@ class _DirInfo(_Entry):
 
 
 class DeliverableView(FS):
-    # TODO I'm not including the manifest.  We need them.
-    def __init__(self, base_fs: VersionView) -> None:
+    def __init__(
+        self, base_fs: VersionView, synth_files: Optional[Dict[str, bytes]] = None
+    ) -> None:
         self.base_fs = base_fs
         self.path_dict: Dict[str, _Entry] = {"/": _DirInfo()}
 
-        self._populate_path_dict()
+        self._populate_path_dict_from_base_fs()
 
-    def _populate_path_dict(self) -> None:
-        def insert_dirpath(dirpath: str) -> _DirInfo:
-            if dirpath == "/":
-                # We've recursed to the top and just return the
-                # _DirInfo value we initialized path_dict with.
-                return cast(_DirInfo, self.path_dict["/"])
-            else:
-                parent_dirpath, dirname = fs.path.split(dirpath)
-                # Make an entry for the parent directory
-                # (recursively), and add your info to it.
-                dir_info = insert_dirpath(parent_dirpath).add_dir(dirname)
-                # Put your own entry into the path dictionary.
-                self.path_dict[dirpath] = dir_info
-                return dir_info
+        # Insert the synthetic files
+        synth_files = dict() if synth_files is None else synth_files
+        self._populate_path_dict_from_synth_files(synth_files)
 
+    def _insert_dirpath(self, dirpath: str) -> _DirInfo:
+        if dirpath == "/":
+            # We've recursed to the top and just return the
+            # _DirInfo value we initialized path_dict with.
+            return cast(_DirInfo, self.path_dict["/"])
+        else:
+            parent_dirpath, dirname = fs.path.split(dirpath)
+            # Make an entry for the parent directory
+            # (recursively), and add your info to it.
+            dir_info = self._insert_dirpath(parent_dirpath).add_dir(dirname)
+            # Put your own entry into the path dictionary.
+            self.path_dict[dirpath] = dir_info
+            return dir_info
+
+    def _populate_path_dict_from_synth_files(
+        self, synth_files: Dict[str, bytes]
+    ) -> None:
+        def insert_synth_file(filepath: str, contents: bytes) -> None:
+            dirpath, filename = fs.path.split(filepath)
+            file_info = _SynthFileInfo(contents)
+            # Make an entry for the parent directory (recursively),
+            # and add your info to it.
+            self._insert_dirpath(dirpath).add_file(filename, file_info)
+            # Put your own entry into the path dictionary.
+            self.path_dict[filepath] = file_info
+
+        for filepath, contents in synth_files.items():
+            insert_synth_file(filepath, contents)
+
+    def _populate_path_dict_from_base_fs(self) -> None:
         def insert_filepaths(deliverable_filepath: str, archive_filepath: str) -> None:
-            file_info = _FileInfo(archive_filepath)
+            file_info = _BaseFileInfo(archive_filepath)
             dirpath, filename = fs.path.split(deliverable_filepath)
             # Make an entry for the parent directory (recursively),
             # and add your info to it.
-            insert_dirpath(dirpath).add_file(filename, file_info)
+            self._insert_dirpath(dirpath).add_file(filename, file_info)
             # Put your own entry into the path dictionary.
             self.path_dict[deliverable_filepath] = file_info
 
@@ -182,10 +209,12 @@ class DeliverableView(FS):
         if check_writable(mode):
             raise ResourceReadOnly(path)
         info = self.path_dict[fs.path.abspath(path)]
-        if isinstance(info, _FileInfo):
+        if isinstance(info, _BaseFileInfo):
             return self.base_fs.openbin(
                 info.archive_filepath, mode, buffering, **options
             )
+        elif isinstance(info, _SynthFileInfo):
+            return io.BytesIO(info.contents)
         else:
             raise fs.errors.FileExpected(path)
 
@@ -203,7 +232,7 @@ class DeliverableView(FS):
 
     @staticmethod
     def create_deliverable_view(
-        mv: Multiversioned, lid: LID, vid: Optional[VID] = None
+        bundle_db: BundleDB, mv: Multiversioned, lid: LID, vid: Optional[VID] = None
     ) -> "DeliverableView":
         if vid is None:
             vv = mv.create_version_view(lid)

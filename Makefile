@@ -171,6 +171,9 @@ changes : venv black mypy
 		python Pipeline2.py $$project_id; say ya; \
 	done;
 
+dv : venv black mypy
+	$(ACTIVATE) && PYTHONPATH=$(HOME)/pds-tools python DV.py
+
 ##############################
 # Download shm & spt from mast
 ##############################
