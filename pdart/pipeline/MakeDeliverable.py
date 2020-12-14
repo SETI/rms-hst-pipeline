@@ -2,6 +2,7 @@ import os
 import os.path
 import shutil
 import tarfile
+from typing import Dict
 
 import fs.path
 from fs.base import FS
@@ -15,13 +16,43 @@ from pdart.archive.ChecksumManifest import (
 from pdart.archive.TransferManifest import make_transfer_manifest
 from pdart.db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
 from pdart.fs.deliverablefs.DeliverableFS import DeliverableFS, lidvid_to_dirpath
+from pdart.fs.deliverableview.DeliverableView import (
+    DeliverableView,
+    NO_VISIT_COLLECTIONS,
+)
+from pdart.fs.multiversioned.VersionView import VersionView
+from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Utils import make_osfs, make_version_view
+from pdart.pipeline.Utils import make_multiversioned, make_osfs, make_version_view
 
 _TAR_NEEDED: bool = False
+
+
+def long_lidvid_to_dirpath(lidvid: LIDVID) -> str:
+    lid = lidvid.lid()
+    # parts are bundle, collection, product
+    parts = lid.parts()
+    if len(parts) >= 3 and parts[1] not in NO_VISIT_COLLECTIONS:
+        fake_filename = f"{parts[2]}_raw.fits"
+        visit = HstFilename(fake_filename).visit()
+        visit_part = f"visit_{visit}"
+        parts[2] = visit_part
+    return fs.path.join("/", *parts)
+
+
+def short_lidvid_to_dirpath(lidvid: LIDVID) -> str:
+    lid = lidvid.lid()
+    # parts are collection, product
+    parts = lid.parts()[1:]
+    if len(parts) >= 2 and parts[0] not in NO_VISIT_COLLECTIONS:
+        fake_filename = f"{parts[1]}_raw.fits"
+        visit = HstFilename(fake_filename).visit()
+        visit_part = f"visit_{visit}"
+        parts[1] = visit_part
+    return fs.path.join(*parts)
 
 
 def _fix_up_deliverable(dir: str) -> None:
@@ -68,6 +99,54 @@ class MakeDeliverable(MarkedStage):
     """
 
     def _run(self) -> None:
+        self._run_new()
+
+    def _run_new(self) -> None:
+        working_dir: str = self.working_dir()
+        archive_dir: str = self.archive_dir()
+        deliverable_dir: str = self.deliverable_dir()
+        manifest_dir: str = self.manifest_dir()
+
+        assert not os.path.isdir(
+            deliverable_dir
+        ), "{deliverable_dir} cannot exist for MakeDeliverable"
+
+        changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
+        changes_dict = read_changes_dict(changes_path)
+
+        with make_osfs(archive_dir) as archive_osfs, make_multiversioned(
+            archive_osfs
+        ) as mv:
+            bundle_segment = self._bundle_segment
+            bundle_lid = LID.create_from_parts([bundle_segment])
+            bundle_vid = changes_dict.vid(bundle_lid)
+            bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid)
+            version_view = VersionView(mv, bundle_lidvid)
+
+            synth_files: Dict[str, bytes] = dict()
+
+            # open the database
+            db_filepath = fs.path.join(working_dir, _BUNDLE_DB_NAME)
+            bundle_db = create_bundle_db_from_os_filepath(db_filepath)
+
+            bundle_lidvid_str = str(bundle_lidvid)
+            synth_files = dict()
+            cm = make_checksum_manifest(
+                bundle_db, bundle_lidvid_str, short_lidvid_to_dirpath
+            )
+            synth_files["/checksum.manifest.txt"] = cm.encode("utf-8")
+            tm = make_transfer_manifest(
+                bundle_db, bundle_lidvid_str, short_lidvid_to_dirpath
+            )
+            synth_files["/transfer.manifest.txt"] = tm.encode("utf-8")
+
+            deliverable_view = DeliverableView(version_view, synth_files)
+
+            os.mkdir(deliverable_dir)
+            deliverable_osfs = OSFS(deliverable_dir)
+            copy_fs(deliverable_view, deliverable_osfs)
+
+    def _run_old(self) -> None:
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()
         deliverable_dir: str = self.deliverable_dir()

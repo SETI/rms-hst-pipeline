@@ -29,7 +29,7 @@ from pdart.pds4.VID import VID
 
 _INFO_DICT = Mapping[str, Mapping[str, object]]
 
-_NO_VISIT_COLLECTIONS = ["context", "document", "schema"]
+NO_VISIT_COLLECTIONS = ["context", "document", "schema"]
 # Do not convert paths within these collections to use "visit_NN"
 
 
@@ -66,7 +66,7 @@ def translate_filepath(archive_filepath: str) -> str:
 
     if len(pds4) == 3:
         collection_segment = pds4[1]
-        if collection_segment in _NO_VISIT_COLLECTIONS:
+        if collection_segment in NO_VISIT_COLLECTIONS:
             return fs.path.join("/", *pds4, *non_pds4)
         else:
             product_segment = pds4[2]
@@ -117,6 +117,7 @@ class DeliverableView(FS):
     def __init__(
         self, base_fs: VersionView, synth_files: Optional[Dict[str, bytes]] = None
     ) -> None:
+        FS.__init__(self)
         self.base_fs = base_fs
         self.path_dict: Dict[str, _Entry] = {"/": _DirInfo()}
 
