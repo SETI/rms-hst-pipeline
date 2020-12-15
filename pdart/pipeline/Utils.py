@@ -135,3 +135,11 @@ def make_version_view(
 
     yield res
     res.close()
+
+
+def has_suffix_shm_spt_shp(file_name: str) -> bool:
+    """Check if a file or lidvid has these suffixes: shm, spt, shp"""
+    for suffix in ["shm", "spt", "shp"]:
+        if suffix in file_name.lower():
+            return True
+    return False

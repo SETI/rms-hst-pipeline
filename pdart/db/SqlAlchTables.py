@@ -286,6 +286,35 @@ class FitsProduct(Product):
 ############################################################
 
 
+class TargetIdentification(Base):
+    """
+    A database representation of all info for target identification xml.
+    """
+
+    __tablename__ = "target_identification"
+
+    # From "TARG_ID" field in SPT/SHM/SHP .fits file
+    target_id = Column(String, primary_key=True, nullable=False)
+    name = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+    # alternate_designation can be a list of strings separated by semicolon or
+    # an empty list.
+    alternate_designations = Column(String, nullable=False)
+    lid_reference = Column(String, nullable=False)
+    # description can be none.
+    description = Column(String)
+
+    __mapper_args__ = {
+        "polymorphic_identity": "target_identification",
+    }
+
+    def __repr__(self) -> str:
+        return f"TargetIdentification(target_id={self.target_id!r}"
+
+
+############################################################
+
+
 class ContextProduct(Base):
     """
     A database representation of LIDVIDs for context products.

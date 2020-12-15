@@ -1,6 +1,7 @@
 import os.path
 from typing import List
 
+import astropy.io.fits
 import fs.path
 
 from pdart.db.BundleDB import (
@@ -20,7 +21,12 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
+from pdart.pipeline.Utils import (
+    make_osfs,
+    make_sv_deltas,
+    make_version_view,
+    has_suffix_shm_spt_shp,
+)
 from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
 
 
@@ -115,6 +121,32 @@ def _populate_products(
                     )
 
 
+def _populate_target_identification(
+    changes_dict: ChangesDict, db: BundleDB, sv_deltas: COWFS
+) -> None:
+    for lid, (vid, changed) in changes_dict.items():
+        if changed and lid.is_product_lid():
+            lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
+
+            product_path = lid_to_dir(lidvid.lid())
+
+            # Get a list of SHM/SPT/SHP fits files
+            fits_files = [
+                fits_file
+                for fits_file in sv_deltas.listdir(product_path)
+                if (
+                    fs.path.splitext(fits_file)[1].lower() == ".fits"
+                    and has_suffix_shm_spt_shp(fs.path.splitext(fits_file)[0].lower())
+                )
+            ]
+            # Pass the path of SHM/SPT/SHP fits files to create a record in
+            # target identification table
+            for fits_file in fits_files:
+                fits_file_path = fs.path.join(product_path, fits_file)
+                fits_os_path = sv_deltas.getsyspath(fits_file_path)
+                db.create_target_identification(fits_os_path)
+
+
 class PopulateDatabase(MarkedStage):
     """
     We create the database if necessary, create the bundle in the
@@ -156,6 +188,7 @@ class PopulateDatabase(MarkedStage):
             bundle_lidvid = _populate_bundle(changes_dict, db)
             _populate_collections(changes_dict, db)
             _populate_products(changes_dict, db, sv_deltas)
+            _populate_target_identification(changes_dict, db, sv_deltas)
 
         assert db
 

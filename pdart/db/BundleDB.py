@@ -2,6 +2,7 @@ import os.path
 import re
 from typing import Any, Dict, List, Optional, Tuple, cast
 
+import astropy.io.fits
 from sqlalchemy import and_, create_engine, exists
 from sqlalchemy.orm import sessionmaker
 
@@ -26,6 +27,7 @@ from pdart.db.SqlAlchTables import (
     File,
     FitsFile,
     FitsProduct,
+    TargetIdentification,
     Hdu,
     OtherCollection,
     Product,
@@ -515,6 +517,34 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
+
+    def create_target_identification(self, fits_os_path: str) -> None:
+        """
+        Create a record in target_identification table with this target id if
+        it doesn't exist.
+        """
+        fits = astropy.io.fits.open(fits_os_path)
+        target_id = fits[0].header["TARG_ID"].strip()
+        if not self.target_id_exists(target_id):
+            self.session.add(
+                TargetIdentification(
+                    target_id=target_id,
+                    name="name_placeholder",
+                    type="types_placeholder",
+                    alternate_designations="alternate_designation_placeholder",
+                    lid_reference="lid_reference_placeholder",
+                    description="description_placeholder",
+                )
+            )
+            self.session.commit()
+
+    def target_id_exists(self, target_id: str) -> bool:
+        """
+        Returns True if a target id exists in the database.
+        """
+        return self.session.query(
+            exists().where(TargetIdentification.target_id == target_id)
+        ).scalar()
 
     def product_exists(self, product_lidvid: str) -> bool:
         """

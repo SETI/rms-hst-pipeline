@@ -29,6 +29,7 @@ _TABLES: Set[str] = {
     "schema_products",
     "document_products",
     "fits_products",
+    "target_identification",
     "files",
     "fits_files",
     "bad_fits_files",
