@@ -16,17 +16,13 @@ from pdart.pipeline.ChangesDict import (
 )
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.fs.cowfs.COWFS import COWFS
+from pdart.fs.multiversioned.Utils import lid_to_dirpath
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
-
-
-# TODO Cut-and-pasted from BuildLabels.  Refactor this.
-def lid_to_dir(lid: LID) -> str:
-    return fs.path.join(*[part + "$" for part in lid.parts()])
 
 
 def _populate_schema_collection(db: BundleDB, bundle_lidvid: str) -> None:
@@ -78,7 +74,7 @@ def _populate_products(
             lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
             collection_lidvid = changes_dict.parent_lidvid(lidvid)
             if changed:
-                product_path = lid_to_dir(lidvid.lid())
+                product_path = lid_to_dirpath(lidvid.lid())
                 if collection_lidvid.lid().collection_id == "document":
                     db.create_document_product(str(lidvid), str(collection_lidvid))
 

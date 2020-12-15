@@ -140,7 +140,7 @@ class MastSlice(object):
         self.download_products(products_table, download_dir=download_dir)
 
 
-# MastSlice with cutomized query criteria
+# MastSlice with customized query criteria
 class CustomizedQueryMastSlice(MastSlice):
     def __init__(
         self, start_date: _YMD, end_date: _YMD, proposal_id: Optional[int] = None

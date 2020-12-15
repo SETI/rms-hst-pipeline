@@ -22,6 +22,7 @@ from pdart.db.SqlAlchTables import (
     OtherCollection,
 )
 from pdart.fs.cowfs.COWFS import COWFS
+from pdart.fs.multiversioned.Utils import lid_to_dirpath
 from pdart.labels.BrowseProductLabel import make_browse_product_label
 from pdart.labels.BundleLabel import make_bundle_label
 from pdart.labels.CitationInformation import Citation_Information
@@ -81,11 +82,7 @@ def _lidvid_to_dir(lidvid: str) -> str:
     def get_lid(lidvid: str) -> LID:
         return LIDVID(lidvid).lid()
 
-    return lid_to_dir(get_lid(str(lidvid)))
-
-
-def lid_to_dir(lid: LID) -> str:
-    return fs.path.join(*[part + "$" for part in lid.parts()])
+    return lid_to_dirpath(get_lid(str(lidvid)))
 
 
 def _extend_lidvid(lidvid_str: str, segment: str) -> str:

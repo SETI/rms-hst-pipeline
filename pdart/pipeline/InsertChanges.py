@@ -8,7 +8,7 @@ import fs.copy
 from fs.path import abspath, iteratepath
 from fs.subfs import SubFS
 
-from pdart.fs.multiversioned.Utils import component_files
+from pdart.fs.multiversioned.Utils import component_files, dirpath_to_lid
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, ChangesDict, read_changes_dict
@@ -19,15 +19,6 @@ from pdart.pipeline.Utils import (
     make_sv_osfs,
     make_version_view,
 )
-
-
-def dir_to_lid(dir: str) -> LID:
-    """
-    Convert a directory path to a LID.  Raise on errors.
-    """
-    # TODO This is copied from RecordChanges.  Refactor.
-    parts = [str(part[:-1]) for part in iteratepath(dir) if "$" in part]
-    return LID.create_from_parts(parts)
 
 
 def _is_component_path(dirpath: str) -> bool:
@@ -42,7 +33,7 @@ def _merge_primaries(changes_dict: ChangesDict, src_fs: FS, dst_fs: FS) -> None:
     # files and directories.  Think about it.
     for dirpath in src_fs.walk.dirs(search="depth"):
         if _is_component_path(dirpath):
-            lid = dir_to_lid(dirpath)
+            lid = dirpath_to_lid(dirpath)
             changed = changes_dict.changed(lid)
             if changed:
                 if not dst_fs.isdir(dirpath):

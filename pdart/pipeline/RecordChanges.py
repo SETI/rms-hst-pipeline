@@ -7,6 +7,7 @@ from fs.subfs import SubFS
 from fs.path import iteratepath, join, relpath, splitext
 
 from pdart.fs.multiversioned.Multiversioned import Multiversioned
+from pdart.fs.multiversioned.Utils import dirpath_to_lid
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -34,14 +35,6 @@ def _is_primary_file(filepath: str) -> bool:
 
 def _is_primary_dir(dirpath: str) -> bool:
     return "$/browse_" not in dirpath
-
-
-def dir_to_lid(dir: str) -> LID:
-    """
-    Convert a directory path to a LID.  Raise on errors.
-    """
-    parts = [str(part[:-1]) for part in iteratepath(dir) if "$" in part]
-    return LID.create_from_parts(parts)
 
 
 def _lid_is_primary(lid: LID) -> bool:
@@ -108,7 +101,7 @@ def _get_primary_changes(
         if primary_dirs == latest_dirs:
             for dir in primary_dirs:
                 full_dirpath = join(dirpath, relpath(dir))
-                lid = dir_to_lid(full_dirpath)
+                lid = dirpath_to_lid(full_dirpath)
                 assert lid in result.changes_dict
                 if result.changed(lid):
                     _LOGGER.info(f"CHANGE DETECTED in {dirpath}: {lid} changed")
@@ -165,7 +158,7 @@ def _get_primary_changes(
         return True
 
     for dirpath in primary_fs.walk.dirs(filter=["*\$$"], search="depth"):
-        lid = dir_to_lid(dirpath)
+        lid = dirpath_to_lid(dirpath)
 
         if _lid_is_primary(lid):
             latest_lidvid = mv.latest_lidvid(lid)
