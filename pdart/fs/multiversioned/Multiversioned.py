@@ -6,6 +6,7 @@ from fs.base import FS
 from fs.subfs import SubFS
 from fs.tempfs import TempFS
 
+from pdart.documents.Downloads import DOCUMENT_SUFFIXES
 from pdart.fs.multiversioned.SubdirVersions import (
     SUBDIR_VERSIONS_FILENAME,
     read_subdir_versions_from_directory,
@@ -26,7 +27,7 @@ IS_NEW_TEST = Callable[[LIDVID, VersionContents, "Multiversioned"], bool]
 
 
 def doc_filter(filepath: str) -> bool:
-    return fs.path.splitext(filepath)[1] in [".apt", ".pdf", ".pro", ".prop"]
+    return fs.path.splitext(filepath)[1] in DOCUMENT_SUFFIXES
 
 
 def fits_filter(filepath: str) -> bool:

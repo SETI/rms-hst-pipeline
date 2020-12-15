@@ -8,6 +8,7 @@ from pdart.db.BundleDB import (
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
+from pdart.documents.Downloads import DOCUMENT_SUFFIXES
 from pdart.pipeline.ChangesDict import (
     CHANGES_DICT_NAME,
     ChangesDict,
@@ -81,10 +82,7 @@ def _populate_products(
                     doc_files = [
                         doc_file
                         for doc_file in sv_deltas.listdir(product_path)
-                        if (
-                            fs.path.splitext(doc_file)[1].lower()
-                            in [".apt", ".pdf", ".pro", ".prop"]
-                        )
+                        if (fs.path.splitext(doc_file)[1].lower() in DOCUMENT_SUFFIXES)
                     ]
 
                     for doc_file in doc_files:

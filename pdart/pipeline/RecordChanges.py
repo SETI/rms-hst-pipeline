@@ -6,6 +6,7 @@ from fs.base import FS
 from fs.subfs import SubFS
 from fs.path import iteratepath, join, relpath, splitext
 
+from pdart.documents.Downloads import DOCUMENT_SUFFIXES
 from pdart.fs.multiversioned.Multiversioned import Multiversioned
 from pdart.fs.multiversioned.Utils import dirpath_to_lid
 from pdart.pds4.LID import LID
@@ -26,11 +27,12 @@ from pdart.pipeline.Stage import MarkedStage
 
 _LOGGER = logging.getLogger(__name__)
 
+_PRIMARY_SUFFIXES = DOCUMENT_SUFFIXES + [".fits", ".txt"]
+
 
 def _is_primary_file(filepath: str) -> bool:
-    PRIMARY_SUFFIXES = [".fits", ".apt", ".pdf", ".pro", ".prop", ".txt"]
     _, ext = splitext(filepath)
-    return ext in PRIMARY_SUFFIXES
+    return ext in _PRIMARY_SUFFIXES
 
 
 def _is_primary_dir(dirpath: str) -> bool:

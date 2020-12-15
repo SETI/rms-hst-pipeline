@@ -5,6 +5,8 @@ from typing import List, Set, Tuple
 
 import fs.path
 
+DOCUMENT_SUFFIXES = [".apt", ".pdf", ".pro", ".prop"]
+
 
 def _retrieve_doc(url: str, filepath: str) -> bool:
     """Retrieves the text at that URL or returns False."""
