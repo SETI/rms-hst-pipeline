@@ -5,9 +5,10 @@ from typing import Dict
 
 from fs.base import FS
 import fs.copy
-from fs.path import iteratepath
+from fs.path import abspath, iteratepath
 from fs.subfs import SubFS
 
+from pdart.fs.multiversioned.Utils import component_files
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, ChangesDict, read_changes_dict
@@ -53,14 +54,12 @@ def _merge_primaries(changes_dict: ChangesDict, src_fs: FS, dst_fs: FS) -> None:
                     if not src_sub_fs.isdir(subdirpath):
                         dst_sub_fs.removetree(subdirpath)
                 # delete the files in the destination (if any)
-                for filepath in dst_sub_fs.walk.files():
-                    if "$" not in filepath:
-                        dst_sub_fs.remove(filepath)
+                for filepath in component_files(dst_fs, dirpath):
+                    dst_sub_fs.remove(filepath)
                 # copy the new files across
                 src_sub_fs = SubFS(src_fs, dirpath)
-                for filepath in src_sub_fs.walk.files():
-                    if "$" not in filepath:
-                        fs.copy.copy_file(src_sub_fs, filepath, dst_sub_fs, filepath)
+                for filepath in component_files(src_fs, dirpath):
+                    fs.copy.copy_file(src_sub_fs, filepath, dst_sub_fs, filepath)
 
 
 class InsertChanges(MarkedStage):

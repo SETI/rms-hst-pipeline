@@ -1,7 +1,7 @@
 from typing import Iterator
 
 from fs.base import FS
-from fs.path import relpath
+from fs.path import abspath
 from fs.subfs import SubFS
 import fs.walk
 
@@ -14,7 +14,7 @@ def component_directories(fs: FS, dirpath: str) -> Iterator[str]:
     directory name).
     """
     return (
-        relpath(dirpath)
+        abspath(dirpath)
         for dirpath in SubFS(fs, dirpath).walk.dirs()
         if "$" not in dirpath
     )
@@ -27,7 +27,7 @@ def component_files(fs: FS, dirpath: str) -> Iterator[str]:
     will have "$" in their paths (in the subcomponent directory name).
     """
     return (
-        relpath(filepath)
+        abspath(filepath)
         for filepath in SubFS(fs, dirpath).walk.files()
         if "$" not in filepath
     )

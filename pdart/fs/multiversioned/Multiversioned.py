@@ -204,24 +204,12 @@ class Multiversioned(MutableMapping):
                 for name in single_version_fs.listdir(path)
                 if is_segment(name)
             }
-            # Now look at files.  We recurse over all contained files
-            # and collect up their filepaths.
 
-            # We recurse over all the contained files (rather than
-            # only those in the directory of path) because PDS4 allows
-            # nested files.  For instance, a bundle could contain a
-            # file with path a/b/c/d/e.txt.  If there's no $ in the
-            # filepath, it's in the bundle, not in a collection of the
-            # bundle.
-            sfs = SubFS(single_version_fs, path)
-            filepaths: Set[str] = {
-                filepath for filepath in sfs.walk.files() if "$" not in filepath
-            }
-
-            # We create a VersionContents object from the set of new
-            # LIDVIDs and filepath.
-            contents = VersionContents.create_from_lidvids(
-                child_lidvids, sfs, filepaths
+            # Now look at files.  We create a VersionContents object
+            # from the set of new LIDVIDs and all the files contained
+            # in the component's directory.
+            contents = VersionContents.create_from_lidvids_and_dirpath(
+                child_lidvids, single_version_fs, path
             )
 
             # Now we ask the Multiversioned to insert these contents

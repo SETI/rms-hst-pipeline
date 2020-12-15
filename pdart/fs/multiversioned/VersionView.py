@@ -171,6 +171,4 @@ class VersionView(FS):
             for name in self.listdir(dirpath)
             if is_segment(name)
         }
-        sfs = SubFS(self, dirpath)
-        filepaths = {file for file in sfs.walk.files() if "$" not in file}
-        return VersionContents.create_from_lids(subcomps, sfs, filepaths)
+        return VersionContents.create_from_lids_and_dirpath(subcomps, self, dirpath)
