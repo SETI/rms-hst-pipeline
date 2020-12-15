@@ -3,6 +3,7 @@ from typing import Any, Callable, Generic, List, Set, TypeVar, Union, cast
 from fs.base import FS
 from fs.path import isabs
 
+from pdart.fs.multiversioned.Utils import component_files
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 
@@ -59,10 +60,24 @@ class VersionContents(Generic[S]):
         return VersionContents[LID](False, subcomponents, fs, filepaths)
 
     @staticmethod
+    def create_from_lids_and_dirpath(
+        subcomponents: Set[LID], fs: FS, dirpath: str
+    ) -> "VersionContents[LID]":
+        filepaths = component_files(fs, dirpath)
+        return VersionContents[LID](False, subcomponents, fs, set(filepaths))
+
+    @staticmethod
     def create_from_lidvids(
         subcomponents: Set[LIDVID], fs: FS, filepaths: Set[str]
     ) -> "VersionContents[LIDVID]":
         return VersionContents[LIDVID](True, subcomponents, fs, filepaths)
+
+    @staticmethod
+    def create_from_lidvids_and_dirpath(
+        subcomponents: Set[LIDVID], fs: FS, dirpath: str
+    ) -> "VersionContents[LIDVID]":
+        filepaths = component_files(fs, dirpath)
+        return VersionContents[LIDVID](True, subcomponents, fs, set(filepaths))
 
     def lidvids(self) -> List[LIDVID]:
         if self.contains_lidvids:
