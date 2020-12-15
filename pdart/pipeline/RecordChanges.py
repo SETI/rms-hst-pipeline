@@ -68,6 +68,16 @@ def _next_vid(mv: Multiversioned, lid: LID, changed: bool) -> VID:
 def _get_primary_changes(
     mv: Multiversioned, primary_fs: FS, latest_version_fs: FS
 ) -> ChangesDict:
+    """
+    Walk through the two filesystems, when you find differences
+    between the two, if it involves primary files, note it in a
+    ChangesDict and return all the changes.
+
+    TODO This function was hacked together.  It works but it's
+    possible that the check is quadratic in the size of the tree, not
+    linear.  That would be bad.  Review this function and fix it if
+    it's wrong.  When done, remove this comment.
+    """
     result = ChangesDict()
 
     def filter_to_primary_files(dir: str, filenames: Iterator[str]) -> Set[str]:
@@ -79,12 +89,6 @@ def _get_primary_changes(
         return {dirname for dirname in dirnames if _is_primary_dir(join(dir, dirname))}
 
     def dirs_match(dirpath: str) -> bool:
-        # All dirs in subcomponents will have a "$" in their path (it
-        # comes after the name of the subcomponent), so by filtering
-        # them out, we get only the dirs for this component.  PDS4
-        # *does* allow directories in a component (that aren't part of
-        # a subcomponent), so we use walk instead of listdir() to get
-        # *all* the dirs, not just the top-level ones.
         primary_dirs = filter_to_primary_dirs(
             dirpath,
             (

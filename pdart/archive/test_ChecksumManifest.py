@@ -9,7 +9,6 @@ from pdart.archive.ChecksumManifest import (
     plain_lidvid_to_dirpath,
 )
 from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.fs.primitives.DirUtils import lid_to_dir
 from pdart.labels.CollectionInventory import get_collection_inventory_name
 from pdart.labels.CollectionLabel import get_collection_label_name
 from pdart.pds4.LIDVID import LIDVID
