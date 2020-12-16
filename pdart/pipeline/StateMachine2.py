@@ -26,6 +26,16 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class SaveDownloads(MarkedStage):
+    """
+    Back up the mastDownload and documentDownload directories so we
+    can change them but be able to revert the changes later.  We don't
+    want to change the download directories because then we'll have to
+    re-download them.
+
+    This is a temporary pass for testing; it won't appear in a real
+    pipeline.
+    """
+
     def _run(self) -> None:
         def make_tarball(tarball_name: str, dir_to_compress: str) -> None:
             tarball = fs.path.join(self.working_dir(), tarball_name)
@@ -53,6 +63,14 @@ class SaveDownloads(MarkedStage):
 
 
 class ChangeFiles(MarkedStage):
+    """
+    Make a single change in the mastDownload folder.  It may change a
+    single FITS file, or it might delete a whole directory.
+
+    This is a temporary pass for testing; it won't appear in a real
+    pipeline.
+    """
+
     def _run(self) -> None:
         def change_fits_file(rel_path: str) -> None:
             abs_path = fs.path.join(
@@ -91,9 +109,6 @@ class ChangeFiles(MarkedStage):
 
 class ReResetPipeline(MarkedStage):
     """
-    A stage in the pipeline for development and debugging.  ****This
-    is not intended to be in the final pipeline.****
-
     We reset the directory by deleting everything except for the
     downloaded document and data files, their archived tarballs, and
     the archive.
@@ -128,6 +143,10 @@ class StateMachine2(object):
     This object runs a list of pipeline stages, hardcoded into
     self.stages.  It uses a BasicMarkerFile to show progress and
     record the final state.
+
+    This is a second pass on the bundle.  It's intended to test
+    whether the other pipeline code can properly detect and process
+    changes in the downloaded files.  The ChangeFiles step can either
     """
 
     def __init__(self, dirs: Directories, proposal_id: int) -> None:

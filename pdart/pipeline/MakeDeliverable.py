@@ -36,6 +36,14 @@ def short_lidvid_to_dirpath(lidvid: LIDVID) -> str:
 
 
 def copy_fs(version_view: FS, deliverable: FS) -> None:
+    # TODO The note below is probably obsolete.  It was written when
+    # we were using the DeliverableFS to make the deliverable.  We've
+    # now switched to using the DeliverableView. (The obsolete
+    # DeliverableFS has been deleted from the repo.)  In any case,
+    # this doesn't seem to hurt anything, but it can probably all be
+    # replaced by fs.copy.copy_file()--see the last line.  Try it and
+    # see.
+
     # TODO I could (and used to) just do a fs.copy.copy_fs() from the
     # version_view to a DeliverableFS.  I removed it to debug issues
     # with the validation tool.  Now I find this hack is just as easy

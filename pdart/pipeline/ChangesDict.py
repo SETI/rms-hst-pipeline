@@ -6,6 +6,17 @@ from pdart.pds4.VID import VID
 
 
 class ChangesDict(object):
+    """
+    This class represents a list of PDS4 components in a version and
+    whether they have changed since the previous version or not.
+    Internally, it's a list of LID, VID, and a bool: True means it's
+    changed.
+
+    This class is written to (and can be read from) the filesystem so
+    that the information is available to multiple stages in the
+    pipeline.
+    """
+
     def __init__(
         self, changes_dict: Optional[Dict[LID, Tuple[VID, bool]]] = None
     ) -> None:

@@ -1,0 +1,162 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf840
+{\fonttbl\f0\fswiss\fcharset0 Optima-Regular;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww16200\viewh13200\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs48 \cf0 Virtual filesystems
+\b0\fs36 \
+\
+
+\f1 pyfilesystem2
+\f0  is a framework that generalizes the idea of the filesystem.  This allows you to take code that reads and writes data in the filesystem, and make it agnostic to where the data lives.  Instead of living in a directory,  it could live in memory, or it could live in DropBox or on the other end of an FTP connection.  \
+\
+It can also make your code agnostic to 
+\i how
+\i0  the data is stored.  It could all live within a single tarfile, or it could be automatically decrypted and encrypted as you read and write, it could transparently rearrange how you store your data, or it could automatically recognize when you have duplicated data and only store one copy of it for you.\
+\
+
+\f1 pyfilesystem2
+\f0  has an interface modeled on the 
+\f1 os
+\f0  module's interface.  Instead of 
+\f1 import os
+\f0 , you say 
+\f1 import fs.base
+\f0 , then you make your calls on virtual filesystem objects.  If 
+\f1 my_fs
+\f0  is a virtual filesystem you've created, then\
+\
+
+\f1 os.open("foo.txt", "w")
+\f0 		becomes 	
+\f1 my_fs.open("foo.txt", "w")
+\f0 \
+
+\f1 os.mkdir("new_dir")
+\f0 			becomes 	
+\f1 my_fs.mkdir("new_dir")
+\f0 \
+
+\f1 os.remove("obsolete.pdf")
+\f0 	becomes 	
+\f1 my_fs.remove("obsolete.pdf")
+\f0 \
+etc.\
+\
+To create a filesystem object, you can say\
+\
+
+\f1 import fs.osfs; my_fs = fs.osfs.OSFS("root_dir")
+\f0  to turn an ordinary directory on disk into a filesystem\
+\
+
+\f1 import fs.memoryfs; my_fs = fs.memoryfs.MemoryFS()
+\f0  to get a filesystem that lives entirely in memory\
+\
+
+\f1 import fs.tarfs; my_fs = fs.tarfs.TarFS()
+\f0  to treat a tarfile as a filesystem\
+\
+pyfilesystem2 has a few other filesystems built in, and there are others available outside of the project.\
+\
+I've written a few virtual filesystem for the 
+\f1 pdart
+\f0  project.  \
+\
+With 
+\f1 pdart.fs.cowfs
+\f0 , you get a copy-on-write filesystem.  This combines a read-write layer on top of a read-only layer to let you "modify" fixed data.  We use it with versioning.  \
+\
+
+\f1 old_version = fs.osfs.OSFS(
+\f0\i directory where old version lives
+\f1\i0 )\
+changes = fs.osfs.OSFS(
+\f0\i a directory to store the changes
+\f1\i0 )\
+new_version = pdart.fs.cowfs.COWFS(old_version, changes)\
+
+\f0 \
+The 
+\f1 new_version
+\f0  object contains all the data from the 
+\f1 old_version
+\f0 , but you can modify it all you want.  The original data remains untouched in the directory that 
+\f1 old_version
+\f0  refers to.  If you try to write within the 
+\f1 new_version
+\f0  filesystem, it will copy the old data from the 
+\f1 old_version
+\f0  storage to the 
+\f1 changes
+\f0  storage, and then write to the copied read-write data.\
+\
+With 
+\f1 pdart.fs.multiversioned.VersionView
+\f0 , you can get a 
+\f1 VersionView
+\f0  object that provides a view into our multiversioned file storage and makes it look as if you're looking at just a single version.  The multiversioned file storage encodes version numbers into path names in a way that isn't very human-readable.  Looking through a 
+\f1 VersionView
+\f0 , you see a normal-looking filesystem that reflects the PDS4 logical hierarchy.\
+\
+If 
+\f1 mv
+\f0  is a 
+\f1 pdart.fs.multiversioned.Multiversioned
+\f0  object that represents a bundle archive, containing many versions of the bundle, by saying\
+\
+
+\f1 lid = "urn:nasa:pds:hst_12345"\
+vv = mv.create_version_view(lid)
+\f0 \
+\
+
+\f1 vv
+\f0  will contain the (read-only) contents of the latest version of the bundle in the PDS4 logical hierarchy 
+\i bundle_id
+\f1\i0 /
+\f0\i collection_id
+\f1\i0 /
+\f0\i product_id
+\f1\i0 /
+\f0\i filename
+\i0 , without any version numbers encoded into the paths.\
+\
+With 
+\f1 pdart.fs.deliverableview
+\f0 , you get a read-only view of a particular version in the archive, with the files rearranged in a way that's more human-friendly.  It's the same on the bundle and collection levels, but below that, the files are organized by visit instead of by the PDS4 product name.  This is the format intended for delivery to end-users (hence the name).  A 
+\f1 DeliverableView
+\f0  is a filesystem like any other, though it's read-only.\
+\
+
+\f1 archive_fs = fs.osfs.OSFS(
+\f0\i archive directory
+\f1\i0 )\
+mv = pdart.fs.multiversioned.Multiversioned(archive_fs)\
+# for the latest version, you can use the bundle LID like this:
+\f0 \
+
+\f1 vv = mv.create_version_view(
+\f0\i lid
+\f1\i0 )
+\f0 \
+
+\f1 # or for an earlier version, you can use VersionView's constructor\
+# and a LIDVID like this:\
+vv = pdart.fs.multiversioned.VersionView(mv, 
+\f0\i lidvid
+\f1\i0 )\
+dv = pdart.fs.deliverableview.DeliverableView(vv)\
+\
+
+\f0 The 
+\f1 DeliverableView
+\f0  constructor has the option to take a dictionary of filepaths and bytes.  This is to provide synthetic files: files that don't exist in the archive, but that you want to include in the view.  We use this to include the two mandatory manifests for PDS4 deliveries: the checksum manifest and the transfer manifest.  Since the transfer manifest shows the connection between LIDVIDs and filepaths in the deliverable, it can't go into the archive without permanently hard-coding our deliverable layout into the archive.  We'd rather keep the option to be able to change it in the future.\
+\
+You can see an example of how this all fits together in the 
+\f1 pdart.pipeline.MakeDeliverable
+\f0  stage of the pipeline.
+\f1 \
+}

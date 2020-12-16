@@ -6,8 +6,9 @@ from pdart.pipeline.Stage import MarkedStage
 
 class ResetPipeline(MarkedStage):
     """
-    A stage in the pipeline for development and debugging.  ****This
-    is not intended to be in the final pipeline.****
+    A stage in the pipeline for development and debugging.  This is a
+    temporary stage for testing and is not intended to be in the final
+    pipeline.
 
     We reset the directory by deleting everything except for the
     downloaded document and data files.
