@@ -1,0 +1,188 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf840
+{\fonttbl\f0\fmodern\fcharset0 Courier;\f1\fswiss\fcharset0 Optima-Regular;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\margl1440\margr1440\vieww16200\viewh13200\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 pdart
+\f1  assumes a 
+\f0 pds-tools
+\f1  directory at the same directory level as 
+\f0 pdart
+\f1 .\
+\
+You must install 
+\f0 python3
+\f1 , 
+\f0 black
+\f1  (a formatter).  I used 
+\f0 homebrew
+\f1  for that.  You will also need the PDS4 validation tool, which can be downloaded from the PDS4 site.  
+\i\fs28 URL needed.
+\i0\fs36 \
+\
+The rest should be automatic using makefiles and the Python tools.\
+\
+I try to do as much as possible in 
+\f0 Make
+\f1 , so everything can be automated.  This includes formatting and typechecking.\
+\
+Reduced dependencies:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 {{\NeXTGraphic reduced.png \width12540 \height8860
+}¬}\
+\
+
+\f0 pds4
+\f1  contains basic datastructures and utilities for PDS4 identifiers and HST filenames.\
+\
+
+\f0 astroquery
+\f1  contains functions to download the datafiles from MAST using the 
+\f0 astropy
+\f1  library.  There are a lot of details, so I put them all into one place so I wouldn't have to remember them.\
+\
+
+\f0 documents
+\f1  contains functions to download documentation file from MAST and to convert their encoding to UTF-8 if necessary.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0 \cf0 citations
+\f1  contains code to parse documentation files and extract information like author names and publication dates that are needed in the XML label files.  Mark wrote this code.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \
+
+\f0 xml
+\f1  handles construction, pretty-printing, and validation of XML files.  XML files are built from templates, which contain holes that can be filled with single nodes, or lists of nodes ("fragments").  Templates are interpreted by passing in a dictionary that says what should go into each hole.  \
+\
+When the code was first written, we were building the XML as we read in the data, so we needed to build the XML starting at the bottom and working upwards.  The standard XML libraries for Python build XML starting from the top, root node, and add children, working towards the bottom.  To get around this, instead of building the actual XML, we make and combine 
+\i builder functions
+\i0  starting at the bottom working towards the top, and our final result is a function that, when run, builds the entire XML tree.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 There is some ad-hoc code to typecheck what we're building, because it was so easy to make mistakes and so hard to debug.  \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 Later we decided to read all the data into a database first, and then build the XML, so the original way of working with builder functions instead of XML nodes may no longer be the best way to construct the XML.\
+\
+There are functions to validate an XML file using an XSD file (which validates the structure) and a Schematron file (which validates the contents).\
+\
+
+\f0 db
+\f1  contains the code to interact with the bundle databases.  For each bundle, we create a database that contains all the information needed to build the XML label files for the datafiles in that bundle.  We use the 
+\f0 SQLAlchemy
+\f1  library to interface with the database.  It lets us define Python classes that correspond to rows in the database, letting us use Python objects in a natural way instead of having to write SQL code.\
+\
+The classes are defined in 
+\f0 SqlAlchTables.py
+\f1 .  If you want to edit this, you'll need to understand SQLAlchemy.  
+\f0 BundleDB.py
+\f1  defines an object that represents the bundle database.  It has methods for all the basic tasks you must do, and acts as a wrapper around the SQLAlchemy code.  You can call methods of 
+\f0 BundleDB
+\f1  without knowing anything about SQLAlchemy. \
+\
+
+\f0 FitsFileDB.py
+\f1  has functions to put information from FITS datafiles into the bundle database and to get it back out.  
+\f0 BrowseFileDB.py
+\f1  does the same for browse files (small image files).\
+\
+Sometimes it's useful to travel over all the parts of a bundle.  
+\f0 BundleWalk.py
+\f1  gives a framework to walk through a bundle, providing access to the database at all the subparts.  You can implement a subclass of 
+\f0 BundleWalk
+\f1  by overriding the different 
+\f0 visit_XXX()
+\f1  methods to do what you need to be done\
+\
+
+\f0 labels
+\f1  contains the code that tells how to build the different kinds of XML label files.  It contains templates for the different kinds of files and for parts of the file.  They often appear in pairs, with one giving a higher-level view of what's being built, and the other containing the templates used to build.  They will have names like 
+\f0 FitsProductLabel.py
+\f1  (higher-level view) and 
+\f0 FitsProductLabelXml.py
+\f1  (the templates).\
+\
+Besides label files, there are also collection inventories, which are an ASCII formatted list of files.\
+\
+To get information from the database to build label files, sometimes we need to search in a datafile for it,  sometimes we need to search in just one part of the datafile, and sometimes we need to search through multiple datafiles.  To generalize the idea of searching, the file 
+\f0 Lookup.py
+\f1  defines an abstract class 
+\f0 Lookup
+\f1  that gives a single, dictionary-like interface to any of these kinds of searches.\
+\
+
+\f0 archive
+\f1  contains functions to create 
+\i PDS4 manifests:
+\i0  lists of the files to be delivered to our clients.  Each file gets a checksum and a physical location within the delivery tarball (since the PDS4 standard does not say where files must live).\
+\
+
+\f0 fs
+\f1  contains 
+\i Python virtual filesystems
+\i0  using the 
+\f0 PyFilesystem2
+\f1  library.  (Documentation here: https://docs.pyfilesystem.org/en/latest/index.html).  A Python virtual filesystem is an object with an interface that looks like Python's module 
+\f0 os
+\f1  and 
+\f0 os.path
+\f1 .  For instance, if you have a filesystem object 
+\f0 fs
+\f1 , instead of calling 
+\f0 os.open()
+\f1  to open a file, you would call 
+\f0 fs.open()
+\f1 .  This way, the code is presented with an object that looks and acts the same as the filesystem, but can do more things for you.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 In PDS4, a bundle and its files can have multiple versions and we need to keep track of all of them.  The 
+\f0 fs.cowfs
+\f1  module provides a 
+\i copy-on-write
+\i0  filesystem that, from the front, looks like any other filesystem that you can read and write to.  On the back, it maintains two directories; one read-only directory contains the original contents, and the other contains only the changes that you've made.  This lets us recognize when we need to create a new PDS4 version of the file and lets us reuse the files that haven't changed, but all this complicated logic is hidden from the user of the filesystem.\
+\
+The 
+\f0 fs.multiversioned
+\f1  module provides a way to store all the different versions of files and what directory they live in into a single back-end directory structure.   The 
+\f0 VersionView
+\f1  class gives you a read-only view of a single bundle version.  You can interact with it as if it's any ordinary directory, and the virtual filesystem will hide all the translation it must do in back to figure out the version locations and what's in what directory.\
+\
+The 
+\f0 fs.primitives
+\f1  module contains an implementation of the virtual filesystem interface that is inefficient, but easy to prove correct.  This was used while developing the other virtual filesystems and making sure they were right.\
+\
+We store files in a logical hierarchy that matches the PDS4 concepts, but for the deliverables, a more traditional, visits-based hierarchy is easier for humans to use.  Rather than hard-coding this into the system (since human tastes change), we put the visits-based structure into its own module  The 
+\f0 fs.deliverablefs
+\f1  module provides a virtual filesystem that looks like the logical PDS4 structure in the front, but in the back, it is visits-based.  To make a deliverable, you copy the whole logical structure into it, and out the back-end comes a visits-based structure. \
+\
+The virtual filesystems do a lot of work and let us isolate a lot of complicated logic into a single place.  But they are tricky to get right and require good knowledge of the 
+\f0 PyFilesystem2
+\f1  library to edit.  If they are working right, they can be treated as black boxes that work just like actual filesystems.\
+\
+The 
+\f0 pipeline
+\f1  module drives all the other layers.  If you want a high-level view of what needs to be done to create a PDS4 bundle, this is the place to start.  The current implementation is just one way to do it, and I expected eventually to reimplement it using Apache Airflow (https://airflow.apache.org) to automatically handle things like scheduling, running bundles in parallel, and monitoring from a GUI.\
+\
+The current implementation runs twelve steps, each implemented in a class:\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	1.	}reset the pipeline\
+{\listtext	2.	}download documents\
+{\listtext	3.	}download datafiles\
+{\listtext	4.	}copy the downloaded files into single directory\
+{\listtext	5.	}record while files have changed\
+{\listtext	6.	}create a directory for a new version of the bundle if any files have changed\
+{\listtext	7.	}fill the bundle database with information from the new files\
+{\listtext	8.	}build new browse products for changed files\
+{\listtext	9.	}build new labels for changed files\
+{\listtext	10.	}insert the new bundle version into the archive\
+{\listtext	11.	}create a deliverable directory\
+{\listtext	12.	}validate the bundle with the PDS4 validation tool\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \
+}

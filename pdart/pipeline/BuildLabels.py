@@ -1,3 +1,4 @@
+import logging
 from typing import cast, Set
 
 import fs.path
@@ -21,6 +22,7 @@ from pdart.db.SqlAlchTables import (
     OtherCollection,
 )
 from pdart.fs.cowfs.COWFS import COWFS
+from pdart.fs.multiversioned.Utils import lid_to_dirpath
 from pdart.labels.BrowseProductLabel import make_browse_product_label
 from pdart.labels.BundleLabel import make_bundle_label
 from pdart.labels.CitationInformation import Citation_Information
@@ -46,11 +48,14 @@ from pdart.pipeline.ChangesDict import (
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
+_LOGGER = logging.getLogger(__name__)
+
+
 _VERIFY = False
 
 
 def log_label(tag: str, lidvid: str) -> None:
-    print("^^^^", tag, "label for", lidvid)
+    _LOGGER.info(f"{tag} label for {lidvid}")
 
 
 def _create_citation_info(
@@ -77,11 +82,7 @@ def _lidvid_to_dir(lidvid: str) -> str:
     def get_lid(lidvid: str) -> LID:
         return LIDVID(lidvid).lid()
 
-    return lid_to_dir(get_lid(str(lidvid)))
-
-
-def lid_to_dir(lid: LID) -> str:
-    return fs.path.join(*[part + "$" for part in lid.parts()])
+    return lid_to_dirpath(get_lid(str(lidvid)))
 
 
 def _extend_lidvid(lidvid_str: str, segment: str) -> str:
@@ -106,6 +107,20 @@ def create_pds4_labels(
                 if first_bundle:
                     self._create_context_collection(bundle)
                     self._create_schema_collection(bundle)
+                else:
+                    context_collection_lid = (
+                        LIDVID(bundle.lidvid).lid().extend_lid("context")
+                    )
+                    context_collection_lidvid = LIDVID.create_from_lid_and_vid(
+                        context_collection_lid, VID("1.0")
+                    )
+                    bundle_db.create_context_collection(
+                        str(context_collection_lidvid), bundle.lidvid
+                    )
+                    changes_dict.set(context_collection_lid, VID("1.0"), False)
+                    bundle_db.create_bundle_collection_link(
+                        str(bundle_lidvid), str(context_collection_lidvid)
+                    )
                 self._post_visit_bundle(bundle)
 
         def _create_context_collection(self, bundle: Bundle) -> None:

@@ -1,3 +1,4 @@
+from logging import Logger
 import os.path
 import re
 from typing import Any, Dict, List, Optional, Tuple, cast
@@ -203,6 +204,19 @@ class BundleDB(object):
         for collection in self.get_bundle_collections(bundle_lidvid):
             dump_collection_link_tree(collection.lidvid)
 
+    def log_link_tree(self, logger: Logger, level: int, bundle_lidvid: str) -> None:
+        INDENT = 4 * " "
+
+        def log_collection_link_tree(collection_lidvid: str) -> None:
+            logger.log(level, INDENT + collection_lidvid)
+            for product in self.get_collection_products(collection_lidvid):
+                logger.log(level, 2 * INDENT + product.lidvid)
+
+        bundle = self.get_bundle(bundle_lidvid)
+        logger.log(level, bundle_lidvid)
+        for collection in self.get_bundle_collections(bundle_lidvid):
+            log_collection_link_tree(collection.lidvid)
+
     ############################################################
 
     def create_bundle(self, bundle_lidvid: str) -> None:
@@ -230,38 +244,15 @@ class BundleDB(object):
     def get_bundle_collections(self, bundle_lidvid: str) -> List[Collection]:
         # TODO There's probably better ways to do this.  Use a SQL
         # join?
-        _False = False
-
-        if _False:
-            return [
-                self.session.query(Collection)
-                .filter(Collection.lidvid == link.collection_lidvid)
-                .one()
-                for link in self.session.query(BundleCollectionLink)
-                .filter(BundleCollectionLink.bundle_lidvid == bundle_lidvid)
-                .order_by(BundleCollectionLink.collection_lidvid)
-                .all()
-            ]
-        else:
-            # for debugging
-            print(f";;;; get_bundle_collections({bundle_lidvid!r})")
-            links = (
-                self.session.query(BundleCollectionLink)
-                .filter(BundleCollectionLink.bundle_lidvid == bundle_lidvid)
-                .order_by(BundleCollectionLink.collection_lidvid)
-                .all()
-            )
-
-            res = list()
-            for link in links:
-                print(f";;;; {link}")
-                coll = (
-                    self.session.query(Collection)
-                    .filter(Collection.lidvid == link.collection_lidvid)
-                    .one()
-                )
-                res.append(coll)
-            return res
+        return [
+            self.session.query(Collection)
+            .filter(Collection.lidvid == link.collection_lidvid)
+            .one()
+            for link in self.session.query(BundleCollectionLink)
+            .filter(BundleCollectionLink.bundle_lidvid == bundle_lidvid)
+            .order_by(BundleCollectionLink.collection_lidvid)
+            .all()
+        ]
 
     ############################################################
 
@@ -804,19 +795,11 @@ class BundleDB(object):
         ).scalar()
 
     def get_file(self, basename: str, product_lidvid: str) -> File:
-        try:
-            return (
-                self.session.query(File)
-                .filter(
-                    File.product_lidvid == product_lidvid, File.basename == basename
-                )
-                .one()
-            )
-        except Exception as e:
-            print(
-                f"**** BundleDB.get_file({basename!r}, {product_lidvid!r}) raises {e!r}"
-            )
-            raise
+        return (
+            self.session.query(File)
+            .filter(File.product_lidvid == product_lidvid, File.basename == basename)
+            .one()
+        )
 
     ############################################################
 
@@ -883,29 +866,18 @@ class BundleDB(object):
         Return a list of dictionaries mapping FITS keys to their
         values, one per Hdu in the FITS file.
         """
-        try:
 
-            def get_card_dictionary(index: int) -> Dict[str, Any]:
-                cards = (
-                    self.session.query(Card)
-                    .filter(Card.product_lidvid == fits_product_lidvid)
-                    .filter(Card.hdu_index == index)
-                )
-                return {card.keyword: card.value for card in cards}
-
-            # TODO The cast is a hack.  How should it properly be done?
-            file = cast(FitsFile, self.get_file(basename, fits_product_lidvid))
-            return [get_card_dictionary(i) for i in range(file.hdu_count)]
-        except Exception as e:
-            print(
-                f"""**** BundleDB.get_card_dictionaries(
-    fits_product_lidvid={fits_product_lidvid},
-    basename={basename}
-    )
-raised exception = {e} ****
-"""
+        def get_card_dictionary(index: int) -> Dict[str, Any]:
+            cards = (
+                self.session.query(Card)
+                .filter(Card.product_lidvid == fits_product_lidvid)
+                .filter(Card.hdu_index == index)
             )
-            raise
+            return {card.keyword: card.value for card in cards}
+
+        # TODO The cast is a hack.  How should it properly be done?
+        file = cast(FitsFile, self.get_file(basename, fits_product_lidvid))
+        return [get_card_dictionary(i) for i in range(file.hdu_count)]
 
     def get_other_suffixed_card_dictionaries(
         self, fits_product_lidvid: str, basename: str, suffix: str

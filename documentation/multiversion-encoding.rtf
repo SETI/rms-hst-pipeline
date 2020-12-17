@@ -1,0 +1,176 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf840
+{\fonttbl\f0\fswiss\fcharset0 Optima-Regular;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;}
+{\*\expandedcolortbl;;\csgenericrgb\c0\c0\c100000;}
+\margl1440\margr1440\vieww16200\viewh13200\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs48 \cf0 Multiversion encoding: encoding PDS4 structures into a filesystem
+\b0\fs36 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+Filesystems have fairly strict structures.  Each file or directory (except the root) has a single parent.  Files and directories have one set of contents at a time.  If you ignore the possibility of links, the elements of a filesystem form a tree.\
+\
+PDS4 object are different.  Different versions of a component (bundle, collection or product) can have different contents.  Any version of a component can have multiple parents.  Different versions may have different children.  This makes it very difficult to encode multiple versions of PDS4 objects into a single archive filesystem.\
+\
+
+\fs28 Say you have a bundle 
+\f1 bob
+\f0  with collection 
+\f1 cathy
+\f0  and products 
+\f1 pete
+\f0  and 
+\f1 polly
+\f0 .  Product 
+\f1 pete
+\f0  version 1 has for a parent collection 
+\f1 cathy
+\f0  version 1.  Say now that 
+\f1 polly
+\f0  is updated to version 2.  Collection 
+\f1 cathy
+\f0  and bundle 
+\f1 bob
+\f0  must be updated to version 2 because 
+\f1 polly
+\f0  has changed and 
+\f1 polly
+\f0  is part of them.  But 
+\f1 pete
+\f0  remains at version 1.\
+\
+So 
+\f1 pete
+\f0  version 1 now has two different parents: 
+\f1 cathy
+\f0  version 1 and 
+\f1 cathy
+\f0  version 2.  And 
+\f1 cathy
+\f0  has different contents, depending on its version: 
+\f1 cathy
+\f0  version 1 contain 
+\f1 polly
+\f0  version 1 and 
+\f1 cathy
+\f0  version 2 contains 
+\f1 polly
+\f0  version 2.\
+
+\fs36 \
+It's the versioning of PDS4 structure/directory contents that is the difficult part.  We get around that by putting the info on contents into a file.  Once we do that, the rest can be handled by encoding filepaths.\
+\
+Dollar-signs are illegal in PDS4 filenames, so we can use them freely in our encoding, knowing that there can be no nameclashes.\
+\
+To convert a LIDVID to an archive directory path, extract the PDS4 object names from the LID (the bundle, collection and product names, some of which might be missing), use them as directory names, and add a final subdirectory of the form 
+\f1 v$
+\f0\i VID.  
+\i0 \
+\
+
+\fs28 Using the above example, the path corresponding to 
+\f1 bob
+\f0  version 2 (LIDVID 
+\f1 urn:nasa:pds4:bob::2.0
+\f0 ) would be 
+\f1 /bob/v$2.0
+\f0  and the path corresponding to 
+\f1 pete
+\f0  (LIDVID 
+\f1 urn:nasa:pds4:bob:cathy:pete::1.0
+\f0 ) would be 
+\f1 /bob/cathy/pete/v$1.0
+\f0 .  Any files (and possibly directories) belonging to that component live in that directory.
+\fs36 \
+\
+To convert an archive directory path to a LIDVID, look for a path segment of the form 
+\f1 v$
+\f0\i n.n
+\i0 .  The portion of the path before that is the LID, that segment corresponds to the VID, and any part of the path after that corresponds to the filepath within the component.\
+\
+
+\fs28 Using the above example, the path 
+\f1 /bob/cathy/v$3.4/foo/bar.txt
+\f0  corresponds to a file at the path 
+\f1 foo/bar.txt
+\f0  within a PDS4 collection with LIDVID 
+\f1 urn:nasa:pds4:bob:cathy::3.4
+\f0 .
+\fs36 \
+\
+Note: we don't currently use subdirectories within PDS4 components, but the standard allows them, so we're keeping the possibility open.\
+\
+To find the contents of a PDS4 structure, look within the directory for its LIDVID.  There you will find a file named 
+\f1 subdir$versions.txt
+\f0 .  Its contents will be a series of lines, each of which has a subcomponent name, whitespace, and a VID.\
+\
+
+\fs28 Using the above example, 
+\f1 cathy
+\f0  version 1 contains 
+\f1 pete
+\f0  and 
+\f1 polly
+\f0 , both version 1.  So in the directory 
+\f1 /bob/cathy/v$1.0
+\f0 , you'll find a 
+\f1 subdir$versions.txt
+\f0  file.  
+\f1 /bob/cathy/v$1.0/subdir$versions.txt
+\f0  will contain the lines\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1 \cf2 pete 1.0\
+polly 1.0\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0 \cf0 \
+On the other hand, 
+\f1 cathy
+\f0  version 2 contains 
+\f1 pete
+\f0  version 1 and 
+\f1 polly
+\f0  version 2.  So 
+\f1 /bob/cathy/v$2.0/subdir$versions.txt
+\f0  will contain the lines\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1 \cf2 pete 1.0\
+polly 2.0
+\f0\fs36 \cf0 \
+\
+Note that contents in the PDS4 sense will 
+\i not
+\i0  be contents in the filesystem sense.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs28 \cf0 Using the above example, the PDS4 product 
+\f1 pete
+\f0  version 1 is part of PDS4 collection 
+\f1 cathy
+\f0  version 2, but the contents of 
+\f1 pete
+\f0  version 1 is in 
+\f1 /bob/cathy/pete/v$1.0
+\f0  which is 
+\i not
+\i0  within the directory 
+\f1 /bob/cathy/v$2.0
+\f0  where 
+\f1 cathy
+\f0  version 2 lives.
+\fs36 \
+\
+You can find the code that reads and writes 
+\f1 subdir$versions.txt
+\f0  files in 
+\f1 pdart.fs.multiversioned.SubdirVersions.py
+\f0 .\
+\
+\
+}

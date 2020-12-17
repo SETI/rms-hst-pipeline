@@ -2,9 +2,9 @@ import unittest
 
 import fs.path
 
+from pdart.archive.TestUtils import lid_to_dir
 from pdart.archive.TransferManifest import make_transfer_manifest
 from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.fs.primitives.DirUtils import lid_to_dir
 from pdart.pds4.LIDVID import LIDVID
 
 _BUNDLE_LIDVID: str = "urn:nasa:pds:hst_00001::1.0"

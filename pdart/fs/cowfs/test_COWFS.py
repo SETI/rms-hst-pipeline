@@ -27,6 +27,16 @@ class TestCOWFS(FSTestCases, unittest.TestCase):
         self.fs.writetext("/b$/c.txt", "Buggy?")
         self.fs.invariant()
 
+    def test_listdir_bug(self) -> None:
+        # Removing a file disclosed a bug in COWFS.listdir().  This
+        # serves as a regression test.
+        self.tempfs.makedirs("/b/d")
+        self.tempfs.writetext("/b/d/c1.txt", "hmmm")
+        self.tempfs.writetext("/b/d/c2.txt", "hmmm")
+        self.tempfs.writetext("/b/d/c3.txt", "hmmm")
+        self.fs.remove("/b/d/c1.txt")
+        self.assertEqual({"c2.txt", "c3.txt"}, set(self.fs.listdir("/b/d")))
+
     def test_listdir(self) -> None:
         fs = MemoryFS()
         fs.makedirs("/b$")

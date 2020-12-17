@@ -1,16 +1,33 @@
 #!/bin/bash
 set -eu
 
+die(){
+    echo $@ >&2
+}
+
+usage(){
+    die Usage: "$(basename $0)" '<project-id>'
+}
+
+if [ $# -ne 1 ]; then
+    usage
+fi
+
+
+PROJECT_ID=$1
+
 # A temporary script to restore downloaded files to their original
 # state from tarballs.  Used while developing the pipeline to handle
 # changed files.
 
-if [ -f tmp-working-dir/hst_09059/documentDownload.tar.gz ]; then
-    rm -rf tmp-working-dir/hst_09059/documentDownload || exit 0
-    open -W tmp-working-dir/hst_09059/documentDownload.tar.gz
+find . -name .DS_Store -delete
+
+if [ -f tmp-working-dir/hst_${PROJECT_ID}/documentDownload.tar.gz ]; then
+    rm -rf tmp-working-dir/hst_${PROJECT_ID}/documentDownload || exit 0
+    open -W tmp-working-dir/hst_${PROJECT_ID}/documentDownload.tar.gz
 fi
 
-if [ -f tmp-working-dir/hst_09059/mastDownload.tar.gz ]; then
-    rm -rf tmp-working-dir/hst_09059/mastDownload || exit 0
-    open -W tmp-working-dir/hst_09059/mastDownload.tar.gz
+if [ -f tmp-working-dir/hst_${PROJECT_ID}/mastDownload.tar.gz ]; then
+    rm -rf tmp-working-dir/hst_${PROJECT_ID}/mastDownload || exit 0
+    open -W tmp-working-dir/hst_${PROJECT_ID}/mastDownload.tar.gz
 fi

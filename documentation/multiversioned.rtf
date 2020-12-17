@@ -1,0 +1,154 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf840
+{\fonttbl\f0\fswiss\fcharset0 Optima-Regular;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww16200\viewh13200\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 To be able to store multiple versions of files and multiple versions of 
+\i directories
+\i0  into a single filesystem, we must use a scheme to encode the version numbers and directory contents into the filesystem.  A collection label for the collection with the LIDVID 
+\f1 urn:nasa:pds:hst_09059:data_acs_flt::2.1
+\f0  would be stored at 
+\f1 /hst_09059/data_acs_flt/v$2.1/collection_data.xml
+\f0  and to find the contents of the collection, you have to look into a file stored at 
+\f1 /hst_09059/data_acs_flt/v$2.1/subdir$versions.txt
+\f0 .  This is neither obvious nor easily readable by humans and it's best to let software handle it.\
+\
+I've written 
+\f1 pdart.fs.multiversioned.Multiversioned
+\f0  to handle this.  It acts as a wrapper around a 
+\f1 pyfilesystem2
+\f0  virtual filesystem and lets you access the data in a few different ways.  To use it, you create a virtual filesystem object containing the archive data (in the difficult-to-read format), and then use it to create a Multiversioned object.\
+\
+
+\f1 fs = fs.osfs.OSFS(
+\f0\i directory where the bundle archive lives
+\f1\i0 )\
+mv = Multiversioned(fs)\
+
+\f0 \
+There are two ways to view the data.  \
+\
+
+\b\fs48 Single-version view
+\b0\fs36 \
+\
+If you are interested in just a single version, you can look at the latest version of a LID, or at a specific LIDVID, past or present.\
+\
+
+\f1 lid = pdart.pds4.LID(
+\f0\i desired bundle LID
+\f1\i0 )\
+vv = mv.create_version_view()
+\f0 \
+\
+will give you a 
+\f1 VersionView
+\f0 , a read-only virtual filesystem object that contains the latest version of the bundle's contents.  Files within 
+\f1 vv
+\f0  are found at the PDS logical path 
+\f1 /
+\f0\i bundle-id
+\f1\i0 /
+\f0\i collection-id
+\f1\i0 /
+\f0\i product-id
+\f1\i0 /
+\f0\i filepath. 
+\i0  To read the collection label for the 
+\f1 hst_09059/data_acs_flt
+\f0  that appears in that bundle version, you could simply say
+\f1 \
+\
+f = vv.open("/hst_09059/data_acs_flt/collection_data.xml", "r")\
+\
+
+\f0 although in the actual, archive filesystem, it is stored at 
+\f1 /hst_09059/data_acs_flt/v$2.1/collection_data.xml
+\f0 .  Similarly, to find the contents of the collection, you can ask:\
+\
+
+\f1 contents = vv.listdir("/hst_09059/data_acs_flt/")
+\f0 \
+\
+and get the contents although in the actual, archive filesystem, the names of the contents of that version of the collection are stored in 
+\f1 /hst_09059/data_acs_flt/v$2.1/subdir$versions.txt
+\f0 .  In short, 
+\f1 VersionView
+\f0 s let you focus on the version you're interested in and ignore the rest of the archive and the existence of versioning.\
+\
+If you want to look at a particular version, not the current one, you can instead use a LIDVID and say\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1 \cf0 lidvid = pdart.pds4.LIDVID(
+\f0\i desired bundle LIDVID
+\f1\i0 )\
+vv = VersionView(mv, lidvid)
+\f0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0  \
+\
+
+\b\fs48 The dictionary-like view
+\b0\fs36 \
+\
+
+\f1 Multiversioned
+\f0  also has a dictionary-like interface where the keys are LIDVIDs and the values are 
+\f1 pdart.fs.multiversioned.VersionContents
+\f0  objects.  Each 
+\f1 VersionContents
+\f0  object works like a directory:  while a directory contains files, their contents, and subdirectories, each 
+\f1 VersionContents
+\f0  object contains files, their contents, and a list of sub-LIDVIDs that it contains.  \
+\
+So, given a 
+\f1 Multiversioned
+\f0  object, if you want to look at the contents of the collection with a given LIDVID, you can say\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1 \cf0 lidvid = pdart.pds4.LIDVID(
+\f0\i desired bundle LIDVID
+\f1\i0 )\
+contents = mv[lidvid]\
+sub_lidvids = contents.subcomponents
+\f0 \
+\
+Rather than actually packing the files' bytes into the 
+\f1 VersionContents
+\f0  object (they could take up gigabytes!), we pack a single 
+\f1 pyfilesystem2
+\f0  virtual filesystem object into it with a list of filenames.  (This gives us flexiblity as it could hold its data in memory if small, or on the disk if large.) \
+\
+So to process the files that are contained in that LIDVID, you could say\
+\
+
+\f1 fs = contents.fs\
+for filepath in contents.filepaths:\
+	with fs.open(filepath, "r") as f:\
+		
+\f0\i do something with the file f
+\f1\i0 \
+
+\f0 \
+When you want to add a new bundle, collection or product version to an archive, you build a 
+\f1 VersionContents
+\f0  object, a LIDVID for your new version, and say\
+\
+
+\f1 contents = VersionContents.create_from_lidvids(\
+	sub_lidvids, filesys, filepaths)\
+lidvid = pdart.pds4.LIDVID(
+\f0\i desired LIDVID
+\f1\i0 )\
+mv[lidvid] = contents
+\f0 \
+\
+Each LIDVID can be assigned only once\'97that is, once a version is written, it never changed\'97but read from as many times as you like.\
+\
+(
+\f1 VersionContents
+\f0  objects can be built to work with either LIDs or LIDVIDs.  This can be ignored most of the time.)}

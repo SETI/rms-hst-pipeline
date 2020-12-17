@@ -5,9 +5,10 @@ from typing import Dict
 
 from fs.base import FS
 import fs.copy
-from fs.path import iteratepath
+from fs.path import abspath, iteratepath
 from fs.subfs import SubFS
 
+from pdart.fs.multiversioned.Utils import component_files, dirpath_to_lid
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, ChangesDict, read_changes_dict
@@ -18,15 +19,6 @@ from pdart.pipeline.Utils import (
     make_sv_osfs,
     make_version_view,
 )
-
-
-def dir_to_lid(dir: str) -> LID:
-    """
-    Convert a directory path to a LID.  Raise on errors.
-    """
-    # TODO This is copied from RecordChanges.  Refactor.
-    parts = [str(part[:-1]) for part in iteratepath(dir) if "$" in part]
-    return LID.create_from_parts(parts)
 
 
 def _is_component_path(dirpath: str) -> bool:
@@ -41,21 +33,24 @@ def _merge_primaries(changes_dict: ChangesDict, src_fs: FS, dst_fs: FS) -> None:
     # files and directories.  Think about it.
     for dirpath in src_fs.walk.dirs(search="depth"):
         if _is_component_path(dirpath):
-            lid = dir_to_lid(dirpath)
+            lid = dirpath_to_lid(dirpath)
             changed = changes_dict.changed(lid)
             if changed:
                 if not dst_fs.isdir(dirpath):
                     dst_fs.makedirs(dirpath)
+                src_sub_fs = SubFS(src_fs, dirpath)
                 dst_sub_fs = SubFS(dst_fs, dirpath)
+                # delete directories in dst that don't exist in src
+                for subdirpath in dst_sub_fs.walk.dirs(search="depth"):
+                    if not src_sub_fs.isdir(subdirpath):
+                        dst_sub_fs.removetree(subdirpath)
                 # delete the files in the destination (if any)
-                for filepath in dst_sub_fs.walk.files():
-                    if "$" not in filepath:
-                        dst_sub_fs.remove(filepath)
+                for filepath in component_files(dst_fs, dirpath):
+                    dst_sub_fs.remove(filepath)
                 # copy the new files across
                 src_sub_fs = SubFS(src_fs, dirpath)
-                for filepath in src_sub_fs.walk.files():
-                    if "$" not in filepath:
-                        fs.copy.copy_file(src_sub_fs, filepath, dst_sub_fs, filepath)
+                for filepath in component_files(src_fs, dirpath):
+                    fs.copy.copy_file(src_sub_fs, filepath, dst_sub_fs, filepath)
 
 
 class InsertChanges(MarkedStage):

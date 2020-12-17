@@ -1,4 +1,5 @@
 import abc
+import logging
 from typing import Optional
 
 from pdart.pipeline.Stage import Stage
@@ -17,6 +18,9 @@ from pdart.pipeline.RecordChanges import RecordChanges
 from pdart.pipeline.ResetPipeline import ResetPipeline
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.ValidateBundle import ValidateBundle
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class StateMachine(object):
@@ -52,6 +56,7 @@ class StateMachine(object):
 
         i = phase_index()
         try:
+            _LOGGER.info(f"{self.stages[i+1][0]}")
             return self.stages[i + 1][1]
         except IndexError:
             return None

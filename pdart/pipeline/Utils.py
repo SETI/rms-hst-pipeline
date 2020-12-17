@@ -114,6 +114,15 @@ def make_mv_deltas(base_fs: FS, cow_dirpath: str) -> Generator[COWFS, None, None
 
 
 @contextmanager
+def make_multiversioned(archive_osfs: FS) -> Generator[Multiversioned, None, None]:
+    assert categorize_filesystem(archive_osfs) in [
+        EMPTY_FS_TYPE,
+        MULTIVERSIONED_FS_TYPE,
+    ], categorize_filesystem(archive_osfs)
+    yield Multiversioned(archive_osfs)
+
+
+@contextmanager
 def make_version_view(
     archive_osfs: OSFS, bundle_segment: str
 ) -> Generator[VersionView, None, None]:
@@ -121,20 +130,16 @@ def make_version_view(
     Create a read-only view of the latest version of the bundle.
     Intended to be used in a with-statement.
     """
-    assert categorize_filesystem(archive_osfs) in [
-        EMPTY_FS_TYPE,
-        MULTIVERSIONED_FS_TYPE,
-    ], categorize_filesystem(archive_osfs)
-    mv = Multiversioned(archive_osfs)
-    lid = LID("urn:nasa:pds:" + str(bundle_segment))
-    res = mv.create_version_view(lid)
-    assert categorize_filesystem(res) in [
-        EMPTY_FS_TYPE,
-        SINGLE_VERSIONED_FS_TYPE,
-    ], categorize_filesystem(res)
+    with make_multiversioned(archive_osfs) as mv:
+        lid = LID("urn:nasa:pds:" + str(bundle_segment))
+        res = mv.create_version_view(lid)
+        assert categorize_filesystem(res) in [
+            EMPTY_FS_TYPE,
+            SINGLE_VERSIONED_FS_TYPE,
+        ], categorize_filesystem(res)
 
-    yield res
-    res.close()
+        yield res
+        res.close()
 
 
 def has_suffix_shm_spt_shp(file_name: str) -> bool:

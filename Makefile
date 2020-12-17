@@ -63,7 +63,7 @@ test: venv
 # Run some subset of the tests.  Hack as needed.
 .PHONY: t
 t: venv
-	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) pytest pdart/labels/test_HstParameters.py
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_PATH) pytest pdart/fs/cowfs/test_COWFS.py
 
 
 ############################################################
@@ -152,11 +152,15 @@ nicmos-pipeline : LILS=07885
 nicmos-pipeline : lil-pipeline
 
 CHANGES=09059
+# CHANGES=09748
+# CHANGES=15505
+# CHANGES=07885 # NICMOS
+
 changes : venv black mypy
 	mkdir -p $(LIL-TWD)
 	-rm $(LIL-TWD)/*/\#*.txt
-	./reset-downloads
 	for project_id in $(CHANGES); do \
+	    ./reset-downloads $$project_id; \
 	    echo '****' hst_$$project_id ' ROUND ONE ****'; \
 	    say round one; \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
@@ -292,12 +296,6 @@ save-reqs :
 ############################################################
 # MAINTENANCE
 ############################################################
-
-# Show a diagram of the module dependencies.  Do not break these.
-.PHONY: modules
-modules:
-	dot -Tpng modules.dot -o modules.png
-	open modules.png
 
 # Format the Python source with black: https://black.readthedocs.io/
 .PHONY: black

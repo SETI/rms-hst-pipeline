@@ -229,7 +229,11 @@ Extras are {additions_paths - deletions_paths}.
         if layer == NO_LAYER:
             raise fs.errors.ResourceNotFound(path)
         elif layer == BASE_LAYER:
-            return self.base_fs.listdir(path)
+            return [
+                name
+                for name in self.base_fs.listdir(path)
+                if self.layer(fs.path.join(path, name)) != NO_LAYER
+            ]
         elif layer == ADD_LAYER:
             # Get the listing on the additions layer
             names = set(self.additions_fs.listdir(path))

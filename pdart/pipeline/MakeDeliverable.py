@@ -1,41 +1,49 @@
 import os
-import os.path
-import shutil
-import tarfile
+from typing import Dict
 
 import fs.path
 from fs.base import FS
 from fs.osfs import OSFS
-import fs.walk
 
 from pdart.archive.ChecksumManifest import (
     make_checksum_manifest,
-    plain_lidvid_to_visits_dirpath,
 )
 from pdart.archive.TransferManifest import make_transfer_manifest
 from pdart.db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
-from pdart.fs.deliverablefs.DeliverableFS import DeliverableFS, lidvid_to_dirpath
+from pdart.fs.deliverableview.DeliverableView import (
+    DeliverableView,
+    NO_VISIT_COLLECTIONS,
+)
+from pdart.fs.multiversioned.VersionView import VersionView
+from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Utils import make_osfs, make_version_view
-
-_TAR_NEEDED: bool = False
+from pdart.pipeline.Utils import make_multiversioned, make_osfs
 
 
-def _fix_up_deliverable(dir: str) -> None:
-    # TODO DeliverableFS was written with an older directory
-    # structure.  When used with the new, we get trailing dollar signs
-    # on directories representing bundles, collections, and products.
-    # No time to fix it right now, so we just patch up the resulting
-    # directory tree.  TODO But *do* fix it.
-    for path, _, _ in os.walk(dir, topdown=False):
-        if path[-1] == "$":
-            os.rename(path, path[:-1])
+def short_lidvid_to_dirpath(lidvid: LIDVID) -> str:
+    lid = lidvid.lid()
+    # parts are collection, product
+    parts = lid.parts()[1:]
+    if len(parts) >= 2 and parts[0] not in NO_VISIT_COLLECTIONS:
+        fake_filename = f"{parts[1]}_raw.fits"
+        visit = HstFilename(fake_filename).visit()
+        visit_part = f"visit_{visit}"
+        parts[1] = visit_part
+    return fs.path.join(*parts)
 
 
 def copy_fs(version_view: FS, deliverable: FS) -> None:
+    # TODO The note below is probably obsolete.  It was written when
+    # we were using the DeliverableFS to make the deliverable.  We've
+    # now switched to using the DeliverableView. (The obsolete
+    # DeliverableFS has been deleted from the repo.)  In any case,
+    # this doesn't seem to hurt anything, but it can probably all be
+    # replaced by fs.copy.copy_file()--see the last line.  Try it and
+    # see.
+
     # TODO I could (and used to) just do a fs.copy.copy_fs() from the
     # version_view to a DeliverableFS.  I removed it to debug issues
     # with the validation tool.  Now I find this hack is just as easy
@@ -80,49 +88,34 @@ class MakeDeliverable(MarkedStage):
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
 
-        if os.path.isdir(deliverable_dir):
-            OSFS(deliverable_dir).tree()
-            assert False, "wtf?"
-
-        with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self._bundle_segment
-        ) as version_view:
+        with make_osfs(archive_dir) as archive_osfs, make_multiversioned(
+            archive_osfs
+        ) as mv:
             bundle_segment = self._bundle_segment
             bundle_lid = LID.create_from_parts([bundle_segment])
             bundle_vid = changes_dict.vid(bundle_lid)
-            bundle_lidvid = str(LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid))
+            bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid)
+            version_view = VersionView(mv, bundle_lidvid)
 
-            os.mkdir(deliverable_dir)
-            deliverable_osfs = OSFS(deliverable_dir)
-            copy_fs(version_view, deliverable_osfs)
-            _fix_up_deliverable(deliverable_dir)
+            synth_files: Dict[str, bytes] = dict()
 
             # open the database
             db_filepath = fs.path.join(working_dir, _BUNDLE_DB_NAME)
-            db = create_bundle_db_from_os_filepath(db_filepath)
+            bundle_db = create_bundle_db_from_os_filepath(db_filepath)
 
-            # add manifests
-            checksum_manifest_path = fs.path.join(manifest_dir, "checksum.manifest.txt")
-            with open(checksum_manifest_path, "w") as f:
-                f.write(
-                    make_checksum_manifest(
-                        db, bundle_lidvid, plain_lidvid_to_visits_dirpath
-                    )
-                )
+            bundle_lidvid_str = str(bundle_lidvid)
+            synth_files = dict()
+            cm = make_checksum_manifest(
+                bundle_db, bundle_lidvid_str, short_lidvid_to_dirpath
+            )
+            synth_files["/checksum.manifest.txt"] = cm.encode("utf-8")
+            tm = make_transfer_manifest(
+                bundle_db, bundle_lidvid_str, short_lidvid_to_dirpath
+            )
+            synth_files["/transfer.manifest.txt"] = tm.encode("utf-8")
 
-            transfer_manifest_path = fs.path.join(manifest_dir, "transfer.manifest.txt")
-            with open(transfer_manifest_path, "w") as f:
-                f.write(
-                    make_transfer_manifest(
-                        db, bundle_lidvid, plain_lidvid_to_visits_dirpath
-                    )
-                )
+            deliverable_view = DeliverableView(version_view, synth_files)
 
-            # Tar it up.
-            if _TAR_NEEDED:
-                bundle_dir = str(fs.path.join(deliverable_dir, self._bundle_segment))
-
-                with tarfile.open(f"{bundle_dir}.tar", "w") as tar:
-                    tar.add(bundle_dir, arcname=os.path.basename(bundle_dir))
-
-                shutil.rmtree(bundle_dir)
+            os.mkdir(deliverable_dir)
+            deliverable_osfs = OSFS(deliverable_dir)
+            copy_fs(deliverable_view, deliverable_osfs)

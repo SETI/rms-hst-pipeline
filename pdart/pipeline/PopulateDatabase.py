@@ -9,6 +9,7 @@ from pdart.db.BundleDB import (
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
+from pdart.documents.Downloads import DOCUMENT_SUFFIXES
 from pdart.pipeline.ChangesDict import (
     CHANGES_DICT_NAME,
     ChangesDict,
@@ -17,6 +18,7 @@ from pdart.pipeline.ChangesDict import (
 )
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.fs.cowfs.COWFS import COWFS
+from pdart.fs.multiversioned.Utils import lid_to_dirpath
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -28,11 +30,6 @@ from pdart.pipeline.Utils import (
     has_suffix_shm_spt_shp,
 )
 from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
-
-
-# TODO Cut-and-pasted from BuildLabels.  Refactor this.
-def lid_to_dir(lid: LID) -> str:
-    return fs.path.join(*[part + "$" for part in lid.parts()])
 
 
 def _populate_schema_collection(db: BundleDB, bundle_lidvid: str) -> None:
@@ -84,17 +81,14 @@ def _populate_products(
             lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
             collection_lidvid = changes_dict.parent_lidvid(lidvid)
             if changed:
-                product_path = lid_to_dir(lidvid.lid())
+                product_path = lid_to_dirpath(lidvid.lid())
                 if collection_lidvid.lid().collection_id == "document":
                     db.create_document_product(str(lidvid), str(collection_lidvid))
 
                     doc_files = [
                         doc_file
                         for doc_file in sv_deltas.listdir(product_path)
-                        if (
-                            fs.path.splitext(doc_file)[1].lower()
-                            in [".apt", ".pdf", ".pro", ".prop"]
-                        )
+                        if (fs.path.splitext(doc_file)[1].lower() in DOCUMENT_SUFFIXES)
                     ]
 
                     for doc_file in doc_files:
@@ -168,10 +162,11 @@ class PopulateDatabase(MarkedStage):
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
+        bundle_lid = LID.create_from_parts([self._bundle_segment])
+        first_round = changes_dict.vid(bundle_lid) == VID("1.0")
         schema_collection_lid = LID.create_from_parts([self._bundle_segment, "schema"])
-        if not changes_dict.contains(schema_collection_lid):
-            changes_dict.set(schema_collection_lid, VID("1.0"), True)
-            write_changes_dict(changes_dict, changes_path)
+        changes_dict.set(schema_collection_lid, VID("1.0"), first_round)
+        write_changes_dict(changes_dict, changes_path)
 
         db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
         db_exists = os.path.isfile(db_filepath)

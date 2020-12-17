@@ -213,24 +213,11 @@ def verify_label_or_raise(label: bytes) -> None:
     Given the text of a PDS4 label, run XML Schema *and* Schematron
     validations on it.  Raise an exception on failures.
     """
-    try:
-        failures_from_xml_schema = xml_schema_failures(None, label)
-        if failures_from_xml_schema is not None:
-            raise Exception(
-                f"XML schema validation errors: {str(failures_from_xml_schema)}"
-            )
-        failures_from_schematron = schematron_failures(None, label)
-        if failures_from_schematron is not None:
-            raise Exception(f"Schematron validation errors: {failures_from_schematron}")
-    except Exception:
-        # Debugging functionality: write the label to disk.
-        PRINT_AND_SAVE_LABEL = True
-        if PRINT_AND_SAVE_LABEL:
-            import time
-
-            print(label)
-            t = int(time.time() * 1000)
-            fp = f"tmp{t}.xml"
-            with open(fp, "wb") as f:
-                f.write(label)
-        raise
+    failures_from_xml_schema = xml_schema_failures(None, label)
+    if failures_from_xml_schema is not None:
+        raise Exception(
+            f"XML schema validation errors: {str(failures_from_xml_schema)}"
+        )
+    failures_from_schematron = schematron_failures(None, label)
+    if failures_from_schematron is not None:
+        raise Exception(f"Schematron validation errors: {failures_from_schematron}")

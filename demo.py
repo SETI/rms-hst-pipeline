@@ -20,14 +20,11 @@ from fs.tarfs import *
 
 # These imports are for PDART.
 from pdart.fs.cowfs.COWFS import *
-from pdart.fs.deliverablefs.DeliverableFS import *
+from pdart.fs.deliverableview.DeliverableView import *
 from pdart.fs.multiversioned.Multiversioned import *
 from pdart.fs.multiversioned.VersionView import *
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
-
-# A kludge
-from pdart.pipeline.MakeDeliverable import _fix_up_deliverable as fix_up
 
 
 def reset() -> None:
@@ -221,15 +218,16 @@ def demo_version_views() -> None:
     )
 
 
-def demo_deliverable() -> DeliverableFS:
+def demo_deliverable() -> DeliverableView:
     """
-    Demonstration of the DeliverableFS, a write-only filesystem.
+    Demonstration of the DeliverableView: a view of one version of the
+    bundle, in a human-friendly format.
     """
+    global m
 
     # Create the DeliverableFS.
     os.makedirs("demo/hst_00001-deliverable")
     dos = OSFS("demo/hst_00001-deliverable")
-    d = DeliverableFS(dos)
 
     # Set up the Multiversioned archive.
     demo_multi()
@@ -237,16 +235,9 @@ def demo_deliverable() -> DeliverableFS:
 
     # Get a view on one version.
     vv = m.create_version_view(lid)
+    dv = DeliverableView(vv)
 
-    # Copy that view into the DeliverableFS.
-    copy_dir(vv, "/", d, "/")
-    # Now the filesystem has the files in a human-friendly deliverable
-    # format.
+    show_fs(dv, "deliverable")
 
-    # Fix a bug in the DeliverableFS implementation (removing dollar
-    # signs from directory names), and show us the contents of the
-    # deliverable.
-    fix_up("demo/hst_00001-deliverable")
-    show_fs(dos, "deliverable")
-
-    return d
+    copy_fs(dv, dos)
+    return dv

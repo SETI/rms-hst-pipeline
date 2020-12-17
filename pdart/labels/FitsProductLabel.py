@@ -114,20 +114,7 @@ def _find_RAWish_lookups(
         )
         return card_dicts
 
-    try:
-        card_dicts = _find_RAWish_card_dicts()
-    except NoResultFound as e:
-        # TODO Remove this instrumentation
-        print(
-            f"""**** _find_RAWish_lookups(
-    product_lidvid={product_lidvid},
-    file_basename={file_basename},
-    siblings={siblings}
-    )
-raised exception = {e} ****
-"""
-        )
-        raise
+    card_dicts = _find_RAWish_card_dicts()
     return make_hdu_lookups(RAWish_basename, card_dicts)
 
 

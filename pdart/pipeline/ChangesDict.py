@@ -1,3 +1,4 @@
+from logging import Logger
 from typing import Dict, ItemsView, Optional, Tuple
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -5,6 +6,17 @@ from pdart.pds4.VID import VID
 
 
 class ChangesDict(object):
+    """
+    This class represents a list of PDS4 components in a version and
+    whether they have changed since the previous version or not.
+    Internally, it's a list of LID, VID, and a bool: True means it's
+    changed.
+
+    This class is written to (and can be read from) the filesystem so
+    that the information is available to multiple stages in the
+    pipeline.
+    """
+
     def __init__(
         self, changes_dict: Optional[Dict[LID, Tuple[VID, bool]]] = None
     ) -> None:
@@ -38,6 +50,18 @@ class ChangesDict(object):
         for lid, (vid, changed) in sorted(self.changes_dict.items()):
             print(lid, vid, changed)
         print("****************")
+
+    def log(self, logger: Logger, level: int, note: str = "") -> None:
+        logger.log(level, f"**** ChangeDict {note} ****")
+        for lid, (vid, changed) in sorted(self.changes_dict.items()):
+            logger.log(level, f"{lid} {vid} {changed}")
+        logger.log(level, "****************")
+
+    def has_changes(self) -> bool:
+        res = False
+        for lid, (vid, changed) in self.changes_dict.items():
+            res = res or changed
+        return res
 
 
 CHANGES_DICT = ChangesDict

@@ -1,3 +1,4 @@
+import logging
 from typing import Callable, List, Optional, Tuple
 
 import fs.path
@@ -11,6 +12,8 @@ from pdart.db.SqlAlchTables import (
     ProductLabel,
 )
 from pdart.pds4.LIDVID import LIDVID
+
+_LOGGER = logging.getLogger(__name__)
 
 _LTD = Callable[[LIDVID], str]
 
@@ -42,10 +45,6 @@ def plain_lidvid_to_visits_dirpath(lidvid: LIDVID) -> str:
 def make_checksum_manifest(
     bundle_db: BundleDB, bundle_lidvid: str, lidvid_to_dirpath: _LTD
 ) -> str:
-    print("//// link tree")
-    bundle_db.dump_link_tree(bundle_lidvid)
-    print("////////////////////////////////////////////////////////////")
-
     files: List[File] = []
 
     bundle = bundle_db.get_bundle(bundle_lidvid)

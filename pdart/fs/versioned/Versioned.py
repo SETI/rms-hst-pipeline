@@ -76,8 +76,6 @@ class MultiversionedOSFS(OSFS, Versioned):
 
 ############################################################
 
-_DO_ASSERTIONS = False
-
 
 class SingleVersionedCOWFS(COWFS, Versioned):
     def __init__(
@@ -86,20 +84,6 @@ class SingleVersionedCOWFS(COWFS, Versioned):
         additions_fs: Optional[FS] = None,
         deletions_fs: Optional[FS] = None,
     ) -> None:
-        # TODO Lots of temporary hacks (1) until I bring the external
-        # filesystems into the pdart tree, and (2) until I define a
-        # SingleVersionedTempFS.  Get rid of them.  Ugly, ugly, ugly.
-        from pdart.fs.versioned.ISingleVersionBundleFS import ISingleVersionBundleFS
-
-        if _DO_ASSERTIONS:
-            # Temporarily removing this because VersionView is not a Versioned.
-            # TODO Fix this.
-            assert (
-                isinstance(base_fs, Versioned)
-                or isinstance(base_fs, ISingleVersionBundleFS)
-                or isinstance(base_fs, TempFS)
-            ), type(base_fs)
-            assert isinstance(base_fs, TempFS) or base_fs.is_single_versioned_fs()
         COWFS.__init__(self, base_fs, additions_fs, deletions_fs)
 
     def is_single_versioned_fs(self) -> bool:
