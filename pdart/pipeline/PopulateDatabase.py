@@ -27,7 +27,6 @@ from pdart.pipeline.Utils import (
     make_osfs,
     make_sv_deltas,
     make_version_view,
-    has_suffix_shm_spt_shp,
 )
 from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
 
@@ -122,7 +121,7 @@ def _populate_target_identification(
         if changed and lid.is_product_lid():
             lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
 
-            product_path = lid_to_dir(lidvid.lid())
+            product_path = lid_to_dirpath(lidvid.lid())
 
             # Get a list of SHM/SPT/SHP fits files
             fits_files = [
@@ -139,6 +138,14 @@ def _populate_target_identification(
                 fits_file_path = fs.path.join(product_path, fits_file)
                 fits_os_path = sv_deltas.getsyspath(fits_file_path)
                 db.create_target_identification(fits_os_path)
+
+
+def has_suffix_shm_spt_shp(file_name: str) -> bool:
+    """Check if a file or lidvid has these suffixes: shm, spt, shp"""
+    for suffix in ["shm", "spt", "shp"]:
+        if suffix in file_name.lower():
+            return True
+    return False
 
 
 class PopulateDatabase(MarkedStage):
