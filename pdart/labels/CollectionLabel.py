@@ -43,8 +43,11 @@ def get_collection_label_name(bundle_db: BundleDB, collection_lidvid: str) -> st
         return "collection_schema.xml"
 
     def get_other_collection_label_name(collection: Collection) -> str:
-        prefix = cast(OtherCollection, collection).prefix
-        return f"collection_{prefix}.xml"
+        collection_obj = cast(OtherCollection, collection)
+        prefix = collection_obj.prefix
+        instrument = collection_obj.instrument
+        suffix = collection_obj.suffix
+        return f"collection_{prefix}_{instrument}_{suffix}.xml"
 
     collection: Collection = bundle_db.get_collection(collection_lidvid)
     return switch_on_collection_subtype(

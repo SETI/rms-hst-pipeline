@@ -17,7 +17,7 @@
   </Collection>
   <File_Area_Inventory>
     <File>
-      <file_name>collection_data.csv</file_name>
+      <file_name>collection_data_acs_raw.csv</file_name>
     </File>
     <Inventory>
       <offset unit="byte">0</offset>

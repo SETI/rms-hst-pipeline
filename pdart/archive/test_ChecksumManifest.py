@@ -94,9 +94,9 @@ class test_ChecksumManifest(unittest.TestCase):
         self.assertEqual(
             "ba8a714e47d3c7606c0a2d438f9e4811  bundle.xml\n"
             "ba8a714e47d3c7606c0a2d438f9e4811  "
-            "data_wfpc2_raw/collection_data.csv\n"
+            "data_wfpc2_raw/collection_data_wfpc2_raw.csv\n"
             "ba8a714e47d3c7606c0a2d438f9e4811  "
-            "data_wfpc2_raw/collection_data.xml\n"
+            "data_wfpc2_raw/collection_data_wfpc2_raw.xml\n"
             "ba8a714e47d3c7606c0a2d438f9e4811  "
             "data_wfpc2_raw/u2no0401t/u2no0401t.xml\n"
             "ba8a714e47d3c7606c0a2d438f9e4811  "
@@ -136,9 +136,9 @@ class test_ChecksumManifest(unittest.TestCase):
         expected = (
             "ba8a714e47d3c7606c0a2d438f9e4811  bundle.xml\n"
             "ba8a714e47d3c7606c0a2d438f9e4811  "
-            "data_wfpc2_raw/collection_data.csv\n"
+            "data_wfpc2_raw/collection_data_wfpc2_raw.csv\n"
             "ba8a714e47d3c7606c0a2d438f9e4811  "
-            "data_wfpc2_raw/collection_data.xml\n"
+            "data_wfpc2_raw/collection_data_wfpc2_raw.xml\n"
             "ba8a714e47d3c7606c0a2d438f9e4811  "
             "data_wfpc2_raw/u2no0401t/u2no0401t.xml\n"
             "ba8a714e47d3c7606c0a2d438f9e4811  "

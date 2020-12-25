@@ -39,7 +39,7 @@ class test_TransferManifest(unittest.TestCase):
         expected = """\
 urn:nasa:pds:hst_00001::1.0                          hst_00001/bundle.xml
 urn:nasa:pds:hst_00001:data_wfpc2_raw::1.0           \
-hst_00001/data_wfpc2_raw/collection_data.xml
+hst_00001/data_wfpc2_raw/collection_data_wfpc2_raw.xml
 urn:nasa:pds:hst_00001:data_wfpc2_raw:u2no0401t::1.0 \
 hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t.xml
 """
@@ -55,7 +55,7 @@ hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t.xml
         expected = """\
 urn:nasa:pds:hst_00001::1.0                          hst_00001/bundle.xml
 urn:nasa:pds:hst_00001:data_wfpc2_raw::1.0           \
-hst_00001/data_wfpc2_raw/collection_data.xml
+hst_00001/data_wfpc2_raw/collection_data_wfpc2_raw.xml
 urn:nasa:pds:hst_00001:data_wfpc2_raw:u2no0401t::1.0 \
 hst_00001/data_wfpc2_raw/u2no0401t/u2no0401t.xml
 urn:nasa:pds:hst_00001:document::1.0                 \
