@@ -1,7 +1,7 @@
 """
 Utility functions.
 """
-from typing import List, Tuple
+from typing import List
 
 import unittest
 from os.path import isfile
@@ -63,7 +63,7 @@ def path_to_testfile(basename: str) -> str:
     return join(dirname(__file__), "testfiles", basename)
 
 
-def wavelength_from_range(range_input: Tuple) -> List[str]:
+def wavelength_from_range(min_range: float, max_range: float) -> List[str]:
     """
     Takes in a range, and return a list of relevant wavelength range names.
     Here is the wavelength table that we are interested at:
@@ -72,34 +72,44 @@ def wavelength_from_range(range_input: Tuple) -> List[str]:
         0.390   -           0.700     Visible        (390 and 700 nm)
         0.65    -           5.0       Near Infrared  (0.65 and 5.0 micrometers)
         0.75    -         300         Infrared       (0.75 and 300 micrometers)
+       30       -         300         Far Infrared   (30 and 300 micrometers)
     """
-    WAVELENGTH_NAMES = ["Ultraviolet", "Visible", "Near Infrared", "Infrared"]
-    min_value = range_input[0]
-    max_value = range_input[1]
-    if max_value < min_value:
+    WAVELENGTH_NAMES = [
+        "Ultraviolet",
+        "Visible",
+        "Near Infrared",
+        "Infrared",
+        "Far Infrared",
+    ]
+
+    if max_range < min_range:
         raise ValueError("Invalid range passed in")
     min_idx, max_idx = 0, 0
 
-    if min_value < 0.01 or (min_value >= 0.01 and min_value <= 0.4):
+    if min_range < 0.01 or (min_range >= 0.01 and min_range <= 0.4):
         min_idx = 0
-    elif min_value >= 0.39 and min_value <= 0.7:
+    elif min_range >= 0.39 and min_range <= 0.7:
         min_idx = 1
-    elif min_value >= 0.65 and min_value <= 5:
+    elif min_range >= 0.65 and min_range <= 5:
         min_idx = 2
-    elif min_value >= 0.75 and min_value <= 300:
+    elif min_range >= 0.75 and min_range <= 300:
         min_idx = 3
-    elif min_value > 300:
+    elif min_range >= 30 and min_range <= 300:
+        min_idx = 4
+    elif min_range > 300:
         return []
 
-    if max_value > 300 or (max_value >= 0.75 and max_value <= 300):
+    if max_range > 300 or (max_range >= 30 and max_range <= 300):
+        max_idx = 4
+    elif max_range >= 0.75 and max_range <= 300:
         max_idx = 3
-    elif max_value >= 0.65 and max_value <= 5:
+    elif max_range >= 0.65 and max_range <= 5:
         max_idx = 2
-    elif max_value >= 0.39 and max_value <= 0.7:
+    elif max_range >= 0.39 and max_range <= 0.7:
         max_idx = 1
-    elif max_value >= 0.01 and max_value <= 0.4:
+    elif max_range >= 0.01 and max_range <= 0.4:
         max_idx = 0
-    elif max_value < 0.01:
+    elif max_range < 0.01:
         return []
 
     return WAVELENGTH_NAMES[min_idx : max_idx + 1]
