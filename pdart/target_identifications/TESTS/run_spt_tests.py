@@ -11,8 +11,8 @@
 #
 ################################################################################
 
-from Target_Identifications.hst import hst_target_identifications
-from Target_Identifications.TESTS.SPT_TESTS import SPT_TESTS
+from target_identifications.hst import hst_target_identifications
+from target_identifications.TESTS.SPT_TESTS import SPT_TESTS
 
 errors_raised = 0
 missing_targets = 0
