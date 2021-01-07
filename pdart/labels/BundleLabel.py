@@ -56,7 +56,9 @@ def make_bundle_label(
                     "bundle_lid": lidvid_to_lid(bundle.lidvid),
                     "bundle_vid": lidvid_to_vid(bundle.lidvid),
                     "proposal_id": str(proposal_id),
-                    "Citation_Information": make_citation_information(info),
+                    "Citation_Information": make_citation_information(
+                        info, is_for_bundle=True
+                    ),
                     "Bundle_Member_Entries": combine_nodes_into_fragment(
                         reduced_collections
                     ),

@@ -1,6 +1,7 @@
 """
 Utility functions.
 """
+import re
 from typing import List
 
 import unittest
@@ -9,6 +10,19 @@ from os.path import isfile
 from fs.path import dirname, join
 
 from pdart.pds4.LIDVID import LIDVID
+
+ACCEPTED_INSTRUMENTS = [
+    "WFC3",
+    "ACS",
+    "COS",
+    "NICMOS",
+    "STIS",
+    "WFPC2",
+    "WFPC",
+    "FOC",
+    "FOS",
+    "GHRS",
+]
 
 
 def lidvid_to_lid(lidvid: str) -> str:
@@ -113,3 +127,24 @@ def wavelength_from_range(min_range: float, max_range: float) -> List[str]:
         return []
 
     return WAVELENGTH_NAMES[min_idx : max_idx + 1]
+
+
+def get_instruments_names(citation_instruments: str) -> str:
+    """
+    Take citation_instruments from citation .pro or .apt files, and return a
+    string of accepted instruments separated by "," if there are multiple ones.
+    """
+    instrument_set = set()
+    citation_instruments = citation_instruments.upper()
+    for instrument in ACCEPTED_INSTRUMENTS:
+        # Use regex here to make sure we get the correct instrument in the case
+        # of WFPC & WFPC2
+        instrument_regex = re.compile(rf".*{instrument}(\s|\/)")
+        if instrument_regex.match(citation_instruments):
+            instrument_set.add(instrument)
+        # NIC1/NIC2 for NICMOS
+        if "NIC" in citation_instruments:
+            instrument_set.add("NICMOS")
+    sorted_instruments = list(instrument_set)
+    sorted_instruments.sort()
+    return ", ".join(sorted_instruments)

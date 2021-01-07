@@ -7,8 +7,10 @@ import os.path
 from sqlalchemy.orm.exc import NoResultFound
 
 from pdart.db.BundleDB import BundleDB
+from pdart.citations import Citation_Information
 from pdart.db.SqlAlchTables import File, OtherCollection
 from pdart.labels.FileContents import get_file_contents
+from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.Lookup import (
     CARD_SET,
     DictLookup,
@@ -141,6 +143,7 @@ def _find_SHMish_lookup(
 def make_fits_product_label(
     working_dir: str,
     bundle_db: BundleDB,
+    info: Citation_Information,
     collection_lidvid: str,
     product_lidvid: str,
     bundle_lidvid: str,
@@ -202,6 +205,9 @@ def make_fits_product_label(
                     "Time_Coordinates": get_time_coordinates(start_stop_times),
                     "Target_Identification": get_target(target_info),
                     "HST": hst_parameters,
+                    "Citation_Information": make_citation_information(
+                        info, is_for_data=True
+                    ),
                 }
             )
             .toxml()

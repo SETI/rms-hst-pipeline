@@ -131,6 +131,8 @@ class Citation_Information:
         title: str,
         submission_year: int,
         timing_year: int,
+        instruments: str,
+        target_names: str,
     ):
 
         self.filename = filename
@@ -149,6 +151,9 @@ class Citation_Information:
         # Year set externally via a call to set_publication_year
         self.pub_year = 0
 
+        self.instruments = instruments
+        self.target_names = target_names
+
     @staticmethod
     def create_from_file(
         filename: str, pipeline_version: Any = None
@@ -163,7 +168,17 @@ class Citation_Information:
         else:
             raise ValueError("unrecognized file format: " + filename)
 
-        (propno, category, cycle, authors, title, submission_year, timing_year) = info
+        (
+            propno,
+            category,
+            cycle,
+            authors,
+            title,
+            submission_year,
+            timing_year,
+            instruments,
+            target_names,
+        ) = info
 
         # Cleanup
         title = fix_title(title)
@@ -178,6 +193,8 @@ class Citation_Information:
             title,
             submission_year,
             timing_year,
+            instruments,
+            target_names,
         )
 
     @property
@@ -214,8 +231,7 @@ class Citation_Information:
     @property
     def keywords(self) -> List[str]:
         """Keywords for use in XML; currently always an empty list."""
-
-        return []
+        return ["HST", self.instruments, self.target_names]
 
     @property
     def description(self) -> str:
@@ -264,4 +280,6 @@ class Citation_Information:
             "{title}",
             2001,
             2001,
+            "{instruments}",
+            "{target_names}",
         )

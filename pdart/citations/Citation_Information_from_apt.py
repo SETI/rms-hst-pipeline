@@ -1,6 +1,6 @@
 import re
 import xml.dom.minidom as md
-from typing import List, Tuple
+from typing import List, Set, Tuple
 
 # This is how we find a date embedded inside a comment
 DATE_REGEX1 = re.compile(r" *--.*Submission.*[^0-9](19[7-9][0-9]|20[0-3][0-9])[^0-9].*")
@@ -14,7 +14,7 @@ DATE_REGEX3 = re.compile(r" *:date .*?-(20[0-3][0-9]) .*")
 
 def Citation_Information_from_apt(
     filename: str,
-) -> Tuple[int, str, int, List[str], str, int, int]:
+) -> Tuple[int, str, int, List[str], str, int, int, str, str]:
 
     # Read file
     doc = md.parse(filename)
@@ -44,6 +44,33 @@ def Citation_Information_from_apt(
     # Get title
     nodes = doc.getElementsByTagName("Title")
     title = nodes[0].childNodes[0].data
+
+    # Get instruments and target Names
+    # 1. Look for "Observation" tag, if there exists one, get info from there.
+    # 2. If there is no "Observation", look for "Exposure" tag, if there exists
+    #    one, get info from there
+    instruments_set: Set[str] = set()
+    target_names_set: Set[str] = set()
+    nodes = doc.getElementsByTagName("Observation")
+    if len(nodes) != 0:
+        for node in nodes:
+            instruments_set.add(node.getAttribute("Instrument"))
+            target_names_set.add(node.getAttribute("TargetName"))
+    else:
+        nodes = doc.getElementsByTagName("Exposure")
+        # if len(nodes) == 0:
+        #     raise ValueError("missing instruments & target names in " + filename)
+        for node in nodes:
+            instruments_set.add(node.getAttribute("Config"))
+            target_names_set.add(node.getAttribute("TargetName"))
+
+    if not len(instruments_set):
+        raise ValueError("missing instruments in " + filename)
+    elif not len(target_names_set):
+        raise ValueError("missing target names in " + filename)
+
+    instruments = ", ".join(list(instruments_set))
+    target_names = ", ".join(list(target_names_set))
 
     # Try to get the year from the SubmissionLog
     nodes = doc.getElementsByTagName("SubmissionLog")
@@ -81,4 +108,14 @@ def Citation_Information_from_apt(
             if year_str:
                 timing_year = max(timing_year, int(year_str))
 
-    return (propno, category, cycle, authors, title, submission_year, timing_year)
+    return (
+        propno,
+        category,
+        cycle,
+        authors,
+        title,
+        submission_year,
+        timing_year,
+        instruments,
+        target_names,
+    )

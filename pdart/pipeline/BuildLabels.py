@@ -313,6 +313,7 @@ def create_pds4_labels(
             label = make_fits_product_label(
                 working_dir,
                 self.db,
+                info,
                 collection_lidvid,
                 str(fits_file.product_lidvid),
                 str(bundle_lidvid),

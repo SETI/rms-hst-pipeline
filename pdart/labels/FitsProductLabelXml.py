@@ -21,6 +21,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
 .</title>
     <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Observational</product_class>
+    <NODE name="Citation_Information" />
     <Modification_History>
       <Modification_Detail>
         <modification_date>2016-04-20</modification_date>

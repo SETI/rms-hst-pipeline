@@ -7,6 +7,7 @@ import unittest
 
 from fs.path import basename
 
+from pdart.citations import Citation_Information
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.labels.FitsProductLabel import make_fits_product_label
@@ -17,6 +18,7 @@ class Test_FitsProductLabel(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
+        self.info = Citation_Information.create_test_citation_information()
 
     def test_make_fits_product_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_13012::123.90201"
@@ -51,6 +53,7 @@ class Test_FitsProductLabel(unittest.TestCase):
             label = make_fits_product_label(
                 working_dir,
                 self.db,
+                self.info,
                 collection_lidvid,
                 RAWish_product_lidvid,
                 bundle_lidvid,

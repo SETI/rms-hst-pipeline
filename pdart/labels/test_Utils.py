@@ -3,7 +3,10 @@ import os
 import tempfile
 import unittest
 
-from pdart.labels.Utils import wavelength_from_range
+from pdart.labels.Utils import (
+    wavelength_from_range,
+    get_instruments_names,
+)
 
 
 class Test_Utils(unittest.TestCase):
@@ -48,3 +51,10 @@ class Test_Utils(unittest.TestCase):
         #     0.65    -           5.0       Near Infrared  (0.65 and 5.0 micrometers)
         #     0.75    -         300         Infrared       (0.75 and 300 micrometers)
         #    30       -         300         Far Infrared   (30 and 300 micrometers)
+
+    def test_get_instruments_names(self) -> None:
+        self.assertEqual("ACS", get_instruments_names("ACS/HRC"))
+        self.assertEqual("NICMOS", get_instruments_names("NIC1 NIC2"))
+        self.assertEqual("ACS, STIS", get_instruments_names("ACS/HRC STIS/CCD"))
+        self.assertEqual("STIS", get_instruments_names("STIS/CCD STIS/NUV-MAMA"))
+        self.assertEqual("FOS, WFPC2", get_instruments_names("WFPC2 FOS/RD FOS/BL HRS"))

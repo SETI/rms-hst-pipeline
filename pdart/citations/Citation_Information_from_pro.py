@@ -144,6 +144,12 @@ DMY_REGEX = re.compile(
     r"(?:^|.*[^0-9])[0-9]{1,2}-" + MONTHS + r"-(?:|19|20)([0-9]{2})(?:$|[^0-9].*)"
 )
 
+# Target Names                 PLUTO, PLUTO-STYX-KERBEROS
+TARG_REGEX = re.compile(r".*Target Names\s+(.*)(?:\r\n|\r|\n)")
+
+# Configurations               NIC1 NIC2
+INSTRUMENT_REGEX = re.compile(r".*Configurations\s+(.*)(?:\r\n|\r|\n)")
+
 ################################################################################
 
 MISSING_CYCLES = {
@@ -157,7 +163,7 @@ MISSING_CYCLES = {
 
 def Citation_Information_from_pro(
     filename: str,
-) -> Tuple[int, str, int, List[str], str, int, int]:
+) -> Tuple[int, str, int, List[str], str, int, int, str, str]:
 
     # A quick and dirty function to merge author lists
     # Sometimes the PI is in the author list, sometimes not!
@@ -348,6 +354,20 @@ def Citation_Information_from_pro(
 
             timing_year = max(alt_year, timing_year)
 
+    # Get the target name
+    instruments = ""
+    for rec in recs:
+        match = INSTRUMENT_REGEX.match(rec)
+        if match:
+            instruments = match.group(1).strip()
+
+    # Get the target name
+    target_names = ""
+    for rec in recs:
+        match = TARG_REGEX.match(rec)
+        if match:
+            target_names = match.group(1).strip()
+
     # Fill in a cycle number if it is still missing
     if not cycle:
         for k, rec in enumerate(recs):
@@ -384,7 +404,21 @@ def Citation_Information_from_pro(
         raise ValueError("missing authors in " + filename)
     elif not title:
         raise ValueError("missing title in " + filename)
+    elif not instruments:
+        raise ValueError("missing instruments in " + filename)
+    elif not target_names:
+        raise ValueError("missing target names in " + filename)
     elif not cycle:
         raise ValueError("missing cycle number in " + filename)
 
-    return (propno, category, cycle, authors, title, submission_year, timing_year)
+    return (
+        propno,
+        category,
+        cycle,
+        authors,
+        title,
+        submission_year,
+        timing_year,
+        instruments,
+        target_names,
+    )
