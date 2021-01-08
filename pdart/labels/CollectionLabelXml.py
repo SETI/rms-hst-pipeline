@@ -50,8 +50,14 @@ make_label: DocTemplate = interpret_document_template(
     <NODE name="title"/>
     <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Collection</product_class>
-
     <NODE name="Citation_Information" />
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>2016-04-20</modification_date>
+        <version_id>1.0</version_id>
+        <description>Initial version</description>
+      </Modification_Detail>
+    </Modification_History>
   </Identification_Area>
   <Collection>
     <collection_type>Data</collection_type>
