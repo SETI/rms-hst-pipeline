@@ -8,8 +8,9 @@
     <information_model_version>1.13.0.0</information_model_version>
     <product_class>Product_Collection</product_class>
     <Citation_Information>
-      <publication_year>1992</publication_year>
-      <description>{author_1}, {author_2}, "{title}", HST Cycle 1 Program 99999, 1992.</description>
+      <author_list>{author_1}, {author_2}</author_list>
+      <publication_year>2021</publication_year>
+      <description>{author_1}, {author_2}, "{title}", HST Cycle 1 Program 99999, 2021.</description>
     </Citation_Information>
     <Modification_History>
       <Modification_Detail>
