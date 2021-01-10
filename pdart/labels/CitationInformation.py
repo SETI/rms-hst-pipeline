@@ -40,8 +40,6 @@ def make_citation_information(
     """
     Return a ``<Citation_Information />`` XML element.
     """
-    info.set_publication_year(PUBLICATION_YEAR)
-
     if is_for_bundle:
         return _bundle_citation_information(
             {

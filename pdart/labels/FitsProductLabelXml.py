@@ -25,7 +25,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
       <Modification_Detail>
         <modification_date>2016-04-20</modification_date>
         <version_id>1.0</version_id>
-        <description>Initial version</description>
+        <description>Initial PDS4 version</description>
       </Modification_Detail>
     </Modification_History>
   </Identification_Area>

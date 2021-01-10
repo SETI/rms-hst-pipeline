@@ -635,3 +635,29 @@ class ProposalInfo(Base):
     author_list = Column(String, nullable=False)
     proposal_year = Column(String, nullable=False)
     publication_year = Column(String, nullable=False)
+
+
+############################################################
+
+
+class CitationInfo(Base):
+    """
+    A database representation of citation information in a bundle.
+    """
+
+    __tablename__ = "citation_info"
+    lidvid = Column(String, primary_key=True, nullable=False)
+    filename = Column(String, nullable=False)
+    propno = Column(Integer, nullable=False)
+    category = Column(String, nullable=False)
+    cycle = Column(Integer, nullable=False)
+    authors = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    submission_year = Column(Integer, nullable=False)
+    timing_year = Column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"CitationInfo(lidvid={self.lidvid!r})"
+
+
+############################################################

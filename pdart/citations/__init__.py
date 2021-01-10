@@ -255,7 +255,7 @@ class Citation_Information:
     @staticmethod
     def create_test_citation_information() -> "Citation_Information":
         """For testing."""
-        return Citation_Information(
+        info = Citation_Information(
             "{filename}",
             99999,
             "{category}",
@@ -265,3 +265,5 @@ class Citation_Information:
             2001,
             2001,
         )
+        info.set_publication_year(2021)
+        return info

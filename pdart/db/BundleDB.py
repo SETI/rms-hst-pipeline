@@ -16,6 +16,7 @@ from pdart.db.SqlAlchTables import (
     BundleCollectionLink,
     BundleLabel,
     Card,
+    CitationInfo,
     Collection,
     CollectionInventory,
     CollectionLabel,
@@ -44,6 +45,7 @@ from pdart.labels.Suffixes import RAW_SUFFIXES
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
+from pdart.pipeline.Utils import create_citation_info
 
 _BUNDLE_DB_NAME: str = "bundle$database.db"
 _BUNDLE_DIRECTORY_PATTERN: str = r"\Ahst_([0-9]{5})\Z"
@@ -253,6 +255,48 @@ class BundleDB(object):
             .order_by(BundleCollectionLink.collection_lidvid)
             .all()
         ]
+
+    ############################################################
+    def create_citation(self, bundle_lidvid: str, info_param: Tuple) -> None:
+        """
+        Create a citation info with this LIDVID if none exists.
+        """
+
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not self.citation_exists(bundle_lidvid):
+            proposal_id = _lidvid_to_proposal_id(bundle_lidvid)
+            # Only call create_citation_info to parse .apt or .pro inside
+            # create_from_file when creating the database
+            (sv_deltas, documents_dir, docs) = info_param
+            info = create_citation_info(sv_deltas, documents_dir, docs)
+            self.session.add(
+                CitationInfo(
+                    lidvid=bundle_lidvid,
+                    filename=info.filename,
+                    propno=info.propno,
+                    category=info.category,
+                    cycle=info.cycle,
+                    authors=",".join(info.authors),
+                    title=info.title,
+                    submission_year=info.submission_year,
+                    timing_year=info.timing_year,
+                )
+            )
+            self.session.commit()
+
+    def citation_exists(self, bundle_lidvid: str) -> bool:
+        """
+        Returns True if a citation info with the given LIDVID exists in the
+        database.
+        """
+        return self.session.query(
+            exists().where(CitationInfo.lidvid == bundle_lidvid)
+        ).scalar()
+
+    def get_citation(self, lidvid: str) -> CitationInfo:
+        return (
+            self.session.query(CitationInfo).filter(CitationInfo.lidvid == lidvid).one()
+        )
 
     ############################################################
 

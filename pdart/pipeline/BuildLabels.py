@@ -46,36 +46,22 @@ from pdart.pipeline.ChangesDict import (
     write_changes_dict,
 )
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
+from pdart.pipeline.Utils import (
+    make_osfs,
+    make_sv_deltas,
+    make_version_view,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 
 _VERIFY = False
 
+PUBLICATION_YEAR = 2021
+
 
 def log_label(tag: str, lidvid: str) -> None:
     _LOGGER.info(f"{tag} label for {lidvid}")
-
-
-def _create_citation_info(
-    sv_deltas: COWFS, document_dir: str, document_files: Set[str]
-) -> Citation_Information:
-    # We sort only to make '.apt' appear before '.pro' since the
-    # algorithm for '.apt' is more reliable.
-    for basename in sorted(document_files):
-        _, ext = fs.path.splitext(basename)
-        if ext.lower() in [".apt", ".pro"]:
-            filepath = fs.path.join(document_dir, basename)
-            os_filepath = sv_deltas.getsyspath(filepath)
-            return Citation_Information.create_from_file(os_filepath)
-
-    # If you got here, there was no '.apt' or '.pro' file and so we don't
-    # know how to make Citation_Information.
-    raise Exception(
-        f"{document_dir} contains only {document_files}; "
-        "can't make Citation_Information"
-    )
 
 
 def _lidvid_to_dir(lidvid: str) -> str:
@@ -377,7 +363,18 @@ class BuildLabels(MarkedStage):
             documents_dir = f"/{self._bundle_segment}$/document$/phase2$"
             docs = set(sv_deltas.listdir(documents_dir))
 
-            info = _create_citation_info(sv_deltas, documents_dir, docs)
+            citation_info_from_db = db.get_citation(str(bundle_lidvid))
+            info = Citation_Information(
+                citation_info_from_db.filename,
+                citation_info_from_db.propno,
+                citation_info_from_db.category,
+                citation_info_from_db.cycle,
+                citation_info_from_db.authors.split(","),
+                citation_info_from_db.title,
+                citation_info_from_db.submission_year,
+                citation_info_from_db.timing_year,
+            )
+            info.set_publication_year(PUBLICATION_YEAR)
 
             # create_pds4_labels() may change changes_dict, because we
             # create the context collection if it doesn't exist.

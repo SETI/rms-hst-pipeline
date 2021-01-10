@@ -1,5 +1,5 @@
 import os.path
-from typing import List
+from typing import List, Tuple
 
 import astropy.io.fits
 import fs.path
@@ -140,6 +140,15 @@ def _populate_target_identification(
                 db.create_target_identification(fits_os_path)
 
 
+def _populate_citation_info(
+    changes_dict: ChangesDict, db: BundleDB, info_param: Tuple
+) -> None:
+    for lid, (vid, changed) in changes_dict.items():
+        if changed and lid.is_bundle_lid():
+            lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
+            db.create_citation(str(lidvid), info_param)
+
+
 def has_suffix_shm_spt_shp(file_name: str) -> bool:
     """Check if a file or lidvid has these suffixes: shm, spt, shp"""
     for suffix in ["shm", "spt", "shp"]:
@@ -187,10 +196,16 @@ class PopulateDatabase(MarkedStage):
             if not db_exists:
                 db.create_tables()
 
+            documents_dir = f"/{self._bundle_segment}$/document$/phase2$"
+            docs = set(sv_deltas.listdir(documents_dir))
+            # Pass this to create citation info db in _populate_citation_info
+            info_param: Tuple = (sv_deltas, documents_dir, docs)
+
             bundle_lidvid = _populate_bundle(changes_dict, db)
             _populate_collections(changes_dict, db)
             _populate_products(changes_dict, db, sv_deltas)
             _populate_target_identification(changes_dict, db, sv_deltas)
+            _populate_citation_info(changes_dict, db, info_param)
 
         assert db
 
