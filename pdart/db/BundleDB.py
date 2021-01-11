@@ -40,6 +40,7 @@ from pdart.db.SqlAlchTables import (
     create_tables,
     switch_on_collection_subtype,
 )
+from pdart.citations import Citation_Information
 from pdart.db.Utils import file_md5
 from pdart.labels.Suffixes import RAW_SUFFIXES
 from pdart.pds4.HstFilename import HstFilename
@@ -257,7 +258,7 @@ class BundleDB(object):
         ]
 
     ############################################################
-    def create_citation(self, bundle_lidvid: str, info_param: Tuple) -> None:
+    def create_citation(self, bundle_lidvid: str, info_param: Tuple = None) -> None:
         """
         Create a citation info with this LIDVID if none exists.
         """
@@ -265,10 +266,17 @@ class BundleDB(object):
         assert LIDVID(bundle_lidvid).is_bundle_lidvid()
         if not self.citation_exists(bundle_lidvid):
             proposal_id = _lidvid_to_proposal_id(bundle_lidvid)
-            # Only call create_citation_info to parse .apt or .pro inside
-            # create_from_file when creating the database
-            (sv_deltas, documents_dir, docs) = info_param
-            info = create_citation_info(sv_deltas, documents_dir, docs)
+
+            # For testing purpose, we set info_param to None and pass in test
+            # citation information instance
+            if info_param is None:
+                info = Citation_Information.create_test_citation_information()
+            else:
+                # We call create_citation_info to parse .apt or .pro inside
+                # create_from_file only when creating the database in the pipeline.
+                (sv_deltas, documents_dir, docs) = info_param
+                info = create_citation_info(sv_deltas, documents_dir, docs)
+
             self.session.add(
                 CitationInfo(
                     lidvid=bundle_lidvid,

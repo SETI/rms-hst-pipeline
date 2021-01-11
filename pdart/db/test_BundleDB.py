@@ -9,6 +9,7 @@ from pdart.db.SqlAlchTables import (
     Bundle,
     OtherCollection,
     switch_on_collection_subtype,
+    CitationInfo,
 )
 from pdart.db.Utils import file_md5
 from pdart.pds4.LIDVID import LIDVID
@@ -912,3 +913,44 @@ class Test_BundleDB(unittest.TestCase):
 
         proposal_info = self.db.get_proposal_info(bundle_lid)
         self.assertEqual("Proposal of marriage", proposal_info.proposal_title)
+
+    ############################################################
+    def test_create_citation(self) -> None:
+        bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
+        self.assertTrue(
+            self.db.session.query(CitationInfo)
+            .filter(CitationInfo.lidvid == bundle_lidvid)
+            .count()
+            == 0
+        )
+        self.assertFalse(self.db.citation_exists(bundle_lidvid))
+        self.db.create_citation(bundle_lidvid)
+        self.assertTrue(
+            self.db.session.query(CitationInfo)
+            .filter(CitationInfo.lidvid == bundle_lidvid)
+            .count()
+            == 1
+        )
+        self.assertTrue(self.db.citation_exists(bundle_lidvid))
+        self.db.create_citation(bundle_lidvid)
+        self.assertTrue(self.db.citation_exists(bundle_lidvid))
+
+    def test_citation_exists(self) -> None:
+        bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
+        self.assertFalse(self.db.citation_exists(bundle_lidvid))
+        self.db.create_citation(bundle_lidvid)
+        self.assertTrue(self.db.citation_exists(bundle_lidvid))
+
+    def test_get_citation(self) -> None:
+        bundle_lidvid = "urn:nasa:pds:hst_99999::1.1"
+        self.db.create_citation(bundle_lidvid)
+        citation = self.db.get_citation(bundle_lidvid)
+        self.assertEqual(bundle_lidvid, citation.lidvid)
+        self.assertEqual("{filename}", citation.filename)
+        self.assertEqual(99999, citation.propno)
+        self.assertEqual("{category}", citation.category)
+        self.assertEqual(1, citation.cycle)
+        self.assertEqual("{author_1},{author_2}", citation.authors)
+        self.assertEqual("{title}", citation.title)
+        self.assertEqual(2001, citation.submission_year)
+        self.assertEqual(2001, citation.timing_year)
