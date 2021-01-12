@@ -19,7 +19,7 @@ from astropy.io import fits as pyfits
 # Get the root of the FITS file source directory tree
 source = sys.argv[1]
 
-REGEX = re.compile('(.*)(hst_\d{4,5}/)(.*\.fits)', re.I)
+REGEX = re.compile("(.*)(hst_\d{4,5}/)(.*\.fits)", re.I)
 
 # Create a list of all the file paths
 paths = []
@@ -27,7 +27,7 @@ for root, _, basenames in os.walk(source):
 
     for basename in basenames:
         test = basename[-9:].lower()
-        if test not in ('_spt.fits', '_shm.fits', '_shf.fits'):
+        if test not in ("_spt.fits", "_shm.fits", "_shf.fits"):
             continue
 
         paths.append(os.path.join(root, basename))
@@ -40,7 +40,7 @@ paths.sort()
 all_tuples = set()
 
 # Begin the list of dictionaries
-print('SPT_TESTS = [')
+print("SPT_TESTS = [")
 
 for path in paths:
 
@@ -61,19 +61,19 @@ for path in paths:
     for key in header:
 
         # This is the dictionary of target info
-        if (key.startswith('MT_LV') or
-            key.startswith('TARKEY') or
-            key == 'TARGNAME' or
-            key == 'TARG_ID' or
-            key == 'PROPOSID'):
-                new_dict[key] = header[key]
+        if (
+            key.startswith("MT_LV")
+            or key.startswith("TARKEY")
+            or key == "TARGNAME"
+            or key == "TARG_ID"
+            or key == "PROPOSID"
+        ):
+            new_dict[key] = header[key]
 
         # This is a unique tuple containing target info, independent of
         # proposal. A tuple is a static structure that can be added to a set.
-        if (key.startswith('MT_LV') or
-            key.startswith('TARKEY') or
-            key == 'TARGNAME'):
-                new_tuple += (key, header[key])
+        if key.startswith("MT_LV") or key.startswith("TARKEY") or key == "TARGNAME":
+            new_tuple += (key, header[key])
 
     hdulist.close()
 
@@ -82,22 +82,21 @@ for path in paths:
         continue
 
     # SPT_TESTS is a list of tuples (spt_file_path, spt_dictionary)
-    print(f'  ("{short_path}",', '{')
+    print(f'  ("{short_path}",', "{")
 
-    for (key,value) in new_dict.items():
+    for (key, value) in new_dict.items():
         if isinstance(value, str):
-            value = value.strip().replace('"', '')
+            value = value.strip().replace('"', "")
             print(f'    "{key}": "{value}",')
         else:
             print(f'    "{key}": {value},')
 
-    print('  }),')
+    print("  }),")
 
     # Make sure this dictionary is not repated
     all_tuples.add(new_tuple)
 
 # End the list of dictionaries
-print(']')
+print("]")
 
 ################################################################################
-

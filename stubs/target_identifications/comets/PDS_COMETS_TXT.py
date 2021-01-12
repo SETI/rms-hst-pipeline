@@ -1,14 +1,14 @@
 # Downloaded from:
 #   https://pds-smallbodies.astro.umd.edu/data_sb/resources/periodic_comets.shtml
 # on 12/14/20 with subsequent editing.
-# 
+#
 # Periodic Comet Names and Designations
-# 
+#
 # Last Update: 27 Oct 2020
-# 
-#  Official           PDS Name                  
-# Designation                                   
-#                                               
+#
+#  Official           PDS Name
+# Designation
+#
 
 PDS_COMETS_TXT = """
    P/2018 Y2      Africano 1                    
@@ -766,11 +766,10 @@ PDS_COMETS_TXT = """
 
 
 # Unnamed comets:
-# 
-# 288P/2006 VW139   5.33    2011 Jul 18.5417   (300163)                                                   
-# 282P/2003 BM80    8.76    2013 Jan 14.9030   (323137)                                                   
+#
+# 288P/2006 VW139   5.33    2011 Jul 18.5417   (300163)
+# 282P/2003 BM80    8.76    2013 Jan 14.9030   (323137)
 # 362P/2008 GO98    7.89    2016 Aug 23.5083   (457175)
-#    A/2019 G3     71.21    2018 Dec  3.4506   
-#    A/2019 O4    188.39    2020 Feb  9.9277   
-#    A/2020 A1    131.78    2019 Dec  2.0673   
-
+#    A/2019 G3     71.21    2018 Dec  3.4506
+#    A/2019 O4    188.39    2020 Feb  9.9277
+#    A/2020 A1    131.78    2019 Dec  2.0673

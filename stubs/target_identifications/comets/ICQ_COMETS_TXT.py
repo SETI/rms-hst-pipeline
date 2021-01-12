@@ -1,7 +1,7 @@
 # Downloaded from:
 #   http://www.icq.eps.harvard.edu/names1.html
 # on 12/28/20 with minor subsequent editing.
-# 
+#
 # Comet Names and Designations
 
 ICQ_COMETS_TXT = """
