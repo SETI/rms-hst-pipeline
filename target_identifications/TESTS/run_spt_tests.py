@@ -10,7 +10,6 @@
 #   python3 run_spt_tests.py
 #
 ################################################################################
-
 from target_identifications.hst import hst_target_identifications
 from target_identifications.TESTS.SPT_TESTS import SPT_TESTS
 
