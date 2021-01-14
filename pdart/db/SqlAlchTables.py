@@ -293,8 +293,9 @@ class TargetIdentification(Base):
 
     __tablename__ = "target_identification"
 
+    id = Column(Integer, primary_key=True, nullable=False)
     # From "TARG_ID" field in SPT/SHM/SHP .fits file
-    target_id = Column(String, primary_key=True, nullable=False)
+    target_id = Column(String, nullable=False)
     name = Column(String, nullable=False)
     type = Column(String, nullable=False)
     # alternate_designation can be a list of strings separated by semicolon or

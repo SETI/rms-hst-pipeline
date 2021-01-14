@@ -1,3 +1,4 @@
+# type: ignore
 SPT_TESTS = [
     (
         "hst_01080/y0zz0301t_shf.fits",

@@ -1,3 +1,4 @@
+# type: ignore
 # Table adapted from
 # Nomenclature in the Outer Solar System
 # Brett Gladman

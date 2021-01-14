@@ -120,16 +120,14 @@ def _populate_target_identification(
     for lid, (vid, changed) in changes_dict.items():
         if changed and lid.is_product_lid():
             lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
-
             product_path = lid_to_dirpath(lidvid.lid())
-
             # Get a list of SHM/SPT/SHP fits files
             fits_files = [
                 fits_file
                 for fits_file in sv_deltas.listdir(product_path)
                 if (
                     fs.path.splitext(fits_file)[1].lower() == ".fits"
-                    and has_suffix_shm_spt_shp(fs.path.splitext(fits_file)[0].lower())
+                    and has_suffix_shm_spt_shf(fs.path.splitext(fits_file)[0].lower())
                 )
             ]
             # Pass the path of SHM/SPT/SHP fits files to create a record in
@@ -137,7 +135,7 @@ def _populate_target_identification(
             for fits_file in fits_files:
                 fits_file_path = fs.path.join(product_path, fits_file)
                 fits_os_path = sv_deltas.getsyspath(fits_file_path)
-                db.create_target_identification(fits_os_path)
+                db.create_target_identification(fits_os_path, str(lidvid))
 
 
 def _populate_citation_info(
@@ -149,9 +147,9 @@ def _populate_citation_info(
             db.create_citation(str(lidvid), info_param)
 
 
-def has_suffix_shm_spt_shp(file_name: str) -> bool:
-    """Check if a file or lidvid has these suffixes: shm, spt, shp"""
-    for suffix in ["shm", "spt", "shp"]:
+def has_suffix_shm_spt_shf(file_name: str) -> bool:
+    """Check if a file or lidvid has these suffixes: shm, spt, shf"""
+    for suffix in ["shm", "spt", "shf"]:
         if suffix in file_name.lower():
             return True
     return False

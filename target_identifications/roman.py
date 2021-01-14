@@ -1,3 +1,4 @@
+# type: ignore
 # From http://code.activestate.com/recipes/81611-roman-numerals/
 
 numeral_map = tuple(

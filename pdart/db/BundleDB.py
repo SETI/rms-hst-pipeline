@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 import astropy.io.fits
 from sqlalchemy import and_, create_engine, exists
 from sqlalchemy.orm import sessionmaker
+from target_identifications.hst import hst_target_identifications  # type: ignore
 
 from pdart.db.SqlAlchTables import (
     Association,
@@ -561,25 +562,46 @@ class BundleDB(object):
             )
             self.session.commit()
 
-    def create_target_identification(self, fits_os_path: str) -> None:
+    def create_target_identification(
+        self, fits_os_path: str, product_lidvid: str
+    ) -> None:
         """
         Create a record in target_identification table with this target id if
         it doesn't exist.
         """
         fits = astropy.io.fits.open(fits_os_path)
-        target_id = fits[0].header["TARG_ID"].strip()
+        hdu = fits[0].header
+        target_id = hdu["TARG_ID"].strip()
         if not self.target_id_exists(target_id):
-            self.session.add(
-                TargetIdentification(
-                    target_id=target_id,
-                    name="name_placeholder",
-                    type="types_placeholder",
-                    alternate_designations="alternate_designation_placeholder",
-                    lid_reference="lid_reference_placeholder",
-                    description="description_placeholder",
+
+            # Info that we are interested at from HDU:
+            # MT_LV1_1, MT_LV1_2, ..., MT_LV2_1, ...
+            # TARKEY1, TARKEY2, ...
+            # TARGNAME
+            # TARG_ID, PROPOSID
+            HDU_INFO = ["TARG_ID", "PROPOSID", "TARGNAME"]
+            spt_lookup = {}
+            for key in hdu.keys():
+                if (
+                    key in ["TARG_ID", "PROPOSID", "TARGNAME"]
+                    or key.startswith("TARKEY")
+                    or key.startswith("MT_LV")
+                ):
+                    data = hdu[key]
+                    spt_lookup[key] = data.strip() if type(data) is str else data
+            target_identifications = hst_target_identifications(spt_lookup)
+            for target_data in target_identifications:
+                self.session.add(
+                    TargetIdentification(
+                        target_id=target_id,
+                        name=target_data[0],
+                        alternate_designations=",".join(target_data[1]),
+                        type=target_data[2],
+                        description="/n".join(target_data[3]),
+                        lid_reference=target_data[4],
+                    )
                 )
-            )
-            self.session.commit()
+                self.session.commit()
 
     def target_id_exists(self, target_id: str) -> bool:
         """
