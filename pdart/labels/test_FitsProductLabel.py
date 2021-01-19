@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 import os
 import os.path
 import shutil
@@ -9,6 +9,7 @@ from fs.path import basename
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
+from pdart.db.SqlAlchTables import TargetIdentification
 from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
 
@@ -24,6 +25,15 @@ class Test_FitsProductLabel(unittest.TestCase):
 
         collection_lidvid = "urn:nasa:pds:hst_13012:data_acs_raw::3.14159"
         self.db.create_other_collection(collection_lidvid, bundle_lidvid)
+
+        # Create target identifications db for testing purpose
+        target_id = "13012_1"
+        target_identifications: List[Tuple] = [
+            ("Uranus", [], "Planet", [], "urn:nasa:pds:context:target:planet.uranus")
+        ]
+        self.db.add_record_to_target_identification_db(
+            target_id, target_identifications
+        )
 
         with tempfile.TemporaryDirectory() as working_dir:
             mast_dir = os.path.join(working_dir, "mastDownload")

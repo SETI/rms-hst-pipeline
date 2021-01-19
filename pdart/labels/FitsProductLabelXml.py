@@ -41,7 +41,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
       </Internal_Reference>
     </Investigation_Area>
     <NODE name="Observing_System" />
-    <NODE name="Target_Identification" />
+    <FRAGMENT name="Target_Identification" />
     <Mission_Area><NODE name="HST" /></Mission_Area>
   </Observation_Area>
   <File_Area_Observational>

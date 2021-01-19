@@ -44,6 +44,7 @@ def get_target_info(lookup: Lookup) -> Dict[str, str]:
                     "type": type,
                     "description": f"The {type.lower()} {name}",
                     "lid": target_lid([type, name]),
+                    "alternate_designations": "",
                 }
             elif len(info) == 3:
                 primary = info[2]
@@ -52,6 +53,7 @@ def get_target_info(lookup: Lookup) -> Dict[str, str]:
                     "type": type,
                     "description": f"The {type.lower()} of {primary}, {name}",
                     "lid": target_lid([type, primary, name]),
+                    "alternate_designations": "",
                 }
 
     if _USING_PLACEHOLDER:
@@ -68,6 +70,7 @@ def get_target(target_info: Dict[str, str]) -> NodeBuilder:
     return target_identification(
         target_info["name"],
         target_info["type"],
+        target_info["alternate_designations"],
         target_info["description"],
         target_info["lid"],
     )

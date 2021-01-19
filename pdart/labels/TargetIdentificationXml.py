@@ -5,7 +5,32 @@ product labels.
 
 from typing import Dict, List
 
-from pdart.xml.Templates import NodeBuilder, interpret_template
+from pdart.xml.Templates import (
+    combine_nodes_into_fragment,
+    FragBuilder,
+    interpret_template,
+    NodeBuilder,
+    NodeBuilderTemplate,
+)
+
+_make_alternate_designation_node: NodeBuilderTemplate = interpret_template(
+    """<alternate_designation><NODE name="alternate_designation"  /></alternate_designation>"""
+)
+
+
+def _make_alternate_designation(alternate_designation: str) -> FragBuilder:
+    return _make_alternate_designation_node(
+        {"alternate_designation": alternate_designation}
+    )
+
+
+_make_description_node: NodeBuilderTemplate = interpret_template(
+    """<description><NODE name="description"  /></description>"""
+)
+
+
+def _make_description(description: str) -> FragBuilder:
+    return _make_description_node({"description": description})
 
 
 def _munge(name: str) -> str:
@@ -14,19 +39,38 @@ def _munge(name: str) -> str:
 
 
 def target_identification(
-    target_name: str, target_type: str, target_description: str, target_lid: str
+    target_name: str,
+    target_type: str,
+    alternate_designations: str,
+    target_description: str,
+    target_lid: str,
 ) -> NodeBuilder:
     """
     Given a target name and target type, return a function that takes
     a document and returns a filled-out ``<Target_Identification />``
     XML node, used in product labels.
     """
+    alternate_designations_list = []
+    if len(alternate_designations) != 0:
+        alternate_designations_list = alternate_designations.split("\n")
+    alternate_designation_nodes: List[NodeBuilder] = [
+        _make_alternate_designation(alternate_designation)
+        for alternate_designation in alternate_designations_list
+    ]
+
+    # description_nodes: List[NodeBuilder] = []
+    # if len(alternate_designations) != 0:
+    #     description_nodes = [_make_description(alternate_designations)]
+    description_nodes: List[NodeBuilder] = []
+    if len(target_description) != 0:
+        description_nodes = [_make_description(target_description)]
 
     func = interpret_template(
         """<Target_Identification>
         <name><NODE name="name"/></name>
+        <FRAGMENT name="alternate_designations"/>
         <type><NODE name="type"/></type>
-        <description><NODE name="description"/></description>
+        <FRAGMENT name="description"/>
         <Internal_Reference>
             <lid_reference><NODE name="target_lid"/></lid_reference>
             <reference_type>data_to_target</reference_type>
@@ -36,7 +80,10 @@ def target_identification(
         {
             "name": target_name,
             "type": target_type,
-            "description": target_description,
+            "alternate_designations": combine_nodes_into_fragment(
+                alternate_designation_nodes
+            ),
+            "description": combine_nodes_into_fragment(description_nodes),
             "target_lid": target_lid,
         }
     )

@@ -51,7 +51,6 @@
     <Target_Identification>
       <name>Uranus</name>
       <type>Planet</type>
-      <description>The planet Uranus</description>
       <Internal_Reference>
         <lid_reference>urn:nasa:pds:context:target:planet.uranus</lid_reference>
         <reference_type>data_to_target</reference_type>

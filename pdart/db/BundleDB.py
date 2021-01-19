@@ -562,55 +562,6 @@ class BundleDB(object):
             )
             self.session.commit()
 
-    def create_target_identification(
-        self, fits_os_path: str, product_lidvid: str
-    ) -> None:
-        """
-        Create a record in target_identification table with this target id if
-        it doesn't exist.
-        """
-        fits = astropy.io.fits.open(fits_os_path)
-        hdu = fits[0].header
-        target_id = hdu["TARG_ID"].strip()
-        if not self.target_id_exists(target_id):
-
-            # Info that we are interested at from HDU:
-            # MT_LV1_1, MT_LV1_2, ..., MT_LV2_1, ...
-            # TARKEY1, TARKEY2, ...
-            # TARGNAME
-            # TARG_ID, PROPOSID
-            HDU_INFO = ["TARG_ID", "PROPOSID", "TARGNAME"]
-            spt_lookup = {}
-            for key in hdu.keys():
-                if (
-                    key in ["TARG_ID", "PROPOSID", "TARGNAME"]
-                    or key.startswith("TARKEY")
-                    or key.startswith("MT_LV")
-                ):
-                    data = hdu[key]
-                    spt_lookup[key] = data.strip() if type(data) is str else data
-            target_identifications = hst_target_identifications(spt_lookup)
-            for target_data in target_identifications:
-                self.session.add(
-                    TargetIdentification(
-                        target_id=target_id,
-                        name=target_data[0],
-                        alternate_designations=",".join(target_data[1]),
-                        type=target_data[2],
-                        description="/n".join(target_data[3]),
-                        lid_reference=target_data[4],
-                    )
-                )
-                self.session.commit()
-
-    def target_id_exists(self, target_id: str) -> bool:
-        """
-        Returns True if a target id exists in the database.
-        """
-        return self.session.query(
-            exists().where(TargetIdentification.target_id == target_id)
-        ).scalar()
-
     def product_exists(self, product_lidvid: str) -> bool:
         """
         Returns True iff a product with the given LIDVID exists in the
@@ -661,6 +612,71 @@ class BundleDB(object):
             self.session.query(File)
             .filter(File.product_lidvid == product_lidvid)
             .order_by(File.basename)
+            .all()
+        )
+
+    ############################################################
+    def create_target_identification(self, fits_os_path: str) -> None:
+        """
+        Create a record in target_identification table with this target id if
+        it doesn't exist.
+        """
+        fits = astropy.io.fits.open(fits_os_path)
+        hdu = fits[0].header
+        target_id = hdu["TARG_ID"].strip()
+
+        if not self.target_id_exists(target_id):
+            # Info that we are interested at from HDU:
+            # MT_LV1_1, MT_LV1_2, ..., MT_LV2_1, ...
+            # TARKEY1, TARKEY2, ...
+            # TARGNAME
+            # TARG_ID, PROPOSID
+            HDU_INFO = ["TARG_ID", "PROPOSID", "TARGNAME"]
+            spt_lookup = {}
+            for key in hdu.keys():
+                if (
+                    key in ["TARG_ID", "PROPOSID", "TARGNAME"]
+                    or key.startswith("TARKEY")
+                    or key.startswith("MT_LV")
+                ):
+                    data = hdu[key]
+                    spt_lookup[key] = data.strip() if type(data) is str else data
+            target_identifications = hst_target_identifications(spt_lookup)
+            self.add_record_to_target_identification_db(
+                target_id, target_identifications
+            )
+
+    def add_record_to_target_identification_db(
+        self, target_id: str, target_identifications: List[Tuple]
+    ) -> None:
+        """
+        Add data record to TargetIdentification db.
+        """
+        for target_data in target_identifications:
+            self.session.add(
+                TargetIdentification(
+                    target_id=target_id,
+                    name=target_data[0],
+                    alternate_designations="\n".join(target_data[1]),
+                    type=target_data[2],
+                    description="\n".join(target_data[3]),
+                    lid_reference=target_data[4],
+                )
+            )
+            self.session.commit()
+
+    def target_id_exists(self, target_id: str) -> bool:
+        """
+        Returns True if a target id exists in the database.
+        """
+        return self.session.query(
+            exists().where(TargetIdentification.target_id == target_id)
+        ).scalar()
+
+    def get_target_identification(self, target_id: str) -> List[TargetIdentification]:
+        return (
+            self.session.query(TargetIdentification)
+            .filter(TargetIdentification.target_id == target_id)
             .all()
         )
 

@@ -40,6 +40,10 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.xml.Pretty import pretty_and_verify
+from pdart.xml.Templates import (
+    combine_nodes_into_fragment,
+    NodeBuilder,
+)
 
 
 def _directory_siblings(
@@ -184,6 +188,23 @@ def make_fits_product_label(
         bundle_db.create_context_product(observing_system_lid(instrument))
         target_info = get_target_info(shm_lookup)
         bundle_db.create_context_product(target_info["lid"])
+        # Fetch target identifications from db
+        target_id = shm_lookup["TARG_ID"]
+        target_identifications = bundle_db.get_target_identification(target_id)
+
+        # At this stage, target identifications should be in the db
+        assert len(target_identifications) != 0
+        # Create a list of Target_Identification nodes. It will be inserted in
+        # XML when passing into make_label
+        target_identification_nodes: List[NodeBuilder] = []
+        for target in target_identifications:
+            target_dict: Dict[str, Any] = {}
+            target_dict["name"] = target.name
+            target_dict["type"] = target.type
+            target_dict["alternate_designations"] = target.alternate_designations
+            target_dict["description"] = target.description
+            target_dict["lid"] = target.lid_reference
+            target_identification_nodes.append(get_target(target_dict))
 
         label = (
             make_label(
@@ -200,14 +221,19 @@ def make_fits_product_label(
                     "investigation_lidvid": investigation_area_lidvid,
                     "Observing_System": observing_system(instrument),
                     "Time_Coordinates": get_time_coordinates(start_stop_times),
-                    "Target_Identification": get_target(target_info),
+                    "Target_Identification": combine_nodes_into_fragment(
+                        target_identification_nodes
+                    ),
                     "HST": hst_parameters,
                 }
             )
             .toxml()
             .encode()
         )
+    except AssertionError:
+        raise AssertionError(f"{target_id} has no target identifications stored in DB.")
     except Exception as e:
+        print(str(e))
         raise LabelError(
             product_lidvid, file_basename, (lookup, hdu_lookups[0], shm_lookup)
         ) from e

@@ -135,7 +135,7 @@ def _populate_target_identification(
             for fits_file in fits_files:
                 fits_file_path = fs.path.join(product_path, fits_file)
                 fits_os_path = sv_deltas.getsyspath(fits_file_path)
-                db.create_target_identification(fits_os_path, str(lidvid))
+                db.create_target_identification(fits_os_path)
 
 
 def _populate_citation_info(

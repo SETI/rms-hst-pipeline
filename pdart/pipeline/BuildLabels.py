@@ -363,6 +363,7 @@ class BuildLabels(MarkedStage):
             documents_dir = f"/{self._bundle_segment}$/document$/phase2$"
             docs = set(sv_deltas.listdir(documents_dir))
 
+            # fetch citation info from database
             citation_info_from_db = db.get_citation(str(bundle_lidvid))
             info = Citation_Information(
                 citation_info_from_db.filename,

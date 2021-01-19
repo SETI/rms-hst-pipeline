@@ -18,4 +18,4 @@ RAW_SUFFIXES: List[str] = [
 ]
 
 """The suffixes used to extract Hst_Parameter information."""
-SHM_SUFFIXES: List[str] = ["shm", "spt"]
+SHM_SUFFIXES: List[str] = ["shm", "spt", "shf"]
