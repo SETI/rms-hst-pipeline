@@ -58,9 +58,6 @@ def target_identification(
         for alternate_designation in alternate_designations_list
     ]
 
-    # description_nodes: List[NodeBuilder] = []
-    # if len(alternate_designations) != 0:
-    #     description_nodes = [_make_description(alternate_designations)]
     description_nodes: List[NodeBuilder] = []
     if len(target_description) != 0:
         description_nodes = [_make_description(target_description)]

@@ -23,11 +23,6 @@ class Test_TargetIdentification(unittest.TestCase):
 
         populate_database_from_fits_file(db, os_filepath, fits_product_lidvid)
 
-        # file_basename = basename(os_filepath)
-        #
-        # card_dicts = db.get_card_dictionaries(fits_product_lidvid, file_basename)
-        #
-        # nb = get_target(get_target_info(DictLookup("test_get_target", card_dicts)))
         # 1. Add record to target identification db
         # 2. Fetch data from target identification db to build xml
         target_id = "13012_1"

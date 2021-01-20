@@ -34,6 +34,8 @@ from pdart.labels.ObservingSystem import (
 )
 from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
 from pdart.labels.TargetIdentification import get_target, get_target_info
+from pdart.labels.TargetIdentificationXml import target_lid
+
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
 from pdart.pds4.LID import LID
@@ -186,8 +188,7 @@ def make_fits_product_label(
         bundle_db.create_context_product(investigation_area_lidvid)
         bundle_db.create_context_product(instrument_host_lid())
         bundle_db.create_context_product(observing_system_lid(instrument))
-        target_info = get_target_info(shm_lookup)
-        bundle_db.create_context_product(target_info["lid"])
+
         # Fetch target identifications from db
         target_id = shm_lookup["TARG_ID"]
         target_identifications = bundle_db.get_target_identification(target_id)
@@ -198,6 +199,7 @@ def make_fits_product_label(
         # XML when passing into make_label
         target_identification_nodes: List[NodeBuilder] = []
         for target in target_identifications:
+            bundle_db.create_context_product(target_lid([target.type, target.name]))
             target_dict: Dict[str, Any] = {}
             target_dict["name"] = target.name
             target_dict["type"] = target.type
