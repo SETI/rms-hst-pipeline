@@ -14,7 +14,7 @@ from pdart.xml.Templates import (
 )
 
 _make_alternate_designation_node: NodeBuilderTemplate = interpret_template(
-    """<alternate_designation><NODE name="alternate_designation"  /></alternate_designation>"""
+    """<alternate_designation><NODE name="alternate_designation"/></alternate_designation>"""
 )
 
 
@@ -25,7 +25,9 @@ def _make_alternate_designation(alternate_designation: str) -> FragBuilder:
 
 
 _make_description_node: NodeBuilderTemplate = interpret_template(
-    """<description><NODE name="description"  /></description>"""
+    """<description>
+<NODE name="description"/>
+      </description>"""
 )
 
 
@@ -60,6 +62,9 @@ def target_identification(
 
     description_nodes: List[NodeBuilder] = []
     if len(target_description) != 0:
+        # properly align multi line textnodes with two tabs
+        target_description = "\t\t" + target_description
+        target_description = target_description.replace("\n", "\n\t\t")
         description_nodes = [_make_description(target_description)]
 
     func = interpret_template(
