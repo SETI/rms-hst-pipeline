@@ -20,6 +20,24 @@
       </Modification_Detail>
     </Modification_History>
   </Identification_Area>
+  <Context_Area>
+    <Target_Identification>
+      <name>762 Pulcova</name>
+      <alternate_designation>(762) Pulcova</alternate_designation>
+      <alternate_designation>(762) 1913SQ</alternate_designation>
+      <alternate_designation>1913SQ</alternate_designation>
+      <alternate_designation>(762) 1952 QM1</alternate_designation>
+      <alternate_designation>1952 QM1</alternate_designation>
+      <alternate_designation>Pulcova</alternate_designation>
+      <alternate_designation>Minor Planet 762</alternate_designation>
+      <alternate_designation>NAIF ID 2000762</alternate_designation>
+      <type>Asteroid</type>
+      <Internal_Reference>
+        <lid_reference>urn:nasa:pds:context:target:asteroid.762_pulcova</lid_reference>
+        <reference_type>collection_to_target</reference_type>
+      </Internal_Reference>
+    </Target_Identification>
+  </Context_Area>
   <Collection>
     <collection_type>Data</collection_type>
   </Collection>

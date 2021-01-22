@@ -46,6 +46,7 @@ def target_identification(
     alternate_designations: str,
     target_description: str,
     target_lid: str,
+    reference_type: str,
 ) -> NodeBuilder:
     """
     Given a target name and target type, return a function that takes
@@ -62,9 +63,9 @@ def target_identification(
 
     description_nodes: List[NodeBuilder] = []
     if len(target_description) != 0:
-        # properly align multi line textnodes with two tabs
-        target_description = "\t\t" + target_description
-        target_description = target_description.replace("\n", "\n\t\t")
+        # properly align multi line textnodes with 8 spaces
+        target_description = " " * 8 + target_description
+        target_description = target_description.replace("\n", "\n" + " " * 8)
         description_nodes = [_make_description(target_description)]
 
     func = interpret_template(
@@ -75,7 +76,7 @@ def target_identification(
         <FRAGMENT name="description"/>
         <Internal_Reference>
             <lid_reference><NODE name="target_lid"/></lid_reference>
-            <reference_type>data_to_target</reference_type>
+            <reference_type><NODE name="reference_type"/></reference_type>
         </Internal_Reference>
         </Target_Identification>"""
     )(
@@ -87,6 +88,7 @@ def target_identification(
             ),
             "description": combine_nodes_into_fragment(description_nodes),
             "target_lid": target_lid,
+            "reference_type": reference_type,
         }
     )
     return func

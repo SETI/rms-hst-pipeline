@@ -1,6 +1,6 @@
 """Functionality to build a bundle label using a SQLite database."""
 
-from typing import Dict
+from typing import Dict, List
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
@@ -10,12 +10,23 @@ from pdart.db.SqlAlchTables import (
     OtherCollection,
     switch_on_collection_subtype,
 )
-from pdart.labels.BundleLabelXml import make_bundle_entry_member, make_label
+from pdart.labels.BundleLabelXml import (
+    make_bundle_entry_member,
+    make_label,
+    make_bundle_context_node,
+)
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.LabelError import LabelError
-from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
+from pdart.labels.Utils import (
+    lidvid_to_lid,
+    lidvid_to_vid,
+    create_target_identification_nodes,
+)
 from pdart.xml.Pretty import pretty_and_verify
-from pdart.xml.Templates import combine_nodes_into_fragment
+from pdart.xml.Templates import (
+    combine_nodes_into_fragment,
+    NodeBuilder,
+)
 
 
 def make_bundle_label(
@@ -49,6 +60,14 @@ def make_bundle_label(
         for collection in bundle_db.get_bundle_collections(bundle.lidvid)
     ]
 
+    target_identifications = bundle_db.get_all_target_identification()
+    target_identification_nodes: List[NodeBuilder] = []
+    target_identification_nodes = create_target_identification_nodes(
+        bundle_db, target_identifications, "bundle"
+    )
+    context_node: List[NodeBuilder] = []
+    context_node = [make_bundle_context_node(target_identification_nodes)]
+
     try:
         label = (
             make_label(
@@ -62,6 +81,7 @@ def make_bundle_label(
                     "Bundle_Member_Entries": combine_nodes_into_fragment(
                         reduced_collections
                     ),
+                    "Context_Area": combine_nodes_into_fragment(context_node),
                 }
             )
             .toxml()

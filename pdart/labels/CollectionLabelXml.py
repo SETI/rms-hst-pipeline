@@ -1,12 +1,15 @@
 """Templates to create a label for a collection."""
+from typing import List
 
 from pdart.labels.Namespaces import COLLECTION_NAMESPACES, PDS4_XML_MODEL
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import (
     DocTemplate,
+    NodeBuilder,
     NodeBuilderTemplate,
     interpret_document_template,
     interpret_template,
+    combine_nodes_into_fragment,
 )
 
 make_context_collection_title: NodeBuilderTemplate = interpret_template(
@@ -39,6 +42,29 @@ images obtained from HST Observing Program \
 <NODE name="proposal_id"/>.</title>"""
 )
 
+# _make_collection_context_area: NodeBuilderTemplate = interpret_template(
+#     """<Context_Area>
+#       <FRAGMENT name="Target_Identification" />
+#     </Context_Area>"""
+# )
+
+
+def make_collection_context_node(
+    target_identification_nodes: List[NodeBuilder],
+) -> NodeBuilder:
+    func = interpret_template(
+        """<Context_Area>
+        <FRAGMENT name="Target_Identification" />
+        </Context_Area>"""
+    )(
+        {
+            "Target_Identification": combine_nodes_into_fragment(
+                target_identification_nodes
+            ),
+        }
+    )
+    return func
+
 
 make_label: DocTemplate = interpret_document_template(
     f"""<?xml version="1.0" encoding="utf-8"?>
@@ -59,6 +85,7 @@ make_label: DocTemplate = interpret_document_template(
       </Modification_Detail>
     </Modification_History>
   </Identification_Area>
+  <FRAGMENT name="Context_Area" />
   <Collection>
     <collection_type>Data</collection_type>
   </Collection>

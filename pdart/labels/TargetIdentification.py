@@ -73,4 +73,5 @@ def get_target(target_info: Dict[str, str]) -> NodeBuilder:
         target_info["alternate_designations"],
         target_info["description"],
         target_info["lid"],
+        target_info["reference_type"],
     )

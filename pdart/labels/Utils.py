@@ -1,14 +1,19 @@
 """
 Utility functions.
 """
-from typing import List
+from typing import Any, Dict, List
 
 import unittest
 from os.path import isfile
 
 from fs.path import dirname, join
 
+from pdart.db.BundleDB import BundleDB
+from pdart.db.SqlAlchTables import TargetIdentification
+from pdart.labels.TargetIdentification import get_target
+from pdart.labels.TargetIdentificationXml import target_lid
 from pdart.pds4.LIDVID import LIDVID
+from pdart.xml.Templates import NodeBuilder
 
 
 def lidvid_to_lid(lidvid: str) -> str:
@@ -113,3 +118,32 @@ def wavelength_from_range(min_range: float, max_range: float) -> List[str]:
         return []
 
     return WAVELENGTH_NAMES[min_idx : max_idx + 1]
+
+
+def create_target_identification_nodes(
+    bundle_db: BundleDB,
+    target_identifications: List[TargetIdentification],
+    reference_type: str,
+) -> List[NodeBuilder]:
+    """
+    Take in a list of TargetIdentification records (from db), build a target
+    dictionary for each record and return a list of Target_Identification nodes.
+    It will be inserted in XML when passing into make_label.
+    """
+    reference_type_dict = {
+        "data": "data_to_target",
+        "collection": "collection_to_target",
+        "bundle": "bundle_to_target",
+    }
+    target_identification_nodes: List[NodeBuilder] = []
+    for target in target_identifications:
+        bundle_db.create_context_product(target_lid([target.type, target.name]))
+        target_dict: Dict[str, Any] = {}
+        target_dict["name"] = target.name
+        target_dict["type"] = target.type
+        target_dict["alternate_designations"] = target.alternate_designations
+        target_dict["description"] = target.description
+        target_dict["lid"] = target.lid_reference
+        target_dict["reference_type"] = reference_type_dict[reference_type]
+        target_identification_nodes.append(get_target(target_dict))
+    return target_identification_nodes

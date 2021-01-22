@@ -2,7 +2,7 @@
 Functionality to build a collection label using a SQLite database.
 """
 
-from typing import cast, Callable
+from typing import cast, Callable, List
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
@@ -20,11 +20,19 @@ from pdart.labels.CollectionLabelXml import (
     make_label,
     make_other_collection_title,
     make_schema_collection_title,
+    make_collection_context_node,
 )
 from pdart.labels.LabelError import LabelError
-from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
+from pdart.labels.Utils import (
+    lidvid_to_lid,
+    lidvid_to_vid,
+    create_target_identification_nodes,
+)
 from pdart.xml.Pretty import pretty_and_verify
-from pdart.xml.Templates import NodeBuilder
+from pdart.xml.Templates import (
+    combine_nodes_into_fragment,
+    NodeBuilder,
+)
 
 
 # TODO Should probably test document_collection independently.
@@ -123,6 +131,7 @@ def make_context_collection_label(
                     "proposal_id": str(proposal_id),
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
+                    "Context_Area": combine_nodes_into_fragment([]),
                 }
             )
             .toxml()
@@ -173,6 +182,7 @@ def make_schema_collection_label(
                     "proposal_id": str(proposal_id),
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
+                    "Context_Area": combine_nodes_into_fragment([]),
                 }
             )
             .toxml()
@@ -233,6 +243,14 @@ def make_other_collection_label(
 
     inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
 
+    target_identifications = bundle_db.get_all_target_identification()
+    target_identification_nodes: List[NodeBuilder] = []
+    target_identification_nodes = create_target_identification_nodes(
+        bundle_db, target_identifications, "collection"
+    )
+    context_node: List[NodeBuilder] = []
+    context_node = [make_collection_context_node(target_identification_nodes)]
+
     try:
         label = (
             make_label(
@@ -244,6 +262,7 @@ def make_other_collection_label(
                     "proposal_id": str(proposal_id),
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
+                    "Context_Area": combine_nodes_into_fragment(context_node),
                 }
             )
             .toxml()

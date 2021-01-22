@@ -1,13 +1,34 @@
 """Templates to create a label for a bundle."""
+from typing import List
 
 from pdart.labels.Namespaces import BUNDLE_NAMESPACES, PDS4_XML_MODEL
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import (
     DocTemplate,
     NodeBuilderTemplate,
+    NodeBuilder,
     interpret_document_template,
     interpret_template,
+    combine_nodes_into_fragment,
 )
+
+
+def make_bundle_context_node(
+    target_identification_nodes: List[NodeBuilder],
+) -> NodeBuilder:
+    func = interpret_template(
+        """<Context_Area>
+        <FRAGMENT name="Target_Identification" />
+        </Context_Area>"""
+    )(
+        {
+            "Target_Identification": combine_nodes_into_fragment(
+                target_identification_nodes
+            ),
+        }
+    )
+    return func
+
 
 make_label: DocTemplate = interpret_document_template(
     f"""<?xml version="1.0" encoding="utf-8"?>
@@ -29,6 +50,7 @@ make_label: DocTemplate = interpret_document_template(
       </Modification_Detail>
     </Modification_History>
   </Identification_Area>
+  <FRAGMENT name="Context_Area" />
   <Bundle>
     <bundle_type>Archive</bundle_type>
   </Bundle>

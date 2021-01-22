@@ -38,6 +38,7 @@ class Test_TargetIdentification(unittest.TestCase):
         target_dict["alternate_designations"] = target_from_db[0].alternate_designations
         target_dict["description"] = target_from_db[0].description
         target_dict["lid"] = target_from_db[0].lid_reference
+        target_dict["reference_type"] = "data_to_target"
         nb = get_target(target_dict)
 
         doc = xml.dom.getDOMImplementation().createDocument(None, None, None)

@@ -37,7 +37,11 @@ from pdart.labels.TargetIdentification import get_target, get_target_info
 from pdart.labels.TargetIdentificationXml import target_lid
 
 from pdart.labels.TimeCoordinates import get_time_coordinates
-from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
+from pdart.labels.Utils import (
+    lidvid_to_lid,
+    lidvid_to_vid,
+    create_target_identification_nodes,
+)
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -195,18 +199,20 @@ def make_fits_product_label(
 
         # At this stage, target identifications should be in the db
         assert len(target_identifications) != 0
-        # Create a list of Target_Identification nodes. It will be inserted in
-        # XML when passing into make_label
+
         target_identification_nodes: List[NodeBuilder] = []
-        for target in target_identifications:
-            bundle_db.create_context_product(target_lid([target.type, target.name]))
-            target_dict: Dict[str, Any] = {}
-            target_dict["name"] = target.name
-            target_dict["type"] = target.type
-            target_dict["alternate_designations"] = target.alternate_designations
-            target_dict["description"] = target.description
-            target_dict["lid"] = target.lid_reference
-            target_identification_nodes.append(get_target(target_dict))
+        target_identification_nodes = create_target_identification_nodes(
+            bundle_db, target_identifications, "data"
+        )
+        # for target in target_identifications:
+        #     bundle_db.create_context_product(target_lid([target.type, target.name]))
+        #     target_dict: Dict[str, Any] = {}
+        #     target_dict["name"] = target.name
+        #     target_dict["type"] = target.type
+        #     target_dict["alternate_designations"] = target.alternate_designations
+        #     target_dict["description"] = target.description
+        #     target_dict["lid"] = target.lid_reference
+        #     target_identification_nodes.append(get_target(target_dict))
 
         label = (
             make_label(

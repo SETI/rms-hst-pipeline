@@ -674,11 +674,20 @@ class BundleDB(object):
         ).scalar()
 
     def get_target_identification(self, target_id: str) -> List[TargetIdentification]:
+        """
+        Returns target identifications of a specific target id in the database.
+        """
         return (
             self.session.query(TargetIdentification)
             .filter(TargetIdentification.target_id == target_id)
             .all()
         )
+
+    def get_all_target_identification(self) -> List[TargetIdentification]:
+        """
+        Returns all (unique) target identifications in the database.
+        """
+        return self.session.query(TargetIdentification).all()
 
     ############################################################
     def create_context_product(self, id: str) -> None:

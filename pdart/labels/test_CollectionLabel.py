@@ -1,5 +1,7 @@
 import unittest
 
+from typing import List, Tuple
+
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.labels.CollectionLabel import make_collection_label
@@ -26,6 +28,30 @@ class Test_CollectionLabel(unittest.TestCase):
 
         self.db.create_document_product(_DOC_PRODUCT_LIDVID, _DOC_COLLECTION_LIDVID)
         self.info = Citation_Information.create_test_citation_information()
+
+        # Create target identifications db for testing purpose
+        target_id = "09059_1"
+        target_identifications: List[Tuple] = [
+            (
+                "762 Pulcova",
+                [
+                    "(762) Pulcova",
+                    "(762) 1913SQ",
+                    "1913SQ",
+                    "(762) 1952 QM1",
+                    "1952 QM1",
+                    "Pulcova",
+                    "Minor Planet 762",
+                    "NAIF ID 2000762",
+                ],
+                "Asteroid",
+                [],
+                "urn:nasa:pds:context:target:asteroid.762_pulcova",
+            )
+        ]
+        self.db.add_record_to_target_identification_db(
+            target_id, target_identifications
+        )
 
     def test_make_collection_label(self) -> None:
         # make a standard collection label
