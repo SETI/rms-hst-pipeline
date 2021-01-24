@@ -87,7 +87,7 @@ make_label: DocTemplate = interpret_document_template(
   </Identification_Area>
   <FRAGMENT name="Context_Area" />
   <Collection>
-    <collection_type>Data</collection_type>
+    <collection_type><NODE name="collection_type"/></collection_type>
   </Collection>
   <File_Area_Inventory>
     <File>

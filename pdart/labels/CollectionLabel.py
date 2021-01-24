@@ -98,7 +98,7 @@ def make_context_collection_label(
     verify: bool,
 ) -> bytes:
     """
-    Create the label text for the collection having this LIDVID using
+    Create the label text for the ccontext ollection having this LIDVID using
     the bundle database.  If verify is True, verify the label against
     its XML and Schematron schemas.  Raise an exception if either
     fails.
@@ -132,6 +132,7 @@ def make_context_collection_label(
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
                     "Context_Area": combine_nodes_into_fragment([]),
+                    "collection_type": "Context",
                 }
             )
             .toxml()
@@ -151,7 +152,7 @@ def make_schema_collection_label(
     verify: bool,
 ) -> bytes:
     """
-    Create the label text for the collection having this LIDVID using
+    Create the label text for the schema collection having this LIDVID using
     the bundle database.  If verify is True, verify the label against
     its XML and Schematron schemas.  Raise an exception if either
     fails.
@@ -183,6 +184,7 @@ def make_schema_collection_label(
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
                     "Context_Area": combine_nodes_into_fragment([]),
+                    "collection_type": "Schema",
                 }
             )
             .toxml()
@@ -202,9 +204,9 @@ def make_other_collection_label(
     verify: bool,
 ) -> bytes:
     """
-    Create the label text for the collection having this LIDVID using
-    the bundle database.  If verify is True, verify the label against
-    its XML and Schematron schemas.  Raise an exception if either
+    Create the label text for the document, browse, and data collection having
+    this LIDVID using the bundle database.  If verify is True, verify the label
+    against its XML and Schematron schemas.  Raise an exception if either
     fails.
     """
     # TODO this is sloppy; is there a better way?
@@ -248,8 +250,18 @@ def make_other_collection_label(
     target_identification_nodes = create_target_identification_nodes(
         bundle_db, target_identifications, "collection"
     )
+
+    # Properly assign collection type for Document, Browse, or Data collection.
+    # Context node only exists in Data collection label.
     context_node: List[NodeBuilder] = []
-    context_node = [make_collection_context_node(target_identification_nodes)]
+    collection_type: str = ""
+    type_name = type(collection).__name__
+    if type_name == "DocumentCollection":
+        collection_type = "Document"
+    elif type_name == "OtherCollection":
+        collection_type = cast(OtherCollection, collection).prefix.capitalize()
+        if collection_type == "Data":
+            context_node = [make_collection_context_node(target_identification_nodes)]
 
     try:
         label = (
@@ -263,6 +275,7 @@ def make_other_collection_label(
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
                     "Context_Area": combine_nodes_into_fragment(context_node),
+                    "collection_type": collection_type,
                 }
             )
             .toxml()
