@@ -43,7 +43,7 @@ class Test_FileContents(unittest.TestCase):
     <offset unit="byte">14400</offset>
     <object_length unit="byte">8640</object_length>
     <parsing_standard_id>FITS 3.0</parsing_standard_id>
-    <description>Global FITS Header</description>
+    <description>FITS Header</description>
   </Header>
   <Array_2D_Image>
     <offset unit="byte">23040</offset>
@@ -68,14 +68,14 @@ class Test_FileContents(unittest.TestCase):
     <offset unit="byte">2122560</offset>
     <object_length unit="byte">5760</object_length>
     <parsing_standard_id>FITS 3.0</parsing_standard_id>
-    <description>Global FITS Header</description>
+    <description>FITS Header</description>
   </Header>
   <Header>
     <local_identifier>hdu_3</local_identifier>
     <offset unit="byte">2128320</offset>
     <object_length unit="byte">5760</object_length>
     <parsing_standard_id>FITS 3.0</parsing_standard_id>
-    <description>Global FITS Header</description>
+    <description>FITS Header</description>
   </Header>
 </Wrapper>
 """

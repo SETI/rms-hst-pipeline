@@ -16,14 +16,12 @@ make_label: DocTemplate = interpret_document_template(
   <Identification_Area>
     <logical_identifier><NODE name="lid" /></logical_identifier>
     <version_id><NODE name="vid" /></version_id>
-    <title>This product contains the <NODE name="suffix" /> \
-image obtained the HST Observing Program <NODE name="proposal_id" />\
-.</title>
+    <title><NODE name="title" /></title>
     <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Observational</product_class>
     <Modification_History>
       <Modification_Detail>
-        <modification_date>2016-04-20</modification_date>
+        <modification_date><NODE name="mod_date" /></modification_date>
         <version_id>1.0</version_id>
         <description>Initial PDS4 version</description>
       </Modification_Detail>
@@ -31,6 +29,7 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
   </Identification_Area>
   <Observation_Area>
     <NODE name="Time_Coordinates" />
+    <NODE name="Primary_Result_Summary" />
     <Investigation_Area>
       <name><NODE name="Investigation_Area_name" /></name>
       <type>Individual Investigation</type>

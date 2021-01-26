@@ -70,11 +70,13 @@ def get_file_contents(
         local_identifier = f"hdu_{hdu_index}"
         offset = str(hdrLoc)
         object_length = str(datLoc - hdrLoc)
+        description = "Global FITS Header" if hdu_index == 0 else "FITS Header"
         header = header_contents(
             {
                 "local_identifier": local_identifier,
                 "offset": offset,
                 "object_length": object_length,
+                "description": description,
             }
         )
 

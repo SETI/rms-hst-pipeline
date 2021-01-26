@@ -44,7 +44,7 @@ header_contents: NodeBuilderTemplate = interpret_template(
 <offset unit="byte"><NODE name="offset"/></offset>
 <object_length unit="byte"><NODE name="object_length"/></object_length>
 <parsing_standard_id>FITS 3.0</parsing_standard_id>
-<description>Global FITS Header</description>
+<description><NODE name="description"/></description>
 </Header>"""
 )
 """

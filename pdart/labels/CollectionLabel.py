@@ -232,7 +232,11 @@ def make_other_collection_label(
     def make_other_coll_title(coll: Collection) -> NodeBuilder:
         other_collection = cast(OtherCollection, coll)
         return make_other_collection_title(
-            {"suffix": other_collection.suffix, "proposal_id": str(proposal_id)}
+            {
+                "instrument": other_collection.instrument.upper(),
+                "proposal_id": str(proposal_id),
+            }
+            # {"suffix": other_collection.suffix, "proposal_id": str(proposal_id)}
         )
 
     title: NodeBuilder = switch_on_collection_subtype(

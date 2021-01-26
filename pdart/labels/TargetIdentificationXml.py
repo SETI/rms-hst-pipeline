@@ -49,7 +49,7 @@ def target_identification(
     reference_type: str,
 ) -> NodeBuilder:
     """
-    Given a target name and target type, return a function that takes
+    Given the info of target identifications, return a function that takes
     a document and returns a filled-out ``<Target_Identification />``
     XML node, used in product labels.
     """

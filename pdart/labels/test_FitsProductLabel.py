@@ -66,6 +66,7 @@ class Test_FitsProductLabel(unittest.TestCase):
                 bundle_lidvid,
                 RAWish_file_basename,
                 True,
+                True,
             )
-
+            print(label)
             assert_golden_file_equal(self, "test_FitsProductLabel.golden.xml", label)

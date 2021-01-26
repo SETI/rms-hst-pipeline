@@ -2,6 +2,7 @@
 Functionality to create a label for a data product containing a single
 FITS file.
 """
+from datetime import date
 from typing import Any, Dict, Generator, List, Optional, Tuple, cast
 import os.path
 from sqlalchemy.orm.exc import NoResultFound
@@ -32,6 +33,7 @@ from pdart.labels.ObservingSystem import (
     observing_system,
     observing_system_lid,
 )
+from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
 from pdart.labels.TargetIdentification import get_target, get_target_info
 from pdart.labels.TargetIdentificationXml import target_lid
@@ -50,6 +52,8 @@ from pdart.xml.Templates import (
     combine_nodes_into_fragment,
     NodeBuilder,
 )
+
+MOD_DATE_FOR_TESTESING = "2016-04-20"
 
 
 def _directory_siblings(
@@ -156,6 +160,7 @@ def make_fits_product_label(
     bundle_lidvid: str,
     file_basename: str,
     verify: bool,
+    use_mod_date_for_testing: bool = False,
 ) -> bytes:
     try:
         product = bundle_db.get_product(product_lidvid)
@@ -163,6 +168,20 @@ def make_fits_product_label(
         assert isinstance(collection, OtherCollection)
         instrument = collection.instrument
         suffix = collection.suffix
+
+        # Check if it's raw or calibrated image
+        if suffix == "cal":
+            image_type = "calibrated"
+        else:
+            image_type = "raw"
+
+        # If a label is created for testing purpose to compare with pre-made XML
+        # we will use MOD_DATE_FOR_TESTESING as the modification date.
+        if not use_mod_date_for_testing:
+            # Get the date when the label is created
+            mod_date = date.today().strftime("%Y-%m-%d")
+        else:
+            mod_date = MOD_DATE_FOR_TESTESING
 
         card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
         lookup = DictLookup(file_basename, card_dicts)
@@ -204,23 +223,30 @@ def make_fits_product_label(
         target_identification_nodes = create_target_identification_nodes(
             bundle_db, target_identifications, "data"
         )
-        # for target in target_identifications:
-        #     bundle_db.create_context_product(target_lid([target.type, target.name]))
-        #     target_dict: Dict[str, Any] = {}
-        #     target_dict["name"] = target.name
-        #     target_dict["type"] = target.type
-        #     target_dict["alternate_designations"] = target.alternate_designations
-        #     target_dict["description"] = target.description
-        #     target_dict["lid"] = target.lid_reference
-        #     target_identification_nodes.append(get_target(target_dict))
+
+        title = (
+            f"{instrument.upper()} {image_type} image, {file_basename}, "
+            + f"obtained by the HST Observing Program {proposal_id}."
+        )
+
+        # Dictionary used for primary result summary
+        primary_result_dict: Dict[str, Any] = {}
+        primary_result_dict["processing_level"] = image_type.capitalize()
+        primary_result_dict["description"] = title
+        # Put a random wavelenght first, this should be coming from
+        # Utils.wavelength_from_range
+        primary_result_dict["wavelength_range"] = "Infrared"
 
         label = (
             make_label(
                 {
                     "lid": lidvid_to_lid(product_lidvid),
                     "vid": lidvid_to_vid(product_lidvid),
-                    "proposal_id": str(proposal_id),
-                    "suffix": suffix,
+                    # "proposal_id": str(proposal_id),
+                    # "image_type": image_type,
+                    # "instrument": instrument,
+                    "title": title,
+                    "mod_date": mod_date,
                     "file_name": file_basename,
                     "file_contents": get_file_contents(
                         bundle_db, card_dicts, instrument, product_lidvid
@@ -233,6 +259,9 @@ def make_fits_product_label(
                         target_identification_nodes
                     ),
                     "HST": hst_parameters,
+                    "Primary_Result_Summary": primary_result_summary(
+                        primary_result_dict
+                    ),
                 }
             )
             .toxml()
