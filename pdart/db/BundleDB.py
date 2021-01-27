@@ -463,6 +463,13 @@ class BundleDB(object):
             .all()
         ]
 
+    def get_instrument_from_other_collection(self) -> str:
+        """
+        Returns instrument of the bundle from OtherCollection table.
+        """
+        first_record = self.session.query(OtherCollection).first()
+        return str(first_record.instrument)
+
     ############################################################
 
     def create_browse_product(

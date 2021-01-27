@@ -2,7 +2,6 @@
 Functionality to create a label for a data product containing a single
 FITS file.
 """
-from datetime import date
 from typing import Any, Dict, Generator, List, Optional, Tuple, cast
 import os.path
 from sqlalchemy.orm.exc import NoResultFound
@@ -43,6 +42,8 @@ from pdart.labels.Utils import (
     lidvid_to_lid,
     lidvid_to_vid,
     create_target_identification_nodes,
+    get_current_date,
+    MOD_DATE_FOR_TESTESING,
 )
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -52,8 +53,6 @@ from pdart.xml.Templates import (
     combine_nodes_into_fragment,
     NodeBuilder,
 )
-
-MOD_DATE_FOR_TESTESING = "2016-04-20"
 
 
 def _directory_siblings(
@@ -179,7 +178,7 @@ def make_fits_product_label(
         # we will use MOD_DATE_FOR_TESTESING as the modification date.
         if not use_mod_date_for_testing:
             # Get the date when the label is created
-            mod_date = date.today().strftime("%Y-%m-%d")
+            mod_date = get_current_date()
         else:
             mod_date = MOD_DATE_FOR_TESTESING
 
@@ -242,9 +241,6 @@ def make_fits_product_label(
                 {
                     "lid": lidvid_to_lid(product_lidvid),
                     "vid": lidvid_to_vid(product_lidvid),
-                    # "proposal_id": str(proposal_id),
-                    # "image_type": image_type,
-                    # "instrument": instrument,
                     "title": title,
                     "mod_date": mod_date,
                     "file_name": file_basename,

@@ -14,24 +14,24 @@ from pdart.xml.Templates import (
 
 make_context_collection_title: NodeBuilderTemplate = interpret_template(
     """
-    <title>Context collection obtained from HST Observing Program \
-<NODE name="proposal_id"/>.</title>
+    <title>Context collection of <NODE name="instrument"/> observations \
+obtained from HST Observing Program <NODE name="proposal_id"/>.</title>
     """
 )
 
 
 make_document_collection_title: NodeBuilderTemplate = interpret_template(
     """
-    <title>Document collection obtained from HST Observing Program \
-<NODE name="proposal_id"/>.</title>
+    <title>Document collection of <NODE name="instrument"/> observations \
+obtained from HST Observing Program <NODE name="proposal_id"/>.</title>
     """
 )
 
 
 make_schema_collection_title: NodeBuilderTemplate = interpret_template(
     """
-    <title>Schema collection obtained from HST Observing Program \
-<NODE name="proposal_id"/>.</title>
+    <title>Schema collection of <NODE name="instrument"/> observations \
+obtained from HST Observing Program <NODE name="proposal_id"/>.</title>
     """
 )
 
@@ -74,7 +74,7 @@ make_label: DocTemplate = interpret_document_template(
     <NODE name="Citation_Information" />
     <Modification_History>
       <Modification_Detail>
-        <modification_date>2016-04-20</modification_date>
+        <modification_date><NODE name="mod_date" /></modification_date>
         <version_id>1.0</version_id>
         <description>Initial PDS4 version</description>
       </Modification_Detail>

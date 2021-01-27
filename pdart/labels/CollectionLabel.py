@@ -27,6 +27,8 @@ from pdart.labels.Utils import (
     lidvid_to_lid,
     lidvid_to_vid,
     create_target_identification_nodes,
+    get_current_date,
+    MOD_DATE_FOR_TESTESING,
 )
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import (
@@ -73,6 +75,7 @@ def make_collection_label(
     collection_lidvid: str,
     bundle_lidvid: str,
     verify: bool,
+    use_mod_date_for_testing: bool = False,
 ) -> bytes:
     """
     Create the label text for the collection having this LIDVID using
@@ -81,13 +84,22 @@ def make_collection_label(
     fails.
     """
     collection = bundle_db.get_collection(collection_lidvid)
+
+    # If a label is created for testing purpose to compare with pre-made XML
+    # we will use MOD_DATE_FOR_TESTESING as the modification date.
+    if not use_mod_date_for_testing:
+        # Get the date when the label is created
+        mod_date = get_current_date()
+    else:
+        mod_date = MOD_DATE_FOR_TESTESING
+
     return switch_on_collection_subtype(
         collection,
         make_context_collection_label,
         make_other_collection_label,
         make_schema_collection_label,
         make_other_collection_label,
-    )(bundle_db, info, collection_lidvid, bundle_lidvid, verify)
+    )(bundle_db, info, collection_lidvid, bundle_lidvid, verify, mod_date)
 
 
 def make_context_collection_label(
@@ -96,6 +108,7 @@ def make_context_collection_label(
     collection_lidvid: str,
     bundle_lidvid: str,
     verify: bool,
+    mod_date: str,
 ) -> bytes:
     """
     Create the label text for the ccontext ollection having this LIDVID using
@@ -113,9 +126,12 @@ def make_context_collection_label(
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
     proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
-
+    instrument = bundle_db.get_instrument_from_other_collection().upper()
     title: NodeBuilder = make_context_collection_title(
-        {"proposal_id": str(proposal_id)}
+        {
+            "instrument": instrument,
+            "proposal_id": str(proposal_id),
+        }
     )
 
     inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
@@ -128,6 +144,7 @@ def make_context_collection_label(
                     "collection_vid": collection_vid,
                     "record_count": record_count,
                     "title": title,
+                    "mod_date": mod_date,
                     "proposal_id": str(proposal_id),
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
@@ -150,6 +167,7 @@ def make_schema_collection_label(
     collection_lidvid: str,
     bundle_lidvid: str,
     verify: bool,
+    mod_date: str,
 ) -> bytes:
     """
     Create the label text for the schema collection having this LIDVID using
@@ -167,8 +185,13 @@ def make_schema_collection_label(
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
     proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
-
-    title: NodeBuilder = make_schema_collection_title({"proposal_id": str(proposal_id)})
+    instrument = bundle_db.get_instrument_from_other_collection().upper()
+    title: NodeBuilder = make_schema_collection_title(
+        {
+            "instrument": instrument,
+            "proposal_id": str(proposal_id),
+        }
+    )
 
     inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
 
@@ -180,6 +203,7 @@ def make_schema_collection_label(
                     "collection_vid": collection_vid,
                     "record_count": record_count,
                     "title": title,
+                    "mod_date": mod_date,
                     "proposal_id": str(proposal_id),
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
@@ -202,6 +226,7 @@ def make_other_collection_label(
     collection_lidvid: str,
     bundle_lidvid: str,
     verify: bool,
+    mod_date: str,
 ) -> bytes:
     """
     Create the label text for the document, browse, and data collection having
@@ -219,24 +244,39 @@ def make_other_collection_label(
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
     proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
+    instrument = bundle_db.get_instrument_from_other_collection().upper()
 
     def make_ctxt_coll_title(_coll: Collection) -> NodeBuilder:
-        return make_context_collection_title({"proposal_id": str(proposal_id)})
+        return make_context_collection_title(
+            {
+                "instrument": instrument,
+                "proposal_id": str(proposal_id),
+            }
+        )
 
     def make_doc_coll_title(_coll: Collection) -> NodeBuilder:
-        return make_document_collection_title({"proposal_id": str(proposal_id)})
+        return make_document_collection_title(
+            {
+                "instrument": instrument,
+                "proposal_id": str(proposal_id),
+            }
+        )
 
     def make_sch_coll_title(_coll: Collection) -> NodeBuilder:
-        return make_schema_collection_title({"proposal_id": str(proposal_id)})
+        return make_schema_collection_title(
+            {
+                "instrument": instrument,
+                "proposal_id": str(proposal_id),
+            }
+        )
 
     def make_other_coll_title(coll: Collection) -> NodeBuilder:
         other_collection = cast(OtherCollection, coll)
         return make_other_collection_title(
             {
-                "instrument": other_collection.instrument.upper(),
+                "instrument": instrument,
                 "proposal_id": str(proposal_id),
             }
-            # {"suffix": other_collection.suffix, "proposal_id": str(proposal_id)}
         )
 
     title: NodeBuilder = switch_on_collection_subtype(
@@ -275,6 +315,7 @@ def make_other_collection_label(
                     "collection_vid": collection_vid,
                     "record_count": record_count,
                     "title": title,
+                    "mod_date": mod_date,
                     "proposal_id": str(proposal_id),
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,

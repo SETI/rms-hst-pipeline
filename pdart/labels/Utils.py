@@ -1,6 +1,7 @@
 """
 Utility functions.
 """
+from datetime import date
 from typing import Any, Dict, List
 
 import unittest
@@ -14,6 +15,13 @@ from pdart.labels.TargetIdentification import get_target
 from pdart.labels.TargetIdentificationXml import target_lid
 from pdart.pds4.LIDVID import LIDVID
 from pdart.xml.Templates import NodeBuilder
+
+"""The suffixes considered raw data, in order of preference."""
+MOD_DATE_FOR_TESTESING: str = "2016-04-20"
+
+
+def get_current_date() -> str:
+    return date.today().strftime("%Y-%m-%d")
 
 
 def lidvid_to_lid(lidvid: str) -> str:
