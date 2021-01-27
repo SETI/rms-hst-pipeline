@@ -21,6 +21,8 @@ from pdart.labels.Utils import (
     lidvid_to_lid,
     lidvid_to_vid,
     create_target_identification_nodes,
+    get_current_date,
+    MOD_DATE_FOR_TESTESING,
 )
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import (
@@ -30,7 +32,11 @@ from pdart.xml.Templates import (
 
 
 def make_bundle_label(
-    bundle_db: BundleDB, bundle_lidvid: str, info: Citation_Information, verify: bool
+    bundle_db: BundleDB,
+    bundle_lidvid: str,
+    info: Citation_Information,
+    verify: bool,
+    use_mod_date_for_testing: bool = False,
 ) -> bytes:
     """
     Create the label text for the bundle in the bundle database using
@@ -68,6 +74,12 @@ def make_bundle_label(
     context_node: List[NodeBuilder] = []
     context_node = [make_bundle_context_node(target_identification_nodes)]
 
+    if not use_mod_date_for_testing:
+        # Get the date when the label is created
+        mod_date = get_current_date()
+    else:
+        mod_date = MOD_DATE_FOR_TESTESING
+
     try:
         label = (
             make_label(
@@ -78,6 +90,7 @@ def make_bundle_label(
                     "Citation_Information": make_citation_information(
                         info, is_for_bundle=True
                     ),
+                    "mod_date": mod_date,
                     "Bundle_Member_Entries": combine_nodes_into_fragment(
                         reduced_collections
                     ),

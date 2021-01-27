@@ -44,7 +44,7 @@ make_label: DocTemplate = interpret_document_template(
     <NODE name="Citation_Information" />
     <Modification_History>
       <Modification_Detail>
-        <modification_date>2016-04-20</modification_date>
+        <modification_date><NODE name="mod_date" /></modification_date>
         <version_id>1.0</version_id>
         <description>Initial PDS4 version</description>
       </Modification_Detail>
