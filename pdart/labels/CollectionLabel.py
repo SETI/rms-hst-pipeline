@@ -276,6 +276,7 @@ def make_other_collection_label(
             {
                 "instrument": instrument,
                 "proposal_id": str(proposal_id),
+                "prefix": other_collection.prefix.capitalize(),
             }
         )
 

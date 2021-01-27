@@ -223,8 +223,9 @@ def make_fits_product_label(
             bundle_db, target_identifications, "data"
         )
 
+        rootname = bundle_db.get_rootname_from_fits_product(product_lidvid)
         title = (
-            f"{instrument.upper()} {image_type} image, {file_basename}, "
+            f"{instrument.upper()} {image_type} image, {rootname}.fits, "
             + f"obtained by the HST Observing Program {proposal_id}."
         )
 
