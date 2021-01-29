@@ -30,15 +30,7 @@ make_label: DocTemplate = interpret_document_template(
   <Observation_Area>
     <NODE name="Time_Coordinates" />
     <NODE name="Primary_Result_Summary" />
-    <Investigation_Area>
-      <name><NODE name="Investigation_Area_name" /></name>
-      <type>Individual Investigation</type>
-      <Internal_Reference>
-        <lidvid_reference><NODE name="investigation_lidvid" />\
-</lidvid_reference>
-        <reference_type>data_to_investigation</reference_type>
-      </Internal_Reference>
-    </Investigation_Area>
+    <NODE name="Investigation_Area" />
     <NODE name="Observing_System" />
     <FRAGMENT name="Target_Identification" />
     <Mission_Area><NODE name="HST" /></Mission_Area>

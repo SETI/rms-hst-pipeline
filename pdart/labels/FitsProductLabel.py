@@ -32,6 +32,7 @@ from pdart.labels.ObservingSystem import (
     observing_system,
     observing_system_lid,
 )
+from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
 from pdart.labels.TargetIdentification import get_target, get_target_info
@@ -206,6 +207,7 @@ def make_fits_product_label(
         bundle = bundle_db.get_bundle(bundle_lidvid)
         proposal_id = bundle.proposal_id
 
+        investigation_area_name = mk_Investigation_Area_name(proposal_id)
         investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
         bundle_db.create_context_product(investigation_area_lidvid)
         bundle_db.create_context_product(instrument_host_lid())
@@ -248,8 +250,11 @@ def make_fits_product_label(
                     "file_contents": get_file_contents(
                         bundle_db, card_dicts, instrument, product_lidvid
                     ),
-                    "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
-                    "investigation_lidvid": investigation_area_lidvid,
+                    "Investigation_Area": investigation_area(
+                        investigation_area_name, investigation_area_lidvid, "data"
+                    ),
+                    # "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
+                    # "investigation_lidvid": investigation_area_lidvid,
                     "Observing_System": observing_system(instrument),
                     "Time_Coordinates": get_time_coordinates(start_stop_times),
                     "Target_Identification": combine_nodes_into_fragment(

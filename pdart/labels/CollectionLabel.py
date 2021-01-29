@@ -22,6 +22,12 @@ from pdart.labels.CollectionLabelXml import (
     make_schema_collection_title,
     make_collection_context_node,
 )
+from pdart.labels.FitsProductLabelXml import (
+    mk_Investigation_Area_lidvid,
+    mk_Investigation_Area_name,
+)
+from pdart.labels.InvestigationArea import investigation_area
+from pdart.labels.ObservingSystem import observing_system
 from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import (
     lidvid_to_lid,
@@ -290,6 +296,7 @@ def make_other_collection_label(
 
     inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
 
+    # Get the list of target identifications nodes for the collection
     target_identifications = bundle_db.get_all_target_identification()
     target_identification_nodes: List[NodeBuilder] = []
     target_identification_nodes = create_target_identification_nodes(
@@ -306,7 +313,11 @@ def make_other_collection_label(
     elif type_name == "OtherCollection":
         collection_type = cast(OtherCollection, collection).prefix.capitalize()
         if collection_type == "Data":
-            context_node = [make_collection_context_node(target_identification_nodes)]
+            context_node = [
+                make_collection_context_node(
+                    target_identification_nodes,
+                )
+            ]
 
     try:
         label = (
