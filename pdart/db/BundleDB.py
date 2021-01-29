@@ -622,15 +622,6 @@ class BundleDB(object):
             .all()
         )
 
-    def get_rootname_from_fits_product(self, product_lidvid: str) -> str:
-        """Return rootname of a fits product based on product lidvid"""
-        return str(
-            self.session.query(FitsProduct)
-            .filter(FitsProduct.product_lidvid == product_lidvid)
-            .one()
-            .rootname
-        )
-
     ############################################################
     def create_target_identification(self, fits_os_path: str) -> None:
         """
