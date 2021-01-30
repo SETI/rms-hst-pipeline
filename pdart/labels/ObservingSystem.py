@@ -6,7 +6,7 @@ _observing_system: NodeBuilderTemplate = interpret_template(
       <name><NODE name="name"/></name>
       <Observing_System_Component>
         <name>Hubble Space Telescope</name>
-        <type>Spacecraft</type>
+        <type>Host</type>
         <Internal_Reference>
           <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
           <reference_type>is_instrument_host</reference_type>

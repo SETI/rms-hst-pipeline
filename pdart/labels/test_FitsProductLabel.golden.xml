@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd http://pds.nasa.gov/pds4/mission/hst/v1 https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.xsd">
+<Product_Observational xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd http://pds.nasa.gov/pds4/mission/hst/v1 https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.xsd">
   <Identification_Area>
     <logical_identifier>urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq</logical_identifier>
     <version_id>1.0</version_id>
     <title>ACS data file jbz504eoq_raw.fits obtained by the HST Observing Program 13012.</title>
-    <information_model_version>1.13.0.0</information_model_version>
+    <information_model_version>1.15.0.0</information_model_version>
     <product_class>Product_Observational</product_class>
     <Modification_History>
       <Modification_Detail>
@@ -42,7 +42,7 @@
       <name>Hubble Space Telescope Advanced Camera for Surveys</name>
       <Observing_System_Component>
         <name>Hubble Space Telescope</name>
-        <type>Spacecraft</type>
+        <type>Host</type>
         <Internal_Reference>
           <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
           <reference_type>is_instrument_host</reference_type>

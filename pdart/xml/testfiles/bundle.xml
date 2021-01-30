@@ -6,7 +6,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?>
     <logical_identifier>urn:nasa:pds:hst_09059</logical_identifier>
     <version_id>1.0</version_id>
     <title>This bundle contains images obtained from HST Observing Program 9059.</title>
-    <information_model_version>1.13.0.0</information_model_version>
+    <information_model_version>1.15.0.0</information_model_version>
     <product_class>Product_Bundle</product_class>
     <Citation_Information>
       <publication_year>2000</publication_year>
