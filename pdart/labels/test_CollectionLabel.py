@@ -29,6 +29,13 @@ class Test_CollectionLabel(unittest.TestCase):
         self.db.create_document_product(_DOC_PRODUCT_LIDVID, _DOC_COLLECTION_LIDVID)
         self.info = Citation_Information.create_test_citation_information()
 
+        # Create start/stop time in db for testing purpose
+        self.db.update_fits_product_time(
+            _FITS_PRODUCT_LIDVID,
+            "2005-01-19T14:58:56Z",
+            "2005-01-19T15:41:05Z",
+        )
+
         # Create target identifications db for testing purpose
         target_id = "09059_1"
         target_identifications: List[Tuple] = [

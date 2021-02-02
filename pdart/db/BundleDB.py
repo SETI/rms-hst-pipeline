@@ -4,7 +4,7 @@ import re
 from typing import Any, Dict, List, Optional, Tuple, cast
 
 import astropy.io.fits
-from sqlalchemy import and_, create_engine, exists
+from sqlalchemy import and_, create_engine, exists, func, desc, asc
 from sqlalchemy.orm import sessionmaker
 from target_identifications.hst import hst_target_identifications  # type: ignore
 
@@ -556,6 +556,8 @@ class BundleDB(object):
                     f"non-FITS product with LIDVID {product_lidvid} already exists"
                 )
         else:
+            # Stop/start time will be added later when walking through each
+            # fits product at the stage of creating fits product labels.
             self.session.add(
                 FitsProduct(
                     lidvid=product_lidvid,
@@ -621,6 +623,42 @@ class BundleDB(object):
             .order_by(File.basename)
             .all()
         )
+
+    def update_fits_product_time(
+        self, product_lidvid: str, start_time: str, stop_time: str
+    ) -> None:
+        """Update the start/stop time for a fits_product."""
+        record = (
+            self.session.query(FitsProduct)
+            .filter(FitsProduct.product_lidvid == product_lidvid)
+            .one()
+        )
+        record.start_time = start_time
+        record.stop_time = stop_time
+        self.session.commit()
+
+    def get_roll_up_time_from_db(self, suffix: str = "") -> Tuple:
+        """
+        Get min start_time and max stop time from fits_products for a specific
+        data suffix (or None).
+        """
+        if suffix:
+            min_start_time = (
+                self.session.query(func.min(FitsProduct.start_time))
+                .filter(FitsProduct.product_lidvid.contains(suffix))  # type: ignore
+                .scalar()
+            )
+            max_stop_time = (
+                self.session.query(func.max(FitsProduct.stop_time))
+                .filter(FitsProduct.product_lidvid.contains(suffix))  # type: ignore
+                .scalar()
+            )
+        else:
+            min_start_time = self.session.query(
+                func.min(FitsProduct.start_time)
+            ).scalar()
+            max_stop_time = self.session.query(func.max(FitsProduct.stop_time)).scalar()
+        return (min_start_time, max_stop_time)
 
     ############################################################
     def create_target_identification(self, fits_os_path: str) -> None:

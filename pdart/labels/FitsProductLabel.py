@@ -203,6 +203,12 @@ def make_fits_product_label(
             "exposure_duration": exposure_duration,
         }
 
+        # Store start/stop time for each fits_product in fits_products table.
+        # The min/max will be pulled out for roll-up in data collection/bundle.
+        bundle_db.update_fits_product_time(
+            product_lidvid, start_date_time, stop_date_time
+        )
+
         hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)
         bundle = bundle_db.get_bundle(bundle_lidvid)
         proposal_id = bundle.proposal_id

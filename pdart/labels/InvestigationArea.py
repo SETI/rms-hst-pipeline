@@ -1,4 +1,6 @@
-"""Templates to create an ``<Investigation_Area />`` XML element."""
+"""Templates to create an ``<Investigation_Area />`` XML element.
+Roll-up: One <Investigation_Area /> for bundle, data colleciton, and data.
+"""
 from typing import Any, Dict
 
 from pdart.xml.Templates import NodeBuilder, NodeBuilderTemplate, interpret_template

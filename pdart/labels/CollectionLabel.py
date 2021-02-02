@@ -26,6 +26,7 @@ from pdart.labels.FitsProductLabelXml import (
     mk_Investigation_Area_lidvid,
     mk_Investigation_Area_name,
 )
+from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.ObservingSystem import observing_system
 from pdart.labels.LabelError import LabelError
@@ -296,13 +297,6 @@ def make_other_collection_label(
 
     inventory_name = get_collection_inventory_name(bundle_db, collection_lidvid)
 
-    # Get the list of target identifications nodes for the collection
-    target_identifications = bundle_db.get_all_target_identification()
-    target_identification_nodes: List[NodeBuilder] = []
-    target_identification_nodes = create_target_identification_nodes(
-        bundle_db, target_identifications, "collection"
-    )
-
     # Properly assign collection type for Document, Browse, or Data collection.
     # Context node only exists in Data collection label.
     context_node: List[NodeBuilder] = []
@@ -312,9 +306,44 @@ def make_other_collection_label(
         collection_type = "Document"
     elif type_name == "OtherCollection":
         collection_type = cast(OtherCollection, collection).prefix.capitalize()
+        suffix = cast(OtherCollection, collection).suffix
+
+        # Roll-up (Context node) only exists in data collection
         if collection_type == "Data":
+            # Get min start_time and max stop_time
+            start_time, stop_time = bundle_db.get_roll_up_time_from_db(suffix)
+            # Make sure start/stop time exists in db.
+            assert (
+                start_time is not None
+            ), "Start time is not stored in FitsProduct table."
+            assert (
+                stop_time is not None
+            ), "Stop time is not stored in FitsProduct table."
+
+            start_stop_times = {
+                "start_date_time": start_time,
+                "stop_date_time": stop_time,
+            }
+            time_coordinates_node = get_time_coordinates(start_stop_times)
+
+            # Get the list of target identifications nodes for the collection
+            target_identifications = bundle_db.get_all_target_identification()
+            target_identification_nodes: List[NodeBuilder] = []
+            target_identification_nodes = create_target_identification_nodes(
+                bundle_db, target_identifications, "collection"
+            )
+
+            # Get the investigation node for the collection
+            investigation_area_name = mk_Investigation_Area_name(proposal_id)
+            investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
+            investigation_area_node = investigation_area(
+                investigation_area_name, investigation_area_lidvid, "collection"
+            )
+
             context_node = [
                 make_collection_context_node(
+                    time_coordinates_node,
+                    investigation_area_node,
                     target_identification_nodes,
                 )
             ]

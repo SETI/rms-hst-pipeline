@@ -14,14 +14,20 @@ from pdart.xml.Templates import (
 
 
 def make_bundle_context_node(
+    time_coordinates_node: NodeBuilder,
+    investigation_area_node: NodeBuilder,
     target_identification_nodes: List[NodeBuilder],
 ) -> NodeBuilder:
     func = interpret_template(
         """<Context_Area>
+        <NODE name="Time_Coordinates" />
+        <NODE name="Investigation_Area" />
         <FRAGMENT name="Target_Identification" />
         </Context_Area>"""
     )(
         {
+            "Time_Coordinates": time_coordinates_node,
+            "Investigation_Area": investigation_area_node,
             "Target_Identification": combine_nodes_into_fragment(
                 target_identification_nodes
             ),

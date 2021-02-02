@@ -1,6 +1,8 @@
 """
 Templates to create a ``<Target_Identification />`` XML node for
 product labels.
+Roll-up: We will put multiple <Target_Identification /> when there are more than
+one target identification object.
 """
 
 from typing import Dict, List

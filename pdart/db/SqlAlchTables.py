@@ -274,6 +274,8 @@ class FitsProduct(Product):
         String, ForeignKey("products.lidvid"), primary_key=True, nullable=False
     )
     rootname = Column(String, nullable=False)
+    start_time = Column(String)
+    stop_time = Column(String)
 
     __mapper_args__ = {
         "polymorphic_identity": "fits_product",
