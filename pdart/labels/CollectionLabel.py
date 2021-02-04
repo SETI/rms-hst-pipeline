@@ -308,7 +308,7 @@ def make_other_collection_label(
     elif type_name == "OtherCollection":
         collection_type = cast(OtherCollection, collection).prefix.capitalize()
         suffix = cast(OtherCollection, collection).suffix
-        instrument = cast(OtherCollection, collection).instrument.upper()
+        instrument = cast(OtherCollection, collection).instrument
 
         # Roll-up (Context node) only exists in data collection
         if collection_type == "Data":
@@ -337,7 +337,7 @@ def make_other_collection_label(
                 image_type = "raw"
             primary_result_dict["processing_level"] = image_type.capitalize()
             p_title = (
-                f"{instrument} data files obtained by the HST "
+                f"{instrument.upper()} data files obtained by the HST "
                 + f"Observing Program {proposal_id}."
             )
             primary_result_dict["description"] = p_title
@@ -360,11 +360,15 @@ def make_other_collection_label(
                 investigation_area_name, investigation_area_lidvid, "collection"
             )
 
+            # Get the observing system node for the collection
+            observing_system_node = observing_system([instrument])
+
             context_node = [
                 make_collection_context_node(
                     time_coordinates_node,
                     primary_result_summary_node,
                     investigation_area_node,
+                    observing_system_node,
                     target_identification_nodes,
                 )
             ]

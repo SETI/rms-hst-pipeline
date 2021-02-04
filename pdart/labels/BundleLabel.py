@@ -22,6 +22,7 @@ from pdart.labels.FitsProductLabelXml import (
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.InvestigationArea import investigation_area
+from pdart.labels.ObservingSystem import observing_system
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import (
@@ -115,7 +116,8 @@ def make_bundle_label(
     primary_result_dict: Dict[str, Any] = {}
     # Put dummy value in processing level, wait for update.
     primary_result_dict["processing_level"] = "Raw"
-    instruments = ",".join(bundle_db.get_instruments_of_the_bundle()).upper()
+    instruments_list = bundle_db.get_instruments_of_the_bundle()
+    instruments = ", ".join(instruments_list).upper()
     p_title = (
         f"{instruments} observations obtained by the HST "
         + f"Observing Program {proposal_id}."
@@ -126,12 +128,16 @@ def make_bundle_label(
     primary_result_dict["wavelength_range"] = wavelength_range
     primary_result_summary_node = primary_result_summary(primary_result_dict)
 
+    # Get the observing system node for the bundle
+    observing_system_node = observing_system(instruments_list)
+
     context_node: List[NodeBuilder] = []
     context_node = [
         make_bundle_context_node(
             time_coordinates_node,
             primary_result_summary_node,
             investigation_area_node,
+            observing_system_node,
             target_identification_nodes,
         )
     ]
