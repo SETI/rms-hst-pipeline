@@ -276,6 +276,7 @@ class FitsProduct(Product):
     rootname = Column(String, nullable=False)
     start_time = Column(String)
     stop_time = Column(String)
+    wavelength_range = Column(String)
 
     __mapper_args__ = {
         "polymorphic_identity": "fits_product",

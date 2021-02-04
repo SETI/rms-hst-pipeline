@@ -1,6 +1,6 @@
 """Functionality to build a bundle label using a SQLite database."""
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
@@ -20,6 +20,7 @@ from pdart.labels.FitsProductLabelXml import (
     mk_Investigation_Area_name,
 )
 from pdart.labels.TimeCoordinates import get_time_coordinates
+from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.LabelError import LabelError
@@ -72,6 +73,18 @@ def make_bundle_label(
         for collection in bundle_db.get_bundle_collections(bundle.lidvid)
     ]
 
+    # Get the bundle title from part of CitationInformation description
+    title = (
+        info.title
+        + ", HST Cycle "
+        + str(info.cycle)
+        + " Program "
+        + str(info.propno)
+        + ", "
+        + info.publication_year
+        + "."
+    )
+
     # Get the list of target identifications nodes for the collection
     target_identifications = bundle_db.get_all_target_identification()
     target_identification_nodes: List[NodeBuilder] = []
@@ -98,10 +111,28 @@ def make_bundle_label(
     }
     time_coordinates_node = get_time_coordinates(start_stop_times)
 
+    # Dictionary used for primary result summary
+    primary_result_dict: Dict[str, Any] = {}
+    # Put dummy value in processing level, wait for update.
+    primary_result_dict["processing_level"] = "Raw"
+    instruments = ",".join(bundle_db.get_instruments_of_the_bundle()).upper()
+    p_title = (
+        f"{instruments} observations obtained by the HST "
+        + f"Observing Program {proposal_id}."
+    )
+    primary_result_dict["description"] = p_title
+    # Get unique wavelength names for roll-up in bundle
+    wavelength_range = bundle_db.get_wavelength_range_from_db()
+    primary_result_dict["wavelength_range"] = wavelength_range
+    primary_result_summary_node = primary_result_summary(primary_result_dict)
+
     context_node: List[NodeBuilder] = []
     context_node = [
         make_bundle_context_node(
-            time_coordinates_node, investigation_area_node, target_identification_nodes
+            time_coordinates_node,
+            primary_result_summary_node,
+            investigation_area_node,
+            target_identification_nodes,
         )
     ]
 
@@ -118,6 +149,7 @@ def make_bundle_label(
                     "bundle_lid": lidvid_to_lid(bundle.lidvid),
                     "bundle_vid": lidvid_to_vid(bundle.lidvid),
                     "proposal_id": str(proposal_id),
+                    "title": title,
                     "Citation_Information": make_citation_information(
                         info, is_for_bundle=True
                     ),

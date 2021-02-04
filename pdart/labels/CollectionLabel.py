@@ -2,7 +2,7 @@
 Functionality to build a collection label using a SQLite database.
 """
 
-from typing import cast, Callable, List
+from typing import Any, cast, Callable, Dict, List
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
@@ -27,6 +27,7 @@ from pdart.labels.FitsProductLabelXml import (
     mk_Investigation_Area_name,
 )
 from pdart.labels.TimeCoordinates import get_time_coordinates
+from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.ObservingSystem import observing_system
 from pdart.labels.LabelError import LabelError
@@ -133,10 +134,10 @@ def make_context_collection_label(
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
     proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
-    instrument = bundle_db.get_instrument_from_other_collection().upper()
+    instruments = ",".join(bundle_db.get_instruments_of_the_bundle()).upper()
     title: NodeBuilder = make_context_collection_title(
         {
-            "instrument": instrument,
+            "instrument": instruments,
             "proposal_id": str(proposal_id),
         }
     )
@@ -192,10 +193,10 @@ def make_schema_collection_label(
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
     proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
-    instrument = bundle_db.get_instrument_from_other_collection().upper()
+    instruments = ",".join(bundle_db.get_instruments_of_the_bundle()).upper()
     title: NodeBuilder = make_schema_collection_title(
         {
-            "instrument": instrument,
+            "instrument": instruments,
             "proposal_id": str(proposal_id),
         }
     )
@@ -251,12 +252,12 @@ def make_other_collection_label(
     collection: Collection = bundle_db.get_collection(collection_lidvid)
 
     proposal_id = bundle_db.get_bundle(bundle_lidvid).proposal_id
-    instrument = bundle_db.get_instrument_from_other_collection().upper()
+    instruments = ",".join(bundle_db.get_instruments_of_the_bundle()).upper()
 
     def make_ctxt_coll_title(_coll: Collection) -> NodeBuilder:
         return make_context_collection_title(
             {
-                "instrument": instrument,
+                "instrument": instruments,
                 "proposal_id": str(proposal_id),
             }
         )
@@ -264,7 +265,7 @@ def make_other_collection_label(
     def make_doc_coll_title(_coll: Collection) -> NodeBuilder:
         return make_document_collection_title(
             {
-                "instrument": instrument,
+                "instrument": instruments,
                 "proposal_id": str(proposal_id),
             }
         )
@@ -272,7 +273,7 @@ def make_other_collection_label(
     def make_sch_coll_title(_coll: Collection) -> NodeBuilder:
         return make_schema_collection_title(
             {
-                "instrument": instrument,
+                "instrument": instruments,
                 "proposal_id": str(proposal_id),
             }
         )
@@ -281,7 +282,7 @@ def make_other_collection_label(
         other_collection = cast(OtherCollection, coll)
         return make_other_collection_title(
             {
-                "instrument": instrument,
+                "instrument": other_collection.instrument.upper(),
                 "proposal_id": str(proposal_id),
                 "prefix": other_collection.prefix.capitalize(),
             }
@@ -307,6 +308,7 @@ def make_other_collection_label(
     elif type_name == "OtherCollection":
         collection_type = cast(OtherCollection, collection).prefix.capitalize()
         suffix = cast(OtherCollection, collection).suffix
+        instrument = cast(OtherCollection, collection).instrument.upper()
 
         # Roll-up (Context node) only exists in data collection
         if collection_type == "Data":
@@ -326,6 +328,24 @@ def make_other_collection_label(
             }
             time_coordinates_node = get_time_coordinates(start_stop_times)
 
+            # Dictionary used for primary result summary
+            primary_result_dict: Dict[str, Any] = {}
+            # Check if it's raw or calibrated image, we will update this later
+            if suffix == "cal":
+                image_type = "calibrated"
+            else:
+                image_type = "raw"
+            primary_result_dict["processing_level"] = image_type.capitalize()
+            p_title = (
+                f"{instrument} data files obtained by the HST "
+                + f"Observing Program {proposal_id}."
+            )
+            primary_result_dict["description"] = p_title
+            # Get unique wavelength names for roll-up in data collection
+            wavelength_range = bundle_db.get_wavelength_range_from_db(suffix)
+            primary_result_dict["wavelength_range"] = wavelength_range
+            primary_result_summary_node = primary_result_summary(primary_result_dict)
+
             # Get the list of target identifications nodes for the collection
             target_identifications = bundle_db.get_all_target_identification()
             target_identification_nodes: List[NodeBuilder] = []
@@ -343,6 +363,7 @@ def make_other_collection_label(
             context_node = [
                 make_collection_context_node(
                     time_coordinates_node,
+                    primary_result_summary_node,
                     investigation_area_node,
                     target_identification_nodes,
                 )

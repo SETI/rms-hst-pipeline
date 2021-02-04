@@ -1,5 +1,7 @@
-"""Templates to create an ``<Investigation_Area />`` XML element.
+"""
+Templates to create an ``<Investigation_Area />`` XML element.
 Roll-up: One <Investigation_Area /> for bundle, data colleciton, and data.
+Reference type can be difference for bundle, data collection, and data.
 """
 from typing import Any, Dict
 

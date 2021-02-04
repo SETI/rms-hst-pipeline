@@ -36,6 +36,12 @@ class Test_CollectionLabel(unittest.TestCase):
             "2005-01-19T15:41:05Z",
         )
 
+        # Create wavelength range in db for testing purpose
+        self.db.update_wavelength_range(
+            _FITS_PRODUCT_LIDVID,
+            ["Visible", "Near Infrared", "Infrared"],
+        )
+
         # Create target identifications db for testing purpose
         target_id = "09059_1"
         target_identifications: List[Tuple] = [

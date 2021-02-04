@@ -15,18 +15,21 @@ from pdart.xml.Templates import (
 
 def make_bundle_context_node(
     time_coordinates_node: NodeBuilder,
+    primary_result_summary_node: NodeBuilder,
     investigation_area_node: NodeBuilder,
     target_identification_nodes: List[NodeBuilder],
 ) -> NodeBuilder:
     func = interpret_template(
         """<Context_Area>
         <NODE name="Time_Coordinates" />
+        <NODE name="Primary_Result_Summary" />
         <NODE name="Investigation_Area" />
         <FRAGMENT name="Target_Identification" />
         </Context_Area>"""
     )(
         {
             "Time_Coordinates": time_coordinates_node,
+            "Primary_Result_Summary": primary_result_summary_node,
             "Investigation_Area": investigation_area_node,
             "Target_Identification": combine_nodes_into_fragment(
                 target_identification_nodes
@@ -43,8 +46,7 @@ make_label: DocTemplate = interpret_document_template(
   <Identification_Area>
     <logical_identifier><NODE name="bundle_lid"/></logical_identifier>
     <version_id><NODE name="bundle_vid"/></version_id>
-    <title>This bundle contains images obtained from HST Observing Program
-<NODE name="proposal_id"/>.</title>
+    <title><NODE name="title"/></title>
     <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Bundle</product_class>
     <NODE name="Citation_Information" />

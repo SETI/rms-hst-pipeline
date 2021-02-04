@@ -54,6 +54,14 @@ class Test_BundleLabel(unittest.TestCase):
             target_id, target_identifications
         )
 
+        # Create wavelength range in db for testing purpose
+        self.db.update_wavelength_range(
+            _FITS_PRODUCT_LIDVID,
+            ["Ultraviolet", "Visible", "Near Infrared", "Infrared"],
+        )
+
     def test_make_bundle_label(self) -> None:
         label = make_bundle_label(self.db, _BUNDLE_LIDVID, self.info, True, True)
+        print("=================")
+        print(label)
         assert_golden_file_equal(self, "test_BundleLabel.golden.xml", label)

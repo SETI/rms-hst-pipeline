@@ -45,6 +45,7 @@ from pdart.labels.Utils import (
     create_target_identification_nodes,
     get_current_date,
     MOD_DATE_FOR_TESTESING,
+    wavelength_from_range,
 )
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -240,9 +241,14 @@ def make_fits_product_label(
         primary_result_dict: Dict[str, Any] = {}
         primary_result_dict["processing_level"] = image_type.capitalize()
         primary_result_dict["description"] = title
-        # Put a random wavelenght first, this should be coming from
+        # Put a random wavelength first, this should be coming from
         # Utils.wavelength_from_range
-        primary_result_dict["wavelength_range"] = "Infrared"
+        if suffix == "raw":
+            wavelength_range = wavelength_from_range(0.5, 0.8)
+        else:
+            wavelength_range = wavelength_from_range(0.390, 0.7)
+        bundle_db.update_wavelength_range(product_lidvid, wavelength_range)
+        primary_result_dict["wavelength_range"] = wavelength_range
 
         label = (
             make_label(

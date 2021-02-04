@@ -463,12 +463,24 @@ class BundleDB(object):
             .all()
         ]
 
-    def get_instrument_from_other_collection(self) -> str:
+    def get_instrument_from_other_collection(self, collection_lidvid: str) -> str:
         """
-        Returns instrument of the bundle from OtherCollection table.
+        Returns instrument of a collection from OtherCollection table.
         """
-        first_record = self.session.query(OtherCollection).first()
-        return str(first_record.instrument)
+        record = (
+            self.session.query(OtherCollection)
+            .filter(OtherCollection.collection_lidvid == collection_lidvid)
+            .one()
+        )
+        return str(record.instrument)
+
+    def get_instruments_of_the_bundle(self) -> List[str]:
+        """
+        Returns a list of instruments of a bundle from OtherCollection table.
+        """
+        results = self.session.query(OtherCollection.instrument).distinct().all()
+        instruments = [res.instrument for res in results]
+        return instruments
 
     ############################################################
 
@@ -556,8 +568,9 @@ class BundleDB(object):
                     f"non-FITS product with LIDVID {product_lidvid} already exists"
                 )
         else:
-            # Stop/start time will be added later when walking through each
-            # fits product at the stage of creating fits product labels.
+            # Stop/start time & wavelength ranges will be added later when
+            # walking through each fits product at the stage of creating fits
+            # product labels.
             self.session.add(
                 FitsProduct(
                     lidvid=product_lidvid,
@@ -659,6 +672,53 @@ class BundleDB(object):
             ).scalar()
             max_stop_time = self.session.query(func.max(FitsProduct.stop_time)).scalar()
         return (min_start_time, max_stop_time)
+
+    def update_wavelength_range(
+        self, product_lidvid: str, wavelength_range: List[str]
+    ) -> None:
+        """Update the wavelength ranges for a fits_product."""
+        record = (
+            self.session.query(FitsProduct)
+            .filter(FitsProduct.product_lidvid == product_lidvid)
+            .one()
+        )
+        record.wavelength_range = ",".join(wavelength_range)
+        self.session.commit()
+
+    def get_wavelength_range_from_db(self, suffix: str = "") -> List[str]:
+        """
+        Get a list of unique wavelength range names from fits_products for a
+        specific data suffix (or None).
+        """
+        if suffix:
+            results = (
+                self.session.query(FitsProduct.wavelength_range)
+                .filter(FitsProduct.product_lidvid.contains(suffix))  # type: ignore
+                .distinct()
+                .all()
+            )
+        else:
+            results = self.session.query(FitsProduct.wavelength_range).distinct().all()
+
+        # Get unique wavelength range names
+        unique_wavelength_names = []
+        for res in results:
+            if res.wavelength_range:
+                unique_wavelength_names += res.wavelength_range.split(",")
+
+        # Sort the list in the following order so that the wavelength_range in
+        # primary_result_summary will be in the same order.
+        WAVELENGTH_ORDER = {
+            "Ultraviolet": 0,
+            "Visible": 1,
+            "Near Infrared": 2,
+            "Infrared": 3,
+            "Far Infrared": 4,
+        }
+        wavelength_li = list(set(unique_wavelength_names))
+        wavelength_li.sort(key=lambda name: WAVELENGTH_ORDER[name])
+
+        return wavelength_li
 
     ############################################################
     def create_target_identification(self, fits_os_path: str) -> None:

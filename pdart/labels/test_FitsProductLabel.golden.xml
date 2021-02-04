@@ -26,6 +26,8 @@
       <processing_level>Raw</processing_level>
       <description>ACS data file jbz504eoq_raw.fits obtained by the HST Observing Program 13012.</description>
       <Science_Facets>
+        <wavelength_range>Visible</wavelength_range>
+        <wavelength_range>Near Infrared</wavelength_range>
         <wavelength_range>Infrared</wavelength_range>
         <discipline_name>Ring-Moon Systems</discipline_name>
       </Science_Facets>
