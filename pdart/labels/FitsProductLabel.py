@@ -264,9 +264,7 @@ def make_fits_product_label(
                     "Investigation_Area": investigation_area(
                         investigation_area_name, investigation_area_lidvid, "data"
                     ),
-                    # "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
-                    # "investigation_lidvid": investigation_area_lidvid,
-                    "Observing_System": observing_system(instrument),
+                    "Observing_System": observing_system([instrument]),
                     "Time_Coordinates": get_time_coordinates(start_stop_times),
                     "Target_Identification": combine_nodes_into_fragment(
                         target_identification_nodes
