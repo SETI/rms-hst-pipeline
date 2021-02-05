@@ -17,7 +17,7 @@ def make_bundle_context_node(
     time_coordinates_node: NodeBuilder,
     primary_result_summary_node: NodeBuilder,
     investigation_area_node: NodeBuilder,
-    observing_system_node: NodeBuilder,
+    observing_system_nodes: List[NodeBuilder],
     target_identification_nodes: List[NodeBuilder],
 ) -> NodeBuilder:
     func = interpret_template(
@@ -25,7 +25,7 @@ def make_bundle_context_node(
         <NODE name="Time_Coordinates" />
         <NODE name="Primary_Result_Summary" />
         <NODE name="Investigation_Area" />
-        <NODE name="Observing_System" />
+        <FRAGMENT name="Observing_System" />
         <FRAGMENT name="Target_Identification" />
         </Context_Area>"""
     )(
@@ -33,7 +33,7 @@ def make_bundle_context_node(
             "Time_Coordinates": time_coordinates_node,
             "Primary_Result_Summary": primary_result_summary_node,
             "Investigation_Area": investigation_area_node,
-            "Observing_System": observing_system_node,
+            "Observing_System": combine_nodes_into_fragment(observing_system_nodes),
             "Target_Identification": combine_nodes_into_fragment(
                 target_identification_nodes
             ),

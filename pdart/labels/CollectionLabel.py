@@ -361,7 +361,7 @@ def make_other_collection_label(
             )
 
             # Get the observing system node for the collection
-            observing_system_node = observing_system([instrument])
+            observing_system_node = observing_system(instrument)
 
             context_node = [
                 make_collection_context_node(

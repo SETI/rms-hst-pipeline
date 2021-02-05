@@ -123,13 +123,16 @@ def make_bundle_label(
         + f"Observing Program {proposal_id}."
     )
     primary_result_dict["description"] = p_title
+
     # Get unique wavelength names for roll-up in bundle
     wavelength_range = bundle_db.get_wavelength_range_from_db()
     primary_result_dict["wavelength_range"] = wavelength_range
     primary_result_summary_node = primary_result_summary(primary_result_dict)
 
     # Get the observing system node for the bundle
-    observing_system_node = observing_system(instruments_list)
+    observing_system_nodes: List[NodeBuilder] = [
+        observing_system(instrument) for instrument in instruments_list
+    ]
 
     context_node: List[NodeBuilder] = []
     context_node = [
@@ -137,7 +140,7 @@ def make_bundle_label(
             time_coordinates_node,
             primary_result_summary_node,
             investigation_area_node,
-            observing_system_node,
+            observing_system_nodes,
             target_identification_nodes,
         )
     ]
