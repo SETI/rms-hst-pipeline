@@ -641,14 +641,27 @@ class BundleDB(object):
         self, product_lidvid: str, start_time: str, stop_time: str
     ) -> None:
         """Update the start/stop time for a fits_product."""
+        if not self.fits_product_time_exists(product_lidvid):
+            record = (
+                self.session.query(FitsProduct)
+                .filter(FitsProduct.product_lidvid == product_lidvid)
+                .one()
+            )
+            record.start_time = start_time
+            record.stop_time = stop_time
+            self.session.commit()
+
+    def fits_product_time_exists(self, product_lidvid: str) -> bool:
+        """
+        Returns True if a product with the given LIDVID has start/stop time
+        exist in the database.
+        """
         record = (
             self.session.query(FitsProduct)
-            .filter(FitsProduct.product_lidvid == product_lidvid)
+            .filter(FitsProduct.lidvid == product_lidvid)
             .one()
         )
-        record.start_time = start_time
-        record.stop_time = stop_time
-        self.session.commit()
+        return record.start_time and record.stop_time
 
     def get_roll_up_time_from_db(self, suffix: str = "") -> Tuple:
         """

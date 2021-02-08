@@ -25,6 +25,9 @@ from pdart.labels.HstParameters import (
     get_hst_parameters,
     get_start_stop_date_times,
     get_exposure_duration,
+    get_instrument_id,
+    get_detector_ids,
+    get_filter_name,
 )
 from pdart.labels.LabelError import LabelError
 from pdart.labels.ObservingSystem import (
@@ -55,6 +58,8 @@ from pdart.xml.Templates import (
     combine_nodes_into_fragment,
     NodeBuilder,
 )
+
+from wavelength_ranges import wavelength_ranges  # type: ignore
 
 
 def _directory_siblings(
@@ -241,12 +246,12 @@ def make_fits_product_label(
         primary_result_dict: Dict[str, Any] = {}
         primary_result_dict["processing_level"] = image_type.capitalize()
         primary_result_dict["description"] = title
-        # Put a random wavelength first, this should be coming from
-        # Utils.wavelength_from_range
-        if suffix == "raw":
-            wavelength_range = wavelength_from_range(0.5, 0.8)
-        else:
-            wavelength_range = wavelength_from_range(0.390, 0.7)
+
+        # Get wavelength
+        instrument_id = get_instrument_id(hdu_lookups, shm_lookup)
+        detector_ids = get_detector_ids(hdu_lookups, shm_lookup)
+        filter_name = get_filter_name(hdu_lookups, shm_lookup)
+        wavelength_range = wavelength_ranges(instrument_id, detector_ids, filter_name)
         bundle_db.update_wavelength_range(product_lidvid, wavelength_range)
         primary_result_dict["wavelength_range"] = wavelength_range
 
@@ -281,7 +286,6 @@ def make_fits_product_label(
     except AssertionError:
         raise AssertionError(f"{target_id} has no target identifications stored in DB.")
     except Exception as e:
-        print(str(e))
         raise LabelError(
             product_lidvid, file_basename, (lookup, hdu_lookups[0], shm_lookup)
         ) from e

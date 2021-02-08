@@ -26,6 +26,7 @@
       <processing_level>Raw</processing_level>
       <description>ACS data file jbz504eoq_raw.fits obtained by the HST Observing Program 13012.</description>
       <Science_Facets>
+        <wavelength_range>Ultraviolet</wavelength_range>
         <wavelength_range>Visible</wavelength_range>
         <wavelength_range>Near Infrared</wavelength_range>
         <wavelength_range>Infrared</wavelength_range>
@@ -99,7 +100,7 @@
           <hst:exposure_type>NORMAL</hst:exposure_type>
         </hst:Exposure_Parameters>
         <hst:Wavelength_Filter_Grating_Parameters>
-          <hst:filter_name>F165LP+N/A</hst:filter_name>
+          <hst:filter_name>F165LP</hst:filter_name>
           <hst:center_filter_wavelength unit="micrometer">0.</hst:center_filter_wavelength>
           <hst:bandwidth unit="micrometer">0.</hst:bandwidth>
           <hst:spectral_resolution unit="micrometer">0.</hst:spectral_resolution>
