@@ -17,3 +17,19 @@ SUFFIX_INFO = {
     "spt": ("Telemetry", "Miscellaneous"),
     "trl": ("Calibrated", "Miscellaneous"),
 }
+
+
+def get_collection_type(suffix):
+    try:
+        collection_type = SUFFIX_INFO[suffix][1].lower()
+    except:
+        raise ValueError(f"{suffix} has no collection type in SUFFIX_INFO.")
+    return collection_type
+
+
+def get_processing_level(suffix):
+    try:
+        processing_level = SUFFIX_INFO[suffix][0].lower()
+    except:
+        raise ValueError(f"{suffix} has no processing level in SUFFIX_INFO.")
+    return processing_level

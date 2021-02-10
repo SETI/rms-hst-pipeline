@@ -6,7 +6,7 @@ import fs.path
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import *
-from pdart.pipeline.suffix_info import SUFFIX_INFO  # type: ignore
+from pdart.pipeline.suffix_info import get_collection_type  # type: ignore
 
 _OLD_IMPL = False
 
@@ -78,13 +78,7 @@ class CopyPrimaryFiles(MarkedStage):
                 instrument_name = hst_filename.instrument_name()
                 suffix = hst_filename.suffix()
 
-                # Use SUFFIX_INFO to classify data and miscellaneous for
-                # different suffixes.
-                try:
-                    collection_type = SUFFIX_INFO[suffix][1][:4].lower()
-                except:
-                    raise ValueError(f"{suffix} has no collection type in SUFFIX_INFO.")
-                print(f"collection_type: {collection_type}")
+                collection_type = collection_type = get_collection_type(suffix)
                 coll = f"{collection_type}_{instrument_name}_{suffix}"
 
                 new_path = fs.path.join(
