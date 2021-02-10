@@ -59,6 +59,8 @@ from pdart.xml.Templates import (
     NodeBuilder,
 )
 
+from pdart.pipeline.suffix_info import SUFFIX_INFO  # type: ignore
+
 from wavelength_ranges import wavelength_ranges  # type: ignore
 
 
@@ -107,7 +109,8 @@ def _munge_lidvid(product_lidvid: str, suffix: str, new_basename: str) -> str:
     bundle_id, collection_id, product_id = LIDVID(product_lidvid).lid().parts()
 
     # TODO This is a hack
-    new_collection_id = collection_id[:-3] + suffix.lower()
+    collection_type = SUFFIX_INFO[suffix.lower()][1][:4].lower()
+    new_collection_id = collection_type + collection_id[4:-3] + suffix.lower()
     # TODO This is a hack
     new_product_id = new_basename[0:9]
 

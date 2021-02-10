@@ -311,7 +311,7 @@ def get_filter_name(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
             if filter2.startswith("CLEAR") or filter2 == "N/A":
                 return "CLEAR"
             else:
-                return filter1
+                return filter2
         if filter2.startswith("CLEAR") or filter2 == "N/A":
             return filter1
         # At this point, both filters start with "F" followed by three digits,

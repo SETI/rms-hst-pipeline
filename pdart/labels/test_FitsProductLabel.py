@@ -13,6 +13,8 @@ from pdart.db.SqlAlchTables import TargetIdentification
 from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
 
+from pdart.pipeline.suffix_info import SUFFIX_INFO  # type: ignore
+
 
 class Test_FitsProductLabel(unittest.TestCase):
     def setUp(self) -> None:
@@ -40,9 +42,8 @@ class Test_FitsProductLabel(unittest.TestCase):
             os.mkdir(mast_dir)
 
             def make_lidvid(suffix: str) -> Tuple[str, str]:
-                fits_product_lidvid = (
-                    f"urn:nasa:pds:hst_13012:data_acs_{suffix}:jbz504eoq::1.0"
-                )
+                collection_type = SUFFIX_INFO[suffix.lower()][1][:4].lower()
+                fits_product_lidvid = f"urn:nasa:pds:hst_13012:{collection_type}_acs_{suffix}:jbz504eoq::1.0"
                 self.db.create_fits_product(fits_product_lidvid, collection_lidvid)
 
                 file_basename = f"jbz504eoq_{suffix}.fits"
