@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Ancillary xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd http://pds.nasa.gov/pds4/mission/hst/v1 https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.xsd">
+  <Identification_Area>
+    <logical_identifier>urn:nasa:pds:hst_09059:miscellaneous_acs_spt:j6gp01mkq</logical_identifier>
+    <version_id>1.0</version_id>
+    <title>ACS data file j6gp01mkq_spt.fits obtained by the HST Observing Program 9059.</title>
+    <information_model_version>1.15.0.0</information_model_version>
+    <product_class>Product_Ancillary</product_class>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>2016-04-20</modification_date>
+        <version_id>1.0</version_id>
+        <description>Initial PDS4 version</description>
+      </Modification_Detail>
+    </Modification_History>
+  </Identification_Area>
+  <File_Area_Ancillary>
+    <File>
+      <file_name>j6gp01mkq_spt.fits</file_name>
+    </File>
+    <Header>
+      <local_identifier>hdu_0</local_identifier>
+      <offset unit="byte">0</offset>
+      <object_length unit="byte">28800</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>Global FITS Header</description>
+    </Header>
+    <Header>
+      <local_identifier>hdu_1</local_identifier>
+      <offset unit="byte">28800</offset>
+      <object_length unit="byte">25920</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>FITS Header</description>
+    </Header>
+    <Array>
+      <offset unit="byte">54720</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Line</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array>
+  </File_Area_Ancillary>
+</Product_Ancillary>

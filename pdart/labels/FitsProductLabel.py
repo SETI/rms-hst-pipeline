@@ -17,7 +17,8 @@ from pdart.labels.Lookup import (
     make_hdu_lookups,
 )
 from pdart.labels.FitsProductLabelXml import (
-    make_label,
+    make_data_label,
+    make_misc_label,
     mk_Investigation_Area_lidvid,
     mk_Investigation_Area_name,
 )
@@ -261,37 +262,39 @@ def make_fits_product_label(
         bundle_db.update_wavelength_range(product_lidvid, wavelength_range)
         primary_result_dict["wavelength_range"] = wavelength_range
 
-        label = (
-            make_label(
-                {
-                    "lid": lidvid_to_lid(product_lidvid),
-                    "vid": lidvid_to_vid(product_lidvid),
-                    "title": title,
-                    "mod_date": mod_date,
-                    "file_name": file_basename,
-                    "file_contents": get_file_contents(
-                        bundle_db, card_dicts, instrument, product_lidvid
-                    ),
-                    "Investigation_Area": investigation_area(
-                        investigation_area_name, investigation_area_lidvid, "data"
-                    ),
-                    "Observing_System": observing_system(instrument),
-                    "Time_Coordinates": get_time_coordinates(start_stop_times),
-                    "Target_Identification": combine_nodes_into_fragment(
-                        target_identification_nodes
-                    ),
-                    "HST": hst_parameters,
-                    "Primary_Result_Summary": primary_result_summary(
-                        primary_result_dict
-                    ),
-                }
-            )
-            .toxml()
-            .encode()
-        )
+        # Dictionary passed into templates. Use the same data dictionary for
+        # either data label template or misc label template
+        data_dict = {
+            "lid": lidvid_to_lid(product_lidvid),
+            "vid": lidvid_to_vid(product_lidvid),
+            "title": title,
+            "mod_date": mod_date,
+            "file_name": file_basename,
+            "file_contents": get_file_contents(
+                bundle_db, card_dicts, instrument, product_lidvid
+            ),
+            "Investigation_Area": investigation_area(
+                investigation_area_name, investigation_area_lidvid, "data"
+            ),
+            "Observing_System": observing_system(instrument),
+            "Time_Coordinates": get_time_coordinates(start_stop_times),
+            "Target_Identification": combine_nodes_into_fragment(
+                target_identification_nodes
+            ),
+            "HST": hst_parameters,
+            "Primary_Result_Summary": primary_result_summary(primary_result_dict),
+        }
+
+        collection_type = get_collection_type(suffix)
+        if collection_type == "data":
+            label = make_data_label(data_dict).toxml().encode()
+        elif collection_type == "miscellaneous":
+            label = make_misc_label(data_dict).toxml().encode()
+
     except AssertionError:
         raise AssertionError(f"{target_id} has no target identifications stored in DB.")
     except Exception as e:
+        print(str(e))
         raise LabelError(
             product_lidvid, file_basename, (lookup, hdu_lookups[0], shm_lookup)
         ) from e

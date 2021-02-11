@@ -8,7 +8,7 @@ from pdart.labels.Namespaces import (
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import DocTemplate, interpret_document_template
 
-make_label: DocTemplate = interpret_document_template(
+make_data_label: DocTemplate = interpret_document_template(
     f"""<?xml version="1.0" encoding="utf-8"?>
 {PDS4_XML_MODEL}
 {HST_XML_MODEL}
@@ -44,7 +44,38 @@ make_label: DocTemplate = interpret_document_template(
 </Product_Observational>"""
 )
 """
-An interpreted document template to create a product label.
+An interpreted document template to create a data product label.
+"""
+
+make_misc_label: DocTemplate = interpret_document_template(
+    f"""<?xml version="1.0" encoding="utf-8"?>
+{PDS4_XML_MODEL}
+{HST_XML_MODEL}
+<Product_Ancillary {FITS_PRODUCT_NAMESPACES}>
+  <Identification_Area>
+    <logical_identifier><NODE name="lid" /></logical_identifier>
+    <version_id><NODE name="vid" /></version_id>
+    <title><NODE name="title" /></title>
+    <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
+    <product_class>Product_Ancillary</product_class>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date><NODE name="mod_date" /></modification_date>
+        <version_id>1.0</version_id>
+        <description>Initial PDS4 version</description>
+      </Modification_Detail>
+    </Modification_History>
+  </Identification_Area>
+  <File_Area_Ancillary>
+    <File>
+      <file_name><NODE name="file_name" /></file_name>
+    </File>
+    <FRAGMENT name="file_contents" />
+  </File_Area_Ancillary>
+</Product_Ancillary>"""
+)
+"""
+An interpreted document template to create a misc product label.
 """
 
 
