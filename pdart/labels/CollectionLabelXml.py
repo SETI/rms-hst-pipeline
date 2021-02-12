@@ -38,9 +38,7 @@ obtained from HST Observing Program <NODE name="proposal_id"/>.</title>
 
 make_other_collection_title: NodeBuilderTemplate = interpret_template(
     """
-    <title><NODE name="prefix"/> collection of <NODE name="instrument"/> \
-observations obtained from HST Observing Program <NODE name="proposal_id"/>\
-.</title>
+    <title><NODE name="collection_title"/></title>
     """
 )
 

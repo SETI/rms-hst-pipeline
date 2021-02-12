@@ -66,6 +66,14 @@ class Test_CollectionLabel(unittest.TestCase):
             target_id, target_identifications
         )
 
+        # Create data collection title in db for testing purpose
+        data_collection_title = (
+            "Raw, uncalibrated ACS/HRC image files from HST Program 9059."
+        )
+        self.db.update_fits_product_collection_title(
+            _COLLECTION_LIDVID, data_collection_title
+        )
+
     def test_make_collection_label(self) -> None:
         # make a standard collection label
         label = make_collection_label(

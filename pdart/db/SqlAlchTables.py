@@ -163,6 +163,7 @@ class OtherCollection(Collection):
     instrument = Column(String(8), nullable=False)
     prefix = Column(String(8), nullable=False)
     suffix = Column(String(8), nullable=False)
+    title = Column(String)
 
     __mapper_args__ = {
         "polymorphic_identity": "other_collection",

@@ -259,6 +259,14 @@ def make_fits_product_label(
             product_title = product_title.format(
                 I=instrument_id + "/" + channel_id, F=file_basename, P=proposal_id
             )
+            collection_title = titles[1] + "."
+            collection_title = collection_title.format(
+                I=instrument_id + "/" + channel_id, F=file_basename, P=proposal_id
+            )
+            # save data/misc collection title to OtherCollection table
+            bundle_db.update_fits_product_collection_title(
+                collection_lidvid, collection_title
+            )
         except KeyError:
             # If product_title doesn't exist in SUFFIX_TITLES, we use the
             # following text as the product_title.

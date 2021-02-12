@@ -422,6 +422,8 @@ class BundleDB(object):
             instrument = _lidvid_to_instrument(collection_lidvid)
             prefix = _lidvid_to_prefix(collection_lidvid)
             suffix = _lidvid_to_suffix(collection_lidvid)
+            # Data/misc fits product collection title will be added later
+            # when creating product labels.
             self.session.add(
                 OtherCollection(
                     lidvid=collection_lidvid,
@@ -437,6 +439,39 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
+
+    def fits_product_collection_title_exists(self, collection_lidvid: str) -> bool:
+        """
+        Returns True iff a collection with the given LIDVID has title exists
+        in the database.
+        """
+        record = (
+            self.session.query(OtherCollection)
+            .filter(OtherCollection.collection_lidvid == collection_lidvid)
+            .one()
+        )
+        return record.title
+
+    def update_fits_product_collection_title(
+        self, collection_lidvid: str, title: str
+    ) -> None:
+        """Update title for fits product collection."""
+        if not self.fits_product_collection_title_exists(collection_lidvid):
+            record = (
+                self.session.query(OtherCollection)
+                .filter(OtherCollection.collection_lidvid == collection_lidvid)
+                .one()
+            )
+            record.title = title
+            self.session.commit()
+
+    def get_fits_product_collection_title(self, collection_lidvid: str) -> str:
+        title = (
+            self.session.query(OtherCollection.title)
+            .filter(OtherCollection.collection_lidvid == collection_lidvid)
+            .scalar()
+        )
+        return str(title)
 
     def collection_exists(self, collection_lidvid: str) -> bool:
         """
@@ -462,17 +497,6 @@ class BundleDB(object):
             .order_by(CollectionProductLink.product_lidvid)
             .all()
         ]
-
-    def get_instrument_from_other_collection(self, collection_lidvid: str) -> str:
-        """
-        Returns instrument of a collection from OtherCollection table.
-        """
-        record = (
-            self.session.query(OtherCollection)
-            .filter(OtherCollection.collection_lidvid == collection_lidvid)
-            .one()
-        )
-        return str(record.instrument)
 
     def get_instruments_of_the_bundle(self) -> List[str]:
         """

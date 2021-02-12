@@ -44,6 +44,7 @@ from pdart.xml.Templates import (
     NodeBuilder,
 )
 
+from pdart.pipeline.suffix_info import get_processing_level  # type: ignore
 
 # TODO Should probably test document_collection independently.
 
@@ -280,13 +281,16 @@ def make_other_collection_label(
 
     def make_other_coll_title(coll: Collection) -> NodeBuilder:
         other_collection = cast(OtherCollection, coll)
-        return make_other_collection_title(
-            {
-                "instrument": other_collection.instrument.upper(),
-                "proposal_id": str(proposal_id),
-                "prefix": other_collection.prefix.capitalize(),
-            }
-        )
+        if other_collection.prefix == "browse":
+            collection_title = (
+                f"{other_collection.prefix.capitalize()} "
+                + f"collection of {other_collection.instrument.upper()} "
+                + f"observations obtained from HST Observing Program {proposal_id}."
+            )
+        else:
+            # Get the data/misc collection title from db.
+            collection_title = str(other_collection.title)
+        return make_other_collection_title({"collection_title": collection_title})
 
     title: NodeBuilder = switch_on_collection_subtype(
         collection,
@@ -331,15 +335,10 @@ def make_other_collection_label(
             # Dictionary used for primary result summary
             primary_result_dict: Dict[str, Any] = {}
             # Check if it's raw or calibrated image, we will update this later
-            if suffix == "cal":
-                image_type = "calibrated"
-            else:
-                image_type = "raw"
-            primary_result_dict["processing_level"] = image_type.capitalize()
-            p_title = (
-                f"{instrument.upper()} data files obtained by the HST "
-                + f"Observing Program {proposal_id}."
-            )
+            processing_level = get_processing_level(suffix)
+            primary_result_dict["processing_level"] = processing_level
+
+            p_title = bundle_db.get_fits_product_collection_title(collection_lidvid)
             primary_result_dict["description"] = p_title
             # Get unique wavelength names for roll-up in data collection
             wavelength_range = bundle_db.get_wavelength_range_from_db(suffix)

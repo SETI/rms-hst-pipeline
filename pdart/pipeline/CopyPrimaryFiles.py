@@ -78,7 +78,7 @@ class CopyPrimaryFiles(MarkedStage):
                 instrument_name = hst_filename.instrument_name()
                 suffix = hst_filename.suffix()
 
-                collection_type = collection_type = get_collection_type(suffix)
+                collection_type = get_collection_type(suffix)
                 coll = f"{collection_type}_{instrument_name}_{suffix}"
 
                 new_path = fs.path.join(
