@@ -29,7 +29,7 @@ def get_collection_type(suffix):
 
 def get_processing_level(suffix):
     try:
-        processing_level = SUFFIX_INFO[suffix][0].lower()
+        processing_level = SUFFIX_INFO[suffix][0]
     except:
         raise ValueError(f"{suffix} has no processing level in SUFFIX_INFO.")
     return processing_level

@@ -23,6 +23,7 @@ from pdart.labels.FitsProductLabelXml import (
     mk_Investigation_Area_name,
 )
 from pdart.labels.HstParameters import (
+    get_channel_id,
     get_hst_parameters,
     get_start_stop_date_times,
     get_exposure_duration,
@@ -42,6 +43,8 @@ from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
 from pdart.labels.TargetIdentification import get_target, get_target_info
 from pdart.labels.TargetIdentificationXml import target_lid
 
+from pdart.labels.suffix_titles import get_titles_format  # type: ignore
+
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import (
     lidvid_to_lid,
@@ -60,7 +63,10 @@ from pdart.xml.Templates import (
     NodeBuilder,
 )
 
-from pdart.pipeline.suffix_info import get_collection_type  # type: ignore
+from pdart.pipeline.suffix_info import (  # type: ignore
+    get_collection_type,
+    get_processing_level,
+)
 
 from wavelength_ranges import wavelength_ranges  # type: ignore
 
@@ -182,12 +188,6 @@ def make_fits_product_label(
         instrument = collection.instrument
         suffix = collection.suffix
 
-        # Check if it's raw or calibrated image
-        if suffix == "cal":
-            image_type = "calibrated"
-        else:
-            image_type = "raw"
-
         # If a label is created for testing purpose to compare with pre-made XML
         # we will use MOD_DATE_FOR_TESTESING as the modification date.
         if not use_mod_date_for_testing:
@@ -244,22 +244,34 @@ def make_fits_product_label(
             bundle_db, target_identifications, "data"
         )
 
-        title = (
-            f"{instrument.upper()} data file {file_basename} "
-            + f"obtained by the HST Observing Program {proposal_id}."
-        )
-
-        # Dictionary used for primary result summary
-        primary_result_dict: Dict[str, Any] = {}
-        primary_result_dict["processing_level"] = image_type.capitalize()
-        primary_result_dict["description"] = title
-
         # Get wavelength
         instrument_id = get_instrument_id(hdu_lookups, shm_lookup)
         detector_ids = get_detector_ids(hdu_lookups, shm_lookup)
         filter_name = get_filter_name(hdu_lookups, shm_lookup)
         wavelength_range = wavelength_ranges(instrument_id, detector_ids, filter_name)
         bundle_db.update_wavelength_range(product_lidvid, wavelength_range)
+
+        # Get title
+        channel_id = get_channel_id(hdu_lookups, shm_lookup)
+        try:
+            titles = get_titles_format(instrument_id, channel_id, suffix)
+            product_title = titles[0] + "."
+            product_title = product_title.format(
+                I=instrument_id + "/" + channel_id, F=file_basename, P=proposal_id
+            )
+        except KeyError:
+            # If product_title doesn't exist in SUFFIX_TITLES, we use the
+            # following text as the product_title.
+            product_title = (
+                f"{instrument_id} data file {file_basename} "
+                + f"obtained by the HST Observing Program {proposal_id}."
+            )
+
+        # Dictionary used for primary result summary
+        processing_level = get_processing_level(suffix)
+        primary_result_dict: Dict[str, Any] = {}
+        primary_result_dict["processing_level"] = processing_level
+        primary_result_dict["description"] = product_title
         primary_result_dict["wavelength_range"] = wavelength_range
 
         # Dictionary passed into templates. Use the same data dictionary for
@@ -267,7 +279,7 @@ def make_fits_product_label(
         data_dict = {
             "lid": lidvid_to_lid(product_lidvid),
             "vid": lidvid_to_vid(product_lidvid),
-            "title": title,
+            "title": product_title,
             "mod_date": mod_date,
             "file_name": file_basename,
             "file_contents": get_file_contents(
@@ -285,6 +297,8 @@ def make_fits_product_label(
             "Primary_Result_Summary": primary_result_summary(primary_result_dict),
         }
 
+        # Pass the data_dict to either data label or misc label based on
+        # collection_type
         collection_type = get_collection_type(suffix)
         if collection_type == "data":
             label = make_data_label(data_dict).toxml().encode()

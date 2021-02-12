@@ -5,7 +5,7 @@
   <Identification_Area>
     <logical_identifier>urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq</logical_identifier>
     <version_id>1.0</version_id>
-    <title>ACS data file jbz504eoq_raw.fits obtained by the HST Observing Program 13012.</title>
+    <title>Raw, uncalibrated ACS/SBC image file jbz504eoq_raw.fits from HST Program 13012.</title>
     <information_model_version>1.15.0.0</information_model_version>
     <product_class>Product_Observational</product_class>
     <Modification_History>
@@ -24,7 +24,7 @@
     <Primary_Result_Summary>
       <purpose>Science</purpose>
       <processing_level>Raw</processing_level>
-      <description>ACS data file jbz504eoq_raw.fits obtained by the HST Observing Program 13012.</description>
+      <description>Raw, uncalibrated ACS/SBC image file jbz504eoq_raw.fits from HST Program 13012.</description>
       <Science_Facets>
         <wavelength_range>Ultraviolet</wavelength_range>
         <wavelength_range>Visible</wavelength_range>
