@@ -24,6 +24,8 @@ def get_collection_type(suffix):
         collection_type = SUFFIX_INFO[suffix][1].lower()
     except:
         raise ValueError(f"{suffix} has no collection type in SUFFIX_INFO.")
+        # TODO: SUFFIX_INFO will be updated later. Might need a default value
+        # if suffix doesn't exist in SUFFIX_INFO
         # collection_type = "data"
     return collection_type
 
@@ -33,5 +35,7 @@ def get_processing_level(suffix):
         processing_level = SUFFIX_INFO[suffix][0]
     except:
         raise ValueError(f"{suffix} has no processing level in SUFFIX_INFO.")
+        # TODO: SUFFIX_INFO will be updated later. Might need a default value
+        # if suffix doesn't exist in SUFFIX_INFO
         # processing_level = "Raw"
     return processing_level

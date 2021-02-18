@@ -128,9 +128,9 @@ copy-results :
 # smaller version for testing
 ##############################
 
-# LILS=07885 09059 09748 15505
+LILS=07885 09059 09748 15505
 # LILS=09059
-LILS=13012
+# LILS=13012
 
 .PHONY: lil-pipeline
 LIL-TWD=$(TMP_WORKING_DIR)
@@ -142,8 +142,8 @@ lil-pipeline : venv
 	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
 	done;
-	# say lil pipeline is done
-	# open $(LIL-TWD)
+	say lil pipeline is done
+	open $(LIL-TWD)
 
 ##############################
 # Pipeline for NICMOS ONLY

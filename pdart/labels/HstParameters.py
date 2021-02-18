@@ -20,7 +20,7 @@ from pdart.labels.HstParametersXml import (
     wavelength_filter_grating_parameters,
     operational_parameters,
 )
-from pdart.labels.Lookup import Lookup
+from pdart.labels.Lookup import Lookup, merge_two_hdu_lookups
 from pdart.xml.Templates import (
     FragBuilder,
     NodeBuilder,
@@ -77,7 +77,7 @@ def get_bandwidth(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return a float for the ``<bandwidth />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     # Works for STIS and WFPC2
     try:
         return "%.4f" % (float(lookup["BANDWID"]) * 1.0e-4)
@@ -92,7 +92,7 @@ def get_binning_mode(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<binning_mode />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     instrument = get_instrument_id(data_lookups, shm_lookup)
     # WF/PC and WFPC2 are special cases
     if instrument in ("WF/PC", "WFPC2"):
@@ -119,7 +119,7 @@ def get_center_filter_wavelength(data_lookups: List[Lookup], shm_lookup: Lookup)
     """
     Return a float for the ``<center_filter_wavelength />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     # Works for STIS and WFPC2
     try:
         return "%.4f" % (float(lookup["CENTRWV"]) * 1.0e-4)
@@ -134,7 +134,7 @@ def get_channel_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<channel_id />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     instrument = get_instrument_id(data_lookups, shm_lookup)
     if instrument == "NICMOS":
         result = "NIC" + str(lookup["CAMERA"])
@@ -182,7 +182,7 @@ def get_cosmic_ray_split_count(data_lookups: List[Lookup], shm_lookup: Lookup) -
     """
     Return text for the ``<cosmic_ray_split_count />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     try:
         return str(lookup["CRSPLIT"])
     except KeyError:
@@ -213,7 +213,7 @@ def get_detector_ids(data_lookups: List[Lookup], shm_lookup: Lookup) -> List[str
         ccds.sort()
         return ccds
 
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     instrument = get_instrument_id(data_lookups, shm_lookup)
     channel = get_channel_id(data_lookups, shm_lookup)
     if instrument == "ACS" and channel == "WFC":
@@ -277,7 +277,7 @@ def get_exposure_duration(data_lookups: List[Lookup], shm_lookup: Lookup) -> str
     """
     Return a float for the ``<exposure_duration />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     try:
         return str(lookup["EXPTIME"])
     except KeyError:
@@ -291,7 +291,7 @@ def get_exposure_type(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<exposure_type />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     return lookup["EXPFLAG"].strip()
 
 
@@ -302,7 +302,7 @@ def get_filter_name(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<filter_name />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     instrument = get_instrument_id(data_lookups, shm_lookup)
     if instrument == "ACS":
         filter1 = lookup["FILTER1"].strip()
@@ -369,7 +369,7 @@ def get_fine_guidance_sensor_lock_type(
     """
     Return text for the ``<fine_guidance_system_lock_type />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     return lookup["FGSLOCK"].strip()
 
 
@@ -380,7 +380,7 @@ def get_gain_setting(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<gain_mode_id />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     # Works for WFPC2
     try:
         wfpc2_gain: int = int(float(lookup["ATODGAIN"]))  # format WFPC2 gains as ints
@@ -407,7 +407,7 @@ def get_gyroscope_mode(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<gyroscope_mode />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     try:
         return str(lookup["GYROMODE"]).strip().replace("T", "3")
     except KeyError:
@@ -443,7 +443,7 @@ def get_hst_proposal_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<hst_proposal_id />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     return str(lookup["PROPOSID"])
 
 
@@ -454,7 +454,7 @@ def get_hst_target_name(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<hst_target_name />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     return lookup["TARGNAME"]
 
 
@@ -465,7 +465,7 @@ def get_instrument_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<instrument_id />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     instrument = lookup["INSTRUME"].strip()
     if instrument == "HRS":
         return "GHRS"
@@ -481,7 +481,7 @@ def get_instrument_mode_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> st
     """
     Return text for the ``<instrument_mode_id />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     instrument = get_instrument_id(data_lookups, shm_lookup)
     if instrument in ("WF/PC", "WFPC2"):
         return lookup["MODE"].strip()
@@ -504,7 +504,7 @@ def get_mast_observation_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> s
     """
     Return text for the ``<mast_observation_id />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     KEYS = ["ROOTNAME", "ASN_ID"]
     for keyword in KEYS:
         try:
@@ -594,7 +594,7 @@ def get_observation_type(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<observation_type />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     try:
         obstype = lookup["OBSTYPE"].strip()
         if obstype not in ("IMAGING", "SPECTROGRAPHIC"):
@@ -621,7 +621,7 @@ def get_proposed_aperture_name(data_lookups: List[Lookup], shm_lookup: Lookup) -
     """
     Return text for the ``<proposed_aperture_name />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     try:
         res = lookup["PROPAPER"].strip()  # only a few instruments distinguish
         if res:
@@ -639,7 +639,7 @@ def get_repeat_exposure_count(data_lookups: List[Lookup], shm_lookup: Lookup) ->
     """
     Return text for the ``<repeat_exposure_count />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     try:
         return str(lookup["NRPTEXP"])
     except KeyError:
@@ -671,7 +671,7 @@ def get_plate_scale(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<plate_scale />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     # Works for STIS
     try:
         return str(lookup["PLATESC"])
@@ -699,7 +699,7 @@ def get_spectral_resolution(data_lookups: List[Lookup], shm_lookup: Lookup) -> s
     """
     Return text for the ``<spectral_resolution />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     # Works for STIS
     try:
         return "%.4f" % (float(lookup["SPECRES"]) * 1.0e-4)
@@ -718,7 +718,7 @@ def get_start_stop_date_times(
     elements.
     """
 
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
 
     # HST documents indicate that times are only accurate to a second or so.
     # This is consistent with the fact that start times indicated by DATE-OBS
@@ -799,7 +799,7 @@ def get_subarray_flag(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     """
     Return text for the ``<subarray_flag />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     try:
         value: str = lookup["SUBARRAY"]
         if value == "1" or value.startswith("T"):
@@ -823,7 +823,7 @@ def get_targeted_detector_ids(
     Return a list of one or more text values for the
     ``<targeted_detector_ids />`` XML element.
     """
-    lookup = data_lookups[0]
+    lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
     instrument = get_instrument_id(data_lookups, shm_lookup)
     aperture = get_aperture_name(data_lookups, shm_lookup)
     if instrument == "WFPC2":

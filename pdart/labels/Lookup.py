@@ -102,6 +102,16 @@ def make_hdu_lookups(label: str, card_dicts: CARD_SET) -> List[Lookup]:
     ]
 
 
+# Merge Hdu0 and Hdu1. Some HST params data only exists in Hdu1 for some
+# proposal id (ex: 13012), so when getting data HST params data, we will look
+# at both Hdu0 and Hdu1.
+def merge_two_hdu_lookups(hdu0: Lookup, hdu1: Lookup) -> Lookup:
+    # Use data from Hdu0 as the primary, so if a param data exists in both
+    # Hdu0 and Hdu1, we will use the one from hdu0.
+    comb_dict = {**hdu1.card_dict, **hdu0.card_dict}  # type: ignore
+    return HduLookup("Combine Hdu0 and Hdu1", comb_dict)
+
+
 ############################################################
 
 
