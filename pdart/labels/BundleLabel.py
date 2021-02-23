@@ -1,6 +1,6 @@
 """Functionality to build a bundle label using a SQLite database."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 
 from pdart.citations import Citation_Information
 from pdart.db.BundleDB import BundleDB
@@ -56,13 +56,19 @@ def make_bundle_label(
     proposal_id = bundle.proposal_id
 
     def get_ref_type(collection: Collection) -> str:
-        return switch_on_collection_subtype(
+        ref_type = switch_on_collection_subtype(
             collection,
             "bundle_has_context_collection",
             "bundle_has_document_collection",
             "bundle_has_schema_collection",
-            "bundle_has_data_collection",
+            "bundle_has_other_collection",
         )
+
+        if ref_type == "bundle_has_other_collection":
+            collection_type = cast(OtherCollection, collection).prefix
+            ref_type = f"bundle_has_{collection_type}_collection"
+
+        return ref_type
 
     reduced_collections = [
         make_bundle_entry_member(
