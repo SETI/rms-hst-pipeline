@@ -36,6 +36,7 @@ from pdart.labels.CollectionLabel import (
 )
 from pdart.labels.DocumentProductLabel import make_document_product_label
 from pdart.labels.FitsProductLabel import make_fits_product_label
+from pdart.labels.TargetIdentification import make_context_target_label
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -52,12 +53,16 @@ from pdart.pipeline.Utils import (
     make_version_view,
 )
 
+import urllib
+import bs4  # type: ignore
+
 _LOGGER = logging.getLogger(__name__)
 
 
 _VERIFY = False
 
 PUBLICATION_YEAR = 2021
+PDS_URL = "https://pds.nasa.gov/data/pds4/context-pds4/target/"
 
 
 def log_label(tag: str, lidvid: str) -> None:
@@ -123,8 +128,50 @@ def create_pds4_labels(
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
             context_coll_dir_path = fs.path.join(bundle_dir_path, "context$")
             label_deltas.makedir(context_coll_dir_path)
+
+            self._create_context_target_label(context_coll_dir_path, collection_lidvid)
+
             collection = bundle_db.get_collection(collection_lidvid)
             self._post_visit_collection(collection)
+
+        def _create_context_target_label(
+            self, context_coll_dir_path: str, collection_lidvid: str
+        ) -> None:
+            """
+            Create target lable under context collection if it doesn't exist
+            in PDS page.
+            """
+            with urllib.request.urlopen(PDS_URL) as response:
+                html = response.read()
+            soup = bs4.BeautifulSoup(html, "html.parser")
+            a_tags = soup.find_all("a")
+            target_label_list = [a.string for a in a_tags if a.string]
+            target_records = bundle_db.get_all_target_identification()
+            target_list = []
+            for record in target_records:
+                name = str(record.name).replace(" ", "_")
+                target = f"{record.type}.{name}".lower()
+                if target not in target_list:
+                    target_list.append(target)
+
+            for target in target_list:
+                is_target_label_exists = False
+                for label in target_label_list:
+                    if target in label:
+                        is_target_label_exists = True
+                        break
+                if not is_target_label_exists:
+                    label_filename = f"{target}_1.0.xml"
+                    label_filepath = fs.path.join(context_coll_dir_path, label_filename)
+                    target_lidvid = f"urn:nasa:pds:context:target:{target}::1.0"
+                    label = make_context_target_label(self.db, target, _VERIFY)
+                    label_deltas.setbytes(label_filepath, label)
+                    bundle_db.create_target_label(
+                        label_deltas.getsyspath(label_filepath),
+                        label_filename,
+                        target_lidvid,
+                        collection_lidvid,
+                    )
 
         def _create_schema_collection(self, bundle: Bundle) -> None:
             schema_products = bundle_db.get_schema_products()

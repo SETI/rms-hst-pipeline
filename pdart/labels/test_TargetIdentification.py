@@ -30,7 +30,7 @@ class Test_TargetIdentification(unittest.TestCase):
             ("Uranus", [], "Planet", [], "urn:nasa:pds:context:target:planet.uranus")
         ]
         db.add_record_to_target_identification_db(target_id, target_identifications)
-        target_from_db = db.get_target_identification(target_id)
+        target_from_db = db.get_target_identifications_based_on_id(target_id)
         target_dict: Dict[str, Any] = {}
         # We only have one entry from db query in this test case.
         target_dict["name"] = target_from_db[0].name

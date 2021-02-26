@@ -623,6 +623,21 @@ class ProductLabel(Base):
     md5_hash = Column(String(32), nullable=False)
 
 
+class TargetLabel(Base):
+    """
+    A database representation of a newly generated PDS4 target label.
+    """
+
+    __tablename__ = "target_labels"
+
+    target_lidvid = Column(String, primary_key=True, nullable=False)
+    # We store target label under context collection directory, this will point
+    # us to the correct path of the target label
+    collection_lidvid = Column(String, nullable=False)
+    basename = Column(String, nullable=False)
+    md5_hash = Column(String(32), nullable=False)
+
+
 ############################################################
 
 

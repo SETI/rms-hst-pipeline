@@ -44,6 +44,7 @@ _TABLES: Set[str] = {
     "proposal_info",
     "target_identification",
     "citation_info",
+    "target_labels",
 }
 
 

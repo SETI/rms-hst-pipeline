@@ -34,10 +34,10 @@ from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import (
     lidvid_to_lid,
     lidvid_to_vid,
-    create_target_identification_nodes,
     get_current_date,
     MOD_DATE_FOR_TESTESING,
 )
+from pdart.labels.TargetIdentification import create_target_identification_nodes
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import (
     combine_nodes_into_fragment,

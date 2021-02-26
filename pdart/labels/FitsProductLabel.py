@@ -40,8 +40,12 @@ from pdart.labels.ObservingSystem import (
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
-from pdart.labels.TargetIdentification import get_target, get_target_info
-from pdart.labels.TargetIdentificationXml import target_lid
+from pdart.labels.TargetIdentification import (
+    get_target,
+    get_target_info,
+    create_target_identification_nodes,
+)
+from pdart.labels.TargetIdentificationXml import get_target_lid
 
 from pdart.labels.suffix_titles import get_titles_format  # type: ignore
 
@@ -49,7 +53,6 @@ from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import (
     lidvid_to_lid,
     lidvid_to_vid,
-    create_target_identification_nodes,
     get_current_date,
     MOD_DATE_FOR_TESTESING,
     wavelength_from_range,
@@ -234,7 +237,9 @@ def make_fits_product_label(
 
         # Fetch target identifications from db
         target_id = shm_lookup["TARG_ID"]
-        target_identifications = bundle_db.get_target_identification(target_id)
+        target_identifications = bundle_db.get_target_identifications_based_on_id(
+            target_id
+        )
 
         # At this stage, target identifications should be in the db
         assert len(target_identifications) != 0

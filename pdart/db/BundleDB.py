@@ -31,6 +31,7 @@ from pdart.db.SqlAlchTables import (
     FitsFile,
     FitsProduct,
     TargetIdentification,
+    TargetLabel,
     Hdu,
     OtherCollection,
     Product,
@@ -815,7 +816,9 @@ class BundleDB(object):
             exists().where(TargetIdentification.target_id == target_id)
         ).scalar()
 
-    def get_target_identification(self, target_id: str) -> List[TargetIdentification]:
+    def get_target_identifications_based_on_id(
+        self, target_id: str
+    ) -> List[TargetIdentification]:
         """
         Returns target identifications of a specific target id in the database.
         """
@@ -823,6 +826,18 @@ class BundleDB(object):
             self.session.query(TargetIdentification)
             .filter(TargetIdentification.target_id == target_id)
             .all()
+        )
+
+    def get_target_identification_based_on_lid(
+        self, target_lid: str
+    ) -> TargetIdentification:
+        """
+        Returns target identification of a specific target lid in the database.
+        """
+        return (
+            self.session.query(TargetIdentification)
+            .filter(TargetIdentification.lid_reference == target_lid)
+            .one()
         )
 
     def get_all_target_identification(self) -> List[TargetIdentification]:
@@ -1379,6 +1394,45 @@ class BundleDB(object):
             .filter(ProposalInfo.bundle_lid == bundle_lid)
             .one()
         )
+
+    ############################################################
+
+    def create_target_label(
+        self,
+        os_filepath: str,
+        basename: str,
+        target_lidvid: str,
+        collection_lidvid: str,
+    ) -> None:
+        if self.target_label_exists(target_lidvid):
+            pass
+        else:
+            self.session.add(
+                TargetLabel(
+                    target_lidvid=target_lidvid,
+                    basename=basename,
+                    md5_hash=file_md5(os_filepath),
+                    collection_lidvid=collection_lidvid,
+                )
+            )
+            self.session.commit()
+            assert self.target_label_exists(target_lidvid)
+
+    def target_label_exists(self, target_lidvid: str) -> bool:
+        """
+        Returns True iff there is a label for the target with the
+        given LIDVID.
+        """
+        return self.session.query(
+            exists().where(TargetLabel.target_lidvid == target_lidvid)
+        ).scalar()
+
+    def get_target_labels(self) -> List[TargetLabel]:
+        """
+        Returns the label for the target with the given LIDVID, or
+        raises an exception.
+        """
+        return self.session.query(TargetLabel).all()
 
     ############################################################
 

@@ -10,6 +10,7 @@ from pdart.db.SqlAlchTables import (
     CollectionLabel,
     File,
     ProductLabel,
+    TargetLabel,
 )
 from pdart.pds4.LIDVID import LIDVID
 
@@ -77,6 +78,14 @@ def make_checksum_manifest(
             )
             files.extend(bundle_db.get_product_files(product_lidvid))
 
+    for target in bundle_db.get_target_labels():
+        label_pairs.append(
+            make_target_label_pair(
+                target,
+                lidvid_to_dirpath,
+            )
+        )
+
     file_pairs = [make_checksum_pair(file, lidvid_to_dirpath) for file in files]
 
     sorted_pairs = sorted(file_pairs + label_pairs)
@@ -121,6 +130,35 @@ def make_product_label_pair(
         return fs.path.relpath(fs.path.join(dir, product_label.basename))
 
     return (label_to_filepath(product_label), product_label.md5_hash)
+
+
+def make_target_label_pair(
+    target_label: TargetLabel, lidvid_to_dirpath: _LTD
+) -> Tuple[str, str]:
+    def label_to_filepath(target_label: TargetLabel) -> str:
+        # This is a workaround because target lidvid under context doesn't
+        # match the directory path. For example:
+        # target lidvid: urn:nasa:pds:context:target:asteroid.762_pulcova::1.0
+        # path: hst_09059/context/asteroid.762_pulcova_1.0.xml
+        # We need remove "target" and put in a dummy bundle id in lidvid.
+        target_lidvid_mod = str(target_label.collection_lidvid)
+
+        dir = lidvid_to_dirpath(LIDVID(target_lidvid_mod))
+        print("#########")
+        print(target_lidvid_mod)
+        print(dir)
+        lidvid = LIDVID(target_lidvid_mod)
+        lid = lidvid.lid()
+        # parts are collection, product
+        parts = lid.parts()[1:]
+        print(lid)
+        print(lid.bundle_id)
+        print(lid.collection_id)
+        print(lid.product_id)
+        print(parts)
+        return fs.path.relpath(fs.path.join(dir, target_label.basename))
+
+    return (label_to_filepath(target_label), target_label.md5_hash)
 
 
 def make_checksum_pair(file: File, lidvid_to_dirpath: _LTD) -> Tuple[str, str]:

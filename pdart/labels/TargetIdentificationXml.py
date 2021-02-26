@@ -7,7 +7,11 @@ one target identification object.
 
 from typing import Dict, List
 
+from pdart.labels.Namespaces import COLLECTION_NAMESPACES, PDS4_XML_MODEL
+from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import (
+    DocTemplate,
+    interpret_document_template,
     combine_nodes_into_fragment,
     FragBuilder,
     interpret_template,
@@ -33,7 +37,7 @@ _make_description_node: NodeBuilderTemplate = interpret_template(
 )
 
 
-def _make_description(description: str) -> FragBuilder:
+def make_description(description: str) -> FragBuilder:
     return _make_description_node({"description": description})
 
 
@@ -68,7 +72,7 @@ def target_identification(
         # properly align multi line textnodes with 8 spaces
         target_description = " " * 8 + target_description
         target_description = target_description.replace("\n", "\n" + " " * 8)
-        description_nodes = [_make_description(target_description)]
+        description_nodes = [make_description(target_description)]
 
     func = interpret_template(
         """<Target_Identification>
@@ -96,7 +100,7 @@ def target_identification(
     return func
 
 
-def target_lid(target_parts: List[str]) -> str:
+def get_target_lid(target_parts: List[str]) -> str:
     target = ".".join(_munge(target_part) for target_part in target_parts)
     return f"urn:nasa:pds:context:target:{target}"
 
@@ -120,3 +124,47 @@ approximate_target_table: Dict[str, List[str]] = {
     "DIONE": ["Dione", "Satellite", "Saturn"],
     "IAPETUS": ["Iapetus", "Satellite", "Saturn"],
 }
+
+# The following is for the template of target label in context collection
+_make_alias_node: NodeBuilderTemplate = interpret_template(
+    """<Alias>
+    <alternate_title><NODE name="alternate_title"/></alternate_title>
+      </Alias>"""
+)
+
+
+def make_alias(alternate_title: str) -> FragBuilder:
+    return _make_alias_node({"alternate_title": alternate_title})
+
+
+make_label: DocTemplate = interpret_document_template(
+    f"""<?xml version="1.0" encoding="utf-8"?>
+{PDS4_XML_MODEL}
+<Product_Context {COLLECTION_NAMESPACES}>
+  <Identification_Area>
+    <logical_identifier><NODE name="target_lid" /></logical_identifier>
+    <version_id><NODE name="target_vid" /></version_id>
+    <title><NODE name="title"/></title>
+    <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
+    <product_class>Product_Context</product_class>
+    <Alias_List>
+      <FRAGMENT name="alias"/>
+    </Alias_List>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date><NODE name="mod_date" /></modification_date>
+        <version_id>1.0</version_id>
+        <description>Initial PDS4 version</description>
+      </Modification_Detail>
+    </Modification_History>
+  </Identification_Area>
+  <Target>
+    <name><NODE name="name"/></name>
+    <type><NODE name="type"/></type>
+    <FRAGMENT name="description"/>
+  </Target>
+</Product_Context>"""
+)
+"""
+An interpreted document template to create a target label.
+"""
