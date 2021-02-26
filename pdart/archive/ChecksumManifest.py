@@ -144,18 +144,10 @@ def make_target_label_pair(
         target_lidvid_mod = str(target_label.collection_lidvid)
 
         dir = lidvid_to_dirpath(LIDVID(target_lidvid_mod))
-        print("#########")
-        print(target_lidvid_mod)
-        print(dir)
         lidvid = LIDVID(target_lidvid_mod)
         lid = lidvid.lid()
         # parts are collection, product
         parts = lid.parts()[1:]
-        print(lid)
-        print(lid.bundle_id)
-        print(lid.collection_id)
-        print(lid.product_id)
-        print(parts)
         return fs.path.relpath(fs.path.join(dir, target_label.basename))
 
     return (label_to_filepath(target_label), target_label.md5_hash)

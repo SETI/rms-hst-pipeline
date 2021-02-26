@@ -150,7 +150,8 @@ def create_pds4_labels(
             target_list = []
             for record in target_records:
                 name = str(record.name).replace(" ", "_")
-                target = f"{record.type}.{name}".lower()
+                type = str(record.type).replace(" ", "_")
+                target = f"{type}.{name}".lower()
                 if target not in target_list:
                     target_list.append(target)
 
