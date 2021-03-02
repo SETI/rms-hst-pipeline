@@ -17,14 +17,19 @@ from pdart.labels.Lookup import (
     make_hdu_lookups,
 )
 from pdart.labels.FitsProductLabelXml import (
-    make_label,
+    make_data_label,
+    make_misc_label,
     mk_Investigation_Area_lidvid,
     mk_Investigation_Area_name,
 )
 from pdart.labels.HstParameters import (
+    get_channel_id,
     get_hst_parameters,
     get_start_stop_date_times,
     get_exposure_duration,
+    get_instrument_id,
+    get_detector_ids,
+    get_filter_name,
 )
 from pdart.labels.LabelError import LabelError
 from pdart.labels.ObservingSystem import (
@@ -32,14 +37,41 @@ from pdart.labels.ObservingSystem import (
     observing_system,
     observing_system_lid,
 )
+from pdart.labels.InvestigationArea import investigation_area
+from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
-from pdart.labels.TargetIdentification import get_target, get_target_info
+from pdart.labels.TargetIdentification import (
+    get_target,
+    get_target_info,
+    create_target_identification_nodes,
+)
+from pdart.labels.TargetIdentificationXml import get_target_lid
+
+from pdart.labels.suffix_titles import get_titles_format  # type: ignore
+
 from pdart.labels.TimeCoordinates import get_time_coordinates
-from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
+from pdart.labels.Utils import (
+    lidvid_to_lid,
+    lidvid_to_vid,
+    get_current_date,
+    MOD_DATE_FOR_TESTESING,
+    wavelength_from_range,
+)
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.xml.Pretty import pretty_and_verify
+from pdart.xml.Templates import (
+    combine_nodes_into_fragment,
+    NodeBuilder,
+)
+
+from pdart.pipeline.suffix_info import (  # type: ignore
+    get_collection_type,
+    get_processing_level,
+)
+
+from wavelength_ranges import wavelength_ranges  # type: ignore
 
 
 def _directory_siblings(
@@ -87,7 +119,11 @@ def _munge_lidvid(product_lidvid: str, suffix: str, new_basename: str) -> str:
     bundle_id, collection_id, product_id = LIDVID(product_lidvid).lid().parts()
 
     # TODO This is a hack
-    new_collection_id = collection_id[:-3] + suffix.lower()
+    collection_type = get_collection_type(suffix)
+    first_underscore_idx = collection_id.index("_")
+    new_collection_id = (
+        collection_type + collection_id[first_underscore_idx:-3] + suffix.lower()
+    )
     # TODO This is a hack
     new_product_id = new_basename[0:9]
 
@@ -146,6 +182,7 @@ def make_fits_product_label(
     bundle_lidvid: str,
     file_basename: str,
     verify: bool,
+    use_mod_date_for_testing: bool = False,
 ) -> bytes:
     try:
         product = bundle_db.get_product(product_lidvid)
@@ -153,6 +190,14 @@ def make_fits_product_label(
         assert isinstance(collection, OtherCollection)
         instrument = collection.instrument
         suffix = collection.suffix
+
+        # If a label is created for testing purpose to compare with pre-made XML
+        # we will use MOD_DATE_FOR_TESTESING as the modification date.
+        if not use_mod_date_for_testing:
+            # Get the date when the label is created
+            mod_date = get_current_date()
+        else:
+            mod_date = MOD_DATE_FOR_TESTESING
 
         card_dicts = bundle_db.get_card_dictionaries(product_lidvid, file_basename)
         lookup = DictLookup(file_basename, card_dicts)
@@ -174,40 +219,109 @@ def make_fits_product_label(
             "exposure_duration": exposure_duration,
         }
 
+        # Store start/stop time for each fits_product in fits_products table.
+        # The min/max will be pulled out for roll-up in data collection/bundle.
+        bundle_db.update_fits_product_time(
+            product_lidvid, start_date_time, stop_date_time
+        )
+
         hst_parameters = get_hst_parameters(hdu_lookups, shm_lookup)
         bundle = bundle_db.get_bundle(bundle_lidvid)
         proposal_id = bundle.proposal_id
 
+        investigation_area_name = mk_Investigation_Area_name(proposal_id)
         investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
         bundle_db.create_context_product(investigation_area_lidvid)
         bundle_db.create_context_product(instrument_host_lid())
         bundle_db.create_context_product(observing_system_lid(instrument))
-        target_info = get_target_info(shm_lookup)
-        bundle_db.create_context_product(target_info["lid"])
 
-        label = (
-            make_label(
-                {
-                    "lid": lidvid_to_lid(product_lidvid),
-                    "vid": lidvid_to_vid(product_lidvid),
-                    "proposal_id": str(proposal_id),
-                    "suffix": suffix,
-                    "file_name": file_basename,
-                    "file_contents": get_file_contents(
-                        bundle_db, card_dicts, instrument, product_lidvid
-                    ),
-                    "Investigation_Area_name": mk_Investigation_Area_name(proposal_id),
-                    "investigation_lidvid": investigation_area_lidvid,
-                    "Observing_System": observing_system(instrument),
-                    "Time_Coordinates": get_time_coordinates(start_stop_times),
-                    "Target_Identification": get_target(target_info),
-                    "HST": hst_parameters,
-                }
-            )
-            .toxml()
-            .encode()
+        # Fetch target identifications from db
+        target_id = shm_lookup["TARG_ID"]
+        target_identifications = bundle_db.get_target_identifications_based_on_id(
+            target_id
         )
+
+        # At this stage, target identifications should be in the db
+        assert len(target_identifications) != 0
+
+        target_identification_nodes: List[NodeBuilder] = []
+        target_identification_nodes = create_target_identification_nodes(
+            bundle_db, target_identifications, "data"
+        )
+
+        # Get wavelength
+        instrument_id = get_instrument_id(hdu_lookups, shm_lookup)
+        detector_ids = get_detector_ids(hdu_lookups, shm_lookup)
+        filter_name = get_filter_name(hdu_lookups, shm_lookup)
+        wavelength_range = wavelength_ranges(instrument_id, detector_ids, filter_name)
+        bundle_db.update_wavelength_range(product_lidvid, wavelength_range)
+
+        # Get title
+        channel_id = get_channel_id(hdu_lookups, shm_lookup)
+        try:
+            titles = get_titles_format(instrument_id, channel_id, suffix)
+            product_title = titles[0] + "."
+            product_title = product_title.format(
+                I=instrument_id + "/" + channel_id, F=file_basename, P=proposal_id
+            )
+            collection_title = titles[1] + "."
+            collection_title = collection_title.format(
+                I=instrument_id + "/" + channel_id, F=file_basename, P=proposal_id
+            )
+            # save data/misc collection title to OtherCollection table
+            bundle_db.update_fits_product_collection_title(
+                collection_lidvid, collection_title
+            )
+        except KeyError:
+            # If product_title doesn't exist in SUFFIX_TITLES, we use the
+            # following text as the product_title.
+            product_title = (
+                f"{instrument_id} data file {file_basename} "
+                + f"obtained by the HST Observing Program {proposal_id}."
+            )
+
+        # Dictionary used for primary result summary
+        processing_level = get_processing_level(suffix)
+        primary_result_dict: Dict[str, Any] = {}
+        primary_result_dict["processing_level"] = processing_level
+        primary_result_dict["description"] = product_title
+        primary_result_dict["wavelength_range"] = wavelength_range
+
+        # Dictionary passed into templates. Use the same data dictionary for
+        # either data label template or misc label template
+        data_dict = {
+            "lid": lidvid_to_lid(product_lidvid),
+            "vid": lidvid_to_vid(product_lidvid),
+            "title": product_title,
+            "mod_date": mod_date,
+            "file_name": file_basename,
+            "file_contents": get_file_contents(
+                bundle_db, card_dicts, instrument, product_lidvid
+            ),
+            "Investigation_Area": investigation_area(
+                investigation_area_name, investigation_area_lidvid, "data"
+            ),
+            "Observing_System": observing_system(instrument),
+            "Time_Coordinates": get_time_coordinates(start_stop_times),
+            "Target_Identification": combine_nodes_into_fragment(
+                target_identification_nodes
+            ),
+            "HST": hst_parameters,
+            "Primary_Result_Summary": primary_result_summary(primary_result_dict),
+        }
+
+        # Pass the data_dict to either data label or misc label based on
+        # collection_type
+        collection_type = get_collection_type(suffix)
+        if collection_type == "data":
+            label = make_data_label(data_dict).toxml().encode()
+        elif collection_type == "miscellaneous":
+            label = make_misc_label(data_dict).toxml().encode()
+
+    except AssertionError:
+        raise AssertionError(f"{target_id} has no target identifications stored in DB.")
     except Exception as e:
+        print(str(e))
         raise LabelError(
             product_lidvid, file_basename, (lookup, hdu_lookups[0], shm_lookup)
         ) from e

@@ -1,23 +1,91 @@
 <?xml version="1.0"?>
-<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd">
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd">
   <Identification_Area>
     <logical_identifier>urn:nasa:pds:hst_09059:data_acs_raw</logical_identifier>
     <version_id>1.2</version_id>
-    <title>This collection contains the raw images obtained from HST Observing Program 9059.</title>
-    <information_model_version>1.13.0.0</information_model_version>
+    <title>Raw, uncalibrated ACS/HRC image files from HST Program 9059.</title>
+    <information_model_version>1.15.0.0</information_model_version>
     <product_class>Product_Collection</product_class>
     <Citation_Information>
-      <publication_year>1992</publication_year>
-      <description>{author_1}, {author_2}, "{title}", HST Cycle 1 Program 99999, 1992.</description>
+      <author_list>{author_1}, {author_2}</author_list>
+      <publication_year>2021</publication_year>
+      <description>{author_1}, {author_2}, "{title}", HST Cycle 1 Program 99999, 2021.</description>
     </Citation_Information>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>2016-04-20</modification_date>
+        <version_id>1.0</version_id>
+        <description>Initial PDS4 version</description>
+      </Modification_Detail>
+    </Modification_History>
   </Identification_Area>
+  <Context_Area>
+    <Time_Coordinates>
+      <start_date_time>2005-01-19T14:58:56Z</start_date_time>
+      <stop_date_time>2005-01-19T15:41:05Z</stop_date_time>
+    </Time_Coordinates>
+    <Primary_Result_Summary>
+      <purpose>Science</purpose>
+      <processing_level>Raw</processing_level>
+      <description>Raw, uncalibrated ACS/HRC image files from HST Program 9059.</description>
+      <Science_Facets>
+        <wavelength_range>Visible</wavelength_range>
+        <wavelength_range>Near Infrared</wavelength_range>
+        <wavelength_range>Infrared</wavelength_range>
+        <discipline_name>Ring-Moon Systems</discipline_name>
+      </Science_Facets>
+    </Primary_Result_Summary>
+    <Investigation_Area>
+      <name>HST observing program 9059</name>
+      <type>Individual Investigation</type>
+      <Internal_Reference>
+        <lidvid_reference>urn:nasa:pds:context:investigation:investigation.hst_09059::1.0</lidvid_reference>
+        <reference_type>collection_to_investigation</reference_type>
+      </Internal_Reference>
+    </Investigation_Area>
+    <Observing_System>
+      <name>Hubble Space Telescope Advanced Camera for Surveys</name>
+      <Observing_System_Component>
+        <name>Hubble Space Telescope</name>
+        <type>Host</type>
+        <Internal_Reference>
+          <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+          <reference_type>is_instrument_host</reference_type>
+        </Internal_Reference>
+      </Observing_System_Component>
+      <Observing_System_Component>
+        <name>Advanced Camera for Surveys</name>
+        <type>Instrument</type>
+        <Internal_Reference>
+          <lid_reference>urn:nasa:pds:context:instrument:insthost.acs</lid_reference>
+          <reference_type>is_instrument</reference_type>
+        </Internal_Reference>
+      </Observing_System_Component>
+    </Observing_System>
+    <Target_Identification>
+      <name>762 Pulcova</name>
+      <alternate_designation>(762) Pulcova</alternate_designation>
+      <alternate_designation>(762) 1913SQ</alternate_designation>
+      <alternate_designation>1913SQ</alternate_designation>
+      <alternate_designation>(762) 1952 QM1</alternate_designation>
+      <alternate_designation>1952 QM1</alternate_designation>
+      <alternate_designation>Pulcova</alternate_designation>
+      <alternate_designation>Minor Planet 762</alternate_designation>
+      <alternate_designation>NAIF ID 2000762</alternate_designation>
+      <type>Asteroid</type>
+      <Internal_Reference>
+        <lid_reference>urn:nasa:pds:context:target:asteroid.762_pulcova</lid_reference>
+        <reference_type>collection_to_target</reference_type>
+      </Internal_Reference>
+    </Target_Identification>
+  </Context_Area>
   <Collection>
     <collection_type>Data</collection_type>
   </Collection>
   <File_Area_Inventory>
     <File>
-      <file_name>collection_data.csv</file_name>
+      <file_name>collection_data_acs_raw.csv</file_name>
     </File>
     <Inventory>
       <offset unit="byte">0</offset>

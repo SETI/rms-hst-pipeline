@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
-<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd http://pds.nasa.gov/pds4/mission/hst/v1 https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.xsd">
+<Product_Observational xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd http://pds.nasa.gov/pds4/mission/hst/v1 https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.xsd">
   <Identification_Area>
     <logical_identifier>urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq</logical_identifier>
     <version_id>1.0</version_id>
-    <title>This product contains the raw image obtained the HST Observing Program 13012.</title>
-    <information_model_version>1.13.0.0</information_model_version>
+    <title>Raw, uncalibrated ACS/SBC image file jbz504eoq_raw.fits from HST Program 13012.</title>
+    <information_model_version>1.15.0.0</information_model_version>
     <product_class>Product_Observational</product_class>
     <Modification_History>
       <Modification_Detail>
         <modification_date>2016-04-20</modification_date>
-        <version_id>0.1</version_id>
-        <description>PDS4 version-in-development of the product</description>
+        <version_id>1.0</version_id>
+        <description>Initial PDS4 version</description>
       </Modification_Detail>
     </Modification_History>
   </Identification_Area>
@@ -21,6 +21,18 @@
       <start_date_time>2012-09-27T20:23:28Z</start_date_time>
       <stop_date_time>2012-09-27T20:27:58Z</stop_date_time>
     </Time_Coordinates>
+    <Primary_Result_Summary>
+      <purpose>Science</purpose>
+      <processing_level>Raw</processing_level>
+      <description>Raw, uncalibrated ACS/SBC image file jbz504eoq_raw.fits from HST Program 13012.</description>
+      <Science_Facets>
+        <wavelength_range>Ultraviolet</wavelength_range>
+        <wavelength_range>Visible</wavelength_range>
+        <wavelength_range>Near Infrared</wavelength_range>
+        <wavelength_range>Infrared</wavelength_range>
+        <discipline_name>Ring-Moon Systems</discipline_name>
+      </Science_Facets>
+    </Primary_Result_Summary>
     <Investigation_Area>
       <name>HST observing program 13012</name>
       <type>Individual Investigation</type>
@@ -33,7 +45,7 @@
       <name>Hubble Space Telescope Advanced Camera for Surveys</name>
       <Observing_System_Component>
         <name>Hubble Space Telescope</name>
-        <type>Spacecraft</type>
+        <type>Host</type>
         <Internal_Reference>
           <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
           <reference_type>is_instrument_host</reference_type>
@@ -51,7 +63,6 @@
     <Target_Identification>
       <name>Uranus</name>
       <type>Planet</type>
-      <description>The planet Uranus</description>
       <Internal_Reference>
         <lid_reference>urn:nasa:pds:context:target:planet.uranus</lid_reference>
         <reference_type>data_to_target</reference_type>
@@ -89,7 +100,7 @@
           <hst:exposure_type>NORMAL</hst:exposure_type>
         </hst:Exposure_Parameters>
         <hst:Wavelength_Filter_Grating_Parameters>
-          <hst:filter_name>F165LP+N/A</hst:filter_name>
+          <hst:filter_name>F165LP</hst:filter_name>
           <hst:center_filter_wavelength unit="micrometer">0.</hst:center_filter_wavelength>
           <hst:bandwidth unit="micrometer">0.</hst:bandwidth>
           <hst:spectral_resolution unit="micrometer">0.</hst:spectral_resolution>
@@ -123,7 +134,7 @@
       <offset unit="byte">14400</offset>
       <object_length unit="byte">8640</object_length>
       <parsing_standard_id>FITS 3.0</parsing_standard_id>
-      <description>Global FITS Header</description>
+      <description>FITS Header</description>
     </Header>
     <Array_2D_Image>
       <offset unit="byte">23040</offset>
@@ -148,14 +159,14 @@
       <offset unit="byte">2122560</offset>
       <object_length unit="byte">5760</object_length>
       <parsing_standard_id>FITS 3.0</parsing_standard_id>
-      <description>Global FITS Header</description>
+      <description>FITS Header</description>
     </Header>
     <Header>
       <local_identifier>hdu_3</local_identifier>
       <offset unit="byte">2128320</offset>
       <object_length unit="byte">5760</object_length>
       <parsing_standard_id>FITS 3.0</parsing_standard_id>
-      <description>Global FITS Header</description>
+      <description>FITS Header</description>
     </Header>
   </File_Area_Observational>
 </Product_Observational>

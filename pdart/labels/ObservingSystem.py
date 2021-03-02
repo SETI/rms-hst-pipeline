@@ -1,4 +1,10 @@
-"""Templates to create an ``<Observing_System />`` XML element."""
+"""
+Templates to create an ``<Observing_System />`` XML element.
+Roll-up: One <Observing_System /> for bundle, data colleciton, and data.
+There can be multiple instruments for a bundle, but only one instrument for
+data collection and data.
+"""
+
 from pdart.xml.Templates import NodeBuilder, NodeBuilderTemplate, interpret_template
 
 _observing_system: NodeBuilderTemplate = interpret_template(
@@ -6,7 +12,7 @@ _observing_system: NodeBuilderTemplate = interpret_template(
       <name><NODE name="name"/></name>
       <Observing_System_Component>
         <name>Hubble Space Telescope</name>
-        <type>Spacecraft</type>
+        <type>Host</type>
         <Internal_Reference>
           <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
           <reference_type>is_instrument_host</reference_type>

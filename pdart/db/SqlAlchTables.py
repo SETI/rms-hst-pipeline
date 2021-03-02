@@ -163,6 +163,7 @@ class OtherCollection(Collection):
     instrument = Column(String(8), nullable=False)
     prefix = Column(String(8), nullable=False)
     suffix = Column(String(8), nullable=False)
+    title = Column(String)
 
     __mapper_args__ = {
         "polymorphic_identity": "other_collection",
@@ -274,6 +275,9 @@ class FitsProduct(Product):
         String, ForeignKey("products.lidvid"), primary_key=True, nullable=False
     )
     rootname = Column(String, nullable=False)
+    start_time = Column(String)
+    stop_time = Column(String)
+    wavelength_range = Column(String)
 
     __mapper_args__ = {
         "polymorphic_identity": "fits_product",
@@ -281,6 +285,36 @@ class FitsProduct(Product):
 
     def __repr__(self) -> str:
         return f"FitsProduct(lidvid={self.lidvid!r}"
+
+
+############################################################
+
+
+class TargetIdentification(Base):
+    """
+    A database representation of all info for target identification xml.
+    """
+
+    __tablename__ = "target_identification"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    # From "TARG_ID" field in SPT/SHM/SHP .fits file
+    target_id = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+    # alternate_designation can be a list of strings separated by semicolon or
+    # an empty list.
+    alternate_designations = Column(String, nullable=False)
+    lid_reference = Column(String, nullable=False)
+    # description can be none.
+    description = Column(String)
+
+    __mapper_args__ = {
+        "polymorphic_identity": "target_identification",
+    }
+
+    def __repr__(self) -> str:
+        return f"TargetIdentification(target_id={self.target_id!r}"
 
 
 ############################################################
@@ -589,6 +623,21 @@ class ProductLabel(Base):
     md5_hash = Column(String(32), nullable=False)
 
 
+class TargetLabel(Base):
+    """
+    A database representation of a newly generated PDS4 target label.
+    """
+
+    __tablename__ = "target_labels"
+
+    target_lidvid = Column(String, primary_key=True, nullable=False)
+    # We store target label under context collection directory, this will point
+    # us to the correct path of the target label
+    collection_lidvid = Column(String, nullable=False)
+    basename = Column(String, nullable=False)
+    md5_hash = Column(String(32), nullable=False)
+
+
 ############################################################
 
 
@@ -606,3 +655,29 @@ class ProposalInfo(Base):
     author_list = Column(String, nullable=False)
     proposal_year = Column(String, nullable=False)
     publication_year = Column(String, nullable=False)
+
+
+############################################################
+
+
+class CitationInfo(Base):
+    """
+    A database representation of citation information in a bundle.
+    """
+
+    __tablename__ = "citation_info"
+    lidvid = Column(String, primary_key=True, nullable=False)
+    filename = Column(String, nullable=False)
+    propno = Column(Integer, nullable=False)
+    category = Column(String, nullable=False)
+    cycle = Column(Integer, nullable=False)
+    authors = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    submission_year = Column(Integer, nullable=False)
+    timing_year = Column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"CitationInfo(lidvid={self.lidvid!r})"
+
+
+############################################################

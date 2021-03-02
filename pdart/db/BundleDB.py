@@ -3,8 +3,10 @@ import os.path
 import re
 from typing import Any, Dict, List, Optional, Tuple, cast
 
-from sqlalchemy import and_, create_engine, exists
+import astropy.io.fits
+from sqlalchemy import and_, create_engine, exists, func, desc, asc
 from sqlalchemy.orm import sessionmaker
+from target_identifications.hst import hst_target_identifications  # type: ignore
 
 from pdart.db.SqlAlchTables import (
     Association,
@@ -15,6 +17,7 @@ from pdart.db.SqlAlchTables import (
     BundleCollectionLink,
     BundleLabel,
     Card,
+    CitationInfo,
     Collection,
     CollectionInventory,
     CollectionLabel,
@@ -27,6 +30,8 @@ from pdart.db.SqlAlchTables import (
     File,
     FitsFile,
     FitsProduct,
+    TargetIdentification,
+    TargetLabel,
     Hdu,
     OtherCollection,
     Product,
@@ -37,11 +42,13 @@ from pdart.db.SqlAlchTables import (
     create_tables,
     switch_on_collection_subtype,
 )
+from pdart.citations import Citation_Information
 from pdart.db.Utils import file_md5
 from pdart.labels.Suffixes import RAW_SUFFIXES
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
+from pdart.pipeline.Utils import create_citation_info
 
 _BUNDLE_DB_NAME: str = "bundle$database.db"
 _BUNDLE_DIRECTORY_PATTERN: str = r"\Ahst_([0-9]{5})\Z"
@@ -253,6 +260,55 @@ class BundleDB(object):
         ]
 
     ############################################################
+    def create_citation(self, bundle_lidvid: str, info_param: Tuple = None) -> None:
+        """
+        Create a citation info with this LIDVID if none exists.
+        """
+
+        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not self.citation_exists(bundle_lidvid):
+            proposal_id = _lidvid_to_proposal_id(bundle_lidvid)
+
+            # For testing purpose, we set info_param to None and pass in test
+            # citation information instance
+            if info_param is None:
+                info = Citation_Information.create_test_citation_information()
+            else:
+                # We call create_citation_info to parse .apt or .pro inside
+                # create_from_file only when creating the database in the pipeline.
+                (sv_deltas, documents_dir, docs) = info_param
+                info = create_citation_info(sv_deltas, documents_dir, docs)
+
+            self.session.add(
+                CitationInfo(
+                    lidvid=bundle_lidvid,
+                    filename=info.filename,
+                    propno=info.propno,
+                    category=info.category,
+                    cycle=info.cycle,
+                    authors=",".join(info.authors),
+                    title=info.title,
+                    submission_year=info.submission_year,
+                    timing_year=info.timing_year,
+                )
+            )
+            self.session.commit()
+
+    def citation_exists(self, bundle_lidvid: str) -> bool:
+        """
+        Returns True if a citation info with the given LIDVID exists in the
+        database.
+        """
+        return self.session.query(
+            exists().where(CitationInfo.lidvid == bundle_lidvid)
+        ).scalar()
+
+    def get_citation(self, lidvid: str) -> CitationInfo:
+        return (
+            self.session.query(CitationInfo).filter(CitationInfo.lidvid == lidvid).one()
+        )
+
+    ############################################################
 
     def create_context_collection(
         self, collection_lidvid: str, bundle_lidvid: str
@@ -367,6 +423,8 @@ class BundleDB(object):
             instrument = _lidvid_to_instrument(collection_lidvid)
             prefix = _lidvid_to_prefix(collection_lidvid)
             suffix = _lidvid_to_suffix(collection_lidvid)
+            # Data/misc fits product collection title will be added later
+            # when creating product labels.
             self.session.add(
                 OtherCollection(
                     lidvid=collection_lidvid,
@@ -382,6 +440,39 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
+
+    def fits_product_collection_title_exists(self, collection_lidvid: str) -> bool:
+        """
+        Returns True iff a collection with the given LIDVID has title exists
+        in the database.
+        """
+        record = (
+            self.session.query(OtherCollection)
+            .filter(OtherCollection.collection_lidvid == collection_lidvid)
+            .one()
+        )
+        return record.title
+
+    def update_fits_product_collection_title(
+        self, collection_lidvid: str, title: str
+    ) -> None:
+        """Update title for fits product collection."""
+        if not self.fits_product_collection_title_exists(collection_lidvid):
+            record = (
+                self.session.query(OtherCollection)
+                .filter(OtherCollection.collection_lidvid == collection_lidvid)
+                .one()
+            )
+            record.title = title
+            self.session.commit()
+
+    def get_fits_product_collection_title(self, collection_lidvid: str) -> str:
+        title = (
+            self.session.query(OtherCollection.title)
+            .filter(OtherCollection.collection_lidvid == collection_lidvid)
+            .scalar()
+        )
+        return str(title)
 
     def collection_exists(self, collection_lidvid: str) -> bool:
         """
@@ -407,6 +498,14 @@ class BundleDB(object):
             .order_by(CollectionProductLink.product_lidvid)
             .all()
         ]
+
+    def get_instruments_of_the_bundle(self) -> List[str]:
+        """
+        Returns a list of instruments of a bundle from OtherCollection table.
+        """
+        results = self.session.query(OtherCollection.instrument).distinct().all()
+        instruments = [res.instrument for res in results]
+        return instruments
 
     ############################################################
 
@@ -494,6 +593,9 @@ class BundleDB(object):
                     f"non-FITS product with LIDVID {product_lidvid} already exists"
                 )
         else:
+            # Stop/start time & wavelength ranges will be added later when
+            # walking through each fits product at the stage of creating fits
+            # product labels.
             self.session.add(
                 FitsProduct(
                     lidvid=product_lidvid,
@@ -559,6 +661,190 @@ class BundleDB(object):
             .order_by(File.basename)
             .all()
         )
+
+    def update_fits_product_time(
+        self, product_lidvid: str, start_time: str, stop_time: str
+    ) -> None:
+        """Update the start/stop time for a fits_product."""
+        if not self.fits_product_time_exists(product_lidvid):
+            record = (
+                self.session.query(FitsProduct)
+                .filter(FitsProduct.product_lidvid == product_lidvid)
+                .one()
+            )
+            record.start_time = start_time
+            record.stop_time = stop_time
+            self.session.commit()
+
+    def fits_product_time_exists(self, product_lidvid: str) -> bool:
+        """
+        Returns True if a product with the given LIDVID has start/stop time
+        exist in the database.
+        """
+        record = (
+            self.session.query(FitsProduct)
+            .filter(FitsProduct.lidvid == product_lidvid)
+            .one()
+        )
+        return record.start_time and record.stop_time
+
+    def get_roll_up_time_from_db(self, suffix: str = "") -> Tuple:
+        """
+        Get min start_time and max stop time from fits_products for a specific
+        data suffix (or None).
+        """
+        if suffix:
+            min_start_time = (
+                self.session.query(func.min(FitsProduct.start_time))
+                .filter(FitsProduct.product_lidvid.contains(suffix))  # type: ignore
+                .scalar()
+            )
+            max_stop_time = (
+                self.session.query(func.max(FitsProduct.stop_time))
+                .filter(FitsProduct.product_lidvid.contains(suffix))  # type: ignore
+                .scalar()
+            )
+        else:
+            min_start_time = self.session.query(
+                func.min(FitsProduct.start_time)
+            ).scalar()
+            max_stop_time = self.session.query(func.max(FitsProduct.stop_time)).scalar()
+        return (min_start_time, max_stop_time)
+
+    def update_wavelength_range(
+        self, product_lidvid: str, wavelength_range: List[str]
+    ) -> None:
+        """Update the wavelength ranges for a fits_product."""
+        record = (
+            self.session.query(FitsProduct)
+            .filter(FitsProduct.product_lidvid == product_lidvid)
+            .one()
+        )
+        record.wavelength_range = ",".join(wavelength_range)
+        self.session.commit()
+
+    def get_wavelength_range_from_db(self, suffix: str = "") -> List[str]:
+        """
+        Get a list of unique wavelength range names from fits_products for a
+        specific data suffix (or None).
+        """
+        if suffix:
+            results = (
+                self.session.query(FitsProduct.wavelength_range)
+                .filter(FitsProduct.product_lidvid.contains(suffix))  # type: ignore
+                .distinct()
+                .all()
+            )
+        else:
+            results = self.session.query(FitsProduct.wavelength_range).distinct().all()
+
+        # Get unique wavelength range names
+        unique_wavelength_names = []
+        for res in results:
+            if res.wavelength_range:
+                unique_wavelength_names += res.wavelength_range.split(",")
+
+        # Sort the list in the following order so that the wavelength_range in
+        # primary_result_summary will be in the same order.
+        WAVELENGTH_ORDER = {
+            "Ultraviolet": 0,
+            "Visible": 1,
+            "Near Infrared": 2,
+            "Infrared": 3,
+            "Far Infrared": 4,
+        }
+        wavelength_li = list(set(unique_wavelength_names))
+        wavelength_li.sort(key=lambda name: WAVELENGTH_ORDER[name])
+
+        return wavelength_li
+
+    ############################################################
+    def create_target_identification(self, fits_os_path: str) -> None:
+        """
+        Create a record in target_identification table with this target id if
+        it doesn't exist.
+        """
+        fits = astropy.io.fits.open(fits_os_path)
+        hdu = fits[0].header
+        target_id = hdu["TARG_ID"].strip()
+
+        if not self.target_id_exists(target_id):
+            # Info that we are interested at from HDU:
+            # MT_LV1_1, MT_LV1_2, ..., MT_LV2_1, ...
+            # TARKEY1, TARKEY2, ...
+            # TARGNAME
+            # TARG_ID, PROPOSID
+            HDU_INFO = ["TARG_ID", "PROPOSID", "TARGNAME"]
+            spt_lookup = {}
+            for key in hdu.keys():
+                if (
+                    key in ["TARG_ID", "PROPOSID", "TARGNAME"]
+                    or key.startswith("TARKEY")
+                    or key.startswith("MT_LV")
+                ):
+                    data = hdu[key]
+                    spt_lookup[key] = data.strip() if type(data) is str else data
+            target_identifications = hst_target_identifications(spt_lookup)
+            self.add_record_to_target_identification_db(
+                target_id, target_identifications
+            )
+
+    def add_record_to_target_identification_db(
+        self, target_id: str, target_identifications: List[Tuple]
+    ) -> None:
+        """
+        Add data record to TargetIdentification db.
+        """
+        for target_data in target_identifications:
+            self.session.add(
+                TargetIdentification(
+                    target_id=target_id,
+                    name=target_data[0],
+                    alternate_designations="\n".join(target_data[1]),
+                    type=target_data[2],
+                    description="\n".join(target_data[3]),
+                    lid_reference=target_data[4],
+                )
+            )
+            self.session.commit()
+
+    def target_id_exists(self, target_id: str) -> bool:
+        """
+        Returns True if a target id exists in the database.
+        """
+        return self.session.query(
+            exists().where(TargetIdentification.target_id == target_id)
+        ).scalar()
+
+    def get_target_identifications_based_on_id(
+        self, target_id: str
+    ) -> List[TargetIdentification]:
+        """
+        Returns target identifications of a specific target id in the database.
+        """
+        return (
+            self.session.query(TargetIdentification)
+            .filter(TargetIdentification.target_id == target_id)
+            .all()
+        )
+
+    def get_target_identification_based_on_lid(
+        self, target_lid: str
+    ) -> TargetIdentification:
+        """
+        Returns target identification of a specific target lid in the database.
+        """
+        return (
+            self.session.query(TargetIdentification)
+            .filter(TargetIdentification.lid_reference == target_lid)
+            .one()
+        )
+
+    def get_all_target_identification(self) -> List[TargetIdentification]:
+        """
+        Returns all (unique) target identifications in the database.
+        """
+        return self.session.query(TargetIdentification).all()
 
     ############################################################
     def create_context_product(self, id: str) -> None:
@@ -1108,6 +1394,45 @@ class BundleDB(object):
             .filter(ProposalInfo.bundle_lid == bundle_lid)
             .one()
         )
+
+    ############################################################
+
+    def create_target_label(
+        self,
+        os_filepath: str,
+        basename: str,
+        target_lidvid: str,
+        collection_lidvid: str,
+    ) -> None:
+        if self.target_label_exists(target_lidvid):
+            pass
+        else:
+            self.session.add(
+                TargetLabel(
+                    target_lidvid=target_lidvid,
+                    basename=basename,
+                    md5_hash=file_md5(os_filepath),
+                    collection_lidvid=collection_lidvid,
+                )
+            )
+            self.session.commit()
+            assert self.target_label_exists(target_lidvid)
+
+    def target_label_exists(self, target_lidvid: str) -> bool:
+        """
+        Returns True iff there is a label for the target with the
+        given LIDVID.
+        """
+        return self.session.query(
+            exists().where(TargetLabel.target_lidvid == target_lidvid)
+        ).scalar()
+
+    def get_target_labels(self) -> List[TargetLabel]:
+        """
+        Returns the label for the target with the given LIDVID, or
+        raises an exception.
+        """
+        return self.session.query(TargetLabel).all()
 
     ############################################################
 

@@ -26,8 +26,11 @@ def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -
         return "collection_schema.csv"
 
     def get_other_collection_inventory_name(collection: Collection) -> str:
-        prefix = cast(OtherCollection, collection).prefix
-        return f"collection_{prefix}.csv"
+        collection_obj = cast(OtherCollection, collection)
+        prefix = collection_obj.prefix
+        instrument = collection_obj.instrument
+        suffix = collection_obj.suffix
+        return f"collection_{prefix}_{instrument}_{suffix}.csv"
 
     collection: Collection = bundle_db.get_collection(collection_lidvid)
     return switch_on_collection_subtype(

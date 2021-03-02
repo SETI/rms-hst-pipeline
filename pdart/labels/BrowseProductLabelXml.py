@@ -19,8 +19,8 @@ image obtained the HST Observing Program <NODE name="proposal_id" />\
     <Modification_History>
       <Modification_Detail>
         <modification_date>2016-04-20</modification_date>
-        <version_id>0.1</version_id>
-        <description>PDS4 version-in-development of the product</description>
+        <version_id>1.0</version_id>
+        <description>Initial PDS4 version</description>
       </Modification_Detail>
     </Modification_History>
   </Identification_Area>

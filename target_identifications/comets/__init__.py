@@ -59,16 +59,16 @@ from .ICQ_COMETS_TXT import ICQ_COMETS_TXT
 from .. import minor_planets
 from .. import lids
 
-NUMBERED_COMET_PATTERN = r'(\d+)[A-Z]'
+NUMBERED_COMET_PATTERN = r"(\d+)[A-Z]"
 NUMBERED_COMET_REGEX = re.compile(NUMBERED_COMET_PATTERN)
 
-COMET_DESIGNATION_PATTERN = r'[A-Z]/-?\d{1,4} [A-Z][A-Z]?[0-9]*'
+COMET_DESIGNATION_PATTERN = r"[A-Z]/-?\d{1,4} [A-Z][A-Z]?[0-9]*"
 COMET_DESIGNATION_REGEX = re.compile(COMET_DESIGNATION_PATTERN)
 
-OLD_REGEX1 = re.compile(r'\d{4}[a-z]1?')            # E.g., 1987g1, 1869a
-OLD_REGEX2 = re.compile('-?\d{1,4}(| [IVX]+)')      # E.g., -239, 1948 VII
+OLD_REGEX1 = re.compile(r"\d{4}[a-z]1?")  # E.g., 1987g1, 1869a
+OLD_REGEX2 = re.compile("-?\d{1,4}(| [IVX]+)")  # E.g., -239, 1948 VII
 
-NUMBER_SUFFIX_PATTERN = r'(.+?)[- ](\d+)'
+NUMBER_SUFFIX_PATTERN = r"(.+?)[- ](\d+)"
 NUMBER_SUFFIX_REGEX = re.compile(NUMBER_SUFFIX_PATTERN)
 
 # Indicates whether to print detailed information during intialization
@@ -84,45 +84,56 @@ VERBOSE = False
 # A list of comets that have been re-disgnated as minor planets
 COMETS_NOW_MINOR_PLANETS = [
     # (number, letter, designation, name, index, MP number)
-    ( 95, 'P', '1977 UB'   , 'Chiron'           ,  0,   2060),
-    (107, 'P', '1949 W1'   , 'Wilson-Harrington',  1,   4015),
-    (133, 'P', '1996 N2'   , 'Elst-Pizarro'     ,  0,   7968),
-    (174, 'P', '2000 EC98' , 'Echeclus'         ,  0,  60558),
-    (176, 'P', '1999 RE70' , 'LINEAR'           , 52, 118401),
-    (288, 'P', '2006 VW139', ''                 ,  0, 300163),
-    (282, 'P', '2003 BM80' , ''                 ,  0, 323137),
-    (362, 'P', '2008 GO98' , ''                 ,  0, 457175),
+    (95, "P", "1977 UB", "Chiron", 0, 2060),
+    (107, "P", "1949 W1", "Wilson-Harrington", 1, 4015),
+    (133, "P", "1996 N2", "Elst-Pizarro", 0, 7968),
+    (174, "P", "2000 EC98", "Echeclus", 0, 60558),
+    (176, "P", "1999 RE70", "LINEAR", 52, 118401),
+    (288, "P", "2006 VW139", "", 0, 300163),
+    (282, "P", "2003 BM80", "", 0, 323137),
+    (362, "P", "2008 GO98", "", 0, 457175),
 ]
 
 # Repairs known errors in the SSD comet list
 def REPAIR_SSD_COMETS(ssd_comets):
 
     # SSD comet list does not include "2I" designation for Borisov
-    borisov = [c for c in ssd_comets if c.designation == 'C/2019 Q4'][0]
+    borisov = [c for c in ssd_comets if c.designation == "C/2019 Q4"][0]
     borisov.number = 2
-    borisov.letter = 'I'
+    borisov.letter = "I"
 
     # SSD comet list is missing 'Oumuamua, with SSD refers to as a "hyperbolic
     # asteroid
-    oumuamua = CometInfo(1, 'I', 'A/2017 U1', '', "'Oumuamua", 0, 3788040)
+    oumuamua = CometInfo(1, "I", "A/2017 U1", "", "'Oumuamua", 0, 3788040)
     ssd_comets.append(oumuamua)
+
 
 # Repairs known errors in the PDS comet list
 def REPAIR_PDS_COMETS(pds_comets):
 
     return
 
+
 ################################################################################
 # Class for comet information
 ################################################################################
+
 
 class CometInfo(object):
 
     ######## CONSTRUCTORS
 
-    def __init__(self, number, letter, designation, suffix, name,
-                 index=0, naif_id=0, alt_designations=[]):
-
+    def __init__(
+        self,
+        number,
+        letter,
+        designation,
+        suffix,
+        name,
+        index=0,
+        naif_id=0,
+        alt_designations=[],
+    ):
         def clean_str(string):
             """Removes surrounding whitespace and optional quotes."""
             string = string.strip()
@@ -131,8 +142,8 @@ class CometInfo(object):
 
             # There should never be a space after a dash. This shows up for some
             # negative years. (This removes up to three spaces after a dash!)
-            string = string.replace('-  ', '-')
-            string = string.replace('- ', '-')
+            string = string.replace("-  ", "-")
+            string = string.replace("- ", "-")
 
             return string
 
@@ -147,31 +158,31 @@ class CometInfo(object):
 
             return value
 
-        self.number      = clean_int(number)
-        self.letter      = clean_str(letter)
+        self.number = clean_int(number)
+        self.letter = clean_str(letter)
         self.designation = clean_str(designation)
-        self.suffix      = clean_str(suffix)
-        self.name        = clean_str(name)
-        self.index       = clean_int(index)
-        self.naif_id     = clean_int(naif_id)
+        self.suffix = clean_str(suffix)
+        self.name = clean_str(name)
+        self.index = clean_int(index)
+        self.naif_id = clean_int(naif_id)
         self.alt_designations = [clean_str(d) for d in alt_designations]
 
-        self.fragments    = []      # List of fragments, if any
-        self.parent       = None    # Parent if this is a fragment
-        self.index_needed = False   # True if name without index is ambiguous
-        self.mp_number    = 0       # Minor planet number if any, used for
-                                    # re-classified bodies
+        self.fragments = []  # List of fragments, if any
+        self.parent = None  # Parent if this is a fragment
+        self.index_needed = False  # True if name without index is ambiguous
+        self.mp_number = 0  # Minor planet number if any, used for
+        # re-classified bodies
 
         # Tests and further cleanup
-        assert len(self.letter) == 1, 'Invalid letter: ' + letter
+        assert len(self.letter) == 1, "Invalid letter: " + letter
 
         # Remove a suffix appended to the designation
         if not self.suffix:
             # Dash separates suffix from designation, but not if the year is
             # negative!
-            parts = self.designation.rpartition('-')
-            if parts[0] and not parts[0].endswith('/'):
-                self.suffix = '-' + parts[2]
+            parts = self.designation.rpartition("-")
+            if parts[0] and not parts[0].endswith("/"):
+                self.suffix = "-" + parts[2]
                 self.designation = parts[0]
 
         # If the designation is a comet number, fill in the comet number
@@ -179,24 +190,26 @@ class CometInfo(object):
             match = NUMBERED_COMET_REGEX.fullmatch(self.designation)
             if match:
                 self.number = int(self.designation[:-1])
-                assert self.designation.endswith(self.letter), 'Letter mismatch'
-                self.designation = ''
+                assert self.designation.endswith(self.letter), "Letter mismatch"
+                self.designation = ""
 
             # Otherwise, designation starts with a letter and slash
             else:
-                if '/' not in self.designation:
-                    self.designation = self.letter + '/' + self.designation
+                if "/" not in self.designation:
+                    self.designation = self.letter + "/" + self.designation
 
         # Make sure the designation has a proper format
         if self.designation:
             match = COMET_DESIGNATION_REGEX.fullmatch(self.designation)
-            assert match, 'Invalid designation: ' + self.designation
+            assert match, "Invalid designation: " + self.designation
 
         for designation in self.alt_designations:
-            match = (COMET_DESIGNATION_REGEX.fullmatch(designation) or
-                     OLD_REGEX1.fullmatch(designation) or
-                     OLD_REGEX2.fullmatch(designation))
-            assert match, 'Invalid designation: ' + designation
+            match = (
+                COMET_DESIGNATION_REGEX.fullmatch(designation)
+                or OLD_REGEX1.fullmatch(designation)
+                or OLD_REGEX2.fullmatch(designation)
+            )
+            assert match, "Invalid designation: " + designation
 
         # If the name ends with a number suffix, set the index
         if self.name and not self.index:
@@ -211,12 +224,12 @@ class CometInfo(object):
     def from_pds(rec):
         match = CometInfo.PDS_REGEX.fullmatch(rec)
         if not match:
-            raise ValueError('Illegal row in PDS-comets.txt: ' + rec.rstrip())
+            raise ValueError("Illegal row in PDS-comets.txt: " + rec.rstrip())
 
         (number, letter, designation, suffix, name, index) = match.groups()
 
         # The PDS list has some mystery suffixes. Ignore.
-        suffix = ''
+        suffix = ""
 
         return CometInfo(number, letter, designation, suffix, name, index)
 
@@ -224,10 +237,9 @@ class CometInfo(object):
     SSD_FULLNAME_INDEX_REGEX = re.compile(SSD_FULLNAME_INDEX_PATTERN)
 
     def from_ssd(rec):
-        values = rec.rstrip().split(',')
+        values = rec.rstrip().split(",")
         if len(values) != 5:
-            raise ValueError('Illegal column count in SSD-comets.csv: ' +
-                             rec.rstrip())
+            raise ValueError("Illegal column count in SSD-comets.csv: " + rec.rstrip())
 
         (naif_id, fullname, designation, name, letter) = values
 
@@ -238,11 +250,12 @@ class CometInfo(object):
         else:
             index = 0
 
-        return CometInfo(0, letter, designation, '', name, index, naif_id)
+        return CometInfo(0, letter, designation, "", name, index, naif_id)
 
-    ICQ_PATTERN1 = (r' *(\d*)([A-Z])/? *(-? *\d+ [A-Z]\w+|)(|-[A-Z])' +
-                    r' +\((.*?) *\)\s*(.*)')
-    ICQ_PATTERN2 = r'= (|\w+) += (|-? *\d+ [IVX]*)\s*'
+    ICQ_PATTERN1 = (
+        r" *(\d*)([A-Z])/? *(-? *\d+ [A-Z]\w+|)(|-[A-Z])" + r" +\((.*?) *\)\s*(.*)"
+    )
+    ICQ_PATTERN2 = r"= (|\w+) += (|-? *\d+ [IVX]*)\s*"
 
     ICQ_REGEX1 = re.compile(ICQ_PATTERN1)
     ICQ_REGEX2 = re.compile(ICQ_PATTERN2)
@@ -250,7 +263,7 @@ class CometInfo(object):
     def from_icq(rec):
         match = CometInfo.ICQ_REGEX1.fullmatch(rec)
         if not match:
-            raise ValueError('Invalid ICQ record: ' + rec)
+            raise ValueError("Invalid ICQ record: " + rec)
 
         (number, letter, designation, suffix, name, more) = match.groups()
         alt_designations = []
@@ -262,20 +275,32 @@ class CometInfo(object):
         else:
             alt_designations = []
 
-        return CometInfo(number, letter, designation, suffix, name, 0, 0,
-                         alt_designations)
+        return CometInfo(
+            number, letter, designation, suffix, name, 0, 0, alt_designations
+        )
 
     ######## UTILITIES
 
     def __str__(self):
-        return ('CometInfo(' + str(self.number)  + '|' +
-                               self.letter       + '|' +
-                               self.designation  + '|' +
-                               self.suffix       + '|' +
-                               self.name         + '|' +
-                               str(self.index)   + '|' +
-                               str(self.naif_id) + '|' +
-                               str(self.alt_designations) + ')')
+        return (
+            "CometInfo("
+            + str(self.number)
+            + "|"
+            + self.letter
+            + "|"
+            + self.designation
+            + "|"
+            + self.suffix
+            + "|"
+            + self.name
+            + "|"
+            + str(self.index)
+            + "|"
+            + str(self.naif_id)
+            + "|"
+            + str(self.alt_designations)
+            + ")"
+        )
 
     def __repr__(self):
         return self.__str__()
@@ -293,23 +318,23 @@ class CometInfo(object):
             return self.number == other.number
 
         # One matching designation confirms equality
-        self_designations  = set([self.designation]  + self.alt_designations)
+        self_designations = set([self.designation] + self.alt_designations)
         other_designations = set([other.designation] + other.alt_designations)
         overlap = self_designations.intersection(other_designations)
-        if overlap and overlap != {''}:
+        if overlap and overlap != {""}:
             return True
 
         return False
 
     def merge(self, other):
 
-        self.number      = self.number    or other.number
-        self.letter      = self.letter    or other.letter
-        self.suffix      = self.suffix    or other.suffix
-        self.name        = self.name      or other.name
-        self.index       = self.index     or other.index
-        self.naif_id     = self.naif_id   or other.naif_id
-        self.mp_number   = self.mp_number or other.mp_number
+        self.number = self.number or other.number
+        self.letter = self.letter or other.letter
+        self.suffix = self.suffix or other.suffix
+        self.name = self.name or other.name
+        self.index = self.index or other.index
+        self.naif_id = self.naif_id or other.naif_id
+        self.mp_number = self.mp_number or other.mp_number
 
         # Merge lists of designations, keeping preferred designation in front
         if self.designation:
@@ -317,10 +342,9 @@ class CometInfo(object):
         elif other.designation:
             new_designations = [other.designation]
         else:
-            new_designations = ['']
+            new_designations = [""]
 
-        for d in (self.alt_designations +
-                  [other.designation] + other.alt_designations):
+        for d in self.alt_designations + [other.designation] + other.alt_designations:
             if d and d not in new_designations:
                 new_designations.append(d)
 
@@ -329,9 +353,16 @@ class CometInfo(object):
 
     def copy(self, deep=False):
 
-        clone = CometInfo(self.number, self.letter, self.designation,
-                          self.suffix, self.name, self.index, self.naif_id,
-                          self.alt_designations)
+        clone = CometInfo(
+            self.number,
+            self.letter,
+            self.designation,
+            self.suffix,
+            self.name,
+            self.index,
+            self.naif_id,
+            self.alt_designations,
+        )
         clone.index_needed = self.index_needed
         clone.fragments = clone.fragments
 
@@ -344,47 +375,51 @@ class CometInfo(object):
     def full_names(self, ignore_suffix=False):
 
         # Interpret the name
-        if self.name.startswith('Great') and self.name.endswith('comet'):
-            great_name = self.name + ' of ' + self.designation[2:6]
-            name_alone = ''
-            name_index = ''
+        if self.name.startswith("Great") and self.name.endswith("comet"):
+            great_name = self.name + " of " + self.designation[2:6]
+            name_alone = ""
+            name_index = ""
         elif self.index:
-            great_name = ''
+            great_name = ""
             name_alone = self.name
-            name_index = self.name + ' ' + str(self.index)
+            name_index = self.name + " " + str(self.index)
         else:
-            great_name = ''
+            great_name = ""
             name_alone = self.name
-            name_index = ''
+            name_index = ""
 
         # Interpret the suffix
         if ignore_suffix:
-            suffix = ''
+            suffix = ""
         else:
             suffix = self.suffix
 
         names = []
         if self.number:
-          for n in (name_alone, name_index):
-            if not n: continue
+            for n in (name_alone, name_index):
+                if not n:
+                    continue
 
-            names += [str(self.number) + self.letter + '/' + n + suffix]
+                names += [str(self.number) + self.letter + "/" + n + suffix]
 
-          names += [str(self.number) + self.letter + suffix]
+            names += [str(self.number) + self.letter + suffix]
 
         if self.designation:
-          for n in (name_index, name_alone):
-            if not n: continue
+            for n in (name_index, name_alone):
+                if not n:
+                    continue
 
-            names += [self.designation + suffix + ' (' + n + ')',
-                      self.designation + suffix + ' ' + n]
+                names += [
+                    self.designation + suffix + " (" + n + ")",
+                    self.designation + suffix + " " + n,
+                ]
 
-            if suffix:
-                names += [self.designation + ' ' + n + suffix]
+                if suffix:
+                    names += [self.designation + " " + n + suffix]
 
         for designation in [self.designation] + self.alt_designations:
-          if designation:
-            names += [designation + suffix]
+            if designation:
+                names += [designation + suffix]
 
         if great_name:
             names += [great_name + suffix]
@@ -394,32 +429,33 @@ class CometInfo(object):
             names += [name_alone + suffix]
 
         if self.naif_id:
-            names += ['NAIF ID ' + str(self.naif_id)]
+            names += ["NAIF ID " + str(self.naif_id)]
 
         return names
 
     def lid(self):
 
         if self.number:
-            string = f'{self.number}{self.letter}_{self.name}'
-        elif self.name.startswith('Great'):
+            string = f"{self.number}{self.letter}_{self.name}"
+        elif self.name.startswith("Great"):
             string = self.designation
         else:
-            string = f'{self.designation}_{self.name}'
+            string = f"{self.designation}_{self.name}"
 
         if self.index:
-            string += f'_{self.index}'
+            string += f"_{self.index}"
 
         string += self.suffix
 
         # Cleanup for LID formation rule compliance
-        return lids.clean('comet.' + string)
+        return lids.clean("comet." + string)
 
     def target_identifications(self):
 
-        names = [n for n in self.full_names() if not n.isdigit() and
-                                                 not n.startswith('-')]
-        targets = [(names[0], names[1:], 'Comet', [], self.lid())]
+        names = [
+            n for n in self.full_names() if not n.isdigit() and not n.startswith("-")
+        ]
+        targets = [(names[0], names[1:], "Comet", [], self.lid())]
 
         if self.fragments:
             targets += [f.target_identifications()[0] for f in self.fragments]
@@ -433,26 +469,27 @@ class CometInfo(object):
         else:
             return self.designation
 
+
 ########################################
 # Load PDS comets
 ########################################
 
-recs = PDS_COMETS_TXT.split('\n')
-recs = [rec for rec in recs if not rec.rstrip() == '']
+recs = PDS_COMETS_TXT.split("\n")
+recs = [rec for rec in recs if not rec.rstrip() == ""]
 pds_comets = [CometInfo.from_pds(rec) for rec in recs]
 
 # Treat Chiron as an asteroid (Centaur), in accordance with MPC
-pds_comets = [c for c in pds_comets if c.name != 'Chiron']
+pds_comets = [c for c in pds_comets if c.name != "Chiron"]
 REPAIR_PDS_COMETS(pds_comets)
 
 ########################################
 # Load SSD comets
 ########################################
 
-SSD_COMETS_CSV = SSD_COMETS_CSV.replace('PANSTARRS', 'PanSTARRS')
+SSD_COMETS_CSV = SSD_COMETS_CSV.replace("PANSTARRS", "PanSTARRS")
 
-recs = SSD_COMETS_CSV.split('\n')
-recs = [rec for rec in recs if not rec.rstrip() == '']
+recs = SSD_COMETS_CSV.split("\n")
+recs = [rec for rec in recs if not rec.rstrip() == ""]
 ssd_comets = [CometInfo.from_ssd(rec) for rec in recs]
 REPAIR_SSD_COMETS(ssd_comets)
 
@@ -460,8 +497,8 @@ REPAIR_SSD_COMETS(ssd_comets)
 # Load ICQ comets
 ########################################
 
-recs = ICQ_COMETS_TXT.split('\n')
-recs = [rec for rec in recs if not rec.rstrip() == '']
+recs = ICQ_COMETS_TXT.split("\n")
+recs = [rec for rec in recs if not rec.rstrip() == ""]
 icq_comets = [CometInfo.from_icq(rec) for rec in recs]
 
 # Merge duplicates (of which there can be many, one per apparition)
@@ -469,7 +506,7 @@ merged_comets = []
 for comet in icq_comets:
     try:
         k = merged_comets.index(comet)
-    except ValueError:      # not found
+    except ValueError:  # not found
         merged_comets.append(comet)
         continue
 
@@ -484,7 +521,7 @@ icq_comets = merged_comets
 mp_comets = []
 for info in COMETS_NOW_MINOR_PLANETS:
     (number, letter, designation, name, index, mp_number) = info
-    comet = CometInfo(number, letter, designation, '', name, index)
+    comet = CometInfo(number, letter, designation, "", name, index)
     comet.mp_number = mp_number
     mp_comets.append(comet)
 
@@ -498,7 +535,7 @@ for comet in pds_comets:
     except ValueError:
         # This happens if a PDS comet does not have a NAIF ID.
         if VERBOSE:
-            print('# PDS comet not found in SSD list: ' + str(comet))
+            print("# PDS comet not found in SSD list: " + str(comet))
         continue
 
     comet.merge(ssd_comets[k])
@@ -545,7 +582,7 @@ for comet in mp_comets:
     except ValueError:
         # This happens if a minor planet comet is not already in the list
         if VERBOSE:
-            print('# Minor planet comet not found in list: ' + str(comet))
+            print("# Minor planet comet not found in list: " + str(comet))
         COMETS.append(comet)
         continue
 
@@ -562,14 +599,14 @@ for comet in mp_comets:
 # list is represented by a sub-list, with one entry per fragment. For most
 # comets, which do not have multiple fragments, the sub-list has unit length.
 
-comet_list_by_name = {}     # mixture of multiple comets and multiple fragments
+comet_list_by_name = {}  # mixture of multiple comets and multiple fragments
 for comet in COMETS:
     if comet.name in comet_list_by_name:
         comet_list_by_name[comet.name].append(comet)
     else:
         comet_list_by_name[comet.name] = [comet]
 
-COMETS_BY_NAME = {}         # grouped by unique comet
+COMETS_BY_NAME = {}  # grouped by unique comet
 for (name, comet_list) in comet_list_by_name.items():
     unique_comets = []
     for comet in comet_list:
@@ -595,16 +632,16 @@ for (name, comet_list) in comet_list_by_name.items():
         # actually unique. It occurs because the PDS list unnecessariily assigns
         # an index to every comet, even if its name is unique.
         if VERBOSE:
-            print('# Index removed:', comet)
+            print("# Index removed:", comet)
 
 # Create a big dictionary indexed by every possible name
-COMET_LOOKUP = {}           # indexed by any name
-BEST_NAME_LOOKUP = {}       # indexed by preferred name
+COMET_LOOKUP = {}  # indexed by any name
+BEST_NAME_LOOKUP = {}  # indexed by preferred name
 
 for comet in COMETS:
     full_names = comet.full_names()
     if not full_names:
-        raise ValueError('No names: ' + str(comet))
+        raise ValueError("No names: " + str(comet))
 
     BEST_NAME_LOOKUP[full_names[0]] = comet
 
@@ -616,15 +653,14 @@ for comet in COMETS:
             # name. However, beyond that, this is not a big deal; it just means
             # that two different Target_Identification objects will share the
             # same alt_designation.
-            print('WARNING: Duplicated name:', name,
-                                               COMET_LOOKUP[name], comet)
+            print("WARNING: Duplicated name:", name, COMET_LOOKUP[name], comet)
         else:
             COMET_LOOKUP[name] = comet
             COMET_LOOKUP[name.upper()] = comet
-            COMET_LOOKUP[name.upper().replace('-',' ')] = comet
+            COMET_LOOKUP[name.upper().replace("-", " ")] = comet
 
     lid = comet.lid()
-    parts = lid.partition('comet.')
+    parts = lid.partition("comet.")
 
     for key in (lid, parts[1] + parts[2], parts[2]):
         COMET_LOOKUP[key] = comet
@@ -632,7 +668,8 @@ for comet in COMETS:
 
 # Link up fragments to their parent comets
 for comet in COMETS:
-    if not comet.suffix: continue
+    if not comet.suffix:
+        continue
 
     keys = comet.full_names(ignore_suffix=True)
     best = keys[0]
@@ -642,19 +679,19 @@ for comet in COMETS:
         parent = BEST_NAME_LOOKUP[best]
     else:
         parent = comet.copy()
-        parent.suffix    = ''
+        parent.suffix = ""
         parent.fragments = []
-        parent.naif_id   = 0
+        parent.naif_id = 0
 
         if VERBOSE:
-            print('# Creating parent comet:', parent)
+            print("# Creating parent comet:", parent)
 
         # Update the dictionaries
         BEST_NAME_LOOKUP[best] = parent
         for key in keys:
             COMET_LOOKUP[key] = parent
             COMET_LOOKUP[key.upper()] = parent
-            COMET_LOOKUP[key.upper().replace('-',' ')] = parent
+            COMET_LOOKUP[key.upper().replace("-", " ")] = parent
 
     # Insert this fragment into the parent's list
     parent.fragments.append(comet)
@@ -700,16 +737,17 @@ for (name, comet_lists) in COMETS_BY_NAME.items():
         else:
             new_list.append(first)
 
-    BEST_NAME_LOOKUP[name + '+'] = new_list
-    COMET_LOOKUP[name + '+'] = new_list
-    COMET_LOOKUP[name.upper() + '+'] = new_list
-    COMET_LOOKUP[name.upper().replace('-',' ') + '+'] = new_list
+    BEST_NAME_LOOKUP[name + "+"] = new_list
+    COMET_LOOKUP[name + "+"] = new_list
+    COMET_LOOKUP[name.upper() + "+"] = new_list
+    COMET_LOOKUP[name.upper().replace("-", " ") + "+"] = new_list
 
 ################################################################################
 
-LID_REGEX       = re.compile(r'.*(comet\..*)', re.I)
-PAREN_REGEX     = re.compile(r'(.*)\((.*)\)(.*)')
-NO_SUFFIX_REGEX = re.compile(r'(.*?)-[A-Z]\d?')
+LID_REGEX = re.compile(r".*(comet\..*)", re.I)
+PAREN_REGEX = re.compile(r"(.*)\((.*)\)(.*)")
+NO_SUFFIX_REGEX = re.compile(r"(.*?)-[A-Z]\d?")
+
 
 def identify_comet(keys, warnings=[], ignore_suffix=False):
     """A CometInfo object, based on the identifications given."""
@@ -721,7 +759,7 @@ def identify_comet(keys, warnings=[], ignore_suffix=False):
 
     original_keys = keys
     if comet_identifications.DEBUG:
-        print('original comet keys:', keys)
+        print("original comet keys:", keys)
 
     new_keys = []
     for key in keys:
@@ -735,9 +773,11 @@ def identify_comet(keys, warnings=[], ignore_suffix=False):
         # This deals with random ways of combining things inside parentheses
         match = PAREN_REGEX.fullmatch(key)
         if match:
-            new_keys += [match.group(1).strip(),
-                         match.group(2).strip(),
-                         match.group(3).strip()]
+            new_keys += [
+                match.group(1).strip(),
+                match.group(2).strip(),
+                match.group(3).strip(),
+            ]
             continue
 
         new_keys += [key]
@@ -747,8 +787,10 @@ def identify_comet(keys, warnings=[], ignore_suffix=False):
     for key in new_keys:
         key = key.upper()
 
-        if not key: continue
-        if key in keys: continue
+        if not key:
+            continue
+        if key in keys:
+            continue
 
         keys.append(key)
 
@@ -764,10 +806,10 @@ def identify_comet(keys, warnings=[], ignore_suffix=False):
         keys = stripped_keys
 
     if comet_identifications.DEBUG:
-        print('processed comet keys:', keys)
+        print("processed comet keys:", keys)
 
     comet = None
-    name = None     # A name alone could be ambiguous if missing an index
+    name = None  # A name alone could be ambiguous if missing an index
     for key in keys:
         key = key.upper()
         if key in COMET_LOOKUP:
@@ -777,53 +819,54 @@ def identify_comet(keys, warnings=[], ignore_suffix=False):
             if not comet:
                 comet = test_comet
                 if comet_identifications.DEBUG:
-                    print('comet found:', comet)
+                    print("comet found:", comet)
 
             # Subsequent matches must be consistent
             elif comet != test_comet:
-              raise ValueError('Inconsistent comets designations: ' +
-                               f'{comet}, {test_comet}')
+                raise ValueError(
+                    "Inconsistent comets designations: " + f"{comet}, {test_comet}"
+                )
 
         # Handle an ambiguous discoverer name string
-        elif key + '+' in COMET_LOOKUP:
-            test_name = COMET_LOOKUP[key + '+']
+        elif key + "+" in COMET_LOOKUP:
+            test_name = COMET_LOOKUP[key + "+"]
 
             # Save the first
             if not name:
                 name = key
                 if comet_identifications.DEBUG:
-                    print('ambiguous comet name found:', name)
+                    print("ambiguous comet name found:", name)
 
             # Subsequent matches must be consistent
             if name != key:
-                raise ValueError('Inconsistent comet designations: ' +
-                                 f'{name}, {key}')
+                raise ValueError("Inconsistent comet designations: " + f"{name}, {key}")
 
         # Handle an unrecognized key
         elif comet_identifications.IGNORE_EXTRA_NAMES:
-            warnings.append(f'WARNING: Ignored comet identifier: {key}')
+            warnings.append(f"WARNING: Ignored comet identifier: {key}")
             if comet_identifications.DEBUG:
-                print('comet identifier ignored:', key)
+                print("comet identifier ignored:", key)
 
         else:
-            raise ValueError(f'Unrecognized comet identifier: {key}')
+            raise ValueError(f"Unrecognized comet identifier: {key}")
 
     if not comet:
         if name:
-            raise ValueError(f'Ambiguous comet name: {name}')
+            raise ValueError(f"Ambiguous comet name: {name}")
         else:
-            raise KeyError(f'No comet found: {original_keys}')
+            raise KeyError(f"No comet found: {original_keys}")
 
     # If an ambiguous name was found (due to missing index), check it now
     if name:
-        for c in COMET_LOOKUP[name + '+']:
+        for c in COMET_LOOKUP[name + "+"]:
             if c == comet:
                 break
 
         if c != comet:
-            raise ValueError(f'Name and comet do not match: {name}, {comet}')
+            raise ValueError(f"Name and comet do not match: {name}, {comet}")
 
     return comet
+
 
 def append_comet_designations(info, comet):
     """Append the name and designations of this comet to a given list of
@@ -841,9 +884,9 @@ def append_comet_designations(info, comet):
         early_names = []
         late_names = []
         for name in list1:
-            if name.startswith('Minor Planet'):
+            if name.startswith("Minor Planet"):
                 late_names.append(name)
-            elif name.startswith('NAIF ID'):
+            elif name.startswith("NAIF ID"):
                 late_names.append(name)
             else:
                 early_names.append(name)
@@ -851,7 +894,7 @@ def append_comet_designations(info, comet):
         # Insert unique names into the list
         for name in list2:
             if name not in list1:
-                if name.startswith('NAIF ID'):
+                if name.startswith("NAIF ID"):
                     late_names.append(name)
                 else:
                     early_names.append(name)
@@ -872,19 +915,21 @@ def append_comet_designations(info, comet):
     for (mp_name, alt_designations, mp_type, desc, lid) in info:
         alt_designations = merge_lists(alt_designations, comet_names)
 
-        desc.append('NOTE: This body is designated as both a minor planet ' +
-                    'and a comet.')
+        desc.append(
+            "NOTE: This body is designated as both a minor planet " + "and a comet."
+        )
 
         new_info.append((mp_name, alt_designations, mp_type, desc, lid))
 
     return new_info
 
-def comet_identifications(keys, a=0., e=0., i=0., q=0., warnings=[],
-                          ignore_suffix=False):
+
+def comet_identifications(
+    keys, a=0.0, e=0.0, i=0.0, q=0.0, warnings=[], ignore_suffix=False
+):
 
     # Identify the comet
-    comet = identify_comet(keys, warnings=warnings,
-                                 ignore_suffix=ignore_suffix)
+    comet = identify_comet(keys, warnings=warnings, ignore_suffix=ignore_suffix)
 
     # If this is also a minor planet, return minor planet info with additional
     # designations. The minor_planet_identifications function will test a,e,i
@@ -893,10 +938,9 @@ def comet_identifications(keys, a=0., e=0., i=0., q=0., warnings=[],
         # Set check_comets to False here because the comet has already been
         # identified and we are already prepared to append the additional
         # designations.
-        info = minor_planets.minor_planet_identifications(comet.mp_number,
-                                                          a, e, i, q,
-                                                          warnings,
-                                                          check_comets=False)
+        info = minor_planets.minor_planet_identifications(
+            comet.mp_number, a, e, i, q, warnings, check_comets=False
+        )
         return append_comet_designations(info, comet)
 
     # Check orbital elements if necessary
@@ -905,6 +949,7 @@ def comet_identifications(keys, a=0., e=0., i=0., q=0., warnings=[],
         minor_planets.check_elements(a, e, i, q, a0, e0, i0, q0, warnings)
 
     return comet.target_identifications()
+
 
 # These attributes of the function control its behavior...
 

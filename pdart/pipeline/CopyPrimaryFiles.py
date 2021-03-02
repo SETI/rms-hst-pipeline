@@ -6,6 +6,7 @@ import fs.path
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import *
+from pdart.pipeline.suffix_info import get_collection_type  # type: ignore
 
 _OLD_IMPL = False
 
@@ -76,7 +77,10 @@ class CopyPrimaryFiles(MarkedStage):
                 product = hst_filename.rootname()
                 instrument_name = hst_filename.instrument_name()
                 suffix = hst_filename.suffix()
-                coll = f"data_{instrument_name}_{suffix}"
+
+                collection_type = get_collection_type(suffix)
+                coll = f"{collection_type}_{instrument_name}_{suffix}"
+
                 new_path = fs.path.join(
                     to_segment_dir(bundle_segment),
                     to_segment_dir(coll),

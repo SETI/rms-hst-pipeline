@@ -1,13 +1,46 @@
 """Templates to create a label for a bundle."""
+from typing import List
 
 from pdart.labels.Namespaces import BUNDLE_NAMESPACES, PDS4_XML_MODEL
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import (
     DocTemplate,
     NodeBuilderTemplate,
+    NodeBuilder,
     interpret_document_template,
     interpret_template,
+    combine_nodes_into_fragment,
 )
+
+
+def make_bundle_context_node(
+    time_coordinates_node: NodeBuilder,
+    primary_result_summary_node: NodeBuilder,
+    investigation_area_node: NodeBuilder,
+    observing_system_nodes: List[NodeBuilder],
+    target_identification_nodes: List[NodeBuilder],
+) -> NodeBuilder:
+    func = interpret_template(
+        """<Context_Area>
+        <NODE name="Time_Coordinates" />
+        <NODE name="Primary_Result_Summary" />
+        <NODE name="Investigation_Area" />
+        <FRAGMENT name="Observing_System" />
+        <FRAGMENT name="Target_Identification" />
+        </Context_Area>"""
+    )(
+        {
+            "Time_Coordinates": time_coordinates_node,
+            "Primary_Result_Summary": primary_result_summary_node,
+            "Investigation_Area": investigation_area_node,
+            "Observing_System": combine_nodes_into_fragment(observing_system_nodes),
+            "Target_Identification": combine_nodes_into_fragment(
+                target_identification_nodes
+            ),
+        }
+    )
+    return func
+
 
 make_label: DocTemplate = interpret_document_template(
     f"""<?xml version="1.0" encoding="utf-8"?>
@@ -16,12 +49,19 @@ make_label: DocTemplate = interpret_document_template(
   <Identification_Area>
     <logical_identifier><NODE name="bundle_lid"/></logical_identifier>
     <version_id><NODE name="bundle_vid"/></version_id>
-    <title>This bundle contains images obtained from HST Observing Program
-<NODE name="proposal_id"/>.</title>
+    <title><NODE name="title"/></title>
     <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Bundle</product_class>
     <NODE name="Citation_Information" />
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date><NODE name="mod_date" /></modification_date>
+        <version_id>1.0</version_id>
+        <description>Initial PDS4 version</description>
+      </Modification_Detail>
+    </Modification_History>
   </Identification_Area>
+  <FRAGMENT name="Context_Area" />
   <Bundle>
     <bundle_type>Archive</bundle_type>
   </Bundle>

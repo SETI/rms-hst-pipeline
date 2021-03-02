@@ -1,6 +1,8 @@
 import os.path
 from contextlib import contextmanager
-from typing import Generator
+from typing import Generator, Set
+
+import fs.path
 
 from fs.osfs import OSFS
 from fs.wrap import read_only
@@ -14,6 +16,7 @@ from pdart.fs.versioned.Versioned import (
     SingleVersionedCOWFS,
     SingleVersionedOSFS,
 )
+from pdart.labels.CitationInformation import Citation_Information
 from pdart.pds4.LID import LID
 from pdart.pipeline.FSTypes import *
 
@@ -140,3 +143,23 @@ def make_version_view(
 
         yield res
         res.close()
+
+
+def create_citation_info(
+    sv_deltas: COWFS, document_dir: str, document_files: Set[str]
+) -> Citation_Information:
+    # We sort only to make '.apt' appear before '.pro' since the
+    # algorithm for '.apt' is more reliable.
+    for basename in sorted(document_files):
+        _, ext = fs.path.splitext(basename)
+        if ext.lower() in [".apt", ".pro"]:
+            filepath = fs.path.join(document_dir, basename)
+            os_filepath = sv_deltas.getsyspath(filepath)
+            return Citation_Information.create_from_file(os_filepath)
+
+    # If you got here, there was no '.apt' or '.pro' file and so we don't
+    # know how to make Citation_Information.
+    raise Exception(
+        f"{document_dir} contains only {document_files}; "
+        "can't make Citation_Information"
+    )

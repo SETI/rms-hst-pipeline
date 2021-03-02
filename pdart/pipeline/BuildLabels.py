@@ -36,6 +36,7 @@ from pdart.labels.CollectionLabel import (
 )
 from pdart.labels.DocumentProductLabel import make_document_product_label
 from pdart.labels.FitsProductLabel import make_fits_product_label
+from pdart.labels.TargetIdentification import make_context_target_label
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -46,36 +47,26 @@ from pdart.pipeline.ChangesDict import (
     write_changes_dict,
 )
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
+from pdart.pipeline.Utils import (
+    make_osfs,
+    make_sv_deltas,
+    make_version_view,
+)
+
+import urllib
+import bs4  # type: ignore
 
 _LOGGER = logging.getLogger(__name__)
 
 
 _VERIFY = False
 
+PUBLICATION_YEAR = 2021
+PDS_URL = "https://pds.nasa.gov/data/pds4/context-pds4/target/"
+
 
 def log_label(tag: str, lidvid: str) -> None:
     _LOGGER.info(f"{tag} label for {lidvid}")
-
-
-def _create_citation_info(
-    sv_deltas: COWFS, document_dir: str, document_files: Set[str]
-) -> Citation_Information:
-    # We sort only to make '.apt' appear before '.pro' since the
-    # algorithm for '.apt' is more reliable.
-    for basename in sorted(document_files):
-        _, ext = fs.path.splitext(basename)
-        if ext.lower() in [".apt", ".pro"]:
-            filepath = fs.path.join(document_dir, basename)
-            os_filepath = sv_deltas.getsyspath(filepath)
-            return Citation_Information.create_from_file(os_filepath)
-
-    # If you got here, there was no '.apt' or '.pro' file and so we don't
-    # know how to make Citation_Information.
-    raise Exception(
-        f"{document_dir} contains only {document_files}; "
-        "can't make Citation_Information"
-    )
 
 
 def _lidvid_to_dir(lidvid: str) -> str:
@@ -137,8 +128,51 @@ def create_pds4_labels(
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
             context_coll_dir_path = fs.path.join(bundle_dir_path, "context$")
             label_deltas.makedir(context_coll_dir_path)
+
+            self._create_context_target_label(context_coll_dir_path, collection_lidvid)
+
             collection = bundle_db.get_collection(collection_lidvid)
             self._post_visit_collection(collection)
+
+        def _create_context_target_label(
+            self, context_coll_dir_path: str, collection_lidvid: str
+        ) -> None:
+            """
+            Create target lable under context collection if it doesn't exist
+            in PDS page.
+            """
+            with urllib.request.urlopen(PDS_URL) as response:
+                html = response.read()
+            soup = bs4.BeautifulSoup(html, "html.parser")
+            a_tags = soup.find_all("a")
+            target_label_list = [a.string for a in a_tags if a.string]
+            target_records = bundle_db.get_all_target_identification()
+            target_list = []
+            for record in target_records:
+                name = str(record.name).replace(" ", "_")
+                type = str(record.type).replace(" ", "_")
+                target = f"{type}.{name}".lower()
+                if target not in target_list:
+                    target_list.append(target)
+
+            for target in target_list:
+                is_target_label_exists = False
+                for label in target_label_list:
+                    if target in label:
+                        is_target_label_exists = True
+                        break
+                if not is_target_label_exists:
+                    label_filename = f"{target}_1.0.xml"
+                    label_filepath = fs.path.join(context_coll_dir_path, label_filename)
+                    target_lidvid = f"urn:nasa:pds:context:target:{target}::1.0"
+                    label = make_context_target_label(self.db, target, _VERIFY)
+                    label_deltas.setbytes(label_filepath, label)
+                    bundle_db.create_target_label(
+                        label_deltas.getsyspath(label_filepath),
+                        label_filename,
+                        target_lidvid,
+                        collection_lidvid,
+                    )
 
         def _create_schema_collection(self, bundle: Bundle) -> None:
             schema_products = bundle_db.get_schema_products()
@@ -377,7 +411,19 @@ class BuildLabels(MarkedStage):
             documents_dir = f"/{self._bundle_segment}$/document$/phase2$"
             docs = set(sv_deltas.listdir(documents_dir))
 
-            info = _create_citation_info(sv_deltas, documents_dir, docs)
+            # fetch citation info from database
+            citation_info_from_db = db.get_citation(str(bundle_lidvid))
+            info = Citation_Information(
+                citation_info_from_db.filename,
+                citation_info_from_db.propno,
+                citation_info_from_db.category,
+                citation_info_from_db.cycle,
+                citation_info_from_db.authors.split(","),
+                citation_info_from_db.title,
+                citation_info_from_db.submission_year,
+                citation_info_from_db.timing_year,
+            )
+            info.set_publication_year(PUBLICATION_YEAR)
 
             # create_pds4_labels() may change changes_dict, because we
             # create the context collection if it doesn't exist.
