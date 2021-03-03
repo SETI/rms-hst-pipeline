@@ -53,6 +53,7 @@ from pdart.pipeline.Utils import (
     make_version_view,
 )
 
+import json
 import urllib
 import bs4  # type: ignore
 
@@ -173,6 +174,20 @@ def create_pds4_labels(
                         target_lidvid,
                         collection_lidvid,
                     )
+
+                    new_context = {
+                        "name": [name],
+                        "type": [type],
+                        "lidvid": target_lidvid,
+                    }
+                    # Create tmp-context-products.json for validation tool.
+                    # Merge the required context-products.json with the
+                    # tmp-context_products.json.
+                    with open("context-products.json", "r+") as req_json:
+                        data = json.load(req_json)
+                    with open("tmp-context-products.json", "w") as tmp_json:
+                        data["Product_Context"].append(new_context)
+                        json.dump(data, tmp_json)
 
         def _create_schema_collection(self, bundle: Bundle) -> None:
             schema_products = bundle_db.get_schema_products()

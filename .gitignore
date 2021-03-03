@@ -158,3 +158,6 @@ TestMastResult.py
 
 # proposal ids
 proposal_ids_all.txt
+
+# tmp context products json
+tmp-context-products.json
