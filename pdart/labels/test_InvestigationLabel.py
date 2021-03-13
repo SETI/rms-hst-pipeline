@@ -12,7 +12,7 @@ _COLLECTION_LIDVID = "urn:nasa:pds:hst_09059:data_acs_raw::1.2"
 _FITS_PRODUCT_LIDVID = "urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::1.2"
 
 
-class Test_TargetLabel(unittest.TestCase):
+class Test_InvestigationLabel(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
@@ -75,6 +75,4 @@ class Test_TargetLabel(unittest.TestCase):
 
     def test_make_bundle_label(self) -> None:
         label = make_investigation_label(self.db, _BUNDLE_LIDVID, self.info, True, True)
-        print(label)
-        # label = make_bundle_label(self.db, _BUNDLE_LIDVID, self.info, True, True)
         assert_golden_file_equal(self, "test_InvestigationLabel.golden.xml", label)

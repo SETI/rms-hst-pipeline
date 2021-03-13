@@ -33,7 +33,7 @@ def _make_alternate_designation(alternate_designation: str) -> FragBuilder:
 _make_description_node: NodeBuilderTemplate = interpret_template(
     """<description>
 <NODE name="description"/>
-      </description>"""
+    </description>"""
 )
 
 
