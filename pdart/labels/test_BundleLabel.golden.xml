@@ -42,7 +42,7 @@
       <name>HST observing program 9059</name>
       <type>Individual Investigation</type>
       <Internal_Reference>
-        <lidvid_reference>urn:nasa:pds:context:investigation:investigation.hst_09059::1.0</lidvid_reference>
+        <lidvid_reference>urn:nasa:pds:context:investigation:individual.hst_09059::1.0</lidvid_reference>
         <reference_type>bundle_to_investigation</reference_type>
       </Internal_Reference>
     </Investigation_Area>
@@ -60,7 +60,7 @@
         <name>Advanced Camera for Surveys</name>
         <type>Instrument</type>
         <Internal_Reference>
-          <lid_reference>urn:nasa:pds:context:instrument:insthost.acs</lid_reference>
+          <lid_reference>urn:nasa:pds:context:instrument:hst.acs</lid_reference>
           <reference_type>is_instrument</reference_type>
         </Internal_Reference>
       </Observing_System_Component>

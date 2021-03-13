@@ -105,6 +105,11 @@ def get_target_lid(target_parts: List[str]) -> str:
     return f"urn:nasa:pds:context:target:{target}"
 
 
+def get_target_lidvid(target_parts: List[str], version: str = "1.0") -> str:
+    lid = get_target_lid(target_parts)
+    return f"{lid}::{version}"
+
+
 approximate_target_table: Dict[str, List[str]] = {
     "VENUS": ["Venus", "Planet"],
     "MARS": ["Mars", "Planet"],

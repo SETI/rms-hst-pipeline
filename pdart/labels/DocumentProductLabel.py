@@ -34,7 +34,7 @@ def make_document_product_label(
     bundle = bundle_db.get_bundle(bundle_lidvid)
     proposal_id = bundle.proposal_id
     investigation_lidvid = (
-        f"urn:nasa:pds:context:investigation:investigation.hst_{proposal_id:05}::1.0"
+        f"urn:nasa:pds:context:investigation:individual.hst_{proposal_id:05}::1.0"
     )
     title = f"Summary of the observation plan for HST proposal {proposal_id}"
 

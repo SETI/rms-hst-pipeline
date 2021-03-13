@@ -1,5 +1,5 @@
 import logging
-from typing import cast, Set
+from typing import cast, Set, Dict, List
 
 import fs.path
 import os.path
@@ -34,9 +34,11 @@ from pdart.labels.CollectionLabel import (
     get_collection_label_name,
     make_collection_label,
 )
+from pdart.labels.FitsProductLabelXml import mk_Investigation_Area_lidvid
 from pdart.labels.DocumentProductLabel import make_document_product_label
 from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.labels.TargetIdentification import make_context_target_label
+from pdart.labels.InvestigationLabel import make_investigation_label
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -130,7 +132,12 @@ def create_pds4_labels(
             context_coll_dir_path = fs.path.join(bundle_dir_path, "context$")
             label_deltas.makedir(context_coll_dir_path)
 
+            # Create target lable if it doesn't exist in PDS page.
             self._create_context_target_label(context_coll_dir_path, collection_lidvid)
+            # Create investigation label
+            self._create_context_investigation_label(
+                bundle_lidvid, context_coll_dir_path, collection_lidvid
+            )
 
             collection = bundle_db.get_collection(collection_lidvid)
             self._post_visit_collection(collection)
@@ -142,6 +149,7 @@ def create_pds4_labels(
             Create target lable under context collection if it doesn't exist
             in PDS page.
             """
+            # Get all the targets in PDS page
             with urllib.request.urlopen(PDS_URL) as response:
                 html = response.read()
             soup = bs4.BeautifulSoup(html, "html.parser")
@@ -156,6 +164,7 @@ def create_pds4_labels(
                 if target not in target_list:
                     target_list.append(target)
 
+            new_target_context_list = []
             for target in target_list:
                 is_target_label_exists = False
                 for label in target_label_list:
@@ -168,26 +177,71 @@ def create_pds4_labels(
                     target_lidvid = f"urn:nasa:pds:context:target:{target}::1.0"
                     label = make_context_target_label(self.db, target, _VERIFY)
                     label_deltas.setbytes(label_filepath, label)
-                    bundle_db.create_target_label(
+                    bundle_db.create_context_product_label(
                         label_deltas.getsyspath(label_filepath),
                         label_filename,
                         target_lidvid,
                         collection_lidvid,
                     )
 
-                    new_context = {
+                    new_target_context = {
                         "name": [name],
                         "type": [type],
                         "lidvid": target_lidvid,
                     }
-                    # Create tmp-context-products.json for validation tool.
-                    # Merge the required context-products.json with the
-                    # tmp-context_products.json.
-                    with open("context-products.json", "r+") as req_json:
-                        data = json.load(req_json)
-                    with open("tmp-context-products.json", "w") as tmp_json:
-                        data["Product_Context"].append(new_context)
-                        json.dump(data, tmp_json)
+                    new_target_context_list.append(new_target_context)
+
+            # Create tmp-context-products.json for validation tool.
+            self._create_tmp_json_for_validation(new_target_context_list)
+
+        def _create_context_investigation_label(
+            self,
+            bundle_lidvid: str,
+            context_coll_dir_path: str,
+            collection_lidvid: str,
+        ) -> None:
+            """
+            Create the context investigation label (one per bundle).
+            """
+            bundle = bundle_db.get_bundle(bundle_lidvid)
+            proposal_id = bundle.proposal_id
+            investigation_lidvid = mk_Investigation_Area_lidvid(proposal_id)
+            label_base = LIDVID(investigation_lidvid).lid().product_id
+            label_filename = f"{label_base}.xml"
+            label_filepath = fs.path.join(context_coll_dir_path, label_filename)
+            label = make_investigation_label(self.db, bundle_lidvid, info, _VERIFY)
+            label_deltas.setbytes(label_filepath, label)
+            bundle_db.create_context_product_label(
+                label_deltas.getsyspath(label_filepath),
+                label_filename,
+                investigation_lidvid,
+                collection_lidvid,
+            )
+
+        def _create_tmp_json_for_validation(self, extra_list: List) -> None:
+            """
+            Create tmp-context-products.json for validation tool.
+            """
+            context_products = bundle_db.get_context_products()
+            data: Dict[str, List] = {}
+            for context_product in context_products:
+                new_context = {
+                    "name": [],
+                    "type": [],
+                    "lidvid": str(context_product.lidvid),
+                }
+                if "Product_Context" in data:
+                    data["Product_Context"].append(new_context)
+                else:
+                    data["Product_Context"] = [new_context]
+            # Include newly added context target products
+            for target_context in extra_list:
+                if "Product_Context" in data:
+                    data["Product_Context"].append(target_context)
+                else:
+                    data["Product_Context"] = [target_context]
+            with open("tmp-context-products.json", "w") as tmp_json:
+                json.dump(data, tmp_json)
 
         def _create_schema_collection(self, bundle: Bundle) -> None:
             schema_products = bundle_db.get_schema_products()

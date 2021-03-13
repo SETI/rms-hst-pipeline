@@ -16,7 +16,7 @@
   </Identification_Area>
   <Reference_List>
     <Internal_Reference>
-      <lidvid_reference>urn:nasa:pds:context:investigation:investigation.hst_13012::1.0</lidvid_reference>
+      <lidvid_reference>urn:nasa:pds:context:investigation:individual.hst_13012::1.0</lidvid_reference>
       <reference_type>document_to_investigation</reference_type>
     </Internal_Reference>
   </Reference_List>

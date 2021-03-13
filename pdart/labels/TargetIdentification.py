@@ -12,6 +12,7 @@ from pdart.labels.TargetIdentificationXml import (
     approximate_target_table,
     target_identification,
     get_target_lid,
+    get_target_lidvid,
     make_label,
     make_alias,
     make_description,
@@ -107,7 +108,9 @@ def create_target_identification_nodes(
     }
     target_identification_nodes: List[NodeBuilder] = []
     for target in target_identifications:
-        bundle_db.create_context_product(get_target_lid([target.type, target.name]))
+        bundle_db.create_context_product(
+            get_target_lidvid([target.type, target.name]), "target"
+        )
         target_dict: Dict[str, Any] = {}
         target_dict["name"] = target.name
         target_dict["type"] = target.type
@@ -135,7 +138,8 @@ def make_context_target_label(
     target_lidvid = f"{target_lid}::1.0"
     target_identification = bundle_db.get_target_identification_based_on_lid(target_lid)
     bundle_db.create_context_product(
-        get_target_lid([target_identification.type, target_identification.name])
+        get_target_lidvid([target_identification.type, target_identification.name]),
+        "target",
     )
 
     alias = str(target_identification.alternate_designations)

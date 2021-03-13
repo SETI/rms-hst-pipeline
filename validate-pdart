@@ -31,7 +31,7 @@ REPORT_FILEPATH="${REPORT_DIR}"/validation-report.txt
 # products ready.
 validate "${BUNDLE_DIR}" -M "${MANIFEST_DIR}"/checksum.manifest.txt -R pds4.bundle \
     -D \
-    --add-context "${CONTEXT_PRODUCTS}" \
+    --add-context-products "${CONTEXT_PRODUCTS}" \
     -S ${SCHEMATRONS} -x ${SCHEMAS} \
     -r "${REPORT_FILEPATH}"
 

@@ -44,7 +44,7 @@ _TABLES: Set[str] = {
     "proposal_info",
     "target_identification",
     "citation_info",
-    "target_labels",
+    "context_product_labels",
 }
 
 
@@ -412,7 +412,7 @@ class Test_BundleDB(unittest.TestCase):
         product_lidvid = "urn:nasa:pds:hst_99999:context:important_stuff::1.8"
 
         self.assertFalse(self.db.context_product_exists(product_lidvid))
-        self.db.create_context_product(product_lidvid)
+        self.db.create_context_product(product_lidvid, "important")
         self.assertTrue(self.db.context_product_exists(product_lidvid))
 
     def test_document_product_exists(self) -> None:

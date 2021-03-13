@@ -123,3 +123,16 @@ def wavelength_from_range(min_range: float, max_range: float) -> List[str]:
         return []
 
     return WAVELENGTH_NAMES[min_idx : max_idx + 1]
+
+
+def date_time_to_date(date_time: str) -> str:
+    """
+    Take in a date_time string and return a date string, for exampel:
+    "2005-01-19T15:41:05Z" to "2005-01-19"
+    """
+    try:
+        idx = date_time.index("T")
+    except:
+        raise ValueError("Failed to convert from date_time to date")
+
+    return date_time[:idx]

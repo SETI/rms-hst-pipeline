@@ -10,7 +10,7 @@ from pdart.db.SqlAlchTables import (
     CollectionLabel,
     File,
     ProductLabel,
-    TargetLabel,
+    ContextProductLabel,
 )
 from pdart.pds4.LIDVID import LIDVID
 
@@ -78,13 +78,19 @@ def make_checksum_manifest(
             )
             files.extend(bundle_db.get_product_files(product_lidvid))
 
-    for target in bundle_db.get_target_labels():
-        label_pairs.append(
-            make_target_label_pair(
-                target,
-                lidvid_to_dirpath,
-            )
-        )
+    for product_label in bundle_db.get_context_product_labels():
+        label_pairs.append(make_context_product_pair(product_label, lidvid_to_dirpath))
+
+    # investigation = bundle_db.get_investigation_product()
+    # investigation_lidvid = str(investigation.lidvid)
+    # label_pairs = [
+    #     make_investigation_label_pair(
+    #         bundle_db.get_investigation_label(
+    #             investigation_lidvid),
+    #             lidvid_to_dirpath
+    #         )
+    #     )
+    # ]
 
     file_pairs = [make_checksum_pair(file, lidvid_to_dirpath) for file in files]
 
@@ -132,25 +138,24 @@ def make_product_label_pair(
     return (label_to_filepath(product_label), product_label.md5_hash)
 
 
-def make_target_label_pair(
-    target_label: TargetLabel, lidvid_to_dirpath: _LTD
+def make_context_product_pair(
+    context_product_label: ContextProductLabel, lidvid_to_dirpath: _LTD
 ) -> Tuple[str, str]:
-    def label_to_filepath(target_label: TargetLabel) -> str:
-        # This is a workaround because target lidvid under context doesn't
+    def label_to_filepath(context_product_label: ContextProductLabel) -> str:
+        # This is a workaround because lidvid under context doesn't
         # match the directory path. For example:
         # target lidvid: urn:nasa:pds:context:target:asteroid.762_pulcova::1.0
         # path: hst_09059/context/asteroid.762_pulcova_1.0.xml
-        # We need remove "target" and put in a dummy bundle id in lidvid.
-        target_lidvid_mod = str(target_label.collection_lidvid)
+        lidvid_mod = str(context_product_label.collection_lidvid)
 
-        dir = lidvid_to_dirpath(LIDVID(target_lidvid_mod))
-        lidvid = LIDVID(target_lidvid_mod)
+        dir = lidvid_to_dirpath(LIDVID(lidvid_mod))
+        lidvid = LIDVID(lidvid_mod)
         lid = lidvid.lid()
         # parts are collection, product
         parts = lid.parts()[1:]
-        return fs.path.relpath(fs.path.join(dir, target_label.basename))
+        return fs.path.relpath(fs.path.join(dir, context_product_label.basename))
 
-    return (label_to_filepath(target_label), target_label.md5_hash)
+    return (label_to_filepath(context_product_label), context_product_label.md5_hash)
 
 
 def make_checksum_pair(file: File, lidvid_to_dirpath: _LTD) -> Tuple[str, str]:

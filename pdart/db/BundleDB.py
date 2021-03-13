@@ -31,7 +31,7 @@ from pdart.db.SqlAlchTables import (
     FitsFile,
     FitsProduct,
     TargetIdentification,
-    TargetLabel,
+    ContextProductLabel,
     Hdu,
     OtherCollection,
     Product,
@@ -847,7 +847,7 @@ class BundleDB(object):
         return self.session.query(TargetIdentification).all()
 
     ############################################################
-    def create_context_product(self, id: str) -> None:
+    def create_context_product(self, id: str, ref_type: str) -> None:
         """
         Create a context product with this LIDVID if none exists.
         """
@@ -857,7 +857,7 @@ class BundleDB(object):
             assert LID(id).is_product_lid()
 
         if not self.context_product_exists(id):
-            self.session.add(ContextProduct(lidvid=id))
+            self.session.add(ContextProduct(lidvid=id, ref_type=ref_type))
             self.session.commit()
 
     def context_product_exists(self, lidvid: str) -> bool:
@@ -870,7 +870,31 @@ class BundleDB(object):
         ).scalar()
 
     def get_context_products(self) -> List[ContextProduct]:
+        """
+        Returns all context products in the database.
+        """
         return self.session.query(ContextProduct).order_by(ContextProduct.lidvid).all()
+
+    def get_reference_context_products(self, lidvid: str) -> List[ContextProduct]:
+        """
+        Returns all context products without the given LIDVID, this is used
+        to get all the reference lids for investigation label.
+        """
+        return (
+            self.session.query(ContextProduct)
+            .filter(ContextProduct.lidvid != lidvid)
+            .all()
+        )
+
+    def get_investigation_product(self) -> ContextProduct:
+        """
+        Returns the investigation context product.
+        """
+        return (
+            self.session.query(ContextProduct)
+            .filter(ContextProduct.lidvid.contains("investigation"))  # type: ignore
+            .one()
+        )
 
     ############################################################
     def create_schema_product(self, id: str) -> None:
@@ -1397,42 +1421,42 @@ class BundleDB(object):
 
     ############################################################
 
-    def create_target_label(
+    def create_context_product_label(
         self,
         os_filepath: str,
         basename: str,
-        target_lidvid: str,
+        lidvid: str,
         collection_lidvid: str,
     ) -> None:
-        if self.target_label_exists(target_lidvid):
+        if self.context_product_label_exists(lidvid):
             pass
         else:
             self.session.add(
-                TargetLabel(
-                    target_lidvid=target_lidvid,
+                ContextProductLabel(
+                    lidvid=lidvid,
                     basename=basename,
                     md5_hash=file_md5(os_filepath),
                     collection_lidvid=collection_lidvid,
                 )
             )
             self.session.commit()
-            assert self.target_label_exists(target_lidvid)
+            assert self.context_product_label_exists(lidvid)
 
-    def target_label_exists(self, target_lidvid: str) -> bool:
+    def context_product_label_exists(self, lidvid: str) -> bool:
         """
-        Returns True iff there is a label for the target with the
+        Returns True iff there is a label for the context product with the
         given LIDVID.
         """
         return self.session.query(
-            exists().where(TargetLabel.target_lidvid == target_lidvid)
+            exists().where(ContextProductLabel.lidvid == lidvid)
         ).scalar()
 
-    def get_target_labels(self) -> List[TargetLabel]:
+    def get_context_product_labels(self) -> List[ContextProductLabel]:
         """
-        Returns the label for the target with the given LIDVID, or
+        Returns the label for the context product with the given LIDVID, or
         raises an exception.
         """
-        return self.session.query(TargetLabel).all()
+        return self.session.query(ContextProductLabel).all()
 
     ############################################################
 
