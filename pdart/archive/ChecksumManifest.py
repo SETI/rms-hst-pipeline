@@ -81,17 +81,6 @@ def make_checksum_manifest(
     for product_label in bundle_db.get_context_product_labels():
         label_pairs.append(make_context_product_pair(product_label, lidvid_to_dirpath))
 
-    # investigation = bundle_db.get_investigation_product()
-    # investigation_lidvid = str(investigation.lidvid)
-    # label_pairs = [
-    #     make_investigation_label_pair(
-    #         bundle_db.get_investigation_label(
-    #             investigation_lidvid),
-    #             lidvid_to_dirpath
-    #         )
-    #     )
-    # ]
-
     file_pairs = [make_checksum_pair(file, lidvid_to_dirpath) for file in files]
 
     sorted_pairs = sorted(file_pairs + label_pairs)

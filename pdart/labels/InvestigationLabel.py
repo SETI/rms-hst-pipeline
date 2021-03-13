@@ -71,10 +71,10 @@ def make_investigation_label(
     internal_reference_nodes: List[NodeBuilder] = []
     for product in context_products:
         ref_lid = lidvid_to_lid(product.lidvid)
-        if "instrument_host" in ref_lid:
-            ref_type = f"is_{product.ref_type}"
-        else:
-            ref_type = f"investigation_to_{product.ref_type}"
+        # if "instrument_host" in ref_lid:
+        #     ref_type = f"is_{product.ref_type}"
+        # else:
+        ref_type = f"investigation_to_{product.ref_type}"
         ref_node = make_internal_ref(ref_lid, ref_type)
         internal_reference_nodes.append(ref_node)
 

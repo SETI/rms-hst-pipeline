@@ -233,7 +233,7 @@ def make_fits_product_label(
         investigation_area_name = mk_Investigation_Area_name(proposal_id)
         investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
         bundle_db.create_context_product(investigation_area_lidvid, "investigation")
-        bundle_db.create_context_product(instrument_host_lidvid(), "instrument")
+        bundle_db.create_context_product(instrument_host_lidvid(), "instrument_host")
         bundle_db.create_context_product(
             observing_system_lidvid(instrument), "instrument"
         )

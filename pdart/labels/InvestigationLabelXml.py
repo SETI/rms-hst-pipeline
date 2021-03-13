@@ -53,7 +53,7 @@ make_label: DocTemplate = interpret_document_template(
     </Reference_List>
     <Investigation>
         <name><NODE name="title"/></name>
-        <type>Individual</type>
+        <type>Individual Investigation</type>
         <start_date><NODE name="start_date"/></start_date>
         <stop_date><NODE name="stop_date"/></stop_date>
         <description><NODE name="description"/></description>
