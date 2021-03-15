@@ -87,9 +87,14 @@ def mk_Investigation_Area_name(proposal_id: int) -> str:
     return f"HST observing program {proposal_id}"
 
 
-def mk_Investigation_Area_lidvid(proposal_id: int) -> str:
+def mk_Investigation_Area_lid(proposal_id: int) -> str:
+    return f"urn:nasa:pds:context:investigation:individual.hst_{proposal_id:05}"
+
+
+def mk_Investigation_Area_lidvid(proposal_id: int, version: str = "1.0") -> str:
     """
     Boilerplate for the text content of a ``<lidvid />`` element in
     the ``<Investigation_Area />`` element.
     """
-    return f"urn:nasa:pds:context:investigation:investigation.hst_{proposal_id:05}::1.0"
+    lid = mk_Investigation_Area_lid(proposal_id)
+    return f"{lid}::{version}"

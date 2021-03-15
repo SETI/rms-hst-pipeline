@@ -20,15 +20,6 @@ class ValidateBundle(MarkedStage):
             self.deliverable_dir()
         ), f"Need {self.deliverable_dir()} for ValidateBundle"
 
-        # if tmp-context-products.json doesn't exist, we will create one based
-        # on the required context-products.json. Note: tmp-context-products.json
-        # won't be pushed to github.
-        if not os.path.isfile('tmp-context-products.json'):
-            with open("context-products.json", "r+") as req_json:
-                data = json.load(req_json)
-            with open("tmp-context-products.json", "w") as tmp_json:
-                json.dump(data, tmp_json)
-
         completed_process: CompletedProcess = run(
             [
                 "./validate-pdart",

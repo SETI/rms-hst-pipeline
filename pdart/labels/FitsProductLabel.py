@@ -33,9 +33,10 @@ from pdart.labels.HstParameters import (
 )
 from pdart.labels.LabelError import LabelError
 from pdart.labels.ObservingSystem import (
-    instrument_host_lid,
+    instrument_host_lidvid,
     observing_system,
     observing_system_lid,
+    observing_system_lidvid,
 )
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.PrimaryResultSummary import primary_result_summary
@@ -231,9 +232,11 @@ def make_fits_product_label(
 
         investigation_area_name = mk_Investigation_Area_name(proposal_id)
         investigation_area_lidvid = mk_Investigation_Area_lidvid(proposal_id)
-        bundle_db.create_context_product(investigation_area_lidvid)
-        bundle_db.create_context_product(instrument_host_lid())
-        bundle_db.create_context_product(observing_system_lid(instrument))
+        bundle_db.create_context_product(investigation_area_lidvid, "investigation")
+        bundle_db.create_context_product(instrument_host_lidvid(), "instrument_host")
+        bundle_db.create_context_product(
+            observing_system_lidvid(instrument), "instrument"
+        )
 
         # Fetch target identifications from db
         target_id = shm_lookup["TARG_ID"]

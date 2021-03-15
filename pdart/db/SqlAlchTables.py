@@ -329,6 +329,7 @@ class ContextProduct(Base):
 
     __tablename__ = "context_products"
     lidvid = Column(String, primary_key=True, nullable=False)
+    ref_type = Column(String, nullable=False)
 
     def __repr__(self) -> str:
         return f"ContextProduct(lidvid={self.lidvid!r})"
@@ -623,14 +624,14 @@ class ProductLabel(Base):
     md5_hash = Column(String(32), nullable=False)
 
 
-class TargetLabel(Base):
+class ContextProductLabel(Base):
     """
-    A database representation of a newly generated PDS4 target label.
+    A database representation of context product labels.
     """
 
-    __tablename__ = "target_labels"
+    __tablename__ = "context_product_labels"
 
-    target_lidvid = Column(String, primary_key=True, nullable=False)
+    lidvid = Column(String, primary_key=True, nullable=False)
     # We store target label under context collection directory, this will point
     # us to the correct path of the target label
     collection_lidvid = Column(String, nullable=False)

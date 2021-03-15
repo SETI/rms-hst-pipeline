@@ -38,7 +38,7 @@ acs_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Advanced Camera for Surveys",
         "component_name": "Advanced Camera for Surveys",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.acs",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.acs",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -51,7 +51,7 @@ wfc3_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Wide Field Camera 3",
         "component_name": "Wide Field Camera 3",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.wfc3",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.wfc3",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -64,7 +64,7 @@ wfpc2_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Wide-Field Planetary Camera 2",
         "component_name": "Wide-Field Planetary Camera 2",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.wfpc2",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.wfpc2",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -77,7 +77,7 @@ nicmos_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Near Infrared Camera and Multi-Object Spectrometer",
         "component_name": "Near Infrared Camera and Multi-Object Spectrometer",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.nicmos",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.nicmos",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -86,7 +86,7 @@ foc_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Faint Object Camera",
         "component_name": "Faint Object Camera",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.foc",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.foc",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -95,7 +95,7 @@ cos_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Cosmic Origins Spectrograph",
         "component_name": "Cosmic Origins Spectrograph",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.cos",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.cos",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -104,7 +104,7 @@ wfpc_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Wide-Field Planetary Camera 1",
         "component_name": "Wide-Field Planetary Camera 1",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.wfpc",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.wfpc",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -113,7 +113,7 @@ stis_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Space Telescope Imaging Spectrograph",
         "component_name": "Space Telescope Imaging Spectrograph",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.stis",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.stis",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -122,7 +122,7 @@ fos_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Faint Object Spectrograph",
         "component_name": "Faint Object Spectrograph",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.fos",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.fos",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
@@ -131,18 +131,27 @@ ghrs_observing_system: NodeBuilder = _observing_system(
     {
         "name": "Hubble Space Telescope Faint Object Spectrograph",
         "component_name": "Faint Object Spectrograph",
-        "instrument_lid": "urn:nasa:pds:context:instrument:insthost.ghrs",
+        "instrument_lid": "urn:nasa:pds:context:instrument:hst.ghrs",
         "instrument_host_lid": "urn:nasa:pds:context:instrument_host:spacecraft.hst",
     }
 )
 
 
 def observing_system_lid(instrument: str) -> str:
-    return f"urn:nasa:pds:context:instrument:insthost.{instrument}"
+    return f"urn:nasa:pds:context:instrument:hst.{instrument}"
+
+
+def observing_system_lidvid(instrument: str, version: str = "1.0") -> str:
+    lid = observing_system_lid(instrument)
+    return f"{lid}::{version}"
 
 
 def instrument_host_lid() -> str:
     return "urn:nasa:pds:context:instrument_host:spacecraft.hst"
+
+
+def instrument_host_lidvid(version: str = "1.0") -> str:
+    return f"{instrument_host_lid()}::{version}"
 
 
 def observing_system(instrument: str) -> NodeBuilder:

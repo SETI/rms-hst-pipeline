@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Context xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd">
+  <Identification_Area>
+    <logical_identifier>urn:nasa:pds:context:investigation:individual.hst_09059</logical_identifier>
+    <version_id>1.0</version_id>
+    <title>{title}, HST Cycle 1 Program 99999, 2021.</title>
+    <information_model_version>1.15.0.0</information_model_version>
+    <product_class>Product_Context</product_class>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>2016-04-20</modification_date>
+        <version_id>1.0</version_id>
+        <description>Initial set up of the investigation product.</description>
+      </Modification_Detail>
+    </Modification_History>
+  </Identification_Area>
+  <Reference_List>
+    <Internal_Reference>
+      <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+      <reference_type>investigation_to_instrument_host</reference_type>
+    </Internal_Reference>
+    <Internal_Reference>
+      <lid_reference>urn:nasa:pds:context:instrument:hst.acs</lid_reference>
+      <reference_type>investigation_to_instrument</reference_type>
+    </Internal_Reference>
+    <Internal_Reference>
+      <lid_reference>urn:nasa:pds:context:target:asteroid.762_pulcova</lid_reference>
+      <reference_type>investigation_to_target</reference_type>
+    </Internal_Reference>
+  </Reference_List>
+  <Investigation>
+    <name>{title}, HST Cycle 1 Program 99999, 2021.</name>
+    <type>Individual Investigation</type>
+    <start_date>2005-01-19</start_date>
+    <stop_date>2005-01-19</stop_date>
+    <description>PLACEHOLDER</description>
+  </Investigation>
+</Product_Context>
