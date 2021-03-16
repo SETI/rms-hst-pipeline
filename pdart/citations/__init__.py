@@ -3,12 +3,16 @@
 ################################################################################
 
 import re
+import textwrap
+from xml.sax.saxutils import escape
+
 from typing import Any, List
 
 from .Citation_Information_from_apt import Citation_Information_from_apt
 from .Citation_Information_from_pro import Citation_Information_from_pro
 from .fix_title import fix_title
 from .fix_authors import fix_authors
+from .fix_abstract import fix_abstract
 
 YEARS_FOR_CYCLE = {  # YEARS_FOR_CYCLE[cycle_number] = (start_year, end_year)
     1: (1991, 1992),  # https://books.google.com/books?id=iy7HKCO9vO0C
@@ -131,6 +135,7 @@ class Citation_Information:
         title: str,
         submission_year: int,
         timing_year: int,
+        abstract: List[str] = ""
     ):
 
         self.filename = filename
@@ -139,6 +144,7 @@ class Citation_Information:
         self.cycle = cycle
         self.authors = authors
         self.title = title
+        self.abstract = abstract
 
         # Latest submission year of the proposal if known, otherwise zero
         self.submission_year = submission_year
@@ -163,11 +169,13 @@ class Citation_Information:
         else:
             raise ValueError("unrecognized file format: " + filename)
 
-        (propno, category, cycle, authors, title, submission_year, timing_year) = info
+        (propno, category, cycle, authors, title, submission_year, timing_year,
+         abstract) = info
 
         # Cleanup
         title = fix_title(title)
         authors = fix_authors(authors)
+        abstract = fix_abstract(abstract)
 
         return Citation_Information(
             filename,
@@ -178,6 +186,7 @@ class Citation_Information:
             title,
             submission_year,
             timing_year,
+            abstract
         )
 
     @property
@@ -233,6 +242,27 @@ class Citation_Information:
             + self.publication_year
             + "."
         )
+
+    def abstract_formatted(self, width=80, indent=0, escaped=False):
+        """Abstract as a list of strings, formatted to insert into an XML file.
+        """
+
+        formatted = []
+        for paragraph in self.abstract:
+            if not paragraph:
+                formatted.append('')
+                continue
+
+            recs = textwrap.wrap(paragraph, width - indent)
+            paragraph = '\n'.join(recs)
+
+            if indent:
+                paragraph = textwrap.indent(paragraph, indent*" ")
+
+            paragraph = escape(paragraph)
+            formatted += paragraph.splitlines()
+
+        return formatted
 
     def set_publication_year(self, year: int) -> None:
         """Set the publication year that will appear in the citation."""

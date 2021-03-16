@@ -14,7 +14,7 @@ DATE_REGEX3 = re.compile(r" *:date .*?-(20[0-3][0-9]) .*")
 
 def Citation_Information_from_apt(
     filename: str,
-) -> Tuple[int, str, int, List[str], str, int, int]:
+) -> Tuple[int, str, int, List[str], str, int, int, str]:
 
     # Read file
     doc = md.parse(filename)
@@ -44,6 +44,19 @@ def Citation_Information_from_apt(
     # Get title
     nodes = doc.getElementsByTagName("Title")
     title = nodes[0].childNodes[0].data
+
+    # Get abstract
+    nodes = doc.getElementsByTagName("Abstract")
+    if nodes:
+        abstract = nodes[0].childNodes[0].data
+
+        # Remove extraneous newlines in the abstract
+        abstract = abstract.replace("\n\n", "!!!LINEBREAK!!!")
+        abstract = abstract.replace("-\n", "-")
+        abstract = abstract.replace("\n", " ")
+        abstract = abstract.replace("!!!LINEBREAK!!!", "\n\n")
+    else:
+        abstract = ""
 
     # Try to get the year from the SubmissionLog
     nodes = doc.getElementsByTagName("SubmissionLog")
@@ -81,4 +94,5 @@ def Citation_Information_from_apt(
             if year_str:
                 timing_year = max(timing_year, int(year_str))
 
-    return (propno, category, cycle, authors, title, submission_year, timing_year)
+    return (propno, category, cycle, authors, title,
+            submission_year, timing_year, abstract)

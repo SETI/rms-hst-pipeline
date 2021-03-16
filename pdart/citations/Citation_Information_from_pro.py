@@ -144,6 +144,8 @@ DMY_REGEX = re.compile(
     r"(?:^|.*[^0-9])[0-9]{1,2}-" + MONTHS + r"-(?:|19|20)([0-9]{2})(?:$|[^0-9].*)"
 )
 
+ABSTRACT_HEADER = re.compile(r"([567]\.)? *Abstract *$")
+
 ################################################################################
 
 MISSING_CYCLES = {
@@ -157,7 +159,7 @@ MISSING_CYCLES = {
 
 def Citation_Information_from_pro(
     filename: str,
-) -> Tuple[int, str, int, List[str], str, int, int]:
+) -> Tuple[int, str, int, List[str], str, int, int, str]:
 
     # A quick and dirty function to merge author lists
     # Sometimes the PI is in the author list, sometimes not!
@@ -317,6 +319,39 @@ def Citation_Information_from_pro(
 
     authors = merge_authors(authors, pi_author, cois)
 
+    # Get abstract
+    abstract = ""
+    for k, rec in enumerate(recs):
+        match = ABSTRACT_HEADER.match(rec)
+        if match:
+            skip_next_if_blank = True
+            for rec in recs[k+1:]:
+
+                if rec.startswith("\f"):        # form feed
+                    skip_next_if_blank = True
+                    continue
+
+                rec = rec.strip()
+                if skip_next_if_blank and rec == "":
+                    skip_next_if_blank = False
+                    continue
+                if rec.startswith("----"):      # end of section
+                    break
+
+                if rec == "":
+                    abstract += "\n\n"
+                elif abstract.endswith(" --"):
+                    abstract += " " + rec
+                elif abstract.endswith("-"):
+                    abstract += rec
+                else:
+                    abstract += " " + rec
+
+                skip_next_if_blank = False
+
+            abstract = abstract[1:]
+            break
+
     # Get the submission year
     submission_year = 0
     for rec in recs:
@@ -387,4 +422,5 @@ def Citation_Information_from_pro(
     elif not cycle:
         raise ValueError("missing cycle number in " + filename)
 
-    return (propno, category, cycle, authors, title, submission_year, timing_year)
+    return (propno, category, cycle, authors, title,
+            submission_year, timing_year, abstract)
