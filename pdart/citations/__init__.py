@@ -135,7 +135,7 @@ class Citation_Information:
         title: str,
         submission_year: int,
         timing_year: int,
-        abstract: List[str] = ""
+        abstract: List[str] = "",  # type: ignore
     ):
 
         self.filename = filename
@@ -169,13 +169,21 @@ class Citation_Information:
         else:
             raise ValueError("unrecognized file format: " + filename)
 
-        (propno, category, cycle, authors, title, submission_year, timing_year,
-         abstract) = info
+        (
+            propno,
+            category,
+            cycle,
+            authors,
+            title,
+            submission_year,
+            timing_year,
+            abstract,
+        ) = info
 
         # Cleanup
         title = fix_title(title)
         authors = fix_authors(authors)
-        abstract = fix_abstract(abstract)
+        abstract = fix_abstract(abstract)  # type: ignore
 
         return Citation_Information(
             filename,
@@ -186,7 +194,7 @@ class Citation_Information:
             title,
             submission_year,
             timing_year,
-            abstract
+            abstract,  # type: ignore
         )
 
     @property
@@ -243,21 +251,20 @@ class Citation_Information:
             + "."
         )
 
-    def abstract_formatted(self, width=80, indent=0, escaped=False):
-        """Abstract as a list of strings, formatted to insert into an XML file.
-        """
+    def abstract_formatted(self, width=80, indent=0, escaped=False):  # type: ignore
+        """Abstract as a list of strings, formatted to insert into an XML file."""
 
         formatted = []
         for paragraph in self.abstract:
             if not paragraph:
-                formatted.append('')
+                formatted.append("")
                 continue
 
             recs = textwrap.wrap(paragraph, width - indent)
-            paragraph = '\n'.join(recs)
+            paragraph = "\n".join(recs)
 
             if indent:
-                paragraph = textwrap.indent(paragraph, indent*" ")
+                paragraph = textwrap.indent(paragraph, indent * " ")
 
             paragraph = escape(paragraph)
             formatted += paragraph.splitlines()
@@ -294,6 +301,7 @@ class Citation_Information:
             "{title}",
             2001,
             2001,
+            ["{abstract_line_1}", "{abstract_line_2}"],
         )
         info.set_publication_year(2021)
         return info

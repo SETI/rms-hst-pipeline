@@ -290,6 +290,7 @@ class BundleDB(object):
                     title=info.title,
                     submission_year=info.submission_year,
                     timing_year=info.timing_year,
+                    abstract="\n".join(info.abstract),
                 )
             )
             self.session.commit()

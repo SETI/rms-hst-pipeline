@@ -325,9 +325,9 @@ def Citation_Information_from_pro(
         match = ABSTRACT_HEADER.match(rec)
         if match:
             skip_next_if_blank = True
-            for rec in recs[k+1:]:
+            for rec in recs[k + 1 :]:
 
-                if rec.startswith("\f"):        # form feed
+                if rec.startswith("\f"):  # form feed
                     skip_next_if_blank = True
                     continue
 
@@ -335,7 +335,7 @@ def Citation_Information_from_pro(
                 if skip_next_if_blank and rec == "":
                     skip_next_if_blank = False
                     continue
-                if rec.startswith("----"):      # end of section
+                if rec.startswith("----"):  # end of section
                     break
 
                 if rec == "":
@@ -422,5 +422,13 @@ def Citation_Information_from_pro(
     elif not cycle:
         raise ValueError("missing cycle number in " + filename)
 
-    return (propno, category, cycle, authors, title,
-            submission_year, timing_year, abstract)
+    return (
+        propno,
+        category,
+        cycle,
+        authors,
+        title,
+        submission_year,
+        timing_year,
+        abstract,
+    )

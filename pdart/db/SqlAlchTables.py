@@ -676,6 +676,7 @@ class CitationInfo(Base):
     title = Column(String, nullable=False)
     submission_year = Column(Integer, nullable=False)
     timing_year = Column(Integer, nullable=False)
+    abstract = Column(String, nullable=False)
 
     def __repr__(self) -> str:
         return f"CitationInfo(lidvid={self.lidvid!r})"

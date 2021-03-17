@@ -30,6 +30,17 @@ def make_internal_ref(ref_lid: str, ref_type: str) -> FragBuilder:
     )
 
 
+_make_description_node: NodeBuilderTemplate = interpret_template(
+    """<description>
+<NODE name="description"/>
+    </description>"""
+)
+
+
+def make_description(description: str) -> FragBuilder:
+    return _make_description_node({"description": description})
+
+
 make_label: DocTemplate = interpret_document_template(
     f"""<?xml version="1.0" encoding="utf-8"?>
 {PDS4_XML_MODEL}
@@ -56,7 +67,7 @@ make_label: DocTemplate = interpret_document_template(
         <type>Individual Investigation</type>
         <start_date><NODE name="start_date"/></start_date>
         <stop_date><NODE name="stop_date"/></stop_date>
-        <description><NODE name="description"/></description>
+        <FRAGMENT name="description"/>
     </Investigation>
 </Product_Context>"""
 )

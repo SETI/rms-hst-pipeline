@@ -94,5 +94,13 @@ def Citation_Information_from_apt(
             if year_str:
                 timing_year = max(timing_year, int(year_str))
 
-    return (propno, category, cycle, authors, title,
-            submission_year, timing_year, abstract)
+    return (
+        propno,
+        category,
+        cycle,
+        authors,
+        title,
+        submission_year,
+        timing_year,
+        abstract,
+    )
