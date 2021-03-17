@@ -5,6 +5,7 @@
 import re
 from typing import Any, List
 
+
 def fix_abstract(abstract: str) -> List[str]:
     """Standardize punctuation in abstracts. Input is one string, a list
     containing one string per embedded line break (i.e., paragraph) is returned.
@@ -26,52 +27,52 @@ def fix_abstract(abstract: str) -> List[str]:
         rec = " ".join(words)
 
         # Correct space after comma inside a number
-        rec = re.sub(r'(\d), (\d\d\d)([^\d])', r'\1,\2\3', rec)
+        rec = re.sub(r"(\d), (\d\d\d)([^\d])", r"\1,\2\3", rec)
 
         # Correct extraneous "! "
-        rec = re.sub(r'! ([^A-Z])', r'\1', rec)
+        rec = re.sub(r"! ([^A-Z])", r"\1", rec)
 
         # The .pro files often have a "?" where a special character should be
         # In some cases, we can guess what's missing
-        rec = re.sub(r'(\d+)\?(C|K)', r'\1°\2', rec)
-        rec = re.sub(r'([^\w])\?(\w[\w -]*\.?)\?([^\w])', r'\1“\2”\3', rec)
-        rec = re.sub(r'([^\w])\?“(\w[\w -]*\.?)”\?([^\w])', r'\1“\2”\3', rec)
-        rec = re.sub(r'(\w)\?s([^\w])', r'\1’s\2', rec)
-        rec = re.sub(r's\? ([a-z])', r's’ \1', rec)
-        rec = re.sub(r'([A-Za-z]+)\?([A-Za-z]+)', r'\1-\2', rec)
+        rec = re.sub(r"(\d+)\?(C|K)", r"\1°\2", rec)
+        rec = re.sub(r"([^\w])\?(\w[\w -]*\.?)\?([^\w])", r"\1“\2”\3", rec)
+        rec = re.sub(r"([^\w])\?“(\w[\w -]*\.?)”\?([^\w])", r"\1“\2”\3", rec)
+        rec = re.sub(r"(\w)\?s([^\w])", r"\1’s\2", rec)
+        rec = re.sub(r"s\? ([a-z])", r"s’ \1", rec)
+        rec = re.sub(r"([A-Za-z]+)\?([A-Za-z]+)", r"\1-\2", rec)
 
         # Fix non-ASCII and inconsistencies
         rec = rec.replace("r?gime", "regime")
 
-        rec = rec.replace("\x93", '“')
-        rec = rec.replace("\x94", '”')
-        rec = rec.replace("``", '“')
-        rec = rec.replace("''", '”')
-        rec = rec.replace("‘‘", '“')
-        rec = rec.replace("’’", '”')
-        rec = rec.replace("ÔÔ", '“')
-        rec = rec.replace("ÕÕ", '”')
-        rec = rec.replace("Ò", '“')
-        rec = rec.replace("Ó", '”')
-        rec = rec.replace("â\x80\x9c", '“')
-        rec = rec.replace("â\x80\x9d", '”')
+        rec = rec.replace("\x93", "“")
+        rec = rec.replace("\x94", "”")
+        rec = rec.replace("``", "“")
+        rec = rec.replace("''", "”")
+        rec = rec.replace("‘‘", "“")
+        rec = rec.replace("’’", "”")
+        rec = rec.replace("ÔÔ", "“")
+        rec = rec.replace("ÕÕ", "”")
+        rec = rec.replace("Ò", "“")
+        rec = rec.replace("Ó", "”")
+        rec = rec.replace("â\x80\x9c", "“")
+        rec = rec.replace("â\x80\x9d", "”")
 
         rec = rec.replace("\x92", "’")
         rec = rec.replace("Õ", "’")
         rec = rec.replace("â\x80\x99", "’")
 
-        rec = rec.replace("â\x88\x92", "-")     # standard en-dash
+        rec = rec.replace("â\x88\x92", "-")  # standard en-dash
         rec = rec.replace("â\x88’", "-")
         rec = rec.replace("â\x80\x90", "-")
         rec = rec.replace("−", "-")
         rec = rec.replace("‐", "-")
 
-        rec = rec.replace("\x96", "—")          # long dash
+        rec = rec.replace("\x96", "—")  # long dash
         rec = rec.replace("–", "—")
         rec = rec.replace("â\x80\x99", "—")
         rec = rec.replace('â\x80"', "—")
-        rec = rec.replace('â\x80“', "—")
-        rec = rec.replace("Ð","—")
+        rec = rec.replace("â\x80“", "—")
+        rec = rec.replace("Ð", "—")
 
         rec = rec.replace("â\x88¼", "~")
         rec = rec.replace("∼", "~")
@@ -110,15 +111,16 @@ def fix_abstract(abstract: str) -> List[str]:
         # Append to abstract with an extra blank line after each paragrapn
         new_abstract += [rec, ""]
 
-    new_abstract = new_abstract[:-1]        # Strip extra blank line at the end
+    new_abstract = new_abstract[:-1]  # Strip extra blank line at the end
 
     # Sometimes paragraph breaks are incorrect. Fix the most obvious ones.
     merged = "\n".join(new_abstract)
-    merged = re.sub(r'\n([a-z])', r' \1', merged)
-    merged = re.sub(r'([,\w])\n', r'\1 ', merged)
+    merged = re.sub(r"\n([a-z])", r" \1", merged)
+    merged = re.sub(r"([,\w])\n", r"\1 ", merged)
     merged = merged.replace("  ", " ")
     new_abstract = merged.splitlines()
 
     return new_abstract
+
 
 ################################################################################

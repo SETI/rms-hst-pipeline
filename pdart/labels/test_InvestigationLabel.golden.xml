@@ -34,6 +34,9 @@
     <type>Individual Investigation</type>
     <start_date>2005-01-19</start_date>
     <stop_date>2005-01-19</stop_date>
-    <description>PLACEHOLDER</description>
+    <description>
+        {abstract_line_1}
+        {abstract_line_2}
+    </description>
   </Investigation>
 </Product_Context>

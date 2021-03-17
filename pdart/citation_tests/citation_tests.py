@@ -242,12 +242,57 @@ from citations import Citation_Information
 PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
 
 for k in range(9730, 16101):
-    if k in (10142, 10282, 10316, 10454, 10652, 10772, 10790, 10890, 10934,
-             10939, 10972, 11195, 11265, 11275, 11308, 11340, 11478, 11572,
-             11648, 11671, 11726, 11994, 12049, 12230, 12250, 12303, 12305,
-             12318, 12329, 12330, 12365, 12366, 12379, 12435, 12550, 12551,
-             12677, 12703, 12704, 12705, 13162, 13167, 13599, 13602, 13637,
-             13962, 14405, 14863, 15731):
+    if k in (
+        10142,
+        10282,
+        10316,
+        10454,
+        10652,
+        10772,
+        10790,
+        10890,
+        10934,
+        10939,
+        10972,
+        11195,
+        11265,
+        11275,
+        11308,
+        11340,
+        11478,
+        11572,
+        11648,
+        11671,
+        11726,
+        11994,
+        12049,
+        12230,
+        12250,
+        12303,
+        12305,
+        12318,
+        12329,
+        12330,
+        12365,
+        12366,
+        12379,
+        12435,
+        12550,
+        12551,
+        12677,
+        12703,
+        12704,
+        12705,
+        13162,
+        13167,
+        13599,
+        13602,
+        13637,
+        13962,
+        14405,
+        14863,
+        15731,
+    ):
         continue
 
     filename1 = PREFIX + str(k) + ".pro"
@@ -266,14 +311,14 @@ for k in range(9730, 16101):
         abstract2 = c2.abstract
 
         # Ignore spacing, apostrophe, and quote discrepancies
-#         abstract1 = abstract1.replace(" ","")
-#         abstract2 = abstract2.replace(" ","")
-# 
-#         abstract1 = abstract1.replace("’","'")
-#         abstract2 = abstract2.replace("’","'")
-# 
-#         abstract1 = abstract1.replace("“",'"').replace("”",'"')
-#         abstract2 = abstract2.replace("“",'"').replace("”",'"')
+        #         abstract1 = abstract1.replace(" ","")
+        #         abstract2 = abstract2.replace(" ","")
+        #
+        #         abstract1 = abstract1.replace("’","'")
+        #         abstract2 = abstract2.replace("’","'")
+        #
+        #         abstract1 = abstract1.replace("“",'"').replace("”",'"')
+        #         abstract2 = abstract2.replace("“",'"').replace("”",'"')
 
         if abstract1 != abstract2:
             print(k)

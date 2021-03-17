@@ -7,7 +7,11 @@ from typing import Any, Dict, List, Tuple
 from pdart.db.BundleDB import BundleDB
 from pdart.citations import Citation_Information
 from pdart.labels.Lookup import Lookup
-from pdart.labels.InvestigationLabelXml import make_label, make_internal_ref
+from pdart.labels.InvestigationLabelXml import (
+    make_label,
+    make_internal_ref,
+    make_description,
+)
 from pdart.labels.FitsProductLabelXml import (
     mk_Investigation_Area_lid,
     mk_Investigation_Area_lidvid,
@@ -71,12 +75,16 @@ def make_investigation_label(
     internal_reference_nodes: List[NodeBuilder] = []
     for product in context_products:
         ref_lid = lidvid_to_lid(product.lidvid)
-        # if "instrument_host" in ref_lid:
-        #     ref_type = f"is_{product.ref_type}"
-        # else:
         ref_type = f"investigation_to_{product.ref_type}"
         ref_node = make_internal_ref(ref_lid, ref_type)
         internal_reference_nodes.append(ref_node)
+
+    description = info.abstract_formatted(indent=8)  # type: ignore
+    if len(description) != 0:
+        description = "\n".join(description)
+    else:
+        description = " " * 8 + "None"
+    description_nodes: List[NodeBuilder] = [make_description(description)]
 
     if not use_mod_date_for_testing:
         # Get the date when the label is created
@@ -97,7 +105,7 @@ def make_investigation_label(
                     "internal_reference": combine_nodes_into_fragment(
                         internal_reference_nodes
                     ),
-                    "description": "PLACEHOLDER",
+                    "description": combine_nodes_into_fragment(description_nodes),
                 }
             )
             .toxml()

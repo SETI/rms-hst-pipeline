@@ -491,6 +491,7 @@ class BuildLabels(MarkedStage):
                 citation_info_from_db.title,
                 citation_info_from_db.submission_year,
                 citation_info_from_db.timing_year,
+                citation_info_from_db.abstract.split("\n"),
             )
             info.set_publication_year(PUBLICATION_YEAR)
 
