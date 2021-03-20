@@ -8,7 +8,7 @@
 # environment before running Python, so we don't have to specific
 # which one.
 PYTHON=python3
-
+LIDVID_LOG=lidvid_error_log.txt
 ACTIVATE=source venv/bin/activate
 PIP=python -m pip
 
@@ -101,6 +101,8 @@ pipeline : venv clean-results
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
+		python2 checkBundleLIDs.py $(LIL-TWD)/hst_$${project_id}/hst_$${project_id}-deliverable $$project_id; \
+	python checkLIDsLog.py; \
 	done;
 	say pipeline is done
 	open $(TWD)
@@ -138,10 +140,13 @@ LIL-TWD=$(TMP_WORKING_DIR)
 lil-pipeline : venv
 	mkdir -p $(LIL-TWD)
 	-rm $(LIL-TWD)/*/\#*.txt
+	-rm $(LIDVID_LOG)
 	for project_id in $(LILS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
 		python Pipeline.py $$project_id; \
+		python2 checkBundleLIDs.py $(LIL-TWD)/hst_$${project_id}/hst_$${project_id}-deliverable $$project_id; \
+	python checkLIDsLog.py; \
 	done;
 	say lil pipeline is done
 	open $(LIL-TWD)
