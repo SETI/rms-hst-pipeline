@@ -164,6 +164,15 @@ if __name__ == "__main__":
                     vid = lidvid[-3:]
                     lid2viddef[lid] = {}
                     lid2viddef[lid][vid] = {}
+    # Include handbook lid:
+    data_handbook_lid = "urn:nasa:pds:hst-support:document:acs-dhb"
+    inst_handbook_lid = "urn:nasa:pds:hst-support:document:acs-ihb"
+    for lid in [data_handbook_lid, inst_handbook_lid]:
+        vid = "::1.0"
+        livid = lid + vid
+        lidvid2refs[lidvid] = {}
+        lid2viddef[lid] = {}
+        lid2viddef[lid][vid] ={}
 
     if verbose:
         print("___CHECK IF EVERY lid_reference IS DEFINED___")
