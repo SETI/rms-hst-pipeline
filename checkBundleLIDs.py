@@ -172,7 +172,7 @@ if __name__ == "__main__":
         livid = lid + vid
         lidvid2refs[lidvid] = {}
         lid2viddef[lid] = {}
-        lid2viddef[lid][vid] ={}
+        lid2viddef[lid][vid] = {}
 
     if verbose:
         print("___CHECK IF EVERY lid_reference IS DEFINED___")

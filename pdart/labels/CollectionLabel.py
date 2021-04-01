@@ -30,6 +30,7 @@ from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.ObservingSystem import observing_system
+from pdart.labels.DocReferenceList import make_document_reference_list
 from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import (
     lidvid_to_lid,
@@ -158,6 +159,7 @@ def make_context_collection_label(
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
                     "Context_Area": combine_nodes_into_fragment([]),
+                    "Reference_List": combine_nodes_into_fragment([]),
                     "collection_type": "Context",
                 }
             )
@@ -217,6 +219,7 @@ def make_schema_collection_label(
                     "Citation_Information": make_citation_information(info),
                     "inventory_name": inventory_name,
                     "Context_Area": combine_nodes_into_fragment([]),
+                    "Reference_List": combine_nodes_into_fragment([]),
                     "collection_type": "Schema",
                 }
             )
@@ -304,7 +307,9 @@ def make_other_collection_label(
 
     # Properly assign collection type for Document, Browse, or Data collection.
     # Context node only exists in Data collection label.
+    # Reference_List only exists in Data collection label.
     context_node: List[NodeBuilder] = []
+    reference_list_node: List[NodeBuilder] = []
     collection_type: str = ""
     type_name = type(collection).__name__
     if type_name == "DocumentCollection":
@@ -372,6 +377,11 @@ def make_other_collection_label(
                 )
             ]
 
+            # document reference list only exists in data collection
+            reference_list_node = [
+                make_document_reference_list([instrument], "collection")
+            ]
+
     try:
         label = (
             make_label(
@@ -386,6 +396,7 @@ def make_other_collection_label(
                     "inventory_name": inventory_name,
                     "Context_Area": combine_nodes_into_fragment(context_node),
                     "collection_type": collection_type,
+                    "Reference_List": combine_nodes_into_fragment(reference_list_node),
                 }
             )
             .toxml()
