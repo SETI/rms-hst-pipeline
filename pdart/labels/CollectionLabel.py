@@ -314,6 +314,10 @@ def make_other_collection_label(
     type_name = type(collection).__name__
     if type_name == "DocumentCollection":
         collection_type = "Document"
+        # For document collection, we need to add all handbooks in the csv but
+        # we won't create the label for it.
+        inst_list = bundle_db.get_instruments_of_the_bundle()
+        record_count += 2 * len(inst_list)
     elif type_name == "OtherCollection":
         collection_type = cast(OtherCollection, collection).prefix.capitalize()
         suffix = cast(OtherCollection, collection).suffix

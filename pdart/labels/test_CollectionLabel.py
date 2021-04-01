@@ -79,7 +79,6 @@ class Test_CollectionLabel(unittest.TestCase):
         label = make_collection_label(
             self.db, self.info, _COLLECTION_LIDVID, _BUNDLE_LIDVID, True, True
         )
-        print(label)
         assert_golden_file_equal(self, "test_CollectionLabel.golden.xml", label)
 
     def test_make_doc_collection_label(self) -> None:

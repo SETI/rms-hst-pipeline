@@ -164,15 +164,6 @@ if __name__ == "__main__":
                     vid = lidvid[-3:]
                     lid2viddef[lid] = {}
                     lid2viddef[lid][vid] = {}
-    # Include handbook lid:
-    data_handbook_lid = "urn:nasa:pds:hst-support:document:acs-dhb"
-    inst_handbook_lid = "urn:nasa:pds:hst-support:document:acs-ihb"
-    for lid in [data_handbook_lid, inst_handbook_lid]:
-        vid = "::1.0"
-        livid = lid + vid
-        lidvid2refs[lidvid] = {}
-        lid2viddef[lid] = {}
-        lid2viddef[lid][vid] = {}
 
     if verbose:
         print("___CHECK IF EVERY lid_reference IS DEFINED___")
@@ -184,8 +175,9 @@ if __name__ == "__main__":
                 + " lid_references to absent LID "
                 + str(lid)
             )
-            print(msg)
-            log_arr.append(msg)
+            if "-dhb" not in msg and "-ihb" not in msg:
+                print(msg)
+                log_arr.append(msg)
             if verbose:
                 for rFile in lid2refs[lid]:
                     print(" ", rFile)
@@ -203,8 +195,9 @@ if __name__ == "__main__":
                     + " lidvid_references to absent VID "
                     + str(lidvid)
                 )
-                print(msg)
-                log_arr.append(msg)
+                if "-dhb" not in msg and "-ihb" not in msg:
+                    print(msg)
+                    log_arr.append(msg)
         else:
             msg = (
                 "WARNING "
@@ -212,8 +205,9 @@ if __name__ == "__main__":
                 + " lidvid_references to absent LID "
                 + str(lidvid)
             )
-            print(msg)
-            log_arr.append(msg)
+            if "-dhb" not in msg and "ihb" not in msg:
+                print(msg)
+                log_arr.append(msg)
         if verbose:
             for rFile in lidvid2refs[lidvid]:
                 print("   ", rFile)
