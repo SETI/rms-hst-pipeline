@@ -1,5 +1,6 @@
 import os
 import sys
+
 LOG_DIR = "lidvid_error_log.txt"
 
 if __name__ == "__main__":

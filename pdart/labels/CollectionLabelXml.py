@@ -92,6 +92,7 @@ make_label: DocTemplate = interpret_document_template(
     </Modification_History>
   </Identification_Area>
   <FRAGMENT name="Context_Area" />
+  <FRAGMENT name="Reference_List" />
   <Collection>
     <collection_type><NODE name="collection_type"/></collection_type>
   </Collection>

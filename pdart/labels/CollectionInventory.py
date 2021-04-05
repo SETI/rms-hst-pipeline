@@ -51,7 +51,7 @@ def make_collection_inventory(bundle_db: BundleDB, collection_lidvid: str) -> by
     return switch_on_collection_subtype(
         collection,
         make_context_collection_inventory,
-        make_other_collection_inventory,
+        make_document_collection_inventory,
         make_schema_collection_inventory,
         make_other_collection_inventory,
     )(bundle_db, collection_lidvid)
@@ -79,6 +79,26 @@ def make_schema_collection_inventory(
     """
     products = bundle_db.get_schema_products()
     inventory_lines: List[str] = [f"S,{product.lidvid}\r\n" for product in products]
+    res: str = "".join(inventory_lines)
+    return res.encode()
+
+
+def make_document_collection_inventory(
+    bundle_db: BundleDB, collection_lidvid: str
+) -> bytes:
+    """
+    Create the inventory text for the collection having this LIDVID
+    using the bundle database.
+    """
+    products = bundle_db.get_collection_products(collection_lidvid)
+    inventory_lines: List[str] = [f"P,{product.lidvid}\r\n" for product in products]
+    # Include handbooks in the document collection csv
+    inst_list = bundle_db.get_instruments_of_the_bundle()
+    for inst in inst_list:
+        data_handbook_lid = f"S,urn:nasa:pds:hst-support:document:{inst}-dhb\r\n"
+        inst_handbook_lid = f"S,urn:nasa:pds:hst-support:document:{inst}-ihb\r\n"
+        inventory_lines.append(data_handbook_lid)
+        inventory_lines.append(inst_handbook_lid)
     res: str = "".join(inventory_lines)
     return res.encode()
 

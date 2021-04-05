@@ -47,6 +47,7 @@ from pdart.labels.TargetIdentification import (
     create_target_identification_nodes,
 )
 from pdart.labels.TargetIdentificationXml import get_target_lid
+from pdart.labels.DocReferenceList import make_document_reference_list
 
 from pdart.labels.suffix_titles import get_titles_format  # type: ignore
 
@@ -311,6 +312,7 @@ def make_fits_product_label(
             ),
             "HST": hst_parameters,
             "Primary_Result_Summary": primary_result_summary(primary_result_dict),
+            "Reference_List": make_document_reference_list([instrument], "data"),
         }
 
         # Pass the data_dict to either data label or misc label based on

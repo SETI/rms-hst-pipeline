@@ -23,6 +23,7 @@ from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.PrimaryResultSummary import primary_result_summary
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.ObservingSystem import observing_system
+from pdart.labels.DocReferenceList import make_document_reference_list
 from pdart.labels.CitationInformation import make_citation_information
 from pdart.labels.LabelError import LabelError
 from pdart.labels.Utils import (
@@ -173,6 +174,9 @@ def make_bundle_label(
                         reduced_collections
                     ),
                     "Context_Area": combine_nodes_into_fragment(context_node),
+                    "Reference_List": make_document_reference_list(
+                        instruments_list, "bundle"
+                    ),
                 }
             )
             .toxml()

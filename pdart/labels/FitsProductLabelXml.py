@@ -35,6 +35,7 @@ make_data_label: DocTemplate = interpret_document_template(
     <FRAGMENT name="Target_Identification" />
     <Mission_Area><NODE name="HST" /></Mission_Area>
   </Observation_Area>
+  <NODE name="Reference_List" />
   <File_Area_Observational>
     <File>
       <file_name><NODE name="file_name" /></file_name>

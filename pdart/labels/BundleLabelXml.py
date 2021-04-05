@@ -62,6 +62,7 @@ make_label: DocTemplate = interpret_document_template(
     </Modification_History>
   </Identification_Area>
   <FRAGMENT name="Context_Area" />
+  <NODE name="Reference_List" />
   <Bundle>
     <bundle_type>Archive</bundle_type>
   </Bundle>
