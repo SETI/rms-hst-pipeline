@@ -22,7 +22,7 @@ BITPIX_TABLE: Dict[int, str] = {
     32: "SignedMSB4",
     64: "SignedMSB8",
     -32: "IEEE754MSBSingle",
-    -62: "IEEE754MSBDouble",
+    -64: "IEEE754MSBDouble",
 }
 
 

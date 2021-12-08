@@ -778,15 +778,15 @@ def get_start_stop_date_times(
         start_time = date_obs + "T" + time_obs + "Z"
         day = julian.day_from_iso(date_obs)
         sec = julian.sec_from_iso(time_obs)
-        expstart = julian.mjd_from_day_sec(day, sec, leapseconds=False)
+        expstart = julian.mjd_from_day_sec(day, sec)
     else:
-        (day, sec) = julian.day_sec_from_mjd(expstart, leapseconds=False)
+        (day, sec) = julian.day_sec_from_mjd(expstart)
         start_time = julian.ymdhms_format_from_day_sec(day, sec, suffix="Z")
 
     # Fill in the stop time. We ensure that this differs from the start time by
     # the expected amount.
     expend = expstart + delta / 86400.0
-    (day, sec) = julian.day_sec_from_mjd(expend, leapseconds=False)
+    (day, sec) = julian.day_sec_from_mjd(expend)
     stop_time = julian.ymdhms_format_from_day_sec(day, sec, suffix="Z")
 
     return (start_time, stop_time)
