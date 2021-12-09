@@ -6,10 +6,6 @@ from typing import cast, List, Set
 import fs.path
 import picmaker
 
-from pdart.astroquery.AcceptedParams import (
-    ACCEPTED_SUFFIXES,
-    PART_OF_ACCEPTED_SUFFIXES,
-)
 from pdart.db.BundleDB import (
     BundleDB,
     _BUNDLE_DB_NAME,
@@ -26,6 +22,10 @@ from pdart.pipeline.ChangesDict import (
     write_changes_dict,
 )
 from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.Suffix_info import (  # type: ignore
+    ACCEPTED_SUFFIXES,
+    PART_OF_ACCEPTED_SUFFIXES,
+)
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 
 _LOGGER = logging.getLogger(__name__)

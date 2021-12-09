@@ -1,11 +1,11 @@
 import os
 import sys
-from pdart.astroquery.AcceptedParams import (
+from pdart.astroquery.Astroquery import MastSlice, CustomizedQueryMastSlice, ProductSet
+from pdart.pipeline.Directories import DevDirectories
+from pdart.pipeline.Suffix_info import (  # type: ignore
     ACCEPTED_SUFFIXES,
     PART_OF_ACCEPTED_SUFFIXES,
 )
-from pdart.astroquery.Astroquery import MastSlice, CustomizedQueryMastSlice, ProductSet
-from pdart.pipeline.Directories import DevDirectories
 
 # Download from Mast
 if __name__ == "__main__":

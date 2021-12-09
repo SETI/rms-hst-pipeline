@@ -68,7 +68,7 @@ from pdart.xml.Templates import (
     NodeBuilder,
 )
 
-from pdart.pipeline.suffix_info import (  # type: ignore
+from pdart.pipeline.Suffix_info import (  # type: ignore
     get_collection_type,
     get_processing_level,
 )
