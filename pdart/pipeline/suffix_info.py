@@ -82,7 +82,8 @@ INSTRUMENTS_INFO = {
     "z": "ghrs",
 }
 
-# for each instrument, only download files with selected suffixes
+# For each instrument, only download files with selected suffixes.
+# Use ACCEPTED_SUFFIXES for all instruments for now.
 INTRUMENT_SELECTED_SUFFIXES = {
     "wfc3": ACCEPTED_SUFFIXES,
     "acs": ACCEPTED_SUFFIXES,
