@@ -82,6 +82,20 @@ INSTRUMENTS_INFO = {
     "z": "ghrs",
 }
 
+# for each instrument, only download files with selected suffixes
+INTRUMENT_SELECTED_SUFFIXES = {
+    "wfc3": ACCEPTED_SUFFIXES,
+    "acs": ACCEPTED_SUFFIXES,
+    "cos": ACCEPTED_SUFFIXES,
+    "nicmos": ACCEPTED_SUFFIXES,
+    "stis": ACCEPTED_SUFFIXES,
+    "wfpc2": ACCEPTED_SUFFIXES,
+    "wfpc": ACCEPTED_SUFFIXES,
+    "foc": ACCEPTED_SUFFIXES,
+    "fos": ACCEPTED_SUFFIXES,
+    "ghrs": ACCEPTED_SUFFIXES,
+}
+
 
 def get_collection_type(suffix):
     try:

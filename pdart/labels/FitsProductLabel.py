@@ -324,7 +324,9 @@ def make_fits_product_label(
             label = make_misc_label(data_dict).toxml().encode()
 
     except AssertionError:
-        raise AssertionError(f"{target_id} has no target identifications stored in DB.")
+        raise AssertionError(
+            f"{product_lidvid} has no target identifications stored in DB."
+        )
     except Exception as e:
         print(str(e))
         raise LabelError(
