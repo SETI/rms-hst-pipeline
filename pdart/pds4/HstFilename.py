@@ -3,7 +3,10 @@ import re
 
 from fs.path import basename
 
-from pdart.astroquery.AcceptedParams import ACCEPTED_INSTRUMENTS
+from pdart.pipeline.Suffix_info import (  # type: ignore
+    ACCEPTED_INSTRUMENTS,
+    INSTRUMENTS_INFO,
+)
 
 
 class HstFilename(object):
@@ -41,27 +44,9 @@ class HstFilename(object):
         assert (
             i in ACCEPTED_INSTRUMENTS.lower()
         ), f"First char of filename {filename!r} must be in {ACCEPTED_INSTRUMENTS!r}."
-        if i == "i":
-            return "wfc3"
-        elif i == "j":
-            return "acs"
-        elif i == "l":
-            return "cos"
-        elif i == "n":
-            return "nicmos"
-        elif i == "o":
-            return "stis"
-        elif i == "u":
-            return "wfpc2"
-        elif i == "w":
-            return "wfpc"
-        elif i == "x":
-            return "foc"
-        elif i == "y":
-            return "fos"
-        elif i == "z":
-            return "ghrs"
-        else:
+        try:
+            return INSTRUMENTS_INFO[i]
+        except KeyError:
             raise Exception(
                 f"First char of filename {filename!r} must be in {ACCEPTED_INSTRUMENTS!r}."
             )

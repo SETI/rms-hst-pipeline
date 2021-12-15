@@ -6,7 +6,7 @@ import fs.path
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import *
-from pdart.pipeline.suffix_info import get_collection_type  # type: ignore
+from pdart.pipeline.Suffix_info import get_collection_type  # type: ignore
 
 _OLD_IMPL = False
 

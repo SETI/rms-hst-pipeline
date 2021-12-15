@@ -13,7 +13,7 @@ from pdart.db.SqlAlchTables import TargetIdentification
 from pdart.labels.FitsProductLabel import make_fits_product_label
 from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
 
-from pdart.pipeline.suffix_info import get_collection_type  # type: ignore
+from pdart.pipeline.Suffix_info import get_collection_type  # type: ignore
 
 
 class Test_FitsProductLabel(unittest.TestCase):

@@ -4,16 +4,18 @@ from astropy.table import Table
 from astropy.table.row import Row
 from astroquery.mast import Observations
 
-from pdart.astroquery.AcceptedParams import (
-    ACCEPTED_SUFFIXES,
-    PART_OF_ACCEPTED_SUFFIXES,
-    ACCEPTED_INSTRUMENTS,
-)
-
 from pdart.astroquery.Utils import (
     filter_table,
     get_table_with_retries,
     ymd_tuple_to_mjd,
+)
+
+from pdart.pipeline.Suffix_info import (  # type: ignore
+    ACCEPTED_SUFFIXES,
+    PART_OF_ACCEPTED_SUFFIXES,
+    ACCEPTED_INSTRUMENTS,
+    INSTRUMENTS_INFO,
+    INTRUMENT_SELECTED_SUFFIXES,
 )
 
 _YMD = Tuple[int, int, int]
@@ -24,20 +26,20 @@ instruments.  These are the first letters of their 'obs_id's.
 """
 
 
+def _instrument_key(id: str) -> str:
+    """
+    Return the first letter of the obs_id, which tells which
+    instrument made the observation.
+    """
+    return id[0].upper()
+
+
 def _is_accepted_instrument_product_row(row: Row) -> bool:
     """
     We currently only handle products from a limited set of
     instruments.
     """
-
-    def instrument_key(id: str) -> str:
-        """
-        Return the first letter of the obs_id, which tells which
-        instrument made the observation.
-        """
-        return id[0].upper()
-
-    return instrument_key(row["obs_id"]) in ACCEPTED_INSTRUMENTS
+    return _instrument_key(row["obs_id"]) in ACCEPTED_INSTRUMENTS
 
 
 def _is_accepted_product_type_product_row(row: Row) -> bool:
@@ -46,7 +48,9 @@ def _is_accepted_product_type_product_row(row: Row) -> bool:
     instruments.
     """
     desc = str(row["productSubGroupDescription"])
-    return desc.upper() in ACCEPTED_SUFFIXES
+    instrument = INSTRUMENTS_INFO[_instrument_key(row["obs_id"]).lower()]
+    selected_suffixes = INTRUMENT_SELECTED_SUFFIXES[instrument]
+    return desc.upper() in selected_suffixes
 
 
 def _is_selected_accepted_product_type_product_row(row: Row) -> bool:

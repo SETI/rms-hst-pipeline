@@ -148,7 +148,7 @@ lil-pipeline : venv
 		python2 checkBundleLIDs.py $(LIL-TWD)/hst_$${project_id}/hst_$${project_id}-deliverable $$project_id; \
 	python checkLIDsLog.py; \
 	done;
-	say lil pipeline is done
+	# say lil pipeline is done
 	open $(LIL-TWD)
 
 ##############################

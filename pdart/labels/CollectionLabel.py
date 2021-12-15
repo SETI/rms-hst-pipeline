@@ -45,7 +45,7 @@ from pdart.xml.Templates import (
     NodeBuilder,
 )
 
-from pdart.pipeline.suffix_info import get_processing_level  # type: ignore
+from pdart.pipeline.Suffix_info import get_processing_level  # type: ignore
 
 # TODO Should probably test document_collection independently.
 
