@@ -1,5 +1,22 @@
 # type: ignore
 
+# First letter of filenames and the corresponding instrument names
+INSTRUMENTS_INFO = {
+    "i": "wfc3",
+    "j": "acs",
+    "l": "cos",
+    "n": "nicmos",
+    "o": "stis",
+    "u": "wfpc2",
+    "w": "wfpc",
+    "x": "foc",
+    "y": "fos",
+    "z": "ghrs",
+}
+
+# First letter of filenames
+ACCEPTED_INSTRUMENTS = "".join(list(INSTRUMENT_INFO.keys())).upper()
+
 # Key is an HST filename suffix
 # Value is the tuple (processing_level, collection_type)
 SUFFIX_INFO = {
@@ -64,23 +81,6 @@ PART_OF_ACCEPTED_SUFFIXES = [
     "SHM",
     "SPT",
 ]
-
-# First letter of filenames
-ACCEPTED_INSTRUMENTS = "IJLNOUWXYZ"
-
-# First letter of filenames and the corresponding instrument names
-INSTRUMENTS_INFO = {
-    "i": "wfc3",
-    "j": "acs",
-    "l": "cos",
-    "n": "nicmos",
-    "o": "stis",
-    "u": "wfpc2",
-    "w": "wfpc",
-    "x": "foc",
-    "y": "fos",
-    "z": "ghrs",
-}
 
 # For each instrument, only download files with selected suffixes.
 # Use ACCEPTED_SUFFIXES for all instruments for now.
