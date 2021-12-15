@@ -15,7 +15,7 @@ INSTRUMENTS_INFO = {
 }
 
 # First letter of filenames
-ACCEPTED_INSTRUMENTS = "".join(list(INSTRUMENT_INFO.keys())).upper()
+ACCEPTED_INSTRUMENTS = "".join(INSTRUMENT_INFO.keys()).upper()
 
 # Key is an HST filename suffix
 # Value is the tuple (processing_level, collection_type)
