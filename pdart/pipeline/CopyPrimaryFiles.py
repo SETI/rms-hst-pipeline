@@ -79,7 +79,7 @@ class CopyPrimaryFiles(MarkedStage):
                 suffix = hst_filename.suffix()
 
                 collection_type = get_collection_type(
-                    instrument_id=instrument_name, suffix=suffix
+                    suffix=suffix, instrument_id=instrument_name
                 )
                 coll = f"{collection_type}_{instrument_name}_{suffix}"
 

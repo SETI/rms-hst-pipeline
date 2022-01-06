@@ -40,7 +40,6 @@ from pdart.labels.ObservingSystem import (
 )
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.PrimaryResultSummary import primary_result_summary
-from pdart.pipeline.Suffix_info import RAW_SUFFIXES, SHM_SUFFIXES
 from pdart.labels.TargetIdentification import (
     get_target,
     get_target_info,
@@ -49,7 +48,11 @@ from pdart.labels.TargetIdentification import (
 from pdart.labels.TargetIdentificationXml import get_target_lid
 from pdart.labels.DocReferenceList import make_document_reference_list
 
-from pdart.pipeline.Suffix_info import get_titles_format  # type: ignore
+from pdart.pipeline.Suffix_info import (  # type: ignore
+    get_titles_format,
+    RAW_SUFFIXES,
+    SHM_SUFFIXES,
+)
 
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import (
@@ -285,7 +288,7 @@ def make_fits_product_label(
             )
 
         # Dictionary used for primary result summary
-        processing_level = get_processing_level(instrument_id, channel_id, suffix)
+        processing_level = get_processing_level(suffix, instrument_id, channel_id)
         primary_result_dict: Dict[str, Any] = {}
         primary_result_dict["processing_level"] = processing_level
         primary_result_dict["description"] = product_title
@@ -317,7 +320,7 @@ def make_fits_product_label(
 
         # Pass the data_dict to either data label or misc label based on
         # collection_type
-        collection_type = get_collection_type(instrument_id, channel_id, suffix)
+        collection_type = get_collection_type(suffix, instrument_id, channel_id)
         if collection_type == "data":
             label = make_data_label(data_dict).toxml().encode()
         elif collection_type == "miscellaneous":
