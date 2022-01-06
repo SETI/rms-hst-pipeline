@@ -40,7 +40,7 @@ from pdart.labels.ObservingSystem import (
 )
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.PrimaryResultSummary import primary_result_summary
-from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
+from pdart.pipeline.Suffix_info import RAW_SUFFIXES, SHM_SUFFIXES
 from pdart.labels.TargetIdentification import (
     get_target,
     get_target_info,
@@ -49,7 +49,7 @@ from pdart.labels.TargetIdentification import (
 from pdart.labels.TargetIdentificationXml import get_target_lid
 from pdart.labels.DocReferenceList import make_document_reference_list
 
-from pdart.labels.suffix_titles import get_titles_format  # type: ignore
+from pdart.pipeline.Suffix_info import get_titles_format  # type: ignore
 
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import (
@@ -121,7 +121,7 @@ def _munge_lidvid(product_lidvid: str, suffix: str, new_basename: str) -> str:
     bundle_id, collection_id, product_id = LIDVID(product_lidvid).lid().parts()
 
     # TODO This is a hack
-    collection_type = get_collection_type(suffix)
+    collection_type = get_collection_type(suffix=suffix)
     first_underscore_idx = collection_id.index("_")
     new_collection_id = (
         collection_type + collection_id[first_underscore_idx:-3] + suffix.lower()
@@ -285,7 +285,7 @@ def make_fits_product_label(
             )
 
         # Dictionary used for primary result summary
-        processing_level = get_processing_level(suffix)
+        processing_level = get_processing_level(instrument_id, channel_id, suffix)
         primary_result_dict: Dict[str, Any] = {}
         primary_result_dict["processing_level"] = processing_level
         primary_result_dict["description"] = product_title
@@ -317,7 +317,7 @@ def make_fits_product_label(
 
         # Pass the data_dict to either data label or misc label based on
         # collection_type
-        collection_type = get_collection_type(suffix)
+        collection_type = get_collection_type(instrument_id, channel_id, suffix)
         if collection_type == "data":
             label = make_data_label(data_dict).toxml().encode()
         elif collection_type == "miscellaneous":
