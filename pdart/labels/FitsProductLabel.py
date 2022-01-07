@@ -48,7 +48,7 @@ from pdart.labels.TargetIdentification import (
 from pdart.labels.TargetIdentificationXml import get_target_lid
 from pdart.labels.DocReferenceList import make_document_reference_list
 
-from pdart.pipeline.Suffix_info import (  # type: ignore
+from pdart.pipeline.SuffixInfo import (  # type: ignore
     get_titles_format,
     RAW_SUFFIXES,
     SHM_SUFFIXES,
@@ -71,7 +71,7 @@ from pdart.xml.Templates import (
     NodeBuilder,
 )
 
-from pdart.pipeline.Suffix_info import (  # type: ignore
+from pdart.pipeline.SuffixInfo import (  # type: ignore
     get_collection_type,
     get_processing_level,
 )

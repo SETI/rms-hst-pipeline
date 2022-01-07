@@ -3,7 +3,7 @@ import re
 
 from fs.path import basename
 
-from pdart.pipeline.Suffix_info import (  # type: ignore
+from pdart.pipeline.SuffixInfo import (  # type: ignore
     ACCEPTED_INSTRUMENTS,
     INSTRUMENTS_INFO,
 )

@@ -22,7 +22,7 @@ from pdart.pipeline.ChangesDict import (
     write_changes_dict,
 )
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Suffix_info import (  # type: ignore
+from pdart.pipeline.SuffixInfo import (  # type: ignore
     ACCEPTED_SUFFIXES,
     PART_OF_ACCEPTED_SUFFIXES,
 )

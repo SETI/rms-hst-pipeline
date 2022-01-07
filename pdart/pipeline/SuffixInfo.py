@@ -27,9 +27,15 @@
 
 # A dictionary that contains suffix info. The dictionary is keyed by: suffix
 # (instrument_id, suffix), or (instrument_id, channel_id, suffix). The value is
-# a tuple containing the following info: boolean representing if it's an
-# accepted suffix, processing_level, collection_type, product title, collection
-# title, and a list of instrument ids
+# a tuple containing the following info:
+# 1. boolean checking if it's an accepted suffix
+# 2. boolean checking if suffixes are considered as raw data
+# 3. boolean checking if suffixes are used to extract Hst_Parameter information
+# 4. processing_level
+# 5. collection_type
+# 6. product title
+# 7. collection title
+# 8. a list of instrument ids
 SUFFIX_INFO = {
     #    "sfl": (               # ACS (add this)
     #    "asc": (               # NICMOS
@@ -43,6 +49,8 @@ SUFFIX_INFO = {
     #    "pdq": (               # NICMOS
     "asn": (  # ACS, WCF3, NICMOS
         True,
+        False,
+        False,
         "Raw",
         "Miscellaneous",
         "{I} association file {F}, describing an observation set in HST Program {P}",
@@ -50,6 +58,8 @@ SUFFIX_INFO = {
         ["ACS", "WFC3", "NICMOS"],
     ),
     "trl": (  # ACS, WCF3, NICMOS
+        False,
+        False,
         False,
         "Calibrated",
         "Miscellaneous",
@@ -59,6 +69,8 @@ SUFFIX_INFO = {
     ),
     "spt": (  # ACS, WCF3, NICMOS
         True,
+        False,
+        True,
         "Telemetry",
         "Miscellaneous",
         "{I} telemetry and engineering file {F}, including target definitions, for HST Program {P}",
@@ -67,6 +79,8 @@ SUFFIX_INFO = {
     ),
     "raw": (  # ACS, WCF3, NICMOS
         True,
+        True,
+        False,
         "Raw",
         "Data",
         "Raw, uncalibrated {I} image file {F} from HST Program {P}",
@@ -75,6 +89,8 @@ SUFFIX_INFO = {
     ),
     "flt": (  # ACS, WCF3
         True,
+        True,
+        False,
         "Calibrated",
         "Data",
         "Calibrated, flat-fielded {I} image file {F} from HST Program {P}",
@@ -83,6 +99,8 @@ SUFFIX_INFO = {
     ),
     "flc": (  # ACS, WCF3 (if available, then flt should be redefined below)
         True,
+        False,
+        False,
         "Calibrated",
         "Data",
         "Calibrated, flat-fielded, CTE-corrected {I} image file {F} from HST Program {P}",
@@ -91,6 +109,8 @@ SUFFIX_INFO = {
     ),
     "crj": (  # ACS, WCF3
         True,
+        True,
+        False,
         "Calibrated",
         "Data",
         "Combined, calibrated {I} image file {F} from repeated exposures in HST Program {P}",
@@ -99,6 +119,8 @@ SUFFIX_INFO = {
     ),
     "crc": (  # ACS, WCF3 (if available, then crj should be redefined below)
         True,
+        False,
+        False,
         "Calibrated",
         "Data",
         "Combined, calibrated, CTE-corrected {I} image file {F} from repeated exposures in HST Program {P}",
@@ -107,6 +129,8 @@ SUFFIX_INFO = {
     ),
     "drz": (  # ACS, WCF3
         True,
+        True,
+        False,
         "Derived",
         "Data",
         "Calibrated {I} image file {F}, corrected for geometric distortion, from HST Program {P}",
@@ -115,6 +139,8 @@ SUFFIX_INFO = {
     ),
     "drc": (  # ACS, WCF3 (if available, then drz should be redefined below)
         True,
+        False,
+        False,
         "Derived",
         "Data",
         "Calibrated {I} image file {F}, corrected for geometric distortion and CTE, from HST Program {P}",
@@ -123,6 +149,8 @@ SUFFIX_INFO = {
     ),
     ("ACS", "WFC", "flt"): (  # because flc is also available
         True,
+        True,
+        False,
         "Calibrated",
         "Data",
         "Calibrated, flat-fielded {I} image file {F}, without CTE correction, from HST Program {P}",
@@ -131,6 +159,8 @@ SUFFIX_INFO = {
     ),
     ("ACS", "WFC", "crj"): (  # because crc is also available
         True,
+        True,
+        False,
         "Calibrated",
         "Data",
         "Combined, calibrated {I} image file {F} from repeated exposures, without CTE correction, in HST Program {P}",
@@ -139,6 +169,8 @@ SUFFIX_INFO = {
     ),
     ("ACS", "WFC", "drz"): (  # because drc is also available
         True,
+        True,
+        False,
         "Derived",
         "Data",
         "Calibrated {I} image file {F}, corrected for geometric distortion but not CTE, from HST Program {P}",
@@ -147,6 +179,8 @@ SUFFIX_INFO = {
     ),
     ("WFC3", "UVIS", "flt"): (  # because flc is also available
         True,
+        True,
+        False,
         "Calibrated",
         "Data",
         "Calibrated, flat-fielded {I} image file {F}, without CTE correction, from HST Program {P}",
@@ -155,6 +189,8 @@ SUFFIX_INFO = {
     ),
     ("WFC3", "UVIS", "crj"): (  # because crc is also available
         True,
+        True,
+        False,
         "Calibrated",
         "Data",
         "Combined, calibrated {I} image file {F} from repeated exposures, without CTE correction, in HST Program {P}",
@@ -163,6 +199,8 @@ SUFFIX_INFO = {
     ),
     ("WFC3", "UVIS", "drz"): (  # because drc is also available
         True,
+        True,
+        False,
         "Derived",
         "Data",
         "Calibrated {I} image file {F}, corrected for geometric distortion but not CTE, from HST Program {P}",
@@ -171,6 +209,8 @@ SUFFIX_INFO = {
     ),
     ("WFC3", "IR", "raw"): (  # Why do this?  Possibly remove.
         True,
+        True,
+        False,
         "Raw",
         "Data",
         "Raw, uncalibrated {I} image file {F}, without CR rejection, from HST Program {P}",
@@ -178,6 +218,8 @@ SUFFIX_INFO = {
         ["WFC3"],
     ),
     ("WFC3", "IR", "ima"): (  # Doesn't match handbook.
+        False,
+        False,
         False,
         "Partially Processed",
         "Data",
@@ -187,6 +229,8 @@ SUFFIX_INFO = {
     ),
     ("WFC3", "IR", "flt"): (  # Why do this?  Possibly remove.
         True,
+        True,
+        False,
         "Calibrated",
         "Data",
         "Calibrated {I} image file {F}, without CR rejection, from HST Program {P}",
@@ -195,6 +239,8 @@ SUFFIX_INFO = {
     ),
     ("NICMOS", "cal"): (
         True,
+        False,
+        False,
         "Calibrated",
         "Data",
         "Calibrated {I} image file {F} from HST Program {P}",
@@ -202,6 +248,8 @@ SUFFIX_INFO = {
         ["NICMOS"],
     ),
     ("NICMOS", "ima"): (
+        False,
+        False,
         False,
         "Partially Processed",
         "Data",
@@ -211,6 +259,8 @@ SUFFIX_INFO = {
     ),
     ("NICMOS", "mos"): (
         True,
+        False,
+        False,
         "Derived",
         "Data",
         "Combined, calibrated {I} image file {F} for dithered observations in HST Program {P}",
@@ -242,32 +292,59 @@ PART_OF_ACCEPTED_SUFFIXES = [
     "SPT",
 ]
 
-# The suffixes considered raw data, in order of preference.
-RAW_SUFFIXES = [
-    "raw",
-    "flt",
-    "drz",
-    "crj",
-    "d0m",
-    # "d0f", # waivered
-    "c0m",
-    # "c0f" # waivered
-]
 
-# The suffixes used to extract Hst_Parameter information.
-SHM_SUFFIXES = ["shm", "spt", "shf"]
-
-
-def _get_accepted_suffixes():
+# Get the list of suffixes from SUFFIX_INFO based on the boolean values of
+# each key entry. idx = 0 for accepted suffixes, idx = 1 for raw suffixes,
+# idx = 2 for shm suffixes
+def _get_suffixes_list(idx):
     suffix_li = []
     for key in SUFFIX_INFO.keys():
-        if type(key) is not tuple and SUFFIX_INFO[key][0] == True:
-            suffix_li.append(key)
+        if SUFFIX_INFO[key][idx] == True:
+            if type(key) is tuple:
+                if key[-1] not in suffix_li:
+                    suffix_li.append(key[-1])
+            else:
+                if key not in suffix_li:
+                    suffix_li.append(key)
     return suffix_li
 
 
 # For every instrument, we download files with these suffixes.
-ACCEPTED_SUFFIXES = _get_accepted_suffixes()
+ACCEPTED_SUFFIXES = [suffix.upper() for suffix in _get_suffixes_list(0)] + [
+    "A1F",
+    "A2F",
+    "A3F",
+    "ASC",
+    "C0M",
+    "C1M",
+    "C2M",
+    "C3M",
+    "CLB",
+    "CLF",
+    "CORRTAG",
+    "CQF",
+    "D0M",
+    "FLTSUM",
+    "SHM",
+    "SX2",
+    "SXL",
+    "X1D",
+    "X1DSUM",
+    "X2D",
+]
+
+# The suffixes considered raw data, in order of preference.
+# ["raw", "flt", "drz", "crj", "d0m", "c0m",]
+RAW_SUFFIXES = _get_suffixes_list(1) + [
+    "d0m",
+    "c0m",
+]
+
+
+# The suffixes used to extract Hst_Parameter information.
+# ["shm", "spt", "shf"]
+SHM_SUFFIXES = _get_suffixes_list(2) + ["shm", "shf"]
+
 
 # For each instrument, only download files with selected suffixes.
 # Use ACCEPTED_SUFFIXES for all instruments for now.
@@ -310,7 +387,7 @@ def _get_suffix_info_key(instrument_id, channel_id, suffix):
 def get_titles_format(instrument_id, channel_id, suffix):
     key = _get_suffix_info_key(instrument_id, channel_id, suffix)
     try:
-        titles = SUFFIX_INFO[key][3:5]
+        titles = SUFFIX_INFO[key][5:7]
     except:
         raise ValueError(f"{key} has no titles in SUFFIX_INFO.")
     return titles
@@ -319,7 +396,7 @@ def get_titles_format(instrument_id, channel_id, suffix):
 def get_processing_level(suffix, instrument_id=None, channel_id=None):
     key = _get_suffix_info_key(instrument_id, channel_id, suffix)
     try:
-        processing_level = SUFFIX_INFO[key][1]
+        processing_level = SUFFIX_INFO[key][3]
     except:
         raise ValueError(f"{key} has no processing level in SUFFIX_INFO.")
         # TODO: SUFFIX_INFO will be updated later. Might need a default value
@@ -331,7 +408,7 @@ def get_processing_level(suffix, instrument_id=None, channel_id=None):
 def get_collection_type(suffix, instrument_id=None, channel_id=None):
     key = _get_suffix_info_key(instrument_id, channel_id, suffix)
     try:
-        collection_type = SUFFIX_INFO[key][2].lower()
+        collection_type = SUFFIX_INFO[key][4].lower()
     except:
         raise ValueError(f"{key} has no collection type in SUFFIX_INFO.")
         # TODO: SUFFIX_INFO will be updated later. Might need a default value
