@@ -310,6 +310,7 @@ def _get_suffixes_list(idx):
 
 
 # For every instrument, we download files with these suffixes.
+# The concatenated list will be removed once SUFFIX_INFO is fully updated.
 ACCEPTED_SUFFIXES = [suffix.upper() for suffix in _get_suffixes_list(0)] + [
     "A1F",
     "A2F",
@@ -335,6 +336,7 @@ ACCEPTED_SUFFIXES = [suffix.upper() for suffix in _get_suffixes_list(0)] + [
 
 # The suffixes considered raw data, in order of preference.
 # ["raw", "flt", "drz", "crj", "d0m", "c0m",]
+# The concatenated list will be removed once SUFFIX_INFO is fully updated.
 RAW_SUFFIXES = _get_suffixes_list(1) + [
     "d0m",
     "c0m",
@@ -343,6 +345,7 @@ RAW_SUFFIXES = _get_suffixes_list(1) + [
 
 # The suffixes used to extract Hst_Parameter information.
 # ["shm", "spt", "shf"]
+# The concatenated list will be removed once SUFFIX_INFO is fully updated.
 SHM_SUFFIXES = _get_suffixes_list(2) + ["shm", "shf"]
 
 
