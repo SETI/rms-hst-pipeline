@@ -12,9 +12,10 @@ from pdart.astroquery.Utils import (
     ymd_tuple_to_mjd,
 )
 
+from pdart.pipeline.SuffixInfo import ACCEPTED_INSTRUMENTS  # type: ignore
+
 _YMD = Tuple[int, int, int]
 
-_ACCEPTED_INSTRUMENTS: str = "IJLNOSUVWXYZ"
 """
 We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
@@ -43,7 +44,7 @@ def _is_accepted_instrument_product_row(row: Row) -> bool:
         """
         return id[0].upper()
 
-    return instrument_key(row["obs_id"]) in _ACCEPTED_INSTRUMENTS
+    return instrument_key(row["obs_id"]) in ACCEPTED_INSTRUMENTS
 
 
 def _is_accepted_product_type_product_row(row: Row) -> bool:
