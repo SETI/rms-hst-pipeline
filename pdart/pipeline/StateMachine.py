@@ -1,5 +1,7 @@
 import abc
 import logging
+import os
+import pdslogger  # type: ignore
 from typing import Optional
 
 from pdart.pipeline.Stage import Stage
@@ -19,8 +21,10 @@ from pdart.pipeline.ResetPipeline import ResetPipeline
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.ValidateBundle import ValidateBundle
 
-
-_LOGGER = logging.getLogger(__name__)
+LOG_PATH = os.path.join(os.environ["TMP_WORKING_DIR"], "logs/hst_pipeline_log.log")
+_PDS_LOGGER = pdslogger.PdsLogger("pipeline.StateMachine")
+info_handler = pdslogger.file_handler(LOG_PATH, level=logging.INFO, rotation="ymdhms")
+_PDS_LOGGER.add_handler(info_handler)
 
 
 class StateMachine(object):
@@ -56,14 +60,16 @@ class StateMachine(object):
 
         i = phase_index()
         try:
-            _LOGGER.info(f"{self.stages[i+1][0]}")
+            _PDS_LOGGER.info(f"{self.stages[i+1][0]}")
             return self.stages[i + 1][1]
         except IndexError:
             return None
 
     def run(self) -> None:
+        print(f"LOG_PATH: {LOG_PATH}")
         self.marker_file.clear_marker()
         stage: Optional[Stage] = self.stages[0][1]
+        _PDS_LOGGER.open("HST Pipeline")
         while stage is not None:
             stage()
             marker_info = self.marker_file.get_marker()
@@ -72,6 +78,7 @@ class StateMachine(object):
                 stage = self.next_stage(marker_info.phase)
             else:
                 stage = None
+        _PDS_LOGGER.close()
 
         # Throw an exception if the machine failed
         marker_info = self.marker_file.get_marker()

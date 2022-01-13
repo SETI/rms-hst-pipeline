@@ -90,6 +90,9 @@ class Stage(metaclass=abc.ABCMeta):
     def validation_report_dir(self) -> str:
         return self._dirs.validation_report_dir(self._proposal_id)
 
+    def log_dir(self) -> str:
+        return self._dirs.log_dir(self._proposal_id)
+
 
 class MarkedStage(Stage):
     """

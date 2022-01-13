@@ -75,6 +75,9 @@ class Directories(object, metaclass=abc.ABCMeta):
     def validation_report_dir(self, proposal_id: int) -> str:
         return self.working_dir(proposal_id)
 
+    def log_dir(self, proposal_id: int) -> str:
+        return os.path.join(self.working_dir(proposal_id), "log")
+
 
 class DevDirectories(Directories):
     """
