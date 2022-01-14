@@ -27,8 +27,9 @@ from pdart.pipeline.SuffixInfo import (  # type: ignore
     PART_OF_ACCEPTED_SUFFIXES,
 )
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
+from pdart.Logging import PDS_LOGGER
 
-_LOGGER = logging.getLogger(__name__)
+# _LOGGER = logging.getLogger(__name__)
 
 _NON_IMAGE_SUFFIXES: Set[str] = {"ASN", "SHM", "SPT"}
 
@@ -68,11 +69,13 @@ def _fill_in_old_browse_collection(
 
     changes_dict.set(browse_collection_lid, browse_collection_vid, False)
     db.create_bundle_collection_link(str(bundle_lidvid), str(browse_collection_lidvid))
-    _LOGGER.info(f"created link and change for {browse_collection_lidvid}")
+    PDS_LOGGER.open("Fill in old browse collection")
+    PDS_LOGGER.info(f"created link and change for {browse_collection_lidvid}")
     for product in db.get_collection_products(str(browse_collection_lidvid)):
         product_lidvid = LIDVID(product.lidvid)
         changes_dict.set(product_lidvid.lid(), product_lidvid.vid(), False)
-        _LOGGER.info(f"created link and change for {product_lidvid}")
+        PDS_LOGGER.info(f"created link and change for {product_lidvid}")
+    PDS_LOGGER.close()
 
 
 def _build_browse_collection(
@@ -194,7 +197,8 @@ class BuildBrowse(MarkedStage):
     """
 
     def _run(self) -> None:
-        _LOGGER.info("Entering BuildBrowse.")
+        PDS_LOGGER.open("BuildBrowse")
+        PDS_LOGGER.info("Entering BuildBrowse.")
         working_dir: str = self.working_dir()
         archive_dir: str = self.archive_dir()
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
@@ -237,7 +241,7 @@ class BuildBrowse(MarkedStage):
                         collection_lid, collection_vid
                     )
                     if changes_dict.changed(collection_lid):
-                        _LOGGER.info(f"making browse for {collection_lidvid}")
+                        PDS_LOGGER.info(f"making browse for {collection_lidvid}")
                         _build_browse_collection(
                             db,
                             changes_dict,
@@ -252,4 +256,5 @@ class BuildBrowse(MarkedStage):
                         )
 
             write_changes_dict(changes_dict, changes_path)
-        _LOGGER.info("Leaving BuildBrowse.")
+        PDS_LOGGER.info("Leaving BuildBrowse.")
+        PDS_LOGGER.close()
