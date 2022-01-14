@@ -149,7 +149,7 @@ lil-pipeline : venv
 	python checkLIDsLog.py; \
 	done;
 	# say lil pipeline is done
-	open $(LIL-TWD)
+	# open $(LIL-TWD)
 
 ##############################
 # Pipeline for NICMOS ONLY

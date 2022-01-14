@@ -54,13 +54,11 @@ from pdart.pipeline.Utils import (
     make_sv_deltas,
     make_version_view,
 )
+from pdart.Logging import PDS_LOGGER
 
 import json
 import urllib
 import bs4  # type: ignore
-
-_LOGGER = logging.getLogger(__name__)
-
 
 _VERIFY = False
 
@@ -69,7 +67,7 @@ PDS_URL = "https://pds.nasa.gov/data/pds4/context-pds4/target/"
 
 
 def log_label(tag: str, lidvid: str) -> None:
-    _LOGGER.info(f"{tag} label for {lidvid}")
+    PDS_LOGGER.info(f"{tag} label for {lidvid}")
 
 
 def _lidvid_to_dir(lidvid: str) -> str:
@@ -495,9 +493,11 @@ class BuildLabels(MarkedStage):
             )
             info.set_publication_year(PUBLICATION_YEAR)
 
+            PDS_LOGGER.open("BuildLabels")
             # create_pds4_labels() may change changes_dict, because we
             # create the context collection if it doesn't exist.
             create_pds4_labels(
                 working_dir, db, bundle_lidvid, changes_dict, label_deltas, info
             )
+            PDS_LOGGER.close()
             write_changes_dict(changes_dict, changes_path)

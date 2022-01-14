@@ -1,4 +1,8 @@
 import os.path
+
+# import sys
+# import logging
+# import pdslogger
 from contextlib import contextmanager
 from typing import Generator, Set
 
@@ -19,6 +23,13 @@ from pdart.fs.versioned.Versioned import (
 from pdart.labels.CitationInformation import Citation_Information
 from pdart.pds4.LID import LID
 from pdart.pipeline.FSTypes import *
+
+# Set up PDS_LOGGER
+# _proposal_id = str(sys.argv[1]).zfill(5)
+# _log_path = os.path.join(os.environ["TMP_WORKING_DIR"], f"logs/hst_{_proposal_id}_pipeline_log.log")
+# PDS_LOGGER = pdslogger.PdsLogger(f"hst_{_proposal_id}_pipeline")
+# _info_handler = pdslogger.file_handler(_log_path, level=logging.INFO, rotation="ymdhms")
+# PDS_LOGGER.add_handler(_info_handler)
 
 
 def show_tree(tag: str, fs: FS) -> None:
