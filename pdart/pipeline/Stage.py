@@ -7,8 +7,8 @@ from typing import Optional
 
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.MarkerFile import BasicMarkerFile
-
-_LOGGER = logging.getLogger(__name__)
+from pdart.Logging import PDS_LOGGER
+# _LOGGER = logging.getLogger(__name__)
 
 
 class Stage(metaclass=abc.ABCMeta):
@@ -127,6 +127,7 @@ class MarkedStage(Stage):
             f"stage {self.class_name()}: {e}\n"
             f"{traceback.format_exc()}"
         )
-
-        _LOGGER.error(error_text)
+        PDS_LOGGER.open(f"Stage '{self.class_name}' error raised")
+        PDS_LOGGER.error(error_text)
+        PDS_LOGGER.close()
         self._marker_file.set_marker_info(self.class_name(), "failure", error_text)

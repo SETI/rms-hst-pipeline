@@ -76,8 +76,9 @@ import xml.sax
 import xml.sax.handler
 from typing import Any, Callable, Dict, List, Union, cast
 from xml.dom.minidom import Document, Text
+from pdart.Logging import PDS_LOGGER
 
-_LOGGER = logging.getLogger(__name__)
+# _LOGGER = logging.getLogger(__name__)
 
 TemplateDict = Dict[str, Any]
 Node = Any  # should be Text
@@ -268,7 +269,9 @@ def interpret_template(template: str) -> NodeBuilderTemplate:
             try:
                 xml.sax.parseString(template, Builder())
             except Exception:
-                _LOGGER.error(f"malformed template: {template}")
+                PDS_LOGGER.open("Template error")
+                PDS_LOGGER.error(f"malformed template: {template}")
+                PDS_LOGGER.close()
                 raise
             return stack[-1]
 

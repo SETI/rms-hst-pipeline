@@ -24,8 +24,9 @@ from pdart.pipeline.Utils import (
     make_version_view,
 )
 from pdart.pipeline.Stage import MarkedStage
+from pdart.Logging import PDS_LOGGER
 
-_LOGGER = logging.getLogger(__name__)
+# _LOGGER = logging.getLogger(__name__)
 
 _PRIMARY_SUFFIXES = DOCUMENT_SUFFIXES + [".fits", ".txt"]
 
@@ -100,27 +101,31 @@ def _get_primary_changes(
                 if "$" in dir
             ),
         )
+        PDS_LOGGER.open("File changes detected")
         if primary_dirs == latest_dirs:
             for dir in primary_dirs:
                 full_dirpath = join(dirpath, relpath(dir))
                 lid = dirpath_to_lid(full_dirpath)
                 assert lid in result.changes_dict
                 if result.changed(lid):
-                    _LOGGER.info(f"CHANGE DETECTED in {dirpath}: {lid} changed")
+                    PDS_LOGGER.info(f"CHANGE DETECTED in {dirpath}: {lid} changed")
+                    PDS_LOGGER.close()
                     return False
+            PDS_LOGGER.close()
             return True
         else:
             # list of dirs does not match
             added = primary_dirs - latest_dirs
             removed = latest_dirs - primary_dirs
             if added and removed:
-                _LOGGER.info(
+                PDS_LOGGER.info(
                     f"CHANGE DETECTED IN {dirpath}: added {added}; removed {removed}"
                 )
             elif added:
-                _LOGGER.info(f"CHANGE DETECTED IN {dirpath}: added {added}")
+                PDS_LOGGER.info(f"CHANGE DETECTED IN {dirpath}: added {added}")
             else:  # removed
-                _LOGGER.info(f"CHANGE DETECTED IN {dirpath}: removed {removed}")
+                PDS_LOGGER.info(f"CHANGE DETECTED IN {dirpath}: removed {removed}")
+            PDS_LOGGER.close()
             return False
 
     def files_match(dirpath: str) -> bool:

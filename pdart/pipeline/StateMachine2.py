@@ -21,8 +21,8 @@ from pdart.pipeline.Stage import MarkedStage, Stage
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.Utils import make_osfs
 from pdart.pipeline.ValidateBundle import ValidateBundle
-
-_LOGGER = logging.getLogger(__name__)
+from pdart.Logging import PDS_LOGGER
+# _LOGGER = logging.getLogger(__name__)
 
 
 class SaveDownloads(MarkedStage):
@@ -78,28 +78,33 @@ class ChangeFiles(MarkedStage):
             )
 
             from TouchFits import touch_fits
-
-            _LOGGER.info(f"touching {abs_path}")
+            PDS_LOGGER.open("Change fits file")
+            PDS_LOGGER.info(f"touching {abs_path}")
             touch_fits(abs_path)
+            PDS_LOGGER.close()
 
         with make_osfs(self.mast_downloads_dir()) as mast_fs:
 
             def _change_fits_file() -> None:
                 which_file = 0
+                PDS_LOGGER.open("Change fits file")
                 for path in mast_fs.walk.files(filter=["*.fits"]):
                     # change only the n-th FITS file then return
                     if which_file == 0:
                         change_fits_file(path)
-                        _LOGGER.info(f"CHANGED {path}")
+                        PDS_LOGGER.info(f"CHANGED {path}")
+                        PDS_LOGGER.close()
                         return
                     which_file = which_file - 1
                 assert False, "fell off the end of change_fits_file in ChangeFiles"
 
             def _delete_directory() -> None:
+                PDS_LOGGER.open("Delete directory")
                 for path in mast_fs.walk.dirs():
                     if len(fs.path.parts(path)) == 3:
-                        _LOGGER.info(f"REMOVED {path}")
+                        PDS_LOGGER.info(f"REMOVED {path}")
                         mast_fs.removetree(path)
+                        PDS_LOGGER.close()
                         return
                 assert False, "fell off the end of delete_directory in ChangeFiles"
 
@@ -133,9 +138,11 @@ class ReResetPipeline(MarkedStage):
                     shutil.rmtree(fullpath)
                 else:
                     os.unlink(fullpath)
-        _LOGGER.info(
+        PDS_LOGGER.open("Re-reset pipeline")
+        PDS_LOGGER.info(
             f"contents of working_dir after re-reset: {os.listdir(working_dir)}"
         )
+        PDS_LOGGER.close()
 
 
 class StateMachine2(object):
@@ -177,7 +184,7 @@ class StateMachine2(object):
 
         i = phase_index()
         try:
-            _LOGGER.info(f"{self.stages[i+1][0]}")
+            PDS_LOGGER.info(f"{self.stages[i+1][0]}")
             return self.stages[i + 1][1]
         except IndexError:
             return None
