@@ -7,6 +7,8 @@ from astropy.table.row import Row
 from pdart.astroquery.Astroquery import MastSlice, ProductSet, filter_table
 from pdart.pipeline.Stage import MarkedStage
 
+from pdart.Logging import PDS_LOGGER
+
 
 class CheckDownloads(MarkedStage):
     """
@@ -31,6 +33,7 @@ class CheckDownloads(MarkedStage):
         mast_downloads_dir: str,
         proposal_id: int,
     ) -> None:
+        PDS_LOGGER.open("Download datafiles")
         # first pass, <working_dir> shouldn't exist; second pass
         # <working_dir>/mastDownload should not exist.
         assert not os.path.isdir(mast_downloads_dir)
@@ -51,7 +54,9 @@ class CheckDownloads(MarkedStage):
         # TODO This might fail if there are no files.  Which might not be
         # a bad thing.
         print(f"::::::::::mast_downloads_dir: {mast_downloads_dir}")
+        PDS_LOGGER.info(f"Download datafiles to {mast_downloads_dir}")
         assert os.path.isdir(mast_downloads_dir)
+        PDS_LOGGER.close()
 
     def _run(self) -> None:
         working_dir: str = self.working_dir()
