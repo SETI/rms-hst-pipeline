@@ -22,7 +22,7 @@ _log_path = os.path.join(
 )
 _error_log_dir = os.path.join(os.environ["TMP_WORKING_DIR"], "logs")
 _info_handler = pdslogger.file_handler(_log_path, level=logging.INFO, rotation="ymdhms")
-_error_handler = pdslogger.error_handler(_error_log_dir, rotation='none')
+_error_handler = pdslogger.error_handler(_error_log_dir, rotation="none")
 PDS_LOGGER = pdslogger.PdsLogger(f"hst_{_proposal_id}_pipeline")
 PDS_LOGGER.add_handler(_info_handler)
 PDS_LOGGER.add_handler(_error_handler)

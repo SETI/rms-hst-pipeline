@@ -29,8 +29,6 @@ from pdart.pipeline.SuffixInfo import (  # type: ignore
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
 from pdart.Logging import PDS_LOGGER
 
-# _LOGGER = logging.getLogger(__name__)
-
 _NON_IMAGE_SUFFIXES: Set[str] = {"ASN", "SHM", "SPT"}
 
 _BROWSE_SUFFIXES: List[str] = [

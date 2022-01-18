@@ -15,8 +15,6 @@ from pdart.db.SqlAlchTables import (
 from pdart.pds4.LIDVID import LIDVID
 from pdart.Logging import PDS_LOGGER
 
-# _LOGGER = logging.getLogger(__name__)
-
 _LTD = Callable[[LIDVID], str]
 
 

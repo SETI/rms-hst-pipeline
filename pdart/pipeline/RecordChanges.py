@@ -26,8 +26,6 @@ from pdart.pipeline.Utils import (
 from pdart.pipeline.Stage import MarkedStage
 from pdart.Logging import PDS_LOGGER
 
-# _LOGGER = logging.getLogger(__name__)
-
 _PRIMARY_SUFFIXES = DOCUMENT_SUFFIXES + [".fits", ".txt"]
 
 
@@ -101,7 +99,7 @@ def _get_primary_changes(
                 if "$" in dir
             ),
         )
-        PDS_LOGGER.open("File changes detected")
+        PDS_LOGGER.open("Directory changes detected")
         if primary_dirs == latest_dirs:
             for dir in primary_dirs:
                 full_dirpath = join(dirpath, relpath(dir))
@@ -151,17 +149,20 @@ def _get_primary_changes(
                 if "$" not in filepath
             ),
         )
-
+        PDS_LOGGER.open("File changes detected")
         if primary_files != latest_files:
-            _LOGGER.info(
+            PDS_LOGGER.info(
                 f"CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}"
             )
+            PDS_LOGGER.close()
             return False
         for filename in primary_files:
             filepath = join(dirpath, relpath(filename))
             if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(filepath):
-                _LOGGER.info(f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}")
+                PDS_LOGGER.info(f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}")
+                PDS_LOGGER.close()
                 return False
+        PDS_LOGGER.close()
         return True
 
     for dirpath in primary_fs.walk.dirs(filter=["*\$$"], search="depth"):

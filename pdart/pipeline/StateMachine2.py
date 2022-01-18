@@ -22,7 +22,6 @@ from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.Utils import make_osfs
 from pdart.pipeline.ValidateBundle import ValidateBundle
 from pdart.Logging import PDS_LOGGER
-# _LOGGER = logging.getLogger(__name__)
 
 
 class SaveDownloads(MarkedStage):
@@ -78,6 +77,7 @@ class ChangeFiles(MarkedStage):
             )
 
             from TouchFits import touch_fits
+
             PDS_LOGGER.open("Change fits file")
             PDS_LOGGER.info(f"touching {abs_path}")
             touch_fits(abs_path)

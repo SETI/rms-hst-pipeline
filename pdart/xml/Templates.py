@@ -78,8 +78,6 @@ from typing import Any, Callable, Dict, List, Union, cast
 from xml.dom.minidom import Document, Text
 from pdart.Logging import PDS_LOGGER
 
-# _LOGGER = logging.getLogger(__name__)
-
 TemplateDict = Dict[str, Any]
 Node = Any  # should be Text
 Frag = List[Text]
