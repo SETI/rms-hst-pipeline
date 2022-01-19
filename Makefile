@@ -130,10 +130,10 @@ copy-results :
 # smaller version for testing
 ##############################
 
-# LILS=07885 09059 09748 15505
+LILS=07885 09059 09748 15505
 # LILS=15678
 # LILS=09059
-LILS=07885
+# LILS=07885
 
 .PHONY: lil-pipeline
 LIL-TWD=$(TMP_WORKING_DIR)

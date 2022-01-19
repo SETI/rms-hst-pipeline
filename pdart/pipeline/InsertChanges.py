@@ -69,10 +69,10 @@ class InsertChanges(MarkedStage):
         primary_files_dir: str = self.primary_files_dir()
         archive_dir: str = self.archive_dir()
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
-
+        PDS_LOGGER.open("Create a directory for a new version of the bundle")
         assert not os.path.isdir(
             self.deliverable_dir()
-        ), f"{deliverable_dir} cannot exist for InsertChanges"
+        ), f"{self.deliverable_dir()} cannot exist for InsertChanges"
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
@@ -87,7 +87,6 @@ class InsertChanges(MarkedStage):
             _merge_primaries(changes_dict, primary_files_osfs, sv_deltas)
 
         shutil.rmtree(primary_files_dir + "-sv")
-        PDS_LOGGER.open("Create a directory for a new version of the bundle")
         assert os.path.isdir(archive_dir), archive_dir
         dirpath = archive_primary_deltas_dir + "-deltas-sv"
         PDS_LOGGER.info(f"Directory for the new version: {dirpath}")

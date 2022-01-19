@@ -51,7 +51,7 @@ class CopyPrimaryFiles(MarkedStage):
             for file in documents_fs.walk.files():
                 file_basename = os.path.basename(file)
                 new_file_path = os.path.join(new_dir_path, file_basename)
-                PDS_LOGGER.open(f"Copy {file_basename} to {new_file_path}")
+                PDS_LOGGER.info(f"Copy {file_basename} to {new_file_path}")
                 fs.copy.copy_file(documents_fs, file, primary_files_fs, new_file_path)
 
         PDS_LOGGER.close()
@@ -94,7 +94,7 @@ class CopyPrimaryFiles(MarkedStage):
                 )
                 dirs, filename = fs.path.split(new_path)
                 primary_files_fs.makedirs(dirs)
-                PDS_LOGGER.open(f"Copy {filename} to {new_path}")
+                PDS_LOGGER.info(f"Copy {filename} to {new_path}")
                 fs.copy.copy_file(
                     mast_downloads_fs, filepath, primary_files_fs, new_path
                 )

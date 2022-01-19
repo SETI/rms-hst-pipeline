@@ -172,7 +172,7 @@ class PopulateDatabase(MarkedStage):
 
         assert not os.path.isdir(
             self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for PopulateDatabase"
+        ), f"{self.deliverable_dir()} cannot exist for PopulateDatabase"
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)

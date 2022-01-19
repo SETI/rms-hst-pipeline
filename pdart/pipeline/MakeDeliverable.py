@@ -21,6 +21,7 @@ from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import make_multiversioned, make_osfs
+from pdart.Logging import PDS_LOGGER
 
 
 def short_lidvid_to_dirpath(lidvid: LIDVID) -> str:
@@ -80,7 +81,7 @@ class MakeDeliverable(MarkedStage):
         archive_dir: str = self.archive_dir()
         deliverable_dir: str = self.deliverable_dir()
         manifest_dir: str = self.manifest_dir()
-
+        PDS_LOGGER.open("Create deliverable directory")
         assert not os.path.isdir(
             deliverable_dir
         ), "{deliverable_dir} cannot exist for MakeDeliverable"
@@ -119,3 +120,5 @@ class MakeDeliverable(MarkedStage):
             os.mkdir(deliverable_dir)
             deliverable_osfs = OSFS(deliverable_dir)
             copy_fs(deliverable_view, deliverable_osfs)
+            PDS_LOGGER.info(f"Deliverable: {deliverable_dir}")
+        PDS_LOGGER.close()
