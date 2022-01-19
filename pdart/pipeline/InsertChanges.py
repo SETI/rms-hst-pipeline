@@ -19,6 +19,7 @@ from pdart.pipeline.Utils import (
     make_sv_osfs,
     make_version_view,
 )
+from pdart.Logging import PDS_LOGGER
 
 
 def _is_component_path(dirpath: str) -> bool:
@@ -71,7 +72,7 @@ class InsertChanges(MarkedStage):
 
         assert not os.path.isdir(
             self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for InsertChanges"
+        ), f"{deliverable_dir} cannot exist for InsertChanges"
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
@@ -86,8 +87,10 @@ class InsertChanges(MarkedStage):
             _merge_primaries(changes_dict, primary_files_osfs, sv_deltas)
 
         shutil.rmtree(primary_files_dir + "-sv")
-
+        PDS_LOGGER.open("Create a directory for a new version of the bundle")
         assert os.path.isdir(archive_dir), archive_dir
         dirpath = archive_primary_deltas_dir + "-deltas-sv"
+        PDS_LOGGER.info(f"Directory for the new version: {dirpath}")
         assert os.path.isdir(dirpath), dirpath
         assert os.path.isfile(changes_path)
+        PDS_LOGGER.close()
