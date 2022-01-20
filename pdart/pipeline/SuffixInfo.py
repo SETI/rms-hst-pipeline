@@ -287,9 +287,10 @@ INSTRUMENTS_INFO = {
 ACCEPTED_INSTRUMENTS = "".join(INSTRUMENTS_INFO.keys()).upper()
 
 # This is used when we only want to download files with shm & spt suffixes.
-PART_OF_ACCEPTED_SUFFIXES = [
-    "SHM",
-    "SPT",
+TARGET_IDENTIFICATION_SUFFIXES = [
+    "shm",
+    "spt",
+    "shf"
 ]
 
 
@@ -311,27 +312,27 @@ def _get_suffixes_list(idx):
 
 # For every instrument, we download files with these suffixes.
 # The concatenated list will be removed once SUFFIX_INFO is fully updated.
-ACCEPTED_SUFFIXES = [suffix.upper() for suffix in _get_suffixes_list(0)] + [
-    "A1F",
-    "A2F",
-    "A3F",
-    "ASC",
-    "C0M",
-    "C1M",
-    "C2M",
-    "C3M",
-    "CLB",
-    "CLF",
-    "CORRTAG",
-    "CQF",
-    "D0M",
-    "FLTSUM",
-    "SHM",
-    "SX2",
-    "SXL",
-    "X1D",
-    "X1DSUM",
-    "X2D",
+IDENTIFICATION_SUFFIXES = [suffix.lower() for suffix in _get_suffixes_list(0)] + [
+    "a1f",
+    "a2f",
+    "a3f",
+    "asc",
+    "c0m",
+    "c1m",
+    "c2m",
+    "c3m",
+    "clb",
+    "clf",
+    "corrtag",
+    "cqf",
+    "d0m",
+    "fltsum",
+    "shm",
+    "sx2",
+    "sxl",
+    "x1d",
+    "x1dsum",
+    "x2d",
 ]
 
 # The suffixes considered raw data, in order of preference.
@@ -350,18 +351,18 @@ SHM_SUFFIXES = _get_suffixes_list(2) + ["shm", "shf"]
 
 
 # For each instrument, only download files with selected suffixes.
-# Use ACCEPTED_SUFFIXES for all instruments for now.
+# Use IDENTIFICATION_SUFFIXES for all instruments for now.
 INTRUMENT_SELECTED_SUFFIXES = {
-    "wfc3": ACCEPTED_SUFFIXES,
-    "acs": ACCEPTED_SUFFIXES,
-    "cos": ACCEPTED_SUFFIXES,
-    "nicmos": ACCEPTED_SUFFIXES,
-    "stis": ACCEPTED_SUFFIXES,
-    "wfpc2": ACCEPTED_SUFFIXES,
-    "wfpc": ACCEPTED_SUFFIXES,
-    "foc": ACCEPTED_SUFFIXES,
-    "fos": ACCEPTED_SUFFIXES,
-    "ghrs": ACCEPTED_SUFFIXES,
+    "wfc3": IDENTIFICATION_SUFFIXES,
+    "acs": IDENTIFICATION_SUFFIXES,
+    "cos": IDENTIFICATION_SUFFIXES,
+    "nicmos": IDENTIFICATION_SUFFIXES,
+    "stis": IDENTIFICATION_SUFFIXES,
+    "wfpc2": IDENTIFICATION_SUFFIXES,
+    "wfpc": IDENTIFICATION_SUFFIXES,
+    "foc": IDENTIFICATION_SUFFIXES,
+    "fos": IDENTIFICATION_SUFFIXES,
+    "ghrs": IDENTIFICATION_SUFFIXES,
 }
 
 

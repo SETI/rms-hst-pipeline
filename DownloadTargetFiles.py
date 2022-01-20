@@ -20,7 +20,7 @@ _YMD = Tuple[int, int, int]
 We currently only handle products from a limited set of
 instruments.  These are the first letters of their 'obs_id's.
 """
-ACCEPTED_SUFFIXES: List[str] = [
+IDENTIFICATION_SUFFIXES: List[str] = [
     "SHF",
     "SHM",
     "SPT",
@@ -53,7 +53,7 @@ def _is_accepted_product_type_product_row(row: Row) -> bool:
     instruments.
     """
     desc = str(row["productSubGroupDescription"])
-    return desc.upper() in ACCEPTED_SUFFIXES
+    return desc.upper() in IDENTIFICATION_SUFFIXES
 
 
 class MastSlice(object):

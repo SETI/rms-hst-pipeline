@@ -11,8 +11,8 @@ from pdart.astroquery.Utils import (
 )
 
 from pdart.pipeline.SuffixInfo import (  # type: ignore
-    ACCEPTED_SUFFIXES,
-    PART_OF_ACCEPTED_SUFFIXES,
+    IDENTIFICATION_SUFFIXES,
+    TARGET_IDENTIFICATION_SUFFIXES,
     ACCEPTED_INSTRUMENTS,
     INSTRUMENTS_INFO,
     INTRUMENT_SELECTED_SUFFIXES,
@@ -59,7 +59,7 @@ def _is_selected_accepted_product_type_product_row(row: Row) -> bool:
     instruments with selected suffixes.
     """
     desc = str(row["productSubGroupDescription"])
-    return desc.upper() in PART_OF_ACCEPTED_SUFFIXES
+    return desc.lower() in TARGET_IDENTIFICATION_SUFFIXES
 
 
 class MastSlice(object):

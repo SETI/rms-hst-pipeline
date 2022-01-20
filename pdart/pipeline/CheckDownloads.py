@@ -40,7 +40,7 @@ class CheckDownloads(MarkedStage):
         slice = MastSlice((1900, 1, 1), (2025, 1, 1), proposal_id)
         proposal_ids = slice.get_proposal_ids()
         assert proposal_id in proposal_ids, f"{proposal_id} in {proposal_ids}"
-        # get files from full list of ACCEPTED_SUFFIXES
+        # get files from full list of IDENTIFICATION_SUFFIXES
         product_set = slice.to_product_set(proposal_id)
         if not os.path.isdir(working_dir):
             os.makedirs(working_dir)
