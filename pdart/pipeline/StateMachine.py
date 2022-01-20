@@ -55,7 +55,7 @@ class StateMachine(object):
 
         i = phase_index()
         try:
-            PDS_LOGGER.info(f"{self.stages[i+1][0]}")
+            PDS_LOGGER.log("info", f"{self.stages[i+1][0]}")
             return self.stages[i + 1][1]
         except IndexError:
             return None

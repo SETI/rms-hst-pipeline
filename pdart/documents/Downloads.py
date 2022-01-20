@@ -40,7 +40,7 @@ def download_product_documents(proposal_id: int, download_dir: str) -> Set[str]:
     for (url, basename) in table:
         filepath = fs.path.join(download_dir, basename)
         if _retrieve_doc(url, filepath):
-            PDS_LOGGER.info(f"Retrieve {basename} from {url}")
+            PDS_LOGGER.log("info", f"Retrieve {basename} from {url}")
             res.add(basename)
     PDS_LOGGER.close()
 

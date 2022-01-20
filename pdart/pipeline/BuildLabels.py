@@ -67,7 +67,7 @@ PDS_URL = "https://pds.nasa.gov/data/pds4/context-pds4/target/"
 
 
 def log_label(tag: str, lidvid: str) -> None:
-    PDS_LOGGER.info(f"{tag} label for {lidvid}")
+    PDS_LOGGER.log("info", f"{tag} label for {lidvid}")
 
 
 def _lidvid_to_dir(lidvid: str) -> str:

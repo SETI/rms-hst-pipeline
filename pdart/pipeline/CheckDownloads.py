@@ -54,7 +54,7 @@ class CheckDownloads(MarkedStage):
         # TODO This might fail if there are no files.  Which might not be
         # a bad thing.
         print(f"::::::::::mast_downloads_dir: {mast_downloads_dir}")
-        PDS_LOGGER.info(f"Download datafiles to {mast_downloads_dir}")
+        PDS_LOGGER.log("info", f"Download datafiles to {mast_downloads_dir}")
         assert os.path.isdir(mast_downloads_dir)
         PDS_LOGGER.close()
 

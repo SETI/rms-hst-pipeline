@@ -89,7 +89,7 @@ class InsertChanges(MarkedStage):
         shutil.rmtree(primary_files_dir + "-sv")
         assert os.path.isdir(archive_dir), archive_dir
         dirpath = archive_primary_deltas_dir + "-deltas-sv"
-        PDS_LOGGER.info(f"Directory for the new version: {dirpath}")
+        PDS_LOGGER.log("info", f"Directory for the new version: {dirpath}")
         assert os.path.isdir(dirpath), dirpath
         assert os.path.isfile(changes_path)
         PDS_LOGGER.close()

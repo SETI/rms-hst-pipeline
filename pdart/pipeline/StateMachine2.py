@@ -79,7 +79,7 @@ class ChangeFiles(MarkedStage):
             from TouchFits import touch_fits
 
             PDS_LOGGER.open("Change fits file")
-            PDS_LOGGER.info(f"Touching {abs_path}")
+            PDS_LOGGER.log("info", f"Touching {abs_path}")
             touch_fits(abs_path)
             PDS_LOGGER.close()
 
@@ -92,7 +92,7 @@ class ChangeFiles(MarkedStage):
                     # change only the n-th FITS file then return
                     if which_file == 0:
                         change_fits_file(path)
-                        PDS_LOGGER.info(f"CHANGED {path}")
+                        PDS_LOGGER.log("info", f"CHANGED {path}")
                         PDS_LOGGER.close()
                         return
                     which_file = which_file - 1
@@ -102,7 +102,7 @@ class ChangeFiles(MarkedStage):
                 PDS_LOGGER.open("Delete directory")
                 for path in mast_fs.walk.dirs():
                     if len(fs.path.parts(path)) == 3:
-                        PDS_LOGGER.info(f"REMOVED {path}")
+                        PDS_LOGGER.log("info", f"REMOVED {path}")
                         mast_fs.removetree(path)
                         PDS_LOGGER.close()
                         return
@@ -139,8 +139,8 @@ class ReResetPipeline(MarkedStage):
                 else:
                     os.unlink(fullpath)
         PDS_LOGGER.open("Re-reset pipeline")
-        PDS_LOGGER.info(
-            f"contents of working_dir after re-reset: {os.listdir(working_dir)}"
+        PDS_LOGGER.log(
+            "info", f"contents of working_dir after re-reset: {os.listdir(working_dir)}"
         )
         PDS_LOGGER.close()
 
@@ -184,7 +184,7 @@ class StateMachine2(object):
 
         i = phase_index()
         try:
-            PDS_LOGGER.info(f"{self.stages[i+1][0]}")
+            PDS_LOGGER.log("info", f"{self.stages[i+1][0]}")
             return self.stages[i + 1][1]
         except IndexError:
             return None

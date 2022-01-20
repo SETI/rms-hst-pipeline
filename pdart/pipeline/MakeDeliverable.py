@@ -120,5 +120,5 @@ class MakeDeliverable(MarkedStage):
             os.mkdir(deliverable_dir)
             deliverable_osfs = OSFS(deliverable_dir)
             copy_fs(deliverable_view, deliverable_osfs)
-            PDS_LOGGER.info(f"Deliverable: {deliverable_dir}")
+            PDS_LOGGER.log("info", f"Deliverable: {deliverable_dir}")
         PDS_LOGGER.close()

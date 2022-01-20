@@ -106,7 +106,9 @@ def _get_primary_changes(
                 lid = dirpath_to_lid(full_dirpath)
                 assert lid in result.changes_dict
                 if result.changed(lid):
-                    PDS_LOGGER.info(f"CHANGE DETECTED in {dirpath}: {lid} changed")
+                    PDS_LOGGER.log(
+                        "info", f"CHANGE DETECTED in {dirpath}: {lid} changed"
+                    )
                     PDS_LOGGER.close()
                     return False
             PDS_LOGGER.close()
@@ -116,13 +118,16 @@ def _get_primary_changes(
             added = primary_dirs - latest_dirs
             removed = latest_dirs - primary_dirs
             if added and removed:
-                PDS_LOGGER.info(
-                    f"CHANGE DETECTED IN {dirpath}: added {added}; removed {removed}"
+                PDS_LOGGER.log(
+                    "info",
+                    f"CHANGE DETECTED IN {dirpath}: added {added}; removed {removed}",
                 )
             elif added:
-                PDS_LOGGER.info(f"CHANGE DETECTED IN {dirpath}: added {added}")
+                PDS_LOGGER.log("info", f"CHANGE DETECTED IN {dirpath}: added {added}")
             else:  # removed
-                PDS_LOGGER.info(f"CHANGE DETECTED IN {dirpath}: removed {removed}")
+                PDS_LOGGER.log(
+                    "info", f"CHANGE DETECTED IN {dirpath}: removed {removed}"
+                )
             PDS_LOGGER.close()
             return False
 
@@ -151,15 +156,18 @@ def _get_primary_changes(
         )
         PDS_LOGGER.open("File changes detected")
         if primary_files != latest_files:
-            PDS_LOGGER.info(
-                f"CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}"
+            PDS_LOGGER.log(
+                "info",
+                f"CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}",
             )
             PDS_LOGGER.close()
             return False
         for filename in primary_files:
             filepath = join(dirpath, relpath(filename))
             if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(filepath):
-                PDS_LOGGER.info(f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}")
+                PDS_LOGGER.log(
+                    "info", f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}"
+                )
                 PDS_LOGGER.close()
                 return False
         PDS_LOGGER.close()
