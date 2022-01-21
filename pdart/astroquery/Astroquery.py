@@ -15,7 +15,7 @@ from pdart.pipeline.SuffixInfo import (  # type: ignore
     TARGET_IDENTIFICATION_SUFFIXES,
     ACCEPTED_INSTRUMENTS,
     INSTRUMENTS_INFO,
-    INTRUMENT_SELECTED_SUFFIXES,
+    get_suffixes_list,
 )
 
 _YMD = Tuple[int, int, int]
@@ -48,8 +48,8 @@ def _is_accepted_product_type_product_row(row: Row) -> bool:
     instruments.
     """
     desc = str(row["productSubGroupDescription"])
-    instrument = INSTRUMENTS_INFO[_instrument_key(row["obs_id"]).lower()]
-    selected_suffixes = INTRUMENT_SELECTED_SUFFIXES[instrument]
+    instrument = INSTRUMENTS_INFO[_instrument_key(row["obs_id"]).upper()]
+    selected_suffixes = get_suffixes_list(instrument)
     return desc.upper() in selected_suffixes
 
 
