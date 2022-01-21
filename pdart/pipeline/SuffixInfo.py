@@ -237,27 +237,50 @@ INSTRUMENT_FROM_LETTER_CODE = {
     "z": "GHRS",
 }
 
-# First letter of filenames
-ACCEPTED_LETTER_CODES = "".join(INSTRUMENT_FROM_LETTER_CODE.keys()).lower()
-
 # This is used when we only want to download files with shm, spt, and
 # shf suffixes. It's also used to extract Hst_Parameter information.
-TARGET_IDENTIFICATION_SUFFIXES = [ "shm", "spt", "shf"]
+TARGET_IDENTIFICATION_SUFFIXES = ["shm", "spt", "shf"]
+
+# Get the accepted instruments from SUFFIX_INFO.
+def _get_accepted_inst_li():
+    suffix_li = []
+    for key in SUFFIX_INFO.keys():
+        for inst in SUFFIX_INFO[key][5]:
+            if inst not in suffix_li:
+                suffix_li.append(inst)
+    return suffix_li
+
+
+# Get the accepted letter list based on the accepted instruments.
+def _get_accepted_letter_codes():
+    accepted_letter_li = []
+    accepted_inst_li = _get_accepted_inst_li()
+    for letter in INSTRUMENT_FROM_LETTER_CODE.keys():
+        if (
+            INSTRUMENT_FROM_LETTER_CODE[letter] in accepted_inst_li
+            and letter not in accepted_letter_li
+        ):
+            accepted_letter_li.append(letter)
+    return accepted_letter_li
+
+
+# First letter of filenames
+ACCEPTED_LETTER_CODES = "".join(_get_accepted_letter_codes())
 
 # Get the key of SUFFIX_INFO based on the passed in parameters.
 def _get_suffix_info_key(instrument_id, channel_id, suffix):
     if instrument_id and type(instrument_id) != str:
         raise AttributeError(
-            f"{instrument_id} passed into _get_suffix_info_key "
-            + "is not a string.")
+            f"{instrument_id} passed into _get_suffix_info_key " + "is not a string."
+        )
     if channel_id and type(channel_id) != str:
         raise AttributeError(
-            f"{channel_id} passed into _get_suffix_info_key "
-            + "is not a string.")
-    if suffix and type(suffix) != str::
+            f"{channel_id} passed into _get_suffix_info_key " + "is not a string."
+        )
+    if suffix and type(suffix) != str:
         raise AttributeError(
-            f"{suffix} passed into _get_suffix_info_key "
-            + "is not a string.")
+            f"{suffix} passed into _get_suffix_info_key " + "is not a string."
+        )
     if (instrument_id, channel_id, suffix) in SUFFIX_INFO:
         key = (instrument_id, channel_id, suffix)
     elif (instrument_id, suffix) in SUFFIX_INFO:
@@ -281,14 +304,14 @@ def get_suffixes_list(instrument_id=None):
     for key in SUFFIX_INFO.keys():
         if SUFFIX_INFO[key][0]:
             if type(key) is tuple:
-                if (key[-1] not in suffix_li and
-                    (instrument_id is None or
-                     instrument_id in SUFFIX_INFO[key][5])):
+                if key[-1] not in suffix_li and (
+                    instrument_id is None or instrument_id in SUFFIX_INFO[key][5]
+                ):
                     suffix_li.append(key[-1])
             else:
-                if (key not in suffix_li and
-                    (instrument_id is None or
-                     instrument_id in SUFFIX_INFO[key][5])):
+                if key not in suffix_li and (
+                    instrument_id is None or instrument_id in SUFFIX_INFO[key][5]
+                ):
                     suffix_li.append(key)
     return suffix_li
 
@@ -334,6 +357,7 @@ def get_raw_suffix():
                     suffix_li.append(key)
     return suffix_li
 
+
 # For each instrument, only download files with selected suffixes.
 # INTRUMENT_SELECTED_SUFFIXES = {
 #     "WFC3": get_suffixes_list("WFC3"),
@@ -347,8 +371,6 @@ def get_raw_suffix():
 #     "FOS": get_suffixes_list("FOS"),
 #     "GHRS": get_suffixes_list("GHRS"),
 # }
-
-
 
 
 def get_titles_format(instrument_id, channel_id, suffix):

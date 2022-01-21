@@ -12,7 +12,10 @@ from pdart.astroquery.Utils import (
     ymd_tuple_to_mjd,
 )
 
-from pdart.pipeline.SuffixInfo import ACCEPTED_LETTER_CODES  # type: ignore
+from pdart.pipeline.SuffixInfo import (  # type: ignore
+    get_suffixes_list,
+    ACCEPTED_LETTER_CODES,
+)
 
 _YMD = Tuple[int, int, int]
 
