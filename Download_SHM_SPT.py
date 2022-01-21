@@ -3,7 +3,7 @@ import sys
 from pdart.astroquery.Astroquery import MastSlice, CustomizedQueryMastSlice, ProductSet
 from pdart.pipeline.Directories import DevDirectories
 from pdart.pipeline.SuffixInfo import (  # type: ignore
-    IDENTIFICATION_SUFFIXES,
+    get_suffixes_list,
     TARGET_IDENTIFICATION_SUFFIXES,
 )
 

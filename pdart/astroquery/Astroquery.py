@@ -11,10 +11,9 @@ from pdart.astroquery.Utils import (
 )
 
 from pdart.pipeline.SuffixInfo import (  # type: ignore
-    IDENTIFICATION_SUFFIXES,
     TARGET_IDENTIFICATION_SUFFIXES,
-    ACCEPTED_INSTRUMENTS,
-    INSTRUMENTS_INFO,
+    ACCEPTED_LETTER_CODES,
+    INSTRUMENT_FROM_LETTER_CODE,
     get_suffixes_list,
 )
 
@@ -31,7 +30,7 @@ def _instrument_key(id: str) -> str:
     Return the first letter of the obs_id, which tells which
     instrument made the observation.
     """
-    return id[0].upper()
+    return id[0].lower()
 
 
 def _is_accepted_instrument_product_row(row: Row) -> bool:
@@ -39,7 +38,7 @@ def _is_accepted_instrument_product_row(row: Row) -> bool:
     We currently only handle products from a limited set of
     instruments.
     """
-    return _instrument_key(row["obs_id"]) in ACCEPTED_INSTRUMENTS
+    return _instrument_key(row["obs_id"]) in ACCEPTED_LETTER_CODES
 
 
 def _is_accepted_product_type_product_row(row: Row) -> bool:
@@ -48,7 +47,7 @@ def _is_accepted_product_type_product_row(row: Row) -> bool:
     instruments.
     """
     desc = str(row["productSubGroupDescription"])
-    instrument = INSTRUMENTS_INFO[_instrument_key(row["obs_id"]).upper()]
+    instrument = INSTRUMENT_FROM_LETTER_CODE[_instrument_key(row["obs_id"])]
     selected_suffixes = get_suffixes_list(instrument)
     return desc.upper() in selected_suffixes
 

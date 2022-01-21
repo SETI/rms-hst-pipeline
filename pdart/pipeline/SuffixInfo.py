@@ -28,7 +28,7 @@
 # A dictionary that contains suffix info. The dictionary is keyed by: suffix
 # (instrument_id, suffix), or (instrument_id, channel_id, suffix). The value is
 # a tuple containing the following info:
-# 1. boolean checking if it's an IDENTIFICATION_SUFFIXES
+# 1. boolean checking if it's an accepted suffixe that we want to download
 # 2. processing_level
 # 3. collection_type
 # 4. product title
@@ -224,24 +224,53 @@ SUFFIX_INFO = {
 }
 
 # First letter of filenames and the corresponding instrument names
-INSTRUMENTS_INFO = {
-    "i": "wfc3",
-    "j": "acs",
-    "l": "cos",
-    "n": "nicmos",
-    "o": "stis",
-    "u": "wfpc2",
-    "w": "wfpc",
-    "x": "foc",
-    "y": "fos",
-    "z": "ghrs",
+INSTRUMENT_FROM_LETTER_CODE = {
+    "i": "WFC3",
+    "j": "ACS",
+    "l": "COS",
+    "n": "NICMOS",
+    "o": "STIS",
+    "u": "WFPC2",
+    "w": "WFPC",
+    "x": "FOC",
+    "y": "FOS",
+    "z": "GHRS",
 }
 
 # First letter of filenames
-ACCEPTED_INSTRUMENTS = "".join(INSTRUMENTS_INFO.keys()).upper()
+ACCEPTED_LETTER_CODES = "".join(INSTRUMENT_FROM_LETTER_CODE.keys()).lower()
 
-# This is used when we only want to download files with shm & spt suffixes.
+# This is used when we only want to download files with shm, spt, and
+# shf suffixes. It's also used to extract Hst_Parameter information.
 TARGET_IDENTIFICATION_SUFFIXES = [ "shm", "spt", "shf"]
+
+# Get the key of SUFFIX_INFO based on the passed in parameters.
+def _get_suffix_info_key(instrument_id, channel_id, suffix):
+    if instrument_id and type(instrument_id) != str:
+        raise AttributeError(
+            f"{instrument_id} passed into _get_suffix_info_key "
+            + "is not a string.")
+    if channel_id and type(channel_id) != str:
+        raise AttributeError(
+            f"{channel_id} passed into _get_suffix_info_key "
+            + "is not a string.")
+    if suffix and type(suffix) != str::
+        raise AttributeError(
+            f"{suffix} passed into _get_suffix_info_key "
+            + "is not a string.")
+    if (instrument_id, channel_id, suffix) in SUFFIX_INFO:
+        key = (instrument_id, channel_id, suffix)
+    elif (instrument_id, suffix) in SUFFIX_INFO:
+        key = (instrument_id, suffix)
+    elif suffix in SUFFIX_INFO:
+        key = suffix
+    else:
+        raise KeyError(
+            f"Key based on instrument_id: {instrument_id}, "
+            + f"channel_id: {channel_id}, suffix: {suffix} "
+            + "doesn't exists in SUFFIX_INFO."
+        )
+    return key
 
 
 # If no instrument_id passed in, get the full list of suffixes from SUFFIX_INFO
@@ -250,7 +279,7 @@ TARGET_IDENTIFICATION_SUFFIXES = [ "shm", "spt", "shf"]
 def get_suffixes_list(instrument_id=None):
     suffix_li = []
     for key in SUFFIX_INFO.keys():
-        if SUFFIX_INFO[key][0] == True:
+        if SUFFIX_INFO[key][0]:
             if type(key) is tuple:
                 if (key[-1] not in suffix_li and
                     (instrument_id is None or
@@ -266,36 +295,44 @@ def get_suffixes_list(instrument_id=None):
 
 # For every instrument, we download files with these suffixes.
 # The concatenated list will be removed once SUFFIX_INFO is fully updated.
-IDENTIFICATION_SUFFIXES = [suffix.lower() for suffix in get_suffixes_list(0)] + [
-    "a1f",
-    "a2f",
-    "a3f",
-    "asc",
-    "c0m",
-    "c1m",
-    "c2m",
-    "c3m",
-    "clb",
-    "clf",
-    "corrtag",
-    "cqf",
-    "d0m",
-    "fltsum",
-    "shm",
-    "sx2",
-    "sxl",
-    "x1d",
-    "x1dsum",
-    "x2d",
-]
+# IDENTIFICATION_SUFFIXES = [suffix.lower() for suffix in get_suffixes_list(0)] + [
+#     "a1f",
+#     "a2f",
+#     "a3f",
+#     "asc",
+#     "c0m",
+#     "c1m",
+#     "c2m",
+#     "c3m",
+#     "clb",
+#     "clf",
+#     "corrtag",
+#     "cqf",
+#     "d0m",
+#     "fltsum",
+#     "shm",
+#     "sx2",
+#     "sxl",
+#     "x1d",
+#     "x1dsum",
+#     "x2d",
+# ]
 
-# The suffixes considered raw data, in order of preference.
-RAW_SUFFIXES = ["raw", "flt", "drz", "crj", "d0m", "c0m",]
+#
+# RAW_SUFFIXES = ["raw", "flt", "drz", "crj", "d0m", "c0m",]
 
-
-# The suffixes used to extract Hst_Parameter information.
-SHM_SUFFIXES = ["shm", "spt", "shf"]
-
+# Return the suffixes considered raw data, in order of preference.
+def get_raw_suffix():
+    suffix_li = []
+    for key in SUFFIX_INFO.keys():
+        if SUFFIX_INFO[key][1] == "Raw":
+            if type(key) is tuple:
+                if key[-1] not in suffix_li:
+                    suffix_li.append(key[-1])
+            else:
+                if key not in suffix_li:
+                    suffix_li.append(key)
+    return suffix_li
 
 # For each instrument, only download files with selected suffixes.
 # INTRUMENT_SELECTED_SUFFIXES = {
@@ -312,26 +349,6 @@ SHM_SUFFIXES = ["shm", "spt", "shf"]
 # }
 
 
-def _get_suffix_info_key(instrument_id, channel_id, suffix):
-    if instrument_id:
-        instrument_id = instrument_id.upper()
-    if channel_id:
-        channel_id = channel_id.upper()
-    if suffix:
-        suffix = suffix.lower()
-    if (instrument_id, channel_id, suffix) in SUFFIX_INFO:
-        key = (instrument_id, channel_id, suffix)
-    elif (instrument_id, suffix) in SUFFIX_INFO:
-        key = (instrument_id, suffix)
-    elif suffix in SUFFIX_INFO:
-        key = suffix
-    else:
-        raise KeyError(
-            f"Key based on instrument_id: {instrument_id}, "
-            + f"channel_id: {channel_id}, suffix: {suffix} "
-            + "doesn't exists in SUFFIX_INFO."
-        )
-    return key
 
 
 def get_titles_format(instrument_id, channel_id, suffix):

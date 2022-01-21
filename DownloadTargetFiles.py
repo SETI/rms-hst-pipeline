@@ -12,7 +12,7 @@ from pdart.astroquery.Utils import (
     ymd_tuple_to_mjd,
 )
 
-from pdart.pipeline.SuffixInfo import ACCEPTED_INSTRUMENTS  # type: ignore
+from pdart.pipeline.SuffixInfo import ACCEPTED_LETTER_CODES  # type: ignore
 
 _YMD = Tuple[int, int, int]
 
@@ -42,9 +42,9 @@ def _is_accepted_instrument_product_row(row: Row) -> bool:
         Return the first letter of the obs_id, which tells which
         instrument made the observation.
         """
-        return id[0].upper()
+        return id[0].lower()
 
-    return instrument_key(row["obs_id"]) in ACCEPTED_INSTRUMENTS
+    return instrument_key(row["obs_id"]) in ACCEPTED_LETTER_CODES
 
 
 def _is_accepted_product_type_product_row(row: Row) -> bool:
@@ -53,7 +53,7 @@ def _is_accepted_product_type_product_row(row: Row) -> bool:
     instruments.
     """
     desc = str(row["productSubGroupDescription"])
-    return desc.upper() in IDENTIFICATION_SUFFIXES
+    return desc.upper() in get_suffixes_list()
 
 
 class MastSlice(object):

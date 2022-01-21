@@ -23,7 +23,7 @@ from pdart.pipeline.ChangesDict import (
 )
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.SuffixInfo import (  # type: ignore
-    IDENTIFICATION_SUFFIXES,
+    get_suffixes_list,
     TARGET_IDENTIFICATION_SUFFIXES,
 )
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
@@ -33,7 +33,7 @@ _LOGGER = logging.getLogger(__name__)
 _NON_IMAGE_SUFFIXES: Set[str] = {"asn", "shm", "spt"}
 
 _BROWSE_SUFFIXES: List[str] = [
-    suffix for suffix in IDENTIFICATION_SUFFIXES if suffix not in _NON_IMAGE_SUFFIXES
+    suffix for suffix in get_suffixes_list() if suffix not in _NON_IMAGE_SUFFIXES
 ]
 
 
