@@ -315,35 +315,6 @@ def get_suffixes_list(instrument_id=None):
                     suffix_li.append(key)
     return suffix_li
 
-
-# For every instrument, we download files with these suffixes.
-# The concatenated list will be removed once SUFFIX_INFO is fully updated.
-# IDENTIFICATION_SUFFIXES = [suffix.lower() for suffix in get_suffixes_list(0)] + [
-#     "a1f",
-#     "a2f",
-#     "a3f",
-#     "asc",
-#     "c0m",
-#     "c1m",
-#     "c2m",
-#     "c3m",
-#     "clb",
-#     "clf",
-#     "corrtag",
-#     "cqf",
-#     "d0m",
-#     "fltsum",
-#     "shm",
-#     "sx2",
-#     "sxl",
-#     "x1d",
-#     "x1dsum",
-#     "x2d",
-# ]
-
-#
-# RAW_SUFFIXES = ["raw", "flt", "drz", "crj", "d0m", "c0m",]
-
 # Return the suffixes considered raw data, in order of preference.
 def get_raw_suffix():
     suffix_li = []
@@ -352,25 +323,9 @@ def get_raw_suffix():
             if type(key) is tuple:
                 if key[-1] not in suffix_li:
                     suffix_li.append(key[-1])
-            else:
-                if key not in suffix_li:
+            elif key not in suffix_li:
                     suffix_li.append(key)
     return suffix_li
-
-
-# For each instrument, only download files with selected suffixes.
-# INTRUMENT_SELECTED_SUFFIXES = {
-#     "WFC3": get_suffixes_list("WFC3"),
-#     "ACS": get_suffixes_list("ACS"),
-#     "COS": get_suffixes_list("COS"),
-#     "NICMOS": get_suffixes_list("NICMOS"),
-#     "STIS": get_suffixes_list("STIS"),
-#     "WFPC2": get_suffixes_list("WFPC2"),
-#     "WFPC": get_suffixes_list("WFPC"),
-#     "FOC": get_suffixes_list("FOC"),
-#     "FOS": get_suffixes_list("FOS"),
-#     "GHRS": get_suffixes_list("GHRS"),
-# }
 
 
 def get_titles_format(instrument_id, channel_id, suffix):
