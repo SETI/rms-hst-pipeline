@@ -56,7 +56,7 @@ def _is_accepted_product_type_product_row(row: Row) -> bool:
     instruments.
     """
     desc = str(row["productSubGroupDescription"])
-    return desc.upper() in get_suffixes_list()
+    return desc.lower() in get_suffixes_list()
 
 
 class MastSlice(object):

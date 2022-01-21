@@ -81,7 +81,7 @@ class CopyPrimaryFiles(MarkedStage):
                 collection_type = get_collection_type(
                     suffix=suffix, instrument_id=instrument_name
                 )
-                coll = f"{collection_type}_{instrument_name}_{suffix}"
+                coll = f"{collection_type}_{instrument_name.lower()}_{suffix}"
 
                 new_path = fs.path.join(
                     to_segment_dir(bundle_segment),

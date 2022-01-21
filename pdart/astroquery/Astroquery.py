@@ -49,7 +49,7 @@ def _is_accepted_product_type_product_row(row: Row) -> bool:
     desc = str(row["productSubGroupDescription"])
     instrument = INSTRUMENT_FROM_LETTER_CODE[_instrument_key(row["obs_id"])]
     selected_suffixes = get_suffixes_list(instrument)
-    return desc.upper() in selected_suffixes
+    return desc.lower() in selected_suffixes
 
 
 def _is_selected_accepted_product_type_product_row(row: Row) -> bool:
