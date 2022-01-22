@@ -315,6 +315,7 @@ def get_suffixes_list(instrument_id=None):
                     suffix_li.append(key)
     return suffix_li
 
+
 # Return the suffixes considered raw data, in order of preference.
 def get_raw_suffix():
     suffix_li = []
@@ -324,7 +325,7 @@ def get_raw_suffix():
                 if key[-1] not in suffix_li:
                     suffix_li.append(key[-1])
             elif key not in suffix_li:
-                    suffix_li.append(key)
+                suffix_li.append(key)
     return suffix_li
 
 
