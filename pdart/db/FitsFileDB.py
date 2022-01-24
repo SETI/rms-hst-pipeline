@@ -20,12 +20,16 @@ def _populate_associations(
     # table.
     ASSOC_HDU_INDEX = 1
     bin_table = pyfits_obj[ASSOC_HDU_INDEX]  # type: ignore
-    assert isinstance(bin_table, astropy.io.fits.BinTableHDU), type(bin_table)
+    if not isinstance(bin_table, astropy.io.fits.BinTableHDU):
+        raise TypeError(f"HDU is {type(bin_table)}, not a binary table")
 
     # Asserting for now that the three columns are named MEMNAME,
     # MEMTYPE and MEMPRSNT.
     column_names = [col.name for col in bin_table.columns]
-    assert ["MEMNAME", "MEMTYPE", "MEMPRSNT"] == column_names, column_names
+    if ["MEMNAME", "MEMTYPE", "MEMPRSNT"] != column_names:
+        raise ValueError(f"column_names: {column_names} not equal to "
+                         + "['MEMNAME', 'MEMTYPE', 'MEMPRSNT']."
+                        )
 
     def create_assoc_dict(
         assoc_indx: int, memname: str, memtype: str, memprsnt: bool
