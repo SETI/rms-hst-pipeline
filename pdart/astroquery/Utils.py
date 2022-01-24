@@ -41,7 +41,7 @@ def get_table_with_retries(mast_call: Callable[[], Table], max_retries: int) -> 
             retry = retry + 1
             print(f"retry #{retry}: {e}")
             time.sleep(1)
-    assert False, "get_table_with_retries() timed out"
+    raise RuntimeError("get_table_with_retries() timed out")
 
 
 ############################################################
