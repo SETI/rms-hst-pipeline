@@ -87,11 +87,9 @@ def get_file_contents(
             data_type = BITPIX_TABLE[bitpix]
             elmt_arr = element_array({"data_type": data_type})
 
-            assert axes in [
-                1,
-                2,
-                3,
-            ], f"NAXIS = {axes} in hdu #{hdu_index} in {fits_product_lidvid}"
+            if axes not in [1, 2, 3]:
+                raise ValueError(f"NAXIS = {axes} in hdu #{hdu_index} in "
+                                 + f"{fits_product_lidvid}")
             if axes == 1:
                 data = data_1d_contents(
                     {
@@ -115,14 +113,17 @@ def get_file_contents(
                 # images.  We document them as such.  Well, four or
                 # two.  Well, four or two or maybe something else...
                 # Aw, we'll say four or two for now.
-                assert instrument == "wfpc2", f"NAXIS=3 and instrument={instrument}"
+                if instrument != "wfpc2":
+                    raise ValueError(f"NAXIS=3 and instrument={instrument}")
                 naxis3 = int(hdu_card_dict["NAXIS3"])
-                assert naxis3 in [
-                    2,
-                    4,
-                ], f"NAXIS1={hdu_card_dict['NAXIS1']}, NAXIS2={hdu_card_dict['NAXIS2']}, NAXIS3={hdu_card_dict['NAXIS3']}"
+                if naxis3 not in [2, 4]:
+                    raise ValueError(f"NAXIS1={hdu_card_dict['NAXIS1']}, "
+                                     + f"NAXIS2={hdu_card_dict['NAXIS2']}, "
+                                     + f"NAXIS3={hdu_card_dict['NAXIS3']}"
+                                    )
 
-                assert datSpan % naxis3 == 0, "datSpan={datSpan}"
+                if datSpan % naxis3 != 0:
+                    raise ValueError(f"datSpan={datSpan} & naxis3={naxis3}")
                 layerOffset = datSpan // naxis3
                 node_functions = [header]
                 for n in range(0, naxis3):
