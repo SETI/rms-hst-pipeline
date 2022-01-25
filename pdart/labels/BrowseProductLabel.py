@@ -34,17 +34,20 @@ def make_browse_product_label(
     """
     product: Product = bundle_db.get_product(browse_product_lidvid)
 
-    assert isinstance(product, BrowseProduct)
+    if not isinstance(product, BrowseProduct):
+        raise TypeError(f"{product} is not a BrowseProduct.")
     browse_product: BrowseProduct = product
 
     fits_product_lidvid = browse_product.fits_product_lidvid
     file: File = bundle_db.get_file(browse_file_basename, browse_product_lidvid)
-    assert isinstance(file, BrowseFile)
+    if not isinstance(file, BrowseFile):
+        raise TypeError(f"{file} is not a BrowseFile.")
     browse_file: BrowseFile = file
 
     collection: Collection = bundle_db.get_collection(browse_collection_lidvid)
 
-    assert isinstance(collection, OtherCollection)
+    if not isinstance(collection, OtherCollection):
+        raise TypeError(f"{collection} is not a OtherCollection.")
     browse_collection: OtherCollection = collection
 
     bundle = bundle_db.get_bundle(bundle_lidvid)
