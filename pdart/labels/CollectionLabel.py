@@ -129,7 +129,8 @@ def make_context_collection_label(
     # TODO this is sloppy; is there a better way?
     products = bundle_db.get_context_products()
     record_count = len(products)
-    assert record_count > 0, f"{collection_lidvid} has no context products"
+    if record_count <= 0:
+        raise ValueError(f"{collection_lidvid} has no context products.")
 
     collection_lid = lidvid_to_lid(collection_lidvid)
     collection_vid = lidvid_to_vid(collection_lidvid)
@@ -189,7 +190,8 @@ def make_schema_collection_label(
     # TODO this is sloppy; is there a better way?
     products = bundle_db.get_schema_products()
     record_count = len(products)
-    assert record_count > 0, f"{collection_lidvid} has no schema products"
+    if record_count <= 0:
+        raise ValueError(f"{collection_lidvid} has no schema products.")
 
     collection_lid = lidvid_to_lid(collection_lidvid)
     collection_vid = lidvid_to_vid(collection_lidvid)
@@ -249,7 +251,8 @@ def make_other_collection_label(
     # TODO this is sloppy; is there a better way?
     products = bundle_db.get_collection_products(collection_lidvid)
     record_count = len(products)
-    assert record_count > 0, f"{collection_lidvid} has no products"
+    if record_count <= 0:
+        raise ValueError(f"{collection_lidvid} has no products.")
 
     collection_lid = lidvid_to_lid(collection_lidvid)
     collection_vid = lidvid_to_vid(collection_lidvid)
@@ -328,12 +331,10 @@ def make_other_collection_label(
             # Get min start_time and max stop_time
             start_time, stop_time = bundle_db.get_roll_up_time_from_db(suffix)
             # Make sure start/stop time exists in db.
-            assert (
-                start_time is not None
-            ), "Start time is not stored in FitsProduct table."
-            assert (
-                stop_time is not None
-            ), "Stop time is not stored in FitsProduct table."
+            if start_time is None:
+                raise ValueError("Start time is not stored in FitsProduct table.")
+            if stop_time is None:
+                raise ValueError("Stop time is not stored in FitsProduct table.")
 
             start_stop_times = {
                 "start_date_time": start_time,
