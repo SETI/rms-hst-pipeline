@@ -45,12 +45,18 @@ class VersionContents(Generic[S]):
         VersionContents.create_from_lids() and
         VersionContents.create_from_lidvids().
         """
-        assert _data_consistent(contains_lidvids, subcomponents)
+        if not _data_consistent(contains_lidvids, subcomponents):
+            raise TypeError(
+                "Subcomponents are not consistent, should be all "
+                + "livids or all lids."
+            )
         self.contains_lidvids = contains_lidvids
         self.subcomponents: Set[S] = subcomponents
         for filepath in filepaths:
-            assert isabs(filepath)
-            assert fs.isfile(filepath)
+            if not isabs(filepath):
+                raise ValueError(f"{filepath} is not an absolute path.")
+            if not fs.isfile(filepath):
+                raise ValueError(f"{filepath} is not a file.")
         self.fs = fs
         self.filepaths = filepaths
 
