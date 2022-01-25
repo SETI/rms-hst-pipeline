@@ -48,7 +48,8 @@ class FSPrimAdapter(FS):
         if type(namespaces) is not list:
             namespaces = [namespaces]
         node = self._resolve_path_to_node(path)
-        assert node, path
+        if not node:
+            raise ValueError(f"Invalid path: {path}")
         info = {}  # Dict[str, Dict[str, object]]
         info["basic"] = {
             "is_dir": self.prims.is_dir(node),
