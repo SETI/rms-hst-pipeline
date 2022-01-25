@@ -228,7 +228,8 @@ class Multiversioned(MutableMapping):
         # TODO I can't see any reason why there wouldn't be exactly a
         # single segment, but I'm throwing in an assert to let me know
         # if I'm wrong.
-        assert len(bundle_segs) == 1
+        if len(bundle_segs) != 1:
+            raise ValueError(f"bundle_segs: {bundle_segs} is more than 1.")
 
         changed = False
 
@@ -311,5 +312,7 @@ class Multiversioned(MutableMapping):
             dst_filepath = fs.path.join(lidvid_dir, fs.path.relpath(src_filepath))
             self.fs.makedirs(fs.path.dirname(dst_filepath), None, True)
             fs.copy.copy_file(contents.fs, src_filepath, self.fs, dst_filepath)
-        assert self.fs.isdir(lidvid_path(lidvid))
-        assert lidvid in self
+        if not self.fs.isdir(lidvid_path(lidvid)):
+            raise ValueError(f"Lidvid path for {lidvid} is not a directory.")
+        if lidvid not in self:
+            raise IndexError(f"{lidvid} is not set in the wrapped filesystem.")
