@@ -27,9 +27,10 @@ def _populate_associations(
     # MEMTYPE and MEMPRSNT.
     column_names = [col.name for col in bin_table.columns]
     if ["MEMNAME", "MEMTYPE", "MEMPRSNT"] != column_names:
-        raise ValueError(f"column_names: {column_names} not equal to "
-                         + "['MEMNAME', 'MEMTYPE', 'MEMPRSNT']."
-                        )
+        raise ValueError(
+            f"column_names: {column_names} not equal to "
+            + "['MEMNAME', 'MEMTYPE', 'MEMPRSNT']."
+        )
 
     def create_assoc_dict(
         assoc_indx: int, memname: str, memtype: str, memprsnt: bool
