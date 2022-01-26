@@ -15,14 +15,19 @@ class VID(object):
         vs = vid_str.split(".")
 
         # Check requirements
-        assert len(vid_str) <= 255, "VID is too long"
-        assert len(vs) == 2, f"VID {vid_str} does not have two components"
+        if len(vid_str) > 255:
+            raise ValueError("VID is too long.")
+        if len(vs) != 2:
+            raise ValueError(f"VID {vid_str} does not have two components.")
         for v in vs:
-            assert re.match("\\A(0|[1-9][0-9]*)\\Z", v), f"VID is non-numeric: {v}"
+            if not re.match("\\A(0|[1-9][0-9]*)\\Z", v):
+                raise ValueError(f"VID is non-numeric: {v}")
 
         self._VID = vid_str
         self._major = int(vs[0])
-        assert self._major != 0  # the major version may not be zero
+        # the major version may not be zero
+        if self._major == 0:
+            raise ValueError("The major version cannot be zero.")
         self._minor = int(vs[1])
 
     def major(self) -> int:

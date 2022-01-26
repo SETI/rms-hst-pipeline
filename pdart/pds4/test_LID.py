@@ -150,7 +150,7 @@ class TestLID(unittest.TestCase):
 
     def test_create_lid_from_parts(self) -> None:
         parts: List[str] = []
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             LID.create_from_parts(parts)
 
         parts = ["b"]
@@ -163,7 +163,7 @@ class TestLID(unittest.TestCase):
         self.assertEqual(LID("urn:nasa:pds:b:c:p"), LID.create_from_parts(parts))
 
         parts = ["b", "c", "p", "x"]
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             LID.create_from_parts(parts)
 
     @given(lids())
