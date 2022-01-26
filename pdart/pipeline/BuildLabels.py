@@ -260,7 +260,9 @@ def create_pds4_labels(
             bundle_lidvid = str(bundle.lidvid)
             bundle_dir_path = _lidvid_to_dir(bundle_lidvid)
             label = make_bundle_label(self.db, bundle_lidvid, info, _VERIFY)
-            assert label[:6] == b"<?xml ", "Not XML"
+
+            if label[:6] != b"<?xml ":
+                raise ValueError("Bundle label is Not XML.")
 
             label_filename = "bundle.xml"
             label_filepath = fs.path.join(bundle_dir_path, label_filename)
@@ -354,7 +356,8 @@ def create_pds4_labels(
             )
 
             label_base = LIDVID(product_lidvid).lid().product_id
-            assert label_base
+            if not label_base:
+                raise ValueError("Failed to create label filename.")
             label_filename = label_base + ".xml"
             product_dir_path = _lidvid_to_dir(product_lidvid)
             label_filepath = fs.path.join(product_dir_path, label_filename)
@@ -371,7 +374,8 @@ def create_pds4_labels(
             browse_product = cast(
                 BrowseProduct, bundle_db.get_product(browse_product_lidvid)
             )
-            assert isinstance(browse_product, BrowseProduct)
+            if not isinstance(browse_product, BrowseProduct):
+                raise TypeError(f"{browse_product} is not BrowseProduct.")
             fits_product_lidvid = browse_product.fits_product_lidvid
             if not changes_dict.changed(LIDVID(fits_product_lidvid).lid()):
                 return
@@ -402,9 +406,9 @@ def create_pds4_labels(
             if not changes_dict.changed(LIDVID(product_lidvid).lid()):
                 return
             basename = bad_fits_file.basename
-            assert False, (
+            raise ValueError(
                 f"Not yet handling bad FITS file {basename} "
-                f"in product {product_lidvid}"
+                + f"in product {product_lidvid}"
             )
 
         def visit_fits_file(self, collection_lidvid: str, fits_file: FitsFile) -> None:
@@ -447,9 +451,10 @@ class BuildLabels(MarkedStage):
         archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
         archive_label_deltas_dir: str = self.archive_label_deltas_dir()
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for BuildLabels"
+        if os.path.isdir(self.deliverable_dir()):
+            raise ValueError(
+                f"{self.deliverable_dir()} cannot exist " + "for BuildLabels."
+            )
 
         changes_path = fs.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
