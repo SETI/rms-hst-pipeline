@@ -88,8 +88,9 @@ def get_file_contents(
             elmt_arr = element_array({"data_type": data_type})
 
             if axes not in [1, 2, 3]:
-                raise ValueError(f"NAXIS = {axes} in hdu #{hdu_index} in "
-                                 + f"{fits_product_lidvid}")
+                raise ValueError(
+                    f"NAXIS = {axes} in hdu #{hdu_index} in " + f"{fits_product_lidvid}"
+                )
             if axes == 1:
                 data = data_1d_contents(
                     {
@@ -117,10 +118,11 @@ def get_file_contents(
                     raise ValueError(f"NAXIS=3 and instrument={instrument}")
                 naxis3 = int(hdu_card_dict["NAXIS3"])
                 if naxis3 not in [2, 4]:
-                    raise ValueError(f"NAXIS1={hdu_card_dict['NAXIS1']}, "
-                                     + f"NAXIS2={hdu_card_dict['NAXIS2']}, "
-                                     + f"NAXIS3={hdu_card_dict['NAXIS3']}"
-                                    )
+                    raise ValueError(
+                        f"NAXIS1={hdu_card_dict['NAXIS1']}, "
+                        + f"NAXIS2={hdu_card_dict['NAXIS2']}, "
+                        + f"NAXIS3={hdu_card_dict['NAXIS3']}"
+                    )
 
                 if datSpan % naxis3 != 0:
                     raise ValueError(f"datSpan={datSpan} & naxis3={naxis3}")
