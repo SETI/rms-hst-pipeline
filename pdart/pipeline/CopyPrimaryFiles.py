@@ -37,7 +37,8 @@ class CopyPrimaryFiles(MarkedStage):
     def _copy_docs_files(
         self, bundle_segment: str, documents_dir: str, primary_files_dir: str
     ) -> None:
-        assert os.path.isdir(documents_dir)
+        if not os.path.isdir(documents_dir):
+            raise ValueError(f"{documents_dir} doesn't exist.")
         PDS_LOGGER.open("Copy docs files to document directory")
         with make_osfs(documents_dir) as documents_fs, make_sv_osfs(
             primary_files_dir
@@ -61,7 +62,8 @@ class CopyPrimaryFiles(MarkedStage):
     def _copy_fits_files(
         self, bundle_segment: str, mast_downloads_dir: str, primary_files_dir: str
     ) -> None:
-        assert os.path.isdir(mast_downloads_dir)
+        if not os.path.isdir(mast_downloads_dir):
+            raise ValueError(f"{mast_downloads_dir} doesn't exist.")
         PDS_LOGGER.open("Copy fits files to corresponding directories")
         with make_osfs(mast_downloads_dir) as mast_downloads_fs, make_sv_osfs(
             primary_files_dir
@@ -72,7 +74,8 @@ class CopyPrimaryFiles(MarkedStage):
             for filepath in mast_downloads_fs.walk.files(filter=["*.fits"]):
                 parts = fs.path.iteratepath(filepath)
                 depth = len(parts)
-                assert depth == 3, parts
+                if depth != 3:
+                    raise ValueError(f"{parts} length is not 3.")
                 # New way: product name comes from the filename
                 _, _, filename = parts
                 filename = filename.lower()
@@ -99,7 +102,8 @@ class CopyPrimaryFiles(MarkedStage):
                     mast_downloads_fs, filepath, primary_files_fs, new_path
                 )
 
-        assert os.path.isdir(primary_files_dir + "-sv"), primary_files_dir + "-sv"
+        if not os.path.isdir(primary_files_dir + "-sv"):
+            raise ValueError(f"{primary_files_dir + '-sv'} doesn't exist.")
         # # If I made it to here, it should be safe to delete the downloads
         # shutil.rmtree(mast_downloads_dir)
         # assert not os.path.isdir(mast_downloads_dir)
@@ -110,16 +114,20 @@ class CopyPrimaryFiles(MarkedStage):
         mast_downloads_dir: str = self.mast_downloads_dir()
         primary_files_dir: str = self.primary_files_dir()
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), f"{self.deliverable_dir()} cannot exist for CopyPrimaryFiles"
+        if os.path.isdir(self.deliverable_dir()):
+            raise ValueError(
+                f"{self.deliverable_dir()} cannot exist " + "for CopyPrimaryFiles"
+            )
 
-        assert self._bundle_segment.startswith("hst_")
-        assert self._bundle_segment[-5:].isdigit()
+        if not self._bundle_segment.startswith("hst_"):
+            raise ValueError(f"{self._bundle_segment} doesn't start " + "with 'hst'.")
+        if not self._bundle_segment[-5:].isdigit():
+            raise ValueError(f"{self._bundle_segment} doesn't end " + "with 5 digits.")
 
         self._copy_docs_files(self._bundle_segment, documents_dir, primary_files_dir)
         self._copy_fits_files(
             self._bundle_segment, mast_downloads_dir, primary_files_dir
         )
 
-        assert os.path.isdir(primary_files_dir + "-sv")
+        if not os.path.isdir(primary_files_dir + "-sv"):
+            raise ValueError(f"{primary_files_dir + '-sv'} doesn't exist.")
