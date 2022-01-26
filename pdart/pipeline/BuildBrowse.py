@@ -202,9 +202,10 @@ class BuildBrowse(MarkedStage):
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
         archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for BuildBrowse"
+        if os.path.isdir(self.deliverable_dir()):
+            raise ValueError(
+                f"{self.deliverable_dir()} cannot exist " + "for BuildBrowse."
+            )
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
