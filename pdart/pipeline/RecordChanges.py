@@ -104,7 +104,8 @@ def _get_primary_changes(
             for dir in primary_dirs:
                 full_dirpath = join(dirpath, relpath(dir))
                 lid = dirpath_to_lid(full_dirpath)
-                assert lid in result.changes_dict
+                if lid not in result.changes_dict:
+                    raise KeyError(f"{lid} not in changes_dict.")
                 if result.changed(lid):
                     PDS_LOGGER.log(
                         "info", f"CHANGE DETECTED in {dirpath}: {lid} changed"
@@ -207,12 +208,15 @@ class RecordChanges(MarkedStage):
         primary_files_dir: str = self.primary_files_dir()
         archive_dir: str = self.archive_dir()
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for RecordChanges"
+        if os.path.isdir(self.deliverable_dir()):
+            raise ValueError(
+                f"{self.deliverable_dir()} cannot exist " + "for RecordChanges"
+            )
 
-        assert os.path.isdir(working_dir), working_dir
-        assert os.path.isdir(primary_files_dir + "-sv"), primary_files_dir
+        if not os.path.isdir(working_dir):
+            raise ValueError(f"{working_dir} doesn't exist.")
+        if not os.path.isdir(primary_files_dir + "-sv"):
+            raise ValueError(f"{primary_files_dir}-sv doesn't exist.")
 
         changes: Dict[LIDVID, bool] = dict()
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
@@ -231,5 +235,9 @@ class RecordChanges(MarkedStage):
                     print("#### LATEST_VERSION ################")
                     latest_version.tree()
 
-        assert os.path.isdir(primary_files_dir + "-sv")
-        assert os.path.isfile(os.path.join(working_dir, CHANGES_DICT_NAME))
+        if not os.path.isdir(primary_files_dir + "-sv"):
+            raise ValueError(f"{primary_files_dir}-sv doesn't exist.")
+        if not os.path.isfile(os.path.join(working_dir, CHANGES_DICT_NAME)):
+            raise ValueError(
+                f"{os.path.join(working_dir, CHANGES_DICT_NAME)} " + "doesn't exist."
+            )
