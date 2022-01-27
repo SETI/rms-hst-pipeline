@@ -51,7 +51,7 @@ def _populate_bundle(changes_dict: ChangesDict, db: BundleDB) -> LIDVID:
             db.create_bundle(str(lidvid))
             # there's only one, so return it
             return lidvid
-    raise ValueError("No changed bundle LID in changes_dict.")
+    raise RuntimeError("No changed bundle LID in changes_dict.")
 
 
 def _populate_collections(changes_dict: ChangesDict, db: BundleDB) -> None:
@@ -172,7 +172,7 @@ class PopulateDatabase(MarkedStage):
 
         if os.path.isdir(self.deliverable_dir()):
             raise ValueError(
-                f"{self.deliverable_dir()} cannot exist " + "for PopulateDatabase."
+                f"{self.deliverable_dir()} cannot exist for PopulateDatabase."
             )
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)

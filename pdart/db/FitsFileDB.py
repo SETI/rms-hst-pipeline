@@ -21,7 +21,7 @@ def _populate_associations(
     ASSOC_HDU_INDEX = 1
     bin_table = pyfits_obj[ASSOC_HDU_INDEX]  # type: ignore
     if not isinstance(bin_table, astropy.io.fits.BinTableHDU):
-        raise TypeError(f"HDU is {type(bin_table)}, not a binary table")
+        raise TypeError(f"HDU is {type(bin_table)}, not a binary table.")
 
     # Asserting for now that the three columns are named MEMNAME,
     # MEMTYPE and MEMPRSNT.

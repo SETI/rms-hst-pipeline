@@ -89,7 +89,7 @@ def get_file_contents(
 
             if axes not in [1, 2, 3]:
                 raise ValueError(
-                    f"NAXIS = {axes} in hdu #{hdu_index} in " + f"{fits_product_lidvid}"
+                    f"NAXIS = {axes} in hdu #{hdu_index} in {fits_product_lidvid}."
                 )
             if axes == 1:
                 data = data_1d_contents(
@@ -115,13 +115,13 @@ def get_file_contents(
                 # two.  Well, four or two or maybe something else...
                 # Aw, we'll say four or two for now.
                 if instrument != "wfpc2":
-                    raise ValueError(f"NAXIS=3 and instrument={instrument}")
+                    raise ValueError(f"NAXIS=3 and instrument={instrument}.")
                 naxis3 = int(hdu_card_dict["NAXIS3"])
                 if naxis3 not in [2, 4]:
                     raise ValueError(
                         f"NAXIS1={hdu_card_dict['NAXIS1']}, "
                         + f"NAXIS2={hdu_card_dict['NAXIS2']}, "
-                        + f"NAXIS3={hdu_card_dict['NAXIS3']}"
+                        + f"NAXIS3={hdu_card_dict['NAXIS3']}."
                     )
 
                 if datSpan % naxis3 != 0:

@@ -188,5 +188,5 @@ def make_bundle_label(
         raise LabelError(bundle.lidvid) from e
 
     if label[:6] != b"<?xml ":
-        raise ValueError("Bundle label is not XML")
+        raise ValueError("Bundle label is not XML.")
     return pretty_and_verify(label, verify)

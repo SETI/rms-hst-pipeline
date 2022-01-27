@@ -184,7 +184,7 @@ class StateMachine2(object):
             for i, (name, stage) in enumerate(self.stages):
                 if name == phase:
                     return i
-            raise ValueError(f"Unknown phase {phase}.")
+            raise RuntimeError(f"Unknown phase {phase}.")
 
         i = phase_index()
         try:

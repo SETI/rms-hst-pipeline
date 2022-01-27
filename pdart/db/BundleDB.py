@@ -1281,7 +1281,7 @@ class BundleDB(object):
             self.session.commit()
             if not self.bundle_label_exists(bundle_lidvid):
                 raise ValueError(
-                    f"Bundle label for {bundle_lidvid} " + "doesn't exist."
+                    f"Bundle label for {bundle_lidvid} doesn't exist."
                 )
 
     def bundle_label_exists(self, bundle_lidvid: str) -> bool:
@@ -1328,7 +1328,7 @@ class BundleDB(object):
             self.session.commit()
             if not self.collection_label_exists(collection_lidvid):
                 raise ValueError(
-                    f"Collection label for {collection_lidvid} " + "doesn't exist."
+                    f"Collection label for {collection_lidvid} doesn't exist."
                 )
 
     def collection_label_exists(self, collection_lidvid: str) -> bool:
@@ -1375,7 +1375,7 @@ class BundleDB(object):
             self.session.commit()
             if not self.collection_inventory_exists(collection_lidvid):
                 raise ValueError(
-                    f"Collection inventory for {collection_lidvid} " + "doesn't exist."
+                    f"Collection inventory for {collection_lidvid} doesn't exist."
                 )
 
     def collection_inventory_exists(self, collection_lidvid: str) -> bool:
@@ -1422,7 +1422,7 @@ class BundleDB(object):
             self.session.commit()
             if not self.product_label_exists(product_lidvid):
                 raise ValueError(
-                    f"Product label for {product_lidvid} " + "doesn't exist."
+                    f"Product label for {product_lidvid} doesn't exist."
                 )
 
     def product_label_exists(self, product_lidvid: str) -> bool:
@@ -1519,7 +1519,7 @@ class BundleDB(object):
             self.session.commit()
             if not self.context_product_label_exists(lidvid):
                 raise ValueError(
-                    f"Context product label for {lidvid} " + "doesn't exist."
+                    f"Context product label for {lidvid} doesn't exist."
                 )
 
     def context_product_label_exists(self, lidvid: str) -> bool:

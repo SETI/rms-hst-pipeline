@@ -78,11 +78,11 @@ def read_changes_dict(changes_path: str) -> CHANGES_DICT:
             if parts:
                 if len(parts) != 3:
                     raise ValueError(
-                        f"Length of parts {parts} for " + "changes_dict is not 3."
+                        f"Length of parts {parts} for changes_dict is not 3."
                     )
                 lid, vid, changed = parts
                 if changed not in ["False", "True"]:
-                    raise ValueError(f"{changed} from parts has " + "unexpected value.")
+                    raise ValueError(f"{changed} from parts has unexpected value.")
                 changes_dict[LID(lid)] = (VID(vid), changed == "True")
     return ChangesDict(changes_dict)
 

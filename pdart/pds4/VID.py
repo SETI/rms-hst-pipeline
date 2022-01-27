@@ -21,7 +21,7 @@ class VID(object):
             raise ValueError(f"VID {vid_str} does not have two components.")
         for v in vs:
             if not re.match("\\A(0|[1-9][0-9]*)\\Z", v):
-                raise ValueError(f"VID is non-numeric: {v}")
+                raise ValueError(f"VID is non-numeric: {v}.")
 
         self._VID = vid_str
         self._major = int(vs[0])

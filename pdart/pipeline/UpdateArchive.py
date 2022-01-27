@@ -21,7 +21,7 @@ class UpdateArchive(MarkedStage):
 
         if os.path.isdir(self.deliverable_dir()):
             raise ValueError(
-                f"{self.deliverable_dir()} cannot exist " + "for UpdateArchive."
+                f"{self.deliverable_dir()} cannot exist for UpdateArchive."
             )
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
@@ -46,15 +46,15 @@ class UpdateArchive(MarkedStage):
 
         if os.path.isdir(archive_primary_deltas_dir + "-deltas-sv"):
             raise ValueError(
-                f"{archive_primary_deltas_dir}-deltas-sv " + "shouldn't exist."
+                f"{archive_primary_deltas_dir}-deltas-sv shouldn't exist."
             )
         if os.path.isdir(archive_browse_deltas_dir + "-deltas-sv"):
             raise ValueError(
-                f"{archive_browse_deltas_dir}-deltas-sv " + "shouldn't exist."
+                f"{archive_browse_deltas_dir}-deltas-sv shouldn't exist."
             )
         if os.path.isdir(archive_label_deltas_dir + "-deltas-sv"):
             raise ValueError(
-                f"{archive_label_deltas_dir}-deltas-sv " + "shouldn't exist."
+                f"{archive_label_deltas_dir}-deltas-sv shouldn't exist."
             )
         if not os.path.isdir(archive_dir):
             raise ValueError(f"{archive_dir} doesn't exist.")

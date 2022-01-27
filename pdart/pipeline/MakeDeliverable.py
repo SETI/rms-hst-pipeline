@@ -84,7 +84,7 @@ class MakeDeliverable(MarkedStage):
         PDS_LOGGER.open("Create deliverable directory")
         if os.path.isdir(deliverable_dir):
             raise ValueError(
-                f"{deliverable_dir} cannot exist " + "for MakeDeliverable."
+                f"{deliverable_dir} cannot exist for MakeDeliverable."
             )
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)

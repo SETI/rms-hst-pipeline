@@ -67,7 +67,7 @@ class CheckDownloads(MarkedStage):
 
         if os.path.isdir(self.deliverable_dir()):
             raise ValueError(
-                f"{self.deliverable_dir()} cannot exist " + "for CheckDownloads"
+                f"{self.deliverable_dir()} cannot exist for CheckDownloads."
             )
 
         if not os.path.isdir(mast_downloads_dir):

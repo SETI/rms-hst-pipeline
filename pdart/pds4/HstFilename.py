@@ -18,7 +18,7 @@ class HstFilename(object):
     def __init__(self, filename: str) -> None:
         self.filename = filename
         if len(basename(filename)) <= 6:
-            raise ValueError("Filename must be at least six characters long")
+            raise ValueError("Filename must be at least six characters long.")
         basename2 = basename(filename)
         if basename2[0].upper() not in ACCEPTED_INSTRUMENTS:
             raise ValueError(
@@ -70,7 +70,7 @@ class HstFilename(object):
         match = re.match(r"\A([^_]+)_.*\Z", self._basename())
         if not match:
             raise ValueError(
-                f"filename: {self._basename()} rootname doesn't "
+                f"Filename: {self._basename()} rootname doesn't "
                 + "match the expected pattern."
             )
         return str(match.group(1)).lower()
@@ -84,7 +84,7 @@ class HstFilename(object):
         match = re.match(r"\A[^_]+_([^.]+)\..*\Z", self._basename())
         if not match:
             raise ValueError(
-                f"filename: {self._basename()} suffix doesn't "
+                f"Filename: {self._basename()} suffix doesn't "
                 + "match the expected pattern."
             )
         return str(match.group(1)).lower()

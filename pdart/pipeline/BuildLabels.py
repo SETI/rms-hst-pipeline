@@ -406,7 +406,7 @@ def create_pds4_labels(
             if not changes_dict.changed(LIDVID(product_lidvid).lid()):
                 return
             basename = bad_fits_file.basename
-            raise ValueError(
+            raise RuntimeError(
                 f"Not yet handling bad FITS file {basename} "
                 + f"in product {product_lidvid}"
             )
@@ -453,7 +453,7 @@ class BuildLabels(MarkedStage):
 
         if os.path.isdir(self.deliverable_dir()):
             raise ValueError(
-                f"{self.deliverable_dir()} cannot exist " + "for BuildLabels."
+                f"{self.deliverable_dir()} cannot exist for BuildLabels."
             )
 
         changes_path = fs.path.join(working_dir, CHANGES_DICT_NAME)

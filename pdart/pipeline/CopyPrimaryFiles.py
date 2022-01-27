@@ -116,13 +116,13 @@ class CopyPrimaryFiles(MarkedStage):
 
         if os.path.isdir(self.deliverable_dir()):
             raise ValueError(
-                f"{self.deliverable_dir()} cannot exist " + "for CopyPrimaryFiles"
+                f"{self.deliverable_dir()} cannot exist for CopyPrimaryFiles."
             )
 
         if not self._bundle_segment.startswith("hst_"):
-            raise ValueError(f"{self._bundle_segment} doesn't start " + "with 'hst'.")
+            raise ValueError(f"{self._bundle_segment} doesn't start with 'hst'.")
         if not self._bundle_segment[-5:].isdigit():
-            raise ValueError(f"{self._bundle_segment} doesn't end " + "with 5 digits.")
+            raise ValueError(f"{self._bundle_segment} doesn't end with 5 digits.")
 
         self._copy_docs_files(self._bundle_segment, documents_dir, primary_files_dir)
         self._copy_fits_files(

@@ -108,11 +108,11 @@ class COWFS(FS):
 
     def invariant(self) -> bool:
         if not self.additions_fs:
-            raise ValueError(f"Invalid additions_fs: {self.additions_fs}")
+            raise ValueError(f"Invalid additions_fs: {self.additions_fs}.")
         if not self.deletions_fs:
-            raise ValueError(f"Invalid deletions_fs: {self.additions_fs}")
+            raise ValueError(f"Invalid deletions_fs: {self.additions_fs}.")
         if not self.base_fs:
-            raise ValueError(f"Invalid base_fs: {self.base_fs}")
+            raise ValueError(f"Invalid base_fs: {self.base_fs}.")
 
         _deletions_invariant(self.deletions_fs)
 
@@ -209,7 +209,7 @@ class COWFS(FS):
                 raw_info["basic"] = {"name": "", "is_dir": True}
             return Info(raw_info)
         else:
-            raise ValueError(f"unknown layer {layer}")
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def getsyspath(self, path: str) -> str:
         self.check()
@@ -224,7 +224,7 @@ class COWFS(FS):
         elif layer == ROOT_LAYER:
             raise fs.errors.NoSysPath(path=path)
         else:
-            raise ValueError(f"unknown layer {layer}")
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def listdir(self, path: str) -> List[str]:
         self.check()
@@ -258,7 +258,7 @@ class COWFS(FS):
             # Return the entries that actually exist.
             return [name for name in list(names) if self.layer(name) != NO_LAYER]
         else:
-            raise ValueError(f"unknown layer {layer}")
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def makedir(
         self,
@@ -292,7 +292,7 @@ class COWFS(FS):
                 # I think this is wrong.  What if it's a file?
                 raise fs.errors.DirectoryExists(path)
         else:
-            raise ValueError(f"unknown layer {layer}")
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def openbin(
         self, path: str, mode: str = "r", buffering: int = -1, **options: Any
@@ -330,7 +330,7 @@ class COWFS(FS):
         elif layer == ROOT_LAYER:
             raise fs.errors.FileExpected(path)
         else:
-            raise ValueError(f"unknown layer {layer}")
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def remove(self, path: str) -> None:
         self.check()
@@ -349,7 +349,7 @@ class COWFS(FS):
         elif layer == ROOT_LAYER:
             raise fs.errors.FileExpected(path)
         else:
-            raise ValueError(f"unknown layer {layer}")
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def removedir(self, path: str) -> None:
         self.check()
@@ -370,7 +370,7 @@ class COWFS(FS):
         elif layer == ROOT_LAYER:
             raise fs.errors.RemoveRootError(path)
         else:
-            raise ValueError(f"unknown layer {layer}")
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def setinfo(self, path: str, info: _INFO_DICT) -> None:
         self.check()
@@ -386,7 +386,7 @@ class COWFS(FS):
         elif layer == ROOT_LAYER:
             pass
         else:
-            raise ValueError(f"unknown layer {layer}")
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     ############################################################
 

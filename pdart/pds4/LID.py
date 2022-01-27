@@ -19,9 +19,9 @@ class LID(object):
 
         # Check requirements
         if len(lid_str) > 255:
-            raise ValueError(f"{lid_str} length should be <= 255")
+            raise ValueError(f"{lid_str} length should be <= 255.")
         if len(ids) not in [4, 5, 6]:
-            raise ValueError(f"The number of {lid_str} sections are out " + "of range.")
+            raise ValueError(f"The number of {lid_str} sections are out of range.")
         if ids[0] != "urn" or ids[1] != "nasa" or ids[2] != "pds":
             raise ValueError(f"{lid_str} doesn't start with 'urn:nasa:pds'.")
         allowed_chars_re = r"\A[-._a-z0-9]+\Z"
@@ -105,7 +105,7 @@ class LID(object):
         collection_id_parts = self.collection_id.split("_")
         if collection_id_parts[0] != "data":
             raise ValueError(
-                f"to_browse_lid: Only legal within " + f"data_ collections; had {self}"
+                f"to_browse_lid: Only legal within data_ collections; had {self}."
             )
         collection_id_parts[0] = "browse"
         browse_collection_id = "_".join(collection_id_parts)
@@ -125,7 +125,7 @@ class LID(object):
         collection_id_parts = self.collection_id.split("_")
         if collection_id_parts[0] != "browse":
             raise ValueError(
-                f"to_data_lid: Only legal within " + f"browse_ collections; had {self}"
+                f"to_data_lid: Only legal within browse_ collections; had {self}."
             )
         collection_id_parts[0] = "data"
         data_collection_id = "_".join(collection_id_parts)
@@ -146,7 +146,7 @@ class LID(object):
         if collection_id_parts[0] != "data":
             raise ValueError(
                 f"to_other_suffixed_lid: Only legal within "
-                + f"data_ collections; had {self}"
+                + f"data_ collections; had {self}."
             )
         # replace the suffix
         collection_id_parts[2] = suffix

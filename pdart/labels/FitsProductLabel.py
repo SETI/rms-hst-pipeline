@@ -99,7 +99,7 @@ def _raw_sibling_file(siblings: List[str]) -> Tuple[str, str]:
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
-    raise ValueError(f"siblings={siblings}; RAW_SUFFIXES={RAW_SUFFIXES}")
+    raise RuntimeError(f"siblings={siblings}; RAW_SUFFIXES={RAW_SUFFIXES}")
 
 
 def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
@@ -107,7 +107,7 @@ def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
-    raise ValueError(f"siblings={siblings}; SHM_SUFFIXES={SHM_SUFFIXES}")
+    raise RuntimeError(f"siblings={siblings}; SHM_SUFFIXES={SHM_SUFFIXES}")
 
 
 def _sibling_file(siblings: List[str], suffix: str) -> Optional[str]:

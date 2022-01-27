@@ -240,7 +240,7 @@ def get_detector_ids(data_lookups: List[Lookup], shm_lookup: Lookup) -> List[str
         # Example: config = HSP/UNK/VIS
         parts = config.split("/")
         if parts[0] != "HSP":
-            raise ValueError(f"Invalid CONFIG value in {fname(lookup)}")
+            raise ValueError(f"Invalid CONFIG value in {fname(lookup)}.")
         result = [p for p in parts[1:] if p != "UNK"]
     elif instrument == "WFC3" and channel == "UVIS":
         ccds = get_ccds_from_lookups(data_lookups, "CCDCHIP")
@@ -257,7 +257,7 @@ def get_detector_ids(data_lookups: List[Lookup], shm_lookup: Lookup) -> List[str
                 "unknown detector subset in (%d/4) in %s" % (count, fname(lookup))
             )
         if channel not in ("PC", "WFC"):
-            raise ValueError(f"Bad channel for {fname(lookup)}")
+            raise ValueError(f"Bad channel for {fname(lookup)}.")
         if channel == "WFC":
             result = ["WF1", "WF2", "WF3", "WF4"]
         else:
@@ -514,7 +514,7 @@ def get_mast_observation_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> s
         except KeyError:
             pass
 
-    raise ValueError(f"lookup = {lookup}, shm_lookup = {shm_lookup}")
+    raise RuntimeError(f"lookup = {lookup}, shm_lookup = {shm_lookup}")
 
 
 ##############################

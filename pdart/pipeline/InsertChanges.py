@@ -72,7 +72,7 @@ class InsertChanges(MarkedStage):
         PDS_LOGGER.open("Create a directory for a new version of the bundle")
         if os.path.isdir(self.deliverable_dir()):
             raise ValueError(
-                f"{self.deliverable_dir()} cannot exist " + "for InsertChanges."
+                f"{self.deliverable_dir()} cannot exist for InsertChanges."
             )
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)

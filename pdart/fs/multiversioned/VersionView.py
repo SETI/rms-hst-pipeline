@@ -43,7 +43,7 @@ class VersionView(FS):
         if not isinstance(mv, Multiversioned):
             raise TypeError(f"{mv} is not Multiversioned.")
         FS.__init__(self)
-        if not lidvid in mv:
+        if lidvid not in mv:
             raise ValueError(f"{lidvid} is not in mv.")
         self.multiversioned = mv
         self.lidvid = lidvid

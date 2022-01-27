@@ -167,9 +167,9 @@ def probatron_with_svrl_result(
     """
     exit_code, stderr, stdout = probatron_with_stdin(filepath, stdin, schema)
     if stderr != b"":
-        raise RuntimeError(f"stderr = {stderr!r}")
+        raise RuntimeError(f"stderr = {stderr!r}.")
     if exit_code != 0:
-        raise RuntimeError(f"exit_code = {exit_code!r}")
+        raise RuntimeError(f"exit_code = {exit_code!r}.")
     return xml.dom.minidom.parseString(stdout)
 
 
