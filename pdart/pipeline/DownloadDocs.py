@@ -16,7 +16,8 @@ class DownloadDocs(MarkedStage):
     """
 
     def _do_download_docs(self, documents_dir: str, proposal_id: int) -> None:
-        assert not os.path.isdir(documents_dir)
+        if os.path.isdir(documents_dir):
+            raise ValueError(f"{documents_dir} shouldn't exist at this stage.")
         os.makedirs(documents_dir)
         docs = download_product_documents(proposal_id, documents_dir)
         convert_documents_to_utf8(documents_dir, docs)
@@ -26,4 +27,5 @@ class DownloadDocs(MarkedStage):
         if not os.path.isdir(documents_dir):
             self._do_download_docs(documents_dir, self._proposal_id)
 
-        assert os.path.isdir(documents_dir)
+        if not os.path.isdir(documents_dir):
+            raise ValueError(f"{documents_dir} doesn't exist.")

@@ -82,9 +82,10 @@ class MakeDeliverable(MarkedStage):
         deliverable_dir: str = self.deliverable_dir()
         manifest_dir: str = self.manifest_dir()
         PDS_LOGGER.open("Create deliverable directory")
-        assert not os.path.isdir(
-            deliverable_dir
-        ), "{deliverable_dir} cannot exist for MakeDeliverable"
+        if os.path.isdir(deliverable_dir):
+            raise ValueError(
+                f"{deliverable_dir} cannot exist " + "for MakeDeliverable."
+            )
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
