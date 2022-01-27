@@ -88,7 +88,7 @@ def make_sv_deltas(base_fs: FS, cow_dirpath: str) -> Generator[COWFS, None, None
         print(f"{cat_base_fs}, {cat_fs}")
         show_tree("base_fs", base_fs)
         show_tree("fs", fs)
-        assert False
+        raise RuntimeError(f"{cat_base_fs} not equal to {cat_fs}.")
     yield fs
     fs.close()
 
@@ -112,17 +112,18 @@ def make_mv_deltas(base_fs: FS, cow_dirpath: str) -> Generator[COWFS, None, None
         print(f"{cat_base_fs}, {cat_fs}")
         show_tree("base_fs", base_fs)
         show_tree("fs", fs)
-        assert False
+        raise RuntimeError(f"{cat_base_fs} not equal to {cat_fs}.")
     yield fs
     fs.close()
 
 
 @contextmanager
 def make_multiversioned(archive_osfs: FS) -> Generator[Multiversioned, None, None]:
-    assert categorize_filesystem(archive_osfs) in [
+    if categorize_filesystem(archive_osfs) not in [
         EMPTY_FS_TYPE,
         MULTIVERSIONED_FS_TYPE,
-    ], categorize_filesystem(archive_osfs)
+    ]:
+        raise ValueError(categorize_filesystem(archive_osfs))
     yield Multiversioned(archive_osfs)
 
 
@@ -137,10 +138,11 @@ def make_version_view(
     with make_multiversioned(archive_osfs) as mv:
         lid = LID("urn:nasa:pds:" + str(bundle_segment))
         res = mv.create_version_view(lid)
-        assert categorize_filesystem(res) in [
+        if categorize_filesystem(res) not in [
             EMPTY_FS_TYPE,
             SINGLE_VERSIONED_FS_TYPE,
-        ], categorize_filesystem(res)
+        ]:
+            raise ValueError(categorize_filesystem(res))
 
         yield res
         res.close()

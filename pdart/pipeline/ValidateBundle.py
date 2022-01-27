@@ -16,9 +16,8 @@ class ValidateBundle(MarkedStage):
 
     def _run(self) -> None:
         working_dir: str = self.working_dir()
-        assert os.path.isdir(
-            self.deliverable_dir()
-        ), f"Need {self.deliverable_dir()} for ValidateBundle"
+        if not os.path.isdir(self.deliverable_dir()):
+            raise ValueError(f"Need {self.deliverable_dir()} for ValidateBundle.")
 
         completed_process: CompletedProcess = run(
             [
@@ -32,4 +31,5 @@ class ValidateBundle(MarkedStage):
 
         changes_dict_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         os.remove(changes_dict_path)
-        assert not os.path.isfile(changes_dict_path)
+        if os.path.isfile(changes_dict_path):
+            raise ValueError(f"{changes_dict_path} doesn't exist.")
