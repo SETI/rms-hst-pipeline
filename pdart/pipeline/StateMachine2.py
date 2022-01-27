@@ -96,7 +96,7 @@ class ChangeFiles(MarkedStage):
                         PDS_LOGGER.close()
                         return
                     which_file = which_file - 1
-                assert False, "fell off the end of change_fits_file in ChangeFiles"
+                raise RuntimeError("Fell off the end of change_fits_file in ChangeFiles.")
 
             def _delete_directory() -> None:
                 PDS_LOGGER.open("Delete directory")
@@ -106,7 +106,7 @@ class ChangeFiles(MarkedStage):
                         mast_fs.removetree(path)
                         PDS_LOGGER.close()
                         return
-                assert False, "fell off the end of delete_directory in ChangeFiles"
+                raise RuntimeError("Fell off the end of delete_directory in ChangeFiles.")
 
             # _change_fits_file()
             _delete_directory()
@@ -180,7 +180,7 @@ class StateMachine2(object):
             for i, (name, stage) in enumerate(self.stages):
                 if name == phase:
                     return i
-            assert False, f"unknown phase {phase}"
+            raise ValueError(f"Unknown phase {phase}.")
 
         i = phase_index()
         try:
@@ -195,7 +195,8 @@ class StateMachine2(object):
         while stage is not None:
             stage()
             marker_info = self.marker_file.get_marker()
-            assert marker_info is not None
+            if marker_info is None:
+                raise ValueError(f"marker_info: {marker_info}")
             if marker_info.state == "SUCCESS":
                 stage = self.next_stage(marker_info.phase)
             else:
