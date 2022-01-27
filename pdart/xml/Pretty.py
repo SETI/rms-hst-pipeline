@@ -15,10 +15,12 @@ def pretty_print(str: bytes) -> bytes:
 
 
 def pretty_and_verify(label: bytes, verify: bool) -> bytes:
-    assert label[:6] == b"<?xml ", "Not XML"
+    if label[:6] != b"<?xml ":
+        raise ValueError("label is Not XML.")
     label = pretty_print(label)
 
-    assert label[:6] == b"<?xml ", "Not XML"
+    if label[:6] != b"<?xml ":
+        raise ValueError("label is Not XML.")
     if verify:
         verify_label_or_raise(label)
     return label
