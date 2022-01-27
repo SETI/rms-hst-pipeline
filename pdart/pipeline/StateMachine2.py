@@ -96,7 +96,9 @@ class ChangeFiles(MarkedStage):
                         PDS_LOGGER.close()
                         return
                     which_file = which_file - 1
-                raise RuntimeError("Fell off the end of change_fits_file in ChangeFiles.")
+                raise RuntimeError(
+                    "Fell off the end of change_fits_file in ChangeFiles."
+                )
 
             def _delete_directory() -> None:
                 PDS_LOGGER.open("Delete directory")
@@ -106,7 +108,9 @@ class ChangeFiles(MarkedStage):
                         mast_fs.removetree(path)
                         PDS_LOGGER.close()
                         return
-                raise RuntimeError("Fell off the end of delete_directory in ChangeFiles.")
+                raise RuntimeError(
+                    "Fell off the end of delete_directory in ChangeFiles."
+                )
 
             # _change_fits_file()
             _delete_directory()

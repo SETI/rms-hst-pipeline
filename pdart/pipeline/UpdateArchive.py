@@ -19,9 +19,10 @@ class UpdateArchive(MarkedStage):
         archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
         archive_label_deltas_dir: str = self.archive_label_deltas_dir()
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for UpdateArchive"
+        if os.path.isdir(self.deliverable_dir()):
+            raise ValueError(
+                f"{self.deliverable_dir()} cannot exist " + "for UpdateArchive."
+            )
 
         with make_osfs(archive_dir) as archive_osfs, make_version_view(
             archive_osfs, self._bundle_segment
@@ -43,7 +44,17 @@ class UpdateArchive(MarkedStage):
         shutil.rmtree(archive_browse_deltas_dir + "-deltas-sv")
         shutil.rmtree(archive_label_deltas_dir + "-deltas-sv")
 
-        assert not os.path.isdir(archive_primary_deltas_dir + "-deltas-sv")
-        assert not os.path.isdir(archive_browse_deltas_dir + "-deltas-sv")
-        assert not os.path.isdir(archive_label_deltas_dir + "-deltas-sv")
-        assert os.path.isdir(archive_dir)
+        if os.path.isdir(archive_primary_deltas_dir + "-deltas-sv"):
+            raise ValueError(
+                f"{archive_primary_deltas_dir}-deltas-sv " + "shouldn't exist."
+            )
+        if os.path.isdir(archive_browse_deltas_dir + "-deltas-sv"):
+            raise ValueError(
+                f"{archive_browse_deltas_dir}-deltas-sv " + "shouldn't exist."
+            )
+        if os.path.isdir(archive_label_deltas_dir + "-deltas-sv"):
+            raise ValueError(
+                f"{archive_label_deltas_dir}-deltas-sv " + "shouldn't exist."
+            )
+        if not os.path.isdir(archive_dir):
+            raise ValueError(f"{archive_dir} doesn't exist.")
