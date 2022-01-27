@@ -120,33 +120,64 @@ def interpret_document_template(template: str) -> DocTemplate:
                     param = dictionary[param_name]
                     if type(param) in [str]:
                         elmt = doc.createTextNode(param)
-                        assert isinstance(elmt, xml.dom.Node), param_name
+                        if not isinstance(elmt, xml.dom.Node):
+                            raise TypeError(
+                                "Failed to create NODE based "
+                                + f"on info keyed by {param_name} "
+                                + "in dictionary."
+                            )
                         stack.append(elmt)
                     elif type(param) in [int, float]:
                         elmt = doc.createTextNode(str(param))
-                        assert isinstance(elmt, xml.dom.Node), param_name
+                        if not isinstance(elmt, xml.dom.Node):
+                            raise TypeError(
+                                "Failed to create NODE based "
+                                + f"on info keyed by {param_name} "
+                                + "in dictionary."
+                            )
                         stack.append(elmt)
                     else:
-                        assert _is_function(
-                            param
-                        ), f"{param_name} is type {type(param)}; should be function"
+                        if not _is_function(param):
+                            raise ValueError(
+                                f"{param_name} is type "
+                                + f"{type(param)}; should be function."
+                            )
                         elmt = param(doc)
                         if isinstance(elmt, list):
                             for e in elmt:
-                                assert isinstance(e, xml.dom.Node), param_name
-                        else:
-                            assert isinstance(elmt, xml.dom.Node), param_name
+                                if not isinstance(e, xml.dom.Node):
+                                    raise TypeError(
+                                        "Failed to create NODE based "
+                                        + f"on info keyed by {param_name} "
+                                        + "in dictionary."
+                                    )
+                        elif not isinstance(elmt, xml.dom.Node):
+                            raise TypeError(
+                                "Failed to create NODE based "
+                                + f"on info keyed by {param_name} "
+                                + "in dictionary."
+                            )
                         stack.append(elmt)
                 elif name == "FRAGMENT":
                     param_name = attrs["name"]
                     param = dictionary[param_name]
-                    assert _is_function(
-                        param
-                    ), "{param_name} is type {type(param)}; should be function"
+                    if not _is_function(param):
+                        raise ValueError(
+                            f"{param_name} is type "
+                            + f"{type(param)}; should be function."
+                        )
                     elmts = param(doc)
-                    assert isinstance(elmts, list), param_name
+                    if not isinstance(elmts, list):
+                        raise TypeError(
+                            f"elmts created by {param_name} is " + "not a list."
+                        )
                     for elmt in elmts:
-                        assert isinstance(elmt, xml.dom.Node), param_name
+                        if not isinstance(elmt, xml.dom.Node):
+                            raise TypeError(
+                                "Failed to create NODE based "
+                                + f"on info keyed by {param_name} "
+                                + "in dictionary."
+                            )
                     stack.append(elmts)
                 else:
                     elmt = doc.createElement(name)
@@ -157,22 +188,26 @@ def interpret_document_template(template: str) -> DocTemplate:
             def endElement(self, name: str) -> None:
                 if name == "FRAGMENT":
                     elmts = stack.pop()
-                    assert isinstance(elmts, list)
+                    if not isinstance(elmts, list):
+                        raise TypeError(f"{elmts} is not a list.")
                     elmt_list: List[xml.dom.Node] = elmts
                     for elmt in elmts:
-                        assert isinstance(elmt, xml.dom.Node)
+                        if not isinstance(elmt, xml.dom.Node):
+                            raise TypeError(f"{elmt} is not a dom NODE.")
                         elmt.normalize()
                         cast(xml.dom.Node, stack[-1]).appendChild(elmt)
                 else:
                     elmt = stack.pop()
-                    assert isinstance(elmt, xml.dom.Node)
+                    if not isinstance(elmt, xml.dom.Node):
+                        raise TypeError(f"{elmt} is not a dom NODE.")
                     node: xml.dom.Node = elmt
                     node.normalize()
                     cast(xml.dom.Node, stack[-1]).appendChild(node)
 
             def characters(self, content: str) -> None:
                 node = doc.createTextNode(content)
-                assert isinstance(stack[-1], xml.dom.Node)
+                if not isinstance(stack[-1], xml.dom.Node):
+                    raise TypeError(f"{stack[-1]} is not a dom NODE.")
                 stack[-1].appendChild(node)
 
             def ignorableWhitespace(self, content: str) -> None:
@@ -180,7 +215,8 @@ def interpret_document_template(template: str) -> DocTemplate:
 
             def processingInstruction(self, target: str, data: str) -> None:
                 pi = doc.createProcessingInstruction(target, data)
-                assert isinstance(stack[-1], xml.dom.Node)
+                if not isinstance(stack[-1], xml.dom.Node):
+                    raise TypeError(f"{stack[-1]} is not a dom NODE.")
                 stack[-1].appendChild(pi)
 
         xml.sax.parseString(template, Builder())
@@ -214,37 +250,54 @@ def interpret_template(template: str) -> NodeBuilderTemplate:
                         elif type(param) in [int, float]:
                             elmt = doc.createTextNode(str(param))
                         else:
-                            assert _is_function(param), (
-                                f"{param_name} is type {type(param)}; "
-                                f"should be function"
-                            )
+                            if not _is_function(param):
+                                raise ValueError(
+                                    f"{param_name} is type "
+                                    + f"{type(param)}; should be function."
+                                )
                             elmt = param(doc)
-                        assert isinstance(elmt, xml.dom.Node)
+                        if not isinstance(elmt, xml.dom.Node):
+                            raise TypeError(
+                                "Failed to create NODE based "
+                                + f"on info keyed by {param_name} "
+                                + "in dictionary."
+                            )
                         stack.append(elmt)
                     elif name == "FRAGMENT":
                         param_name = attrs["name"]
                         param = dictionary[param_name]
-                        assert _is_function(param), (
-                            f"{param_name} is type {type(param)}; "
-                            f"should be function"
-                        )
+                        if not _is_function(param):
+                            raise ValueError(
+                                f"{param_name} is type "
+                                + f"{type(param)}; should be function."
+                            )
                         elmts = param(doc)
-                        assert isinstance(elmts, list)
+                        if not isinstance(elmts, list):
+                            raise TypeError(
+                                f"elmts created by {param_name} is " + "not a list."
+                            )
                         elmt_list: List[Node] = elmts
                         for elmt in elmt_list:
-                            assert isinstance(elmt, xml.dom.Node)
+                            if not isinstance(elmt, xml.dom.Node):
+                                raise TypeError(
+                                    "Failed to create NODE based "
+                                    + f"on info keyed by {param_name} "
+                                    + "in dictionary."
+                                )
                         stack.append(elmt_list)
                     else:
                         elmt = doc.createElement(name)
                         for name in attrs.getNames():
                             elmt.setAttribute(name, attrs[name])
-                        assert isinstance(elmt, xml.dom.Node)
+                        if not isinstance(elmt, xml.dom.Node):
+                            raise TypeError(f"{elmt} is not a dom NODE.")
                         stack.append(elmt)
 
                 def endElement(self, name: str) -> None:
                     if name == "FRAGMENT":
                         elmts = stack.pop()
-                        assert isinstance(elmts, list)
+                        if not isinstance(elmts, list):
+                            raise TypeError(f"{elmts} is not a list.")
                         elmt_list: List[xml.dom.Node] = elmts
                         for elmt in elmt_list:
                             elmt.normalize()
