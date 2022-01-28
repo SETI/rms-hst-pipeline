@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.db.BundleDB import create_bundle_db_in_memory
+from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.labels.CollectionInventory import make_collection_inventory
 from pdart.labels.utils import assert_golden_file_equal
 

@@ -2,8 +2,8 @@ import os
 import tempfile
 import unittest
 
-from pdart.db.BrowseFileDB import populate_database_from_browse_file
-from pdart.db.BundleDB import create_bundle_db_in_memory
+from pdart.db.browse_file_db import populate_database_from_browse_file
+from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.labels.BrowseProductLabel import make_browse_product_label
 from pdart.labels.utils import assert_golden_file_equal
 

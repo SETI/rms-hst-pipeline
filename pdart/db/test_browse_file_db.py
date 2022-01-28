@@ -1,13 +1,13 @@
 import unittest
 from typing import cast
 
-from pdart.db.BrowseFileDB import populate_database_from_browse_file
-from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.db.SqlAlchTables import BrowseFile
+from pdart.db.browse_file_db import populate_database_from_browse_file
+from pdart.db.bundle_db import create_bundle_db_in_memory
+from pdart.db.sql_alch_tables import BrowseFile
 from pdart.db.utils import path_to_testfile
 
 
-class Test_BrowseFileDB(unittest.TestCase):
+class Test_browse_file_db(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()

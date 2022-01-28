@@ -4,13 +4,13 @@ from typing import cast, Set, Dict, List
 import fs.path
 import os.path
 
-from pdart.db.BundleDB import (
-    BundleDB,
+from pdart.db.bundle_db import (
+    bundle_db,
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
-from pdart.db.BundleWalk import BundleWalk
-from pdart.db.SqlAlchTables import (
+from pdart.db.bundle_walk import bundle_walk
+from pdart.db.sql_alch_tables import (
     BadFitsFile,
     BrowseFile,
     BrowseProduct,
@@ -86,13 +86,13 @@ def _extend_lidvid(lidvid_str: str, segment: str) -> str:
 
 def create_pds4_labels(
     working_dir: str,
-    bundle_db: BundleDB,
+    bundle_db: bundle_db,
     bundle_lidvid: LIDVID,
     changes_dict: ChangesDict,
     label_deltas: COWFS,
     info: Citation_Information,
 ) -> None:
-    class _CreateLabelsWalk(BundleWalk):
+    class _CreateLabelsWalk(bundle_walk):
         def visit_bundle(self, bundle: Bundle, post: bool) -> None:
             if post:
                 first_bundle = LIDVID(bundle.lidvid).vid() == VID("1.0")

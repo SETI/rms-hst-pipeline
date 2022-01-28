@@ -34,7 +34,7 @@ Reduced dependencies:\
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0 {{\NeXTGraphic reduced.png \width12540 \height8860
-}¬}\
+}ï¿½}\
 \
 
 \f0 pds4
@@ -79,23 +79,23 @@ There are functions to validate an XML file using an XSD file (which validates t
 \f1  library to interface with the database.  It lets us define Python classes that correspond to rows in the database, letting us use Python objects in a natural way instead of having to write SQL code.\
 \
 The classes are defined in 
-\f0 SqlAlchTables.py
+\f0 sql_alch_tables.py
 \f1 .  If you want to edit this, you'll need to understand SQLAlchemy.  
-\f0 BundleDB.py
+\f0 bundle_db.py
 \f1  defines an object that represents the bundle database.  It has methods for all the basic tasks you must do, and acts as a wrapper around the SQLAlchemy code.  You can call methods of 
-\f0 BundleDB
+\f0 bundle_db
 \f1  without knowing anything about SQLAlchemy. \
 \
 
-\f0 FitsFileDB.py
+\f0 fits_file_db.py
 \f1  has functions to put information from FITS datafiles into the bundle database and to get it back out.  
-\f0 BrowseFileDB.py
+\f0 browse_file_db.py
 \f1  does the same for browse files (small image files).\
 \
 Sometimes it's useful to travel over all the parts of a bundle.  
-\f0 BundleWalk.py
+\f0 bundle_walk.py
 \f1  gives a framework to walk through a bundle, providing access to the database at all the subparts.  You can implement a subclass of 
-\f0 BundleWalk
+\f0 bundle_walk
 \f1  by overriding the different 
 \f0 visit_XXX()
 \f1  methods to do what you need to be done\

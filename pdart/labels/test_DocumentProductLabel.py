@@ -3,7 +3,7 @@ import tempfile
 import unittest
 
 from pdart.citations import Citation_Information
-from pdart.db.BundleDB import create_bundle_db_in_memory
+from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.labels.DocumentProductLabel import make_document_product_label
 from pdart.labels.utils import assert_golden_file_equal
 

@@ -4,7 +4,7 @@ from typing import List, Tuple
 import os.path
 
 from pdart.citations import Citation_Information
-from pdart.db.BundleDB import BundleDB
+from pdart.db.bundle_db import bundle_db
 from pdart.labels.Namespaces import (
     DOCUMENT_PRODUCT_NAMESPACES,
     HST_XML_MODEL,
@@ -85,7 +85,7 @@ def make_doc_citation_information(info: Citation_Information) -> NodeBuilder:
 
 
 def make_doc_citation_information2(
-    bundle_db: BundleDB, bundle_lid: str, proposal_id: int
+    bundle_db: bundle_db, bundle_lid: str, proposal_id: int
 ) -> NodeBuilder:
     """
     Create a ``<Citation_Information />`` element for the proposal ID.

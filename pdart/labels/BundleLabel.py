@@ -3,8 +3,8 @@
 from typing import Any, Dict, List, cast
 
 from pdart.citations import Citation_Information
-from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import (
+from pdart.db.bundle_db import bundle_db
+from pdart.db.sql_alch_tables import (
     Collection,
     DocumentCollection,
     OtherCollection,
@@ -41,7 +41,7 @@ from pdart.xml.Templates import (
 
 
 def make_bundle_label(
-    bundle_db: BundleDB,
+    bundle_db: bundle_db,
     bundle_lidvid: str,
     info: Citation_Information,
     verify: bool,

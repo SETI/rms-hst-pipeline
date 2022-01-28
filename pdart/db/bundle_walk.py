@@ -1,7 +1,7 @@
 from typing import cast
 
-from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import (
+from pdart.db.bundle_db import bundle_db
+from pdart.db.sql_alch_tables import (
     BadFitsFile,
     BrowseFile,
     BrowseProduct,
@@ -22,9 +22,9 @@ from pdart.db.SqlAlchTables import (
 from pdart.pds4.LIDVID import LIDVID
 
 
-class BundleWalk(object):
+class bundle_walk(object):
     """
-    A walk of a bundle, given its BundleDB.
+    A walk of a bundle, given its bundle_db.
 
     The visit_xxx() methods will be called twice: once before
     (post=False) visiting its children, and once after (post=True)
@@ -44,7 +44,7 @@ class BundleWalk(object):
     hand and to localize necessary changes in code.
     """
 
-    def __init__(self, bundle_db: BundleDB, bundle_lidvid: str) -> None:
+    def __init__(self, bundle_db: bundle_db, bundle_lidvid: str) -> None:
         self.db = bundle_db
         self.bundle_lidvid = bundle_lidvid
 

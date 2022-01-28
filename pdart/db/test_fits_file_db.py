@@ -2,8 +2,8 @@ import unittest
 
 from fs.path import basename
 
-from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.db.FitsFileDB import (
+from pdart.db.bundle_db import create_bundle_db_in_memory
+from pdart.db.fits_file_db import (
     get_card_dictionaries,
     get_file_offsets,
     populate_database_from_fits_file,
@@ -11,7 +11,7 @@ from pdart.db.FitsFileDB import (
 from pdart.db.utils import path_to_testfile
 
 
-class Test_FitsFileDB(unittest.TestCase):
+class Test_fits_file_db(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()

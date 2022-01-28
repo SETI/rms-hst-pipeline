@@ -4,8 +4,8 @@ from typing import List, Tuple
 import astropy.io.fits
 import fs.path
 
-from pdart.db.BundleDB import (
-    BundleDB,
+from pdart.db.bundle_db import (
+    bundle_db,
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
@@ -16,7 +16,7 @@ from pdart.pipeline.ChangesDict import (
     read_changes_dict,
     write_changes_dict,
 )
-from pdart.db.FitsFileDB import populate_database_from_fits_file
+from pdart.db.fits_file_db import populate_database_from_fits_file
 from pdart.fs.cowfs.COWFS import COWFS
 from pdart.fs.multiversioned.utils import lid_to_dirpath
 from pdart.pds4.LID import LID
@@ -31,7 +31,7 @@ from pdart.pipeline.utils import (
 from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
 
 
-def _populate_schema_collection(db: BundleDB, bundle_lidvid: str) -> None:
+def _populate_schema_collection(db: bundle_db, bundle_lidvid: str) -> None:
     # TODO We're assuming here that there will only ever be one schema
     # collection.  I'm not sure that's true.
     lid = LIDVID(bundle_lidvid).lid().extend_lid("schema")
@@ -44,7 +44,7 @@ def _populate_schema_collection(db: BundleDB, bundle_lidvid: str) -> None:
         db.create_schema_product(lidvid)
 
 
-def _populate_bundle(changes_dict: ChangesDict, db: BundleDB) -> LIDVID:
+def _populate_bundle(changes_dict: ChangesDict, db: bundle_db) -> LIDVID:
     for lid, (vid, changed) in changes_dict.items():
         if changed and lid.is_bundle_lid():
             lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
@@ -54,7 +54,7 @@ def _populate_bundle(changes_dict: ChangesDict, db: BundleDB) -> LIDVID:
     raise RuntimeError("No changed bundle LID in changes_dict.")
 
 
-def _populate_collections(changes_dict: ChangesDict, db: BundleDB) -> None:
+def _populate_collections(changes_dict: ChangesDict, db: bundle_db) -> None:
     for lid, (vid, changed) in changes_dict.items():
         if lid.is_collection_lid():
             lidvid = LIDVID.create_from_lid_and_vid(lid, vid)
@@ -73,7 +73,7 @@ def _populate_collections(changes_dict: ChangesDict, db: BundleDB) -> None:
 
 
 def _populate_products(
-    changes_dict: ChangesDict, db: BundleDB, sv_deltas: COWFS
+    changes_dict: ChangesDict, db: bundle_db, sv_deltas: COWFS
 ) -> None:
     for lid, (vid, changed) in changes_dict.items():
         if lid.is_product_lid():
@@ -115,7 +115,7 @@ def _populate_products(
 
 
 def _populate_target_identification(
-    changes_dict: ChangesDict, db: BundleDB, sv_deltas: COWFS
+    changes_dict: ChangesDict, db: bundle_db, sv_deltas: COWFS
 ) -> None:
     for lid, (vid, changed) in changes_dict.items():
         if changed and lid.is_product_lid():
@@ -139,7 +139,7 @@ def _populate_target_identification(
 
 
 def _populate_citation_info(
-    changes_dict: ChangesDict, db: BundleDB, info_param: Tuple
+    changes_dict: ChangesDict, db: bundle_db, info_param: Tuple
 ) -> None:
     for lid, (vid, changed) in changes_dict.items():
         if changed and lid.is_bundle_lid():

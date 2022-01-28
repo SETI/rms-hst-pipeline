@@ -4,8 +4,8 @@ import astropy.io.fits
 import astropy.io.fits.card
 from fs.path import basename
 
-from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import Association, Card, Hdu
+from pdart.db.bundle_db import bundle_db
+from pdart.db.sql_alch_tables import Association, Card, Hdu
 from pdart.pds4.HstFilename import HstFilename
 
 _PYFITS_CARD = Any
@@ -14,7 +14,7 @@ _PYFITS_OBJ = Any
 
 
 def _populate_associations(
-    db: BundleDB, fits_product_lidvid: str, pyfits_obj: _PYFITS_OBJ
+    db: bundle_db, fits_product_lidvid: str, pyfits_obj: _PYFITS_OBJ
 ) -> None:
     # Here we blindly assert that the second HDU is a binary
     # table.
@@ -53,7 +53,7 @@ def _populate_associations(
 
 
 def populate_database_from_fits_file(
-    db: BundleDB, os_filepath: str, fits_product_lidvid: str
+    db: bundle_db, os_filepath: str, fits_product_lidvid: str
 ) -> None:
     file_basename = basename(os_filepath)
     try:
@@ -74,7 +74,7 @@ def populate_database_from_fits_file(
 
 
 def _populate_hdus_associations_and_cards(
-    db: BundleDB, pyfits_obj: _PYFITS_OBJ, file_basename: str, fits_product_lidvid: str
+    db: bundle_db, pyfits_obj: _PYFITS_OBJ, file_basename: str, fits_product_lidvid: str
 ) -> None:
     def create_hdu_dict(index: int, hdu: _PYFITS_HDU) -> Dict[str, Any]:
         fileinfo = hdu.fileinfo()
@@ -126,12 +126,12 @@ def _populate_hdus_associations_and_cards(
 
 
 def get_card_dictionaries(
-    bundle_db: BundleDB, fits_product_lidvid: str, file_basename: str
+    bundle_db: bundle_db, fits_product_lidvid: str, file_basename: str
 ) -> List[Dict[str, Any]]:
     return bundle_db.get_card_dictionaries(fits_product_lidvid, file_basename)
 
 
 def get_file_offsets(
-    bundle_db: BundleDB, fits_product_lidvid: str
+    bundle_db: bundle_db, fits_product_lidvid: str
 ) -> List[Tuple[int, int, int, int]]:
     return bundle_db.get_file_offsets(fits_product_lidvid)

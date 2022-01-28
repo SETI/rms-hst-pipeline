@@ -3,8 +3,8 @@ import tempfile
 import unittest
 from typing import Set, cast
 
-from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.db.SqlAlchTables import (
+from pdart.db.bundle_db import create_bundle_db_in_memory
+from pdart.db.sql_alch_tables import (
     Base,
     Bundle,
     OtherCollection,
@@ -48,7 +48,7 @@ _TABLES: Set[str] = {
 }
 
 
-class Test_BundleDB(unittest.TestCase):
+class Test_bundle_db(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
@@ -60,7 +60,7 @@ class Test_BundleDB(unittest.TestCase):
     def tearDown(self) -> None:
         os.remove(self.dummy_os_filepath)
 
-    def test_BundleDB(self) -> None:
+    def test_bundle_db(self) -> None:
         db = self.db
         self.assertTrue(db.is_open())
         metadata = Base.metadata
@@ -881,7 +881,7 @@ class Test_BundleDB(unittest.TestCase):
         # We don't test the functionality of get_card_dictionaries()
         # here, since we'd first need to populate the database with
         # the contents of the FITS file and that machinery is in
-        # FitsFileDB.  So the real testing happens there.  I leave
+        # fits_file_db.  So the real testing happens there.  I leave
         # this empty test as the equivalent of a "this page left
         # intentionally blank" message.
         pass

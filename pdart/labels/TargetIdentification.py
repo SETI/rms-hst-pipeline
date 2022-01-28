@@ -5,8 +5,8 @@ a product label using a SQLite database.
 
 from typing import Any, Dict, List, Tuple
 
-from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import TargetIdentification
+from pdart.db.bundle_db import bundle_db
+from pdart.db.sql_alch_tables import TargetIdentification
 from pdart.labels.Lookup import Lookup
 from pdart.labels.TargetIdentificationXml import (
     approximate_target_table,
@@ -93,7 +93,7 @@ def get_target(target_info: Dict[str, str]) -> NodeBuilder:
 
 
 def create_target_identification_nodes(
-    bundle_db: BundleDB,
+    bundle_db: bundle_db,
     target_identifications: List[TargetIdentification],
     reference_type: str,
 ) -> List[NodeBuilder]:
@@ -124,7 +124,7 @@ def create_target_identification_nodes(
 
 
 def make_context_target_label(
-    bundle_db: BundleDB,
+    bundle_db: bundle_db,
     target: str,
     verify: bool,
     use_mod_date_for_testing: bool = False,

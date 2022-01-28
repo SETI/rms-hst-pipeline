@@ -9,7 +9,7 @@ from os.path import isfile
 
 from fs.path import dirname, join
 
-from pdart.db.BundleDB import BundleDB
+from pdart.db.bundle_db import bundle_db
 from pdart.pds4.LIDVID import LIDVID
 from pdart.xml.Templates import NodeBuilder
 

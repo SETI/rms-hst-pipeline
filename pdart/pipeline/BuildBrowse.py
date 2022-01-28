@@ -6,8 +6,8 @@ from typing import cast, List, Set
 import fs.path
 import picmaker
 
-from pdart.db.BundleDB import (
-    BundleDB,
+from pdart.db.bundle_db import (
+    bundle_db,
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
@@ -50,7 +50,7 @@ def _extend_lidvid(lid: LID, vid: VID, segment: str) -> str:
 
 
 def _fill_in_old_browse_collection(
-    db: BundleDB,
+    db: bundle_db,
     changes_dict: ChangesDict,
     bundle_lidvid: LIDVID,
     data_collection_lidvid: LIDVID,
@@ -77,7 +77,7 @@ def _fill_in_old_browse_collection(
 
 
 def _build_browse_collection(
-    db: BundleDB,
+    db: bundle_db,
     changes_dict: ChangesDict,
     browse_deltas: COWFS,
     bundle_lidvid: LIDVID,

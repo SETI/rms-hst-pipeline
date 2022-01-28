@@ -5,8 +5,8 @@ from datetime import date
 from typing import List, Optional
 
 from pdart.citations import Citation_Information
-from pdart.db.BundleDB import BundleDB
-from pdart.db.SqlAlchTables import File
+from pdart.db.bundle_db import bundle_db
+from pdart.db.sql_alch_tables import File
 from pdart.labels.DocumentProductLabelXml import (
     make_doc_citation_information,
     make_document_edition,
@@ -18,7 +18,7 @@ from pdart.xml.Pretty import pretty_and_verify
 
 
 def make_document_product_label(
-    bundle_db: BundleDB,
+    bundle_db: bundle_db,
     info: Citation_Information,
     document_product_lidvid: str,
     bundle_lidvid: str,

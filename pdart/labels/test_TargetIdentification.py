@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Tuple
 
 from fs.path import basename
 
-from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.db.FitsFileDB import populate_database_from_fits_file
+from pdart.db.bundle_db import create_bundle_db_in_memory
+from pdart.db.fits_file_db import populate_database_from_fits_file
 from pdart.labels.Lookup import DictLookup
 from pdart.labels.TargetIdentification import get_target, get_target_info
 from pdart.labels.utils import path_to_testfile

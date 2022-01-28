@@ -2,7 +2,7 @@ import unittest
 
 from typing import List, Tuple
 
-from pdart.db.BundleDB import create_bundle_db_in_memory
+from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.labels.TargetIdentification import make_context_target_label
 from pdart.labels.utils import assert_golden_file_equal
 

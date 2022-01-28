@@ -4,7 +4,7 @@ Functionality to build a investigation label using a SQLite database.
 
 from typing import Any, Dict, List, Tuple
 
-from pdart.db.BundleDB import BundleDB
+from pdart.db.bundle_db import bundle_db
 from pdart.citations import Citation_Information
 from pdart.labels.Lookup import Lookup
 from pdart.labels.InvestigationLabelXml import (
@@ -33,7 +33,7 @@ from pdart.xml.Templates import (
 
 
 def make_investigation_label(
-    bundle_db: BundleDB,
+    bundle_db: bundle_db,
     bundle_lidvid: str,
     info: Citation_Information,
     verify: bool,

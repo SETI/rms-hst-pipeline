@@ -4,8 +4,8 @@ from typing import Any, Dict, List
 
 from fs.path import basename
 
-from pdart.db.BundleDB import create_bundle_db_in_memory
-from pdart.db.FitsFileDB import populate_database_from_fits_file
+from pdart.db.bundle_db import create_bundle_db_in_memory
+from pdart.db.fits_file_db import populate_database_from_fits_file
 from pdart.labels.HstParameters import get_hst_parameters
 from pdart.labels.Lookup import CARD_SET, DictLookup, make_hdu_lookups
 from pdart.labels.TimeCoordinates import get_start_stop_times
