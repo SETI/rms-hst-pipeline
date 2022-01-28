@@ -2,8 +2,8 @@ import unittest
 
 import fs.path
 
-from pdart.archive.TestUtils import lid_to_dir
-from pdart.archive.TransferManifest import make_transfer_manifest
+from pdart.archive.test_utils import lid_to_dir
+from pdart.archive.transfer_manifest import make_transfer_manifest
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.pds4.LIDVID import LIDVID
 
@@ -19,7 +19,7 @@ def _lidvid_to_dirpath(lidvid: LIDVID) -> str:
     return fs.path.relpath(lid_to_dir(lid))
 
 
-class test_TransferManifest(unittest.TestCase):
+class test_transfer_manifest(unittest.TestCase):
     def setUp(self) -> None:
         self.bundle_db = create_bundle_db_in_memory()
         self.bundle_db.create_tables()

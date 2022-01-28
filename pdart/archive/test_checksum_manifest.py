@@ -4,7 +4,7 @@ import unittest
 
 import fs.path
 
-from pdart.archive.ChecksumManifest import (
+from pdart.archive.checksum_manifest import (
     make_checksum_manifest,
     plain_lidvid_to_dirpath,
 )
@@ -25,7 +25,7 @@ _PRODUCT2_BASENAME: str = "phase2.pdf"
 _PRODUCT2_CONTENTS: str = "I am mascarading as a PDF file."
 
 
-class test_ChecksumManifest(unittest.TestCase):
+class test_checksum_manifest(unittest.TestCase):
     def setUp(self) -> None:
         self.tmpdir = tempfile.mkdtemp()
         self.bundle_db = create_bundle_db_in_memory()

@@ -5,10 +5,10 @@ import fs.path
 from fs.base import FS
 from fs.osfs import OSFS
 
-from pdart.archive.ChecksumManifest import (
+from pdart.archive.checksum_manifest import (
     make_checksum_manifest,
 )
-from pdart.archive.TransferManifest import make_transfer_manifest
+from pdart.archive.transfer_manifest import make_transfer_manifest
 from pdart.db.BundleDB import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
 from pdart.fs.deliverableview.DeliverableView import (
     DeliverableView,
@@ -83,9 +83,7 @@ class MakeDeliverable(MarkedStage):
         manifest_dir: str = self.manifest_dir()
         PDS_LOGGER.open("Create deliverable directory")
         if os.path.isdir(deliverable_dir):
-            raise ValueError(
-                f"{deliverable_dir} cannot exist for MakeDeliverable."
-            )
+            raise ValueError(f"{deliverable_dir} cannot exist for MakeDeliverable.")
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)

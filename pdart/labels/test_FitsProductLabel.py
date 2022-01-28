@@ -70,6 +70,8 @@ class Test_FitsProductLabel(unittest.TestCase):
                 True,
                 True,
             )
+            print("-----------------------------")
+            print(label)
             assert_golden_file_equal(self, "test_FitsProductLabel.golden.xml", label)
 
     def test_make_misc_fits_product_label(self) -> None:

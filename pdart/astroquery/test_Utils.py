@@ -5,7 +5,7 @@ from astropy.table.row import Row
 from pdart.astroquery.Utils import filter_table, ymdhms_format_from_mjd
 
 
-class TestUtils(unittest.TestCase):
+class test_utils(unittest.TestCase):
     def test_sanity(self) -> None:
         """
         Just a simple sanity check on converting between MJD and

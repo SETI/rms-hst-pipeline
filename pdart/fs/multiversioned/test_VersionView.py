@@ -5,7 +5,7 @@ from fs.errors import FileExpected
 from fs.tempfs import TempFS
 
 from pdart.fs.multiversioned.Multiversioned import Multiversioned
-from pdart.fs.multiversioned.TestUtils import dictionary_to_contents
+from pdart.fs.multiversioned.test_utils import dictionary_to_contents
 from pdart.fs.multiversioned.VersionView import *
 from pdart.pds4.LIDVID import LIDVID
 

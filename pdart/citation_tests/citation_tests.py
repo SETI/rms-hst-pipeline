@@ -25,7 +25,7 @@
 ################################################################################
 
 import os
-from citations import Citation_Information
+from citations import Citation_Information  # type: ignore
 
 PREFIX = "/Users/mark/Desktop/HST-pro-apt-files/"
 

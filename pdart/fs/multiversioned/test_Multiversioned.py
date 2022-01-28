@@ -4,7 +4,7 @@ from fs.memoryfs import MemoryFS
 
 from pdart.fs.cowfs.COWFS import COWFS
 from pdart.fs.multiversioned.Multiversioned import *
-from pdart.fs.multiversioned.TestUtils import dictionary_to_contents
+from pdart.fs.multiversioned.test_utils import dictionary_to_contents
 from pdart.fs.multiversioned.VersionView import VersionView
 
 

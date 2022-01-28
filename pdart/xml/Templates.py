@@ -168,9 +168,7 @@ def interpret_document_template(template: str) -> DocTemplate:
                         )
                     elmts = param(doc)
                     if not isinstance(elmts, list):
-                        raise TypeError(
-                            f"elmts created by {param_name} is not a list."
-                        )
+                        raise TypeError(f"elmts created by {param_name} is not a list.")
                     for elmt in elmts:
                         if not isinstance(elmt, xml.dom.Node):
                             raise TypeError(
