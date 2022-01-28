@@ -7,7 +7,7 @@ from typing import Optional
 
 from pdart.pipeline.Directories import Directories
 from pdart.pipeline.MarkerFile import BasicMarkerFile
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 
 class Stage(metaclass=abc.ABCMeta):

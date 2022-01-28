@@ -3,7 +3,7 @@ import urllib.parse
 import urllib.request
 from typing import List, Set, Tuple
 
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 import fs.path
 

@@ -19,7 +19,7 @@ from pdart.pipeline.RecordChanges import RecordChanges
 from pdart.pipeline.ResetPipeline import ResetPipeline
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.ValidateBundle import ValidateBundle
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 
 class StateMachine(object):

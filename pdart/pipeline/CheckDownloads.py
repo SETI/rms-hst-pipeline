@@ -7,7 +7,7 @@ from astropy.table.row import Row
 from pdart.astroquery.Astroquery import MastSlice, ProductSet, filter_table
 from pdart.pipeline.Stage import MarkedStage
 
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 
 class CheckDownloads(MarkedStage):

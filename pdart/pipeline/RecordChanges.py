@@ -24,7 +24,7 @@ from pdart.pipeline.Utils import (
     make_version_view,
 )
 from pdart.pipeline.Stage import MarkedStage
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 _PRIMARY_SUFFIXES = DOCUMENT_SUFFIXES + [".fits", ".txt"]
 

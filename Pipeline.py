@@ -1,6 +1,6 @@
 import sys
 
-from pdart.Logging import init_logging, PDS_LOGGER
+from pdart.logging import init_logging, PDS_LOGGER
 from pdart.pipeline.Directories import Directories, make_directories
 from pdart.pipeline.StateMachine import StateMachine
 

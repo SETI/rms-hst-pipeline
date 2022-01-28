@@ -21,7 +21,7 @@ from pdart.pipeline.Stage import MarkedStage, Stage
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.Utils import make_osfs
 from pdart.pipeline.ValidateBundle import ValidateBundle
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 
 class SaveDownloads(MarkedStage):

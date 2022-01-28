@@ -54,7 +54,7 @@ from pdart.pipeline.Utils import (
     make_sv_deltas,
     make_version_view,
 )
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 import json
 import urllib

@@ -7,7 +7,7 @@ from pdart.pds4.HstFilename import HstFilename
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.Utils import *
 from pdart.pipeline.SuffixInfo import get_collection_type  # type: ignore
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 _OLD_IMPL = False
 

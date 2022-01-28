@@ -19,7 +19,7 @@ from pdart.pipeline.Utils import (
     make_sv_osfs,
     make_version_view,
 )
-from pdart.Logging import PDS_LOGGER
+from pdart.logging import PDS_LOGGER
 
 
 def _is_component_path(dirpath: str) -> bool:
