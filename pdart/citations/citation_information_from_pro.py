@@ -157,7 +157,7 @@ MISSING_CYCLES = {
 ################################################################################
 
 
-def Citation_Information_from_pro(
+def citation_information_from_pro(
     filename: str,
 ) -> Tuple[int, str, int, List[str], str, int, int, str]:
 

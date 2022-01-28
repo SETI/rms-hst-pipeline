@@ -12,7 +12,7 @@ DATE_REGEX3 = re.compile(r" *:date .*?-(20[0-3][0-9]) .*")
 ################################################################################
 
 
-def Citation_Information_from_apt(
+def citation_information_from_apt(
     filename: str,
 ) -> Tuple[int, str, int, List[str], str, int, int, str]:
 

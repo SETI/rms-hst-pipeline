@@ -8,8 +8,8 @@ from xml.sax.saxutils import escape
 
 from typing import Any, List
 
-from .Citation_Information_from_apt import Citation_Information_from_apt
-from .Citation_Information_from_pro import Citation_Information_from_pro
+from .citation_information_from_apt import citation_information_from_apt
+from .citation_information_from_pro import citation_information_from_pro
 from .fix_title import fix_title
 from .fix_authors import fix_authors
 from .fix_abstract import fix_abstract
@@ -163,9 +163,9 @@ class Citation_Information:
         # Read the file and extract the key info
         filename_lc = filename.lower()
         if filename_lc.endswith(".apt"):
-            info = Citation_Information_from_apt(filename)
+            info = citation_information_from_apt(filename)
         elif filename_lc.endswith(".pro"):
-            info = Citation_Information_from_pro(filename)
+            info = citation_information_from_pro(filename)
         else:
             raise ValueError("unrecognized file format: " + filename)
 
