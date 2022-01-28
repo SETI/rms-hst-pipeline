@@ -55,7 +55,7 @@ from pdart.pipeline.SuffixInfo import (  # type: ignore
 )
 
 from pdart.labels.TimeCoordinates import get_time_coordinates
-from pdart.labels.Utils import (
+from pdart.labels.utils import (
     lidvid_to_lid,
     lidvid_to_vid,
     get_current_date,

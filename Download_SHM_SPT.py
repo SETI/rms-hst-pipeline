@@ -1,6 +1,6 @@
 import os
 import sys
-from pdart.astroquery.Astroquery import MastSlice, CustomizedQueryMastSlice, ProductSet
+from pdart.astroquery.astroquery import MastSlice, CustomizedQueryMastSlice, ProductSet
 from pdart.pipeline.Directories import DevDirectories
 from pdart.pipeline.SuffixInfo import (  # type: ignore
     ACCEPTED_SUFFIXES,

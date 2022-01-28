@@ -10,7 +10,7 @@ from pdart.xml.Schema import (
     svrl_failures,
     xml_schema_failures,
 )
-from pdart.xml.Utils import path_to_testfile
+from pdart.xml.utils import path_to_testfile
 
 
 class TestXmlSchema(unittest.TestCase):

@@ -19,7 +19,7 @@ from pdart.pipeline.RecordChanges import RecordChanges
 from pdart.pipeline.ResetPipeline import ResetPipeline
 from pdart.pipeline.Stage import MarkedStage, Stage
 from pdart.pipeline.UpdateArchive import UpdateArchive
-from pdart.pipeline.Utils import make_osfs
+from pdart.pipeline.utils import make_osfs
 from pdart.pipeline.ValidateBundle import ValidateBundle
 from pdart.logging import PDS_LOGGER
 

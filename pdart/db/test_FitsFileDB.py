@@ -8,7 +8,7 @@ from pdart.db.FitsFileDB import (
     get_file_offsets,
     populate_database_from_fits_file,
 )
-from pdart.db.Utils import path_to_testfile
+from pdart.db.utils import path_to_testfile
 
 
 class Test_FitsFileDB(unittest.TestCase):

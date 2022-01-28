@@ -2,11 +2,11 @@ import unittest
 
 from astropy.table import Table
 
-from pdart.astroquery.Astroquery import MastSlice
+from pdart.astroquery.astroquery import MastSlice
 
 
 @unittest.skip("really slow: investigate")
-class TestAstroquery(unittest.TestCase):
+class Testastroquery(unittest.TestCase):
     slice: MastSlice
 
     @classmethod
@@ -58,7 +58,7 @@ class TestAstroquery(unittest.TestCase):
             "target_name",
             "wavelength_region",
         ]
-        actual = sorted(TestAstroquery.slice.observations_table.colnames)
+        actual = sorted(Testastroquery.slice.observations_table.colnames)
         self.assertEqual(expected, actual)
 
     def test_product_column_names(self) -> None:
@@ -67,7 +67,7 @@ class TestAstroquery(unittest.TestCase):
         # deal: it's just a heads-up for a human to note the change
         # and verify that it's not significant for us.
         def get_a_products_table() -> Table:
-            slice = TestAstroquery.slice
+            slice = Testastroquery.slice
             proposal_id = slice.get_proposal_ids()[0]
             return slice.get_products(proposal_id)
 
@@ -96,14 +96,14 @@ class TestAstroquery(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_init(self) -> None:
-        self.assertTrue(len(TestAstroquery.slice.observations_table) >= 20000)
+        self.assertTrue(len(Testastroquery.slice.observations_table) >= 20000)
 
     def test_get_proposal_ids(self) -> None:
-        self.assertTrue(len(TestAstroquery.slice.get_proposal_ids()) >= 500)
+        self.assertTrue(len(Testastroquery.slice.get_proposal_ids()) >= 500)
 
     def test_get_products(self) -> None:
-        proposal_ids = TestAstroquery.slice.get_proposal_ids()
+        proposal_ids = Testastroquery.slice.get_proposal_ids()
         for proposal_id in proposal_ids:
             # smoke test only: runs it and quits
-            products_table = TestAstroquery.slice.get_products(proposal_id)
+            products_table = Testastroquery.slice.get_products(proposal_id)
             return

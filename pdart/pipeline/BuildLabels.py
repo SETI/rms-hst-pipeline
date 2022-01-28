@@ -22,7 +22,7 @@ from pdart.db.SqlAlchTables import (
     OtherCollection,
 )
 from pdart.fs.cowfs.COWFS import COWFS
-from pdart.fs.multiversioned.Utils import lid_to_dirpath
+from pdart.fs.multiversioned.utils import lid_to_dirpath
 from pdart.labels.BrowseProductLabel import make_browse_product_label
 from pdart.labels.BundleLabel import make_bundle_label
 from pdart.labels.CitationInformation import Citation_Information
@@ -49,7 +49,7 @@ from pdart.pipeline.ChangesDict import (
     write_changes_dict,
 )
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Utils import (
+from pdart.pipeline.utils import (
     make_osfs,
     make_sv_deltas,
     make_version_view,

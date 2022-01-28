@@ -4,7 +4,7 @@ from typing import cast
 from pdart.db.BrowseFileDB import populate_database_from_browse_file
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.SqlAlchTables import BrowseFile
-from pdart.db.Utils import path_to_testfile
+from pdart.db.utils import path_to_testfile
 
 
 class Test_BrowseFileDB(unittest.TestCase):

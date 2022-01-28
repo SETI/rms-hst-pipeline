@@ -18,12 +18,12 @@ from pdart.pipeline.ChangesDict import (
 )
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.fs.cowfs.COWFS import COWFS
-from pdart.fs.multiversioned.Utils import lid_to_dirpath
+from pdart.fs.multiversioned.utils import lid_to_dirpath
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Utils import (
+from pdart.pipeline.utils import (
     make_osfs,
     make_sv_deltas,
     make_version_view,

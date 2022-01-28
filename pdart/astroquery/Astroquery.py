@@ -4,7 +4,7 @@ from astropy.table import Table
 from astropy.table.row import Row
 from astroquery.mast import Observations
 
-from pdart.astroquery.Utils import (
+from pdart.astroquery.utils import (
     filter_table,
     get_table_with_retries,
     ymd_tuple_to_mjd,
@@ -66,7 +66,7 @@ class MastSlice(object):
     """
     A slice in time of the MAST database.
 
-    Look in test_Astroquery.py for a current list of the columns
+    Look in test_astroquery.py for a current list of the columns
     returned for observations and products.
     """
 

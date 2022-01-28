@@ -17,7 +17,7 @@ from pdart.labels.FitsProductLabelXml import (
     mk_Investigation_Area_lidvid,
     mk_Investigation_Area_name,
 )
-from pdart.labels.Utils import (
+from pdart.labels.utils import (
     get_current_date,
     MOD_DATE_FOR_TESTESING,
     lidvid_to_lid,

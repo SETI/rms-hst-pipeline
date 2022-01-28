@@ -14,7 +14,7 @@ from pdart.db.SqlAlchTables import (
 )
 from pdart.labels.BrowseProductLabelXml import make_label
 from pdart.labels.LabelError import LabelError
-from pdart.labels.Utils import lidvid_to_lid, lidvid_to_vid
+from pdart.labels.utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 
 

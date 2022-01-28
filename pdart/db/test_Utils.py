@@ -3,10 +3,10 @@ import os
 import tempfile
 import unittest
 
-from pdart.db.Utils import file_md5, string_md5
+from pdart.db.utils import file_md5, string_md5
 
 
-class Test_Utils(unittest.TestCase):
+class Test_utils(unittest.TestCase):
     def test_file_md5(self) -> None:
         (handle, filepath) = tempfile.mkstemp()
         try:

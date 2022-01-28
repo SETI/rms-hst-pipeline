@@ -20,7 +20,7 @@ from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.Utils import make_multiversioned, make_osfs
+from pdart.pipeline.utils import make_multiversioned, make_osfs
 from pdart.logging import PDS_LOGGER
 
 

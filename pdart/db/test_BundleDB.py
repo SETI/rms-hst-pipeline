@@ -11,7 +11,7 @@ from pdart.db.SqlAlchTables import (
     switch_on_collection_subtype,
     CitationInfo,
 )
-from pdart.db.Utils import file_md5
+from pdart.db.utils import file_md5
 from pdart.pds4.LIDVID import LIDVID
 
 _TABLES: Set[str] = {

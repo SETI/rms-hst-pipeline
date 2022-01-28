@@ -2,7 +2,7 @@ import unittest
 
 from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.labels.CollectionInventory import make_collection_inventory
-from pdart.labels.Utils import assert_golden_file_equal
+from pdart.labels.utils import assert_golden_file_equal
 
 _BUNDLE_LIDVID = "urn:nasa:pds:hst_09059::1.3"
 _COLLECTION_LIDVID = "urn:nasa:pds:hst_09059:data_acs_raw::1.4"

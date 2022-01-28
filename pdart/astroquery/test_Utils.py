@@ -2,7 +2,7 @@ import unittest
 
 from astropy.table.row import Row
 
-from pdart.astroquery.Utils import filter_table, ymdhms_format_from_mjd
+from pdart.astroquery.utils import filter_table, ymdhms_format_from_mjd
 
 
 class test_utils(unittest.TestCase):
@@ -18,7 +18,7 @@ class test_utils(unittest.TestCase):
 
         # I'm using MastSlice to get a table, but it would probably be
         # better to hand-construct one.
-        from pdart.astroquery.Astroquery import MastSlice
+        from pdart.astroquery.astroquery import MastSlice
 
         start_date = (2018, 1, 1)
         end_date = (2018, 3, 26)

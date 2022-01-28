@@ -32,7 +32,7 @@ from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.ObservingSystem import observing_system
 from pdart.labels.DocReferenceList import make_document_reference_list
 from pdart.labels.LabelError import LabelError
-from pdart.labels.Utils import (
+from pdart.labels.utils import (
     lidvid_to_lid,
     lidvid_to_vid,
     get_current_date,

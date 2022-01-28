@@ -1,6 +1,6 @@
 from astroquery.mast import Observations
 from astropy.table import Table
-from pdart.astroquery.Astroquery import _YMD
+from pdart.astroquery.astroquery import _YMD
 
 start_date: _YMD = (2000, 1, 1)
 end_date: _YMD = (2001, 1, 1)

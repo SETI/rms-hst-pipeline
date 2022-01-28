@@ -9,7 +9,7 @@ from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.labels.HstParameters import get_hst_parameters
 from pdart.labels.Lookup import CARD_SET, DictLookup, make_hdu_lookups
 from pdart.labels.TimeCoordinates import get_start_stop_times
-from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
+from pdart.labels.utils import assert_golden_file_equal, path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
 

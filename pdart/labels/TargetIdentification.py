@@ -17,7 +17,7 @@ from pdart.labels.TargetIdentificationXml import (
     make_alias,
     make_description,
 )
-from pdart.labels.Utils import (
+from pdart.labels.utils import (
     get_current_date,
     MOD_DATE_FOR_TESTESING,
 )

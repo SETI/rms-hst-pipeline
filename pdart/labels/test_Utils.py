@@ -3,10 +3,10 @@ import os
 import tempfile
 import unittest
 
-from pdart.labels.Utils import wavelength_from_range
+from pdart.labels.utils import wavelength_from_range
 
 
-class Test_Utils(unittest.TestCase):
+class Test_utils(unittest.TestCase):
     def test_wavelength_from_range(self) -> None:
         self.assertEqual(["Ultraviolet", "Visible"], wavelength_from_range(0.01, 0.4))
         self.assertEqual(

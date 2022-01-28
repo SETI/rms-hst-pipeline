@@ -8,10 +8,10 @@ from fs.tempfs import TempFS
 
 from pdart.fs.multiversioned.VersionContents import VersionContents
 from pdart.pds4.LIDVID import LIDVID
-from pdart.pipeline.Utils import *
+from pdart.pipeline.utils import *
 
 
-class Test_Utils(unittest.TestCase):
+class Test_utils(unittest.TestCase):
     def setUp(self) -> None:
         self.temp_dir = tempfile.mkdtemp()
 

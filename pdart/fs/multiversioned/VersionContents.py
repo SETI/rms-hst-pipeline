@@ -4,7 +4,7 @@ from fs.base import FS
 from fs.path import isabs
 from fs.subfs import SubFS
 
-from pdart.fs.multiversioned.Utils import component_files
+from pdart.fs.multiversioned.utils import component_files
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 

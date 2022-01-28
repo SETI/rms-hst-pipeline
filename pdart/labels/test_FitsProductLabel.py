@@ -11,7 +11,7 @@ from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.db.SqlAlchTables import TargetIdentification
 from pdart.labels.FitsProductLabel import make_fits_product_label
-from pdart.labels.Utils import assert_golden_file_equal, path_to_testfile
+from pdart.labels.utils import assert_golden_file_equal, path_to_testfile
 
 from pdart.pipeline.SuffixInfo import get_collection_type  # type: ignore
 

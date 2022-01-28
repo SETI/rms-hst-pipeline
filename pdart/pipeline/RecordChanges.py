@@ -8,7 +8,7 @@ from fs.path import iteratepath, join, relpath, splitext
 
 from pdart.documents.Downloads import DOCUMENT_SUFFIXES
 from pdart.fs.multiversioned.Multiversioned import Multiversioned
-from pdart.fs.multiversioned.Utils import dirpath_to_lid
+from pdart.fs.multiversioned.utils import dirpath_to_lid
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -17,7 +17,7 @@ from pdart.pipeline.ChangesDict import (
     ChangesDict,
     write_changes_dict,
 )
-from pdart.pipeline.Utils import (
+from pdart.pipeline.utils import (
     make_osfs,
     make_mv_osfs,
     make_sv_osfs,

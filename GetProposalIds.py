@@ -1,7 +1,7 @@
 import os
 import sys
 
-from pdart.astroquery.Astroquery import (
+from pdart.astroquery.astroquery import (
     MastSlice,
     CustomizedQueryMastSlice,
 )

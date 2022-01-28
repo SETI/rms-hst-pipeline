@@ -7,7 +7,7 @@ from pdart.db.BundleDB import create_bundle_db_in_memory
 from pdart.db.FitsFileDB import populate_database_from_fits_file
 from pdart.labels.Lookup import DictLookup
 from pdart.labels.TimeCoordinates import get_start_stop_times, get_time_coordinates
-from pdart.labels.Utils import path_to_testfile
+from pdart.labels.utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
 
