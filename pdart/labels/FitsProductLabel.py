@@ -6,7 +6,7 @@ from typing import Any, Dict, Generator, List, Optional, Tuple, cast
 import os.path
 from sqlalchemy.orm.exc import NoResultFound
 
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import File, OtherCollection
 from pdart.labels.FileContents import get_file_contents
 from pdart.labels.Lookup import (
@@ -80,7 +80,7 @@ from wavelength_ranges import wavelength_ranges  # type: ignore
 
 
 def _directory_siblings(
-    working_dir: str, bundle_db: bundle_db, product_lidvid: str
+    working_dir: str, bundle_db: BundleDB, product_lidvid: str
 ) -> List[str]:
     # Look in the mastDownload directory and search for the file with
     # the product_lidvid's basename.  Then return all its siblings'
@@ -140,7 +140,7 @@ def _munge_lidvid(product_lidvid: str, suffix: str, new_basename: str) -> str:
 
 
 def _find_RAWish_lookups(
-    bundle_db: bundle_db, product_lidvid: str, file_basename: str, siblings: List[str]
+    bundle_db: BundleDB, product_lidvid: str, file_basename: str, siblings: List[str]
 ) -> List[Lookup]:
     # TODO Fix this
     def _find_RAWish_suffix_and_basename() -> Tuple[str, str]:
@@ -160,7 +160,7 @@ def _find_RAWish_lookups(
 
 
 def _find_SHMish_lookup(
-    bundle_db: bundle_db, product_lidvid: str, file_basename: str, siblings: List[str]
+    bundle_db: BundleDB, product_lidvid: str, file_basename: str, siblings: List[str]
 ) -> Lookup:
     # TODO Fix this
     def _find_SHMish_suffix_and_basename() -> Tuple[str, str]:
@@ -181,7 +181,7 @@ def _find_SHMish_lookup(
 
 def make_fits_product_label(
     working_dir: str,
-    bundle_db: bundle_db,
+    bundle_db: BundleDB,
     collection_lidvid: str,
     product_lidvid: str,
     bundle_lidvid: str,

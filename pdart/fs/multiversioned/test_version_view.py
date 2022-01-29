@@ -4,16 +4,16 @@ from typing import Dict
 from fs.errors import FileExpected
 from fs.tempfs import TempFS
 
-from pdart.fs.multiversioned.Multiversioned import Multiversioned
+from pdart.fs.multiversioned.multiversioned import Multiversioned
 from pdart.fs.multiversioned.test_utils import dictionary_to_contents
-from pdart.fs.multiversioned.VersionView import *
+from pdart.fs.multiversioned.version_view import *
 from pdart.pds4.LIDVID import LIDVID
 
 
 ############################################################
 
 
-class Test_VersionView(unittest.TestCase):
+class TestVersionView(unittest.TestCase):
     def setUp(self) -> None:
         # Build a working bundle containing a collection; both include
         # a set of files, not all on the same level.

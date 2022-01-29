@@ -20,9 +20,9 @@ import fs.path
 from fs.permissions import Permissions
 from fs.subfs import SubFS
 
-from pdart.db.bundle_db import bundle_db
-from pdart.fs.multiversioned.Multiversioned import Multiversioned
-from pdart.fs.multiversioned.VersionView import VersionView
+from pdart.db.bundle_db import BundleDB
+from pdart.fs.multiversioned.multiversioned import Multiversioned
+from pdart.fs.multiversioned.version_view import VersionView
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
@@ -301,7 +301,7 @@ class DeliverableView(FS):
 
     @staticmethod
     def create_deliverable_view(
-        bundle_db: bundle_db, mv: Multiversioned, lid: LID, vid: Optional[VID] = None
+        bundle_db: BundleDB, mv: Multiversioned, lid: LID, vid: Optional[VID] = None
     ) -> "DeliverableView":
         if vid is None:
             vv = mv.create_version_view(lid)

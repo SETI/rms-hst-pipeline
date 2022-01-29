@@ -1,6 +1,6 @@
 from typing import cast
 
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import (
     BadFitsFile,
     BrowseFile,
@@ -22,7 +22,7 @@ from pdart.db.sql_alch_tables import (
 from pdart.pds4.LIDVID import LIDVID
 
 
-class bundle_walk(object):
+class BundleWalk(object):
     """
     A walk of a bundle, given its bundle_db.
 
@@ -44,7 +44,7 @@ class bundle_walk(object):
     hand and to localize necessary changes in code.
     """
 
-    def __init__(self, bundle_db: bundle_db, bundle_lidvid: str) -> None:
+    def __init__(self, bundle_db: BundleDB, bundle_lidvid: str) -> None:
         self.db = bundle_db
         self.bundle_lidvid = bundle_lidvid
 

@@ -6,7 +6,7 @@ a product label using a SQLite database.
 
 from typing import Any, Dict, List
 
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 from pdart.db.fits_file_db import get_file_offsets
 from pdart.labels.FileContentsXml import (
     AXIS_NAME_TABLE,
@@ -46,7 +46,7 @@ def _mk_axis_arrays(
 
 
 def get_file_contents(
-    bundle_db: bundle_db,
+    bundle_db: BundleDB,
     card_dicts: List[Dict[str, Any]],
     instrument: str,
     fits_product_lidvid: str,

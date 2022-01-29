@@ -4,10 +4,10 @@ import unittest
 
 from fs.path import join
 
-from pdart.fs.versioned.Versioned import *
+from pdart.fs.versioned.versioned import *
 
 
-class Test_Versioned(unittest.TestCase):
+class TestVersioned(unittest.TestCase):
     def setUp(self) -> None:
         self.temp_dir = tempfile.mkdtemp()
 

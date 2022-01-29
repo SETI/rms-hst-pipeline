@@ -2,17 +2,17 @@ import unittest
 
 from fs.memoryfs import MemoryFS
 
-from pdart.fs.cowfs.COWFS import COWFS
-from pdart.fs.multiversioned.Multiversioned import *
+from pdart.fs.cowfs.cowfs import COWFS
+from pdart.fs.multiversioned.multiversioned import *
 from pdart.fs.multiversioned.test_utils import dictionary_to_contents
-from pdart.fs.multiversioned.VersionView import VersionView
+from pdart.fs.multiversioned.version_view import VersionView
 
 
 def is_new(lidvid: LIDVID, contents: VersionContents, mv: Multiversioned) -> bool:
     return mv[lidvid] != contents
 
 
-class Test_Multiversioned(unittest.TestCase):
+class TestMultiversioned(unittest.TestCase):
     def test_lid_path(self) -> None:
         self.assertEqual("/b", lid_path(LID("urn:nasa:pds:b")))
         self.assertEqual("/b/c", lid_path(LID("urn:nasa:pds:b:c")))

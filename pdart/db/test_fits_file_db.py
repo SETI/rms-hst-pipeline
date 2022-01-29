@@ -11,7 +11,7 @@ from pdart.db.fits_file_db import (
 from pdart.db.utils import path_to_testfile
 
 
-class Test_fits_file_db(unittest.TestCase):
+class TestFitsFileDB(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()

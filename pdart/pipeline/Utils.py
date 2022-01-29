@@ -8,10 +8,10 @@ import fs.path
 from fs.osfs import OSFS
 from fs.wrap import read_only
 
-from pdart.fs.cowfs.COWFS import COWFS
-from pdart.fs.multiversioned.Multiversioned import Multiversioned
-from pdart.fs.multiversioned.VersionView import VersionView
-from pdart.fs.versioned.Versioned import (
+from pdart.fs.cowfs.cowfs import COWFS
+from pdart.fs.multiversioned.multiversioned import Multiversioned
+from pdart.fs.multiversioned.version_view import VersionView
+from pdart.fs.versioned.versioned import (
     MultiversionedCOWFS,
     MultiversionedOSFS,
     SingleVersionedCOWFS,

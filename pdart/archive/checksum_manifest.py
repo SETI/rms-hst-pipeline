@@ -3,7 +3,7 @@ from typing import Callable, List, Optional, Tuple
 
 import fs.path
 
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import (
     BundleLabel,
     CollectionInventory,
@@ -43,7 +43,7 @@ def plain_lidvid_to_visits_dirpath(lidvid: LIDVID) -> str:
 
 
 def make_checksum_manifest(
-    bundle_db: bundle_db, bundle_lidvid: str, lidvid_to_dirpath: _LTD
+    bundle_db: BundleDB, bundle_lidvid: str, lidvid_to_dirpath: _LTD
 ) -> str:
     files: List[File] = []
 

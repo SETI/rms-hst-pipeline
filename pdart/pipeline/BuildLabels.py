@@ -5,11 +5,11 @@ import fs.path
 import os.path
 
 from pdart.db.bundle_db import (
-    bundle_db,
+    BundleDB,
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
-from pdart.db.bundle_walk import bundle_walk
+from pdart.db.bundle_walk import BundleWalk
 from pdart.db.sql_alch_tables import (
     BadFitsFile,
     BrowseFile,
@@ -21,7 +21,7 @@ from pdart.db.sql_alch_tables import (
     FitsFile,
     OtherCollection,
 )
-from pdart.fs.cowfs.COWFS import COWFS
+from pdart.fs.cowfs.cowfs import COWFS
 from pdart.fs.multiversioned.utils import lid_to_dirpath
 from pdart.labels.BrowseProductLabel import make_browse_product_label
 from pdart.labels.BundleLabel import make_bundle_label
@@ -86,13 +86,13 @@ def _extend_lidvid(lidvid_str: str, segment: str) -> str:
 
 def create_pds4_labels(
     working_dir: str,
-    bundle_db: bundle_db,
+    bundle_db: BundleDB,
     bundle_lidvid: LIDVID,
     changes_dict: ChangesDict,
     label_deltas: COWFS,
     info: Citation_Information,
 ) -> None:
-    class _CreateLabelsWalk(bundle_walk):
+    class _CreateLabelsWalk(BundleWalk):
         def visit_bundle(self, bundle: Bundle, post: bool) -> None:
             if post:
                 first_bundle = LIDVID(bundle.lidvid).vid() == VID("1.0")

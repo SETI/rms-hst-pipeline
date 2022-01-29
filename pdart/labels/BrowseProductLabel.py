@@ -3,7 +3,7 @@ Functionality to create a label for a browse product containing browse
 images.
 """
 
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import (
     BrowseFile,
     BrowseProduct,
@@ -19,7 +19,7 @@ from pdart.xml.Pretty import pretty_and_verify
 
 
 def make_browse_product_label(
-    bundle_db: bundle_db,
+    bundle_db: BundleDB,
     browse_collection_lidvid: str,
     browse_product_lidvid: str,
     browse_file_basename: str,

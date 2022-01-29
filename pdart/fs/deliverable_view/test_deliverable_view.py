@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.fs.deliverableview.DeliverableView import translate_filepath
+from pdart.fs.deliverable_view.deliverable_view import translate_filepath
 
 
 class TestDeliverableView(unittest.TestCase):

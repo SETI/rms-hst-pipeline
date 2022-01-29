@@ -2,7 +2,7 @@ from typing import Callable, Tuple
 
 import fs.path
 
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import Bundle, Collection, Product
 from pdart.labels.CollectionLabel import get_collection_label_name
 from pdart.pds4.LIDVID import LIDVID
@@ -18,7 +18,7 @@ def _make_bundle_pair(bundle: Bundle, lidvid_to_dirpath: _LTD) -> Tuple[str, str
 
 
 def _make_collection_pair(
-    bundle_db: bundle_db, collection: Collection, lidvid_to_dirpath: _LTD
+    bundle_db: BundleDB, collection: Collection, lidvid_to_dirpath: _LTD
 ) -> Tuple[str, str]:
     lidvid = str(collection.lidvid)
     dir = fs.path.relpath(lidvid_to_dirpath(LIDVID(lidvid)))
@@ -35,7 +35,7 @@ def _make_product_pair(product: Product, lidvid_to_dirpath: _LTD) -> Tuple[str, 
 
 
 def make_transfer_manifest(
-    bundle_db: bundle_db, bundle_lidvid: str, lidvid_to_dirpath: _LTD
+    bundle_db: BundleDB, bundle_lidvid: str, lidvid_to_dirpath: _LTD
 ) -> str:
     bundle = bundle_db.get_bundle(bundle_lidvid)
     pairs = [_make_bundle_pair(bundle, lidvid_to_dirpath)]

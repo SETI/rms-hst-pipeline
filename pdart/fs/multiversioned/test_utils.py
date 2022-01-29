@@ -4,7 +4,7 @@ from fs.base import FS
 from fs.memoryfs import MemoryFS
 from fs.path import join
 
-from pdart.fs.multiversioned.VersionContents import VersionContents
+from pdart.fs.multiversioned.version_contents import VersionContents
 from pdart.pds4.LIDVID import LIDVID
 
 

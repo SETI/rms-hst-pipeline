@@ -4,7 +4,7 @@ Functionality to build a collection inventory using a SQLite database.
 
 from typing import List, cast
 
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import (
     Collection,
     DocumentCollection,
@@ -13,7 +13,7 @@ from pdart.db.sql_alch_tables import (
 )
 
 
-def get_collection_inventory_name(bundle_db: bundle_db, collection_lidvid: str) -> str:
+def get_collection_inventory_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
     # We have to jump through some hoops to apply
     # switch_on_collection_type().
     def get_context_collection_inventory_name(collection: Collection) -> str:
@@ -42,7 +42,7 @@ def get_collection_inventory_name(bundle_db: bundle_db, collection_lidvid: str) 
     )(collection)
 
 
-def make_collection_inventory(bundle_db: bundle_db, collection_lidvid: str) -> bytes:
+def make_collection_inventory(bundle_db: BundleDB, collection_lidvid: str) -> bytes:
     """
     Create the inventory text for the collection having this LIDVID
     using the bundle database.
@@ -58,7 +58,7 @@ def make_collection_inventory(bundle_db: bundle_db, collection_lidvid: str) -> b
 
 
 def make_context_collection_inventory(
-    bundle_db: bundle_db, collection_lidvid: str
+    bundle_db: BundleDB, collection_lidvid: str
 ) -> bytes:
     """
     Create the inventory text for the collection having this LIDVID
@@ -71,7 +71,7 @@ def make_context_collection_inventory(
 
 
 def make_schema_collection_inventory(
-    bundle_db: bundle_db, collection_lidvid: str
+    bundle_db: BundleDB, collection_lidvid: str
 ) -> bytes:
     """
     Create the inventory text for the collection having this LIDVID
@@ -84,7 +84,7 @@ def make_schema_collection_inventory(
 
 
 def make_document_collection_inventory(
-    bundle_db: bundle_db, collection_lidvid: str
+    bundle_db: BundleDB, collection_lidvid: str
 ) -> bytes:
     """
     Create the inventory text for the collection having this LIDVID
@@ -104,7 +104,7 @@ def make_document_collection_inventory(
 
 
 def make_other_collection_inventory(
-    bundle_db: bundle_db, collection_lidvid: str
+    bundle_db: BundleDB, collection_lidvid: str
 ) -> bytes:
     """
     Create the inventory text for the collection having this LIDVID

@@ -7,13 +7,13 @@ from fs.subfs import SubFS
 from fs.tempfs import TempFS
 
 from pdart.documents.downloads import DOCUMENT_SUFFIXES
-from pdart.fs.multiversioned.SubdirVersions import (
+from pdart.fs.multiversioned.subdir_versions import (
     SUBDIR_VERSIONS_FILENAME,
     read_subdir_versions_from_directory,
     write_subdir_versions_to_directory,
 )
-from pdart.fs.multiversioned.VersionContents import VersionContents
-from pdart.fs.multiversioned.VersionView import VersionView
+from pdart.fs.multiversioned.version_contents import VersionContents
+from pdart.fs.multiversioned.version_view import VersionView
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -184,7 +184,7 @@ class Multiversioned(MutableMapping):
         # TODO This import is circular; that's why I have it here
         # inside the function.  But there must be a better way to
         # structure.
-        from pdart.fs.multiversioned.VersionView import (
+        from pdart.fs.multiversioned.version_view import (
             is_segment,
             strip_segment,
             vv_lid_path,

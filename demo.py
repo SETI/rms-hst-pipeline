@@ -19,10 +19,10 @@ from fs.memoryfs import *
 from fs.tarfs import *
 
 # These imports are for PDART.
-from pdart.fs.cowfs.COWFS import *
-from pdart.fs.deliverableview.DeliverableView import *
-from pdart.fs.multiversioned.Multiversioned import *
-from pdart.fs.multiversioned.VersionView import *
+from pdart.fs.cowfs.cowfs import *
+from pdart.fs.deliverable_view.deliverable_view import *
+from pdart.fs.multiversioned.multiversioned import *
+from pdart.fs.multiversioned.version_view import *
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 

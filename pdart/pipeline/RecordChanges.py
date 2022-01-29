@@ -7,7 +7,7 @@ from fs.subfs import SubFS
 from fs.path import iteratepath, join, relpath, splitext
 
 from pdart.documents.downloads import DOCUMENT_SUFFIXES
-from pdart.fs.multiversioned.Multiversioned import Multiversioned
+from pdart.fs.multiversioned.multiversioned import Multiversioned
 from pdart.fs.multiversioned.utils import dirpath_to_lid
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID

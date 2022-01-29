@@ -11,7 +11,7 @@ from fs.error_tools import convert_os_errors
 from fs.info import Info
 from fs.permissions import Permissions
 
-from pdart.fs.primitives.FSPrimitives import Dir, FSPrimitives, Node
+from pdart.fs.primitives.fs_primitives import Dir, FSPrimitives, Node
 
 _WINDOWS_PLATFORM: bool = False
 

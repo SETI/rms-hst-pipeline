@@ -1,8 +1,8 @@
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 
 
 def populate_database_from_browse_file(
-    db: bundle_db,
+    db: BundleDB,
     browse_product_lidvid: str,
     fits_product_lidvid: str,
     collection_lidvid: str,

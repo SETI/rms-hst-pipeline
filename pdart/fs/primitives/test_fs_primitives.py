@@ -10,11 +10,11 @@ from typing import Any, Dict, IO, cast
 import fs.path
 from fs.test import FSTestCases
 
-from pdart.fs.primitives.FSPrimAdapter import FSPrimAdapter
-from pdart.fs.primitives.FSPrimitives import Dir, FSPrimitives, File, Node
+from pdart.fs.primitives.fs_prim_adapter import FSPrimAdapter
+from pdart.fs.primitives.fs_primitives import Dir, FSPrimitives, File, Node
 
 
-class FSPrimitives_TestBase(object, metaclass=abc.ABCMeta):
+class FSPrimitivesTestBase(object, metaclass=abc.ABCMeta):
     """
     This is not a test case, but an abstract base class for a test case.
     """
@@ -234,7 +234,7 @@ class OSFSPrimitives(FSPrimitives):
 _TMP_DIR: str = os.path.abspath("tmp_osfs_prims")
 
 
-class Test_OSFSPrimitives(unittest.TestCase, FSPrimitives_TestBase):
+class TestOSFSPrimitives(unittest.TestCase, FSPrimitivesTestBase):
     def setUp(self) -> None:
         self.tmpdir = tempfile.mkdtemp()
         self.fs = OSFSPrimitives(self.tmpdir)
@@ -254,7 +254,7 @@ class OSFSPrimAdapter(FSPrimAdapter):
         return cast(OSFSPrimitives, self.prims)._to_sys_path(path)
 
 
-class Test_OSFSPrimAdapter(FSTestCases, unittest.TestCase):
+class TestOSFSPrimAdapter(FSTestCases, unittest.TestCase):
     def make_fs(self) -> FSPrimAdapter:
         self.tmpdir = tempfile.mkdtemp()
         return OSFSPrimAdapter(self.tmpdir)

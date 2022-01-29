@@ -7,7 +7,7 @@ from fs.base import FS
 from fs.osfs import OSFS
 from fs.tempfs import TempFS
 
-from pdart.fs.cowfs.COWFS import COWFS
+from pdart.fs.cowfs.cowfs import COWFS
 
 
 class Versioned(object, metaclass=abc.ABCMeta):

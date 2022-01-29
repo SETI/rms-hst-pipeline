@@ -25,7 +25,7 @@ _PRODUCT2_BASENAME: str = "phase2.pdf"
 _PRODUCT2_CONTENTS: str = "I am mascarading as a PDF file."
 
 
-class test_checksum_manifest(unittest.TestCase):
+class testChecksumManifest(unittest.TestCase):
     def setUp(self) -> None:
         self.tmpdir = tempfile.mkdtemp()
         self.bundle_db = create_bundle_db_in_memory()

@@ -10,11 +10,11 @@ from pdart.archive.checksum_manifest import (
 )
 from pdart.archive.transfer_manifest import make_transfer_manifest
 from pdart.db.bundle_db import _BUNDLE_DB_NAME, create_bundle_db_from_os_filepath
-from pdart.fs.deliverableview.DeliverableView import (
+from pdart.fs.deliverable_view.deliverable_view import (
     DeliverableView,
     NO_VISIT_COLLECTIONS,
 )
-from pdart.fs.multiversioned.VersionView import VersionView
+from pdart.fs.multiversioned.version_view import VersionView
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID

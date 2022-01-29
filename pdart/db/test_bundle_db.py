@@ -48,7 +48,7 @@ _TABLES: Set[str] = {
 }
 
 
-class Test_bundle_db(unittest.TestCase):
+class TestBundleDB(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()

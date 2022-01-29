@@ -94,12 +94,12 @@ def _get_shm_product_lidvid(lidvid_str: str) -> str:
     return _get_other_suffixed_product_lidvid(lidvid_str, "shm")
 
 
-def create_bundle_db_from_os_filepath(os_filepath: str) -> "bundle_db":
-    return bundle_db("sqlite:///" + os_filepath)
+def create_bundle_db_from_os_filepath(os_filepath: str) -> "BundleDB":
+    return BundleDB("sqlite:///" + os_filepath)
 
 
-def create_bundle_db_in_memory() -> "bundle_db":
-    return bundle_db("sqlite:///")
+def create_bundle_db_in_memory() -> "BundleDB":
+    return BundleDB("sqlite:///")
 
 
 def _sure_match(pattern: str, string: Optional[str], group_num: int) -> str:
@@ -141,7 +141,7 @@ def _lidvid_to_suffix(other_collection_lidvid: str) -> str:
     return _sure_match(_COLLECTION_DIRECTORY_PATTERN, collection_id, 4)
 
 
-class bundle_db(object):
+class BundleDB(object):
     def __init__(self, url: str) -> None:
         self.url = url
         self.engine = create_engine(url)
@@ -1536,14 +1536,14 @@ class bundle_db(object):
 
     def close(self) -> None:
         """
-        Close the session associated with this bundle_db.
+        Close the session associated with this BundleDB.
         """
         self.session.close()
         self.session = None
 
     def is_open(self) -> bool:
         """
-        Return True iff the session associated with this bundle_db has not
+        Return True iff the session associated with this BundleDB has not
         been closed.
         """
         return self.session is not None

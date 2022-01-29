@@ -6,7 +6,7 @@ from typing import Set
 from fs.path import join
 from fs.tempfs import TempFS
 
-from pdart.fs.multiversioned.VersionContents import VersionContents
+from pdart.fs.multiversioned.version_contents import VersionContents
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.utils import *
 

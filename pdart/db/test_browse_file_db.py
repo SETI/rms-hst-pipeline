@@ -7,7 +7,7 @@ from pdart.db.sql_alch_tables import BrowseFile
 from pdart.db.utils import path_to_testfile
 
 
-class Test_browse_file_db(unittest.TestCase):
+class TestBrowseFileDB(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()

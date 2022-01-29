@@ -6,7 +6,7 @@ from pdart.astroquery.astroquery import MastSlice
 
 
 @unittest.skip("really slow: investigate")
-class Testastroquery(unittest.TestCase):
+class TestAstroquery(unittest.TestCase):
     slice: MastSlice
 
     @classmethod
@@ -58,7 +58,7 @@ class Testastroquery(unittest.TestCase):
             "target_name",
             "wavelength_region",
         ]
-        actual = sorted(Testastroquery.slice.observations_table.colnames)
+        actual = sorted(TestAstroquery.slice.observations_table.colnames)
         self.assertEqual(expected, actual)
 
     def test_product_column_names(self) -> None:
@@ -67,7 +67,7 @@ class Testastroquery(unittest.TestCase):
         # deal: it's just a heads-up for a human to note the change
         # and verify that it's not significant for us.
         def get_a_products_table() -> Table:
-            slice = Testastroquery.slice
+            slice = TestAstroquery.slice
             proposal_id = slice.get_proposal_ids()[0]
             return slice.get_products(proposal_id)
 
@@ -96,14 +96,14 @@ class Testastroquery(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_init(self) -> None:
-        self.assertTrue(len(Testastroquery.slice.observations_table) >= 20000)
+        self.assertTrue(len(TestAstroquery.slice.observations_table) >= 20000)
 
     def test_get_proposal_ids(self) -> None:
-        self.assertTrue(len(Testastroquery.slice.get_proposal_ids()) >= 500)
+        self.assertTrue(len(TestAstroquery.slice.get_proposal_ids()) >= 500)
 
     def test_get_products(self) -> None:
-        proposal_ids = Testastroquery.slice.get_proposal_ids()
+        proposal_ids = TestAstroquery.slice.get_proposal_ids()
         for proposal_id in proposal_ids:
             # smoke test only: runs it and quits
-            products_table = Testastroquery.slice.get_products(proposal_id)
+            products_table = TestAstroquery.slice.get_products(proposal_id)
             return

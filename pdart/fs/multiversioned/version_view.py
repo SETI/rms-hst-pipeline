@@ -9,11 +9,11 @@ from fs.info import Info
 from fs.permissions import Permissions
 from fs.subfs import SubFS
 
-from pdart.fs.multiversioned.SubdirVersions import (
+from pdart.fs.multiversioned.subdir_versions import (
     SUBDIR_VERSIONS_FILENAME,
     read_subdir_versions_from_directory,
 )
-from pdart.fs.multiversioned.VersionContents import VersionContents
+from pdart.fs.multiversioned.version_contents import VersionContents
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID
@@ -38,7 +38,7 @@ class VersionView(FS):
     def __init__(self, mv: Any, lidvid: LIDVID) -> None:
         # TODO mv should be Multiversioned, but there are circular
         # imports.  Fix this.
-        from pdart.fs.multiversioned.Multiversioned import Multiversioned
+        from pdart.fs.multiversioned.multiversioned import Multiversioned
 
         if not isinstance(mv, Multiversioned):
             raise TypeError(f"{mv} is not Multiversioned.")
@@ -75,7 +75,7 @@ class VersionView(FS):
                 if is_segment(vv_part):
                     if vv_part[:-1] == self.lidvid.lid().bundle_id:
                         # TODO this is a hack; fix it.
-                        from pdart.fs.multiversioned.Multiversioned import lidvid_path
+                        from pdart.fs.multiversioned.multiversioned import lidvid_path
 
                         return lidvid_path(self.lidvid)
                     else:

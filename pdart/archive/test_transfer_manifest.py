@@ -19,7 +19,7 @@ def _lidvid_to_dirpath(lidvid: LIDVID) -> str:
     return fs.path.relpath(lid_to_dir(lid))
 
 
-class test_transfer_manifest(unittest.TestCase):
+class testTransferManifest(unittest.TestCase):
     def setUp(self) -> None:
         self.bundle_db = create_bundle_db_in_memory()
         self.bundle_db.create_tables()

@@ -5,7 +5,7 @@ Functionality to build a collection label using a SQLite database.
 from typing import Any, cast, Callable, Dict, List
 
 from pdart.citations import Citation_Information
-from pdart.db.bundle_db import bundle_db
+from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import (
     Collection,
     DocumentCollection,
@@ -50,7 +50,7 @@ from pdart.pipeline.SuffixInfo import get_processing_level  # type: ignore
 # TODO Should probably test document_collection independently.
 
 
-def get_collection_label_name(bundle_db: bundle_db, collection_lidvid: str) -> str:
+def get_collection_label_name(bundle_db: BundleDB, collection_lidvid: str) -> str:
     # We have to jump through some hoops to apply
     # switch_on_collection_type().
     def get_context_collection_label_name(collection: Collection) -> str:
@@ -80,7 +80,7 @@ def get_collection_label_name(bundle_db: bundle_db, collection_lidvid: str) -> s
 
 
 def make_collection_label(
-    bundle_db: bundle_db,
+    bundle_db: BundleDB,
     info: Citation_Information,
     collection_lidvid: str,
     bundle_lidvid: str,
@@ -113,7 +113,7 @@ def make_collection_label(
 
 
 def make_context_collection_label(
-    bundle_db: bundle_db,
+    bundle_db: BundleDB,
     info: Citation_Information,
     collection_lidvid: str,
     bundle_lidvid: str,
@@ -174,7 +174,7 @@ def make_context_collection_label(
 
 
 def make_schema_collection_label(
-    bundle_db: bundle_db,
+    bundle_db: BundleDB,
     info: Citation_Information,
     collection_lidvid: str,
     bundle_lidvid: str,
@@ -235,7 +235,7 @@ def make_schema_collection_label(
 
 
 def make_other_collection_label(
-    bundle_db: bundle_db,
+    bundle_db: BundleDB,
     info: Citation_Information,
     collection_lidvid: str,
     bundle_lidvid: str,
