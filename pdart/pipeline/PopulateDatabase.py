@@ -9,7 +9,7 @@ from pdart.db.bundle_db import (
     _BUNDLE_DB_NAME,
     create_bundle_db_from_os_filepath,
 )
-from pdart.documents.Downloads import DOCUMENT_SUFFIXES
+from pdart.documents.downloads import DOCUMENT_SUFFIXES
 from pdart.pipeline.ChangesDict import (
     CHANGES_DICT_NAME,
     ChangesDict,

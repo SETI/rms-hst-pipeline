@@ -3,7 +3,7 @@ import shutil
 import tempfile
 import unittest
 
-from pdart.documents.Downloads import download_product_documents
+from pdart.documents.downloads import download_product_documents
 
 
 class TestDownloads(unittest.TestCase):

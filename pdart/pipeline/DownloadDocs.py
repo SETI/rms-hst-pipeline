@@ -1,8 +1,8 @@
 import os
 import os.path
 
-from pdart.documents.ConvertToUtf8 import convert_documents_to_utf8
-from pdart.documents.Downloads import download_product_documents
+from pdart.documents.convert_to_utf8 import convert_documents_to_utf8
+from pdart.documents.downloads import download_product_documents
 from pdart.pipeline.Stage import MarkedStage
 
 
