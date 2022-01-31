@@ -1,6 +1,6 @@
 """Templates to create a label for a product."""
 
-from pdart.labels.Namespaces import (
+from pdart.labels.namespaces import (
     FITS_PRODUCT_NAMESPACES,
     HST_XML_MODEL,
     PDS4_XML_MODEL,

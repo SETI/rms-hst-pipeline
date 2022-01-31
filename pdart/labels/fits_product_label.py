@@ -8,21 +8,21 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import File, OtherCollection
-from pdart.labels.FileContents import get_file_contents
-from pdart.labels.Lookup import (
+from pdart.labels.file_contents import get_file_contents
+from pdart.labels.lookup import (
     CARD_SET,
     DictLookup,
     Lookup,
     MultiDictLookup,
     make_hdu_lookups,
 )
-from pdart.labels.FitsProductLabelXml import (
+from pdart.labels.fits_product_label_xml import (
     make_data_label,
     make_misc_label,
     mk_Investigation_Area_lidvid,
     mk_Investigation_Area_name,
 )
-from pdart.labels.HstParameters import (
+from pdart.labels.hst_parameters import (
     get_channel_id,
     get_hst_parameters,
     get_start_stop_date_times,
@@ -31,22 +31,22 @@ from pdart.labels.HstParameters import (
     get_detector_ids,
     get_filter_name,
 )
-from pdart.labels.LabelError import LabelError
-from pdart.labels.ObservingSystem import (
+from pdart.labels.label_error import LabelError
+from pdart.labels.observing_system import (
     instrument_host_lidvid,
     observing_system,
     observing_system_lid,
     observing_system_lidvid,
 )
-from pdart.labels.InvestigationArea import investigation_area
-from pdart.labels.PrimaryResultSummary import primary_result_summary
-from pdart.labels.TargetIdentification import (
+from pdart.labels.investigation_area import investigation_area
+from pdart.labels.primary_result_summary import primary_result_summary
+from pdart.labels.target_identification import (
     get_target,
     get_target_info,
     create_target_identification_nodes,
 )
-from pdart.labels.TargetIdentificationXml import get_target_lid
-from pdart.labels.DocReferenceList import make_document_reference_list
+from pdart.labels.target_identification_xml import get_target_lid
+from pdart.labels.doc_reference_list import make_document_reference_list
 
 from pdart.pipeline.SuffixInfo import (  # type: ignore
     get_titles_format,
@@ -54,7 +54,7 @@ from pdart.pipeline.SuffixInfo import (  # type: ignore
     SHM_SUFFIXES,
 )
 
-from pdart.labels.TimeCoordinates import get_time_coordinates
+from pdart.labels.time_coordinates import get_time_coordinates
 from pdart.labels.utils import (
     lidvid_to_lid,
     lidvid_to_vid,

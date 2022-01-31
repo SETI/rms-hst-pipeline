@@ -1,7 +1,7 @@
 import unittest
 
 from pdart.db.bundle_db import create_bundle_db_in_memory
-from pdart.labels.CollectionInventory import make_collection_inventory
+from pdart.labels.collection_inventory import make_collection_inventory
 from pdart.labels.utils import assert_golden_file_equal
 
 _BUNDLE_LIDVID = "urn:nasa:pds:hst_09059::1.3"
@@ -9,7 +9,7 @@ _COLLECTION_LIDVID = "urn:nasa:pds:hst_09059:data_acs_raw::1.4"
 _FITS_PRODUCT_LIDVID = "urn:nasa:pds:hst_09059:data_acs_raw:j6gp01lzq_raw::1.5"
 
 
-class Test_CollectionInventory(unittest.TestCase):
+class TestCollectionInventory(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
@@ -21,4 +21,6 @@ class Test_CollectionInventory(unittest.TestCase):
     def test_make_collection_inventory(self) -> None:
         inventory = make_collection_inventory(self.db, _COLLECTION_LIDVID)
 
-        assert_golden_file_equal(self, "test_CollectionInventory.golden.txt", inventory)
+        assert_golden_file_equal(
+            self, "test_collection_inventory.golden.txt", inventory
+        )

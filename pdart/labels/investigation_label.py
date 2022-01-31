@@ -6,13 +6,13 @@ from typing import Any, Dict, List, Tuple
 
 from pdart.db.bundle_db import BundleDB
 from pdart.citations import Citation_Information
-from pdart.labels.Lookup import Lookup
-from pdart.labels.InvestigationLabelXml import (
+from pdart.labels.lookup import Lookup
+from pdart.labels.investigation_label_xml import (
     make_label,
     make_internal_ref,
     make_description,
 )
-from pdart.labels.FitsProductLabelXml import (
+from pdart.labels.fits_product_label_xml import (
     mk_Investigation_Area_lid,
     mk_Investigation_Area_lidvid,
     mk_Investigation_Area_name,
@@ -24,7 +24,7 @@ from pdart.labels.utils import (
     lidvid_to_vid,
     date_time_to_date,
 )
-from pdart.labels.LabelError import LabelError
+from pdart.labels.label_error import LabelError
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import (
     NodeBuilder,

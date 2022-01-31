@@ -7,12 +7,12 @@ from typing import List, Optional
 from pdart.citations import Citation_Information
 from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import File
-from pdart.labels.DocumentProductLabelXml import (
+from pdart.labels.document_product_label_xml import (
     make_doc_citation_information,
     make_document_edition,
     make_label,
 )
-from pdart.labels.LabelError import LabelError
+from pdart.labels.label_error import LabelError
 from pdart.labels.utils import lidvid_to_lid, lidvid_to_vid
 from pdart.xml.Pretty import pretty_and_verify
 

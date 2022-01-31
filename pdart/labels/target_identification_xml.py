@@ -7,7 +7,7 @@ one target identification object.
 
 from typing import Dict, List
 
-from pdart.labels.Namespaces import COLLECTION_NAMESPACES, PDS4_XML_MODEL
+from pdart.labels.namespaces import COLLECTION_NAMESPACES, PDS4_XML_MODEL
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import (
     DocTemplate,

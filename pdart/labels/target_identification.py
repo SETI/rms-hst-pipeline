@@ -7,8 +7,8 @@ from typing import Any, Dict, List, Tuple
 
 from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import TargetIdentification
-from pdart.labels.Lookup import Lookup
-from pdart.labels.TargetIdentificationXml import (
+from pdart.labels.lookup import Lookup
+from pdart.labels.target_identification_xml import (
     approximate_target_table,
     target_identification,
     get_target_lid,
@@ -21,7 +21,7 @@ from pdart.labels.utils import (
     get_current_date,
     MOD_DATE_FOR_TESTESING,
 )
-from pdart.labels.LabelError import LabelError
+from pdart.labels.label_error import LabelError
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import (
     NodeBuilder,

@@ -6,7 +6,7 @@ import julian
 
 from typing import Any, Dict, List, Tuple
 
-from pdart.labels.HstParametersXml import (
+from pdart.labels.hst_parameters_xml import (
     detector_id,
     moving_target_description,
     moving_target_keyword,
@@ -20,7 +20,7 @@ from pdart.labels.HstParametersXml import (
     wavelength_filter_grating_parameters,
     operational_parameters,
 )
-from pdart.labels.Lookup import Lookup, merge_two_hdu_lookups
+from pdart.labels.lookup import Lookup, merge_two_hdu_lookups
 from pdart.xml.Templates import (
     FragBuilder,
     NodeBuilder,

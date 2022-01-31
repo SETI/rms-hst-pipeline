@@ -17,7 +17,7 @@ from pdart.fs.versioned.versioned import (
     SingleVersionedCOWFS,
     SingleVersionedOSFS,
 )
-from pdart.labels.CitationInformation import Citation_Information
+from pdart.labels.citation_information import Citation_Information
 from pdart.pds4.LID import LID
 from pdart.pipeline.FSTypes import *
 

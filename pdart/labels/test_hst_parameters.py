@@ -6,14 +6,14 @@ from fs.path import basename
 
 from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.db.fits_file_db import populate_database_from_fits_file
-from pdart.labels.HstParameters import get_hst_parameters
-from pdart.labels.Lookup import CARD_SET, DictLookup, make_hdu_lookups
-from pdart.labels.TimeCoordinates import get_start_stop_times
+from pdart.labels.hst_parameters import get_hst_parameters
+from pdart.labels.lookup import CARD_SET, DictLookup, make_hdu_lookups
+from pdart.labels.time_coordinates import get_start_stop_times
 from pdart.labels.utils import assert_golden_file_equal, path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
 
-class Test_HstParameters(unittest.TestCase):
+class TestHstParameters(unittest.TestCase):
     # TODO Write cases for other two instruments
 
     # TODO get_gain_mode_id() is failing on this input file.  Investigate why.
@@ -42,4 +42,4 @@ class Test_HstParameters(unittest.TestCase):
         text: bytes = nb(doc).toxml().encode()
         text = pretty_print(text)
 
-        assert_golden_file_equal(self, "test_HstParameters.golden.xml", text)
+        assert_golden_file_equal(self, "test_hst_parameters.golden.xml", text)

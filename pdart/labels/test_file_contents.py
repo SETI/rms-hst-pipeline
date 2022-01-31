@@ -4,13 +4,13 @@ from fs.path import basename
 
 from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.db.fits_file_db import populate_database_from_fits_file
-from pdart.labels.FileContents import get_file_contents
+from pdart.labels.file_contents import get_file_contents
 from pdart.labels.utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
 from pdart.xml.Templates import DocTemplate, interpret_document_template
 
 
-class Test_FileContents(unittest.TestCase):
+class TestFileContents(unittest.TestCase):
     def test_get_file_contents(self) -> None:
         db = create_bundle_db_in_memory()
         db.create_tables()

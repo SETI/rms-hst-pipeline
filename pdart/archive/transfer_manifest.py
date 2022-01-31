@@ -4,7 +4,7 @@ import fs.path
 
 from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import Bundle, Collection, Product
-from pdart.labels.CollectionLabel import get_collection_label_name
+from pdart.labels.collection_label import get_collection_label_name
 from pdart.pds4.LIDVID import LIDVID
 
 _LTD = Callable[[LIDVID], str]

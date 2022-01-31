@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 
 from pdart.db.bundle_db import BundleDB
 from pdart.db.fits_file_db import get_file_offsets
-from pdart.labels.FileContentsXml import (
+from pdart.labels.file_contents_xml import (
     AXIS_NAME_TABLE,
     BITPIX_TABLE,
     axis_array,

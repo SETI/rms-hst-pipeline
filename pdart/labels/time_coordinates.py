@@ -6,8 +6,8 @@ from typing import Any, Dict, List
 
 import julian
 
-from pdart.labels.Lookup import Lookup
-from pdart.labels.TimeCoordinatesXml import time_coordinates
+from pdart.labels.lookup import Lookup
+from pdart.labels.time_coordinates_xml import time_coordinates
 from pdart.xml.Templates import NodeBuilder
 
 

@@ -5,7 +5,7 @@ import os.path
 
 from pdart.citations import Citation_Information
 from pdart.db.bundle_db import BundleDB
-from pdart.labels.Namespaces import (
+from pdart.labels.namespaces import (
     DOCUMENT_PRODUCT_NAMESPACES,
     HST_XML_MODEL,
     PDS4_XML_MODEL,

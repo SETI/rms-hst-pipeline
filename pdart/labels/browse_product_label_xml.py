@@ -1,6 +1,6 @@
 """A document template to create a label for a raw browse product."""
 
-from pdart.labels.Namespaces import BROWSE_PRODUCT_NAMESPACES, PDS4_XML_MODEL
+from pdart.labels.namespaces import BROWSE_PRODUCT_NAMESPACES, PDS4_XML_MODEL
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import DocTemplate, interpret_document_template
 

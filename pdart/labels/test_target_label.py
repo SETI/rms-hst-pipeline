@@ -3,14 +3,14 @@ import unittest
 from typing import List, Tuple
 
 from pdart.db.bundle_db import create_bundle_db_in_memory
-from pdart.labels.TargetIdentification import make_context_target_label
+from pdart.labels.target_identification import make_context_target_label
 from pdart.labels.utils import assert_golden_file_equal
 
 _BUNDLE_LIDVID = "urn:nasa:pds:hst_15678::1.0"
 _TARGET = "asteroid.6478_gault"
 
 
-class Test_TargetLabel(unittest.TestCase):
+class TestTargetLabel(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
@@ -42,4 +42,4 @@ class Test_TargetLabel(unittest.TestCase):
     def test_make_bundle_label(self) -> None:
         label = make_context_target_label(self.db, _TARGET, True, True)
         print(label)
-        assert_golden_file_equal(self, "test_TargetLabel.golden.xml", label)
+        assert_golden_file_equal(self, "test_target_label.golden.xml", label)

@@ -5,13 +5,13 @@ from fs.path import basename
 
 from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.db.fits_file_db import populate_database_from_fits_file
-from pdart.labels.Lookup import DictLookup
-from pdart.labels.TimeCoordinates import get_start_stop_times, get_time_coordinates
+from pdart.labels.lookup import DictLookup
+from pdart.labels.time_coordinates import get_start_stop_times, get_time_coordinates
 from pdart.labels.utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
 
-class Test_TimeCoordinates(unittest.TestCase):
+class TestTimeCoordinates(unittest.TestCase):
     def test_get_default_target(self) -> None:
         fits_product_lidvid = "urn:nasa:pds:hst_13012:data_acs_raw:jbz504eoq_raw::2.3"
         card_dicts = [

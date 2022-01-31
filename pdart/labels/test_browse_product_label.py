@@ -4,11 +4,11 @@ import unittest
 
 from pdart.db.browse_file_db import populate_database_from_browse_file
 from pdart.db.bundle_db import create_bundle_db_in_memory
-from pdart.labels.BrowseProductLabel import make_browse_product_label
+from pdart.labels.browse_product_label import make_browse_product_label
 from pdart.labels.utils import assert_golden_file_equal
 
 
-class Test_BrowseProductLabel(unittest.TestCase):
+class TestBrowseProductLabel(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         (handle, filepath) = tempfile.mkstemp()
@@ -63,4 +63,4 @@ class Test_BrowseProductLabel(unittest.TestCase):
             True,
         )
 
-        assert_golden_file_equal(self, "test_BrowseProductLabel.golden.xml", label)
+        assert_golden_file_equal(self, "test_browse_product_label.golden.xml", label)

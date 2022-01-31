@@ -6,13 +6,13 @@ from fs.path import basename
 
 from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.db.fits_file_db import populate_database_from_fits_file
-from pdart.labels.Lookup import DictLookup
-from pdart.labels.TargetIdentification import get_target, get_target_info
+from pdart.labels.lookup import DictLookup
+from pdart.labels.target_identification import get_target, get_target_info
 from pdart.labels.utils import path_to_testfile
 from pdart.xml.Pretty import pretty_print
 
 
-class Test_TargetIdentification(unittest.TestCase):
+class TestTargetIdentification(unittest.TestCase):
     def test_get_target(self) -> None:
         db = create_bundle_db_in_memory()
         db.create_tables()

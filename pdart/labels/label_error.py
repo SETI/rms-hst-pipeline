@@ -1,6 +1,6 @@
 from typing import Optional, Tuple
 
-from pdart.labels.Lookup import Lookup
+from pdart.labels.lookup import Lookup
 
 
 class LabelError(Exception):

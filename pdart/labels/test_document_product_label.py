@@ -4,11 +4,11 @@ import unittest
 
 from pdart.citations import Citation_Information
 from pdart.db.bundle_db import create_bundle_db_in_memory
-from pdart.labels.DocumentProductLabel import make_document_product_label
+from pdart.labels.document_product_label import make_document_product_label
 from pdart.labels.utils import assert_golden_file_equal
 
 
-class Test_DocumentProductLabel(unittest.TestCase):
+class TestDocumentProductLabel(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
@@ -43,4 +43,4 @@ class Test_DocumentProductLabel(unittest.TestCase):
             "2017-02-31",
         )
 
-        assert_golden_file_equal(self, "test_DocumentProductLabel.golden.xml", label)
+        assert_golden_file_equal(self, "test_document_product_label.golden.xml", label)

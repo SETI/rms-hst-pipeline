@@ -10,29 +10,29 @@ from pdart.db.sql_alch_tables import (
     OtherCollection,
     switch_on_collection_subtype,
 )
-from pdart.labels.BundleLabelXml import (
+from pdart.labels.bundle_label_xml import (
     make_bundle_entry_member,
     make_label,
     make_bundle_context_node,
 )
-from pdart.labels.FitsProductLabelXml import (
+from pdart.labels.fits_product_label_xml import (
     mk_Investigation_Area_lidvid,
     mk_Investigation_Area_name,
 )
-from pdart.labels.TimeCoordinates import get_time_coordinates
-from pdart.labels.PrimaryResultSummary import primary_result_summary
-from pdart.labels.InvestigationArea import investigation_area
-from pdart.labels.ObservingSystem import observing_system
-from pdart.labels.DocReferenceList import make_document_reference_list
-from pdart.labels.CitationInformation import make_citation_information
-from pdart.labels.LabelError import LabelError
+from pdart.labels.time_coordinates import get_time_coordinates
+from pdart.labels.primary_result_summary import primary_result_summary
+from pdart.labels.investigation_area import investigation_area
+from pdart.labels.observing_system import observing_system
+from pdart.labels.doc_reference_list import make_document_reference_list
+from pdart.labels.citation_information import make_citation_information
+from pdart.labels.label_error import LabelError
 from pdart.labels.utils import (
     lidvid_to_lid,
     lidvid_to_vid,
     get_current_date,
     MOD_DATE_FOR_TESTESING,
 )
-from pdart.labels.TargetIdentification import create_target_identification_nodes
+from pdart.labels.target_identification import create_target_identification_nodes
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import (
     combine_nodes_into_fragment,

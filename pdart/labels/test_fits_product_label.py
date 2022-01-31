@@ -10,13 +10,13 @@ from fs.path import basename
 from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.db.fits_file_db import populate_database_from_fits_file
 from pdart.db.sql_alch_tables import TargetIdentification
-from pdart.labels.FitsProductLabel import make_fits_product_label
+from pdart.labels.fits_product_label import make_fits_product_label
 from pdart.labels.utils import assert_golden_file_equal, path_to_testfile
 
 from pdart.pipeline.SuffixInfo import get_collection_type  # type: ignore
 
 
-class Test_FitsProductLabel(unittest.TestCase):
+class TestFitsProductLabel(unittest.TestCase):
     def setUp(self) -> None:
         self.db = create_bundle_db_in_memory()
         self.db.create_tables()
@@ -70,9 +70,7 @@ class Test_FitsProductLabel(unittest.TestCase):
                 True,
                 True,
             )
-            print("-----------------------------")
-            print(label)
-            assert_golden_file_equal(self, "test_FitsProductLabel.golden.xml", label)
+            assert_golden_file_equal(self, "test_fits_product_label.golden.xml", label)
 
     def test_make_misc_fits_product_label(self) -> None:
         bundle_lidvid = "urn:nasa:pds:hst_09059::1.0"
@@ -129,5 +127,5 @@ class Test_FitsProductLabel(unittest.TestCase):
                 True,
             )
             assert_golden_file_equal(
-                self, "test_FitsProductLabel_misc.golden.xml", label
+                self, "test_fits_product_label_misc.golden.xml", label
             )

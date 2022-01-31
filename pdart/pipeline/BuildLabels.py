@@ -23,22 +23,22 @@ from pdart.db.sql_alch_tables import (
 )
 from pdart.fs.cowfs.cowfs import COWFS
 from pdart.fs.multiversioned.utils import lid_to_dirpath
-from pdart.labels.BrowseProductLabel import make_browse_product_label
-from pdart.labels.BundleLabel import make_bundle_label
-from pdart.labels.CitationInformation import Citation_Information
-from pdart.labels.CollectionInventory import (
+from pdart.labels.browse_product_label import make_browse_product_label
+from pdart.labels.bundle_label import make_bundle_label
+from pdart.labels.citation_information import Citation_Information
+from pdart.labels.collection_inventory import (
     get_collection_inventory_name,
     make_collection_inventory,
 )
-from pdart.labels.CollectionLabel import (
+from pdart.labels.collection_label import (
     get_collection_label_name,
     make_collection_label,
 )
-from pdart.labels.FitsProductLabelXml import mk_Investigation_Area_lidvid
-from pdart.labels.DocumentProductLabel import make_document_product_label
-from pdart.labels.FitsProductLabel import make_fits_product_label
-from pdart.labels.TargetIdentification import make_context_target_label
-from pdart.labels.InvestigationLabel import make_investigation_label
+from pdart.labels.fits_product_label_xml import mk_Investigation_Area_lidvid
+from pdart.labels.document_product_label import make_document_product_label
+from pdart.labels.fits_product_label import make_fits_product_label
+from pdart.labels.target_identification import make_context_target_label
+from pdart.labels.investigation_label import make_investigation_label
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pds4.VID import VID

@@ -1,7 +1,7 @@
 """Templates to create a label for a bundle."""
 from typing import List
 
-from pdart.labels.Namespaces import BUNDLE_NAMESPACES, PDS4_XML_MODEL
+from pdart.labels.namespaces import BUNDLE_NAMESPACES, PDS4_XML_MODEL
 from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
 from pdart.xml.Templates import (
     DocTemplate,
