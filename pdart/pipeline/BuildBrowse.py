@@ -12,9 +12,9 @@ from pdart.db.bundle_db import (
     create_bundle_db_from_os_filepath,
 )
 from pdart.fs.cowfs.cowfs import COWFS
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 from pdart.pipeline.ChangesDict import (
     CHANGES_DICT_NAME,
     ChangesDict,

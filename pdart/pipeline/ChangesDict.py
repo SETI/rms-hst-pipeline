@@ -1,8 +1,8 @@
 from logging import Logger
 from typing import Dict, ItemsView, Optional, Tuple
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 
 
 class ChangesDict(object):

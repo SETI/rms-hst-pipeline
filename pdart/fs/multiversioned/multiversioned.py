@@ -14,9 +14,9 @@ from pdart.fs.multiversioned.subdir_versions import (
 )
 from pdart.fs.multiversioned.version_contents import VersionContents
 from pdart.fs.multiversioned.version_view import VersionView
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 
 # An IS_NEW_TEST is a function on a proposed LIDVID with the given
 # VersionContents, and a Multiversioned that returns True iff the

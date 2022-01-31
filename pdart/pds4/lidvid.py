@@ -2,8 +2,8 @@
 
 import functools
 
-from pdart.pds4.LID import LID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.vid import VID
 
 
 @functools.total_ordering

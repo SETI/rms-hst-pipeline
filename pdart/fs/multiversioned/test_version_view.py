@@ -7,7 +7,7 @@ from fs.tempfs import TempFS
 from pdart.fs.multiversioned.multiversioned import Multiversioned
 from pdart.fs.multiversioned.test_utils import dictionary_to_contents
 from pdart.fs.multiversioned.version_view import *
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lidvid import LIDVID
 
 
 ############################################################

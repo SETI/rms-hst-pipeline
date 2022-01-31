@@ -27,7 +27,7 @@ def make_document_product_label(
 ) -> bytes:
     """
     Create the label text for the document product in the bundle
-    having this :class:`~pdart.pds4.LIDVID` using the database
+    having this :class:`~pdart.pds4.lidvid` using the database
     connection.  If verify is True, verify the label against its XML
     and Schematron schemas.  Raise an exception if either fails.
     """

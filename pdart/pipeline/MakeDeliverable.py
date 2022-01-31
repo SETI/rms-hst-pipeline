@@ -15,9 +15,9 @@ from pdart.fs.deliverable_view.deliverable_view import (
     NO_VISIT_COLLECTIONS,
 )
 from pdart.fs.multiversioned.version_view import VersionView
-from pdart.pds4.HstFilename import HstFilename
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.hst_filename import HstFilename
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
 from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, read_changes_dict
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.utils import make_multiversioned, make_osfs

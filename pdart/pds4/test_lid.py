@@ -4,7 +4,7 @@ from typing import List
 import hypothesis.strategies as st
 from hypothesis import assume, given
 
-from pdart.pds4.LID import LID
+from pdart.pds4.lid import LID
 
 
 def lid_segments() -> st.SearchStrategy[str]:

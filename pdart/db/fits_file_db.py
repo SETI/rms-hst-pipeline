@@ -6,7 +6,7 @@ from fs.path import basename
 
 from pdart.db.bundle_db import BundleDB
 from pdart.db.sql_alch_tables import Association, Card, Hdu
-from pdart.pds4.HstFilename import HstFilename
+from pdart.pds4.hst_filename import HstFilename
 
 _PYFITS_CARD = Any
 _PYFITS_HDU = Any

@@ -5,7 +5,7 @@ import fs.path
 from pdart.archive.test_utils import lid_to_dir
 from pdart.archive.transfer_manifest import make_transfer_manifest
 from pdart.db.bundle_db import create_bundle_db_in_memory
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lidvid import LIDVID
 
 _BUNDLE_LIDVID: str = "urn:nasa:pds:hst_00001::1.0"
 _COLLECTION_LIDVID: str = "urn:nasa:pds:hst_00001:data_wfpc2_raw::1.0"

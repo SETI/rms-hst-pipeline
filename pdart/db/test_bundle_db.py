@@ -12,7 +12,7 @@ from pdart.db.sql_alch_tables import (
     CitationInfo,
 )
 from pdart.db.utils import file_md5
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lidvid import LIDVID
 
 _TABLES: Set[str] = {
     "associations",

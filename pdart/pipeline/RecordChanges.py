@@ -9,9 +9,9 @@ from fs.path import iteratepath, join, relpath, splitext
 from pdart.documents.downloads import DOCUMENT_SUFFIXES
 from pdart.fs.multiversioned.multiversioned import Multiversioned
 from pdart.fs.multiversioned.utils import dirpath_to_lid
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 from pdart.pipeline.ChangesDict import (
     CHANGES_DICT_NAME,
     ChangesDict,

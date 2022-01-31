@@ -62,9 +62,9 @@ from pdart.labels.utils import (
     MOD_DATE_FOR_TESTESING,
     wavelength_from_range,
 )
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 from pdart.xml.Pretty import pretty_and_verify
 from pdart.xml.Templates import (
     combine_nodes_into_fragment,

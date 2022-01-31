@@ -5,7 +5,7 @@ from fs.memoryfs import MemoryFS
 from fs.path import join
 
 from pdart.fs.multiversioned.version_contents import VersionContents
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lidvid import LIDVID
 
 
 def write_dictionary_to_fs(fs: FS, dir_path: str, d: Dict[Any, Any]) -> None:

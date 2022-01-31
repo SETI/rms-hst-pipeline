@@ -1,6 +1,6 @@
 import os
 import os.path
-from pdart.pds4.HstFilename import HstFilename
+from pdart.pds4.hst_filename import HstFilename
 
 DOWNLOAD_DIR = "/Volumes/PDART-8TB/bulk-download"
 

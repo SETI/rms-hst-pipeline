@@ -23,10 +23,10 @@ from fs.subfs import SubFS
 from pdart.db.bundle_db import BundleDB
 from pdart.fs.multiversioned.multiversioned import Multiversioned
 from pdart.fs.multiversioned.version_view import VersionView
-from pdart.pds4.HstFilename import HstFilename
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.hst_filename import HstFilename
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 
 _INFO_DICT = Mapping[str, Mapping[str, object]]
 

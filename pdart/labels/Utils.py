@@ -10,7 +10,7 @@ from os.path import isfile
 from fs.path import dirname, join
 
 from pdart.db.bundle_db import BundleDB
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lidvid import LIDVID
 from pdart.xml.Templates import NodeBuilder
 
 """The suffixes considered raw data, in order of preference."""

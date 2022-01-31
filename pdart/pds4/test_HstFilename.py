@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.pds4.HstFilename import HstFilename
+from pdart.pds4.hst_filename import HstFilename
 
 _TEST_FILENAME = "/some/random/folder/j6gp01mmq_trl.fits"
 

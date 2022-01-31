@@ -5,8 +5,8 @@ from fs.path import isabs
 from fs.subfs import SubFS
 
 from pdart.fs.multiversioned.utils import component_files
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
 
 
 S = TypeVar("S", LID, LIDVID)

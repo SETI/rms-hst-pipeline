@@ -12,7 +12,7 @@ from pdart.db.sql_alch_tables import (
     ProductLabel,
     ContextProductLabel,
 )
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lidvid import LIDVID
 from pdart.logging import PDS_LOGGER
 
 _LTD = Callable[[LIDVID], str]

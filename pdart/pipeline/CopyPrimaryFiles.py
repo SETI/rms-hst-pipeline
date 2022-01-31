@@ -3,7 +3,7 @@ import shutil
 
 import fs.path
 
-from pdart.pds4.HstFilename import HstFilename
+from pdart.pds4.hst_filename import HstFilename
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.utils import *
 from pdart.pipeline.SuffixInfo import get_collection_type  # type: ignore

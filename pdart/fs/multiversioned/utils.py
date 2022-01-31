@@ -5,7 +5,7 @@ from fs.path import abspath, iteratepath
 from fs.subfs import SubFS
 import fs.walk
 
-from pdart.pds4.LID import LID
+from pdart.pds4.lid import LID
 
 
 def component_directories(fs: FS, dirpath: str) -> Iterator[str]:

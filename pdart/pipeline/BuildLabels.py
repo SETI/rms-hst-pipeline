@@ -39,9 +39,9 @@ from pdart.labels.document_product_label import make_document_product_label
 from pdart.labels.fits_product_label import make_fits_product_label
 from pdart.labels.target_identification import make_context_target_label
 from pdart.labels.investigation_label import make_investigation_label
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 from pdart.pipeline.ChangesDict import (
     CHANGES_DICT_NAME,
     ChangesDict,

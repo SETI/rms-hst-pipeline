@@ -14,9 +14,9 @@ from pdart.fs.multiversioned.subdir_versions import (
     read_subdir_versions_from_directory,
 )
 from pdart.fs.multiversioned.version_contents import VersionContents
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 
 _INFO = Mapping[str, Mapping[str, Any]]
 

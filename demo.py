@@ -23,8 +23,8 @@ from pdart.fs.cowfs.cowfs import *
 from pdart.fs.deliverable_view.deliverable_view import *
 from pdart.fs.multiversioned.multiversioned import *
 from pdart.fs.multiversioned.version_view import *
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
 
 
 def reset() -> None:

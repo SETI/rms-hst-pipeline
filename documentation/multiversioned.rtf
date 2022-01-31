@@ -37,7 +37,7 @@ There are two ways to view the data.  \
 If you are interested in just a single version, you can look at the latest version of a LID, or at a specific LIDVID, past or present.\
 \
 
-\f1 lid = pdart.pds4.LID(
+\f1 lid = pdart.pds4.lid(
 \f0\i desired bundle LID
 \f1\i0 )\
 vv = mv.create_version_view()
@@ -82,7 +82,7 @@ If you want to look at a particular version, not the current one, you can instea
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f1 \cf0 lidvid = pdart.pds4.LIDVID(
+\f1 \cf0 lidvid = pdart.pds4.lidvid(
 \f0\i desired bundle LIDVID
 \f1\i0 )\
 vv = VersionView(mv, lidvid)
@@ -110,7 +110,7 @@ So, given a
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f1 \cf0 lidvid = pdart.pds4.LIDVID(
+\f1 \cf0 lidvid = pdart.pds4.lidvid(
 \f0\i desired bundle LIDVID
 \f1\i0 )\
 contents = mv[lidvid]\
@@ -141,7 +141,7 @@ When you want to add a new bundle, collection or product version to an archive, 
 
 \f1 contents = VersionContents.create_from_lidvids(\
 	sub_lidvids, filesys, filepaths)\
-lidvid = pdart.pds4.LIDVID(
+lidvid = pdart.pds4.lidvid(
 \f0\i desired LIDVID
 \f1\i0 )\
 mv[lidvid] = contents

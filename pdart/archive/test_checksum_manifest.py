@@ -11,7 +11,7 @@ from pdart.archive.checksum_manifest import (
 from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.labels.collection_inventory import get_collection_inventory_name
 from pdart.labels.collection_label import get_collection_label_name
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lidvid import LIDVID
 
 _BUNDLE_LIDVID: str = "urn:nasa:pds:hst_00001::1.0"
 _COLLECTION_LIDVID: str = "urn:nasa:pds:hst_00001:data_wfpc2_raw::1.0"

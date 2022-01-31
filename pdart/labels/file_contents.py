@@ -54,7 +54,7 @@ def get_file_contents(
     """
     Given the dictionary of the header fields from a product's FITS
     file, an open connection to the database, and the product's
-    :class:`~pdart.pds4.LIDVID`, return an XML fragment containing the
+    :class:`~pdart.pds4.lidvid`, return an XML fragment containing the
     needed ``<Header />`` and ``<Array />`` or ``<Array_2D_Image />``
     elements for the FITS file's HDUs.
     """

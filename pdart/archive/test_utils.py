@@ -2,7 +2,7 @@ from typing import List
 
 from fs.path import join
 
-from pdart.pds4.LID import LID
+from pdart.pds4.lid import LID
 
 
 def _lid_to_parts(lid: LID) -> List[str]:

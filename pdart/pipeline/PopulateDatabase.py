@@ -19,9 +19,9 @@ from pdart.pipeline.ChangesDict import (
 from pdart.db.fits_file_db import populate_database_from_fits_file
 from pdart.fs.cowfs.cowfs import COWFS
 from pdart.fs.multiversioned.utils import lid_to_dirpath
-from pdart.pds4.LID import LID
-from pdart.pds4.LIDVID import LIDVID
-from pdart.pds4.VID import VID
+from pdart.pds4.lid import LID
+from pdart.pds4.lidvid import LIDVID
+from pdart.pds4.vid import VID
 from pdart.pipeline.Stage import MarkedStage
 from pdart.pipeline.utils import (
     make_osfs,

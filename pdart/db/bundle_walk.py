@@ -19,7 +19,7 @@ from pdart.db.sql_alch_tables import (
     OtherCollection,
     switch_on_collection_subtype,
 )
-from pdart.pds4.LIDVID import LIDVID
+from pdart.pds4.lidvid import LIDVID
 
 
 class BundleWalk(object):
