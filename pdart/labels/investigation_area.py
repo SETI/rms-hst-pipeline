@@ -5,7 +5,7 @@ Reference type can be difference for bundle, data collection, and data.
 """
 from typing import Any, Dict
 
-from pdart.xml.Templates import NodeBuilder, NodeBuilderTemplate, interpret_template
+from pdart.xml.templates import NodeBuilder, NodeBuilderTemplate, interpret_template
 
 
 _investigation_area: NodeBuilderTemplate = interpret_template(

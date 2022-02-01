@@ -9,7 +9,7 @@ from pdart.db.fits_file_db import populate_database_from_fits_file
 from pdart.labels.lookup import DictLookup
 from pdart.labels.target_identification import get_target, get_target_info
 from pdart.labels.utils import path_to_testfile
-from pdart.xml.Pretty import pretty_print
+from pdart.xml.pretty import pretty_print
 
 
 class TestTargetIdentification(unittest.TestCase):

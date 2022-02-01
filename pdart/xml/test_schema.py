@@ -1,6 +1,6 @@
 import unittest
 
-from pdart.xml.Schema import (
+from pdart.xml.schema import (
     PDS_SCHEMATRON_SCHEMA,
     probatron,
     probatron_with_stdin,

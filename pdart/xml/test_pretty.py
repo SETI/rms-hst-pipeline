@@ -1,4 +1,4 @@
-from pdart.xml.Pretty import pretty_print
+from pdart.xml.pretty import pretty_print
 
 _PP: bytes = b"""<?xml version="1.0"?>
 <foobar>

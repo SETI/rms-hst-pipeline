@@ -10,7 +10,7 @@ from pdart.labels.hst_parameters import get_hst_parameters
 from pdart.labels.lookup import CARD_SET, DictLookup, make_hdu_lookups
 from pdart.labels.time_coordinates import get_start_stop_times
 from pdart.labels.utils import assert_golden_file_equal, path_to_testfile
-from pdart.xml.Pretty import pretty_print
+from pdart.xml.pretty import pretty_print
 
 
 class TestHstParameters(unittest.TestCase):

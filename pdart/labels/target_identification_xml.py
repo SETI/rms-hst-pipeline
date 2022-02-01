@@ -8,8 +8,8 @@ one target identification object.
 from typing import Dict, List
 
 from pdart.labels.namespaces import COLLECTION_NAMESPACES, PDS4_XML_MODEL
-from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
-from pdart.xml.Templates import (
+from pdart.xml.pds4_version import INFORMATION_MODEL_VERSION
+from pdart.xml.templates import (
     DocTemplate,
     interpret_document_template,
     combine_nodes_into_fragment,

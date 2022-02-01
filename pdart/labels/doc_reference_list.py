@@ -4,7 +4,7 @@ Reference_List exists in data product, data collection and bundle labels.
 """
 from typing import List
 
-from pdart.xml.Templates import (
+from pdart.xml.templates import (
     NodeBuilder,
     NodeBuilderTemplate,
     FragBuilder,

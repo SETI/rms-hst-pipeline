@@ -1,4 +1,4 @@
-from pdart.xml.Templates import NodeBuilderTemplate, interpret_template
+from pdart.xml.templates import NodeBuilderTemplate, interpret_template
 
 hst_parameters: NodeBuilderTemplate = interpret_template(
     """<hst:HST_Parameters>

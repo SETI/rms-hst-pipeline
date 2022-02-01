@@ -6,7 +6,7 @@ label.
 
 from typing import Dict
 
-from pdart.xml.Templates import NodeBuilderTemplate, interpret_template
+from pdart.xml.templates import NodeBuilderTemplate, interpret_template
 
 # For product labels: produces the fragment of the File node that
 # contains Header and Array_2D_Image elements.

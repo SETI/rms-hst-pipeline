@@ -6,7 +6,7 @@ different in bundle, data collection, and data level.
 """
 from typing import Any, List, Dict
 
-from pdart.xml.Templates import (
+from pdart.xml.templates import (
     combine_nodes_into_fragment,
     FragBuilder,
     NodeBuilder,

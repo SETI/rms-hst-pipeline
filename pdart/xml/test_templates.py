@@ -1,7 +1,7 @@
 import unittest
 import xml.dom
 
-from pdart.xml.Templates import (
+from pdart.xml.templates import (
     interpret_document_template,
     interpret_template,
     interpret_text,

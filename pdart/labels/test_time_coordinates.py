@@ -8,7 +8,7 @@ from pdart.db.fits_file_db import populate_database_from_fits_file
 from pdart.labels.lookup import DictLookup
 from pdart.labels.time_coordinates import get_start_stop_times, get_time_coordinates
 from pdart.labels.utils import path_to_testfile
-from pdart.xml.Pretty import pretty_print
+from pdart.xml.pretty import pretty_print
 
 
 class TestTimeCoordinates(unittest.TestCase):

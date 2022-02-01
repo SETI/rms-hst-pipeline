@@ -65,8 +65,8 @@ from pdart.labels.utils import (
 from pdart.pds4.lid import LID
 from pdart.pds4.lidvid import LIDVID
 from pdart.pds4.vid import VID
-from pdart.xml.Pretty import pretty_and_verify
-from pdart.xml.Templates import (
+from pdart.xml.pretty import pretty_and_verify
+from pdart.xml.templates import (
     combine_nodes_into_fragment,
     NodeBuilder,
 )

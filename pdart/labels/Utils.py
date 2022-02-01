@@ -11,7 +11,7 @@ from fs.path import dirname, join
 
 from pdart.db.bundle_db import BundleDB
 from pdart.pds4.lidvid import LIDVID
-from pdart.xml.Templates import NodeBuilder
+from pdart.xml.templates import NodeBuilder
 
 """The suffixes considered raw data, in order of preference."""
 MOD_DATE_FOR_TESTESING: str = "2016-04-20"

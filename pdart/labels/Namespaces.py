@@ -1,4 +1,4 @@
-from pdart.xml.Pds4Version import HST_SHORT_VERSION, PDS4_SHORT_VERSION
+from pdart.xml.pds4_version import HST_SHORT_VERSION, PDS4_SHORT_VERSION
 
 _PDS4_SCHEMA_LOCATION: str = "http://pds.nasa.gov/pds4/pds/v1"
 

@@ -5,7 +5,7 @@ There can be multiple instruments for a bundle, but only one instrument for
 data collection and data.
 """
 
-from pdart.xml.Templates import NodeBuilder, NodeBuilderTemplate, interpret_template
+from pdart.xml.templates import NodeBuilder, NodeBuilderTemplate, interpret_template
 
 _observing_system: NodeBuilderTemplate = interpret_template(
     """<Observing_System>

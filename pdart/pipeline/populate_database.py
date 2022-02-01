@@ -28,7 +28,7 @@ from pdart.pipeline.utils import (
     make_sv_deltas,
     make_version_view,
 )
-from pdart.xml.Pds4Version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
+from pdart.xml.pds4_version import DISP_LIDVID, HST_LIDVID, PDS4_LIDVID
 
 
 def _populate_schema_collection(db: BundleDB, bundle_lidvid: str) -> None:

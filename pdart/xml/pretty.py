@@ -1,7 +1,7 @@
 """
 Pretty-printing functionality.
 """
-from pdart.xml.Schema import run_subprocess, verify_label_or_raise
+from pdart.xml.schema import run_subprocess, verify_label_or_raise
 
 
 def pretty_print(str: bytes) -> bytes:

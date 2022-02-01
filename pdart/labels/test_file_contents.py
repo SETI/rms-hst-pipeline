@@ -6,8 +6,8 @@ from pdart.db.bundle_db import create_bundle_db_in_memory
 from pdart.db.fits_file_db import populate_database_from_fits_file
 from pdart.labels.file_contents import get_file_contents
 from pdart.labels.utils import path_to_testfile
-from pdart.xml.Pretty import pretty_print
-from pdart.xml.Templates import DocTemplate, interpret_document_template
+from pdart.xml.pretty import pretty_print
+from pdart.xml.templates import DocTemplate, interpret_document_template
 
 
 class TestFileContents(unittest.TestCase):

@@ -2,8 +2,8 @@
 from typing import List
 
 from pdart.labels.namespaces import BUNDLE_NAMESPACES, PDS4_XML_MODEL
-from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
-from pdart.xml.Templates import (
+from pdart.xml.pds4_version import INFORMATION_MODEL_VERSION
+from pdart.xml.templates import (
     DocTemplate,
     NodeBuilderTemplate,
     NodeBuilder,

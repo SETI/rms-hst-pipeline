@@ -14,7 +14,7 @@ from pdart.labels.document_product_label_xml import (
 )
 from pdart.labels.label_error import LabelError
 from pdart.labels.utils import lidvid_to_lid, lidvid_to_vid
-from pdart.xml.Pretty import pretty_and_verify
+from pdart.xml.pretty import pretty_and_verify
 
 
 def make_document_product_label(

@@ -8,7 +8,7 @@ import julian
 
 from pdart.labels.lookup import Lookup
 from pdart.labels.time_coordinates_xml import time_coordinates
-from pdart.xml.Templates import NodeBuilder
+from pdart.xml.templates import NodeBuilder
 
 
 def get_start_stop_times(lookup: Lookup) -> Dict[str, str]:

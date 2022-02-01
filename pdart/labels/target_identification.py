@@ -22,8 +22,8 @@ from pdart.labels.utils import (
     MOD_DATE_FOR_TESTESING,
 )
 from pdart.labels.label_error import LabelError
-from pdart.xml.Pretty import pretty_and_verify
-from pdart.xml.Templates import (
+from pdart.xml.pretty import pretty_and_verify
+from pdart.xml.templates import (
     NodeBuilder,
     combine_nodes_into_fragment,
 )

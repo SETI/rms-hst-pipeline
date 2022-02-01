@@ -17,7 +17,7 @@ from pdart.labels.file_contents_xml import (
     element_array,
     header_contents,
 )
-from pdart.xml.Templates import (
+from pdart.xml.templates import (
     FragBuilder,
     NodeBuilder,
     combine_fragments_into_fragment,

@@ -5,8 +5,8 @@ from pdart.labels.namespaces import (
     HST_XML_MODEL,
     PDS4_XML_MODEL,
 )
-from pdart.xml.Pds4Version import INFORMATION_MODEL_VERSION
-from pdart.xml.Templates import DocTemplate, interpret_document_template
+from pdart.xml.pds4_version import INFORMATION_MODEL_VERSION
+from pdart.xml.templates import DocTemplate, interpret_document_template
 
 make_data_label: DocTemplate = interpret_document_template(
     f"""<?xml version="1.0" encoding="utf-8"?>

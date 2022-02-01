@@ -21,7 +21,7 @@ from pdart.labels.hst_parameters_xml import (
     operational_parameters,
 )
 from pdart.labels.lookup import Lookup, merge_two_hdu_lookups
-from pdart.xml.Templates import (
+from pdart.xml.templates import (
     FragBuilder,
     NodeBuilder,
     NodeBuilderTemplate,
