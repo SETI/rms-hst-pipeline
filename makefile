@@ -48,7 +48,7 @@ mypy : venv
 	$(ACTIVATE) && MYPYPATH=stubs mypy $(MYPY_FLAGS) *.py pdart
 
 experiment : venv black mypy
-	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) python Experiment.py
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) python experiment.py
 
 
 ############################################################
@@ -100,9 +100,9 @@ pipeline : venv clean-results
 	for project_id in $(PROJ_IDS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
-		python Pipeline.py $$project_id; \
-		python2 checkBundleLIDs.py $(LIL-TWD)/hst_$${project_id}/hst_$${project_id}-deliverable $$project_id; \
-	python checkLIDsLog.py; \
+		python pipeline.py $$project_id; \
+		python2 check_bundle_lids.py $(LIL-TWD)/hst_$${project_id}/hst_$${project_id}-deliverable $$project_id; \
+	python check_lids_log.py; \
 	done;
 	say pipeline is done
 	open $(TWD)
@@ -130,11 +130,11 @@ copy-results :
 # smaller version for testing
 ##############################
 
-# LILS=07885 09059 09748 15505
+LILS=07885 09059 09748 15505
 # LILS=09748
 # LILS=09059
 # LILS=07885
-LILS=15505
+# LILS=15505
 
 .PHONY: lil-pipeline
 LIL-TWD=$(TMP_WORKING_DIR)
@@ -145,9 +145,9 @@ lil-pipeline : venv
 	for project_id in $(LILS); do \
 	    echo '****' hst_$$project_id '****'; \
 	    $(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
-		python Pipeline.py $$project_id; \
-		python2 checkBundleLIDs.py $(LIL-TWD)/hst_$${project_id}/hst_$${project_id}-deliverable $$project_id; \
-	python checkLIDsLog.py; \
+		python pipeline.py $$project_id; \
+		python2 check_bundle_lids.py $(LIL-TWD)/hst_$${project_id}/hst_$${project_id}-deliverable $$project_id; \
+	python check_lids_log.py; \
 	done;
 	# say lil pipeline is done
 	# open $(LIL-TWD)
@@ -172,11 +172,11 @@ changes : venv black mypy
 	    echo '****' hst_$$project_id ' ROUND ONE ****'; \
 	    say round one; \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
-		python Pipeline.py $$project_id && \
+		python pipeline.py $$project_id && \
 	    echo "**** ROUND TWO ****" && \
 	    say round two && \
 	    $(ACTIVATE) && LIL=True PYTHONPATH=$(HOME)/pds-tools \
-		python Pipeline2.py $$project_id; say ya; \
+		python pipeline2.py $$project_id; say ya; \
 	done;
 
 ##############################
@@ -189,7 +189,7 @@ download-shm-spt : setup_dir
 	for project_id in $(PROJ_IDS); do \
 		echo '****' hst_$$project_id '****'; \
 		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
-		python Download_SHM_SPT.py $$project_id; \
+		python download_shm_spt.py $$project_id; \
 	done;
 
 ############################################################
@@ -208,7 +208,7 @@ download-shm-spt-all : download-shm-spt
 get-proposal-ids : venv
 	mkdir -p $(LIL-TWD)
 	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
-	python GetProposalIds.py all; \
+	python get_proposal_ids.py all; \
 	echo '**** List of Proposal Ids is created under' $(LIL-TWD) '****'; \
 
 ############################################################
@@ -218,7 +218,7 @@ get-proposal-ids : venv
 get-image-proposal-ids : venv
 	mkdir -p $(LIL-TWD)
 	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
-	python GetProposalIds.py image; \
+	python get_proposal_ids.py image; \
 	echo '**** List of Proposal Ids is created under' $(LIL-TWD) '****'; \
 
 ############################################################
@@ -232,7 +232,7 @@ get-file-names-suffixes : venv
 	for project_id in $(TEST_IDS); do \
 		echo '****' hst_$$project_id '****'; \
 		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
-		python DownloadAllFilesForOneProposalId.py $$project_id; \
+		python download_all_files_for_one_proposal_id.py $$project_id; \
 	done;
 	echo '**** List of file names & suffixes is created under' $(FILES_PATH) '****'; \
 
@@ -250,7 +250,7 @@ get-file-names-suffixes-all : venv
 	for project_id in $(TEST_IDS); do \
 		echo '****' hst_$$project_id '****'; \
 		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
-		python DownloadAllFilesForOneProposalId.py $$project_id; \
+		python download_all_files_for_one_proposal_id.py $$project_id; \
 	done;
 	echo '**** List of file names & suffixes is created under' $(FILES_PATH) '****'; \
 
@@ -265,7 +265,7 @@ download-all-files : venv
 	for project_id in $(TEST_IDS); do \
 		echo '****' hst_$$project_id '****'; \
 		$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) \
-		python DownloadAllFilesForOneProposalId.py $$project_id -d; \
+		python download_all_files_for_one_proposal_id.py $$project_id -d; \
 	done;
 	echo '**** Files are under' $(FILES_PATH) '****'; \
 
@@ -327,4 +327,4 @@ clean : tidy
 
 .PHONY: target_files
 target_files : venv
-	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) python DownloadTargetFiles.py
+	$(ACTIVATE) && PYTHONPATH=$(PDSTOOLS_WEBTOOLS_PATH) python download_target_files.py

@@ -16,7 +16,7 @@ def min_fits(filepath: str, value: float) -> None:
 if __name__ == "__main__":
     args_len = len(sys.argv)
     if args_len not in [2, 3]:
-        print("usage: python3 MinFits.py <filepath> [<value>]", file=sys.stderr)
+        print("usage: python3 minfits.py <filepath> [<value>]", file=sys.stderr)
         sys.exit(1)
 
     if args_len == 3:

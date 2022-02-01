@@ -76,7 +76,7 @@ class ChangeFiles(MarkedStage):
                 self.mast_downloads_dir(), fs.path.relpath(rel_path)
             )
 
-            from TouchFits import touch_fits
+            from touch_fits import touch_fits
 
             PDS_LOGGER.open("Change fits file")
             PDS_LOGGER.log("info", f"Touching {abs_path}")

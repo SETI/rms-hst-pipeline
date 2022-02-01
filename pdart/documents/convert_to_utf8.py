@@ -4,7 +4,7 @@ from os.path import join, splitext
 
 
 def _convert_apt_file_to_utf8(document: str) -> None:
-    completed_process: CompletedProcess = run(["./convert-apt-to-utf8", document])
+    completed_process: CompletedProcess = run(["./convert_apt_to_utf8", document])
     completed_process.check_returncode()
 
 

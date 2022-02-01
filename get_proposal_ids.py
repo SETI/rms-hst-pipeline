@@ -22,7 +22,7 @@ if __name__ == "__main__":
         slice = MastSlice((1900, 1, 1), (2025, 1, 1))
         proposal_ids_list = slice.get_proposal_ids()
     else:
-        assert False, "Invalid command for GetProposalIds.py"
+        assert False, "Invalid command for get_proposal_ids.py"
 
     # Write proposal ids into proposal_ids.txt
     with open(list_dir, "w") as f:
