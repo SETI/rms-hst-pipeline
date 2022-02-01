@@ -2,10 +2,10 @@ import unittest
 
 from fs.memoryfs import MemoryFS
 
-from pdart.pipeline.FSTypes import *
+from pdart.pipeline.fs_types import *
 
 
-class Test_FSTypes(unittest.TestCase):
+class TestFSTypes(unittest.TestCase):
     def test_is_version_dir(self) -> None:
         self.assertFalse(is_version_dir("/foo/bar"))
         self.assertFalse(is_version_dir("/foo/bar/v$3"))

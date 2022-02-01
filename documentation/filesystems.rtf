@@ -156,7 +156,7 @@ dv = pdart.fs.deliverable_view.deliverable_view(vv)\
 \f0  constructor has the option to take a dictionary of filepaths and bytes.  This is to provide synthetic files: files that don't exist in the archive, but that you want to include in the view.  We use this to include the two mandatory manifests for PDS4 deliveries: the checksum manifest and the transfer manifest.  Since the transfer manifest shows the connection between LIDVIDs and filepaths in the deliverable, it can't go into the archive without permanently hard-coding our deliverable layout into the archive.  We'd rather keep the option to be able to change it in the future.\
 \
 You can see an example of how this all fits together in the 
-\f1 pdart.pipeline.MakeDeliverable
+\f1 pdart.pipeline.make_deliverable
 \f0  stage of the pipeline.
 \f1 \
 }

@@ -1,7 +1,7 @@
 import os
 import os.path
 import shutil
-from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.stage import MarkedStage
 
 
 class ResetPipeline(MarkedStage):

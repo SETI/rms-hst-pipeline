@@ -5,7 +5,7 @@ from typing import Optional
 from astropy.table.row import Row
 
 from pdart.astroquery.astroquery import MastSlice, ProductSet, filter_table
-from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.stage import MarkedStage
 
 from pdart.logging import PDS_LOGGER
 

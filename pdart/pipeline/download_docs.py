@@ -3,7 +3,7 @@ import os.path
 
 from pdart.documents.convert_to_utf8 import convert_documents_to_utf8
 from pdart.documents.downloads import download_product_documents
-from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.stage import MarkedStage
 
 
 class DownloadDocs(MarkedStage):

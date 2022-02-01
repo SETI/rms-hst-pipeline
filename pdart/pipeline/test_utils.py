@@ -11,7 +11,7 @@ from pdart.pds4.lidvid import LIDVID
 from pdart.pipeline.utils import *
 
 
-class Test_utils(unittest.TestCase):
+class TestUtils(unittest.TestCase):
     def setUp(self) -> None:
         self.temp_dir = tempfile.mkdtemp()
 

@@ -12,7 +12,7 @@ from pdart.fs.multiversioned.utils import dirpath_to_lid
 from pdart.pds4.lid import LID
 from pdart.pds4.lidvid import LIDVID
 from pdart.pds4.vid import VID
-from pdart.pipeline.ChangesDict import (
+from pdart.pipeline.changes_dict import (
     CHANGES_DICT_NAME,
     ChangesDict,
     write_changes_dict,
@@ -23,7 +23,7 @@ from pdart.pipeline.utils import (
     make_sv_osfs,
     make_version_view,
 )
-from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.stage import MarkedStage
 from pdart.logging import PDS_LOGGER
 
 _PRIMARY_SUFFIXES = DOCUMENT_SUFFIXES + [".fits", ".txt"]

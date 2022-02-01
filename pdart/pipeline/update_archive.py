@@ -3,7 +3,7 @@ import os.path
 import shutil
 
 from pdart.fs.multiversioned.multiversioned import Multiversioned, std_is_new
-from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.stage import MarkedStage
 from pdart.pipeline.utils import make_osfs, make_sv_deltas, make_version_view
 
 

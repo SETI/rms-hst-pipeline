@@ -4,9 +4,9 @@ import shutil
 import fs.path
 
 from pdart.pds4.hst_filename import HstFilename
-from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.stage import MarkedStage
 from pdart.pipeline.utils import *
-from pdart.pipeline.SuffixInfo import get_collection_type  # type: ignore
+from pdart.pipeline.suffix_info import get_collection_type  # type: ignore
 from pdart.logging import PDS_LOGGER
 
 _OLD_IMPL = False

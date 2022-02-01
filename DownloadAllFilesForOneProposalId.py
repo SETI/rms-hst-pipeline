@@ -7,7 +7,7 @@ from pdart.astroquery.astroquery import (
     ProductSet,
 )
 
-from pdart.pipeline.Directories import DevDirectories
+from pdart.pipeline.directories import DevDirectories
 
 # Download All files from Mast
 if __name__ == "__main__":

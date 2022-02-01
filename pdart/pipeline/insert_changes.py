@@ -11,8 +11,12 @@ from fs.subfs import SubFS
 from pdart.fs.multiversioned.utils import component_files, dirpath_to_lid
 from pdart.pds4.lid import LID
 from pdart.pds4.lidvid import LIDVID
-from pdart.pipeline.ChangesDict import CHANGES_DICT_NAME, ChangesDict, read_changes_dict
-from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.changes_dict import (
+    CHANGES_DICT_NAME,
+    ChangesDict,
+    read_changes_dict,
+)
+from pdart.pipeline.stage import MarkedStage
 from pdart.pipeline.utils import (
     make_osfs,
     make_sv_deltas,

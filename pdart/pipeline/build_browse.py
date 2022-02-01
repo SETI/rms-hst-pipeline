@@ -15,14 +15,14 @@ from pdart.fs.cowfs.cowfs import COWFS
 from pdart.pds4.lid import LID
 from pdart.pds4.lidvid import LIDVID
 from pdart.pds4.vid import VID
-from pdart.pipeline.ChangesDict import (
+from pdart.pipeline.changes_dict import (
     CHANGES_DICT_NAME,
     ChangesDict,
     read_changes_dict,
     write_changes_dict,
 )
-from pdart.pipeline.Stage import MarkedStage
-from pdart.pipeline.SuffixInfo import (  # type: ignore
+from pdart.pipeline.stage import MarkedStage
+from pdart.pipeline.suffix_info import (  # type: ignore
     ACCEPTED_SUFFIXES,
     PART_OF_ACCEPTED_SUFFIXES,
 )

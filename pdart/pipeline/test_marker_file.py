@@ -2,10 +2,10 @@ import shutil
 import tempfile
 import unittest
 
-from pdart.pipeline.MarkerFile import *
+from pdart.pipeline.marker_file import *
 
 
-class Test_MarkerFile(unittest.TestCase):
+class TestMarkerFile(unittest.TestCase):
     def setUp(self) -> None:
         self.tempdir = tempfile.mkdtemp(None, "test_markerfile_")
         print("****", self.tempdir)

@@ -19,7 +19,7 @@ from pdart.fs.versioned.versioned import (
 )
 from pdart.labels.citation_information import Citation_Information
 from pdart.pds4.lid import LID
-from pdart.pipeline.FSTypes import *
+from pdart.pipeline.fs_types import *
 
 
 def show_tree(tag: str, fs: FS) -> None:

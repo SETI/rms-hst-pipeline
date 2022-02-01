@@ -10,7 +10,7 @@ from pdart.astroquery.utils import (
     ymd_tuple_to_mjd,
 )
 
-from pdart.pipeline.SuffixInfo import (  # type: ignore
+from pdart.pipeline.suffix_info import (  # type: ignore
     ACCEPTED_SUFFIXES,
     PART_OF_ACCEPTED_SUFFIXES,
     ACCEPTED_INSTRUMENTS,

@@ -2,10 +2,10 @@ from subprocess import CompletedProcess, run
 import fs.path
 import os.path
 import json
-from pdart.pipeline.ChangesDict import (
+from pdart.pipeline.changes_dict import (
     CHANGES_DICT_NAME,
 )
-from pdart.pipeline.Stage import MarkedStage
+from pdart.pipeline.stage import MarkedStage
 
 
 class ValidateBundle(MarkedStage):

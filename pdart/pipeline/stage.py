@@ -5,8 +5,8 @@ import os.path
 import traceback
 from typing import Optional
 
-from pdart.pipeline.Directories import Directories
-from pdart.pipeline.MarkerFile import BasicMarkerFile
+from pdart.pipeline.directories import Directories
+from pdart.pipeline.marker_file import BasicMarkerFile
 from pdart.logging import PDS_LOGGER
 
 
