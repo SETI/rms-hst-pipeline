@@ -40,7 +40,7 @@ class CheckDownloads(MarkedStage):
         slice = MastSlice((1900, 1, 1), (2025, 1, 1), proposal_id)
         proposal_ids = slice.get_proposal_ids()
         assert proposal_id in proposal_ids, f"{proposal_id} in {proposal_ids}"
-        # get files from full list of ACCEPTED_SUFFIXES
+        # get files from full list of accepted suffixes
         product_set = slice.to_product_set(proposal_id)
         if not os.path.isdir(working_dir):
             os.makedirs(working_dir)
@@ -50,6 +50,7 @@ class CheckDownloads(MarkedStage):
 
         # TODO This might fail if there are no files.  Which might not be
         # a bad thing.
+        print(f"::::::::::mast_downloads_dir: {mast_downloads_dir}")
         assert os.path.isdir(mast_downloads_dir)
 
     def _run(self) -> None:

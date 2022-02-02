@@ -45,7 +45,7 @@ from pdart.xml.Templates import (
     NodeBuilder,
 )
 
-from pdart.pipeline.Suffix_info import get_processing_level  # type: ignore
+from pdart.pipeline.SuffixInfo import get_processing_level  # type: ignore
 
 # TODO Should probably test document_collection independently.
 
@@ -344,7 +344,9 @@ def make_other_collection_label(
             # Dictionary used for primary result summary
             primary_result_dict: Dict[str, Any] = {}
             # Check if it's raw or calibrated image, we will update this later
-            processing_level = get_processing_level(suffix)
+            processing_level = get_processing_level(
+                suffix=suffix, instrument_id=instrument.upper()
+            )
             primary_result_dict["processing_level"] = processing_level
 
             p_title = bundle_db.get_fits_product_collection_title(collection_lidvid)

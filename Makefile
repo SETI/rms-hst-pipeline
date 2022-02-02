@@ -133,7 +133,7 @@ copy-results :
 LILS=07885 09059 09748 15505
 # LILS=15678
 # LILS=09059
-# LILS=13012
+# LILS=09748
 
 .PHONY: lil-pipeline
 LIL-TWD=$(TMP_WORKING_DIR)
@@ -149,7 +149,7 @@ lil-pipeline : venv
 	python checkLIDsLog.py; \
 	done;
 	# say lil pipeline is done
-	open $(LIL-TWD)
+	# open $(LIL-TWD)
 
 ##############################
 # Pipeline for NICMOS ONLY

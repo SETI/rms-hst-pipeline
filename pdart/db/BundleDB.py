@@ -44,7 +44,7 @@ from pdart.db.SqlAlchTables import (
 )
 from pdart.citations import Citation_Information
 from pdart.db.Utils import file_md5
-from pdart.labels.Suffixes import RAW_SUFFIXES
+from pdart.pipeline.SuffixInfo import get_raw_suffix  # type: ignore
 from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID

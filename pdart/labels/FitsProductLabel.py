@@ -40,7 +40,6 @@ from pdart.labels.ObservingSystem import (
 )
 from pdart.labels.InvestigationArea import investigation_area
 from pdart.labels.PrimaryResultSummary import primary_result_summary
-from pdart.labels.Suffixes import RAW_SUFFIXES, SHM_SUFFIXES
 from pdart.labels.TargetIdentification import (
     get_target,
     get_target_info,
@@ -49,7 +48,11 @@ from pdart.labels.TargetIdentification import (
 from pdart.labels.TargetIdentificationXml import get_target_lid
 from pdart.labels.DocReferenceList import make_document_reference_list
 
-from pdart.labels.suffix_titles import get_titles_format  # type: ignore
+from pdart.pipeline.SuffixInfo import (  # type: ignore
+    get_titles_format,
+    get_raw_suffix,
+    TARGET_IDENTIFICATION_SUFFIXES,
+)
 
 from pdart.labels.TimeCoordinates import get_time_coordinates
 from pdart.labels.Utils import (
@@ -68,7 +71,7 @@ from pdart.xml.Templates import (
     NodeBuilder,
 )
 
-from pdart.pipeline.Suffix_info import (  # type: ignore
+from pdart.pipeline.SuffixInfo import (  # type: ignore
     get_collection_type,
     get_processing_level,
 )
@@ -92,15 +95,15 @@ def _directory_siblings(
 
 
 def _raw_sibling_file(siblings: List[str]) -> Tuple[str, str]:
-    for suffix in RAW_SUFFIXES:
+    for suffix in get_raw_suffix():
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
-    assert False, f"siblings={siblings}; RAW_SUFFIXES={RAW_SUFFIXES}"
+    assert False, f"siblings={siblings}; RAW_SUFFIXES={get_raw_suffix()}"
 
 
 def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
-    for suffix in SHM_SUFFIXES:
+    for suffix in TARGET_IDENTIFICATION_SUFFIXES:
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
@@ -121,7 +124,7 @@ def _munge_lidvid(product_lidvid: str, suffix: str, new_basename: str) -> str:
     bundle_id, collection_id, product_id = LIDVID(product_lidvid).lid().parts()
 
     # TODO This is a hack
-    collection_type = get_collection_type(suffix)
+    collection_type = get_collection_type(suffix=suffix)
     first_underscore_idx = collection_id.index("_")
     new_collection_id = (
         collection_type + collection_id[first_underscore_idx:-3] + suffix.lower()
@@ -285,7 +288,7 @@ def make_fits_product_label(
             )
 
         # Dictionary used for primary result summary
-        processing_level = get_processing_level(suffix)
+        processing_level = get_processing_level(suffix, instrument_id, channel_id)
         primary_result_dict: Dict[str, Any] = {}
         primary_result_dict["processing_level"] = processing_level
         primary_result_dict["description"] = product_title
@@ -317,7 +320,7 @@ def make_fits_product_label(
 
         # Pass the data_dict to either data label or misc label based on
         # collection_type
-        collection_type = get_collection_type(suffix)
+        collection_type = get_collection_type(suffix, instrument_id, channel_id)
         if collection_type == "data":
             label = make_data_label(data_dict).toxml().encode()
         elif collection_type == "miscellaneous":

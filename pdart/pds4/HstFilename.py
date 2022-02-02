@@ -3,9 +3,9 @@ import re
 
 from fs.path import basename
 
-from pdart.pipeline.Suffix_info import (  # type: ignore
-    ACCEPTED_INSTRUMENTS,
-    INSTRUMENTS_INFO,
+from pdart.pipeline.SuffixInfo import (  # type: ignore
+    ACCEPTED_LETTER_CODES,
+    INSTRUMENT_FROM_LETTER_CODE,
 )
 
 
@@ -22,8 +22,8 @@ class HstFilename(object):
         ), "Filename must be at least six characters long"
         basename2 = basename(filename)
         assert (
-            basename2[0].upper() in ACCEPTED_INSTRUMENTS
-        ), f"First char of filename {basename2!r} must be in {ACCEPTED_INSTRUMENTS!r}."
+            basename2[0].lower() in ACCEPTED_LETTER_CODES
+        ), f"First char of filename {basename2!r} must be in {ACCEPTED_LETTER_CODES!r}."
 
     def __str__(self) -> str:
         return self.filename.__str__()
@@ -42,13 +42,13 @@ class HstFilename(object):
         filename = self._basename()
         i = filename[0].lower()
         assert (
-            i in ACCEPTED_INSTRUMENTS.lower()
-        ), f"First char of filename {filename!r} must be in {ACCEPTED_INSTRUMENTS!r}."
+            i in ACCEPTED_LETTER_CODES
+        ), f"First char of filename {filename!r} must be in {ACCEPTED_LETTER_CODES!r}."
         try:
-            return INSTRUMENTS_INFO[i]
+            return INSTRUMENT_FROM_LETTER_CODE[i]
         except KeyError:
             raise Exception(
-                f"First char of filename {filename!r} must be in {ACCEPTED_INSTRUMENTS!r}."
+                f"First char of filename {filename!r} must be in {ACCEPTED_LETTER_CODES!r}."
             )
 
     def hst_internal_proposal_id(self) -> str:
