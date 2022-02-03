@@ -39,23 +39,26 @@ class CopyPrimaryFiles(MarkedStage):
     ) -> None:
         if not os.path.isdir(documents_dir):
             raise ValueError(f"{documents_dir} doesn't exist.")
-        PDS_LOGGER.open("Copy docs files to document directory")
-        with make_osfs(documents_dir) as documents_fs, make_sv_osfs(
-            primary_files_dir
-        ) as primary_files_fs:
-            new_dir_path = os.path.join(
-                to_segment_dir(bundle_segment),
-                to_segment_dir("document"),
-                to_segment_dir("phase2"),
-            )
-            primary_files_fs.makedirs(new_dir_path)
-            for file in documents_fs.walk.files():
-                file_basename = os.path.basename(file)
-                new_file_path = os.path.join(new_dir_path, file_basename)
-                PDS_LOGGER.log("info", f"Copy {file_basename} to {new_file_path}")
-                fs.copy.copy_file(documents_fs, file, primary_files_fs, new_file_path)
-
-        PDS_LOGGER.close()
+        try:
+            PDS_LOGGER.open("Copy docs files to document directory")
+            with make_osfs(documents_dir) as documents_fs, make_sv_osfs(
+                primary_files_dir
+            ) as primary_files_fs:
+                new_dir_path = os.path.join(
+                    to_segment_dir(bundle_segment),
+                    to_segment_dir("document"),
+                    to_segment_dir("phase2"),
+                )
+                primary_files_fs.makedirs(new_dir_path)
+                for file in documents_fs.walk.files():
+                    file_basename = os.path.basename(file)
+                    new_file_path = os.path.join(new_dir_path, file_basename)
+                    PDS_LOGGER.log("info", f"Copy {file_basename} to {new_file_path}")
+                    fs.copy.copy_file(documents_fs, file, primary_files_fs, new_file_path)
+        except Exception as e:
+            PDS_LOGGER.error(e)
+        finally:
+            PDS_LOGGER.close()
         # shutil.rmtree(documents_dir)
         # assert not os.path.isdir(documents_dir)
 
@@ -64,50 +67,54 @@ class CopyPrimaryFiles(MarkedStage):
     ) -> None:
         if not os.path.isdir(mast_downloads_dir):
             raise ValueError(f"{mast_downloads_dir} doesn't exist.")
-        PDS_LOGGER.open("Copy fits files to corresponding directories")
-        with make_osfs(mast_downloads_dir) as mast_downloads_fs, make_sv_osfs(
-            primary_files_dir
-        ) as primary_files_fs:
+        try:
+            PDS_LOGGER.open("Copy fits files to corresponding directories")
+            with make_osfs(mast_downloads_dir) as mast_downloads_fs, make_sv_osfs(
+                primary_files_dir
+            ) as primary_files_fs:
 
-            # Walk the mast_downloads_dir for FITS file and file
-            # them into the COW filesystem.
-            for filepath in mast_downloads_fs.walk.files(filter=["*.fits"]):
-                parts = fs.path.iteratepath(filepath)
-                depth = len(parts)
-                if depth != 3:
-                    raise ValueError(f"{parts} length is not 3.")
-                # New way: product name comes from the filename
-                _, _, filename = parts
-                filename = filename.lower()
-                hst_filename = HstFilename(filename)
-                product = hst_filename.rootname()
-                instrument_name = hst_filename.instrument_name()
-                suffix = hst_filename.suffix()
+                # Walk the mast_downloads_dir for FITS file and file
+                # them into the COW filesystem.
+                for filepath in mast_downloads_fs.walk.files(filter=["*.fits"]):
+                    parts = fs.path.iteratepath(filepath)
+                    depth = len(parts)
+                    if depth != 3:
+                        raise ValueError(f"{parts} length is not 3.")
+                    # New way: product name comes from the filename
+                    _, _, filename = parts
+                    filename = filename.lower()
+                    hst_filename = HstFilename(filename)
+                    product = hst_filename.rootname()
+                    instrument_name = hst_filename.instrument_name()
+                    suffix = hst_filename.suffix()
 
-                collection_type = get_collection_type(
-                    suffix=suffix, instrument_id=instrument_name
-                )
-                coll = f"{collection_type}_{instrument_name}_{suffix}"
+                    collection_type = get_collection_type(
+                        suffix=suffix, instrument_id=instrument_name
+                    )
+                    coll = f"{collection_type}_{instrument_name}_{suffix}"
 
-                new_path = fs.path.join(
-                    to_segment_dir(bundle_segment),
-                    to_segment_dir(coll),
-                    to_segment_dir(product),
-                    filename,
-                )
-                dirs, filename = fs.path.split(new_path)
-                primary_files_fs.makedirs(dirs)
-                PDS_LOGGER.log("info", f"Copy {filename} to {new_path}")
-                fs.copy.copy_file(
-                    mast_downloads_fs, filepath, primary_files_fs, new_path
-                )
+                    new_path = fs.path.join(
+                        to_segment_dir(bundle_segment),
+                        to_segment_dir(coll),
+                        to_segment_dir(product),
+                        filename,
+                    )
+                    dirs, filename = fs.path.split(new_path)
+                    primary_files_fs.makedirs(dirs)
+                    PDS_LOGGER.log("info", f"Copy {filename} to {new_path}")
+                    fs.copy.copy_file(
+                        mast_downloads_fs, filepath, primary_files_fs, new_path
+                    )
 
-        if not os.path.isdir(primary_files_dir + "-sv"):
-            raise ValueError(f"{primary_files_dir + '-sv'} doesn't exist.")
-        # # If I made it to here, it should be safe to delete the downloads
-        # shutil.rmtree(mast_downloads_dir)
-        # assert not os.path.isdir(mast_downloads_dir)
-        PDS_LOGGER.close()
+            if not os.path.isdir(primary_files_dir + "-sv"):
+                raise ValueError(f"{primary_files_dir + '-sv'} doesn't exist.")
+            # # If I made it to here, it should be safe to delete the downloads
+            # shutil.rmtree(mast_downloads_dir)
+            # assert not os.path.isdir(mast_downloads_dir)
+        except Exception as e:
+            PDS_LOGGER.error(e)
+        finally:
+            PDS_LOGGER.close()
 
     def _run(self) -> None:
         documents_dir: str = self.documents_dir()

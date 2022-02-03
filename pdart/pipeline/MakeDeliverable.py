@@ -81,45 +81,49 @@ class MakeDeliverable(MarkedStage):
         archive_dir: str = self.archive_dir()
         deliverable_dir: str = self.deliverable_dir()
         manifest_dir: str = self.manifest_dir()
-        PDS_LOGGER.open("Create deliverable directory")
-        if os.path.isdir(deliverable_dir):
-            raise ValueError(
-                f"{deliverable_dir} cannot exist for MakeDeliverable."
-            )
+        try:
+            PDS_LOGGER.open("Create deliverable directory")
+            if os.path.isdir(deliverable_dir):
+                raise ValueError(
+                    f"{deliverable_dir} cannot exist for MakeDeliverable."
+                )
 
-        changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
-        changes_dict = read_changes_dict(changes_path)
+            changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
+            changes_dict = read_changes_dict(changes_path)
 
-        with make_osfs(archive_dir) as archive_osfs, make_multiversioned(
-            archive_osfs
-        ) as mv:
-            bundle_segment = self._bundle_segment
-            bundle_lid = LID.create_from_parts([bundle_segment])
-            bundle_vid = changes_dict.vid(bundle_lid)
-            bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid)
-            version_view = VersionView(mv, bundle_lidvid)
+            with make_osfs(archive_dir) as archive_osfs, make_multiversioned(
+                archive_osfs
+            ) as mv:
+                bundle_segment = self._bundle_segment
+                bundle_lid = LID.create_from_parts([bundle_segment])
+                bundle_vid = changes_dict.vid(bundle_lid)
+                bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid)
+                version_view = VersionView(mv, bundle_lidvid)
 
-            synth_files: Dict[str, bytes] = dict()
+                synth_files: Dict[str, bytes] = dict()
 
-            # open the database
-            db_filepath = fs.path.join(working_dir, _BUNDLE_DB_NAME)
-            bundle_db = create_bundle_db_from_os_filepath(db_filepath)
+                # open the database
+                db_filepath = fs.path.join(working_dir, _BUNDLE_DB_NAME)
+                bundle_db = create_bundle_db_from_os_filepath(db_filepath)
 
-            bundle_lidvid_str = str(bundle_lidvid)
-            synth_files = dict()
-            cm = make_checksum_manifest(
-                bundle_db, bundle_lidvid_str, short_lidvid_to_dirpath
-            )
-            synth_files["/checksum.manifest.txt"] = cm.encode("utf-8")
-            tm = make_transfer_manifest(
-                bundle_db, bundle_lidvid_str, short_lidvid_to_dirpath
-            )
-            synth_files["/transfer.manifest.txt"] = tm.encode("utf-8")
+                bundle_lidvid_str = str(bundle_lidvid)
+                synth_files = dict()
+                cm = make_checksum_manifest(
+                    bundle_db, bundle_lidvid_str, short_lidvid_to_dirpath
+                )
+                synth_files["/checksum.manifest.txt"] = cm.encode("utf-8")
+                tm = make_transfer_manifest(
+                    bundle_db, bundle_lidvid_str, short_lidvid_to_dirpath
+                )
+                synth_files["/transfer.manifest.txt"] = tm.encode("utf-8")
 
-            deliverable_view = DeliverableView(version_view, synth_files)
+                deliverable_view = DeliverableView(version_view, synth_files)
 
-            os.mkdir(deliverable_dir)
-            deliverable_osfs = OSFS(deliverable_dir)
-            copy_fs(deliverable_view, deliverable_osfs)
-            PDS_LOGGER.log("info", f"Deliverable: {deliverable_dir}")
-        PDS_LOGGER.close()
+                os.mkdir(deliverable_dir)
+                deliverable_osfs = OSFS(deliverable_dir)
+                copy_fs(deliverable_view, deliverable_osfs)
+                PDS_LOGGER.log("info", f"Deliverable: {deliverable_dir}")
+        except Exception as e:
+            PDS_LOGGER.error(e)
+        finally:
+            PDS_LOGGER.close()

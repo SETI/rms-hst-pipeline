@@ -498,11 +498,15 @@ class BuildLabels(MarkedStage):
             )
             info.set_publication_year(PUBLICATION_YEAR)
 
-            PDS_LOGGER.open("BuildLabels")
-            # create_pds4_labels() may change changes_dict, because we
-            # create the context collection if it doesn't exist.
-            create_pds4_labels(
-                working_dir, db, bundle_lidvid, changes_dict, label_deltas, info
-            )
-            PDS_LOGGER.close()
+            try:
+                PDS_LOGGER.open("BuildLabels")
+                # create_pds4_labels() may change changes_dict, because we
+                # create the context collection if it doesn't exist.
+                create_pds4_labels(
+                    working_dir, db, bundle_lidvid, changes_dict, label_deltas, info
+                )
+            except Exception as e:
+                PDS_LOGGER.error(e)
+            finally:
+                PDS_LOGGER.close()
             write_changes_dict(changes_dict, changes_path)
