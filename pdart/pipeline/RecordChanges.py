@@ -166,7 +166,9 @@ def _get_primary_changes(
                 return False
             for filename in primary_files:
                 filepath = join(dirpath, relpath(filename))
-                if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(filepath):
+                if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(
+                    filepath
+                ):
                     PDS_LOGGER.log(
                         "info", f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}"
                     )

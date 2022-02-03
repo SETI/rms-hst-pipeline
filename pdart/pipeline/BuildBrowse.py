@@ -69,7 +69,9 @@ def _fill_in_old_browse_collection(
     db.create_bundle_collection_link(str(bundle_lidvid), str(browse_collection_lidvid))
     try:
         PDS_LOGGER.open("Fill in old browse collection")
-        PDS_LOGGER.log("info", f"Created link and change for {browse_collection_lidvid}")
+        PDS_LOGGER.log(
+            "info", f"Created link and change for {browse_collection_lidvid}"
+        )
         for product in db.get_collection_products(str(browse_collection_lidvid)):
             product_lidvid = LIDVID(product.lidvid)
             changes_dict.set(product_lidvid.lid(), product_lidvid.vid(), False)
@@ -245,7 +247,9 @@ class BuildBrowse(MarkedStage):
                             collection_lid, collection_vid
                         )
                         if changes_dict.changed(collection_lid):
-                            PDS_LOGGER.log("info", f"Making browse for {collection_lidvid}")
+                            PDS_LOGGER.log(
+                                "info", f"Making browse for {collection_lidvid}"
+                            )
                             _build_browse_collection(
                                 db,
                                 changes_dict,

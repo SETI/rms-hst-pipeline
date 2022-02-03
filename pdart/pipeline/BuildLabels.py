@@ -452,9 +452,7 @@ class BuildLabels(MarkedStage):
         archive_label_deltas_dir: str = self.archive_label_deltas_dir()
 
         if os.path.isdir(self.deliverable_dir()):
-            raise ValueError(
-                f"{self.deliverable_dir()} cannot exist for BuildLabels."
-            )
+            raise ValueError(f"{self.deliverable_dir()} cannot exist for BuildLabels.")
 
         changes_path = fs.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)

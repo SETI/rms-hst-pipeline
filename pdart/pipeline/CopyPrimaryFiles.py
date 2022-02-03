@@ -54,7 +54,9 @@ class CopyPrimaryFiles(MarkedStage):
                     file_basename = os.path.basename(file)
                     new_file_path = os.path.join(new_dir_path, file_basename)
                     PDS_LOGGER.log("info", f"Copy {file_basename} to {new_file_path}")
-                    fs.copy.copy_file(documents_fs, file, primary_files_fs, new_file_path)
+                    fs.copy.copy_file(
+                        documents_fs, file, primary_files_fs, new_file_path
+                    )
         except Exception as e:
             PDS_LOGGER.error(e)
         finally:

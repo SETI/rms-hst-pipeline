@@ -77,6 +77,7 @@ class ChangeFiles(MarkedStage):
             )
 
             from TouchFits import touch_fits
+
             try:
                 PDS_LOGGER.open("Change fits file")
                 PDS_LOGGER.log("info", f"Touching {abs_path}")
