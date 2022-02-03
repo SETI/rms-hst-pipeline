@@ -13,15 +13,19 @@ def run() -> None:
     proposal_id = int(sys.argv[1])
     init_logging()
     dirs = make_directories()
-    PDS_LOGGER.open(
-        f"Pipeline for proposal id: {proposal_id}",
-        limits={
-            "info": INFO_MESSAGE_LIMIT,
-        },
-    )
-    state_machine = StateMachine(dirs, proposal_id)
-    state_machine.run()
-    PDS_LOGGER.close()
+    try:
+        PDS_LOGGER.open(
+            f"Pipeline for proposal id: {proposal_id}",
+            limits={
+                "info": INFO_MESSAGE_LIMIT,
+            },
+        )
+        state_machine = StateMachine(dirs, proposal_id)
+        state_machine.run()
+    except Exception as e:
+        PDS_LOGGER.error(e)
+    finally:
+        PDS_LOGGER.close()
 
 
 if __name__ == "__main__":
