@@ -346,7 +346,7 @@ def make_other_collection_label(
             primary_result_dict: Dict[str, Any] = {}
             # Check if it's raw or calibrated image, we will update this later
             processing_level = get_processing_level(
-                suffix=suffix, instrument_id=instrument
+                suffix=suffix, instrument_id=instrument.upper()
             )
             primary_result_dict["processing_level"] = processing_level
 
