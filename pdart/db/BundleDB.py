@@ -49,6 +49,7 @@ from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.Utils import create_citation_info
+from pdart.Logging import PDS_LOGGER
 
 _BUNDLE_DB_NAME: str = "bundle$database.db"
 _BUNDLE_DIRECTORY_PATTERN: str = r"\Ahst_([0-9]{5})\Z"
@@ -815,7 +816,16 @@ class BundleDB(object):
                 ):
                     data = hdu[key]
                     spt_lookup[key] = data.strip() if type(data) is str else data
-            target_identifications = hst_target_identifications(spt_lookup)
+            try:
+                PDS_LOGGER.open("Get Target Identification")
+                target_identifications = hst_target_identifications(spt_lookup)
+                PDS_LOGGER.log(
+                    "info", f"Target identification: {target_identifications}"
+                )
+            except Exception as e:
+                PDS_LOGGER.error(e)
+            finally:
+                PDS_LOGGER.close()
             self.add_record_to_target_identification_db(
                 target_id, target_identifications
             )
