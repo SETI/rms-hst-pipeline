@@ -58,7 +58,7 @@ class CopyPrimaryFiles(MarkedStage):
                         documents_fs, file, primary_files_fs, new_file_path
                     )
         except Exception as e:
-            PDS_LOGGER.error(e)
+            PDS_LOGGER.exception(e)
         finally:
             PDS_LOGGER.close()
         # shutil.rmtree(documents_dir)
@@ -114,7 +114,7 @@ class CopyPrimaryFiles(MarkedStage):
             # shutil.rmtree(mast_downloads_dir)
             # assert not os.path.isdir(mast_downloads_dir)
         except Exception as e:
-            PDS_LOGGER.error(e)
+            PDS_LOGGER.exception(e)
         finally:
             PDS_LOGGER.close()
 

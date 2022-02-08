@@ -44,7 +44,7 @@ def download_product_documents(proposal_id: int, download_dir: str) -> Set[str]:
                 PDS_LOGGER.log("info", f"Retrieve {basename} from {url}")
                 res.add(basename)
     except Exception as e:
-        PDS_LOGGER.error(e)
+        PDS_LOGGER.exception(e)
     finally:
         PDS_LOGGER.close()
 

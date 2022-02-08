@@ -77,7 +77,7 @@ def _fill_in_old_browse_collection(
             changes_dict.set(product_lidvid.lid(), product_lidvid.vid(), False)
             PDS_LOGGER.log("info", f"Created link and change for {product_lidvid}")
     except Exception as e:
-        PDS_LOGGER.error(e)
+        PDS_LOGGER.exception(e)
     finally:
         PDS_LOGGER.close()
 
@@ -266,6 +266,6 @@ class BuildBrowse(MarkedStage):
                 write_changes_dict(changes_dict, changes_path)
             PDS_LOGGER.log("info", "Leaving BuildBrowse.")
         except Exception as e:
-            PDS_LOGGER.error(e)
+            PDS_LOGGER.exception(e)
         finally:
             PDS_LOGGER.close()

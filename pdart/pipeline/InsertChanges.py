@@ -98,6 +98,6 @@ class InsertChanges(MarkedStage):
             if not os.path.isfile(changes_path):
                 raise ValueError(f"{changes_path} is not a file.")
         except Exception as e:
-            PDS_LOGGER.error(e)
+            PDS_LOGGER.exception(e)
         finally:
             PDS_LOGGER.close()

@@ -504,7 +504,7 @@ class BuildLabels(MarkedStage):
                     working_dir, db, bundle_lidvid, changes_dict, label_deltas, info
                 )
             except Exception as e:
-                PDS_LOGGER.error(e)
+                PDS_LOGGER.exception(e)
             finally:
                 PDS_LOGGER.close()
             write_changes_dict(changes_dict, changes_path)

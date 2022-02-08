@@ -63,7 +63,7 @@ class CheckDownloads(MarkedStage):
             if not os.path.isdir(mast_downloads_dir):
                 raise ValueError(f"{mast_downloads_dir} doesn't exist.")
         except Exception as e:
-            PDS_LOGGER.error(e)
+            PDS_LOGGER.exception(e)
         finally:
             PDS_LOGGER.close()
 

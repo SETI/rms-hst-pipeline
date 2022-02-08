@@ -175,7 +175,7 @@ def _get_primary_changes(
                     PDS_LOGGER.close()
                     return False
         except Exception as e:
-            PDS_LOGGER.error(e)
+            PDS_LOGGER.exception(e)
         finally:
             PDS_LOGGER.close()
         return True

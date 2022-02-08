@@ -122,6 +122,6 @@ class MakeDeliverable(MarkedStage):
                 copy_fs(deliverable_view, deliverable_osfs)
                 PDS_LOGGER.log("info", f"Deliverable: {deliverable_dir}")
         except Exception as e:
-            PDS_LOGGER.error(e)
+            PDS_LOGGER.exception(e)
         finally:
             PDS_LOGGER.close()

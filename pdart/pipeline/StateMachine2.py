@@ -83,7 +83,7 @@ class ChangeFiles(MarkedStage):
                 PDS_LOGGER.log("info", f"Touching {abs_path}")
                 touch_fits(abs_path)
             except Exception as e:
-                PDS_LOGGER.error(e)
+                PDS_LOGGER.exception(e)
             finally:
                 PDS_LOGGER.close()
 

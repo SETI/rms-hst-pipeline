@@ -23,7 +23,7 @@ def run() -> None:
         state_machine = StateMachine(dirs, proposal_id)
         state_machine.run()
     except Exception as e:
-        PDS_LOGGER.error(e)
+        PDS_LOGGER.exception(e)
     finally:
         PDS_LOGGER.close()
 
