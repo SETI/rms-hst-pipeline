@@ -16,7 +16,10 @@ class LIDVID(object):
         the LIDVID string is malformed.
         """
         segs = lidvid_str.split("::")
-        assert len(segs) == 2
+        if len(segs) != 2:
+            raise ValueError(
+                f"The number of {lidvid_str} segments: " + f"{len(segs)}, exepct 2."
+            )
         self._lidvid = lidvid_str
         self._lid = LID(segs[0])
         self._vid = VID(segs[1])

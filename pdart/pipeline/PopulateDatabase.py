@@ -51,7 +51,7 @@ def _populate_bundle(changes_dict: ChangesDict, db: BundleDB) -> LIDVID:
             db.create_bundle(str(lidvid))
             # there's only one, so return it
             return lidvid
-    assert False, "No changed bundle LID in changes_dict"
+    raise RuntimeError("No changed bundle LID in changes_dict.")
 
 
 def _populate_collections(changes_dict: ChangesDict, db: BundleDB) -> None:
@@ -170,9 +170,10 @@ class PopulateDatabase(MarkedStage):
         archive_dir: str = self.archive_dir()
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for PopulateDatabase"
+        if os.path.isdir(self.deliverable_dir()):
+            raise ValueError(
+                f"{self.deliverable_dir()} cannot exist for PopulateDatabase."
+            )
 
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
         changes_dict = read_changes_dict(changes_path)
@@ -205,6 +206,8 @@ class PopulateDatabase(MarkedStage):
             _populate_target_identification(changes_dict, db, sv_deltas)
             _populate_citation_info(changes_dict, db, info_param)
 
-        assert db
+        if not db:
+            raise ValueError("db doesn't exist.")
 
-        assert os.path.isfile(db_filepath), db_filepath
+        if not os.path.isfile(db_filepath):
+            raise ValueError(f"{db_filepath} is not a file.")

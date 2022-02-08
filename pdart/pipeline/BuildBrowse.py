@@ -27,8 +27,7 @@ from pdart.pipeline.SuffixInfo import (  # type: ignore
     TARGET_IDENTIFICATION_SUFFIXES,
 )
 from pdart.pipeline.Utils import make_osfs, make_sv_deltas, make_version_view
-
-_LOGGER = logging.getLogger(__name__)
+from pdart.Logging import PDS_LOGGER
 
 _NON_IMAGE_SUFFIXES: Set[str] = {"asn", "shm", "spt"}
 
@@ -68,11 +67,19 @@ def _fill_in_old_browse_collection(
 
     changes_dict.set(browse_collection_lid, browse_collection_vid, False)
     db.create_bundle_collection_link(str(bundle_lidvid), str(browse_collection_lidvid))
-    _LOGGER.info(f"created link and change for {browse_collection_lidvid}")
-    for product in db.get_collection_products(str(browse_collection_lidvid)):
-        product_lidvid = LIDVID(product.lidvid)
-        changes_dict.set(product_lidvid.lid(), product_lidvid.vid(), False)
-        _LOGGER.info(f"created link and change for {product_lidvid}")
+    try:
+        PDS_LOGGER.open("Fill in old browse collection")
+        PDS_LOGGER.log(
+            "info", f"Created link and change for {browse_collection_lidvid}"
+        )
+        for product in db.get_collection_products(str(browse_collection_lidvid)):
+            product_lidvid = LIDVID(product.lidvid)
+            changes_dict.set(product_lidvid.lid(), product_lidvid.vid(), False)
+            PDS_LOGGER.log("info", f"Created link and change for {product_lidvid}")
+    except Exception as e:
+        PDS_LOGGER.exception(e)
+    finally:
+        PDS_LOGGER.close()
 
 
 def _build_browse_collection(
@@ -194,62 +201,71 @@ class BuildBrowse(MarkedStage):
     """
 
     def _run(self) -> None:
-        _LOGGER.info("Entering BuildBrowse.")
-        working_dir: str = self.working_dir()
-        archive_dir: str = self.archive_dir()
-        archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
-        archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
+        try:
+            PDS_LOGGER.open("BuildBrowse")
+            PDS_LOGGER.log("info", "Entering BuildBrowse.")
+            working_dir: str = self.working_dir()
+            archive_dir: str = self.archive_dir()
+            archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
+            archive_browse_deltas_dir: str = self.archive_browse_deltas_dir()
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for BuildBrowse"
-
-        changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
-        changes_dict = read_changes_dict(changes_path)
-
-        db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
-        db = create_bundle_db_from_os_filepath(db_filepath)
-
-        bundle_lid = LID.create_from_parts([self._bundle_segment])
-        bundle_vid = changes_dict.vid(bundle_lid)
-        bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid)
-
-        with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self._bundle_segment
-        ) as version_view, make_sv_deltas(
-            version_view, archive_primary_deltas_dir
-        ) as sv_deltas, make_sv_deltas(
-            sv_deltas, archive_browse_deltas_dir
-        ) as browse_deltas:
-            bundle_path = f"/{self._bundle_segment}$/"
-            collection_segments = [
-                str(coll[:-1])
-                for coll in browse_deltas.listdir(bundle_path)
-                if "$" in coll
-            ]
-            for collection_segment in collection_segments:
-                collection_lid = LID.create_from_parts(
-                    [self._bundle_segment, collection_segment]
+            if os.path.isdir(self.deliverable_dir()):
+                raise ValueError(
+                    f"{self.deliverable_dir()} cannot exist " + "for BuildBrowse."
                 )
-                if _requires_browse_collection(collection_segment):
-                    collection_vid = changes_dict.vid(collection_lid)
-                    collection_lidvid = LIDVID.create_from_lid_and_vid(
-                        collection_lid, collection_vid
-                    )
-                    if changes_dict.changed(collection_lid):
-                        _LOGGER.info(f"making browse for {collection_lidvid}")
-                        _build_browse_collection(
-                            db,
-                            changes_dict,
-                            browse_deltas,
-                            bundle_lidvid,
-                            collection_lidvid,
-                            bundle_path,
-                        )
-                    else:
-                        _fill_in_old_browse_collection(
-                            db, changes_dict, bundle_lidvid, collection_lidvid
-                        )
 
-            write_changes_dict(changes_dict, changes_path)
-        _LOGGER.info("Leaving BuildBrowse.")
+            changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
+            changes_dict = read_changes_dict(changes_path)
+
+            db_filepath = os.path.join(working_dir, _BUNDLE_DB_NAME)
+            db = create_bundle_db_from_os_filepath(db_filepath)
+
+            bundle_lid = LID.create_from_parts([self._bundle_segment])
+            bundle_vid = changes_dict.vid(bundle_lid)
+            bundle_lidvid = LIDVID.create_from_lid_and_vid(bundle_lid, bundle_vid)
+
+            with make_osfs(archive_dir) as archive_osfs, make_version_view(
+                archive_osfs, self._bundle_segment
+            ) as version_view, make_sv_deltas(
+                version_view, archive_primary_deltas_dir
+            ) as sv_deltas, make_sv_deltas(
+                sv_deltas, archive_browse_deltas_dir
+            ) as browse_deltas:
+                bundle_path = f"/{self._bundle_segment}$/"
+                collection_segments = [
+                    str(coll[:-1])
+                    for coll in browse_deltas.listdir(bundle_path)
+                    if "$" in coll
+                ]
+                for collection_segment in collection_segments:
+                    collection_lid = LID.create_from_parts(
+                        [self._bundle_segment, collection_segment]
+                    )
+                    if _requires_browse_collection(collection_segment):
+                        collection_vid = changes_dict.vid(collection_lid)
+                        collection_lidvid = LIDVID.create_from_lid_and_vid(
+                            collection_lid, collection_vid
+                        )
+                        if changes_dict.changed(collection_lid):
+                            PDS_LOGGER.log(
+                                "info", f"Making browse for {collection_lidvid}"
+                            )
+                            _build_browse_collection(
+                                db,
+                                changes_dict,
+                                browse_deltas,
+                                bundle_lidvid,
+                                collection_lidvid,
+                                bundle_path,
+                            )
+                        else:
+                            _fill_in_old_browse_collection(
+                                db, changes_dict, bundle_lidvid, collection_lidvid
+                            )
+
+                write_changes_dict(changes_dict, changes_path)
+            PDS_LOGGER.log("info", "Leaving BuildBrowse.")
+        except Exception as e:
+            PDS_LOGGER.exception(e)
+        finally:
+            PDS_LOGGER.close()

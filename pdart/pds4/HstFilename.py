@@ -17,13 +17,14 @@ class HstFilename(object):
 
     def __init__(self, filename: str) -> None:
         self.filename = filename
-        assert (
-            len(basename(filename)) > 6
-        ), "Filename must be at least six characters long"
+        if len(basename(filename)) <= 6:
+            raise ValueError("Filename must be at least six characters long.")
         basename2 = basename(filename)
-        assert (
-            basename2[0].lower() in ACCEPTED_LETTER_CODES
-        ), f"First char of filename {basename2!r} must be in {ACCEPTED_LETTER_CODES!r}."
+        if basename2[0].lower() not in ACCEPTED_LETTER_CODES:
+            raise ValueError(
+                f"First char of filename {basename2!r} must be "
+                + f"in {ACCEPTED_LETTER_CODES!r}."
+            )
 
     def __str__(self) -> str:
         return self.filename.__str__()
@@ -41,9 +42,11 @@ class HstFilename(object):
         """
         filename = self._basename()
         i = filename[0].lower()
-        assert (
-            i in ACCEPTED_LETTER_CODES
-        ), f"First char of filename {filename!r} must be in {ACCEPTED_LETTER_CODES!r}."
+        if i not in ACCEPTED_LETTER_CODES.lower():
+            raise ValueError(
+                f"First char of filename {filename!r} must be "
+                + f"in {ACCEPTED_LETTER_CODES!r}."
+            )
         try:
             return INSTRUMENT_FROM_LETTER_CODE[i]
         except KeyError:
@@ -65,7 +68,11 @@ class HstFilename(object):
         association tables.
         """
         match = re.match(r"\A([^_]+)_.*\Z", self._basename())
-        assert match
+        if not match:
+            raise ValueError(
+                f"Filename: {self._basename()} rootname doesn't "
+                + "match the expected pattern."
+            )
         return str(match.group(1)).lower()
 
     def suffix(self) -> str:
@@ -75,7 +82,11 @@ class HstFilename(object):
         extension.
         """
         match = re.match(r"\A[^_]+_([^.]+)\..*\Z", self._basename())
-        assert match
+        if not match:
+            raise ValueError(
+                f"Filename: {self._basename()} suffix doesn't "
+                + "match the expected pattern."
+            )
         return str(match.group(1)).lower()
 
     def visit(self) -> str:

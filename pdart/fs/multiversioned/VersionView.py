@@ -40,9 +40,11 @@ class VersionView(FS):
         # imports.  Fix this.
         from pdart.fs.multiversioned.Multiversioned import Multiversioned
 
-        assert isinstance(mv, Multiversioned)
+        if not isinstance(mv, Multiversioned):
+            raise TypeError(f"{mv} is not Multiversioned.")
         FS.__init__(self)
-        assert lidvid in mv
+        if lidvid not in mv:
+            raise ValueError(f"{lidvid} is not in mv.")
         self.multiversioned = mv
         self.lidvid = lidvid
 
@@ -52,7 +54,8 @@ class VersionView(FS):
         parts = [str(p) for p in fs.path.parts(mv_path)]
         lid = LID.create_from_parts(parts[1:-1])
         vid_part = parts[-1]
-        assert vid_part.startswith("v$")
+        if not vid_part.startswith("v$"):
+            raise ValueError(f"{vid_part} doesn't start with 'v$'.")
         vid = VID(vid_part[2:])
         return LIDVID.create_from_lid_and_vid(lid, vid)
 

@@ -109,8 +109,10 @@ class MultiversionedCOWFS(COWFS, Versioned):
         additions_fs: Optional[FS] = None,
         deletions_fs: Optional[FS] = None,
     ) -> None:
-        assert isinstance(base_fs, Versioned)
-        assert base_fs.is_multiversioned_fs()
+        if not isinstance(base_fs, Versioned):
+            raise TypeError(f"Base filesystem {base_fs} is not Versioned.")
+        if not base_fs.is_multiversioned_fs():
+            raise ValueError(f"Base filesystem {base_fs} is not multiversioned.")
         COWFS.__init__(self, base_fs, additions_fs, deletions_fs)
 
     def is_single_versioned_fs(self) -> bool:

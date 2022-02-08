@@ -19,6 +19,7 @@ from pdart.pipeline.Utils import (
     make_sv_osfs,
     make_version_view,
 )
+from pdart.Logging import PDS_LOGGER
 
 
 def _is_component_path(dirpath: str) -> bool:
@@ -68,26 +69,35 @@ class InsertChanges(MarkedStage):
         primary_files_dir: str = self.primary_files_dir()
         archive_dir: str = self.archive_dir()
         archive_primary_deltas_dir: str = self.archive_primary_deltas_dir()
+        try:
+            PDS_LOGGER.open("Create a directory for a new version of the bundle")
+            if os.path.isdir(self.deliverable_dir()):
+                raise ValueError(
+                    f"{self.deliverable_dir()} cannot exist for InsertChanges."
+                )
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for InsertChanges"
+            changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
+            with make_osfs(archive_dir) as archive_osfs, make_version_view(
+                archive_osfs, self._bundle_segment
+            ) as version_view, make_sv_osfs(
+                primary_files_dir
+            ) as primary_files_osfs, make_sv_deltas(
+                version_view, archive_primary_deltas_dir
+            ) as sv_deltas:
+                archive_dirs = list(archive_osfs.walk.dirs())
+                changes_dict = read_changes_dict(changes_path)
+                _merge_primaries(changes_dict, primary_files_osfs, sv_deltas)
 
-        changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
-        with make_osfs(archive_dir) as archive_osfs, make_version_view(
-            archive_osfs, self._bundle_segment
-        ) as version_view, make_sv_osfs(
-            primary_files_dir
-        ) as primary_files_osfs, make_sv_deltas(
-            version_view, archive_primary_deltas_dir
-        ) as sv_deltas:
-            archive_dirs = list(archive_osfs.walk.dirs())
-            changes_dict = read_changes_dict(changes_path)
-            _merge_primaries(changes_dict, primary_files_osfs, sv_deltas)
-
-        shutil.rmtree(primary_files_dir + "-sv")
-
-        assert os.path.isdir(archive_dir), archive_dir
-        dirpath = archive_primary_deltas_dir + "-deltas-sv"
-        assert os.path.isdir(dirpath), dirpath
-        assert os.path.isfile(changes_path)
+            shutil.rmtree(primary_files_dir + "-sv")
+            if not os.path.isdir(archive_dir):
+                raise ValueError(f"{archive_dir} doesn't exist.")
+            dirpath = archive_primary_deltas_dir + "-deltas-sv"
+            PDS_LOGGER.log("info", f"Directory for the new version: {dirpath}")
+            if not os.path.isdir(dirpath):
+                raise ValueError(f"{dirpath} doesn't exist.")
+            if not os.path.isfile(changes_path):
+                raise ValueError(f"{changes_path} is not a file.")
+        except Exception as e:
+            PDS_LOGGER.exception(e)
+        finally:
+            PDS_LOGGER.close()

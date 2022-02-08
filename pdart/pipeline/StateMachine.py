@@ -1,5 +1,6 @@
 import abc
 import logging
+import os
 from typing import Optional
 
 from pdart.pipeline.Stage import Stage
@@ -18,9 +19,7 @@ from pdart.pipeline.RecordChanges import RecordChanges
 from pdart.pipeline.ResetPipeline import ResetPipeline
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.ValidateBundle import ValidateBundle
-
-
-_LOGGER = logging.getLogger(__name__)
+from pdart.Logging import PDS_LOGGER
 
 
 class StateMachine(object):
@@ -52,11 +51,11 @@ class StateMachine(object):
             for i, (name, stage) in enumerate(self.stages):
                 if name == phase:
                     return i
-            assert False, f"unknown phase {phase}"
+            raise ValueError(f"unknown phase {phase}.")
 
         i = phase_index()
         try:
-            _LOGGER.info(f"{self.stages[i+1][0]}")
+            PDS_LOGGER.log("info", f"{self.stages[i+1][0]}")
             return self.stages[i + 1][1]
         except IndexError:
             return None
@@ -67,7 +66,8 @@ class StateMachine(object):
         while stage is not None:
             stage()
             marker_info = self.marker_file.get_marker()
-            assert marker_info is not None
+            if marker_info is None:
+                raise ValueError(f"{marker_info} is None.")
             if marker_info.state == "SUCCESS":
                 stage = self.next_stage(marker_info.phase)
             else:
@@ -75,4 +75,5 @@ class StateMachine(object):
 
         # Throw an exception if the machine failed
         marker_info = self.marker_file.get_marker()
-        assert marker_info and marker_info.state == "SUCCESS"
+        if not marker_info or marker_info.state != "SUCCESS":
+            raise RuntimeError("State machine failed.")

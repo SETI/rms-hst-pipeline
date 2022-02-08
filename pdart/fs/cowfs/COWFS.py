@@ -36,7 +36,8 @@ def _deletions_invariant(filesys: FS) -> None:
     The only files the given filesystem contains all are named DEL.
     """
     names = {fs.path.basename(file) for file in filesys.walk.files()}
-    assert not names or names == {DEL}
+    if names and names != {DEL}:
+        raise ValueError(f"Invalid names: {names}.")
 
 
 def paths(filesys: FS) -> Generator[str, None, None]:
@@ -106,9 +107,12 @@ class COWFS(FS):
     ############################################################
 
     def invariant(self) -> bool:
-        assert self.additions_fs
-        assert self.deletions_fs
-        assert self.base_fs
+        if not self.additions_fs:
+            raise ValueError(f"Invalid additions_fs: {self.additions_fs}.")
+        if not self.deletions_fs:
+            raise ValueError(f"Invalid deletions_fs: {self.additions_fs}.")
+        if not self.base_fs:
+            raise ValueError(f"Invalid base_fs: {self.base_fs}.")
 
         _deletions_invariant(self.deletions_fs)
 
@@ -116,13 +120,13 @@ class COWFS(FS):
         deletions_paths = {
             fs.path.dirname(file) for file in self.deletions_fs.walk.files()
         }
-        assert (
-            additions_paths <= deletions_paths
-        ), f"""Additions_paths {additions_paths}
-is not a subset of
-deletions_path {deletions_paths}.
-Extras are {additions_paths - deletions_paths}.
-"""
+        if additions_paths > deletions_paths:
+            raise ValueError(
+                f"Additions_paths {additions_paths} "
+                + "is not a subset of deletions_path "
+                + f"{deletions_paths}. Extras are "
+                + f"{additions_paths - deletions_paths}."
+            )
 
         return True
 
@@ -205,7 +209,7 @@ Extras are {additions_paths - deletions_paths}.
                 raw_info["basic"] = {"name": "", "is_dir": True}
             return Info(raw_info)
         else:
-            assert False, f"unknown layer {layer}"
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def getsyspath(self, path: str) -> str:
         self.check()
@@ -220,7 +224,7 @@ Extras are {additions_paths - deletions_paths}.
         elif layer == ROOT_LAYER:
             raise fs.errors.NoSysPath(path=path)
         else:
-            assert False, f"unknown layer {layer}"
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def listdir(self, path: str) -> List[str]:
         self.check()
@@ -254,7 +258,7 @@ Extras are {additions_paths - deletions_paths}.
             # Return the entries that actually exist.
             return [name for name in list(names) if self.layer(name) != NO_LAYER]
         else:
-            assert False, f"unknown layer {layer}"
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def makedir(
         self,
@@ -288,7 +292,7 @@ Extras are {additions_paths - deletions_paths}.
                 # I think this is wrong.  What if it's a file?
                 raise fs.errors.DirectoryExists(path)
         else:
-            assert False, f"unknown layer {layer}"
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def openbin(
         self, path: str, mode: str = "r", buffering: int = -1, **options: Any
@@ -326,7 +330,7 @@ Extras are {additions_paths - deletions_paths}.
         elif layer == ROOT_LAYER:
             raise fs.errors.FileExpected(path)
         else:
-            assert False, f"unknown layer {layer}"
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def remove(self, path: str) -> None:
         self.check()
@@ -345,7 +349,7 @@ Extras are {additions_paths - deletions_paths}.
         elif layer == ROOT_LAYER:
             raise fs.errors.FileExpected(path)
         else:
-            assert False, f"unknown layer {layer}"
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def removedir(self, path: str) -> None:
         self.check()
@@ -366,7 +370,7 @@ Extras are {additions_paths - deletions_paths}.
         elif layer == ROOT_LAYER:
             raise fs.errors.RemoveRootError(path)
         else:
-            assert False, f"unknown layer {layer}"
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     def setinfo(self, path: str, info: _INFO_DICT) -> None:
         self.check()
@@ -382,7 +386,7 @@ Extras are {additions_paths - deletions_paths}.
         elif layer == ROOT_LAYER:
             pass
         else:
-            assert False, f"unknown layer {layer}"
+            raise RuntimeError(f"Unknown layer {layer}.")
 
     ############################################################
 

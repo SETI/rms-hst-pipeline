@@ -3,6 +3,8 @@ import urllib.parse
 import urllib.request
 from typing import List, Set, Tuple
 
+from pdart.Logging import PDS_LOGGER
+
 import fs.path
 
 DOCUMENT_SUFFIXES = [".apt", ".pdf", ".pro", ".prop"]
@@ -33,12 +35,17 @@ def download_product_documents(proposal_id: int, download_dir: str) -> Set[str]:
         (f"https://www.stsci.edu/hst/phase2-public/{proposal_id}.pro", "phase2.pro"),
         (f"https://www.stsci.edu/hst/phase2-public/{proposal_id}.prop", "phase2.prop"),
     ]
-
     res: Set[str] = set()
-
-    for (url, basename) in table:
-        filepath = fs.path.join(download_dir, basename)
-        if _retrieve_doc(url, filepath):
-            res.add(basename)
+    try:
+        PDS_LOGGER.open("Download product documents")
+        for (url, basename) in table:
+            filepath = fs.path.join(download_dir, basename)
+            if _retrieve_doc(url, filepath):
+                PDS_LOGGER.log("info", f"Retrieve {basename} from {url}")
+                res.add(basename)
+    except Exception as e:
+        PDS_LOGGER.exception(e)
+    finally:
+        PDS_LOGGER.close()
 
     return res

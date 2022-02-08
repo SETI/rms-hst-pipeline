@@ -39,9 +39,11 @@ class ChangesDict(object):
 
     def parent_lidvid(self, lidvid: LIDVID) -> LIDVID:
         lid = lidvid.lid()
-        assert lid in self.changes_dict, f"lidvid={lidvid}"
+        if lid not in self.changes_dict:
+            raise KeyError(f"lid={lid} not in changes_dict.")
         parent_lid = lid.parent_lid()
-        assert parent_lid in self.changes_dict, f"parent_lid={parent_lid}"
+        if parent_lid not in self.changes_dict:
+            raise KeyError(f"parent_lid={parent_lid} not in changes_dict.")
         parent_vid = self.vid(parent_lid)
         return LIDVID.create_from_lid_and_vid(parent_lid, parent_vid)
 
@@ -74,9 +76,13 @@ def read_changes_dict(changes_path: str) -> CHANGES_DICT:
         for line in f:
             parts = line.strip().split()
             if parts:
-                assert len(parts) == 3, parts
+                if len(parts) != 3:
+                    raise ValueError(
+                        f"Length of parts {parts} for changes_dict is not 3."
+                    )
                 lid, vid, changed = parts
-                assert changed in ["False", "True"]
+                if changed not in ["False", "True"]:
+                    raise ValueError(f"{changed} from parts has unexpected value.")
                 changes_dict[LID(lid)] = (VID(vid), changed == "True")
     return ChangesDict(changes_dict)
 

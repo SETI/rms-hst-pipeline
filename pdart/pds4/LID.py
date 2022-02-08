@@ -18,14 +18,16 @@ class LID(object):
         ids = lid_str.split(":")
 
         # Check requirements
-        assert len(lid_str) <= 255
-        assert len(ids) in [4, 5, 6]
-        assert ids[0] == "urn"
-        assert ids[1] == "nasa"
-        assert ids[2] == "pds"
+        if len(lid_str) > 255:
+            raise ValueError(f"{lid_str} length should be <= 255.")
+        if len(ids) not in [4, 5, 6]:
+            raise ValueError(f"The number of {lid_str} sections are out of range.")
+        if ids[0] != "urn" or ids[1] != "nasa" or ids[2] != "pds":
+            raise ValueError(f"{lid_str} doesn't start with 'urn:nasa:pds'.")
         allowed_chars_re = r"\A[-._a-z0-9]+\Z"
         for id_ in ids:
-            assert re.match(allowed_chars_re, id_), id_
+            if not re.match(allowed_chars_re, id_):
+                raise ValueError(f"{id_} doesn't match the expected pattern.")
 
         # Assign the Id fields
         self.lid = lid_str
@@ -38,7 +40,8 @@ class LID(object):
     @staticmethod
     def create_from_parts(parts: List[str]) -> "LID":
         parts_len = len(parts)
-        assert parts_len in [1, 2, 3], parts
+        if parts_len not in [1, 2, 3]:
+            raise ValueError(f"{parts} length: {parts_len} is out of range.")
         if parts_len == 1:
             return LID(f"urn:nasa:pds:{parts[0]}")
         elif parts_len == 2:
@@ -97,11 +100,13 @@ class LID(object):
         Convert a LID within a data collection into the corresponding
         LID in the browse collection.
         """
-        assert self.collection_id, "to_browse_lid() -> None: Can't call on bundle LID"
+        if not self.collection_id:
+            raise ValueError("to_browse_lid() -> None: Can't call on bundle LID.")
         collection_id_parts = self.collection_id.split("_")
-        assert (
-            collection_id_parts[0] == "data"
-        ), f"to_browse_lid: Only legal within data_ collections; had {self}"
+        if collection_id_parts[0] != "data":
+            raise ValueError(
+                f"to_browse_lid: Only legal within data_ collections; had {self}."
+            )
         collection_id_parts[0] = "browse"
         browse_collection_id = "_".join(collection_id_parts)
 
@@ -115,11 +120,13 @@ class LID(object):
         Convert a LID within a browse collection into the
         corresponding LID in the data collection.
         """
-        assert self.collection_id, "to_data_lid() -> None: Can't call on bundle LID"
+        if not self.collection_id:
+            raise ValueError("to_data_lid() -> None: Can't call on bundle LID.")
         collection_id_parts = self.collection_id.split("_")
-        assert (
-            collection_id_parts[0] == "browse"
-        ), f"to_data_lid: Only legal within browse_ collections; had {self}"
+        if collection_id_parts[0] != "browse":
+            raise ValueError(
+                f"to_data_lid: Only legal within browse_ collections; had {self}."
+            )
         collection_id_parts[0] = "data"
         data_collection_id = "_".join(collection_id_parts)
 
@@ -133,11 +140,14 @@ class LID(object):
         Convert a product LID into the corresponding LID for a file
         with a different suffix.
         """
-        assert self.collection_id, "to_other_suffixed_lid(): Can't call on bundle LID"
+        if not self.collection_id:
+            raise ValueError("to_other_suffixed_lid(): Can't call on bundle LID.")
         collection_id_parts = self.collection_id.split("_")
-        assert (
-            collection_id_parts[0] == "data"
-        ), f"to_other_suffixed_lid: Only legal within data_ collections; had {self}"
+        if collection_id_parts[0] != "data":
+            raise ValueError(
+                f"to_other_suffixed_lid: Only legal within "
+                + f"data_ collections; had {self}."
+            )
         # replace the suffix
         collection_id_parts[2] = suffix
         other_collection_id = "_".join(collection_id_parts)

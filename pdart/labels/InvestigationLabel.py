@@ -65,8 +65,10 @@ def make_investigation_label(
     # Get min start_time and max stop_time
     start_time, stop_time = bundle_db.get_roll_up_time_from_db()
     # Make sure start/stop time exists in db.
-    assert start_time is not None, "Start time is not stored in FitsProduct table."
-    assert stop_time is not None, "Stop time is not stored in FitsProduct table."
+    if start_time is None:
+        raise ValueError("Start time is not stored in FitsProduct table.")
+    if stop_time is None:
+        raise ValueError("Stop time is not stored in FitsProduct table.")
     start_date = date_time_to_date(start_time)
     stop_date = date_time_to_date(stop_time)
 

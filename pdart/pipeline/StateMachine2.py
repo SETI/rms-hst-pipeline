@@ -21,8 +21,7 @@ from pdart.pipeline.Stage import MarkedStage, Stage
 from pdart.pipeline.UpdateArchive import UpdateArchive
 from pdart.pipeline.Utils import make_osfs
 from pdart.pipeline.ValidateBundle import ValidateBundle
-
-_LOGGER = logging.getLogger(__name__)
+from pdart.Logging import PDS_LOGGER
 
 
 class SaveDownloads(MarkedStage):
@@ -79,29 +78,43 @@ class ChangeFiles(MarkedStage):
 
             from TouchFits import touch_fits
 
-            _LOGGER.info(f"touching {abs_path}")
-            touch_fits(abs_path)
+            try:
+                PDS_LOGGER.open("Change fits file")
+                PDS_LOGGER.log("info", f"Touching {abs_path}")
+                touch_fits(abs_path)
+            except Exception as e:
+                PDS_LOGGER.exception(e)
+            finally:
+                PDS_LOGGER.close()
 
         with make_osfs(self.mast_downloads_dir()) as mast_fs:
 
             def _change_fits_file() -> None:
                 which_file = 0
+                PDS_LOGGER.open("Change fits file")
                 for path in mast_fs.walk.files(filter=["*.fits"]):
                     # change only the n-th FITS file then return
                     if which_file == 0:
                         change_fits_file(path)
-                        _LOGGER.info(f"CHANGED {path}")
+                        PDS_LOGGER.log("info", f"CHANGED {path}")
+                        PDS_LOGGER.close()
                         return
                     which_file = which_file - 1
-                assert False, "fell off the end of change_fits_file in ChangeFiles"
+                raise RuntimeError(
+                    "Fell off the end of change_fits_file in ChangeFiles."
+                )
 
             def _delete_directory() -> None:
+                PDS_LOGGER.open("Delete directory")
                 for path in mast_fs.walk.dirs():
                     if len(fs.path.parts(path)) == 3:
-                        _LOGGER.info(f"REMOVED {path}")
+                        PDS_LOGGER.log("info", f"REMOVED {path}")
                         mast_fs.removetree(path)
+                        PDS_LOGGER.close()
                         return
-                assert False, "fell off the end of delete_directory in ChangeFiles"
+                raise RuntimeError(
+                    "Fell off the end of delete_directory in ChangeFiles."
+                )
 
             # _change_fits_file()
             _delete_directory()
@@ -133,9 +146,11 @@ class ReResetPipeline(MarkedStage):
                     shutil.rmtree(fullpath)
                 else:
                     os.unlink(fullpath)
-        _LOGGER.info(
-            f"contents of working_dir after re-reset: {os.listdir(working_dir)}"
+        PDS_LOGGER.open("Re-reset pipeline")
+        PDS_LOGGER.log(
+            "info", f"contents of working_dir after re-reset: {os.listdir(working_dir)}"
         )
+        PDS_LOGGER.close()
 
 
 class StateMachine2(object):
@@ -173,11 +188,11 @@ class StateMachine2(object):
             for i, (name, stage) in enumerate(self.stages):
                 if name == phase:
                     return i
-            assert False, f"unknown phase {phase}"
+            raise RuntimeError(f"Unknown phase {phase}.")
 
         i = phase_index()
         try:
-            _LOGGER.info(f"{self.stages[i+1][0]}")
+            PDS_LOGGER.log("info", f"{self.stages[i+1][0]}")
             return self.stages[i + 1][1]
         except IndexError:
             return None
@@ -188,7 +203,8 @@ class StateMachine2(object):
         while stage is not None:
             stage()
             marker_info = self.marker_file.get_marker()
-            assert marker_info is not None
+            if marker_info is None:
+                raise ValueError(f"marker_info: {marker_info}")
             if marker_info.state == "SUCCESS":
                 stage = self.next_stage(marker_info.phase)
             else:

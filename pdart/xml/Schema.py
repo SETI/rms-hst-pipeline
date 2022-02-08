@@ -81,11 +81,13 @@ def _xsd_validator_schema(
     args: List[str] = ["java", "-jar", "XsdValidator.jar"]
 
     for filename in schemas:
-        assert os.path.isfile(filename), f"schema {filename} required"
+        if not os.path.isfile(filename):
+            raise ValueError(f"Schema {filename} required.")
 
     args.extend(schemas)
     if stdin is None:
-        assert filepath is not None
+        if filepath is None:
+            raise ValueError("Filepath doesn't exist.")
         args.append(filepath)
         return run_subprocess(args)
     else:
@@ -107,7 +109,8 @@ def xml_schema_failures(
         return None
     else:
         # ignore stdout
-        assert stderr
+        if not stderr:
+            raise RuntimeError("Failed to return error from XML Schema validator.")
         return stderr
 
 
@@ -163,8 +166,10 @@ def probatron_with_svrl_result(
     SVRL as XML.
     """
     exit_code, stderr, stdout = probatron_with_stdin(filepath, stdin, schema)
-    assert stderr == b"", f"stderr = {stderr!r}"
-    assert exit_code == 0, f"exit_code = {exit_code!r}"
+    if stderr != b"":
+        raise RuntimeError(f"stderr = {stderr!r}.")
+    if exit_code != 0:
+        raise RuntimeError(f"exit_code = {exit_code!r}.")
     return xml.dom.minidom.parseString(stdout)
 
 

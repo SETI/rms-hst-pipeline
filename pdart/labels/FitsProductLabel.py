@@ -99,7 +99,7 @@ def _raw_sibling_file(siblings: List[str]) -> Tuple[str, str]:
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
-    assert False, f"siblings={siblings}; RAW_SUFFIXES={get_raw_suffix()}"
+    assert False, f"siblings={siblings}; RAW SUFFIXES={get_raw_suffix()}"
 
 
 def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
@@ -107,7 +107,9 @@ def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
-    assert False
+    raise RuntimeError(
+        f"siblings={siblings}; SHM SUFFIXES={TARGET_IDENTIFICATION_SUFFIXES}"
+    )
 
 
 def _sibling_file(siblings: List[str], suffix: str) -> Optional[str]:
@@ -192,7 +194,8 @@ def make_fits_product_label(
     try:
         product = bundle_db.get_product(product_lidvid)
         collection = bundle_db.get_collection(collection_lidvid)
-        assert isinstance(collection, OtherCollection)
+        if not isinstance(collection, OtherCollection):
+            raise TypeError(f"{collection} is not OtherCollection.")
         instrument = collection.instrument
         suffix = collection.suffix
 
@@ -249,7 +252,8 @@ def make_fits_product_label(
         )
 
         # At this stage, target identifications should be in the db
-        assert len(target_identifications) != 0
+        if len(target_identifications) == 0:
+            raise ValueError("Target identification is not stored in db.")
 
         target_identification_nodes: List[NodeBuilder] = []
         target_identification_nodes = create_target_identification_nodes(

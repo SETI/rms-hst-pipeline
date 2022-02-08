@@ -24,8 +24,7 @@ from pdart.pipeline.Utils import (
     make_version_view,
 )
 from pdart.pipeline.Stage import MarkedStage
-
-_LOGGER = logging.getLogger(__name__)
+from pdart.Logging import PDS_LOGGER
 
 _PRIMARY_SUFFIXES = DOCUMENT_SUFFIXES + [".fits", ".txt"]
 
@@ -100,27 +99,37 @@ def _get_primary_changes(
                 if "$" in dir
             ),
         )
+        PDS_LOGGER.open("Directory changes detected")
         if primary_dirs == latest_dirs:
             for dir in primary_dirs:
                 full_dirpath = join(dirpath, relpath(dir))
                 lid = dirpath_to_lid(full_dirpath)
-                assert lid in result.changes_dict
+                if lid not in result.changes_dict:
+                    raise KeyError(f"{lid} not in changes_dict.")
                 if result.changed(lid):
-                    _LOGGER.info(f"CHANGE DETECTED in {dirpath}: {lid} changed")
+                    PDS_LOGGER.log(
+                        "info", f"CHANGE DETECTED in {dirpath}: {lid} changed"
+                    )
+                    PDS_LOGGER.close()
                     return False
+            PDS_LOGGER.close()
             return True
         else:
             # list of dirs does not match
             added = primary_dirs - latest_dirs
             removed = latest_dirs - primary_dirs
             if added and removed:
-                _LOGGER.info(
-                    f"CHANGE DETECTED IN {dirpath}: added {added}; removed {removed}"
+                PDS_LOGGER.log(
+                    "info",
+                    f"CHANGE DETECTED IN {dirpath}: added {added}; removed {removed}",
                 )
             elif added:
-                _LOGGER.info(f"CHANGE DETECTED IN {dirpath}: added {added}")
+                PDS_LOGGER.log("info", f"CHANGE DETECTED IN {dirpath}: added {added}")
             else:  # removed
-                _LOGGER.info(f"CHANGE DETECTED IN {dirpath}: removed {removed}")
+                PDS_LOGGER.log(
+                    "info", f"CHANGE DETECTED IN {dirpath}: removed {removed}"
+                )
+            PDS_LOGGER.close()
             return False
 
     def files_match(dirpath: str) -> bool:
@@ -146,17 +155,29 @@ def _get_primary_changes(
                 if "$" not in filepath
             ),
         )
-
-        if primary_files != latest_files:
-            _LOGGER.info(
-                f"CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}"
-            )
-            return False
-        for filename in primary_files:
-            filepath = join(dirpath, relpath(filename))
-            if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(filepath):
-                _LOGGER.info(f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}")
+        try:
+            PDS_LOGGER.open("File changes detected")
+            if primary_files != latest_files:
+                PDS_LOGGER.log(
+                    "info",
+                    f"CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}",
+                )
+                PDS_LOGGER.close()
                 return False
+            for filename in primary_files:
+                filepath = join(dirpath, relpath(filename))
+                if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(
+                    filepath
+                ):
+                    PDS_LOGGER.log(
+                        "info", f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}"
+                    )
+                    PDS_LOGGER.close()
+                    return False
+        except Exception as e:
+            PDS_LOGGER.exception(e)
+        finally:
+            PDS_LOGGER.close()
         return True
 
     for dirpath in primary_fs.walk.dirs(filter=["*\$$"], search="depth"):
@@ -193,12 +214,15 @@ class RecordChanges(MarkedStage):
         primary_files_dir: str = self.primary_files_dir()
         archive_dir: str = self.archive_dir()
 
-        assert not os.path.isdir(
-            self.deliverable_dir()
-        ), "{deliverable_dir} cannot exist for RecordChanges"
+        if os.path.isdir(self.deliverable_dir()):
+            raise ValueError(
+                f"{self.deliverable_dir()} cannot exist " + "for RecordChanges"
+            )
 
-        assert os.path.isdir(working_dir), working_dir
-        assert os.path.isdir(primary_files_dir + "-sv"), primary_files_dir
+        if not os.path.isdir(working_dir):
+            raise ValueError(f"{working_dir} doesn't exist.")
+        if not os.path.isdir(primary_files_dir + "-sv"):
+            raise ValueError(f"{primary_files_dir}-sv doesn't exist.")
 
         changes: Dict[LIDVID, bool] = dict()
         changes_path = os.path.join(working_dir, CHANGES_DICT_NAME)
@@ -217,5 +241,9 @@ class RecordChanges(MarkedStage):
                     print("#### LATEST_VERSION ################")
                     latest_version.tree()
 
-        assert os.path.isdir(primary_files_dir + "-sv")
-        assert os.path.isfile(os.path.join(working_dir, CHANGES_DICT_NAME))
+        if not os.path.isdir(primary_files_dir + "-sv"):
+            raise ValueError(f"{primary_files_dir}-sv doesn't exist.")
+        if not os.path.isfile(os.path.join(working_dir, CHANGES_DICT_NAME)):
+            raise ValueError(
+                f"{os.path.join(working_dir, CHANGES_DICT_NAME)} " + "doesn't exist."
+            )

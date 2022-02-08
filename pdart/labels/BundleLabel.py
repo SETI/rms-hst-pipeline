@@ -110,8 +110,10 @@ def make_bundle_label(
     # Get min start_time and max stop_time
     start_time, stop_time = bundle_db.get_roll_up_time_from_db()
     # Make sure start/stop time exists in db.
-    assert start_time is not None, "Start time is not stored in FitsProduct table."
-    assert stop_time is not None, "Stop time is not stored in FitsProduct table."
+    if start_time is None:
+        raise ValueError("Start time is not stored in FitsProduct table.")
+    if stop_time is None:
+        raise ValueError("Stop time is not stored in FitsProduct table.")
 
     start_stop_times = {
         "start_date_time": start_time,
@@ -185,5 +187,6 @@ def make_bundle_label(
     except Exception as e:
         raise LabelError(bundle.lidvid) from e
 
-    assert label[:6] == b"<?xml ", "Not XML"
+    if label[:6] != b"<?xml ":
+        raise ValueError("Bundle label is not XML.")
     return pretty_and_verify(label, verify)

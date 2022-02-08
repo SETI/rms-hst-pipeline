@@ -49,6 +49,7 @@ from pdart.pds4.HstFilename import HstFilename
 from pdart.pds4.LID import LID
 from pdart.pds4.LIDVID import LIDVID
 from pdart.pipeline.Utils import create_citation_info
+from pdart.Logging import PDS_LOGGER
 
 _BUNDLE_DB_NAME: str = "bundle$database.db"
 _BUNDLE_DIRECTORY_PATTERN: str = r"\Ahst_([0-9]{5})\Z"
@@ -58,7 +59,11 @@ _COLLECTION_DIRECTORY_PATTERN: str = r"\A(([a-z]+)_([a-z0-9]+)_([a-z0-9_]+)|docu
 def _get_other_suffixed_basename(filepath: str, suffix: str) -> str:
     # TODO BUFFALO A hack.  Make this private and refactor as necessary.
     match = re.match(r"\A([^_]+)_[^\.]+\..*\Z", os.path.basename(filepath))
-    assert match
+    if not match:
+        raise TypeError(
+            "Fits filepath doesn't match the expected pattern "
+            + "in _get_other_suffixed_basename."
+        )
     return f"{match.group(1)}_{suffix}.fits"
 
 
@@ -99,11 +104,17 @@ def create_bundle_db_in_memory() -> "BundleDB":
 
 
 def _sure_match(pattern: str, string: Optional[str], group_num: int) -> str:
-    assert string is not None
+    if string is None:
+        raise TypeError("Argument: string is None to _sure_match.")
     match = re.match(pattern, string)
-    assert match is not None
+    if match is None:
+        raise TypeError(f"{string} doesn't match {pattern} in _sure_match.")
     res = match.group(group_num)
-    assert res is not None
+    if res is None:
+        raise TypeError(
+            f"{string} deosn't match {pattern} group num "
+            + f"{group_num} in _sure_match."
+        )
     return res
 
 
@@ -149,8 +160,10 @@ class BundleDB(object):
     def create_bundle_collection_link(
         self, bundle_lidvid: str, collection_lidvid: str
     ) -> None:
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         if not self.bundle_collection_link_exists(bundle_lidvid, collection_lidvid):
             self.session.add(
                 BundleCollectionLink(
@@ -174,8 +187,10 @@ class BundleDB(object):
     def create_collection_product_link(
         self, collection_lidvid: str, product_lidvid: str
     ) -> None:
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         if not self.collection_product_link_exists(collection_lidvid, product_lidvid):
             self.session.add(
                 CollectionProductLink(
@@ -229,7 +244,8 @@ class BundleDB(object):
         Create a bundle with this LIDVID if none exists.
         """
 
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
         if not self.bundle_exists(bundle_lidvid):
             proposal_id = _lidvid_to_proposal_id(bundle_lidvid)
             self.session.add(Bundle(lidvid=bundle_lidvid, proposal_id=proposal_id))
@@ -265,7 +281,8 @@ class BundleDB(object):
         Create a citation info with this LIDVID if none exists.
         """
 
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
         if not self.citation_exists(bundle_lidvid):
             proposal_id = _lidvid_to_proposal_id(bundle_lidvid)
 
@@ -317,8 +334,10 @@ class BundleDB(object):
         """
         Create a context collection with this LIDVID if none exists.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             context_collection_exists = switch_on_collection_subtype(
@@ -346,8 +365,10 @@ class BundleDB(object):
         """
         Create a document_collection with this LIDVID if none exists.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             document_collection_exists = switch_on_collection_subtype(
@@ -376,8 +397,10 @@ class BundleDB(object):
         """
         Create a schema_collection with this LIDVID if none exists.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid(), collection_lidvid
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid(), bundle_lidvid
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             schema_collection_exists = switch_on_collection_subtype(
@@ -405,8 +428,10 @@ class BundleDB(object):
         """
         Create an other_collection with this LIDVID if none exists.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         if self.collection_exists(collection_lidvid):
             collection = self.get_collection(collection_lidvid)
             other_collection_exists = switch_on_collection_subtype(
@@ -519,9 +544,12 @@ class BundleDB(object):
         """
         Create a product with this LIDVID if none exists.
         """
-        assert LIDVID(browse_product_lidvid).is_product_lidvid()
-        assert LIDVID(fits_product_lidvid).is_product_lidvid()
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(browse_product_lidvid).is_product_lidvid():
+            raise ValueError(f"{browse_product_lidvid} is not product lidvid.")
+        if not LIDVID(fits_product_lidvid).is_product_lidvid():
+            raise ValueError(f"{fits_product_lidvid} is not product lidvid.")
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         if self.product_exists(fits_product_lidvid):
             if not self.fits_product_exists(fits_product_lidvid):
                 raise Exception(f"product {fits_product_lidvid} is not a FITS product")
@@ -560,8 +588,10 @@ class BundleDB(object):
         """
         Create a product with this LIDVID if none exists.
         """
-        assert LIDVID(product_lidvid).is_product_lidvid()
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         if self.product_exists(product_lidvid):
             if self.document_product_exists(product_lidvid):
                 pass
@@ -583,7 +613,8 @@ class BundleDB(object):
         Create a product with this LIDVID if none exists.
         """
         product_lidvid2 = LIDVID(product_lidvid)
-        assert product_lidvid2.is_product_lidvid(), product_lidvid
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         rootname: str = cast(str, product_lidvid2.lid().product_id)
         LIDVID(collection_lidvid)
         if self.product_exists(product_lidvid):
@@ -785,7 +816,16 @@ class BundleDB(object):
                 ):
                     data = hdu[key]
                     spt_lookup[key] = data.strip() if type(data) is str else data
-            target_identifications = hst_target_identifications(spt_lookup)
+            try:
+                PDS_LOGGER.open("Get Target Identification")
+                target_identifications = hst_target_identifications(spt_lookup)
+                PDS_LOGGER.log(
+                    "info", f"Target identification: {target_identifications}"
+                )
+            except Exception as e:
+                PDS_LOGGER.error(e)
+            finally:
+                PDS_LOGGER.close()
             self.add_record_to_target_identification_db(
                 target_id, target_identifications
             )
@@ -853,9 +893,11 @@ class BundleDB(object):
         Create a context product with this LIDVID if none exists.
         """
         if "::" in id:
-            assert LIDVID(id).is_product_lidvid()
+            if not LIDVID(id).is_product_lidvid():
+                raise ValueError(f"{id} is not product lidvid.")
         else:
-            assert LID(id).is_product_lid()
+            if not LID(id).is_product_lid():
+                raise ValueError(f"{id} is not product lid.")
 
         if not self.context_product_exists(id):
             self.session.add(ContextProduct(lidvid=id, ref_type=ref_type))
@@ -903,9 +945,11 @@ class BundleDB(object):
         Create a schema product with this LIDVID if none exists.
         """
         if "::" in id:
-            assert LIDVID(id).is_product_lidvid()
+            if not LIDVID(id).is_product_lidvid():
+                raise ValueError(f"{id} is not product lidvid.")
         else:
-            assert LID(id).is_product_lid()
+            if not LID(id).is_product_lid():
+                raise ValueError(f"{id} is not product lid.")
 
         if not self.schema_product_exists(id):
             self.session.add(SchemaProduct(lidvid=id))
@@ -936,7 +980,8 @@ class BundleDB(object):
         Create a bad FITS file record with this basename belonging to
         the product if none exists.
         """
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         if self.fits_file_exists(basename, product_lidvid):
             pass
         else:
@@ -957,7 +1002,8 @@ class BundleDB(object):
         Create a browse file with this basename belonging to the product
         if none exists.
         """
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         if self.browse_file_exists(basename, product_lidvid):
             pass
         else:
@@ -970,7 +1016,11 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
-            assert self.browse_file_exists(basename, product_lidvid)
+            if not self.browse_file_exists(basename, product_lidvid):
+                raise ValueError(
+                    f"Browse file: {basename} with product "
+                    + f"lidvid: {product_lidvid} doesn't exist."
+                )
 
     def create_document_file(
         self, os_filepath: str, basename: str, product_lidvid: str
@@ -979,7 +1029,8 @@ class BundleDB(object):
         Create a document file with this basename belonging to the product
         if none exists.
         """
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         if self.document_file_exists(basename, product_lidvid):
             pass
         else:
@@ -991,7 +1042,11 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
-            assert self.document_file_exists(basename, product_lidvid)
+            if not self.document_file_exists(basename, product_lidvid):
+                raise ValueError(
+                    f"Document file: {basename} with product "
+                    + f"lidvid: {product_lidvid} doesn't exist."
+                )
 
     def create_fits_file(
         self, os_filepath: str, basename: str, product_lidvid: str, hdu_count: int
@@ -1000,7 +1055,8 @@ class BundleDB(object):
         Create a FITS file with this basename belonging to the product
         if none exists.
         """
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         if self.fits_file_exists(basename, product_lidvid):
             pass
         else:
@@ -1014,7 +1070,11 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
-            assert self.fits_file_exists(basename, product_lidvid)
+            if not self.fits_file_exists(basename, product_lidvid):
+                raise ValueError(
+                    f"Fits file: {basename} with product "
+                    + f"lidvid: {product_lidvid} doesn't exist."
+                )
 
     def file_exists(self, basename: str, product_lidvid: str) -> bool:
         """
@@ -1216,7 +1276,8 @@ class BundleDB(object):
     def create_bundle_label(
         self, os_filepath: str, basename: str, bundle_lidvid: str
     ) -> None:
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
         if self.bundle_label_exists(bundle_lidvid):
             pass
         else:
@@ -1228,14 +1289,16 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
-            assert self.bundle_label_exists(bundle_lidvid)
+            if not self.bundle_label_exists(bundle_lidvid):
+                raise ValueError(f"Bundle label for {bundle_lidvid} doesn't exist.")
 
     def bundle_label_exists(self, bundle_lidvid: str) -> bool:
         """
         Returns True iff there is a label for the bundle with the
         given LIDVID.
         """
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
         return self.session.query(
             exists().where(BundleLabel.bundle_lidvid == bundle_lidvid)
         ).scalar()
@@ -1245,7 +1308,8 @@ class BundleDB(object):
         Returns the label for the bundle with the given LIDVID, or
         raises an exception.
         """
-        assert LIDVID(bundle_lidvid).is_bundle_lidvid()
+        if not LIDVID(bundle_lidvid).is_bundle_lidvid():
+            raise ValueError(f"{bundle_lidvid} is not bundle lidvid.")
         return (
             self.session.query(BundleLabel)
             .filter(BundleLabel.bundle_lidvid == bundle_lidvid)
@@ -1257,7 +1321,8 @@ class BundleDB(object):
     def create_collection_label(
         self, os_filepath: str, basename: str, collection_lidvid: str
     ) -> None:
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         if self.collection_label_exists(collection_lidvid):
             pass
         else:
@@ -1269,14 +1334,18 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
-            assert self.collection_label_exists(collection_lidvid)
+            if not self.collection_label_exists(collection_lidvid):
+                raise ValueError(
+                    f"Collection label for {collection_lidvid} doesn't exist."
+                )
 
     def collection_label_exists(self, collection_lidvid: str) -> bool:
         """
         Returns True iff there is a label for the collection with the
         given LIDVID.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         return self.session.query(
             exists().where(CollectionLabel.collection_lidvid == collection_lidvid)
         ).scalar()
@@ -1286,7 +1355,8 @@ class BundleDB(object):
         Returns the label for the collection with the given LIDVID, or
         raises an exception.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         return (
             self.session.query(CollectionLabel)
             .filter(CollectionLabel.collection_lidvid == collection_lidvid)
@@ -1298,7 +1368,8 @@ class BundleDB(object):
     def create_collection_inventory(
         self, os_filepath: str, basename: str, collection_lidvid: str
     ) -> None:
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         if self.collection_inventory_exists(collection_lidvid):
             pass
         else:
@@ -1310,14 +1381,18 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
-            assert self.collection_inventory_exists(collection_lidvid)
+            if not self.collection_inventory_exists(collection_lidvid):
+                raise ValueError(
+                    f"Collection inventory for {collection_lidvid} doesn't exist."
+                )
 
     def collection_inventory_exists(self, collection_lidvid: str) -> bool:
         """
         Returns True iff there is a inventory for the collection with the
         given LIDVID.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         return self.session.query(
             exists().where(CollectionInventory.collection_lidvid == collection_lidvid)
         ).scalar()
@@ -1327,7 +1402,8 @@ class BundleDB(object):
         Returns the inventory for the collection with the given LIDVID, or
         raises an exception.
         """
-        assert LIDVID(collection_lidvid).is_collection_lidvid()
+        if not LIDVID(collection_lidvid).is_collection_lidvid():
+            raise ValueError(f"{collection_lidvid} is not collection lidvid.")
         return (
             self.session.query(CollectionInventory)
             .filter(CollectionInventory.collection_lidvid == collection_lidvid)
@@ -1339,7 +1415,8 @@ class BundleDB(object):
     def create_product_label(
         self, os_filepath: str, basename: str, product_lidvid: str
     ) -> None:
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         if self.product_label_exists(product_lidvid):
             pass
         else:
@@ -1351,14 +1428,16 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
-            assert self.product_label_exists(product_lidvid)
+            if not self.product_label_exists(product_lidvid):
+                raise ValueError(f"Product label for {product_lidvid} doesn't exist.")
 
     def product_label_exists(self, product_lidvid: str) -> bool:
         """
         Returns True iff there is a label for the product with the
         given LIDVID.
         """
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         return self.session.query(
             exists().where(ProductLabel.product_lidvid == product_lidvid)
         ).scalar()
@@ -1368,7 +1447,8 @@ class BundleDB(object):
         Returns the label for the product with the given LIDVID, or
         raises an exception.
         """
-        assert LIDVID(product_lidvid).is_product_lidvid()
+        if not LIDVID(product_lidvid).is_product_lidvid():
+            raise ValueError(f"{product_lidvid} is not product lidvid.")
         return (
             self.session.query(ProductLabel)
             .filter(ProductLabel.product_lidvid == product_lidvid)
@@ -1378,7 +1458,8 @@ class BundleDB(object):
     ############################################################
 
     def proposal_info_exists(self, bundle_lid: str) -> bool:
-        assert LID(bundle_lid).is_bundle_lid()
+        if not LID(bundle_lid).is_bundle_lid():
+            raise ValueError(f"{bundle_lid} is not bundle lid.")
         return self.session.query(
             exists().where(ProposalInfo.bundle_lid == bundle_lid)
         ).scalar()
@@ -1398,7 +1479,8 @@ class BundleDB(object):
         NOTE: We don't allow updating through this interface now.  We
         might want to allow it in the future.
         """
-        assert LID(bundle_lid).is_bundle_lid()
+        if not LID(bundle_lid).is_bundle_lid():
+            raise ValueError(f"{bundle_lid} is not bundle lid.")
         if self.proposal_info_exists(bundle_lid):
             raise Exception(f"proposal info with LID {bundle_lid} already exists")
         else:
@@ -1441,7 +1523,8 @@ class BundleDB(object):
                 )
             )
             self.session.commit()
-            assert self.context_product_label_exists(lidvid)
+            if not self.context_product_label_exists(lidvid):
+                raise ValueError(f"Context product label for {lidvid} doesn't exist.")
 
     def context_product_label_exists(self, lidvid: str) -> bool:
         """

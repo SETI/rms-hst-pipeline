@@ -49,7 +49,8 @@ def get_target_info(lookup: Lookup) -> Dict[str, str]:
 
     for prefix, info in approximate_target_table.items():
         if targname.startswith(prefix):
-            assert len(info) in [2, 3], f"unexpected target_info: {info}"
+            if len(info) not in [2, 3]:
+                raise ValueError(f"unexpected target_info: {info}.")
             name = info[0]
             type = info[1]
             if len(info) == 2:

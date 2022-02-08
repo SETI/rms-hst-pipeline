@@ -25,9 +25,13 @@ def parse_subdir_versions(txt: str) -> Dict[str, str]:
         line = line.strip()
         if line:
             fields = line.split(" ")
-            assert len(fields) == 2, f"line #{n} = {line!r}"
+            if len(fields) != 2:
+                raise ValueError(f"Line #{n} = {line!r}.")
             # TODO assert format of each field
-            assert _versionRE.match(str(fields[1]))
+            if not _versionRE.match(str(fields[1])):
+                raise ValueError(
+                    f"{str(fields[1])} doesn't match the subdir version pattern."
+                )
             d[str(fields[0])] = str(fields[1])
     return d
 
@@ -38,7 +42,8 @@ def unparse_subdir_versions(d: Dict[str, str]) -> str:
     string to be stored in a subdir-version file.
     """
     for v in d.values():
-        assert _versionRE.match(str(v))
+        if not _versionRE.match(str(v)):
+            raise ValueError(f"{str(v)} doesn't match the subdir version pattern.")
     return "".join([f"{k} {v}\n" for k, v in sorted(d.items())])
 
 
