@@ -47,13 +47,13 @@ SUFFIX_INFO = {
     #    "pdq": (               # NICMOS
     "asn": (  # ACS, WCF3, NICMOS
         True,
-        "Raw",
+        "None",
         "Miscellaneous",
         "{I} association file {F}, describing an observation set in HST Program {P}",
         "{I} association files describing observation sets in HST Program {P}",
-        ["ACS", "NICMOS", "WFC3"],
+        ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
-    ("NICMOS", "cal"): (
+    "cal": (
         True,
         "Calibrated",
         "Data",
@@ -75,7 +75,7 @@ SUFFIX_INFO = {
         "Data",
         "Combined, calibrated {I} image file {F} from repeated exposures in HST Program {P}",
         "Combined, calibrated {I} image files from repeated exposures in HST Program {P}",
-        ["ACS", "WFC3"],
+        ["ACS", "STIS", "WFC3"],
     ),
     "drc": (  # ACS, WCF3 (if available, then drz should be redefined below)
         True,
@@ -107,17 +107,17 @@ SUFFIX_INFO = {
         "Data",
         "Calibrated, flat-fielded {I} image file {F} from HST Program {P}",
         "Calibrated, flat-fielded {I} image files from HST Program {P}",
-        ["ACS", "WFC3"],
+        ["ACS", "STIS", "WFC3"],
     ),
-    ("NICMOS", "ima"): (
+    "ima": (
         False,
         "Partially Processed",
         "Data",
         "Calibrated but uncombined {I} image file {F} for MULTIACCUM observations in HST Program {P}",
         "Calibrated but uncombined {I} image file for MULTIACCUM observations in HST Program {P}",
-        ["NICMOS"],
+        ["NICMOS", "WFC3"],
     ),
-    ("NICMOS", "mos"): (
+    "mos": (
         True,
         "Derived",
         "Data",
@@ -131,23 +131,23 @@ SUFFIX_INFO = {
         "Data",
         "Raw, uncalibrated {I} image file {F} from HST Program {P}",
         "Raw, uncalibrated {I} image files from HST Program {P}",
-        ["ACS", "NICMOS", "WFC3"],
+        ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
     "spt": (  # ACS, WCF3, NICMOS
         True,
-        "Telemetry",
+        "None",
         "Miscellaneous",
         "{I} telemetry and engineering file {F}, including target definitions, for HST Program {P}",
         "{I} telemetry and engineering files, including target definitions, for HST Program {P}",
-        ["ACS", "NICMOS", "WFC3"],
+        ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
     "trl": (  # ACS, WCF3, NICMOS
-        False,
-        "Calibrated",
+        True,
+        "None",
         "Miscellaneous",
         "{I} trailer file {F}, containing a calibration processing log in HST Program {P}",
         "{I} trailer files, containing calibration processing logs for HST Program {P}",
-        ["ACS", "NICMOS", "WFC3"],
+        ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
     ("ACS", "WFC", "flt"): (  # because flc is also available
         True,
@@ -195,30 +195,6 @@ SUFFIX_INFO = {
         "Data",
         "Calibrated {I} image file {F}, corrected for geometric distortion but not CTE, from HST Program {P}",
         "Calibrated {I} image files, corrected for geometric distortion but not CTE, from HST Program {P}",
-        ["WFC3"],
-    ),
-    ("WFC3", "IR", "raw"): (  # Why do this?  Possibly remove.
-        True,
-        "Raw",
-        "Data",
-        "Raw, uncalibrated {I} image file {F}, without CR rejection, from HST Program {P}",
-        "Raw, uncalibrated {I} image files, without CR rejection, from HST Program {P}",
-        ["WFC3"],
-    ),
-    ("WFC3", "IR", "ima"): (  # Doesn't match handbook.
-        False,
-        "Partially Processed",
-        "Data",
-        "Calibrated {I} image file {F}, without CR rejection, from HST Program {P}",
-        "Calibrated {I} image files, without CR rejection, from HST Program {P}",
-        ["WFC3"],
-    ),
-    ("WFC3", "IR", "flt"): (  # Why do this?  Possibly remove.
-        True,
-        "Calibrated",
-        "Data",
-        "Calibrated {I} image file {F}, without CR rejection, from HST Program {P}",
-        "Calibrated {I} image files, without CR rejection, from HST Program {P}",
         ["WFC3"],
     ),
 }
