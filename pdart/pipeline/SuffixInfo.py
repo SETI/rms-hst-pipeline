@@ -45,7 +45,7 @@ SUFFIX_INFO = {
     #    "spb": (               # NICMOS
     #    "spf": (               # NICMOS
     #    "pdq": (               # NICMOS
-    "asn": (  # ACS, WCF3, NICMOS
+    "asn": (  
         True,
         "None",
         "Miscellaneous",
@@ -61,7 +61,7 @@ SUFFIX_INFO = {
         "Calibrated {I} image files from HST Program {P}",
         ["NICMOS"],
     ),
-    "crc": (  # ACS, WCF3 (if available, then crj should be redefined below)
+    "crc": (  # if available, then crj should be redefined below
         True,
         "Calibrated",
         "Data",
@@ -69,7 +69,7 @@ SUFFIX_INFO = {
         "Combined, calibrated, CTE-corrected {I} image files from repeated exposures in HST Program {P}",
         ["ACS", "WFC3"],
     ),
-    "crj": (  # ACS, WCF3
+    "crj": (  
         True,
         "Calibrated",
         "Data",
@@ -77,7 +77,7 @@ SUFFIX_INFO = {
         "Combined, calibrated {I} image files from repeated exposures in HST Program {P}",
         ["ACS", "STIS", "WFC3"],
     ),
-    "drc": (  # ACS, WCF3 (if available, then drz should be redefined below)
+    "drc": (  # if available, then drz should be redefined below
         True,
         "Derived",
         "Data",
@@ -85,7 +85,7 @@ SUFFIX_INFO = {
         "Calibrated {I} image files, corrected for geometric distortion and CTE, from HST Program {P}",
         ["ACS", "WFC3"],
     ),
-    "drz": (  # ACS, WCF3
+    "drz": (  
         True,
         "Derived",
         "Data",
@@ -93,7 +93,7 @@ SUFFIX_INFO = {
         "Calibrated {I} image files, corrected for geometric distortion, from HST Program {P}",
         ["ACS", "WFC3"],
     ),
-    "flc": (  # ACS, WCF3 (if available, then flt should be redefined below)
+    "flc": (  # if available, then flt should be redefined below
         True,
         "Calibrated",
         "Data",
@@ -101,7 +101,7 @@ SUFFIX_INFO = {
         "Calibrated, flat-fielded, CTE-corrected {I} image files from HST Program {P}",
         ["ACS", "WFC3"],
     ),
-    "flt": (  # ACS, WCF3
+    "flt": (  
         True,
         "Calibrated",
         "Data",
@@ -125,7 +125,7 @@ SUFFIX_INFO = {
         "Combined, calibrated {I} image files for dithered observations in HST Program {P}",
         ["NICMOS"],
     ),
-    "raw": (  # ACS, WCF3, NICMOS
+    "raw": (  
         True,
         "Raw",
         "Data",
@@ -133,7 +133,7 @@ SUFFIX_INFO = {
         "Raw, uncalibrated {I} image files from HST Program {P}",
         ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
-    "spt": (  # ACS, WCF3, NICMOS
+    "spt": (  
         True,
         "None",
         "Miscellaneous",
@@ -141,7 +141,7 @@ SUFFIX_INFO = {
         "{I} telemetry and engineering files, including target definitions, for HST Program {P}",
         ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
-    "trl": (  # ACS, WCF3, NICMOS
+    "trl": (  
         True,
         "None",
         "Miscellaneous",
