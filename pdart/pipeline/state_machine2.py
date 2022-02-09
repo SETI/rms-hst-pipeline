@@ -78,10 +78,14 @@ class ChangeFiles(MarkedStage):
 
             from touch_fits import touch_fits
 
-            PDS_LOGGER.open("Change fits file")
-            PDS_LOGGER.log("info", f"Touching {abs_path}")
-            touch_fits(abs_path)
-            PDS_LOGGER.close()
+            try:
+                PDS_LOGGER.open("Change fits file")
+                PDS_LOGGER.log("info", f"Touching {abs_path}")
+                touch_fits(abs_path)
+            except Exception as e:
+                PDS_LOGGER.exception(e)
+            finally:
+                PDS_LOGGER.close()
 
         with make_osfs(self.mast_downloads_dir()) as mast_fs:
 

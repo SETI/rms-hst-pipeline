@@ -155,23 +155,29 @@ def _get_primary_changes(
                 if "$" not in filepath
             ),
         )
-        PDS_LOGGER.open("File changes detected")
-        if primary_files != latest_files:
-            PDS_LOGGER.log(
-                "info",
-                f"CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}",
-            )
-            PDS_LOGGER.close()
-            return False
-        for filename in primary_files:
-            filepath = join(dirpath, relpath(filename))
-            if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(filepath):
+        try:
+            PDS_LOGGER.open("File changes detected")
+            if primary_files != latest_files:
                 PDS_LOGGER.log(
-                    "info", f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}"
+                    "info",
+                    f"CHANGE DETECTED IN {dirpath}: {primary_files} != {latest_files}",
                 )
                 PDS_LOGGER.close()
                 return False
-        PDS_LOGGER.close()
+            for filename in primary_files:
+                filepath = join(dirpath, relpath(filename))
+                if primary_fs.getbytes(filepath) != latest_version_fs.getbytes(
+                    filepath
+                ):
+                    PDS_LOGGER.log(
+                        "info", f"CHANGE DETECTED IN {filepath}; DIRPATH = {dirpath}"
+                    )
+                    PDS_LOGGER.close()
+                    return False
+        except Exception as e:
+            PDS_LOGGER.exception(e)
+        finally:
+            PDS_LOGGER.close()
         return True
 
     for dirpath in primary_fs.walk.dirs(filter=["*\$$"], search="depth"):

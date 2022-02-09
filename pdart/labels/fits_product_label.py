@@ -50,8 +50,8 @@ from pdart.labels.doc_reference_list import make_document_reference_list
 
 from pdart.pipeline.suffix_info import (  # type: ignore
     get_titles_format,
-    RAW_SUFFIXES,
-    SHM_SUFFIXES,
+    get_raw_suffix,
+    TARGET_IDENTIFICATION_SUFFIXES,
 )
 
 from pdart.labels.time_coordinates import get_time_coordinates
@@ -95,19 +95,21 @@ def _directory_siblings(
 
 
 def _raw_sibling_file(siblings: List[str]) -> Tuple[str, str]:
-    for suffix in RAW_SUFFIXES:
+    for suffix in get_raw_suffix():
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
-    raise RuntimeError(f"siblings={siblings}; RAW_SUFFIXES={RAW_SUFFIXES}")
+    raise RuntimeError(f"siblings={siblings}; RAW SUFFIXES={get_raw_suffix()}")
 
 
 def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
-    for suffix in SHM_SUFFIXES:
+    for suffix in TARGET_IDENTIFICATION_SUFFIXES:
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
-    raise RuntimeError(f"siblings={siblings}; SHM_SUFFIXES={SHM_SUFFIXES}")
+    raise RuntimeError(
+        f"siblings={siblings}; SHM_SUFFIXES={TARGET_IDENTIFICATION_SUFFIXES}"
+    )
 
 
 def _sibling_file(siblings: List[str], suffix: str) -> Optional[str]:
