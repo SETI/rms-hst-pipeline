@@ -45,7 +45,7 @@ SUFFIX_INFO = {
     #    "spb": (               # NICMOS
     #    "spf": (               # NICMOS
     #    "pdq": (               # NICMOS
-    "asc": (  
+    "asc": (
         True,
         "None",
         "Miscellaneous",
@@ -53,7 +53,7 @@ SUFFIX_INFO = {
         "Post-calibration {I} association files describing observation sets in HST Program {P}",
         ["NICMOS"],
     ),
-    "asn": (  
+    "asn": (
         True,
         "None",
         "Miscellaneous",
@@ -61,9 +61,7 @@ SUFFIX_INFO = {
         "{I} association files describing observation sets in HST Program {P}",
         ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
-    "c0f": (  # Waivered version of c0m
-        False,
-    ),
+    "c0f": (False,),  # Waivered version of c0m
     "c0m": (
         True,
         "Calibrated",
@@ -72,9 +70,7 @@ SUFFIX_INFO = {
         "Calibrated {I} image files from HST Program {P}",
         ["WFPC2"],
     ),
-    "c1f": (  # Waivered version of c1m
-        False,
-    ),
+    "c1f": (False,),  # Waivered version of c1m
     "c1m": (
         True,
         "Calibrated",
@@ -83,12 +79,8 @@ SUFFIX_INFO = {
         "Data quality for calibrated {I} image files from HST Program {P}",
         ["WFPC2"],
     ),
-    "c2f": (  # Waivered
-        False,
-    ),
-    "c3f": (  # Waivered
-        False,
-    ),
+    "c2f": (False,),  # Waivered
+    "c3f": (False,),  # Waivered
     "c3m": (
         True,
         "None",
@@ -97,9 +89,7 @@ SUFFIX_INFO = {
         "Throughput table for {I} image files from HST Program {P}",
         ["WFPC2"],
     ),
-    "c3t": (  # Waivered version of c3m
-        False,
-    ),
+    "c3t": (False,),  # Waivered version of c3m
     "cal": (
         True,
         "Calibrated",
@@ -140,7 +130,7 @@ SUFFIX_INFO = {
         "Combined, calibrated, CTE-corrected {I} image files from repeated exposures in HST Program {P}",
         ["ACS", "WFC3"],
     ),
-    "crj": (  
+    "crj": (
         True,
         "Calibrated",
         "Data",
@@ -148,9 +138,7 @@ SUFFIX_INFO = {
         "Combined, calibrated {I} image files from repeated exposures in HST Program {P}",
         ["ACS", "STIS", "WFC3"],
     ),
-    "d0f": (  # Waivered version of d0m
-        False,
-    ),
+    "d0f": (False,),  # Waivered version of d0m
     "d0m": (
         True,
         "Raw",
@@ -175,7 +163,7 @@ SUFFIX_INFO = {
         "Drizzled calibrated {I} image files, corrected for geometric distortion and CTE, from HST Program {P}",
         ["ACS", "WFC3"],
     ),
-    "drz": (  
+    "drz": (
         True,
         "Derived",
         "Data",
@@ -183,7 +171,7 @@ SUFFIX_INFO = {
         "Drizzled calibrated {I} image files, corrected for geometric distortion, from HST Program {P}",
         ["ACS", "WFC3", "WFPC2"],
     ),
-    "epc": (  
+    "epc": (
         True,
         "None",
         "Miscellaneous",
@@ -199,7 +187,7 @@ SUFFIX_INFO = {
         "Calibrated, flat-fielded, CTE-corrected {I} image files from HST Program {P}",
         ["ACS", "WFC3"],
     ),
-    "flt": (  
+    "flt": (
         True,
         "Calibrated",
         "Data",
@@ -215,7 +203,7 @@ SUFFIX_INFO = {
         "Calibrated but uncombined {I} image file for MULTIACCUM observations in HST Program {P}",
         ["NICMOS", "WFC3"],
     ),
-    "jif": (  
+    "jif": (
         True,
         "None",
         "Miscellaneous",
@@ -223,7 +211,7 @@ SUFFIX_INFO = {
         "{I} 2-D jitter histogram image files for observations in HST Program {P}",
         ["STIS"],
     ),
-    "jit": (  
+    "jit": (
         True,
         "None",
         "Miscellaneous",
@@ -231,7 +219,7 @@ SUFFIX_INFO = {
         "{I} spacecraft pointing jitter table files for observations in HST Program {P}",
         ["STIS"],
     ),
-    "lrc": (  
+    "lrc": (
         True,
         "None",
         "Miscellaneous",
@@ -239,7 +227,7 @@ SUFFIX_INFO = {
         "{I} local rate check image files for observations in HST Program {P}",
         ["STIS"],
     ),
-    "lsp": (  
+    "lsp": (
         True,
         "None",
         "Miscellaneous",
@@ -255,7 +243,7 @@ SUFFIX_INFO = {
         "Combined, calibrated {I} image files for dithered observations in HST Program {P}",
         ["NICMOS"],
     ),
-    "pdq": (  
+    "pdq": (
         True,
         "None",
         "Miscellaneous",
@@ -263,9 +251,7 @@ SUFFIX_INFO = {
         "{I} OPUS processing data quality files for observations in HST Program {P}",
         ["NICMOS", "STIS"],
     ),
-    "q0f": (  # Waivered version of q0m
-        False,
-    ),
+    "q0f": (False,),  # Waivered version of q0m
     "q0m": (
         True,
         "Raw",
@@ -274,9 +260,7 @@ SUFFIX_INFO = {
         "Data quality for raw {I} image files from HST Program {P}",
         ["WFPC2"],
     ),
-    "q1f": (  # Waivered version of q1m
-        False,
-    ),
+    "q1f": (False,),  # Waivered version of q1m
     "q1m": (
         True,
         "Raw",
@@ -285,7 +269,7 @@ SUFFIX_INFO = {
         "Data quality for extracted engineering data for {I} image files from HST Program {P}",
         ["WFPC2"],
     ),
-    "raw": (  
+    "raw": (
         True,
         "Raw",
         "Data",
@@ -293,7 +277,7 @@ SUFFIX_INFO = {
         "Raw, uncalibrated {I} image files from HST Program {P}",
         ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
-    "rwb": (  
+    "rwb": (
         True,
         "None",
         "Miscellaneous",
@@ -301,7 +285,7 @@ SUFFIX_INFO = {
         "Raw {I} background image files for ACCUM observations in HST Program {P}",
         ["NICMOS"],
     ),
-    "rwf": (  
+    "rwf": (
         True,
         "None",
         "Miscellaneous",
@@ -309,7 +293,7 @@ SUFFIX_INFO = {
         "Raw {I} flat-field image files for ACCUM observations in HST Program {P}",
         ["NICMOS"],
     ),
-    "sx1": (  
+    "sx1": (
         True,
         "Calibrated",
         "Data",
@@ -317,7 +301,7 @@ SUFFIX_INFO = {
         "1-D extracted {I} spectrum files for summed or CR-rejected observations in HST Program {P}",
         ["STIS"],
     ),
-    "sx2": (  
+    "sx2": (
         True,
         "Calibrated",
         "Data",
@@ -325,7 +309,7 @@ SUFFIX_INFO = {
         "2-D direct or spectral {I} image files for summed or CR-rejected observations in HST Program {P}",
         ["STIS"],
     ),
-    "sfl": (  
+    "sfl": (
         True,
         "Calibrated",
         "Data",
@@ -333,7 +317,7 @@ SUFFIX_INFO = {
         "Calibrated and summed {I} MAMA image files created from sub-exposures in an observation in HST Program {P}",
         ["ACS", "STIS"],
     ),
-    "shf": (  # Waivered version of shm.  However, accept anyway, because shm files may not have been generated. 
+    "shf": (  # Waivered version of shm.  However, accept anyway, because shm files may not have been generated.
         True,
         "None",
         "Miscellaneous",
@@ -349,7 +333,7 @@ SUFFIX_INFO = {
         "Standard header packet for {I} image files from HST Program {P}",
         ["WFPC2"],
     ),
-    "spb": (  
+    "spb": (
         True,
         "None",
         "Miscellaneous",
@@ -357,7 +341,7 @@ SUFFIX_INFO = {
         "{I} background SHP and UDL information files for ACCUM observations in HST Program {P}",
         ["NICMOS"],
     ),
-    "spf": (  
+    "spf": (
         True,
         "None",
         "Miscellaneous",
@@ -365,7 +349,7 @@ SUFFIX_INFO = {
         "{I} flat-field SHP and UDL information files for ACCUM observations in HST Program {P}",
         ["NICMOS"],
     ),
-    "spt": (  
+    "spt": (
         True,
         "None",
         "Miscellaneous",
@@ -373,7 +357,7 @@ SUFFIX_INFO = {
         "{I} telemetry and engineering files, including target definitions, for HST Program {P}",
         ["ACS", "NICMOS", "STIS", "WFC3"],
     ),
-    "tag": (  
+    "tag": (
         True,
         "None",
         "Miscellaneous",
@@ -381,7 +365,7 @@ SUFFIX_INFO = {
         "{I} TIME-TAG event list files for observations in HST Program {P}",
         ["STIS"],
     ),
-    "trl": (  
+    "trl": (
         True,
         "None",
         "Miscellaneous",
@@ -389,7 +373,7 @@ SUFFIX_INFO = {
         "{I} trailer files, containing calibration processing logs for HST Program {P}",
         ["ACS", "NICMOS", "STIS", "WFC3", "WFPC2"],
     ),
-    "wav": (  
+    "wav": (
         True,
         "None",
         "Miscellaneous",
@@ -397,7 +381,7 @@ SUFFIX_INFO = {
         "{I} associated wavecal exposure files for observations in HST Program {P}",
         ["STIS"],
     ),
-    "wsp": (  
+    "wsp": (
         True,
         "None",
         "Miscellaneous",
@@ -405,9 +389,7 @@ SUFFIX_INFO = {
         "{I} SPT files for WAV observations in HST Program {P}",
         ["STIS"],
     ),
-    "x0f": (  # Waivered version of x0m
-        False,
-    ),
+    "x0f": (False,),  # Waivered version of x0m
     "x0m": (
         True,
         "Raw",
@@ -416,7 +398,7 @@ SUFFIX_INFO = {
         "Extracted engineering data for raw {I} image files from HST Program {P}",
         ["WFPC2"],
     ),
-    "x1d": (  
+    "x1d": (
         True,
         "Calibrated",
         "Data",
@@ -424,7 +406,7 @@ SUFFIX_INFO = {
         "1-D extracted {I} spectrum files for observations in HST Program {P}",
         ["STIS"],
     ),
-    "x2d": (  
+    "x2d": (
         True,
         "Calibrated",
         "Data",
@@ -504,6 +486,8 @@ TARGET_IDENTIFICATION_SUFFIXES = ["shm", "spt", "shf"]
 def _get_accepted_inst_li():
     suffix_li = []
     for key in SUFFIX_INFO.keys():
+        if SUFFIX_INFO[key][0] == False:
+            continue
         for inst in SUFFIX_INFO[key][5]:
             if inst not in suffix_li:
                 suffix_li.append(inst)
@@ -561,6 +545,8 @@ def _get_suffix_info_key(instrument_id, channel_id, suffix):
 def get_suffixes_list(instrument_id=None):
     suffix_li = []
     for key in SUFFIX_INFO.keys():
+        if SUFFIX_INFO[key][0] == False:
+            continue
         if SUFFIX_INFO[key][0]:
             if type(key) is tuple:
                 if key[-1] not in suffix_li and (
@@ -579,6 +565,8 @@ def get_suffixes_list(instrument_id=None):
 def get_raw_suffix():
     suffix_li = []
     for key in SUFFIX_INFO.keys():
+        if SUFFIX_INFO[key][0] == False:
+            continue
         if SUFFIX_INFO[key][1] == "Raw":
             if type(key) is tuple:
                 if key[-1] not in suffix_li:

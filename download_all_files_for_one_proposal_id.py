@@ -6,6 +6,7 @@ from pdart.astroquery.astroquery import (
     CustomizedQueryMastSlice,
     ProductSet,
 )
+from pdart.pipeline.suffix_info import INSTRUMENT_FROM_LETTER_CODE  # type: ignore
 
 from pdart.pipeline.directories import DevDirectories
 
@@ -28,19 +29,25 @@ if __name__ == "__main__":
 
     # Get full list of files and unique suffixes of one proposal id
     suffixes = []
+    inst = ""
     with open(file_path, "w") as f:
+
         f.write("==================\nList of files:\n==================\n")
         for row in result:
             productFilename = row["productFilename"]
-            productSubGroupDescription = row["productSubGroupDescription"]
             # Using iterrows is faster but mypy will complain about Table dosen't
             # have attribute iterrows. We can use # type: ignore to ignore it.
             # for (productFilename, productSubGroupDescription) in result.iterrows(  # type: ignore
             #     "productFilename", "productSubGroupDescription"
             # ):
+            if action != "-s":
+                f.write("%s\n" % productFilename)
+            if not inst:
+                inst = INSTRUMENT_FROM_LETTER_CODE[productFilename[0]]
+            productSubGroupDescription = row["productSubGroupDescription"]
             suffixes.append(str(productSubGroupDescription))
-            f.write("%s\n" % productFilename)
         unique_suffixes = set(suffixes)
+        f.write("==================\nInstrument:\n==================\n%s\n" % inst)
         f.write(
             "==================\nUnique suffixes:\n==================\n%s\n"
             % unique_suffixes
@@ -50,3 +57,5 @@ if __name__ == "__main__":
     if action == "-d":
         product_set = ProductSet(result)
         product_set.download(working_dir)
+# Get the suffixes for one proposal id:
+# python3 download_all_files_for_one_proposal_id.py 07885 -s
