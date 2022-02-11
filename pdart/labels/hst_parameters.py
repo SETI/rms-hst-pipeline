@@ -28,6 +28,7 @@ from pdart.xml.templates import (
     combine_nodes_into_fragment,
 )
 
+WFPC2_DETECTOR_IDS = {1: "PC1", 2: "WF2", 3: "WF3", 4: "WF4"}
 # All functions have the same input arguments:
 #   data_lookups: List[Lookup]
 #           a list of all the FITS headers in a data file (raw, d0f, drz, etc.)
@@ -142,7 +143,11 @@ def get_channel_id(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
         result = lookup["CAMERA"].strip()
     else:
         try:
-            return lookup["DETECTOR"].strip()
+            ccd = lookup["DETECTOR"].strip()
+            if instrument == "WFPC2":
+                return WFPC2_DETECTOR_IDS[ccd]
+            else:
+                return ccd
         except KeyError:
             result = instrument
 
@@ -192,7 +197,6 @@ def get_cosmic_ray_split_count(data_lookups: List[Lookup], shm_lookup: Lookup) -
 ##############################
 # get_detector_ids
 ##############################
-WFPC2_DETECTOR_IDS = {1: "PC1", 2: "WF2", 3: "WF3", 4: "WF4"}
 
 
 def get_detector_ids(data_lookups: List[Lookup], shm_lookup: Lookup) -> List[str]:
