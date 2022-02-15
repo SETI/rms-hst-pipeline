@@ -1,6 +1,6 @@
 import sys
 
-from pdart.logging import init_logging
+from pdart.logging import init_logging, PDS_LOGGER
 from pdart.pipeline.directories import Directories, make_directories
 from pdart.pipeline.state_machine2 import StateMachine2
 
@@ -20,7 +20,7 @@ def run() -> None:
                 "info": INFO_MESSAGE_LIMIT,
             },
         )
-        state_machine = StateMachine(dirs, proposal_id)
+        state_machine = StateMachine2(dirs, proposal_id)
         state_machine.run()
     except Exception as e:
         PDS_LOGGER.exception(e)
