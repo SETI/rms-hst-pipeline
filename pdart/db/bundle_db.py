@@ -898,7 +898,6 @@ class BundleDB(object):
             .one()
         )
 
-
     def get_all_target_identification(self) -> List[TargetIdentification]:
         """
         Returns all (unique) target identifications in the database.
