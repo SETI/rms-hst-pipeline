@@ -125,7 +125,7 @@ def create_target_identification_nodes(
 
 def make_context_target_label(
     bundle_db: BundleDB,
-    target: str,
+    target_info: str,
     verify: bool,
     use_mod_date_for_testing: bool = False,
 ) -> bytes:
@@ -135,9 +135,27 @@ def make_context_target_label(
     its XML and Schematron schemas.  Raise an exception if either
     fails.
     """
+    target_info_arr = target_info.split(".")
+    target = f"{target_info_arr[0]}.{target_info_arr[1]}"
+    target_type = target_info_arr[0].capitalize()
+    target_name = target_info_arr[1].capitalize()
+    target_id = target_info_arr[2]
     target_lid = f"urn:nasa:pds:context:target:{target}"
     target_lidvid = f"{target_lid}::1.0"
-    target_identification = bundle_db.get_target_identification_based_on_lid(target_lid)
+    # For the case when we can't search by target_lid, ex: 8218, the lid reference
+    # reference stored in db is "urn:nasa:pds:context:target:satellite.neptune.triton"
+    # which can't be searched by target_id "urn:nasa:pds:context:target:satellite.triton"
+    # we will search by target_id, name, and type.
+    try:
+        target_identification = bundle_db.get_target_identification_based_on_lid(
+            target_lid
+        )
+    except:
+        target_identification = bundle_db.get_target_identification_based_on_name_type(
+            target_id,
+            target_name,
+            target_type,
+        )
     bundle_db.create_context_product(
         get_target_lidvid([target_identification.type, target_identification.name]),
         "target",

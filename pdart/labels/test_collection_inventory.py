@@ -20,8 +20,6 @@ class TestCollectionInventory(unittest.TestCase):
 
     def test_make_collection_inventory(self) -> None:
         inventory = make_collection_inventory(self.db, _COLLECTION_LIDVID)
-        print("===========================")
-        print(inventory)
         assert_golden_file_equal(
             self, "test_collection_inventory.golden.txt", inventory
         )

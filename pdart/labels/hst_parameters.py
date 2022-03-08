@@ -387,14 +387,20 @@ def get_gain_setting(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     Return text for the ``<gain_mode_id />`` XML element.
     """
     lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
+    instrument = get_instrument_id(data_lookups, shm_lookup)
     # Works for WFPC2
     try:
         wfpc2_gain: int = int(float(lookup["ATODGAIN"]))  # format WFPC2 gains as ints
-        if wfpc2_gain in (7, 15):
+        # Need to specifically check this to avoid causing issues on STIS/NUV-MAMA
+        if instrument == "WFPC2":
+            if wfpc2_gain in (7, 15):
+                return str(wfpc2_gain)
+            raise ValueError(
+                "unrecognized WFPC2 gain (%d) in %s" % (wfpc2_gain, fname(lookup))
+            )
+        else:
+            # For STIS/NUV-MAMA
             return str(wfpc2_gain)
-        raise ValueError(
-            "unrecognized WFPC2 gain (%d) in %s" % (wfpc2_gain, fname(lookup))
-        )
     except KeyError:
         pass
     # Works for ACS, WFC3, others

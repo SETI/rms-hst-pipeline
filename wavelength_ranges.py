@@ -54,6 +54,9 @@ EASY_TRANSLATIONS = {
     ("HSP", "VIS"): ["UV", "VIS", "NIR"],
     ("HSP", "POL"): ["UV", "VIS", "NIR"],
     ("HSP", "PMT"): ["UV", "VIS", "NIR"],
+    # refer to urn:nasa:pds:hst_08218:data_stis_flt:o5ec01siq::1.0
+    # detector will be CCD
+    ("STIS", "CCD"): ["UV"],
     ("STIS", "FUV-MAMA"): ["UV"],
     ("STIS", "NUV-MAMA"): ["UV"],
     ("WFC3", "IR"): ["NIR"],

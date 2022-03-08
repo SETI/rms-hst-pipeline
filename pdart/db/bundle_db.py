@@ -881,6 +881,25 @@ class BundleDB(object):
             .one()
         )
 
+    def get_target_identification_based_on_name_type(
+        self, target_id: str, target_name: str, target_type: str
+    ) -> TargetIdentification:
+        """
+        Returns target identification of a specific target name and type in
+        the database.
+        """
+        return (
+            self.session.query(TargetIdentification)
+            .filter(
+                TargetIdentification.target_id == target_id,
+                TargetIdentification.name == target_name,
+                TargetIdentification.type == target_type,
+            )
+            .one()
+        )
+
+    # .filter(File.product_lidvid == product_lidvid, File.basename == basename)
+
     def get_all_target_identification(self) -> List[TargetIdentification]:
         """
         Returns all (unique) target identifications in the database.
