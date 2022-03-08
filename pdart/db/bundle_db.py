@@ -898,7 +898,6 @@ class BundleDB(object):
             .one()
         )
 
-    # .filter(File.product_lidvid == product_lidvid, File.basename == basename)
 
     def get_all_target_identification(self) -> List[TargetIdentification]:
         """
