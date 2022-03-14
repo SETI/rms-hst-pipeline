@@ -7,7 +7,10 @@ from pdart.labels.target_identification import make_context_target_label
 from pdart.labels.utils import assert_golden_file_equal
 
 _BUNDLE_LIDVID = "urn:nasa:pds:hst_15678::1.0"
-_TARGET = "asteroid.6478_gault.15678_1"
+_TARGET = {
+    "target_id": "15678_1",
+    "target_lid": "urn:nasa:pds:context:target:asteroid.6478_gault",
+}
 
 
 class TestTargetLabel(unittest.TestCase):
