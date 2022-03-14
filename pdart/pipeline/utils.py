@@ -166,3 +166,13 @@ def create_citation_info(
         f"{document_dir} contains only {document_files}; "
         "can't make Citation_Information"
     )
+
+
+def get_clean_target_text(text: str) -> str:
+    SPECIAL_CHARS = "!#$%^&*/ "
+    REMOVED_CHARS = "()"
+    for char in SPECIAL_CHARS:
+        text = text.replace(char, "_")
+    for char in REMOVED_CHARS:
+        text = text.replace(char, "")
+    return text

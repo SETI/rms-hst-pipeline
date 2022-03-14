@@ -18,6 +18,7 @@ from pdart.xml.templates import (
     NodeBuilder,
     NodeBuilderTemplate,
 )
+from pdart.pipeline.utils import get_clean_target_text
 
 _make_alternate_designation_node: NodeBuilderTemplate = interpret_template(
     """<alternate_designation><NODE name="alternate_designation"/></alternate_designation>"""
@@ -43,7 +44,8 @@ def make_description(description: str) -> FragBuilder:
 
 def _munge(name: str) -> str:
     """Munge the string to act as part of a LID."""
-    return name.replace(" ", "_").lower()
+    name = get_clean_target_text(name)
+    return name.lower()
 
 
 def target_identification(
@@ -107,6 +109,9 @@ def get_target_lid(target_parts: List[str]) -> str:
 
 def get_target_lidvid(target_parts: List[str], version: str = "1.0") -> str:
     lid = get_target_lid(target_parts)
+    return f"{lid}::{version}"
+
+def get_target_lidvid_by_lid(lid: str, version: str = "1.0") -> str:
     return f"{lid}::{version}"
 
 

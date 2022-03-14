@@ -881,8 +881,8 @@ class BundleDB(object):
             .one()
         )
 
-    def get_target_identification_based_on_name_type(
-        self, target_id: str, target_name: str, target_type: str
+    def get_target_identification_based_on_id(
+        self, target_id: str
     ) -> TargetIdentification:
         """
         Returns target identification of a specific target name and type in
@@ -890,11 +890,7 @@ class BundleDB(object):
         """
         return (
             self.session.query(TargetIdentification)
-            .filter(
-                TargetIdentification.target_id == target_id,
-                TargetIdentification.name == target_name,
-                TargetIdentification.type == target_type,
-            )
+            .filter(TargetIdentification.target_id == target_id)
             .one()
         )
 

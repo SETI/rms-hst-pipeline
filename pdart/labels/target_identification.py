@@ -13,6 +13,7 @@ from pdart.labels.target_identification_xml import (
     target_identification,
     get_target_lid,
     get_target_lidvid,
+    get_target_lidvid_by_lid,
     make_label,
     make_alias,
     make_description,
@@ -109,9 +110,11 @@ def create_target_identification_nodes(
     }
     target_identification_nodes: List[NodeBuilder] = []
     for target in target_identifications:
-        bundle_db.create_context_product(
-            get_target_lidvid([target.type, target.name]), "target"
-        )
+        target_lidvid = get_target_lidvid_by_lid(target.lid_reference)
+        bundle_db.create_context_product(target_lidvid, "target")
+        # bundle_db.create_context_product(
+        #     get_target_lidvid([target.type, target.name]), "target"
+        # )
         target_dict: Dict[str, Any] = {}
         target_dict["name"] = target.name
         target_dict["type"] = target.type
@@ -137,29 +140,31 @@ def make_context_target_label(
     """
     target_info_arr = target_info.split(".")
     target = f"{target_info_arr[0]}.{target_info_arr[1]}"
-    target_type = target_info_arr[0].capitalize()
-    target_name = target_info_arr[1].capitalize()
+    # target_type = target_info_arr[0].capitalize()
+    # target_name = target_info_arr[1].capitalize()
     target_id = target_info_arr[2]
     target_lid = f"urn:nasa:pds:context:target:{target}"
     target_lidvid = f"{target_lid}::1.0"
     # For the case when we can't search by target_lid, ex: 8218, the lid reference
     # reference stored in db is "urn:nasa:pds:context:target:satellite.neptune.triton"
     # which can't be searched by target_id "urn:nasa:pds:context:target:satellite.triton"
-    # we will search by target_id, name, and type.
+    # we will search by target_id.
     try:
         target_identification = bundle_db.get_target_identification_based_on_lid(
             target_lid
         )
     except:
-        target_identification = bundle_db.get_target_identification_based_on_name_type(
+        target_identification = bundle_db.get_target_identification_based_on_id(
             target_id,
-            target_name,
-            target_type,
         )
     bundle_db.create_context_product(
-        get_target_lidvid([target_identification.type, target_identification.name]),
+        get_target_lidvid_by_lid(target_identification.lid_reference),
         "target",
     )
+    # bundle_db.create_context_product(
+    #     get_target_lidvid([target_identification.type, target_identification.name]),
+    #     "target",
+    # )
 
     alias = str(target_identification.alternate_designations)
     if len(alias) != 0:
