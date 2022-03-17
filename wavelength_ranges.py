@@ -74,7 +74,6 @@ EASY_TRANSLATIONS = {
 
 def wavelength_abbrevs(instrument_id, detector_ids, filter_name):
     """A list of abbreviated wavelength ranges: "UV", "VIS", and/or "NIR"."""
-
     # Handle easy cases, where wavelength range only depends on instrument or
     # instrument/detector. This also handles the special filter "PRISM" on FOS,
     # whose range depends on the detector.

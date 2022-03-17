@@ -163,11 +163,14 @@ def create_pds4_labels(
                 # type = str(record.type).replace(" ", "_")
                 target = f"{type}.{name}".lower()
                 if target not in target_list:
-                    target_list.append((target, record.target_id))
+                    target_list.append((target,
+                                        record.target_id,
+                                        record.lid_reference))
             new_target_context_list = []
             for entry in target_list:
                 target = entry[0]
                 target_id = entry[1]
+                target_lid = entry[2]
                 is_target_label_exists = False
                 for label in target_label_list:
                     if target in label:
@@ -176,13 +179,6 @@ def create_pds4_labels(
                 if not is_target_label_exists:
                     label_filename = f"{target}_1.0.xml"
                     label_filepath = fs.path.join(context_coll_dir_path, label_filename)
-                    target_identification = (
-                        bundle_db.get_target_identification_based_on_id(
-                            target_id,
-                        )
-                    )
-
-                    target_lid = target_identification.lid_reference
                     target_lidvid = f"{target_lid}::1.0"
                     target_info = {
                         "target_id": target_id,

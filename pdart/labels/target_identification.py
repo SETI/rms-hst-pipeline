@@ -150,10 +150,9 @@ def make_context_target_label(
             target_lid
         )
     except:
-        target_identification = bundle_db.get_target_identification_based_on_id(
-            target_id,
+        target_identification = bundle_db.get_target_identification_based_on_id_and_lid(
+            target_id, target_lid
         )
-    # Once we get the
     target_lid = target_identification.lid_reference
     bundle_db.create_context_product(
         get_target_lidvid_by_lid(target_lid),
