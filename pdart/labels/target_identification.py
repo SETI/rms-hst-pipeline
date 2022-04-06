@@ -16,6 +16,7 @@ from pdart.labels.target_identification_xml import (
     get_target_lidvid_by_lid,
     make_label,
     make_alias,
+    make_alias_list,
     make_description,
 )
 from pdart.labels.utils import (
@@ -160,9 +161,10 @@ def make_context_target_label(
     )
 
     alias = str(target_identification.alternate_designations)
+    alias_list_nodes: List[NodeBuilder] = []
     if len(alias) != 0:
         alias_list = alias.split("\n")
-    alias_nodes: List[NodeBuilder] = [make_alias(alias) for alias in alias_list]
+        alias_list_nodes = [make_alias_list(alias_list)]
 
     target_description = str(target_identification.description)
     if len(target_description) != 0:
@@ -186,7 +188,7 @@ def make_context_target_label(
                     "target_lid": target_lid,
                     "target_vid": "1.0",
                     "title": target_identification.name,
-                    "alias": combine_nodes_into_fragment(alias_nodes),
+                    "alias_list": combine_nodes_into_fragment(alias_list_nodes),
                     "name": target_identification.name,
                     "type": target_identification.type,
                     "description": combine_nodes_into_fragment(description_nodes),

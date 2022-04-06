@@ -59,12 +59,12 @@ EASY_TRANSLATIONS = {
     ("STIS", "CCD"): ["UV"],
     ("STIS", "FUV-MAMA"): ["UV"],
     ("STIS", "NUV-MAMA"): ["UV"],
-    ("STIS", "CCD", "G230L" ): ["UV"],
+    ("STIS", "CCD", "G230L"): ["UV"],
     ("STIS", "CCD", "G230LB"): ["UV"],
     ("STIS", "CCD", "G230MB"): ["UV"],
-    ("STIS", "CCD", "G430L" ): ["UV" , "VIS"],
-    ("STIS", "CCD", "G750L" ): ["VIS", "NIR"],
-    ("STIS", "CCD", "G750M" ): ["VIS", "NIR"],
+    ("STIS", "CCD", "G430L"): ["UV", "VIS"],
+    ("STIS", "CCD", "G750L"): ["VIS", "NIR"],
+    ("STIS", "CCD", "G750M"): ["VIS", "NIR"],
     ("STIS", "CCD", "MIRVIS"): ["VIS", "NIR"],
     ("WFC3", "IR"): ["NIR"],
     ("FOS", "BLUE", "PRISM"): ["UV", "VIS"],
@@ -92,7 +92,7 @@ def wavelength_abbrevs(instrument_id, detector_ids, filter_name):
 
         # Strip a STIS suffix, e.g., "+ND_3" or "+LONG_PASS", and try again
         if instrument_id == "STIS" and "+" in filter_name:
-            key = (instrument_id, det, filter_name.partition('+')[0])
+            key = (instrument_id, det, filter_name.partition("+")[0])
             if key in EASY_TRANSLATIONS:
                 results.append(EASY_TRANSLATIONS[key])
 

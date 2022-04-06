@@ -53,7 +53,7 @@ from pdart.pipeline.utils import (
     make_osfs,
     make_sv_deltas,
     make_version_view,
-    get_clean_target_text
+    get_clean_target_text,
 )
 from pdart.logging import PDS_LOGGER
 
@@ -163,9 +163,7 @@ def create_pds4_labels(
                 # type = str(record.type).replace(" ", "_")
                 target = f"{type}.{name}".lower()
                 if target not in target_list:
-                    target_list.append((target,
-                                        record.target_id,
-                                        record.lid_reference))
+                    target_list.append((target, record.target_id, record.lid_reference))
             new_target_context_list = []
             for entry in target_list:
                 target = entry[0]

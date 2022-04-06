@@ -146,6 +146,18 @@ def make_alias(alternate_title: str) -> FragBuilder:
     return _make_alias_node({"alternate_title": alternate_title})
 
 
+_make_alias_list: NodeBuilderTemplate = interpret_template(
+    """<Alias_List>
+    <FRAGMENT name="alias"/>
+      </Alias_List>"""
+)
+
+
+def make_alias_list(alias_list: List[str]) -> NodeBuilder:
+    alias_nodes: List[NodeBuilder] = [make_alias(alias) for alias in alias_list]
+    return _make_alias_list({"alias": combine_nodes_into_fragment(alias_nodes)})
+
+
 make_label: DocTemplate = interpret_document_template(
     f"""<?xml version="1.0" encoding="utf-8"?>
 {PDS4_XML_MODEL}
@@ -156,9 +168,7 @@ make_label: DocTemplate = interpret_document_template(
     <title><NODE name="title"/></title>
     <information_model_version>{INFORMATION_MODEL_VERSION}</information_model_version>
     <product_class>Product_Context</product_class>
-    <Alias_List>
-      <FRAGMENT name="alias"/>
-    </Alias_List>
+    <FRAGMENT name="alias_list"/>
     <Modification_History>
       <Modification_Detail>
         <modification_date><NODE name="mod_date" /></modification_date>

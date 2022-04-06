@@ -866,8 +866,8 @@ def get_targeted_detector_ids(
         if aperture == "FQCH4W3":
             return ["WF3"]
         raise ValueError(
-            "unrecognized WFPC2 aperture (%s) for %s [%s]",
-            (aperture, fname(lookup), lookup),
+            "unrecognized WFPC2 aperture (%s) for %s [%s]"
+            % (aperture, fname(lookup), lookup),
         )
     channel = get_channel_id(data_lookups, shm_lookup)
     if instrument == "ACS" and channel == "WFC":

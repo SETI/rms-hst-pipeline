@@ -891,8 +891,8 @@ class BundleDB(object):
         return (
             self.session.query(TargetIdentification)
             .filter(
-                    TargetIdentification.target_id == target_id,
-                    TargetIdentification.lid_reference == target_lid
+                TargetIdentification.target_id == target_id,
+                TargetIdentification.lid_reference == target_lid,
             )
             .one()
         )
