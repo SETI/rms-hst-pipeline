@@ -122,37 +122,39 @@ FILTER_REGEX = re.compile("[FG](|[QR])(\d+)([WMNHLX]|LP|AW|BW|BN15)")
 #     expected based on the center wavelength alone.
 
 # Instrument names in comments after each line indicate that MST has verified
-# the entry from that instrument's handbook in Spring 2022. 
+# the entry from that instrument's handbook in Spring 2022.
 
 FILTER_EXCEPTIONS = {
     "CLEAR": ["UV", "VIS", "NIR"],
-    "F130LP": ["UV", "VIS", "NIR"],    # WFPC2
+    "F130LP": ["UV", "VIS", "NIR"],  # WFPC2
     "F165LP": ["UV", "VIS", "NIR"],
     "F200LP": ["UV", "VIS", "NIR"],
     "F305LP": ["UV", "VIS"],
     "F350LP": ["UV", "VIS", "NIR"],
     "F370LP": ["UV", "VIS"],
     "F372M": ["UV", "VIS"],
-    "F380W": ["UV", "VIS"],            # WFPC2
-    "F410M": ["UV", "VIS"],            # WFPC2
+    "F380W": ["UV", "VIS"],  # WFPC2
+    "F410M": ["UV", "VIS"],  # WFPC2
     "F430W": ["UV", "VIS"],
     "F435W": ["UV", "VIS"],
     "F600LP": ["VIS", "NIR"],
-    "F606W": ["VIS", "NIR"],           # WFPC2
+    "F606W": ["VIS", "NIR"],  # WFPC2
     "F622W": ["VIS", "NIR"],
     "F625W": ["VIS", "NIR"],
-    "F675W": ["VIS", "NIR"],           # WFPC2
-    "F702W": ["VIS", "NIR"],           # WFPC2
+    "F675W": ["VIS", "NIR"],  # WFPC2
+    "F702W": ["VIS", "NIR"],  # WFPC2
     "F718M": ["VIS", "NIR"],
-    "FQCH4N": ["VIS", "NIR"],          # WFPC2
-    "FQCH4N15": ["VIS", "NIR"],        # WFPC2
-    "FQCH4N33": ["VIS", "NIR"],        # WFPC2
-    "FQCH4P15": ["VIS", "NIR"],        # WFPC2
+    "FQCH4N": ["VIS", "NIR"],  # WFPC2
+    "FQCH4N15": ["VIS", "NIR"],  # WFPC2
+    "FQCH4N33": ["VIS", "NIR"],  # WFPC2
+    "FQCH4P15": ["VIS", "NIR"],  # WFPC2
     "FQUVN": ["UV", "VIS"],
-    "FR418N": ["VIS"],                 # WFPC2
-    "FR533N": ["VIS"],                 # WFPC2
-    "FR680N": ["VIS", "NIR"],          # WFPC2
-    "FR868N": ["NIR"],                 # WFPC2
+    "FR418N": ["VIS"],  # WFPC2
+    "FR533N": ["VIS"],  # WFPC2
+    "FR680N": ["VIS", "NIR"],  # WFPC2
+    "FR680N18": ["VIS", "NIR"],  # WFPC2
+    "FR680N33": ["VIS", "NIR"],  # WFPC2
+    "FR868N": ["NIR"],  # WFPC2
     "FR459M": ["UV", "VIS"],
     "G430L": ["UV", "VIS"],
     "G430M": ["UV", "VIS"],
@@ -209,7 +211,7 @@ def ranges_from_one_filter(filter_name):
 
     if not results:
         raise ValueError("Wavelength range not found: " + filter_name)
-        
+
     return results
 
 

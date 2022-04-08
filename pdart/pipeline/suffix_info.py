@@ -478,6 +478,9 @@ INSTRUMENT_FROM_LETTER_CODE = {
     "z": "GHRS",
 }
 
+# Reference files suffixes used to extract Hst_Parameter information.
+REF_SUFFIXES = ["d0m", "raw"]
+ALT_REF_SUFFIXES = ["mos", "drz", "crj"]
 # This is used when we only want to download files with shm, spt, and
 # shf suffixes. It's also used to extract Hst_Parameter information.
 TARGET_IDENTIFICATION_SUFFIXES = ["shm", "spt", "shf"]
@@ -562,18 +565,11 @@ def get_suffixes_list(instrument_id=None):
 
 
 # Return the suffixes considered raw data, in order of preference.
-def get_raw_suffix():
-    suffix_li = []
-    for key in SUFFIX_INFO.keys():
-        if SUFFIX_INFO[key][0] == False:
-            continue
-        if SUFFIX_INFO[key][1] == "Raw":
-            if type(key) is tuple:
-                if key[-1] not in suffix_li:
-                    suffix_li.append(key[-1])
-            elif key not in suffix_li:
-                suffix_li.append(key)
-    return suffix_li
+def get_ref_suffix(alt_ref=False):
+    if not alt_ref:
+        return REF_SUFFIXES
+    else:
+        return ALT_REF_SUFFIXES
 
 
 def get_titles_format(instrument_id, channel_id, suffix):

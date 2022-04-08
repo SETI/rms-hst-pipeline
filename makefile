@@ -131,8 +131,8 @@ copy-results :
 ##############################
 
 # LILS=07885 09059 09748 15505
-LILS=07885
-# LILS=07181
+# LILS=07885
+LILS=05776
 
 .PHONY: lil-pipeline
 LIL-TWD=$(TMP_WORKING_DIR)
