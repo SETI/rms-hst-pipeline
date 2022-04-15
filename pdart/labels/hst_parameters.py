@@ -857,7 +857,7 @@ def get_targeted_detector_ids(
             return ["WF2", "WF3"]
         if aperture in ("WF3", "WF3-FIX", "FQCH4NW3", "F160BN15"):
             return ["WF3"]
-        if aperture in ("WF4", "WF4-FIX", "FQCH4NW4"):
+        if aperture in ("WF4", "WF4-FIX", "FQCH4NW4", "FQCH4W4"):
             return ["WF4"]
         if aperture == "FQCH4N1":
             return ["PC1", "WF3"]
