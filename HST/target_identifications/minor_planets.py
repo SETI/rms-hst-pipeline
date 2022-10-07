@@ -526,9 +526,6 @@ def minor_planet_identifications(keys, a=0., e=0., i=0., q=0.,
     if minor_planet_identifications.DEBUG:
         print(f'minor planet body type: {body_type}, (a = {a0})')
 
-    # Check orbital elements if necessary
-    check_elements(a, e, i, q, a0, e0, i0, q0, warnings)
-
     # Define the MinorPlanetInfo; include fixes for Pluto
     if name == 'Pluto':
         mp = MinorPlanetInfo(body_type, number, '', name, [])
@@ -540,6 +537,10 @@ def minor_planet_identifications(keys, a=0., e=0., i=0., q=0.,
     else:
         mp = MinorPlanetInfo(body_type, number, designations[0], name,
                              designations[1:])
+
+    # Check orbital elements if necessary
+    check_elements(a, e, i, q, a0, e0, i0, q0, warnings, (mp.name or mp.designation
+                                                                  or str(mp.number)))
 
     # Get the Target Identification tuples
     info = mp.target_identifications()
@@ -563,7 +564,7 @@ minor_planet_identifications.DEBUG = False
 
 THRESHOLD = 0.05
 
-def check_elements(a, e, i, q, a0, e0, i0, q0, warnings=[]):
+def check_elements(a, e, i, q, a0, e0, i0, q0, warnings=[], name=''):
 
     # Check orbital elements only if necessary
     if (a,e,i,q) == (0.,0.,0.,0.):
@@ -571,7 +572,10 @@ def check_elements(a, e, i, q, a0, e0, i0, q0, warnings=[]):
 
     # Orbital elements not available
     if (a0,e0,i0,q0) == (0.,0.,0.,0.):
-        warnings.append('MPC orbital elements are not available')
+        if name:
+            warnings.append(f'MPC orbital elements are not available for "{name}"')
+        else:
+            warnings.append('MPC orbital elements are not available')
         return
 
     values = []
@@ -594,9 +598,15 @@ def check_elements(a, e, i, q, a0, e0, i0, q0, warnings=[]):
 
     errors.sort()
     if errors[-2] > THRESHOLD:
-        raise ValueError(f'Orbital element mismatch: {values}')
+        if name:
+            raise ValueError(f'Orbital element mismatch for "{name}": {values}')
+        else:
+            raise ValueError(f'Orbital element mismatch: {values}')
 
     if errors[-1] > THRESHOLD:
-        warnings.append(f'One orbital element mismatch: {values}')
+        if name:
+            warnings.append(f'One orbital element mismatch for "{name}": {values}')
+        else:
+            warnings.append(f'One orbital element mismatch: {values}')
 
 ##########################################################################################

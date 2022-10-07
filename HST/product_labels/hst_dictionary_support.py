@@ -929,7 +929,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         elif instrument_id == 'WFPC':
             # I cannot find documentation for the apertures for WFPC so this is just an
             # educated guess
-            if aperture_name == 'ALL':
+            if aperture_name in ('ALL', 'ANY'):
                 targeted_detector_ids = detector_ids
             elif aperture_name.startswith('W'):
                 targeted_detector_ids = ['WF' + aperture_name[1]]  # WFn

@@ -41,6 +41,7 @@ DEBUG = False           # Set to True to see lots of useful debugging info
 standard_body_identifications.DEBUG = DEBUG
 minor_planet_identifications.DEBUG = DEBUG
 comet_identifications.DEBUG = DEBUG
+comet_identifications.DEBUG = DEBUG
 
 ##########################################################################################
 # SPT_REPAIRS is a manually managed list of target identifications that cannot be inferred
@@ -59,16 +60,23 @@ comet_identifications.DEBUG = DEBUG
 SPT_REPAIRS = {
     '2442'      : {'TARGNAME': 'COMET-SL-1991A1'},  # was a random string
     '2569_'     : {'MT_LV1_1': 'STD=PLUTO'},        # missing TARG_ID, no MT_LV1
+    '2771'      : {'MT_LV1_1': 'STD=SATURN'},       # HSP Saturn occ
     '2890_9'    : {'MT_LV1_1': 'STD=SATURN'},       # missing MT_LV1
     '2891_10'   : {'MT_LV1_1': 'STD=TITAN'},        # missing MT_LV1
     '3064_1'    : {'MT_LV1_1': 'FILE='},            # missing MT_LV1
+    '3373'      : {'MT_LV1_1': 'STD=SATURN'},       # HSP Saturn occ
+    '3375'      : {'MT_LV1_1': 'STD=SATURN'},       # HSP Saturn occ
+    '4225'      : {'MT_LV1_1': 'STD=SATURN'},       # HSP Saturn occ
     '5834_1'    : {'TARGNAME': 'C1984K1 SHOEMAKER'},# was "COMET-SHOEMAKER-1984K1"
     '5834_2'    : {'TARKEY1': 'COMET SHOEMAKER 87O-86XIV',
                                                     # was "SHOEMAKER 87O-85XIV"
                    'TARGNAME': 'C1987H1 SHOEMAKER'},# was "COMET-SHOEMAKER-1987H1"
     '6736'      : {'TARKEY1' : 'COMET C/1996 B2 (HYAKUTAKE)',
                    'TARGNAME': 'C/1996 B2'},        # was "COMET B2-NUCLEUS", "B2"
+    '7489'      : {'MT_LV1_1': 'STD=TRITON'},       # FGS fixed, TARGNAME="TR\d+.*"
+    '7490'      : {'MT_LV1_1': 'STD=TRITON'},       # FGS fixed, TARGNAME="TR\d+.*"
     '7594'      : {'TARKEY2' : 'COMET C/1997 BA6'}, # year was 1996
+    '8105'      : {'MT_LV1_1': 'STD=PLUTO'},        # FGS fixed, TARGNAME="PLUTO-OS"
     '8699_2'    : {'TARGNAME': 'ASHBROOK-JACKSON',  # was "ASHBROOK"
                    'MT_LV1_1': 'FILE='},            # revised elements
     '8699_4'    : {'MT_LV1_1': 'FILE='},            # revised elements
@@ -122,6 +130,8 @@ SPT_REPAIRS = {
                    'TARKEY2': ''},                  # was extraneous info
     '14498_1'   : {'TARGNAME': 'P2010-V1-C-OFFSET'},# was P2010-V-C-OFFSET"
     '14629_2'   : {'TARGNAME': '2014MU69'},         # was "2014MU69-A"
+    '15003'     : {'TARKEY1' : 'KBO',
+                   'TARGNAME': '2014MU69'},         # FGS occ campaign
     '15108_1'   : {'TARGNAME': '2014 OS393'},       # was "K14OD3S"
     '16077_1'   : {'TARGNAME': 'P/2019 LD2',        # was "2019LD2"
                    'TARKEY2': 'P/2019 LD2',         # was "2019_LD2"
@@ -460,6 +470,8 @@ STD_TRANSLATOR = translator.TranslatorByRegex([
     (r'(.*)',                                   ('S', r'\1')),
 ])
 
+UNIQUE_WARNINGS_LOGGED = set()
+
 def hst_target_identifications(spt_header0, filepath, logger=None):
     """Return a list of target identifications as tuples of the form:
           (name, alt_designations, type, description, lid)
@@ -518,7 +530,7 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
         if DEBUG: print('SPT repair found:')
         for key in repair:
             if key in spt_header0:
-                message = f'  "{key}": "{repair[key]}" (was "{spt_header0[key]}"'
+                message = f'  "{key}": "{repair[key]}" (was "{spt_header0[key]})"'
             else:
                 message = f'  "{key}": "{repair[key]}" (was missing)'
             messages.append(message)
@@ -548,9 +560,6 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
         pass
 
     if DEBUG: print('MT_LVs =', MT_LVs)
-
-    if not MT_LVs:
-        raise ValueError('Missing MT_LV keywords')
 
     ######################################################################################
     # Handle STD values
@@ -638,30 +647,33 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
 
     if DEBUG: print('votes, TARKEYs =', votes, TARKEYs)
 
-    # Get orbital elements
-    parts = MT_LVs[0].split(',')
-    parts = [p.split('=') for p in parts]
+    # Get orbital elements if available
+    if MT_LVs:
+        parts = MT_LVs[0].split(',')
+        parts = [p.split('=') for p in parts]
 
-    get_elements = True
-    left  = parts[0][0].strip()
-    right = parts[0][1].strip()
-    if left == 'TYPE':
-        if right == 'ASTEROID':
-            votes += 'M'
-        elif right == 'COMET':
-            votes += 'C'
-        elif right == 'G_CIRCLE' and TARKEYs[0] == 'PLANET PLUTO':
-            # Program 3843 is a special case, with no easy way to handle it
-            return (standard_body_identifications('PLUTO') +
-                    standard_body_identifications('CHARON'))
+        get_elements = True
+        left  = parts[0][0].strip()
+        right = parts[0][1].strip()
+        if left == 'TYPE':
+            if right == 'ASTEROID':
+                votes += 'M'
+            elif right == 'COMET':
+                votes += 'C'
+            elif right == 'G_CIRCLE' and TARKEYs[0] == 'PLANET PLUTO':
+                # Program 3843 is a special case, with no easy way to handle it
+                return (standard_body_identifications('PLUTO') +
+                        standard_body_identifications('CHARON'))
+            else:
+                raise ValueError('Unsupported target TYPE: ' + right)
+
+        elif left == 'FILE':
+            get_elements = False
+
         else:
-            raise ValueError('Unsupported target TYPE: ' + right)
-
-    elif left == 'FILE':
-        get_elements = False
-
+            raise ValueError('Unsupported MT_LV value: ' + parts[0])
     else:
-        raise ValueError('Unsupported MT_LV value: ' + parts[0])
+        get_elements = False
 
     if get_elements:
         found = False
@@ -769,7 +781,9 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
                                         ignore_suffix=True)
             if ids:
                 for w in comet_warnings:
-                    logger.warn(w, filepath)
+                    if w not in UNIQUE_WARNINGS_LOGGED:
+                        logger.warn(w, filepath)
+                        UNIQUE_WARNINGS_LOGGED.add(w)
 
                 if DEBUG: print('Comet identified!')
                 return ids
@@ -787,7 +801,9 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
                                                warnings=mp_warnings)
             if ids:
                 for w in mp_warnings:
-                    logger.warn(w, filepath)
+                    if w not in UNIQUE_WARNINGS_LOGGED:
+                        logger.warn(w, filepath)
+                        UNIQUE_WARNINGS_LOGGED.add(w)
 
                 if DEBUG: print('Minor planet identified!')
                 return ids
@@ -803,7 +819,8 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
             logger.error(w, filepath)
         raise comet_error
 
-    raise ValueError('Unrecognized target: ' + str(comet_ids + mp_ids))
+    info = f'proposal={PROPOSID}, target="{TARGNAME}", ' + str(comet_ids + mp_ids)
+    raise ValueError('Unrecognized target: ' + info)
 
 ##########################################################################################
 # Functions for "special case" Target Identifications

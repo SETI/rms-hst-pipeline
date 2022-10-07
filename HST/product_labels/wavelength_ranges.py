@@ -12,7 +12,6 @@ FULL_NAMES = {
     "NIR": "Near Infrared",
 }
 
-
 def wavelength_ranges(instrument_id, detector_ids, filter_name):
     """A list of wavelength ranges, based on HST parameters. Each item in the
     list is one of these strings:
@@ -35,7 +34,6 @@ def wavelength_ranges(instrument_id, detector_ids, filter_name):
         return ranges + ["Infrared"]
     else:
         return ranges
-
 
 # This dictionary contains values that override the filter-based algorithm
 # The key is one of:
@@ -63,10 +61,11 @@ EASY_TRANSLATIONS = {
     ("STIS", "CCD", "G750M" ): ["VIS", "NIR"],
     ("STIS", "CCD", "MIRVIS"): ["VIS", "NIR"],
     ("WFC3", "IR"): ["NIR"],
-    ("FOS", "BLUE", "PRISM"): ["UV", "VIS"],
-    ("FOS", "AMBER", "PRISM"): ["UV", "VIS", "NIR"],
+    ("FOS", "AMBER", "MIRROR"): ["UV", "VIS", "NIR"],
+    ("FOS", "AMBER", "PRISM" ): ["UV", "VIS", "NIR"],
+    ("FOS", "BLUE" , "MIRROR"): ["UV", "VIS"],
+    ("FOS", "BLUE" , "PRISM" ): ["UV", "VIS"],
 }
-
 
 def wavelength_abbrevs(instrument_id, detector_ids, filter_name):
     """A list of abbreviated wavelength ranges: "UV", "VIS", and/or "NIR"."""
@@ -98,7 +97,6 @@ def wavelength_abbrevs(instrument_id, detector_ids, filter_name):
 
     # Return ranges based on filter name(s)
     return ranges_from_filter(filter_name)
-
 
 # Boundaries between the definitions of UV, VIS, and NIR, with tiny adjustments
 # for known filters
@@ -172,7 +170,6 @@ FILTER_EXCEPTIONS = {
     "PRISM3"  : ["UV", "VIS"],          # FOC
 }
 
-
 def filter_number(filter_name):
     """The number embedded within a filter name; otherwise, zero."""
 
@@ -181,7 +178,6 @@ def filter_number(filter_name):
         return 0
 
     return int(match.group(2))
-
 
 def ranges_from_one_filter(filter_name):
     """The list of wavelength ranges associated with a single filter name."""
@@ -214,7 +210,6 @@ def ranges_from_one_filter(filter_name):
 
     return results
 
-
 def ranges_from_filter(filter_name):
     """The list of wavelength ranges associated with a filter name, or else a
     sequence of names concatenated with "+"."""
@@ -225,7 +220,6 @@ def ranges_from_filter(filter_name):
     # If there are multiple overlapping filters, the returned list is the
     # mathematical intersection of the individual ranges
     return ranges_intersection(ranges_list)
-
 
 def ranges_intersection(ranges_list):
     """The intersection of multiple ranges."""
@@ -241,7 +235,6 @@ def ranges_intersection(ranges_list):
 
     return sorted_abbrevs(combined)
 
-
 def ranges_union(ranges_list):
     """The union of multiple ranges."""
 
@@ -255,7 +248,6 @@ def ranges_union(ranges_list):
         combined += ranges
 
     return sorted_abbrevs(combined)  # also removes duplicates
-
 
 def sorted_abbrevs(ranges):
     """Range abbreviations sorted to increasing wavelength; duplicates removed."""

@@ -12,6 +12,7 @@ import argparse
 import datetime
 import os
 import pdslogger
+import sys
 
 from product_labels import label_hst_fits_directories
 
@@ -78,6 +79,9 @@ else:
 
 logger.add_handler(pdslogger.file_handler(logpath))
 
+LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
+logger.open('label-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
+
 label_hst_fits_directories(args.path,
                            match_pattern = args.select,
                            old_directories = [args.old],
@@ -86,5 +90,6 @@ label_hst_fits_directories(args.path,
                            reset_dates = args.reset_dates,
                            replace_nans = args.replace_nans,
                            delete_duplicates = args.delete_duplicates)
+logger.close()
 
 ##########################################################################################

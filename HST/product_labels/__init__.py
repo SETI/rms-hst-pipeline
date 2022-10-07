@@ -295,8 +295,13 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         # Gather the HDU structure info
         hdu_dictionaries = []
         for k,hdu in enumerate(hdulist):
-            hdu_dictionaries.append(fill_hdu_dictionary(hdu, k, instrument_id,
-                                                        filepath, logger))
+            try:
+                hdu_dictionaries.append(fill_hdu_dictionary(hdu, k, instrument_id,
+                                                            filepath, logger))
+            except (ValueError, TypeError) as e:
+                logger.error('Irrecoverable error reading FITS file', filepath)
+                logger.exception(e)
+                break
 
         # Fix known errors
         repair_hdu_dictionaries(hdu_dictionaries, filepath, logger)
@@ -651,9 +656,18 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             try:
                 target_ids = hst_target_identifications(spt_hdulist[0].header,
                                                         spt_fullpath, logger)
+                logger.debug(f'Target "{target_ids[0][0]}" identified',
+                             ipppssoot_dict['spt_fullpath'])
+            except ValueError as e:
+                target_ids = [('UNK', [], 'UNK', [], 'UNK')]
+                if str(e).startswith('Unrecognized target'):
+                    logger.error('Unrecognized target:', ipppssoot_dict['spt_fullpath']
+                                 + '\n  ' + str(e)[21:])
+                else:
+                    logger.error(str(e), ipppssoot_dict['spt_fullpath'])
             except Exception as e:
                 target_ids = [('UNK', [], 'UNK', [], 'UNK')]
-                logger.error('Unrecognized target', ipppssoot_dict['spt_fullpath'])
+                logger.exception(e)
 
         ipppssoot_dict['target_identifications'] = target_ids
 

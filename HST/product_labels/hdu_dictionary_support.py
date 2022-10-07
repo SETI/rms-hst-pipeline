@@ -105,7 +105,7 @@ UNIT_TRANSLATOR = {
 }
 
 # Don't issue warnings when these appear at the end of a description
-NOT_UNITS = {"0", "1", "1 or 0", "T/F"}
+NOT_UNITS = {"0", "1", "1 or 0", "T/F", "diodes", "defl.units"}
 
 # These will be called Array_*D_Image or Array_*D_Spectrum rather than Array_*D
 SCIENCE_EXTNAMES = {'SCI', 'ERR', 'DQ', 'SAMP', 'TIME', 'WHT', 'CTX'}

@@ -29,8 +29,8 @@
 # planet and its moons, that might all simultaneously be targets of a given observation.
 # However, this capability is not yet used for standard bodies.
 #
-# NOTE: Information about the complete set of standard bodies is found in
-# STANDARD_BODY_INFO.py. This file must be maintained manually.
+# NOTE: Information about the complete set of standard bodies is found in the list
+# STANDARD_BODY_INFO. This must be maintained manually.
 ##########################################################################################
 
 from . import minor_planets
@@ -257,7 +257,7 @@ STANDARD_BODY_INFO = [
     ('Hippocamp'  , 14,   814, 'Satellite', 'Neptune', ['S/2004 N 1']),
 
     # Dwarf planet systems
-    # Bbelow, "$" in a designation is a placeholder for the parent designation, e.g.,
+    # Below, "$" in a designation is a placeholder for the parent designation, e.g.,
     # "S/2005 $ 1" -> "S/2005 (136199) 1" or "S/2005 (2003 UB313) 1"
     ('Ceres'   ,  1, 2000001, 'Dwarf Planet', '', ['1899 OF', '1943 XB']),
 

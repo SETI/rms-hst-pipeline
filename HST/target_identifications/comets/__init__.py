@@ -890,7 +890,8 @@ def comet_identifications(keys, a=0., e=0., i=0., q=0., warnings=[], ignore_suff
     # Check orbital elements if necessary
     if a or e or i or q:
         (_, a0, e0, i0, q0) = minor_planets.get_mpc_info(comet.mpc_key())
-        minor_planets.check_elements(a, e, i, q, a0, e0, i0, q0, warnings)
+        minor_planets.check_elements(a, e, i, q, a0, e0, i0, q0, warnings,
+                                     comet.full_names()[0])
 
     return comet.target_identifications()
 
