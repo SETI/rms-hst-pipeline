@@ -387,14 +387,20 @@ def get_gain_setting(data_lookups: List[Lookup], shm_lookup: Lookup) -> str:
     Return text for the ``<gain_mode_id />`` XML element.
     """
     lookup = merge_two_hdu_lookups(data_lookups[0], data_lookups[1])
+    instrument = get_instrument_id(data_lookups, shm_lookup)
     # Works for WFPC2
     try:
         wfpc2_gain: int = int(float(lookup["ATODGAIN"]))  # format WFPC2 gains as ints
-        if wfpc2_gain in (7, 15):
+        # Need to specifically check this to avoid causing issues on STIS/NUV-MAMA
+        if instrument == "WFPC2":
+            if wfpc2_gain in (7, 15):
+                return str(wfpc2_gain)
+            raise ValueError(
+                "unrecognized WFPC2 gain (%d) in %s" % (wfpc2_gain, fname(lookup))
+            )
+        else:
+            # For STIS/NUV-MAMA
             return str(wfpc2_gain)
-        raise ValueError(
-            "unrecognized WFPC2 gain (%d) in %s" % (wfpc2_gain, fname(lookup))
-        )
     except KeyError:
         pass
     # Works for ACS, WFC3, others
@@ -851,7 +857,7 @@ def get_targeted_detector_ids(
             return ["WF2", "WF3"]
         if aperture in ("WF3", "WF3-FIX", "FQCH4NW3", "F160BN15"):
             return ["WF3"]
-        if aperture in ("WF4", "WF4-FIX", "FQCH4NW4"):
+        if aperture in ("WF4", "WF4-FIX", "FQCH4NW4", "FQCH4W4"):
             return ["WF4"]
         if aperture == "FQCH4N1":
             return ["PC1", "WF3"]
@@ -860,8 +866,8 @@ def get_targeted_detector_ids(
         if aperture == "FQCH4W3":
             return ["WF3"]
         raise ValueError(
-            "unrecognized WFPC2 aperture (%s) for %s [%s]",
-            (aperture, fname(lookup), lookup),
+            "unrecognized WFPC2 aperture (%s) for %s [%s]"
+            % (aperture, fname(lookup), lookup),
         )
     channel = get_channel_id(data_lookups, shm_lookup)
     if instrument == "ACS" and channel == "WFC":

@@ -53,6 +53,7 @@ from pdart.pipeline.utils import (
     make_osfs,
     make_sv_deltas,
     make_version_view,
+    get_clean_target_text,
 )
 from pdart.logging import PDS_LOGGER
 
@@ -156,14 +157,18 @@ def create_pds4_labels(
             target_records = bundle_db.get_all_target_identification()
             target_list = []
             for record in target_records:
-                name = str(record.name).replace(" ", "_")
-                type = str(record.type).replace(" ", "_")
+                name = get_clean_target_text(record.name)
+                type = get_clean_target_text(record.type)
+                # name = str(record.name).replace(" ", "_")
+                # type = str(record.type).replace(" ", "_")
                 target = f"{type}.{name}".lower()
                 if target not in target_list:
-                    target_list.append(target)
-
+                    target_list.append((target, record.target_id, record.lid_reference))
             new_target_context_list = []
-            for target in target_list:
+            for entry in target_list:
+                target = entry[0]
+                target_id = entry[1]
+                target_lid = entry[2]
                 is_target_label_exists = False
                 for label in target_label_list:
                     if target in label:
@@ -172,8 +177,13 @@ def create_pds4_labels(
                 if not is_target_label_exists:
                     label_filename = f"{target}_1.0.xml"
                     label_filepath = fs.path.join(context_coll_dir_path, label_filename)
-                    target_lidvid = f"urn:nasa:pds:context:target:{target}::1.0"
-                    label = make_context_target_label(self.db, target, _VERIFY)
+                    target_lidvid = f"{target_lid}::1.0"
+                    target_info = {
+                        "target_id": target_id,
+                        "target_lid": target_lid,
+                    }
+
+                    label = make_context_target_label(self.db, target_info, _VERIFY)
                     label_deltas.setbytes(label_filepath, label)
                     bundle_db.create_context_product_label(
                         label_deltas.getsyspath(label_filepath),

@@ -34,7 +34,7 @@ validate "${BUNDLE_DIR}" -M "${MANIFEST_DIR}"/checksum.manifest.txt -R pds4.bund
     --add-context-products "${CONTEXT_PRODUCTS}" \
     -S ${SCHEMATRONS} -x ${SCHEMAS} \
     -r "${REPORT_FILEPATH}"
-
+validate --version
 if [ ! -f "${REPORT_FILEPATH}" ]; then
     die A PDS4 validation report was not generated.
     exit 1

@@ -44,7 +44,7 @@ from pdart.db.sql_alch_tables import (
 )
 from pdart.citations import Citation_Information
 from pdart.db.utils import file_md5
-from pdart.pipeline.suffix_info import get_raw_suffix  # type: ignore
+from pdart.pipeline.suffix_info import get_ref_suffix  # type: ignore
 from pdart.pds4.hst_filename import HstFilename
 from pdart.pds4.lid import LID
 from pdart.pds4.lidvid import LIDVID
@@ -878,6 +878,22 @@ class BundleDB(object):
         return (
             self.session.query(TargetIdentification)
             .filter(TargetIdentification.lid_reference == target_lid)
+            .one()
+        )
+
+    def get_target_identification_based_on_id_and_lid(
+        self, target_id: str, target_lid: str
+    ) -> TargetIdentification:
+        """
+        Returns target identification of a specific target name and type in
+        the database.
+        """
+        return (
+            self.session.query(TargetIdentification)
+            .filter(
+                TargetIdentification.target_id == target_id,
+                TargetIdentification.lid_reference == target_lid,
+            )
             .one()
         )
 

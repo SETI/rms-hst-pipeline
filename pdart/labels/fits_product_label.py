@@ -50,7 +50,7 @@ from pdart.labels.doc_reference_list import make_document_reference_list
 
 from pdart.pipeline.suffix_info import (  # type: ignore
     get_titles_format,
-    get_raw_suffix,
+    get_ref_suffix,
     TARGET_IDENTIFICATION_SUFFIXES,
 )
 
@@ -95,11 +95,22 @@ def _directory_siblings(
 
 
 def _raw_sibling_file(siblings: List[str]) -> Tuple[str, str]:
-    for suffix in get_raw_suffix():
+    for suffix in get_ref_suffix():
         sib_file = _sibling_file(siblings, suffix)
         if sib_file:
             return (suffix, sib_file)
-    raise RuntimeError(f"siblings={siblings}; RAW SUFFIXES={get_raw_suffix()}")
+    # if the main reference file doesn't exist, we check for alternate
+    # reference file and also make sure the ninth character of the basename
+    # is between 0~9 when using using alternate reference file.
+    for suffix in get_ref_suffix(alt_ref=True):
+        sib_file = _sibling_file(siblings, suffix)
+        if sib_file:
+            return (suffix, sib_file)
+    raise RuntimeError(
+        f"Cannot get the reference files. Siblings={siblings};"
+        + f"REF_SUFFIXES={get_ref_suffix()};"
+        + f"ALT_REF_SUFFIXES={get_ref_suffix(alt_ref=True)}"
+    )
 
 
 def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
@@ -112,11 +123,17 @@ def _shm_sibling_file(siblings: List[str]) -> Tuple[str, str]:
     )
 
 
-def _sibling_file(siblings: List[str], suffix: str) -> Optional[str]:
+def _sibling_file(
+    siblings: List[str], suffix: str, alt_ref: bool = False
+) -> Optional[str]:
     # Given a list of siblings, return the first one that ends with
     # "_<suffix>.fits".
     ending = f"_{suffix.lower()}.fits"
     for basename in siblings:
+        if alt_ref:
+            ninth_char = basename[basename.rindex("_") - 1]
+            if int(ninth_char) not in range(0, 10):
+                continue
         if basename.lower().endswith(ending):
             return basename
     return None

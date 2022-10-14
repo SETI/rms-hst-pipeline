@@ -13,8 +13,10 @@ from pdart.labels.target_identification_xml import (
     target_identification,
     get_target_lid,
     get_target_lidvid,
+    get_target_lidvid_by_lid,
     make_label,
     make_alias,
+    make_alias_list,
     make_description,
 )
 from pdart.labels.utils import (
@@ -109,9 +111,11 @@ def create_target_identification_nodes(
     }
     target_identification_nodes: List[NodeBuilder] = []
     for target in target_identifications:
-        bundle_db.create_context_product(
-            get_target_lidvid([target.type, target.name]), "target"
-        )
+        target_lidvid = get_target_lidvid_by_lid(target.lid_reference)
+        bundle_db.create_context_product(target_lidvid, "target")
+        # bundle_db.create_context_product(
+        #     get_target_lidvid([target.type, target.name]), "target"
+        # )
         target_dict: Dict[str, Any] = {}
         target_dict["name"] = target.name
         target_dict["type"] = target.type
@@ -125,7 +129,7 @@ def create_target_identification_nodes(
 
 def make_context_target_label(
     bundle_db: BundleDB,
-    target: str,
+    target_info: Dict[str, str],
     verify: bool,
     use_mod_date_for_testing: bool = False,
 ) -> bytes:
@@ -135,18 +139,32 @@ def make_context_target_label(
     its XML and Schematron schemas.  Raise an exception if either
     fails.
     """
-    target_lid = f"urn:nasa:pds:context:target:{target}"
+    target_id = target_info["target_id"]
+    target_lid = target_info["target_lid"]
     target_lidvid = f"{target_lid}::1.0"
-    target_identification = bundle_db.get_target_identification_based_on_lid(target_lid)
+    # For the case when we can't search by target_lid, ex: 8218, the lid reference
+    # reference stored in db is "urn:nasa:pds:context:target:satellite.neptune.triton"
+    # which can't be searched by target_id "urn:nasa:pds:context:target:satellite.triton"
+    # we will search by target_id.
+    try:
+        target_identification = bundle_db.get_target_identification_based_on_lid(
+            target_lid
+        )
+    except:
+        target_identification = bundle_db.get_target_identification_based_on_id_and_lid(
+            target_id, target_lid
+        )
+    target_lid = target_identification.lid_reference
     bundle_db.create_context_product(
-        get_target_lidvid([target_identification.type, target_identification.name]),
+        get_target_lidvid_by_lid(target_lid),
         "target",
     )
 
     alias = str(target_identification.alternate_designations)
+    alias_list_nodes: List[NodeBuilder] = []
     if len(alias) != 0:
         alias_list = alias.split("\n")
-    alias_nodes: List[NodeBuilder] = [make_alias(alias) for alias in alias_list]
+        alias_list_nodes = [make_alias_list(alias_list)]
 
     target_description = str(target_identification.description)
     if len(target_description) != 0:
@@ -170,7 +188,7 @@ def make_context_target_label(
                     "target_lid": target_lid,
                     "target_vid": "1.0",
                     "title": target_identification.name,
-                    "alias": combine_nodes_into_fragment(alias_nodes),
+                    "alias_list": combine_nodes_into_fragment(alias_list_nodes),
                     "name": target_identification.name,
                     "type": target_identification.type,
                     "description": combine_nodes_into_fragment(description_nodes),
