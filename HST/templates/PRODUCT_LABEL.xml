@@ -1,0 +1,395 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch"
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.sch"
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+$ONCE(template_version = "0.9 beta")
+<!-- $BASENAME(TEMPLATE_PATH())$ $template_version$ ($FILE_ZULU(TEMPLATE_PATH())[:10]$) -->
+<!-- RMS XmlTemplate module version $VERSION_ID()$ -->
+
+$ONCE(PRODUCT = "Product_Ancillary" if processing_level == "Ancillary" else "Product_Observational")
+$ONCE(CONTEXT_AREA = "Context_Area" if processing_level == "Ancillary" else "Observation_Area")
+$ONCE(FILE_AREA = "File_Area" if processing_level == "Ancillary" else "File_Area_Observational")
+<$PRODUCT$
+  xmlns="http://pds.nasa.gov/pds4/pds/v1"
+  xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+  xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                      https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd
+                      http://pds.nasa.gov/pds4/mission/hst/v1
+                      https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.xsd">
+
+$ONCE(prop_id=hst_dictionary["hst_proposal_id"])
+$ONCE(inst_id=hst_dictionary["instrument_id"])
+$ONCE(ipppssoot=hst_dictionary["mast_observation_id"])
+  <Identification_Area>
+    <logical_identifier>
+      urn:nasa:pds:hst_$prop_id$:$collection_name$:$ipppssoot$$lid_suffix$
+    </logical_identifier>
+    <version_id>$version_id[0]$.$version_id[1]$</version_id>
+    <title>
+      $WRAP(6, 90, basename + ": " + product_title)$
+    </title>
+    <information_model_version>1.15.0.0</information_model_version>
+    <product_class>Product_Observational</product_class>
+
+    <Modification_History>
+$FOR(mod=modification_history)
+      <Modification_Detail>
+        <modification_date>$mod["modification_date"]$</modification_date>
+        <version_id>$mod["version_id"][0]$.$mod["version_id"][1]$</version_id>
+        <description>
+          $WRAP(10, 90, mod["description"])$
+        </description>
+      </Modification_Detail>
+$END_FOR
+      <Modification_Detail>
+        <modification_date>$CURRENT_ZULU()[:10]$</modification_date>
+        <version_id>$version_id[0]$.$version_id[1]$</version_id>
+        <description>
+$IF(version_id == (1,0))
+  $IF(hst_dictionary["mast_pipeline_version_id"] == "UNK")
+          Initial PDS4 version. Migrated from the MAST data product.
+  $ELSE
+          Initial PDS4 version. Migrated from the MAST data product produced using their
+          "OPUS" software pipeline version $hst_dictionary["mast_pipeline_version_id"]$.
+  $END_IF
+$ELSE_IF(version_id[1] == 0)
+  $IF(hst_dictionary["mast_pipeline_version_id"] == "UNK")
+          Data product revised by the MAST archive.
+  $ELSE
+          Data product revised by the MAST archive using their "OPUS" pipeline software
+          version $hst_dictionary["mast_pipeline_version_id"]$.
+  $END_IF
+$ELSE
+          PDS4 label revised by the Ring-Moon Systems Node using HST template version
+          $template_version$ and labeling software version $VERSION_ID()$.
+$END_IF
+        </description>
+      </Modification_Detail>
+    </Modification_History>
+  </Identification_Area>
+
+  <$CONTEXT_AREA$>
+    <comment>
+      This is a copy of HST file "$basename$" as obtained from the Mikulski
+      Archive for Space Telescopes (MAST) data archive on $retrieval_date$.
+$IF(has_nans)
+
+      Note: This file has been modified from the original source. The source file contains
+      NaN ("not-a-number") values inside some data arrays, but NaN values are not allowed
+      in PDS4 data products. In this file, all NaN values have been replaced by a fixed
+      constant, as specified below in the Special_Constants class.
+$END_IF
+    </comment>
+$IF(processing_level != "Ancillary")
+    <Time_Coordinates>
+      <start_date_time>$time_coordinates[0]$</start_date_time>
+      <stop_date_time>$time_coordinates[1]$</stop_date_time>
+    </Time_Coordinates>
+    <Primary_Result_Summary>
+      <purpose>Science</purpose>
+      <processing_level>$processing_level$</processing_level>
+      <description>
+        $WRAP(8, 90, basename + ": " + product_title)$
+      </description>
+      <Science_Facets>
+  $FOR(w=wavelength_ranges)
+        <wavelength_range>$w$</wavelength_range>
+  $END_FOR
+        <discipline_name>Ring-Moon Systems</discipline_name>
+      </Science_Facets>
+    </Primary_Result_Summary>
+$END_IF
+    <Investigation_Area>
+      <name>HST observing program $prop_id$</name>
+      <type>Individual Investigation</type>
+      <Internal_Reference>
+        <lid_reference>
+          urn:nasa:pds:context:investigation:individual.hst_$prop_id$
+        </lid_reference>
+        <reference_type>data_to_investigation</reference_type>
+      </Internal_Reference>
+    </Investigation_Area>
+    <Observing_System>
+      <name>Hubble Space Telescope $instrument_name$</name>
+      <Observing_System_Component>
+        <name>Hubble Space Telescope</name>
+        <type>Host</type>
+        <Internal_Reference>
+          <lid_reference>
+            urn:nasa:pds:context:instrument_host:spacecraft.hst
+          </lid_reference>
+          <reference_type>is_instrument_host</reference_type>
+        </Internal_Reference>
+      </Observing_System_Component>
+      <Observing_System_Component>
+        <name>$instrument_name$</name>
+        <type>Instrument</type>
+        <Internal_Reference>
+          <lid_reference>
+            urn:nasa:pds:context:instrument:hst.$inst_id.lower()$
+          </lid_reference>
+          <reference_type>is_instrument</reference_type>
+        </Internal_Reference>
+      </Observing_System_Component>
+    </Observing_System>
+$IF(processing_level != "Ancillary")
+  $FOR(target=target_identifications)
+    <Target_Identification>
+      <name>$target[0]$</name>$NOESCAPE("" if target[0] != "UNK" else "  <!--Unknown target-->")$
+    $FOR(alt=target[1])
+      <alternate_designation>$alt$</alternate_designation>
+    $END_FOR
+      <type>$target[2]$</type>
+    $IF(target[3])
+      <description>
+      $FOR(rec=target[3])
+        $rec$
+      $END_FOR
+      </description>
+    $END_IF
+      <Internal_Reference>
+        <lid_reference>$target[4]$</lid_reference>
+        <reference_type>data_to_target</reference_type>
+      </Internal_Reference>
+    </Target_Identification>
+  $END_FOR
+    <Mission_Area>
+      <hst:HST_Parameters>
+        <hst:Program_Parameters>
+          <hst:mast_observation_id>$hst_dictionary["mast_observation_id"]$</hst:mast_observation_id>
+          <hst:hst_proposal_id>$hst_dictionary["hst_proposal_id"]$</hst:hst_proposal_id>
+          <hst:hst_pi_name>$hst_dictionary["hst_pi_name"]$</hst:hst_pi_name>
+          <hst:visit_id>$hst_dictionary["visit_id"]$</hst:visit_id>
+        </hst:Program_Parameters>
+        <hst:Instrument_Parameters>
+          <hst:instrument_id>$inst_id$</hst:instrument_id>
+          <hst:channel_id>$channel_id$</hst:channel_id>
+  $FOR(detector_id,k,count=hst_dictionary["detector_ids"])
+          <hst:detector_id>$detector_id$</hst:detector_id>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
+  $END_FOR
+          <hst:observation_type>$hst_dictionary["observation_type"]$</hst:observation_type>
+        </hst:Instrument_Parameters>
+        <hst:Pointing_Parameters>
+          <hst:hst_target_name>$hst_dictionary["hst_target_name"]$</hst:hst_target_name>
+  $IF(hst_dictionary["moving_target_flag"] == "UNK")
+          <hst:moving_target_flag nilReason="unknown"></hst:moving_target_flag>  <!--Missing moving target info-->
+          <hst:moving_target_keyword nilReason="unknown"></hst:moving_target_keyword>  <!--Missing moving target info-->
+          <hst:moving_target_description nilReason="unknown"></hst:moving_target_description>  <!--Missing moving target info-->
+  $ELSE_IF(hst_dictionary["moving_target_flag"])
+          <hst:moving_target_flag>true</hst:moving_target_flag>
+    $FOR(keyword,k,count=hst_dictionary["moving_target_keywords"])
+          <hst:moving_target_keyword>$keyword$</hst:moving_target_keyword>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
+    $END_FOR
+    $FOR(description,k,count=hst_dictionary["moving_target_descriptions"])
+      $IF(len(description) > 40 and ',' in description)
+          <hst:moving_target_description>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
+            $WRAP(12, 90, description.replace(',', ', '))$
+          </hst:moving_target_description>
+      $ELSE
+          <hst:moving_target_description>$description$</hst:moving_target_description>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
+      $END_IF
+    $END_FOR
+  $ELSE
+          <hst:moving_target_flag>false</hst:moving_target_flag>
+          <hst:moving_target_keyword nilReason="inapplicable"></hst:moving_target_keyword>  <!--Not a moving target-->
+          <hst:moving_target_description nilReason="inapplicable"></hst:moving_target_description>  <!--Not a moving target-->
+  $END_IF
+          $ONCE(x=hst_dictionary["aperture_name"])
+          <hst:aperture_name$"" if x else ' nilReason="inapplicable"'$>$x$</hst:aperture_name>
+          $ONCE(x=hst_dictionary["proposed_aperture_name"])
+          <hst:proposed_aperture_name$"" if x else ' nilReason="inapplicable"'$>$x$</hst:proposed_aperture_name>
+  $FOR(detector,k,count=hst_dictionary["targeted_detector_ids"])
+          <hst:targeted_detector_id>$detector$</hst:targeted_detector_id>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
+  $END_FOR
+        </hst:Pointing_Parameters>
+        <hst:Tracking_Parameters>
+          <hst:fine_guidance_sensor_lock_type>$hst_dictionary["fine_guidance_sensor_lock_type"]$</hst:fine_guidance_sensor_lock_type>
+          <hst:gyroscope_mode>$hst_dictionary["gyroscope_mode"]$</hst:gyroscope_mode>
+        </hst:Tracking_Parameters>
+        <hst:Exposure_Parameters>
+          <hst:exposure_duration unit="s">$hst_dictionary["exposure_duration"]$</hst:exposure_duration>
+          <hst:exposure_type>$hst_dictionary["exposure_type"]$</hst:exposure_type>
+        </hst:Exposure_Parameters>
+        <hst:Wavelength_Filter_Grating_Parameters>
+          <hst:filter_name>$hst_dictionary["filter_name"]$</hst:filter_name>
+          $ONCE(x=hst_dictionary["center_filter_wavelength"])
+          <hst:center_filter_wavelength unit="micrometer"$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:center_filter_wavelength>
+          $ONCE(x=hst_dictionary["bandwidth"])
+          <hst:bandwidth unit="micrometer"$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:bandwidth>
+          $ONCE(x=hst_dictionary["spectral_resolution"])
+          <hst:spectral_resolution unit="micrometer"$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:spectral_resolution>
+        </hst:Wavelength_Filter_Grating_Parameters>
+        <hst:Operational_Parameters>
+          $ONCE(x=hst_dictionary["instrument_mode_id"])
+          <hst:instrument_mode_id$"" if x else ' nilReason="inapplicable"'$>$x$</hst:instrument_mode_id>
+          $ONCE(x=hst_dictionary["gain_setting"])
+          <hst:gain_setting$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:gain_setting>
+          <hst:coronagraph_flag>$BOOL(hst_dictionary["coronagraph_flag"])$</hst:coronagraph_flag>
+          <hst:cosmic_ray_split_count>$hst_dictionary["cosmic_ray_split_count"]$</hst:cosmic_ray_split_count>
+          <hst:repeat_exposure_count>$hst_dictionary["repeat_exposure_count"]$</hst:repeat_exposure_count>
+          <hst:subarray_flag>$BOOL(hst_dictionary["subarray_flag"])$</hst:subarray_flag>
+          <hst:binning_mode>$hst_dictionary["binning_mode"]$</hst:binning_mode>
+          $ONCE(x=hst_dictionary["plate_scale"])
+          <hst:plate_scale unit="mrad"$"" if x else ' nilReason="missing"'$>$x/1000. if x else ""$</hst:plate_scale>
+        </hst:Operational_Parameters>
+        <hst:Processing_Parameters>
+          $ONCE(x=hst_dictionary["mast_pipeline_version_id"].replace("UNK", ""))
+          <hst:mast_pipeline_version_id$"" if x else ' nilReason="missing"'$>$x$</hst:mast_pipeline_version_id>
+          $ONCE(x=hst_dictionary["hst_quality_id"].replace("UNK", ""))
+          <hst:hst_quality_id$"" if x else ' nilReason="missing"'$>$x$</hst:hst_quality_id>
+  $IF(hst_dictionary["hst_quality_comment"] in ("UNK", ""))
+          <hst:hst_quality_comment nilReason="missing"></hst:hst_quality_comment>
+  $ELSE
+          <hst:hst_quality_comment>
+            $WRAP(12, 90, hst_dictionary["hst_quality_comment"].rstrip(".") + ".")$
+          </hst:hst_quality_comment>
+  $END_IF
+        </hst:Processing_Parameters>
+      </hst:HST_Parameters>
+    </Mission_Area>
+$END_IF
+  </$CONTEXT_AREA$>
+
+  <Reference_List>
+    <Internal_Reference>
+      <lid_reference>urn:nasa:pds:hst-support:document:$inst_id.lower()$-dhb</lid_reference>
+      <reference_type>data_to_document</reference_type>
+      <comment>Data Handbook for $inst_id$</comment>
+    </Internal_Reference>
+    <Internal_Reference>
+      <lid_reference>urn:nasa:pds:hst-support:document:$inst_id.lower()$-ihb</lid_reference>
+      <reference_type>data_to_document</reference_type>
+      <comment>Instrument Handbook for $inst_id$</comment>
+    </Internal_Reference>
+$IF(processing_level != "Ancillary")
+  $FOR(info=browse_info)
+    <Internal_Reference>
+      <lidvid_reference>
+        urn:nasa:pds:hst_$prop_id$:$info.collection_name$:$ipppssoot$$info.lid_suffix$::$version_id[0]$.0
+      </lidvid_reference>
+      <reference_type>data_to_$"thumb" if "thumb" in info.suffix else "browse"$</reference_type>
+    $IF("thumb" in info.suffix)
+      <comment>Thumbnail browse product</comment>
+    $ELSE_IF(hst_dictionary["observation_type"] == "IMAGING")
+      <comment>Full-resolution browse product</comment>
+    $ELSE
+      <comment>Browse product</comment>
+    $END_IF
+    </Internal_Reference>
+  $END_FOR
+$END_IF
+$FOR(ref=reference_basenames)
+  $ONCE(ref_dict=by_basename[ref])
+    <Internal_Reference>
+      <lidvid_reference>
+        urn:nasa:pds:hst_$prop_id$:$ref_dict["collection_name"]$:$ref_dict["ipppssoot"]$$ref_dict["lid_suffix"]$::$ref_dict["version_id"][0]$.$ref_dict["version_id"][1]$
+      </lidvid_reference>
+      <reference_type>data_to_$ref_dict["processing_level"].lower()$_product</reference_type>
+      <comment>
+        $WRAP(8, 90, ref_dict["basename"] + ": " + ref_dict["product_title"])$
+      </comment>
+    </Internal_Reference>
+$END_FOR
+  </Reference_List>
+
+  <$FILE_AREA$>
+    <File>
+      <file_name>$BASENAME(fullpath)$</file_name>
+      <creation_date_time>$FILE_ZULU(fullpath)$</creation_date_time>
+      <md5_checksum>$FILE_MD5(fullpath)$</md5_checksum>
+    </File>
+$FOR(hdu_dict,k=hdu_dictionaries)
+
+    <Header>
+  $ONCE(header=hdu_dict["header"])
+  $ONCE(ddict=hdu_dict["data"])
+  $IF(header["name"])
+      <name>$header["name"]$</name>
+  $END_IF
+      <local_identifier>$header["local_identifier"]$</local_identifier>
+      <offset unit="byte">$header["offset"]$</offset>
+      <object_length unit="byte">$header["object_length"]$</object_length>
+      <parsing_standard_id>$header["parsing_standard_id"]$</parsing_standard_id>
+      <description>
+        $WRAP(8, 90, header["description"])$
+      </description>
+    </Header>
+  $IF(not ddict["is_empty"])
+
+    <$ddict["data_class"]$>
+      <name>$ddict["name"]$</name>
+      <local_identifier>$ddict["local_identifier"]$</local_identifier>
+      <offset unit="byte">$ddict["offset"]$</offset>
+   $IF(ddict["data_class"].startswith("Array"))
+      <axes>$ddict["axes"]$</axes>
+      <axis_index_order>$ddict["axis_index_order"]$</axis_index_order>
+      <description>
+        $WRAP(8, 90, ddict["name"] + ": " + ddict["description"])$
+      </description>
+      <Element_Array>
+        <data_type>$ddict["data_type"]$</data_type>
+    $IF(ddict["unit"])
+        <unit>$ddict["unit"]$</unit>
+    $END_IF
+    $IF(ddict["scaling_factor"] != 1.)
+        <scaling_factor>$ddict["scaling_factor"]$</scaling_factor>
+    $END_IF
+    $IF(ddict["value_offset"] != 0.)
+        <value_offset>$ddict["value_offset"]$</value_offset>
+    $END_IF
+      </Element_Array>
+    $FOR(j=range(ddict["axes"]))
+      <Axis_Array>
+        <axis_name>$ddict["axis_names"][j]$</axis_name>
+        <elements>$ddict["elements"][j]$</elements>
+        <sequence_number>$ddict["sequence_numbers"][j]$</sequence_number>
+      </Axis_Array>
+    $END_FOR
+    $IF(k in hdus_with_nans)
+      <Special_Constants>
+        <invalid_constant>$nan_replacement$</invalid_constant>
+      </Special_Constants>
+    $END_IF
+   $ELSE_IF(ddict["data_class"] == "Table_Binary")
+      <records>$ddict["records"]$</records>
+      <description>
+        $WRAP(8, 90, ddict["name"] + ": " + ddict["description"])$
+      </description>
+      <Record_Binary>
+        <fields>$ddict["fields"]$</fields>
+        <groups>$ddict["groups"]$</groups>
+        <record_length>$ddict["record_length"]$</record_length>
+    $FOR(j=range(ddict["fields"]))
+        <Field_Binary>
+          <name>$ddict["names"][j]$</name>
+          <field_number>$ddict["field_numbers"][j]$</field_number>
+          <field_location>$ddict["field_locations"][j]$</field_location>
+          <data_type>$ddict["data_types"][j]$</data_type>
+          <field_length>$ddict["field_lengths"][j]$</field_length>
+      $IF(field_format=ddict["field_formats"][j])
+          <field_format>$field_format$</field_format>
+      $END_IF
+      $IF(unit=ddict["units"][j])
+          <unit>$unit$</unit>
+      $END_IF
+      $IF(description=ddict["descriptions"][j])
+          <description>
+            $WRAP(12, 90, description)$
+          </description>
+      $END_IF
+        </Field_Binary>
+    $END_FOR
+      </Record_Binary>
+    </$ddict["data_class"]$>
+   $ELSE_IF(ddict["data_class"])
+    $RAISE(IOError, "unsupported class " + ddict["class"])$
+   $END_IF
+  $END_IF
+$END_FOR
+
+  </$FILE_AREA$>
+</$PRODUCT$>
