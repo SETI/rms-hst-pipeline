@@ -54,7 +54,6 @@ def get_modification_history(xml_content):
 
     return info_list
 
-
 TARGET_IDENTIFICATION = re.compile(r'</?Target_Identification>')
 NAME = re.compile(r'</?name>')
 ALTERNATE_DESIGNATION = re.compile(r'</?alternate_designation>')
@@ -104,10 +103,9 @@ def get_target_identifications(xml_content):
         else:
             info['description'] = parts[1]
 
-        info_list.append(target_identification_dict)
+        info_list.append(info)
 
     return info_list
-
 
 CITATION_INFORMATION = re.compile(r'</?Citation_Information>')
 AUTHOR_LIST = re.compile(r'</?author_list>')
@@ -164,7 +162,6 @@ def get_citation_information(xml_content):
 
     return (author_list, editor_list, publication_year, doi, keywords, description)
 
-
 TIME_COORDINATES = re.compile(r'</?Time_Coordinates>')
 START_DATE_TIME = re.compile(r'</?start_date_time>')
 STOP_DATE_TIME = re.compile(r'</?stop_date_time>')
@@ -190,7 +187,6 @@ def get_time_coordinates(xml_content):
     stop_date_time = parts[1].strip()
 
     return (start_date_time, stop_date_time)
-
 
 PRIMARY_RESULT_SUMMARY = re.compile(r'</?Primary_Result_Summary>')
 PURPOSE = re.compile(r'</?purpose>')

@@ -109,7 +109,7 @@ def get_mpc_info(key):
     request fails, return None."""
 
     # Retrieve from cache if available
-    filepath = os.path.join(WEBCACHE, key.replace('/','-')) + '.html'
+    filepath = os.path.join(WEBCACHE, key.upper().replace('/','-')) + '.html'
     if os.path.exists(filepath):
         with open(filepath, 'rb') as f:
             html = f.read()

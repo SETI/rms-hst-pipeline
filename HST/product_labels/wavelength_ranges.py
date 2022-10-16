@@ -43,8 +43,9 @@ def wavelength_ranges(instrument_id, detector_ids, filter_name):
 
 EASY_TRANSLATIONS = {
     "NICMOS": ["NIR"],
-    "COS": ["UV"],
-    "GHRS": ["UV"],
+    "COS"   : ["UV"],
+    "GHRS"  : ["UV"],
+    "FGS"   : ["VIS"],
     ("ACS", "SBN"): ["UV"],
     ("HSP", "UV1"): ["UV"],
     ("HSP", "UV2"): ["UV"],
@@ -80,17 +81,17 @@ def wavelength_abbrevs(instrument_id, detector_ids, filter_name):
     for det in detector_ids:
         key = (instrument_id, det)
         if key in EASY_TRANSLATIONS:
-            results.append(EASY_TRANSLATIONS[key])
+            results += EASY_TRANSLATIONS[key]
 
         key = (instrument_id, det, filter_name)
         if key in EASY_TRANSLATIONS:
-            results.append(EASY_TRANSLATIONS[key])
+            results += EASY_TRANSLATIONS[key]
 
         # Strip a STIS suffix, e.g., "+ND_3" or "+LONG_PASS", and try again
         if instrument_id == "STIS" and "+" in filter_name:
             key = (instrument_id, det, filter_name.partition('+')[0])
             if key in EASY_TRANSLATIONS:
-                results.append(EASY_TRANSLATIONS[key])
+                results += EASY_TRANSLATIONS[key]
 
     if results:
         return ranges_union(results)
@@ -107,7 +108,7 @@ NIR_MIN = 647
 
 # This regular expression matches the number inside a filter name, e.g.,
 # 'F606W'. This is generally the center wavelength of the bandpass in nm.
-FILTER_REGEX = re.compile("[FG](|[QR])(\d+)([WMNHLX]|LP|AW|BW|BN15)")
+FILTER_REGEX = re.compile(r"[FG](|[QR])(\d+)([WMNHLX]|LP|AW|BW|BN15)")
 
 # This is a list of filter/grating names whose ranges would not be correctly
 # inferred from the name based on the usual algorithm. This is needed for two
@@ -240,7 +241,7 @@ def ranges_union(ranges_list):
 
     # This is easy if there's only item
     if len(ranges_list) == 1:
-        return ranges_list[0]
+        return [ranges_list[0]]
 
     # Determine the union
     combined = ranges_list[0]

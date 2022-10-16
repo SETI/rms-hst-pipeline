@@ -17,7 +17,8 @@
 #     product file.
 # [3] associated_suffix: suffix to which the hdu_description_fmt refers if not this
 #     suffix; otherwise, blank. This enables the defining of relationships between files
-#     with different suffixes.
+#     with different suffixes. It there are multiple possible associated suffixes, this is
+#     a tuple of values.
 # [4] product_title_fmt: title format string for the product.
 # [5] collection_title_fmt: title format string for the collection.
 # [6] prior_suffixes: the set of suffixes that contribute to this file and must therefore
@@ -182,7 +183,7 @@ REF_SUFFIXES = {'raw', 'd0m', 'd0f',
                 'rawtag',   'rawtag_a',   'rawtag_b',   # COS...
                 'rawaccum', 'rawaccum_a', 'rawaccum_b',
                 'rawacq',   'rawacq_a',   'rawacq_b'}
-ALT_REF_SUFFIXES = {'mos', 'drz', 'x1dsum', 'fltsum'}   # products with associations
+ALT_REF_SUFFIXES = {'mos', 'drz', 'x1dsum', 'fltsum', 'd1f'}    # d1f needed for GHRS
 SPT_SUFFIXES = {'spt', 'shm', 'shf', 'dmf'}
 
 # These are used when we only want to download files for target identification testing
@@ -590,21 +591,21 @@ SUFFIX_INFO = {
 
     ('corrtag', 'COS'): (
         True, 'Calibrated',
-        'Calibrated TIME-TAG events for the raw {D} {name} {noun}, HDU[{hdu}] of the associated "_rawtag" file ({F}, {lidvid}).', 'rawtag',
+        'Calibrated TIME-TAG events for the raw {D} {name} {noun}, HDU[{hdu}] of the associated file ({F}, {lidvid}).', ('rawtag', 'rawaccum', 'rawacq'),
         'Calibrated {IC} TIME-TAG events for the associated "_rawtag" file ({F}, {lidvid}) from HST Program {P}.',
         'Calibrated {I} "_corrtag" TIME-TAG events list files for HST Program {P}.',
         {'rawaccum', 'rawacq', 'rawtag'}, None,
     ),
     ('corrtag_a', 'COS'): (
         True, 'Calibrated',
-        'Calibrated TIME-TAG events for the raw {D} {name} {noun}, HDU[{hdu}] of the associated "_rawtag_a" file ({F}, {lidvid}).', 'rawtag_a',
+        'Calibrated TIME-TAG events for the raw {D} {name} {noun}, HDU[{hdu}] of the associated file ({F}, {lidvid}).', ('rawtag_a', 'rawaccum_a', 'rawacq_a'),
         'Calibrated {IC} TIME-TAG events for the associated "_rawtag_a" file ({F}, {lidvid}) from HST Program {P}.',
         'Calibrated {I} "_corrtag" TIME-TAG events list files for HST Program {P}.',
         {'rawaccum_a', 'rawacq_a', 'rawtag_a'}, None,
     ),
     ('corrtag_b', 'COS'): (
         True, 'Calibrated',
-        'Calibrated TIME-TAG events for the raw {D} {name} {noun}, HDU[{hdu}] of the associated "_rawtag_b" file ({F}, {lidvid}).', 'rawtag_b',
+        'Calibrated TIME-TAG events for the raw {D} {name} {noun}, HDU[{hdu}] of the associated file ({F}, {lidvid}).', ('rawtag_b', 'rawaccum_b', 'rawacq_b'),
         'Calibrated {IC} TIME-TAG events for the associated "_rawtag_b" file ({F}, {lidvid}) from HST Program {P}.',
         'Calibrated {I} "_corrtag" TIME-TAG events list files for HST Program {P}.',
         {'rawaccum_b', 'rawacq_b', 'rawtag_b'}, None,
@@ -1695,7 +1696,6 @@ def is_rejected(suffix, instrument_id):
         return True
     raise ValueError(f'unrecognized suffix for {instrument_id}: "{suffix}"')
 
-
 def is_recognized(suffix, instrument_id):
     """True if this suffix is recognized, meaning that we know whether or not it needs to
     be archived. False if it is unrecognized.
@@ -1746,44 +1746,34 @@ def _suffix_info_key(suffix, instrument_id, channel_id=None):
                        f'channel "{channel_id}" ' +
                        'not found in SUFFIX_INFO')
 
-
 def _suffix_info(suffix, instrument_id, channel_id=None):
     """The SUFFIX_INFO based on the instrument, channel, and suffix."""
 
     return SUFFIX_INFO[_suffix_info_key(suffix, instrument_id, channel_id)]
 
-
 def get_processing_level(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).processing_level
-
 
 def get_hdu_description_fmt(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).hdu_description_fmt
 
-
 def get_associated_suffix(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).associated_suffix
-
 
 def get_product_title_fmt(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).product_title_fmt
 
-
 def get_collection_title_fmt(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).collection_title_fmt
-
 
 def get_prior_suffixes(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).prior_suffixes
 
-
 def is_ancillary(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).processing_level == 'Ancillary'
 
-
 def is_observational(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).processing_level != 'Ancillary'
-
 
 def collection_name(suffix, instrument_id):
     """The name of the collection for this instrument and suffix.
@@ -1796,14 +1786,12 @@ def collection_name(suffix, instrument_id):
             + '_'
             + EXTENDED_SUFFIXES.get(suffix, (suffix, ''))[0])
 
-
 def lid_suffix(suffix):
     """When a suffix has its own suffix, the latter suffix has to be appended to the
     IPPPSSOOT in the LID because it is not part of the collection name.
     """
 
     return EXTENDED_SUFFIXES.get(suffix, (suffix, ''))[1]
-
 
 def excluded_lid_suffixes(lid_suffix):
     """When a suffix has its own suffix, the list of associated products should exclude
@@ -1812,10 +1800,7 @@ def excluded_lid_suffixes(lid_suffix):
 
     return EXTENDED_SUFFIX_EXCLUSIONS.get(lid_suffix, set())
 
-
 ##########################################################################################
-
-import pytest
 
 def test_recognized():
     """Every listed suffix needs to be recognized.
@@ -1825,7 +1810,6 @@ def test_recognized():
         for suffix in suffixes:
             assert is_recognized(suffix, instrument_id)
 
-
 def test_associated_suffixes():
     """Every associated suffix must be a prior suffix. It must also be referenced in the
     HDU description and the HDU description must mention it.
@@ -1834,7 +1818,10 @@ def test_associated_suffixes():
     for info in SUFFIX_INFO.values():
         desc = info.hdu_description_fmt
         suffix = info.associated_suffix
-        if suffix:
+        if isinstance(suffix, set):
+            for suffix_ in suffix:
+                assert suffix_ in info.prior_suffixes
+        elif suffix:
             assert '_' + suffix in desc
             assert suffix in info.prior_suffixes
         else:
@@ -1858,7 +1845,6 @@ def test_keys():
         if info.is_accepted and len(key) > 1:
             (suffix, instrument_id) = key[:2]
             assert suffix in ALL_SUFFIXES[instrument_id]
-
 
 ##########################################################################################
 

@@ -48,9 +48,6 @@ parser.add_argument('--replace-nans', '-N', action='store_true',
 parser.add_argument('--reset-dates', '-D', action='store_true',
     help='Reset file modification dates to match the inferred product creation times.')
 
-parser.add_argument('--delete-duplicates', '-X', action='store_true',
-    help='Delete data files that are identical to the old versions.')
-
 parser.add_argument('--log', '-l', type=str, default='',
     help='Path and name for the log file. The name always has the current date and time '+
          'appended. If not specified, the file will be written to the current working '  +
@@ -88,8 +85,7 @@ label_hst_fits_directories(args.path,
                            retrieval_date = args.date,
                            logger = logger,
                            reset_dates = args.reset_dates,
-                           replace_nans = args.replace_nans,
-                           delete_duplicates = args.delete_duplicates)
+                           replace_nans = args.replace_nans)
 logger.close()
 
 ##########################################################################################

@@ -1250,43 +1250,49 @@ class XmlElseBlock(XmlBlock):
 # Utility
 ##########################################################################################
 
-NINES = re.compile('.*\.\d+999999([789])')
-ZEROS = re.compile('(.*\.\d+)000000[123]')
-DIGIT_REPLACEMENT = {'7': '3', '8': '2', '9': '1'}
+# Modify a number if it contains ten 0's or 9's in a row, followed by other digits
+ZEROS = re.compile(r'(.*[.1-9])0{10,99}[1-9]\d*')
+NINES = re.compile(r'(.*\.\d+9{10,99})[0-8]\d*')
 
 def pretty_truncate(value):
     """Convert a floating-point number to a string, while suppressing any extraneous
     trailing digits by rounding to the nearest value that does not have them.
 
-    This avoids numbers like "1.00000000000002" and "0.99999999999998" in the XML label.
+    This eliminates numbers like "1.0000000000000241" and "0.9999999999999865" in the XML
+    label, by suppressing insignificant digits.
     """
 
-    (mantissa, e, exponent) = str(value).partition('e')
+    str_value = str(value)
 
-    # Handle trailing nines
-    match = NINES.fullmatch(mantissa)
-    if match:
-        final_digit = match.group(1)
+    (mantissa, e, exponent) = str_value.partition('e')
+    if mantissa.endswith('.0'):
+        return mantissa[:-1] + e + exponent
 
-        # Derive an offset to eliminate the trailing nines
-        offset = mantissa
-        for c in '123456789':       # replace non-zero digits with zeros
-            offset = offset.replace(c, '0')
-
-        offset = offset[:-1] + DIGIT_REPLACEMENT[final_digit]
-                                    # replace the last digit with "1" or "2"
-
-        # Apply the offset
-        value = value + float(offset)
-        mantissa = str(value)
-
-    # Handle trailing zeros plus a one or two
+    # Handle trailing zeros
     match = ZEROS.fullmatch(mantissa)
     if match:
-        mantissa = match.group(1)
+        return match.group(1) + e + exponent
 
-    # Strip any remaining trailing zeros
-    return mantissa.rstrip('0') + e + exponent
+    # Check for trailing nines
+    match = NINES.fullmatch(mantissa)
+    if not match:
+        # Value looks OK; return as is
+        return str_value
+
+    # Replace every digit in the mantissa with a zero
+    # This creates an string expression equal to zero, but using the exact same format,
+    # including sign.
+    offset_str = match.group(1)
+    for c in '123456789':       # replace non-zero digits with zeros
+        offset_str = offset_str.replace(c, '0')
+
+    # Now replace the last digit with "1"
+    # This is an offset (positive or negative) to zero out the trailing digits
+    offset_str = offset_str[:-1] + '1'      # replace the last digit with "1"
+
+    # Apply the offset and return
+    value = float(match.group(1)) + float(offset_str)
+    return str(value).rstrip('0') + e + exponent
 
 ##########################################################################################
 # UNIT TESTS

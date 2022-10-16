@@ -3,11 +3,11 @@
 ##########################################################################################
 
 import datetime
-import filecmp
 import fnmatch
 import os
-import re
-from collections import defaultdict, namedtuple
+import shutil
+import sys
+from collections import defaultdict
 
 import astropy.io.fits as pyfits
 import pdslogger
@@ -15,6 +15,7 @@ import pdslogger
 from . import suffix_info
 from .date_support            import (get_header_date,
                                       get_trl_timetags,
+                                      merge_trl_timetags,
                                       get_label_retrieval_date,
                                       get_file_creation_date,
                                       set_file_timestamp)
@@ -24,7 +25,7 @@ from .hst_dictionary_support  import fill_hst_dictionary
 from .get_time_coordinates    import get_time_coordinates
 from .nan_support             import cmp_ignoring_nans, has_nans, rewrite_wo_nans
 from .wavelength_ranges       import wavelength_ranges
-from .xml_support             import get_modification_history
+from .xml_support             import get_modification_history, get_target_identifications
 
 from target_identifications import hst_target_identifications
 from xmltemplate import XmlTemplate
@@ -39,6 +40,11 @@ TEMPLATE = XmlTemplate(template)
 # From https://archive.stsci.edu/hlsp/ipppssoot.html, valid last chars of the IPPPSSOOT
 STANDARD_TRANSMISSION_TAILS = {'b', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'}
 
+# This needs to be updated the program is revised
+LABEL_VERSION = '1.0'
+timetag = max(os.path.getmtime(__file__), os.path.getmtime(template))
+LABEL_DATE = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
+
 def label_hst_fits_directories(directories, root='', *,
                                match_pattern = '',
                                old_directories = [],
@@ -46,8 +52,7 @@ def label_hst_fits_directories(directories, root='', *,
                                retrieval_date = '',
                                logger = None,
                                reset_dates = True,
-                               replace_nans = False,
-                               delete_duplicates = False):
+                               replace_nans = False):
     """Process one or more directories of HST FITS files, returning the information needed
     for all of their PDS4 labels as a dictionary keyed by the basenames.
 
@@ -59,12 +64,12 @@ def label_hst_fits_directories(directories, root='', *,
                             FITS files.
         old_root            optional path to prepend to each old directory path.
         retrieval_date      date the file was retrieved from MAST, in yyyy-mm-dd format.
-                            If blank, the date will be inferred from the file itself.
+                            If blank, the date will be retrieved from a pre-existing
+                            label, or else it will be set to the file's creation date.
         logger              pdslogger to use; None for default EasyLogger.
         reset_dates         True to reset the modification date of each file to the date
                             found in the FITS header.
         replace_nans        True to rewrite each file without NaNs if NaNs are found.
-        delete_duplicates   True to delete FITS files that are identical to old versions.
     """
 
     filepaths = get_filepaths(directories, root, match_pattern)
@@ -80,8 +85,7 @@ def label_hst_fits_directories(directories, root='', *,
                              retrieval_date = '',
                              logger = logger,
                              reset_dates = reset_dates,
-                             replace_nans = replace_nans,
-                             delete_duplicates = delete_duplicates)
+                             replace_nans = replace_nans)
 
 ############################################
 
@@ -91,8 +95,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                              retrieval_date = '',
                              logger = None,
                              reset_dates = True,
-                             replace_nans = False,
-                             delete_duplicates = False):
+                             replace_nans = False):
     """Process a list of filepaths, returning the information needed for all of their
     PDS4 labels as a dictionary keyed by the basenames.
 
@@ -107,7 +110,6 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         replace_nans        True to rewrite each file without NaNs if NaNs are found.
         reset_dates         True to reset the modification date of each file to the date
                             found in the FITS header.
-        delete_duplicates   True to delete FITS files that are identical to old versions.
     """
 
     logger = logger or pdslogger.EasyLogger()
@@ -137,7 +139,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     # Make sure the retrieval date, if any, is valid
     if retrieval_date:
         try:
-            date_obj = datetime.date.fromisoformat(retrieval_date)
+            _ = datetime.date.fromisoformat(retrieval_date)
         except ValueError:
             logger.exception(ValueError)
             sys.exit(1)
@@ -150,7 +152,6 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     info_by_basename = {}           # info vs. basename
     associations_by_ipppssoot = {}  # association list keyed by IPPPSSOOT
     trl_timetags_by_ipppssoot = {}  # time tag dictionary, which maps date to date-time
-    missing_ipppssoots = set()      # set of all associates not found
 
     prev_instrument_id = ''
     accepted_suffixes = set()
@@ -166,6 +167,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         basename = os.path.basename(fullpath)
         ipppssoot_plus_suffix = basename.partition('.')[0]
         (ipppssoot, _, suffix) = ipppssoot_plus_suffix.partition('_')
+        suffix = suffix.lower()
 
         # Determine the instrument
         instrument_id = suffix_info.INSTRUMENT_FROM_LETTER_CODE[basename[0]]
@@ -219,6 +221,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             'lid_suffix'     : suffix_info.lid_suffix(suffix),
             'group_ipppssoot': ipppssoot,
             'retrieval_date' : file_retrieval_date,
+            'label_version'  : LABEL_VERSION,
+            'label_date'     : LABEL_DATE,
         }
 
         info_by_basename[basename] = basename_dict
@@ -262,30 +266,36 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         basename_dict['fits_is_identical'   ] = fits_is_identical
 
         ##################################################################################
-        # Read key info directly from the file
+        # Read fundamental info from a few specific files
         #
         # associations_by_ipppssoot[ipppssoot] = dictionary of associated IPPPSSOOTs.
         # trl_timetags_by_ipppssoot[ipppssoot] = dictionary mapping dates to date-times.
         ##################################################################################
 
-        # Open the FITS file
-        hdulist = pyfits.open(fullpath)
+        # Open the (original) FITS file
+        original_path = fullpath + '-original'
+        if os.path.exists(original_path):
+            hdulist = pyfits.open(original_path)
+        else:
+            hdulist = pyfits.open(fullpath)
 
         # If this is an association file, read its contents for the IPPPSSOOT
-        if basename.endswith('_asn.fits'):
+        if suffix == 'asn':
             logger.info('Reading associations', filepath)
             associations = read_associations(hdulist, basename)
             associations_by_ipppssoot.update(associations)
 
         # If this is a TRL or PDQ file, get the dictionary of date-times vs. date
-        for pattern in ('_trl.fits', '_pdq.fits'):
-            if basename.endswith(pattern):
-                logger.info('Reading dates', filepath)
-                timetags = get_trl_timetags(hdulist[1], filepath, logger)
-                trl_timetags_by_ipppssoot[ipppssoot] = timetags
+        if suffix in ('trl', 'pdq'):
+            logger.info('Reading dates', filepath)
+            timetag_dict = get_trl_timetags(hdulist[1], filepath, logger)
+            if ipppssoot in trl_timetags_by_ipppssoot:
+                merge_trl_timetags(trl_timetags_by_ipppssoot[ipppssoot], timetag_dict)
+            else:
+                trl_timetags_by_ipppssoot[ipppssoot] = timetag_dict
 
         ##################################################################################
-        # Read key info directly from the file
+        # Read structure and content info from this file
         #
         # "hdu_dictionaries": a list of dictionaries describing the content of each HDU.
         # "internal_date"   : the internal date, if any, from the first FITS header.
@@ -385,13 +395,14 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         elif len(standard_tails) > 1:
             logger.error('Multiple standard transmission characters found for ' +
                          f'"{ipppssoo}": {standard_tails}')
+
             # Better to select the most common IPPPSSOOT
             tuples = []
             for tail in standard_tails:
                 files_with_ipppssoot = len(info_by_ipppssoot[ipppssoo + tail])
                 tuples.append((-files_with_ipppssoot, tail))
 
-            counts.sort()
+            tuples.sort()
             reference_tail = tuples[0][1]
 
         # Move each file under the reference IPPPSSOOT
@@ -456,9 +467,10 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
     ######################################################################################
     # For all IPPPSSOOT dictionaries:
+    #
     # "all_suffixes": set of all suffixes for this IPPPSSOOT.
     # "ipppssoot"   : IPPPSSOOT.
-    # "timetags"    : timetags derived from the TRL file.
+    # "timetags"    : timetags derived from the TRL and PDQ files.
     #
     # For both IPPPSSOOT and basename dictionaries:
     # "by_basename" : overall dictionary info_by_basename.
@@ -562,7 +574,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         ipppssoot_dict['spt_fullpath'] = spt_fullpath
 
     ######################################################################################
-    # Identify the reference file for each IPPPSSOOT:
+    # Identify the reference file for each IPPPSSOOT. This is the file that serves as the
+    # primary source of HST dictionary values.
     #
     # "reference_suffix"  : first reference suffix.
     # "reference_suffixes": set of all reference_suffixes.
@@ -593,34 +606,50 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             reference_suffixes = suffix_info.ALT_REF_SUFFIXES & all_suffixes
             tag = 'Alternative reference'
 
-        if not reference_suffixes:
-            # There's no way for the pipeline to proceed from here
-            logger.error('No reference file found for ' + ipppssoot)
-            no_reference_ipppssoots.append(ipppssoot)
-            continue
-
-        reference_suffix_list = list(reference_suffixes)
-        reference_suffix_list.sort()
-        reference_suffix = reference_suffix_list[0]
-        count = len(reference_suffix_list)
-        if count > 1:
-            for k,suffix in enumerate(reference_suffix_list):
-                logger.debug(f'Multiple {tag.lower()} files found for {ipppssoot} ' +
-                             f'({k+1}/{count})', ipppssoot_dict[suffix]['filepath'])
-        else:
-            logger.debug(f'{tag} file found for ' + ipppssoot,
-                         ipppssoot_dict[reference_suffix]['filepath'])
-
-        ipppssoot_dict['reference_suffix'] = reference_suffix
         ipppssoot_dict['reference_suffixes'] = reference_suffixes
 
-        # Fill the HST dictionary
-        ref_fullpath = ipppssoot_dict[reference_suffix]['fullpath']
-        ref_hdulist = pyfits.open(ref_fullpath)
-        spt_hdulist = pyfits.open(ipppssoot_dict['spt_fullpath'])
+        # If there is no reference data file...
+        if not reference_suffixes:
 
-        hst_dictionary = fill_hst_dictionary(ref_hdulist, spt_hdulist, ref_fullpath,
-                                                                       logger)
+            # Maybe this is supposed to happen
+            spt_hdulist = pyfits.open(ipppssoot_dict['spt_fullpath'])
+            scidata = spt_hdulist[0].header['SCIDATA']
+            spt_hdulist.close()
+
+            if scidata:
+                logger.error('Reference file missing for ' + ipppssoot)
+                no_reference_ipppssoots.append(ipppssoot)
+                continue
+
+            logger.warn('No science data for ' + ipppssoot)
+            reference_suffix = ''
+            ipppssoot_dict['reference_suffix'] = ''
+
+        else:
+            reference_suffix_list = list(reference_suffixes)
+            reference_suffix_list.sort()
+            reference_suffix = reference_suffix_list[0]
+            count = len(reference_suffix_list)
+            if count > 1:
+                for k,suffix in enumerate(reference_suffix_list):
+                    logger.debug(f'Multiple {tag.lower()} files found for {ipppssoot} ' +
+                                 f'({k+1}/{count})', ipppssoot_dict[suffix]['filepath'])
+            else:
+                logger.debug(f'{tag} file found for ' + ipppssoot,
+                             ipppssoot_dict[reference_suffix]['filepath'])
+
+            ipppssoot_dict['reference_suffix'] = reference_suffix
+
+        # Fill the HST dictionary
+        if reference_suffix:
+            fullpath = ipppssoot_dict[reference_suffix]['fullpath']
+            ref_hdulist = pyfits.open(fullpath)
+        else:
+            fullpath = ipppssoot_dict['spt_fullpath']
+            ref_hdulist = None
+
+        spt_hdulist = pyfits.open(ipppssoot_dict['spt_fullpath'])
+        hst_dictionary = fill_hst_dictionary(ref_hdulist, spt_hdulist, fullpath, logger)
         instrument_id = hst_dictionary['instrument_id']
         channel_id = hst_dictionary['channel_id']
 
@@ -633,14 +662,15 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         # Time coordinates
         time_coordinates = get_time_coordinates(ref_hdulist, spt_hdulist, fullpath,
                                                                           logger)
-        ipppssoot_dict['time_coordinates'] = time_coordinates
+        ipppssoot_dict['time_coordinates'] = time_coordinates[:2]
+        ipppssoot_dict['time_is_actual'] = time_coordinates[2]
 
         # Wavelength ranges
         try:
             ranges = wavelength_ranges(hst_dictionary['instrument_id'],
                                        hst_dictionary['detector_ids'],
                                        hst_dictionary['filter_name'])
-        except (ValueError, KeyError) as e:
+        except (ValueError, KeyError):
             ranges = ['UNK']
             logger.error('Undetermined wavelength range for ' +
                          hst_dictionary['filter_name'], ref_fullpath)
@@ -649,29 +679,30 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # Target identifications
         spt_fullpath = ipppssoot_dict['spt_fullpath']
-        xml_content = ipppssoot_dict[reference_suffix]['previous_xml']
+        if reference_suffix:
+            xml_content = ipppssoot_dict[reference_suffix]['previous_xml']
+        else:
+            xml_content = ''
+
         if xml_content:                 # use the old identification if available
-            target_ids = get_target_identifications(xml_content, spt_fullpath, logger)
+            target_ids = get_target_identifications(xml_content)
         else:
             try:
                 target_ids = hst_target_identifications(spt_hdulist[0].header,
                                                         spt_fullpath, logger)
-                logger.debug(f'Target "{target_ids[0][0]}" identified',
+                logger.debug('Target ' + str([rec[0] for rec in target_ids]),
                              ipppssoot_dict['spt_fullpath'])
-            except ValueError as e:
+            except (ValueError, KeyError) as e:
                 target_ids = [('UNK', [], 'UNK', [], 'UNK')]
-                if str(e).startswith('Unrecognized target'):
-                    logger.error('Unrecognized target:', ipppssoot_dict['spt_fullpath']
-                                 + '\n  ' + str(e)[21:])
-                else:
-                    logger.error(str(e), ipppssoot_dict['spt_fullpath'])
+                logger.error(str(e).strip('"'), ipppssoot_dict['spt_fullpath'])
             except Exception as e:
                 target_ids = [('UNK', [], 'UNK', [], 'UNK')]
                 logger.exception(e)
 
         ipppssoot_dict['target_identifications'] = target_ids
 
-        ref_hdulist.close()
+        if ref_hdulist:
+            ref_hdulist.close()
         spt_hdulist.close()
 
     # Delete IPPPSSOOTs without a reference file from structures
@@ -793,30 +824,22 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                     and suffix_info.is_observational(pair[1], instrument_id)):
                         ipppssoot_dict[pair[1]]['prior_pairs'].add((ipppssoot, suffix))
 
-        # The TRL or PDQ file points to all the observational files
-        # This must also be the newest file
-        if 'trl' in ipppssoot_dict:
-            observationals = {p for p in pairs
-                              if suffix_info.is_observational(p[1], instrument_id)}
-            trl_dict = ipppssoot_dict['trl']
-            trl_dict['reference_list'] |= observationals
-            trl_dict['prior_pairs'] |= pairs
-
-        if 'pdq' in ipppssoot_dict:
-            observationals = {p for p in pairs
-                              if suffix_info.is_observational(p[1], instrument_id)}
-            pdq_dict = ipppssoot_dict['pdq']
-            pdq_dict['reference_list'] |= observationals
-            pdq_dict['prior_pairs'] |= pairs
+        # The TRL and PDQ files are newer than all of the observational files except raw
+        # They point to every other file
+        for suffix in {'trl', 'pdq'} & ipppssoot_suffixes:
+            derived = {p for p in pairs
+                       if suffix_info.get_processing_level(p[1], instrument_id)
+                          not in ('Raw', 'Ancillary')}
+            ipppssoot_dict[suffix]['reference_list'] |= pairs
+            ipppssoot_dict[suffix]['prior_pairs'] |= derived
 
         # Every ASN file points to the reference files for this ipppssoot and associates
         # The ASN file must be newer than any of these files
         if 'asn' in ipppssoot_dict:
             reference_pairs = ({p for p in pairs if p[1] in reference_suffixes} |
                                {p for p in pairs if p[1] in suffix_info.REF_SUFFIXES})
-            asn_dict = ipppssoot_dict['asn']
-            asn_dict['reference_list'] |= reference_pairs
-            asn_dict['prior_pairs'] |= reference_pairs
+            ipppssoot_dict['asn']['reference_list'] |= reference_pairs
+            ipppssoot_dict['asn']['prior_pairs'] |= reference_pairs
 
         # Insert the prior suffixes from SUFFIX_INFO
         for suffix in ipppssoot_suffixes:
@@ -865,12 +888,12 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     # Fill in each modification date for each basename; make sure it is later than its
     # internal date and also later than the modification date of any of its priors.
     #
-    # "modification_date": best guess at a modification date in "yyyy-mm-ddThh:mm:ss"
-    #                      format.
+    #  "modification_date": best guess at a modification date in "yyyy-mm-ddThh:mm:ss"
+    #                       format.
     ######################################################################################
 
-    # Fill in each modification date; make sure it is later than its internal date and
-    # also later than the modification date of any of its priors
+    # Fill in each modification date; make sure it is no earlier than its internal date
+    # and also later than the modification date of any of its priors.
     for basename, basename_dict in info_by_basename.items():
         fill_modification_dates(basename_dict, info_by_ipppssoot, logger)
 
@@ -919,16 +942,28 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     for basename, basename_dict in info_by_basename.items():
         basename_dict['nan_replacement'] = 0.
         basename_dict['hdus_with_nans'] = []
-        if basename_dict['has_nans']:
-            if replace_nans:
-                (nan_replacement,
-                 hdus_with_nans) = rewrite_wo_nans(basename_dict['fullpath'])
-                basename_dict['nan_replacement'] = nan_replacement
-                basename_dict['hdus_with_nans'] = hdus_with_nans
-                logger.info(f'NaNs replaced with {nan_replacement}',
-                            basename_dict['fullpath'])
-            else:
-                logger.warn('NaNs found but not replaced', basename_dict['fullpath'])
+
+        if not basename_dict['has_nans']:
+            continue
+
+        fullpath = basename_dict['fullpath']
+        if not replace_nans:
+            logger.warn('NaNs found but not replaced', fullpath)
+            continue
+
+        original_path = fullpath + '-original'
+        if os.path.exists(original_path):
+            (nan_replacement,
+             hdus_with_nans) = rewrite_wo_nans(original_path, rewrite=False)
+            logger.info(f'NaNs already replaced with {nan_replacement}', fullpath)
+        else:
+            shutil.copy(fullpath, original_path)
+            (nan_replacement,
+             hdus_with_nans) = rewrite_wo_nans(fullpath, rewrite=True)
+            logger.info(f'NaNs replaced with {nan_replacement}', fullpath)
+
+        basename_dict['nan_replacement'] = nan_replacement
+        basename_dict['hdus_with_nans'] = hdus_with_nans
 
     ######################################################################################
     # Write the new labels
@@ -1043,11 +1078,18 @@ def fill_modification_dates(basename_dict, info_by_ipppssoot, logger):
     if basename_dict.get('modification_date', ''):
         return
 
+    ipppssoot_dict = basename_dict['ipppssoot_dict']
+    earliest_trl_date = min(ipppssoot_dict['timetags'].values())
+
     # If this file has no internal date, make sure its date is no earlier than the
     # earliest TRL date
-    ipppssoot_dict = basename_dict['ipppssoot_dict']
-    earliest_date = ipppssoot_dict['timetags']['earliest']
-    internal_date = basename_dict['internal_date'] or earliest_date
+    internal_date = basename_dict['internal_date']
+    if not internal_date:
+        internal_date = earliest_trl_date
+
+    # Derived products should not be older than the earliest TRL date
+    if basename_dict['processing_level'] not in ('Ancillary', 'Raw'):
+        internal_date = max(internal_date, earliest_trl_date)
 
     # This avoids a possible infinite loop, even if blank
     basename_dict['modification_date'] = internal_date
