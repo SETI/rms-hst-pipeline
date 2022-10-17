@@ -396,10 +396,10 @@ YY_YY_XX_F   = YY_YY_XX + r'(|-[A-G])'
 P_YY_YY_XX   = r'([PCXDAI])[ /_-]?' + YY_YY_XX
 P_YY_YY_XX_F = P_YY_YY_XX + r'(|-[A-G])'
 
-SEP   = '[ _-]?'
-SEP1  = '[ _-]?\(?'
-SSEP1 = '[ /_-]?\(?'
-SEP2  = '\)?'
+SEP   = r'[ _-]?'
+SEP1  = r'[ _-]?\(?'
+SSEP1 = r'[ /_-]?\(?'
+SEP2  = r'\)?'
 
 ROMAN = r'((?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3}))'   # Roman numeral < 100
 YYYY_ROMAN = r'(1\d{3})[ -]?' + ROMAN
@@ -450,11 +450,11 @@ MINOR_PLANET_TRANSLATOR = translator.TranslatorByRegex([
     (YY19_XXNNN,                                (r'19\1 \2',)),
     (YY20_XXNNN,                                (r'20\1 \2',)),
     (NNN,                                       (r'\1',)),
-    (NNN + '[ -]?' + NAME,                      (r'\1', r'\2')),
+    (NNN + r'[ -]?' + NAME,                     (r'\1', r'\2')),
 
-    (r'\(?' + NNN + '\)?',                      (r'\1',)),
-    (r'\(?' + NNN + '\)?[ -]?' + NAME,          (r'\1', r'\2')),
-    (r'\(?' + NNN + '\)?[ -]?' + YY_YY_XXNNN,   (r'\1', r'\2\3 \4')),
+    (r'\(?' + NNN + r'\)?',                     (r'\1',)),
+    (r'\(?' + NNN + r'\)?[ -]?' + NAME,         (r'\1', r'\2')),
+    (r'\(?' + NNN + r'\)?[ -]?' + YY_YY_XXNNN,  (r'\1', r'\2\3 \4')),
     (NNN + r'[ -]?\(?' + NAME + r'\)?',         (r'\1', r'\2')),
     (NNN + r'[ -]?\(?' + YY_YY_XXNNN + r'\)?',  (r'\1', r'\2\3 \4')),
     (NNN + r'[ -]?' + NAME + r'[ -]?\(?' + YY_YY_XXNNN + r'\)?',
@@ -473,8 +473,8 @@ STD_TRANSLATOR = translator.TranslatorByRegex([
     (r'1 \(VESTA\)',            ('M', '4', 'VESTA')),       # 5175 repair
 
     (NNN,                                       ('M', r'\1')),
-    (NNN + ' ?\(' + NAME + '\).*',              ('M', r'\1', r'\2')),
-    (NAME + ' ?-?' + NNN,                       ('C', r'\1 \2')),
+    (NNN + r' ?\(' + NAME + r'\).*',            ('M', r'\1', r'\2')),
+    (NAME + r' ?-?' + NNN,                      ('C', r'\1 \2')),
     (NAME,                                      ('S', r'\1')),
     (r'(.*)',                                   ('S', r'\1')),
 ])

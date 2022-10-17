@@ -1818,7 +1818,7 @@ def test_associated_suffixes():
     for info in SUFFIX_INFO.values():
         desc = info.hdu_description_fmt
         suffix = info.associated_suffix
-        if isinstance(suffix, set):
+        if isinstance(suffix, tuple):
             for suffix_ in suffix:
                 assert suffix_ in info.prior_suffixes
         elif suffix:
