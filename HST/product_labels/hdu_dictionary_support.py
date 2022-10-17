@@ -4,6 +4,7 @@
 
 import os
 import re
+import pdslogger
 
 # Translate column formats to PDS4 types
 TFORM_INFO = {      # (bytes if defined, PDS4 Field_Binary type)
@@ -180,8 +181,6 @@ def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None):
     logger = logger or pdslogger.NullLogger()
 
     header = hdu.header
-    data = hdu.data
-
     fileinfo = hdu.fileinfo()
     header_offset = fileinfo['hdrLoc']
     data_offset = fileinfo['datLoc']
@@ -451,7 +450,7 @@ def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None):
 
             names.append(name)
             field_numbers.append(k)
-            field_locations.append(header.get('TBCOL' + suffix, loc))
+            field_locations.append(field_location)
             data_types.append(data_type)
             field_lengths.append(field_length)
             field_formats.append(field_format)
@@ -536,8 +535,8 @@ def pds4_field_format(tdisp):
     specified width. "A" alone is treatead as "1A".
 
     Return:         (format, width)
-        format      Allowed PDS4 pattern ("%[\+,-]?[0-9]+(\.([0-9]+))?[doxfeEs]")
-        width       character width of the field
+        format      Allowed PDS4 pattern "%[+-]?[0-9]+(.[0-9]*)?[doxfeEs]".
+        width       character width of the field.
     """
 
     if tdisp == 'A':
@@ -545,14 +544,13 @@ def pds4_field_format(tdisp):
 
     match = TDISP_REGEX.fullmatch(tdisp)
     if match:
-        (fits_code, digits, frac, expo) = match.groups()
+        (fits_code, digits, frac, _) = match.groups()
     else:
         match = WA_REGEX.fullmatch(tdisp)
         if not match:
             return ('', 0)
         (digits, fits_code) = match.groups()
         frac = ''
-        expo = ''
 
     try:
         pds_code = FIELD_FORMAT_CODES[fits_code]

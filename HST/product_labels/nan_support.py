@@ -16,6 +16,7 @@
 
 import filecmp
 import numpy as np
+import os
 import astropy.io.fits as pyfits
 
 def _get_nan_info(hdulist):
@@ -46,7 +47,6 @@ def _get_nan_info(hdulist):
 
     return nan_info
 
-
 def _select_nan_replacement(hdulist, nan_info):
     """Define a constant to replace every NaN value in a data array. The string
     representation of the constant is returned.
@@ -73,10 +73,9 @@ def _select_nan_replacement(hdulist, nan_info):
     # This shouldn't take more than one iteration, but just in case...
     testval = min(minval, -1.)          # start at -1
     while True:
-        formatted = '%.0e' % testval    # e.g., "-2e+00"
+        formatted = '%.0e' % testval   # e.g., "-2e+00"
         testval = float(formatted)
         if testval < minval:
-            invalid_constant = testval
             break
 
         # If this test value was above the cutoff, decrement the negative int before the
@@ -85,8 +84,7 @@ def _select_nan_replacement(hdulist, nan_info):
         formatted = str(int(parts[0])-1) + 'e' + parts[2]
         testval = float(formatted)
 
-    return formatted
-
+    return '%#.0e' % testval
 
 def has_nans(hdulist):
     """Return True if any data array in the FITS file contains NaNs.
@@ -94,8 +92,7 @@ def has_nans(hdulist):
 
     return bool(_get_nan_info(hdulist))
 
-
-def rewrite_wo_nans(filepath):
+def rewrite_wo_nans(filepath, rewrite=True):
     """If any of the data arrays in this FITS file contain NaNs, rewrite the file without
     NaNs. Return
         (replacement value, list of modified HDU indices),
@@ -104,20 +101,24 @@ def rewrite_wo_nans(filepath):
     if the file is unchanged.
     """
 
-    hdulist = pyfits.open(filepath)
+    if rewrite:
+        hdulist = pyfits.open(filepath, mode='update')
+    else:
+        hdulist = pyfits.open(filepath)
+
     nan_info = _get_nan_info(hdulist)
-    hdulist.close()
     if not nan_info:
+        hdulist.close()
         return (None, [])
 
-    hdulist = pyfits.open(filepath, mode='update')
     replacement = _select_nan_replacement(hdulist, nan_info)
-    for k, mask, _ in nan_info:
-        hdulist[k].data[mask] = float(replacement)
+    if rewrite:
+        for k, mask, _ in nan_info:
+            hdulist[k].data[mask] = float(replacement)
 
     hdulist.close()
-    return (replacement, [k for (k, _, _) in nan_info])
 
+    return (replacement, [k for (k, _, _) in nan_info])
 
 def cmp_ignoring_nans(newpath, oldpath):
     """Compare two FITS files and return True if the files are identical except for

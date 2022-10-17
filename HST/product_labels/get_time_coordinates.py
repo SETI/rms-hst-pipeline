@@ -5,20 +5,18 @@ import julian
 import pdslogger
 
 def get_time_coordinates(ref_hdulist, spt_hdulist, filepath='', logger=None):
-    """Return the tuple (start_time, stop_time).
+    """Return the tuple (start_time, stop_time, is_actual).
+
+    The last item is True if these are the actual start/stop times, False if they are
+    predicted times.
 
     Input:
         ref_hdulist     HDU list for the reference data file, as returned by
-                        astropy.io.fits.open().
+                        astropy.io.fits.open(). If there is no such file, use None.
         spt_hdulist     HDU list for the SPT data file.
         filepath        name of the reference file, primarily for error logging.
         logger          pdslogger to use.
     """
-
-    logger = logger or pdslogger.NullLogger()
-
-    header0 = ref_hdulist[0].header
-    header1 = ref_hdulist[1].header
 
     # Quick internal function
     def get_from_header(key, alt=None):
@@ -30,31 +28,38 @@ def get_time_coordinates(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
         return alt
 
+
+    logger = logger or pdslogger.NullLogger()
+
+    if ref_hdulist is not None:
+        header0 = ref_hdulist[0].header
+        if len(ref_hdulist) > 1:
+            header1 = ref_hdulist[1].header
+        else:
+            header1 = {}
+    else:
+        header0 = {}
+        header1 = {}
+
     date_obs = get_from_header('DATE-OBS')
     time_obs = get_from_header('TIME-OBS')
     exptime  = get_from_header('EXPTIME', 0.)
 
     # Initial guess
     if date_obs and time_obs:
-        if '/' in date_obs:     # really??
-            old_date_obs = date_obs
+        if '/' in date_obs:
             dd = date_obs[:2]
             mm = date_obs[3:5]
             yy = date_obs[6:8]
             date_obs = f'19{yy}-{mm}-{dd}'
-            logger.debug(f'DATE-OBS format corrected from {old_date_obs} to {date_obs}',
-                         filepath)
 
         if ' ' in date_obs:
-            old_date_obs = date_obs
             date_obs = date_obs.replace(' ', '0')
-            logger.debug(f'DATE-OBS format corrected from {old_date_obs} to {date_obs}',
-                         filepath)
 
         start_date_time = date_obs + 'T' + time_obs + 'Z'
         stop_tai = julian.tai_from_iso(start_date_time) + exptime
         stop_date_time = julian.ymdhms_format_from_tai(stop_tai, suffix='Z')
-        guess = (start_date_time, stop_date_time)
+        guess = (start_date_time, stop_date_time, True)
     else:
         guess = None
 
@@ -66,9 +71,24 @@ def get_time_coordinates(ref_hdulist, spt_hdulist, filepath='', logger=None):
             logger.warn('Missing FITS keywords EXPSTART/EXPEND; '
                         'using DATE-OBS and TIME-OBS', filepath)
             return guess
-        else:
+
+        pstart = get_from_header('PSTRTIME')
+        pstop  = get_from_header('PSTPTIME')
+        if not pstart or not pstop:
             logger.error('Missing FITS keywords EXPSTART/EXPEND', filepath)
-            return ('UNK', 'UNK')
+            return ('UNK', 'UNK', True)
+
+        # format is "yyyy.ddd:hh:mm:ss"
+        isodates = []
+        for ptime in (pstart, pstop):
+            y = int(ptime[:4])
+            d = int(ptime[5:8])
+            day = julian.day_from_yd(y,d)
+            ymd = julian.ymd_from_day(day)
+            isodate = julian.ymd_format_from_day(day) + 'T' + ptime[9:]
+            isodates.append(isodate)
+
+        return tuple(isodates) + (False,)
 
     # HST documents indicate that times are only accurate to a second or so. This is
     # consistent with the fact that start times indicated by DATE-OBS and TIME-OBS often
@@ -128,6 +148,6 @@ def get_time_coordinates(ref_hdulist, spt_hdulist, filepath='', logger=None):
     (day, sec) = julian.day_sec_from_mjd(expend)
     stop_date_time = julian.ymdhms_format_from_day_sec(day, sec, suffix='Z')
 
-    return (start_date_time, stop_date_time)
+    return (start_date_time, stop_date_time, True)
 
 ##########################################################################################

@@ -95,6 +95,16 @@ FOS_FILTER_NAME_FROM_FGWA_ID = {
     'CAM': 'MIRROR',
 }
 
+GHRS_WAVELENGTHS = {        # in Angstroms, from Table 34.1
+    'G140L'     : ((1100+1900)/2., (0.572+0.573)/2.),
+    'G140M'     : ((1100+1900)/2., (0.056+0.052)/2.),
+    'G160M'     : ((1150+2300)/2., (0.072+0.066)/2.),
+    'G200M'     : ((1600+2300)/2., (0.081+0.075)/2.),
+    'G270M'     : ((2000+3300)/2., (0.096+0.087)/2.),
+    'Echelle A' : ((1100+1700)/2., (0.011+0.018)/2.),
+    'Echelle B' : ((1700+3200)/2., (0.017+0.034)/2.),
+}
+
 INSTRUMENT_NAME = {
     'ACS'   : 'Advanced Camera for Surveys',
     'COS'   : 'Cosmic Origins Spectrograph',
@@ -144,7 +154,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
     Input:
         ref_hdulist     HDU list for the reference data file, as returned by
-                        astropy.io.fits.open().
+                        astropy.io.fits.open(). If there is no such file, use None.
         spt_hdulist     HDU for the spt/shm/shf file associated with this data file.
         filepath        name of the reference file, primarily for error logging.
         logger          pdslogger to use.
@@ -170,9 +180,19 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
     logger = logger or pdslogger.NullLogger()
 
-    header0 = ref_hdulist[0].header
-    header1 = ref_hdulist[1].header
+    # Ignore missing ref_hdulist if SCIDATA is False---just for GHRS
     spt_header = spt_hdulist[0].header
+    if ref_hdulist is not None:
+        scidata = True
+        header0 = ref_hdulist[0].header
+        if len(ref_hdulist) > 1:
+            header1 = ref_hdulist[1].header
+        else:
+            header1 = {}
+    else:
+        scidata = False
+        header0 = {}
+        header1 = {}
 
     # Create an input dictionary with merged content of the above three headers
     merged = {}
@@ -225,7 +245,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     # instrument_id
     ##############################
 
-    instrument_id = header0.get('INSTRUME', '')
+    instrument_id = merged.get('INSTRUME', '')
     if instrument_id == 'HRS':
         instrument_id = 'GHRS'
 
@@ -251,7 +271,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         elif instrument_id == 'HSP':
             channel_id = 'HSP'
         elif instrument_id == 'GHRS':
-            channel_id = 'D' + str(header0['DETECTOR'])
+            channel_id = 'D' + str(spt_header['SS_DET'])
         else:
             try:
                 ccd = header0['DETECTOR']
@@ -403,7 +423,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     try:
-        if instrument_id in ('WFPC', 'WFPC2', 'HSP'):
+        if instrument_id in ('WFPC', 'WFPC2', 'HSP', 'GHRS'):
             aperture_name = spt_header['APER_1']
         elif instrument_id == 'FGS':
             aperture_name = 'FGS' + header0['FGSID']
@@ -458,18 +478,6 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         logger.exception(e, filepath)
 
     ##############################
-    # center_filter_wavelength
-    ##############################
-
-    # Works for STIS and WFPC2; otherwise 0.
-    try:
-        center_filter_wavelength = float(header0.get('CENTRWV', 0.)) * 1.e-4
-    except Exception:
-        center_filter_wavelength = 0.
-
-    hst_dictionary['center_filter_wavelength'] = center_filter_wavelength
-
-    ##############################
     # coronagraph_flag
     ##############################
 
@@ -504,16 +512,17 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     # exposure_duration
     ##############################
 
-    exposure_duration = get_or_log(merged, 'EXPTIME', 0.)
-    exposure_duration = round(exposure_duration, 3)     # strip extraneous precision
-
-    hst_dictionary['exposure_duration'] = exposure_duration
+    if scidata:
+        exposure_duration = get_or_log(merged, 'EXPTIME', 0.)
+        exposure_duration = round(exposure_duration, 3)     # strip extraneous precision
+        hst_dictionary['exposure_duration'] = exposure_duration
 
     ##############################
     # exposure_type
     ##############################
 
-    hst_dictionary['exposure_type'] = get_or_log(merged, 'EXPFLAG', 0.)
+    if scidata:
+        hst_dictionary['exposure_type'] = get_or_log(merged, 'EXPFLAG', 0.)
 
     ##############################
     # filter_name
@@ -544,7 +553,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         elif instrument_id == 'FOC':
             filters = [header0['FILTNAM1'], header0['FILTNAM2'],
                        header0['FILTNAM3'], header0['FILTNAM4']]
-            filters = [f for f in filters if  f]    # ignore blanks
+            filters = [f for f in filters if f]     # ignore blanks
             filters = [f for f in filters if not f.startswith('CLEAR')]
             filters = [f for f in filters if not f.endswith('ND')]
             filters.sort()
@@ -560,7 +569,10 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
             filter_name = spt_header['SPEC_1']
 
         elif instrument_id == 'GHRS':
-            filter_name = header0['GRATING']
+            if scidata:
+                filter_name = header0['GRATING']
+            else:
+                filter_name = spt_header['SPEC_1']
 
         elif instrument_id == 'STIS':
             opt_elem = header0['OPT_ELEM']
@@ -597,10 +609,27 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         logger.exception(e, filepath)
 
     ##############################
+    # center_filter_wavelength
+    ##############################
+
+    if instrument_id == 'GHRS':
+        center_filter_wavelength = GHRS_WAVELENGTHS.get(filter_name, (0.,0.))[0] * 1.e-4
+
+    # Works for STIS and WFPC2; otherwise 0.
+    else:
+        try:
+            center_filter_wavelength = float(header0.get('CENTRWV', 0.)) * 1.e-4
+        except Exception:
+            center_filter_wavelength = 0.
+
+    hst_dictionary['center_filter_wavelength'] = center_filter_wavelength
+
+    ##############################
     # fine_guidance_sensor_lock_type
     ##############################
 
-    hst_dictionary['fine_guidance_sensor_lock_type'] = get_or_log(merged, 'FGSLOCK')
+    if scidata:
+        hst_dictionary['fine_guidance_sensor_lock_type'] = get_or_log(merged, 'FGSLOCK')
 
     ##############################
     # gain_setting
@@ -700,7 +729,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         elif instrument_id == 'FOS':
             instrument_mode_id = header0['GRNDMODE']
 
-        elif instrument_id == 'HSP':
+        elif instrument_id in ('HSP', 'GHRS'):
             instrument_mode_id = spt_header['OPMODE']
 
         else:
@@ -858,18 +887,21 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     # spectral_resolution
     ##############################
 
-    try:
-        if instrument_id == 'STIS':
-            spectral_resolution = merged.get('SPECRES', 0.) * 1.0e-4
-        elif instrument_id == 'FOC' and spt_header['OPMODE'] == 'SPEC':
-            spectral_resolution = 0.00018
-        else:
-            spectral_resolution = 0.
+    spectral_resolution = 0.
+    if instrument_id == 'GHRS':
+        center_filter_wavelength = GHRS_WAVELENGTHS.get(filter_name, (0.,0.))[1] * 1.e-4
 
-        hst_dictionary['spectral_resolution'] = spectral_resolution
+    else:
+        try:
+            if instrument_id == 'STIS':
+                spectral_resolution = merged.get('SPECRES', 0.) * 1.0e-4
+            elif instrument_id == 'FOC' and spt_header['OPMODE'] == 'SPEC':
+                spectral_resolution = 0.00018
 
-    except Exception as e:
-        logger.exception(e, filepath)
+        except Exception as e:
+            logger.exception(e, filepath)
+
+    hst_dictionary['spectral_resolution'] = spectral_resolution
 
     ##############################
     # subarray_flag
