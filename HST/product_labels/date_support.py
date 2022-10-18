@@ -7,9 +7,12 @@
 #
 # get_trl_timetags(hdu1)
 #   Return a dictionary that provides the latest date-time string associated with a
-#   particular date, based on a scraping of the content of HDU #1 from a TRL file. This
-#   can potentially be used to fill in the hours/minutes/seconds of a header date that is
-#   lacking any time information.
+#   particular date, based on a scraping of the content of HDU #1 from a TRL or PDQ file.
+#   This can potentially be used to fill in the hours/minutes/seconds of a header date
+#   that is lacking any time information.
+#
+# merge_trl_timetags(date_dict, new_dict):
+#   Merge the contents of the new dictionary into an existing timetag dictionary.
 #
 # get_label_retrieval_date(filepath)
 #   If the given data file already has a label, get the retrieval date from that label.
@@ -26,9 +29,6 @@
 import datetime
 import os
 import re
-import astropy.io.fits as pyfits
-
-import julian
 
 current_year = datetime.datetime.now().year
 yyyy_since_2020 = '|'.join([str(y) for y in range(2020, current_year+1)])
@@ -53,8 +53,8 @@ YYYY_MM_DD_HH_MM_SS_PATTERN = re.compile(f'{YYYY}-{MM}-{DD}T{HH_MM_SS}')
 
 DADSDATE_PATTERN = re.compile(f'{DD}[ -]{MON}[ -]{YYYY} {HH_MM_SS}', re.I)
 FITSDATE_PATTERN = re.compile(f'{D}-{MON}-{YYYY}', re.I)
-IRAF_TLM_PATTERN = re.compile(f'{HH_MM_SS} \({DD}/{MM}/{YYYY}\)')
-PROCTIME_PATTERN = re.compile(f'{YYYY}\.{DOY}:{HH_MM_SS}')
+IRAF_TLM_PATTERN = re.compile(f'{HH_MM_SS} \\({DD}/{MM}/{YYYY}\\)')
+PROCTIME_PATTERN = re.compile(f'{YYYY}\\.{DOY}:{HH_MM_SS}')
 COMMENT_PATTERN  = re.compile(r'.*{YYYY}-{MM}-{DD}')
 INFLIGHT_YMD_PATTERN = re.compile(f' *INFLIGHT {YYYY}-{MM}-{DD} {YYYY}-{MM}-{DD}')
 INFLIGHT_DMY_PATTERN = re.compile(f' *INFLIGHT {DD}/{MM}/{YYYY} {DD}/{MM}/{YYYY}')
@@ -179,12 +179,12 @@ def get_header_date(hdulist):
 # extensive trial and error.
 
 YYYYDOYHHMMSS           = re.compile(f'{YYYY}{DOY}{HHMMSS}.*')
-D_MON_YY_HH_MM_SS       = re.compile(f'.*[^\d]{D}-{MON}-{YY} {HH_MM_SS}.*', re.I)
+D_MON_YY_HH_MM_SS       = re.compile(f'.*[^0-9]{D}-{MON}-{YY} {HH_MM_SS}.*', re.I)
 MON_D_HH_MM_SS_TZ_YYYY  = re.compile(f'.*{MON} {D} {HH_MM_SS} ([A-Z]+) {YYYY}.*', re.I)
 D_MON_YYYY_HH_MM_SS     = re.compile(f'.*{D}-{MON}-{YYYY} {HH_MM_SS}.*', re.I)
 D_MON_YY_HH_MM_SS       = re.compile(f'.*{D}-{MON}-{YY},? {HH_MM_SS}.*', re.I)
 HH_MM_SS_DD_MON_YYYY    = re.compile(f'.*{HH_MM_SS} {DD}-{MON}-{YYYY}.*', re.I)
-HH_MM_SS_DD_MON_YY      = re.compile(f'.*{HH_MM_SS} {DD}-{MON}-{YY}[^\d].*', re.I)
+HH_MM_SS_DD_MON_YY      = re.compile(f'.*{HH_MM_SS} {DD}-{MON}-{YY}[^0-9].*', re.I)
 HH_MM_SS_FFF_DD_MM_YYYY = re.compile(f'.*{HH_MM_SS_FFF}.? .?{DD}/{MM}/{YYYY}.*')
 YYYY_MM_DD_HH_MM_SS_FFF = re.compile(f'.*{YYYY}-{MM}-{DD}.{HH_MM_SS_FFF}.*')
 HH_MM_SS_TZ_DD_MON_YYYY = re.compile(f'.*{HH_MM_SS} ([A-Z]+) {DD}-{MON}-{YYYY}.*', re.I)
@@ -195,18 +195,18 @@ D_MON_YYYY_HH_MM        = re.compile(f'.*{D}-{MON}-{YYYY} {HH_MM}.*', re.I)
 # If some other weird format is encountered, it will _probably_ be interpreted correctly,
 # using the patterns below, but a warning message will also be logged.
 
-TIME_TEST   = re.compile(r'(.*[^\d])' + HH_MM_SS_FFF + r'(.*)')
+TIME_TEST   = re.compile(r'(.*[^0-9])' + HH_MM_SS_FFF + r'(.*)')
 MONTH_TEST  = re.compile(r'(.* )' + MON + r'(.*)', re.I)
-YYYY_D_TEST = re.compile(f'.*[^\d]{YYYY}[^\d]+{D}[^\d].*')
-YY_D_TEST   = re.compile(f'.*[^\d]{YY}[^\d]+{D}[^\d].*')
-D_YYYY_TEST = re.compile(f'.*[^\d]{D}[^\d]+{YYYY}[^\d].*')
-D_YY_TEST   = re.compile(f'.*[^\d]{D}[^\d]+{YY}[^\d].*')
-D_MM_YYYY_TEST = re.compile(f'.*[^\d]{D}[^d]+{MM}[^\d]+{YYYY}[^\d].*')
-D_MM_YY_TEST   = re.compile(f'.*[^\d]{D}[^d]+{MM}[^\d]+{YY}[^\d].*')
-MM_D_YYYY_TEST = re.compile(f'.*[^\d]{MM}[^d]+{D}[^\d]+{YYYY}[^\d].*')
-MM_D_YY_TEST   = re.compile(f'.*[^\d]{MM}[^d]+{D}[^\d]+{YY}[^\d].*')
-YYYY_MM_D_TEST = re.compile(f'.*[^\d]{YYYY}[^d]+{MM}[^\d]+{D}[^\d].*')
-YY_MM_D_TEST   = re.compile(f'.*[^\d]{YY}[^d]+{MM}[^\d]+{D}[^\d].*')
+YYYY_D_TEST = re.compile(f'.*[^0-9]{YYYY}[^0-9]+{D}[^0-9].*')
+YY_D_TEST   = re.compile(f'.*[^0-9]{YY}[^0-9]+{D}[^0-9].*')
+D_YYYY_TEST = re.compile(f'.*[^0-9]{D}[^0-9]+{YYYY}[^0-9].*')
+D_YY_TEST   = re.compile(f'.*[^0-9]{D}[^0-9]+{YY}[^0-9].*')
+D_MM_YYYY_TEST = re.compile(f'.*[^0-9]{D}[^0-9]+{MM}[^0-9]+{YYYY}[^0-9].*')
+D_MM_YY_TEST   = re.compile(f'.*[^0-9]{D}[^0-9]+{MM}[^0-9]+{YY}[^0-9].*')
+MM_D_YYYY_TEST = re.compile(f'.*[^0-9]{MM}[^0-9]+{D}[^0-9]+{YYYY}[^0-9].*')
+MM_D_YY_TEST   = re.compile(f'.*[^0-9]{MM}[^0-9]+{D}[^0-9]+{YY}[^0-9].*')
+YYYY_MM_D_TEST = re.compile(f'.*[^0-9]{YYYY}[^0-9]+{MM}[^0-9]+{D}[^0-9].*')
+YY_MM_D_TEST   = re.compile(f'.*[^0-9]{YY}[^0-9]+{MM}[^0-9]+{D}[^0-9].*')
 
 # These are the only explicit time zone tags I have encountered. The program raises an
 # ValueError exception if a new one is encountered but not handled. The dictionary returns
@@ -222,7 +222,8 @@ TIMEZONES = {
 
 def get_trl_timetags(hdu_1, filepath, logger=None):
     """Return a dictionary that returns a full date-time string given a date, based on
-    the scraping of recognizable date/time strings from the records in a TRL table.
+    the scraping of recognizable date/time strings from the records in a TRL or PDQ
+    table.
 
     Input:
         hdu1            hdulist[1] from an opened TRL file.
@@ -241,7 +242,6 @@ def get_trl_timetags(hdu_1, filepath, logger=None):
     # The file's timestamp is the latest possible value of the earliest logged date-time
     timestamp = os.path.getmtime(filepath)
     dt = datetime.datetime.utcfromtimestamp(timestamp)
-    earliest_date = dt.isoformat()
 
     date_dict = {}
     for rec in hdu_1.data:
@@ -373,8 +373,8 @@ def get_trl_timetags(hdu_1, filepath, logger=None):
         try:
             offset = TIMEZONES[tz]
         except KeyError:
-            logger.error(f'Unsupported time zone {tz} found; replaced with UTC',
-                         filepath)
+            logger.warn(f'Unsupported time zone {tz} found; replaced with UTC',
+                        filepath)
             offset = 0
 
         if offset:
@@ -384,14 +384,20 @@ def get_trl_timetags(hdu_1, filepath, logger=None):
             yyyy_mm_dd = iso_date[:10]
 
         date_dict[yyyy_mm_dd] = iso_date
-        earliest_date = min(earliest_date, iso_date)
 
     if not date_dict:
-        logger.error('No dates found', filepath)
-
-    date_dict['earliest'] = earliest_date
+        logger.warn('No dates found', filepath)
 
     return date_dict
+
+def merge_trl_timetags(date_dict, new_dict):
+    """Merge the contents of a new date dictionary into the given date dictionary."""
+
+    for date in new_dict:
+        if date in date_dict:
+            date_dict[date] = max(date_dict[date], new_dict[date])
+        else:
+            date_dict[date] = new_dict[date]
 
 ##########################################################################################
 
@@ -418,11 +424,10 @@ def get_label_retrieval_date(filepath, label_suffix='.xml'):
 
         rec = f.readline().strip() + ' ' + f.readline().strip()
 
-    parts = rec.split('as obtained from the Mikulski ' +
-                      'Archive for Space Telescopes (MAST) data archive on ')
+    parts = rec.split('data archive on ')
 
     if len(parts) == 2:
-        return parts[1][:-1]    # strip off the final period
+        return parts[1][:10]
 
     return ''
 

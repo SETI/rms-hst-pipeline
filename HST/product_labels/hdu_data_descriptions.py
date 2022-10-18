@@ -2,6 +2,7 @@
 # hdu_data_descriptions.py
 ##########################################################################################
 
+import pdslogger
 from . import suffix_info
 from .hst_dictionary_support import hst_detector_ids_for_file
 
@@ -27,7 +28,7 @@ DESCRIPTIONS = {
                 'altitude, and count rates for background and the most prominent '       +
                 'airglow lines, to use for interpreting the {name} {noun}, HDU[{hdu}].',
     'WHT'     : 'Weight image, giving the relative weight of pixels in the {name} '      +
-                '{name}, HDU[{hdu}].',
+                '{noun}, HDU[{hdu}].',
     'CTX'     : 'Context image, stored as a bit-encoded array that indicates which of '  +
                 'the input images contributed to each pixel in the {name} {noun}, '      +
                 'HDU[{hdu}].',
@@ -49,7 +50,7 @@ DESCRIPTIONS = {
 # These are needed for the waivered instruments where HDU[0] contains data.
 EXTRA_DESCRIPTIONS = {
     'WFPC': {
-        'C0H': 'Table of information about each of the 2-D calibrated images '          +
+        'C0H': 'Table of information about each of the 2-D calibrated images '    +
                'stacked into the 3-D data array of HDU[0].',
         'C1H': 'Table of information about each of the 2-D data quality masks '   +
                'stacked into the 3-D data array of HDU[0].',
@@ -230,17 +231,24 @@ def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logg
     associated_hdu_index = {}   # extver -> index of first HDU with this extver
     associated_hdu_dicts = hdu_dicts
     associated_suffix_dict = suffix_dict
-    if associated_suffix:
-        selected_pairs = [pair for pair in suffix_dict['reference_list']
-                          if pair[1] == associated_suffix]
+    if not associated_suffix:
+        associated_hdu_index = science_hdu_index
+        associated_sci_class = sci_class
+    else:
+        if isinstance(associated_suffix, str):
+            selected_pairs = [pair for pair in suffix_dict['reference_list']
+                              if pair[1] == associated_suffix]
+        else:       # it's a set of candidate suffixes
+            selected_pairs = [pair for pair in suffix_dict['reference_list']
+                              if pair[1] in associated_suffix]
+
         if not selected_pairs:
             logger.error(f'Missing associated suffix _{associated_suffix} for file',
                          filepath)
             associated_hdu_index = science_hdu_index
             associated_sci_class = sci_class
-
         else:
-            associated_ipppssoot = selected_pairs[0][0]
+            (associated_ipppssoot, associated_suffix) = selected_pairs[0]
             associated_suffix_dict = (ipppssoot_dict['by_ipppssoot']
                                                     [associated_ipppssoot]
                                                     [associated_suffix])
@@ -255,10 +263,6 @@ def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logg
             except KeyError:
                 first_sci = 0
             associated_sci_class = associated_hdu_dicts[first_sci]['data']['data_class']
-
-    else:
-        associated_hdu_index = science_hdu_index
-        associated_sci_class = sci_class
 
     # Create dictionaries to fill in the description strings
     # These values are common across the entire file.
@@ -290,7 +294,7 @@ def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logg
     # Fill in the product title
     product_title_fmt = suffix_info.get_product_title_fmt(suffix, instrument_id,
                                                                   channel_id)
-    suffix_dict['product_title'] = product_title_fmt.format(**local_words)
+    suffix_dict['product_title'] = product_title_fmt.format(**associated_words)
 
     # Fill in the data description for each HDU.
     # If the data object is empty, update the header description instead.
@@ -349,8 +353,8 @@ def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logg
 
     # One very long debug message, if requested
     if log_text and descriptions_for_log:
-        logger.debug(f'New data descriptions', suffix_dict['fullpath'] + '\n' +
-                                               '\n'.join(descriptions_for_log))
+        logger.debug('New data descriptions', suffix_dict['fullpath']
+                     + '\n' + '\n'.join(descriptions_for_log))
 
     return description_set
 

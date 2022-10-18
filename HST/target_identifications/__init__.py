@@ -66,7 +66,17 @@ SPT_REPAIRS = {
     '3064_1'    : {'MT_LV1_1': 'FILE='},            # missing MT_LV1
     '3373'      : {'MT_LV1_1': 'STD=SATURN'},       # HSP Saturn occ
     '3375'      : {'MT_LV1_1': 'STD=SATURN'},       # HSP Saturn occ
+    '4193'      : {'MT_LV1_1': 'STD=TITAN'},        # HSP Titan occ
     '4225'      : {'MT_LV1_1': 'STD=SATURN'},       # HSP Saturn occ
+    '4257_13'   : {'MT_LV1_1': 'STD=MARS'},         # HSP Mars occ
+    '4257_14'   : {'MT_LV1_1': 'STD=MARS'},
+    '4257_22'   : {'MT_LV1_1': 'STD=MARS'},
+    '4257_15'   : {'MT_LV1_1': 'STD=JUPITER'},      # HSP Jupiter occ
+    '4257_16'   : {'MT_LV1_1': 'STD=JUPITER'},
+    '4257_23'   : {'MT_LV1_1': 'STD=JUPITER'},
+    '4257_17'   : {'MT_LV1_1': 'STD=URANUS'},       # HSP Uranus occ
+    '4257_18'   : {'MT_LV1_1': 'STD=URANUS'},
+    '4257_24'   : {'MT_LV1_1': 'STD=URANUS'},
     '5834_1'    : {'TARGNAME': 'C1984K1 SHOEMAKER'},# was "COMET-SHOEMAKER-1984K1"
     '5834_2'    : {'TARKEY1': 'COMET SHOEMAKER 87O-86XIV',
                                                     # was "SHOEMAKER 87O-85XIV"
@@ -159,12 +169,11 @@ SPT_REPAIRS = {
     # This would otherwise fail because the body is no longer listed in the MPC
     '15344_30'  : [('2011 UH413', [], 'Trans-Neptunian Object',
                     ['This body was retracted in MPEC 2020-N22, July 7, 2020.'],
-                    'urn:nasa:pds:context:target:' +
-                        'trans-neptunian_object.2011_uh413')],
+                    'trans-neptunian_object.2011_uh413')],
 
     # The abstract indicates these targets
     '15492_3'   : (minor_planet_identifications('2014 OS393') +
-                   minor_planet_identifications('2014 PN70')),
+                   minor_planet_identifications('2014 PN70'))
 }
 
 ##########################################################################################
@@ -187,10 +196,10 @@ PLANET_RADII = {
 ##########################################################################################
 
 PREPROCESSOR1 = translator.TranslatorByRegex([
-    (r'(.*)-(OFF|OFFSET)\d*',   r'\1'),     # common suffix for offsets
-    (r'(.*)  +(.*)',            r'\1 \2'),  # convert multiple spaces to one
-    (r'(.*)-V[1-9]\d*',         r'\1'),     # always a version number (so far)
-    (r'(.*)',                   r'\1'),     # otherwise no change
+    (r'(.*)-(OFF|OFFSET|FIX)\d*',   r'\1'),     # common suffix for offsets
+    (r'(.*)  +(.*)',                r'\1 \2'),  # convert multiple spaces to one
+    (r'(.*)-V[1-9]\d*',             r'\1'),     # always a version number (so far)
+    (r'(.*)',                       r'\1'),     # otherwise no change
 ])
 
 PREPROCESSOR2 = translator.TranslatorByRegex([
@@ -260,7 +269,7 @@ CLASSIFIER = translator.TranslatorByRegex([
     (r'288P.*',                             ('M', '(300163) 2006 VW139')),
     (r'MBC[ -](.*)',                        ('M', r'\1')),
 
-    (r'(.*)',                               ('' , r'\1')),
+    (r'(.*)',                               ('CM', r'\1')),
 ])
 
 COMET_REPAIRS = translator.TranslatorByRegex([
@@ -387,10 +396,10 @@ YY_YY_XX_F   = YY_YY_XX + r'(|-[A-G])'
 P_YY_YY_XX   = r'([PCXDAI])[ /_-]?' + YY_YY_XX
 P_YY_YY_XX_F = P_YY_YY_XX + r'(|-[A-G])'
 
-SEP   = '[ _-]?'
-SEP1  = '[ _-]?\(?'
-SSEP1 = '[ /_-]?\(?'
-SEP2  = '\)?'
+SEP   = r'[ _-]?'
+SEP1  = r'[ _-]?\(?'
+SSEP1 = r'[ /_-]?\(?'
+SEP2  = r'\)?'
 
 ROMAN = r'((?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3}))'   # Roman numeral < 100
 YYYY_ROMAN = r'(1\d{3})[ -]?' + ROMAN
@@ -441,11 +450,11 @@ MINOR_PLANET_TRANSLATOR = translator.TranslatorByRegex([
     (YY19_XXNNN,                                (r'19\1 \2',)),
     (YY20_XXNNN,                                (r'20\1 \2',)),
     (NNN,                                       (r'\1',)),
-    (NNN + '[ -]?' + NAME,                      (r'\1', r'\2')),
+    (NNN + r'[ -]?' + NAME,                     (r'\1', r'\2')),
 
-    (r'\(?' + NNN + '\)?',                      (r'\1',)),
-    (r'\(?' + NNN + '\)?[ -]?' + NAME,          (r'\1', r'\2')),
-    (r'\(?' + NNN + '\)?[ -]?' + YY_YY_XXNNN,   (r'\1', r'\2\3 \4')),
+    (r'\(?' + NNN + r'\)?',                     (r'\1',)),
+    (r'\(?' + NNN + r'\)?[ -]?' + NAME,         (r'\1', r'\2')),
+    (r'\(?' + NNN + r'\)?[ -]?' + YY_YY_XXNNN,  (r'\1', r'\2\3 \4')),
     (NNN + r'[ -]?\(?' + NAME + r'\)?',         (r'\1', r'\2')),
     (NNN + r'[ -]?\(?' + YY_YY_XXNNN + r'\)?',  (r'\1', r'\2\3 \4')),
     (NNN + r'[ -]?' + NAME + r'[ -]?\(?' + YY_YY_XXNNN + r'\)?',
@@ -464,8 +473,8 @@ STD_TRANSLATOR = translator.TranslatorByRegex([
     (r'1 \(VESTA\)',            ('M', '4', 'VESTA')),       # 5175 repair
 
     (NNN,                                       ('M', r'\1')),
-    (NNN + ' ?\(' + NAME + '\).*',              ('M', r'\1', r'\2')),
-    (NAME + ' ?-?' + NNN,                       ('C', r'\1 \2')),
+    (NNN + r' ?\(' + NAME + r'\).*',            ('M', r'\1', r'\2')),
+    (NAME + r' ?-?' + NNN,                      ('C', r'\1 \2')),
     (NAME,                                      ('S', r'\1')),
     (r'(.*)',                                   ('S', r'\1')),
 ])
@@ -507,15 +516,13 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
     for key in [TARG_ID, PROPOSID, PROPOSID + '_' + TARG_ID]:
         try:
             repair = SPT_REPAIRS[key]
-            if DEBUG: print('repair found for key', key)
-            logger.debug(f'Target repair found for key {key}', filepath)
             break
         except KeyError:
             pass
 
     if isinstance(repair, list):
         if DEBUG: print('target identified in SPT_REPAIRS')
-        logger.debug(f'Target found amoung known repairs', filepath)
+        logger.debug('SPT repair ' + str([r[0] for r in repair]), filepath)
         return repair
 
     if isinstance(repair, str):
@@ -536,7 +543,7 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
             messages.append(message)
             if DEBUG: print(message)
 
-        logger.debug('SPT repair found', filepath + '\n'.join(messages))
+        logger.debug('SPT repair ' + str(repair).replace('\n', ' '), filepath)
 
         temp_dict = {}
         for key in spt_header0:
@@ -819,8 +826,8 @@ def hst_target_identifications(spt_header0, filepath, logger=None):
             logger.error(w, filepath)
         raise comet_error
 
-    info = f'proposal={PROPOSID}, target="{TARGNAME}", ' + str(comet_ids + mp_ids)
-    raise ValueError('Unrecognized target: ' + info)
+    raise ValueError(f'Unrecognized target "{TARGNAME}", proposal={PROPOSID}, '
+                     + str(comet_ids + mp_ids))
 
 ##########################################################################################
 # Functions for "special case" Target Identifications
