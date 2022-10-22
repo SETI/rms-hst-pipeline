@@ -3,7 +3,7 @@
 # pipeline/query-mast.py
 #
 # Syntax:
-#   pipeline/query-mast.py [options] path [path ...]
+#   pipeline/query-mast.py proposal_id [options] path [path ...]
 #
 # Enter the --help option to see more information.
 ##########################################################################################
