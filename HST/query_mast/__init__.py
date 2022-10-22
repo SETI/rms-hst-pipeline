@@ -91,7 +91,6 @@ def query_mast_slice(proposal_id,
                 mtFlag=True
             )
             return table
-            # return get_products(table)
         except ConnectionError as e:
             retry = retry + 1
             logger.info(f"retry #{retry}: {e}")
