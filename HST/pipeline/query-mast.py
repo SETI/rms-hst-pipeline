@@ -80,12 +80,12 @@ end_date = args.end if args.end else END_DATE
 retry = args.retry if args.retry else RETRY
 dir = args.path if args.path else DEFAULT_DIR
 
-table = get_products_from_mast(proposal_id = args.proposal_id,
-                               start_date = start_date,
-                               end_date = end_date,
-                               logger = logger,
-                               max_retries = retry,
-                               dir = dir)
+get_products_from_mast(proposal_id = args.proposal_id,
+                       start_date = start_date,
+                       end_date = end_date,
+                       logger = logger,
+                       max_retries = retry,
+                       dir = dir)
 logger.close()
 
 ##########################################################################################
