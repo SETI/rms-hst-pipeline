@@ -14,7 +14,6 @@ class TestQueryMast:
         ]
     )
     def test_get_products_from_mast(self, proposal_id, error_code):
-        print("HERE")
         if error_code is None:
             get_products_from_mast(proposal_id=proposal_id, testing=True)
         elif error_code == 1:
