@@ -85,7 +85,8 @@ get_products_from_mast(proposal_id = args.proposal_id,
                        end_date = end_date,
                        logger = logger,
                        max_retries = retry,
-                       dir = dir)
+                       dir = dir,
+                       testing=False)
 logger.close()
 
 ##########################################################################################

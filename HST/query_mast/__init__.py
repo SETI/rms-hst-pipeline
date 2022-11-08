@@ -26,7 +26,8 @@ def get_products_from_mast(proposal_id,
                            end_date=END_DATE,
                            logger=None,
                            max_retries=1,
-                           dir=DEFAULT_DIR):
+                           dir=DEFAULT_DIR,
+                           testing=False):
     """Download products from mast with a given proposal id .
     Input:
         proposal_id:    a proposal id.
@@ -51,7 +52,8 @@ def get_products_from_mast(proposal_id,
                              start_date,
                              end_date,
                              logger,
-                             max_retries)
+                             max_retries,
+                             testing)
     filtered_products = get_filtered_products(table)
     # Log all accepted file names
     logger.info(f"List out all accepted files from mast for {proposal_id}")
@@ -60,13 +62,14 @@ def get_products_from_mast(proposal_id,
         suffix = row["productSubGroupDescription"]
         logger.info(f"File: {productFilename} with suffix: {suffix}")
     # Download all accepted files
-    download_files(filtered_products, proposal_id, logger, dir)
+    download_files(filtered_products, proposal_id, logger, dir, testing)
 
 def query_mast_slice(proposal_id,
                      start_date=START_DATE,
                      end_date=END_DATE,
                      logger=None,
-                     max_retries=1):
+                     max_retries=1,
+                     testing=False):
     """Return a slice of mast database as a table object with a given proposal id,
     start_date, and end_date.
     Input:
@@ -83,6 +86,8 @@ def query_mast_slice(proposal_id,
     logger.info("Query mast")
     for retry in range(max_retries):
         try:
+            if testing and max_retries > 1:
+                raise ConnectionError
             table = Observations.query_criteria(
                 dataRights="PUBLIC",
                 obs_collection=["HST"],
@@ -95,8 +100,8 @@ def query_mast_slice(proposal_id,
             retry = retry + 1
             logger.info(f"retry #{retry}: {e}")
             time.sleep(1)
-    logger.exception(RuntimeError)
-    raise RuntimeError("Query mast timed out. Number of retries: " + max_retries)
+    logger.exception(RuntimeError) 
+    raise RuntimeError("Query mast timed out. Number of retries: " + str(max_retries))
 
 def get_filtered_products(table):
     """Return product rows of an observation table with accepted instrument letter code
@@ -109,7 +114,7 @@ def get_filtered_products(table):
     result = filter_table(is_accepted_instrument_suffix, result)
     return result
 
-def download_files(table, proposal_id, logger=None, dir=DEFAULT_DIR):
+def download_files(table, proposal_id, logger=None, dir=DEFAULT_DIR, testing=False):
     """Download files from mast for a given product table and proposal id
     Input:
         table:          an observation table from mast query.
@@ -121,9 +126,10 @@ def download_files(table, proposal_id, logger=None, dir=DEFAULT_DIR):
     logger = logger or pdslogger.EasyLogger()
     hst_segment = f"hst_{proposal_id:05}"
     working_dir = os.path.join(dir, hst_segment)
-    if not os.path.isdir(working_dir):
+    if not os.path.isdir(working_dir): # pragma: no cover
         os.makedirs(working_dir)
 
     if len(table) > 0:
         logger.info("Download files to " + working_dir)
-        Observations.download_products(table, download_dir=working_dir)
+        if not testing: # pragma: no cover, no need to download files during the test
+            Observations.download_products(table, download_dir=working_dir) 
