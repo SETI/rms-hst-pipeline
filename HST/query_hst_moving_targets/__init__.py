@@ -9,22 +9,17 @@ import pdslogger
 from astroquery.mast import Observations
 from requests.exceptions import ConnectionError
 
-from query_mast.utils import (filter_table,
-                    is_accepted_instrument_letter_code,
-                    is_accepted_instrument_suffix,
-                    ymd_tuple_to_mjd)
-
-TWD = os.environ["TMP_WORKING_DIR"]
-DEFAULT_DIR = TWD + "/files_from_mast"
-START_DATE = (1900, 1, 1)
-END_DATE = (2025, 1, 1)
+from hst_general import (START_DATE,
+                         END_DATE,
+                         RETRY)
+from .utils import ymd_tuple_to_mjd
 
 def query_hst_moving_targets(proposal_ids=[],
                              instruments=[],
                              start_date=START_DATE,
                              end_date=END_DATE,
                              logger=None,
-                             max_retries=1):
+                             max_retries=RETRY):
     """Task: query-hst-moving-targets
     Return a list of proposal ids with moving targets.
     Input:
@@ -95,7 +90,7 @@ def query_mast_slice(proposal_id=None,
                      start_date=START_DATE,
                      end_date=END_DATE,
                      logger=None,
-                     max_retries=1,
+                     max_retries=RETRY,
                      testing=False):
     """Return a slice of mast database as a table object with a given proposal id,
     instrument, start_date, and end_date.

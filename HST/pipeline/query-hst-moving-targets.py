@@ -3,7 +3,11 @@
 # pipeline/query-hst-moving-targets.py
 #
 # Syntax:
-#   pipeline/query-hst-moving-targets.py proposal_id [options] path [path ...]
+# query-hst-moving-targets.py [-h]
+#                             [--proposal_ids PROPOSAL_IDS [PROPOSAL_IDS ...]]
+#                             [--instruments INSTRUMENTS [INSTRUMENTS ...]]
+#                             [--start START] [--end END] [--retry RETRY]
+#                             [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 ##########################################################################################
@@ -15,23 +19,23 @@ import pdslogger
 import sys
 
 from query_hst_moving_targets import query_hst_moving_targets
-from product_labels.suffix_info import ACCEPTED_SUFFIXES, INSTRUMENT_FROM_LETTER_CODE
-
-# TWD = os.environ["HST_STAGING"]
-# DEFAULT_DIR = TWD + "/files_from_mast"
-LOG_DIR = os.environ["HST_STAGING"] + '/logs'
-START_DATE = (1900, 1, 1)
-END_DATE = (2025, 1, 1)
-RETRY = 1
+from hst_general import (START_DATE,
+                         END_DATE,
+                         RETRY,
+                         HST_DIR)
+LOG_DIR = HST_DIR["staging"] + '/logs'
 
 # Set up parser
 parser = argparse.ArgumentParser(
     description='query-hst-moving-targets: Perform mast query with a given proposal id')
 
-parser.add_argument('proposal_ids', nargs='+', type=str,
+parser.add_argument('--proposal_ids', '-pid', nargs='+', type=str, default='',
     help='The proposal ids for the mast query')
 
-parser.add_argument('--instruments', nargs='+', type=str, default='',
+# parser.add_argument('proposal_ids', nargs='+', type=str,
+#     help='The proposal ids for the mast query')
+
+parser.add_argument('--instruments', '-inst', nargs='+', type=str, default='',
     help='The instruments for the mast query')
 
 parser.add_argument('--start', type=str, action='store', default='',
@@ -51,6 +55,10 @@ parser.add_argument('--log', '-l', type=str, default='',
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
 
+# Make sure some query constraints are passed in
+if len(sys.argv) == 1:
+    parser.print_help()
+    parser.exit()
 # Parse and validate the command line
 args = parser.parse_args()
 
@@ -81,16 +89,19 @@ instruments = args.instruments if args.instruments else []
 start_date = args.start if args.start else START_DATE
 end_date = args.end if args.end else END_DATE
 retry = args.retry if args.retry else RETRY
-print("##########")
-print(args)
-li = query_hst_moving_targets(proposal_ids = proposal_ids,
+
+logger.info("Mast query constraints: " + str(args))
+pid_li = query_hst_moving_targets(proposal_ids = proposal_ids,
                        instruments = instruments,
                        start_date = start_date,
                        end_date = end_date,
                        logger = logger,
                        max_retries = retry)
-print("=============")
-print(li)
+logger.info("List of program ids: " + str(pid_li))
+# TODO: TASK QUEUE
+# - if there is a missing HST_PIPELINE/hst_<nnnnn> missing, queue query-hst-products
+# - re-queue query-hst-moving-targets with a 30-day delay
+
 logger.close()
 
 ##########################################################################################
