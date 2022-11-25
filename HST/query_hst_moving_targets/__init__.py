@@ -1,18 +1,12 @@
 ##########################################################################################
 # query_hst_moving_targets/__init__.py
 ##########################################################################################
-import time
-import os
-
 import pdslogger
 
-from astroquery.mast import Observations
-from requests.exceptions import ConnectionError
-
-from hst_general import (START_DATE,
+from hst_helper import (START_DATE,
                          END_DATE,
                          RETRY)
-from .utils import ymd_tuple_to_mjd
+from hst_helper.query_utils import query_mast_slice
 
 def query_hst_moving_targets(proposal_ids=[],
                              instruments=[],
@@ -84,58 +78,3 @@ def query_hst_moving_targets(proposal_ids=[],
                 p_id_li.append(p_id)
 
     return p_id_li
-
-def query_mast_slice(proposal_id=None,
-                     instrument=None,
-                     start_date=START_DATE,
-                     end_date=END_DATE,
-                     logger=None,
-                     max_retries=RETRY,
-                     testing=False):
-    """Return a slice of mast database as a table object with a given proposal id,
-    instrument, start_date, and end_date.
-    Input:
-        proposal_id:    a proposal id.
-        instrument:     a instrument name.
-        start_date:     observation start datetime.
-        end_date:       observation end datetime.
-        logger:         pdslogger to use; None for default EasyLogger.
-        max_retries:    number of retries when there is a connection to mast.
-    """
-    logger = logger or pdslogger.EasyLogger()
-    start_date = ymd_tuple_to_mjd(start_date)
-    end_date = ymd_tuple_to_mjd(end_date)
-    retry = 0
-    logger.info("Run query_mast_slice")
-
-    query_params = {
-        "dataRights": "PUBLIC",
-        "obs_collection": ["HST"],
-        "t_obs_release": (start_date, end_date),
-        "mtFlag": True
-    }
-
-    if proposal_id is not None:
-        query_params["proposal_id"] = str(proposal_id)
-    if instrument is not None:
-        query_params["instrument_name"] = str(instrument)
-
-    for retry in range(max_retries):
-        try:
-            if testing and max_retries > 1:
-                raise ConnectionError
-            table = Observations.query_criteria(**query_params)
-            # table = Observations.query_criteria(
-            #     dataRights="PUBLIC",
-            #     obs_collection=["HST"],
-            #     proposal_id=str(proposal_id),
-            #     t_obs_release=(start_date, end_date),
-            #     mtFlag=True
-            # )
-            return table
-        except ConnectionError as e:
-            retry = retry + 1
-            logger.info(f"retry #{retry}: {e}")
-            time.sleep(1)
-    logger.exception(RuntimeError)
-    raise RuntimeError("Query mast timed out. Number of retries: " + str(max_retries))
