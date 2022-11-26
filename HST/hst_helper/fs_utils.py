@@ -39,17 +39,6 @@ def get_program_dir_path(proposal_id, visit=None, root_dir="pipeline"):
 
     return program_dir
 
-# def is_missing_program_dir(proposal_id, root_dir="pipeline"):
-#     """Check if a program directory for a proposal id is missing
-#     Input:
-#         proposal_id:    a proposal id.
-#         root_dir:       root directory of the program, it's either "staging", "pipeline"
-#                         or "bundles".
-#     """
-#     root = HST_DIR[root_dir]
-#     program_dir = root + "/hst_" + str(proposal_id).zfill(5)
-#     return os.path.isdir(program_dir)
-
 def get_format_term(filename):
     """Return IPPPSSOOT for a given file name.
     Input:
@@ -65,7 +54,7 @@ def get_visit(format_term):
     """
     return format_term[4:6]
 
-def construct_downloaded_file_path(proposal_id, fname, visit=None, root_dir="staging"):
+def get_downloaded_file_path(proposal_id, fname, visit=None, root_dir="staging"):
     """Return the file path of a downloaded file.
     Input:
         proposal_id:    a proposal id.
