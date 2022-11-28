@@ -80,7 +80,7 @@ def query_hst_products(proposal_id, logger):
             visit_diff.append(visit)
 
     # Delete all TRL files
-    logger.info(f"Delete all TRL files for {proposal_id} to {trl_dir}")
+    logger.info(f"Delete all TRL files for {proposal_id} in {trl_dir}")
     for visit, trl_files in trl_files_dict.items():
         for f in trl_files:
             filepath = get_downloaded_file_path(proposal_id, f)
