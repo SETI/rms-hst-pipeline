@@ -21,7 +21,7 @@ from hst_helper.fs_utils import (create_program_dir,
                                  get_program_dir_path,
                                  get_visit,)
 
-def query_hst_products(proposal_id, logger):
+def query_hst_products(proposal_id, logger=None):
     """Return all accepted products from mast with a given proposal id .
     Input:
         proposal_id:    a proposal id.
