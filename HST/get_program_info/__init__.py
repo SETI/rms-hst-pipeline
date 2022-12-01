@@ -17,7 +17,7 @@ from hst_helper import (DOCUMENT_SUFFIXES,
 
 from citations import Citation_Information
 
-def get_program_info(proposal_id, logger=None):
+def get_program_info(proposal_id, download_dir=None, logger=None):
     """
     Download proposal files and generate program-info.txt for the given proposal ID
     Input:
@@ -25,12 +25,13 @@ def get_program_info(proposal_id, logger=None):
     """
     logger = logger or pdslogger.EasyLogger()
 
-    documents_dir = get_program_dir_path(proposal_id)
+    download_dir = download_dir or get_program_dir_path(proposal_id)
     # remove the leading zero's of proposal_id if there is one. The proposal file name
     # does not have the leading zero.
     proposal_id = int(proposal_id)
     logger.info(f'Download proposal files for {proposal_id}')
-    download_proposal_files(proposal_id, documents_dir, logger)
+    res = download_proposal_files(proposal_id, download_dir, logger)
+    return res
 
 def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
     """Return a boolean flag to determine if a proposal file is retrieved.
@@ -41,6 +42,7 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
                         to store the newly retrieved proposal file.
     """
     logger = logger or pdslogger.EasyLogger()
+
     try:
         resp = urllib.request.urlopen(url)
         new_contents = resp.read()
@@ -109,7 +111,7 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
          str(proposal_id).zfill(5)+f'.{suffix}') for suffix in DOCUMENT_SUFFIXES
     ]
 
-    # res = set()
+    res = set()
     logger.open('Download proposal files')
     is_program_info_file_created = False
     for (url, basename) in table:
@@ -117,7 +119,7 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
         # Download the new proposal files if necessary
         if is_proposal_file_retrieved(proposal_id, url, filepath, logger=logger):
             logger.info(f'Retrieve {basename} from {url}')
-            # res.add(basename)
+            res.add(basename)
             # Create or update program info file
             _, _, ext = basename.rpartition('.')
             if (not is_program_info_file_created and
@@ -127,4 +129,4 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
                 is_program_info_file_created = True
     logger.close()
 
-    # return res
+    return res

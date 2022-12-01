@@ -2,7 +2,7 @@ from query_hst_moving_targets import query_hst_moving_targets
 import pytest
 
 
-class TestQueryMast:
+class TestQueryHSTMovingTargets:
     @pytest.mark.parametrize(
         'p_ids,inst,expected',
         [

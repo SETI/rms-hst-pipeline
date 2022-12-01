@@ -2,7 +2,7 @@ from query_hst_products import query_hst_products
 import pytest
 
 
-class TestQueryMast:
+class TestQueryHSTProducts:
     # TODO: Need to choose one proposal id and remove both products.txt
     # and trl_checksums.txt to cover all code
     @pytest.mark.parametrize(
@@ -11,7 +11,7 @@ class TestQueryMast:
             ('7885', []),
         ],
     )
-    def test_query_hst_moving_targets(self, p_id, expected):
+    def test_query_hst_products(self, p_id, expected):
         visit_diff = query_hst_products(proposal_id=p_id)
         print(visit_diff)
         assert visit_diff == expected

@@ -57,7 +57,7 @@ LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('get-program-info ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
 logger.info('Get program info for proposal id: ' + str(proposal_id))
-get_program_info(proposal_id, logger)
+get_program_info(proposal_id, None, logger)
 # TASK QUEUE: None
 
 logger.close()
