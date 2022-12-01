@@ -47,21 +47,21 @@ def query_mast_slice(proposal_id=None,
     start_date = ymd_tuple_to_mjd(start_date)
     end_date = ymd_tuple_to_mjd(end_date)
     retry = 0
-    logger.info("Query MAST: run query_mast_slice")
+    logger.info('Query MAST: run query_mast_slice')
 
     query_params = {
-        "dataRights": "PUBLIC",
-        "obs_collection": ["HST"],
-        # "t_obs_release": (start_date, end_date),
-        "mtFlag": True
+        'dataRights': 'PUBLIC',
+        'obs_collection': ['HST'],
+        # 't_obs_release': (start_date, end_date),
+        'mtFlag': True
     }
 
     if proposal_id is not None:
-        query_params["proposal_id"] = str(proposal_id)
+        query_params['proposal_id'] = str(proposal_id)
     if instrument is not None:
-        query_params["instrument_name"] = str(instrument)
+        query_params['instrument_name'] = str(instrument)
     if start_date is not None and end_date is not None:
-        query_params["t_obs_release"] = (start_date, end_date)
+        query_params['t_obs_release'] = (start_date, end_date)
 
     for retry in range(max_retries):
         try:
@@ -71,10 +71,10 @@ def query_mast_slice(proposal_id=None,
             return table
         except ConnectionError as e:
             retry = retry + 1
-            logger.info(f"retry #{retry}: {e}")
+            logger.info(f'retry #{retry}: {e}')
             time.sleep(1)
     logger.exception(RuntimeError)
-    raise RuntimeError("Query mast timed out. Number of retries: " + str(max_retries))
+    raise RuntimeError('Query mast timed out. Number of retries: ' + str(max_retries))
 
 def filter_table(row_predicate, table):
     """Return a copy of the filtered table object based on the return of row_predicate.
@@ -93,7 +93,7 @@ def is_accepted_instrument_letter_code(row):
     Input:
         row:    an observation table row.
     """
-    return row["obs_id"][0].lower() in ACCEPTED_LETTER_CODES
+    return row['obs_id'][0].lower() in ACCEPTED_LETTER_CODES
 
 def is_accepted_instrument_suffix(row):
     """Check if a product row has accepted suffex in the productSubGroupDescription field
@@ -120,14 +120,14 @@ def get_instrument_id(row):
     Input:
         row:    an observation table row.
     """
-    return INSTRUMENT_FROM_LETTER_CODE[row["obs_id"][0].lower()]
+    return INSTRUMENT_FROM_LETTER_CODE[row['obs_id'][0].lower()]
 
 def get_suffix(row):
     """Return the product file suffix for a given product row.
     Input:
         row:    an observation table row.
     """
-    return str(row["productSubGroupDescription"]).lower()
+    return str(row['productSubGroupDescription']).lower()
 
 def get_filtered_products(table):
     """Return product rows of an observation table with accepted instrument letter code
@@ -163,6 +163,6 @@ def download_files(table, dir, logger=None, testing=False):
         os.makedirs(dir)
 
     if len(table) > 0:
-        logger.info("Download files to " + dir)
+        logger.info('Download files to ' + dir)
         if not testing: # pragma: no cover, no need to download files during the test
             Observations.download_products(table, download_dir=dir)

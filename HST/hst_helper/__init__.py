@@ -11,12 +11,12 @@ END_DATE = (2025, 1, 1)
 RETRY = 1
 
 # file directories
-HST_DIR = {"staging": os.environ["HST_STAGING"],
-           "pipeline": os.environ["HST_PIPELINE"],
-           "bundles": os.environ["HST_BUNDLES"]}
-HST_STAGING_DIR = os.environ["HST_STAGING"]
-HST_PIPELINE_DIR = os.environ["HST_PIPELINE"]
-HST_BUNDLES_DIR = os.environ["HST_BUNDLES"]
+HST_DIR = {'staging': os.environ['HST_STAGING'],
+           'pipeline': os.environ['HST_PIPELINE'],
+           'bundles': os.environ['HST_BUNDLES']}
+HST_STAGING_DIR = os.environ['HST_STAGING']
+HST_PIPELINE_DIR = os.environ['HST_PIPELINE']
+HST_BUNDLES_DIR = os.environ['HST_BUNDLES']
 
 # suffixes for proposal files
 DOCUMENT_SUFFIXES = ["apt", "pdf", "pro", "prop"]
