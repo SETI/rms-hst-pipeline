@@ -25,7 +25,7 @@ def query_hst_moving_targets(proposal_ids=[],
         max_retries:    number of retries when there is a connection to mast.
     """
     logger = logger or pdslogger.EasyLogger()
-    logger.info("Run query_hst_moving_targets")
+    logger.info('Run query_hst_moving_targets')
 
     table = []
     if len(proposal_ids) == 0 and len(instruments) == 0:
@@ -73,7 +73,7 @@ def query_hst_moving_targets(proposal_ids=[],
     p_id_li = []
     for t in table:
         for row in t:
-            p_id = row["proposal_id"].zfill(5)
+            p_id = row['proposal_id'].zfill(5)
             if p_id not in p_id_li:
                 p_id_li.append(p_id)
 

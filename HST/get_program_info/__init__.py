@@ -29,7 +29,7 @@ def get_program_info(proposal_id, logger=None):
     # remove the leading zero's of proposal_id if there is one. The proposal file name
     # does not have the leading zero.
     proposal_id = int(proposal_id)
-    logger.info(f"Download proposal files for {proposal_id}")
+    logger.info(f'Download proposal files for {proposal_id}')
     download_proposal_files(proposal_id, documents_dir, logger)
 
 def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
@@ -45,7 +45,7 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
         resp = urllib.request.urlopen(url)
         new_contents = resp.read()
     except urllib.error.URLError as e:
-        logger.info(f"file from {url} is not found for {proposal_id}")
+        logger.info(f'file from {url} is not found for {proposal_id}')
         return False
 
     if is_proposal_file_different(new_contents, filepath):
@@ -53,14 +53,14 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
         if os.path.exists(filepath):
             backup_file(proposal_id, None, filepath)
         # Save the new proposal file
-        with open(filepath, "wb") as f:
+        with open(filepath, 'wb') as f:
             f.write(new_contents)
         return True
 
     # For the case when all propsal files are downloaded but program info file
     # doesn't exist.
-    program_dir, _, _ = filepath.rpartition("/")
-    program_info_filepath = program_dir + "/program-info.txt"
+    program_dir, _, _ = filepath.rpartition('/')
+    program_info_filepath = program_dir + '/program-info.txt'
     if not os.path.exists(program_info_filepath):
         create_program_info_file(filepath)
 
@@ -75,7 +75,7 @@ def is_proposal_file_different(new_contents, filepath):
                     store the newly retrieved proposal file.
     """
     if os.path.exists(filepath):
-        with open(filepath, "rb") as f:
+        with open(filepath, 'rb') as f:
             file_contents = f.read()
         if file_contents == new_contents:
             return False
@@ -90,8 +90,8 @@ def create_program_info_file(filepath):
         filepath:   the file path of a proposal file used to get the citation info.
     """
     citation_info = Citation_Information.create_from_file(filepath)
-    program_dir, _, _ = filepath.rpartition("/")
-    program_info_filepath = program_dir + "/program-info.txt"
+    program_dir, _, _ = filepath.rpartition('/')
+    program_info_filepath = program_dir + '/program-info.txt'
     citation_info.write(program_info_filepath)
 
 def download_proposal_files(proposal_id, download_dir, logger=None):
@@ -105,24 +105,24 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
     logger = logger or pdslogger.EasyLogger()
     # A table contains a list of tuple (url for a proposal file, stored file name)
     table = [
-        (f"https://www.stsci.edu/hst/phase2-public/{proposal_id}.{suffix}",
-         str(proposal_id).zfill(5)+f".{suffix}") for suffix in DOCUMENT_SUFFIXES
+        (f'https://www.stsci.edu/hst/phase2-public/{proposal_id}.{suffix}',
+         str(proposal_id).zfill(5)+f'.{suffix}') for suffix in DOCUMENT_SUFFIXES
     ]
 
     # res = set()
-    logger.open("Download proposal files")
+    logger.open('Download proposal files')
     is_program_info_file_created = False
     for (url, basename) in table:
         filepath = fs.path.join(download_dir, basename)
         # Download the new proposal files if necessary
         if is_proposal_file_retrieved(proposal_id, url, filepath, logger=logger):
-            logger.info(f"Retrieve {basename} from {url}")
+            logger.info(f'Retrieve {basename} from {url}')
             # res.add(basename)
             # Create or update program info file
-            _, _, ext = basename.rpartition(".")
+            _, _, ext = basename.rpartition('.')
             if (not is_program_info_file_created and
                 ext in DOCUMENT_SUFFIXES_FOR_CITATION_INFO):
-                logger.info(f"Create program info file from {basename}")
+                logger.info(f'Create program info file from {basename}')
                 create_program_info_file(filepath)
                 is_program_info_file_created = True
     logger.close()

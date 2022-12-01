@@ -4,12 +4,12 @@ import pytest
 
 class TestQueryMast:
     @pytest.mark.parametrize(
-        "p_ids,inst,expected",
+        'p_ids,inst,expected',
         [
             ([], [], 781),
-            ([], ["NICMOS/NIC1"], 24),
-            (["7885"], [], 1),
-            (["15505"], ["WFC3/UVIS"], 1),
+            ([], ['NICMOS/NIC1'], 24),
+            (['7885'], [], 1),
+            (['15505'], ['WFC3/UVIS'], 1),
         ],
     )
     def test_query_hst_moving_targets(self, p_ids, inst, expected):

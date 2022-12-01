@@ -6,9 +6,9 @@ class TestQueryMast:
     # TODO: Need to choose one proposal id and remove both products.txt
     # and trl_checksums.txt to cover all code
     @pytest.mark.parametrize(
-        "p_id,expected",
+        'p_id,expected',
         [
-            ("7885", []),
+            ('7885', []),
         ],
     )
     def test_query_hst_moving_targets(self, p_id, expected):
