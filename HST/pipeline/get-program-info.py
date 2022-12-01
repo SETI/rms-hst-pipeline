@@ -33,7 +33,7 @@ parser.add_argument('--quiet', '-q', action='store_true',
 
 args = parser.parse_args()
 proposal_id = args.proposal_ids
-LOG_DIR = HST_DIR["pipeline"] + '/hst_'  + proposal_id.zfill(5) + '/logs'
+LOG_DIR = HST_DIR['pipeline'] + '/hst_'  + proposal_id.zfill(5) + '/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.get-program-info-' + proposal_id)
 if not args.quiet:
@@ -56,7 +56,7 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('get-program-info ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-logger.info("Get program info for proposal id: " + str(proposal_id))
+logger.info('Get program info for proposal id: ' + str(proposal_id))
 get_program_info(proposal_id, logger)
 # TASK QUEUE: None
 

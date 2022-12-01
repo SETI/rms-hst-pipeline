@@ -34,7 +34,7 @@ parser.add_argument('--quiet', '-q', action='store_true',
 # Parse and validate the command line
 args = parser.parse_args()
 proposal_id = args.proposal_ids
-LOG_DIR = HST_DIR["pipeline"] + '/hst_'  + proposal_id.zfill(5) + '/logs'
+LOG_DIR = HST_DIR['pipeline'] + '/hst_'  + proposal_id.zfill(5) + '/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.query-hst-products-' + proposal_id)
 if not args.quiet:
@@ -57,9 +57,9 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-logger.info("Query hst products for proposal id: " + str(proposal_id))
+logger.info('Query hst products for proposal id: ' + str(proposal_id))
 visit_li = query_hst_products(proposal_id, logger)
-logger.info("List of visits in which any files are new or chagned: " + str(visit_li))
+logger.info('List of visits in which any files are new or chagned: ' + str(visit_li))
 # TODO: TASK QUEUE
 # - if list is not empty, queue update-hst-program with the list of visits
 # - if list is empty, re-queue query-hst-products with a 30-day delay
