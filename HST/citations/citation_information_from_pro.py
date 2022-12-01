@@ -161,13 +161,13 @@ MISSING_CYCLES = {
 
 
 def citation_information_from_pro(
-    filename: str,
-) -> Tuple[int, str, int, List[str], str, int, int, str]:
+    filename,
+):
 
     # A quick and dirty function to merge author lists
     # Sometimes the PI is in the author list, sometimes not!
-    def merge_authors(authors: List[str], pi_author: str, cois: List[str]) -> List[str]:
-        def letters_only(author: str) -> str:
+    def merge_authors(authors, pi_author, cois):
+        def letters_only(author):
             letters = []
             for c in author:
                 if c.isalpha():

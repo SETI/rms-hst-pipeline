@@ -4,7 +4,7 @@
 
 import re
 
-def fix_abstract(abstract: str) -> List[str]:
+def fix_abstract(abstract):
     """Standardize punctuation in abstracts. Input is one string, a list containing one
     string per embedded line break (i.e., paragraph) is returned.
     """

@@ -15,11 +15,12 @@ from hst_helper.query_utils import (download_files,
                                      get_filtered_products,
                                      get_trl_products,
                                      query_mast_slice)
-from hst_helper.fs_utils import (create_program_dir,
+from hst_helper.fs_utils import (backup_file,
+                                 create_program_dir,
                                  file_md5,
                                  get_downloaded_file_path,
                                  get_program_dir_path,
-                                 get_visit,)
+                                 get_visit)
 
 def query_hst_products(proposal_id, logger=None):
     """Return all accepted products from mast with a given proposal id .
@@ -153,13 +154,7 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
         if files_from_txt != files_li:
             is_visit_diff = True
             # move the old txt file to backups
-            now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
-            backups_dir = get_program_dir_path(proposal_id, visit) + "/backups"
-            basename, _, _ = fname.partition(".")
-            new_path = f"{backups_dir}/{basename}-{now}.txt"
-            if not os.path.isdir(backups_dir):
-                os.makedirs(backups_dir)
-            shutil.move(txt_file_path, new_path)
+            backup_file(proposal_id, visit, txt_file_path)
             # generate the new txt file
             generate_files_txt(proposal_id, files_dict, visit,
                                f"{fname}", checksum_included)

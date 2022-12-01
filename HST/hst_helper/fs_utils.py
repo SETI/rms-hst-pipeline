@@ -1,7 +1,9 @@
 ##########################################################################################
 # hst_helper/fs_utils.py
 ##########################################################################################
+import datetime
 import os
+import shutil
 
 from hashlib import md5
 
@@ -82,3 +84,21 @@ def file_md5(filepath):
                 break
             hasher.update(chunk)
     return hasher.hexdigest()
+
+def backup_file(proposal_id, visit, filepath):
+    """Rename and move a file to the /backups
+    Input:
+        proposal_id:    the proposal id.
+        visit:          the two character visit.
+        filepath:       the current filepath to be renamed & moved.
+    """
+    backups_dir = get_program_dir_path(proposal_id, visit) + "/backups"
+    now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+    _, _, fname = filepath.rpartition("/")
+    basename, _, ext = fname.partition(".")
+    new_path = f"{backups_dir}/{basename}-{now}.{ext}"
+    # create backups dir if it doesn't exist
+    if not os.path.isdir(backups_dir):
+        os.makedirs(backups_dir)
+    # move file to the back up dir
+    shutil.move(filepath, new_path)

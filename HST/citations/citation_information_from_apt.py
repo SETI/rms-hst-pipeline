@@ -11,7 +11,7 @@ DATE_REGEX3 = re.compile(r' *:date .*?-(20[0-3][0-9]) .*')
 ##########################################################################################
 
 
-def citation_information_from_apt(filename)
+def citation_information_from_apt(filename):
     """Return tuple (propno, category, cycle, authors, title, submission_year,
     timing_year, abstract).
     """

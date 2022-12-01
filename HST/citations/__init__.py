@@ -151,10 +151,15 @@ class Citation_Information:
             f.write('\n')
             f.write(', '.join(self.authors))
             f.write('\n')
-            f.write(', '.self.title)
+            f.write(self.title)
             f.write('\n')
-            f.write(self.abstract)
-            f.write('\n')
+            if isinstance(self.abstract, list):
+                for line in self.abstract:
+                    f.write(str(line))
+                    f.write('\n')
+            else:
+                f.write(self.abstract)
+                f.write('\n')
             f.write(str(self.submission_year))
             f.write('\n')
             f.write(str(self.timing_year))
@@ -285,7 +290,7 @@ class Citation_Information:
 
         return formatted
 
-    def set_publication_year(self, year)
+    def set_publication_year(self, year):
         """Set the publication year that will appear in the citation."""
 
         self.pub_year = year
@@ -293,7 +298,7 @@ class Citation_Information:
     def __str__(self):
         return self.description
 
-    def __repr__(self:
+    def __repr__(self):
         return 'Citation_Information(' + self.description + ')'
 
     @staticmethod

@@ -2,6 +2,7 @@
 # hst_helper/query_utils.py
 ##########################################################################################
 import os
+import time
 
 import julian
 import pdslogger
@@ -67,13 +68,6 @@ def query_mast_slice(proposal_id=None,
             if testing and max_retries > 1:
                 raise ConnectionError
             table = Observations.query_criteria(**query_params)
-            # table = Observations.query_criteria(
-            #     dataRights="PUBLIC",
-            #     obs_collection=["HST"],
-            #     proposal_id=str(proposal_id),
-            #     t_obs_release=(start_date, end_date),
-            #     mtFlag=True
-            # )
             return table
         except ConnectionError as e:
             retry = retry + 1

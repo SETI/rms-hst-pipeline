@@ -91,12 +91,12 @@ end_date = args.end if args.end else END_DATE
 retry = args.retry if args.retry else RETRY
 
 logger.info("Mast query constraints: " + str(args))
-pid_li = query_hst_moving_targets(proposal_ids = proposal_ids,
-                                  instruments = instruments,
-                                  start_date = start_date,
-                                  end_date = end_date,
-                                  logger = logger,
-                                  max_retries = retry)
+pid_li = query_hst_moving_targets(proposal_ids=proposal_ids,
+                                  instruments=instruments,
+                                  start_date=start_date,
+                                  end_date=end_date,
+                                  logger=logger,
+                                  max_retries=retry)
 logger.info("List of program ids: " + str(pid_li))
 # TODO: TASK QUEUE
 # - if there is a missing HST_PIPELINE/hst_<nnnnn> missing, queue query-hst-products
