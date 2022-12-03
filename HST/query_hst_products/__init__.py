@@ -10,7 +10,9 @@ from collections import defaultdict
 from hst_helper import (START_DATE,
                         END_DATE,
                         RETRY,
-                        HST_DIR)
+                        HST_DIR,
+                        PRODUCTS_FILE,
+                        TRL_CHECKSUMS_FILE)
 from hst_helper.query_utils import (download_files,
                                      get_filtered_products,
                                      get_trl_products,
@@ -68,15 +70,15 @@ def query_hst_products(proposal_id, logger=None):
     trl_products = get_trl_products(table)
     download_files(trl_products, trl_dir, logger)
 
-    # Compare and create products.txt & trl_checksums.txt
-    logger.info(f'Create products.txt and trl_checksums.txt')
+    # Compare and create PRODUCTS_FILE & TRL_CHECKSUMS_FILE
+    logger.info(f'Create {PRODUCTS_FILE} and {TRL_CHECKSUMS_FILE}')
     for visit in files_dict:
-        logger.info(f'Create products.txt for visit: {visit} of {proposal_id}')
+        logger.info(f'Create {PRODUCTS_FILE} for visit: {visit} of {proposal_id}')
         prod_diff = compare_files_txt(proposal_id, files_dict,
-                                      visit, 'products.txt')
-        logger.info(f'Create trl_checksums.txt for visit: {visit} of {proposal_id}')
+                                      visit, PRODUCTS_FILE)
+        logger.info(f'Create {TRL_CHECKSUMS_FILE} for visit: {visit} of {proposal_id}')
         trl_diff = compare_files_txt(proposal_id, trl_files_dict,
-                                     visit, 'trl_checksums.txt', True)
+                                     visit, TRL_CHECKSUMS_FILE, True)
         if prod_diff or trl_diff:
             visit_diff.append(visit)
 

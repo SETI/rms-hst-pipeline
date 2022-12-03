@@ -13,13 +13,14 @@ from hst_helper.fs_utils import (backup_file,
                                  get_program_dir_path)
 
 from hst_helper import (DOCUMENT_SUFFIXES,
-                        DOCUMENT_SUFFIXES_FOR_CITATION_INFO)
+                        DOCUMENT_SUFFIXES_FOR_CITATION_INFO,
+                        PROGRAM_INFO_FILE)
 
 from citations import Citation_Information
 
 def get_program_info(proposal_id, download_dir=None, logger=None):
     """
-    Download proposal files and generate program-info.txt for the given proposal ID
+    Download proposal files and generate PROGRAM_INFO_FILE for the given proposal ID
     Input:
         proposal_id:    a proposal id.
     """
@@ -62,7 +63,7 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
     # For the case when all propsal files are downloaded but program info file
     # doesn't exist.
     program_dir, _, _ = filepath.rpartition('/')
-    program_info_filepath = program_dir + '/program-info.txt'
+    program_info_filepath = program_dir + '/' + PROGRAM_INFO_FILE
     if not os.path.exists(program_info_filepath):
         create_program_info_file(filepath)
 
@@ -87,13 +88,13 @@ def is_proposal_file_different(new_contents, filepath):
         return True
 
 def create_program_info_file(filepath):
-    """Create and store citation info in program-info.txt
+    """Create and store citation info in PROGRAM_INFO_FILE
     Input:
         filepath:   the file path of a proposal file used to get the citation info.
     """
     citation_info = Citation_Information.create_from_file(filepath)
     program_dir, _, _ = filepath.rpartition('/')
-    program_info_filepath = program_dir + '/program-info.txt'
+    program_info_filepath = program_dir + '/' + PROGRAM_INFO_FILE
     citation_info.write(program_info_filepath)
 
 def download_proposal_files(proposal_id, download_dir, logger=None):

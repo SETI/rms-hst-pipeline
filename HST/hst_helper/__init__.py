@@ -19,5 +19,10 @@ HST_PIPELINE_DIR = os.environ['HST_PIPELINE']
 HST_BUNDLES_DIR = os.environ['HST_BUNDLES']
 
 # suffixes for proposal files
-DOCUMENT_SUFFIXES = ["apt", "pdf", "pro", "prop"]
-DOCUMENT_SUFFIXES_FOR_CITATION_INFO = ["apt", "pro"]
+DOCUMENT_SUFFIXES = ['apt', 'pdf', 'pro', 'prop']
+DOCUMENT_SUFFIXES_FOR_CITATION_INFO = ['apt', 'pro']
+
+# File names
+PROGRAM_INFO_FILE = 'program-info.txt'
+PRODUCTS_FILE = 'products.txt'
+TRL_CHECKSUMS_FILE = 'trl_checksums.txt'
