@@ -5,7 +5,7 @@ attrs==19.3.0
 beautifulsoup4==4.8.2
 black==21.12b0
 bs4==0.0.1
-certifi==2019.11.28
+certifi==2022.12.7
 chardet==3.0.4
 click==8.0.3
 fs==2.4.14
