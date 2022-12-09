@@ -3,20 +3,15 @@
 ##########################################################################################
 import os
 import pdslogger
-import shutil
-import datetime
 
 from collections import defaultdict
-from hst_helper import (START_DATE,
-                        END_DATE,
-                        RETRY,
-                        HST_DIR,
-                        PRODUCTS_FILE,
+
+from hst_helper import (PRODUCTS_FILE,
                         TRL_CHECKSUMS_FILE)
 from hst_helper.query_utils import (download_files,
-                                     get_filtered_products,
-                                     get_trl_products,
-                                     query_mast_slice)
+                                    get_filtered_products,
+                                    get_trl_products,
+                                    query_mast_slice)
 from hst_helper.fs_utils import (backup_file,
                                  create_program_dir,
                                  file_md5,
@@ -32,13 +27,13 @@ def query_hst_products(proposal_id, logger=None):
     visit_diff = []
     logger = logger or pdslogger.EasyLogger()
 
+    logger.info('Query hst products for propsal id: ', str(proposal_id))
     try:
         proposal_id = int(proposal_id)
     except ValueError:
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    logger.info('Query hst products for propsal id: ', str(proposal_id))
     # Query mast
     table = query_mast_slice(proposal_id=proposal_id, logger=logger)
     filtered_products = get_filtered_products(table)
@@ -100,7 +95,7 @@ def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=
         proposal_id:        a proposal id.
         files_dict:         a dictionary keyed by two character visit and store a list of
                             files for the corresponding visit.
-        visit:              two character visit
+        visit:              two character visit.
         fname:              the file name.
         checksum_included:  a flag used to deteremine if we want to include checksum
                             of each file in the generated file.
@@ -128,7 +123,7 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
         proposal_id:        a proposal id.
         files_dict:         a dictionary keyed by two character visit and store a list of
                             files for the corresponding visit.
-        visit:              two character visit
+        visit:              two character visit.
         fname:              the file name.
         checksum_included:  a flag used to deteremine if we want to include checksum
                             of each file in the generated file.

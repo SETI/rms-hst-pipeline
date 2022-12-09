@@ -12,7 +12,8 @@ from astroquery.mast import Observations
 from . import (START_DATE,
                END_DATE,
                RETRY)
-
+from .fs_utils import (get_format_term,
+                       get_visit)
 from product_labels.suffix_info import (ACCEPTED_SUFFIXES,
                                         ACCEPTED_LETTER_CODES,
                                         INSTRUMENT_FROM_LETTER_CODE)
@@ -115,6 +116,16 @@ def is_trl_suffix(row):
     """
     return get_suffix(row) == 'trl'
 
+def is_targeted_visit(row, visit):
+    """Check if a product row is related to a given visit.
+    Input:
+        row:    an observation table row.
+        visit:  two character visit.
+    """
+    filename = row['productFilename']
+    format_term = get_format_term(filename)
+    return get_visit(format_term) == str(visit)
+
 def get_instrument_id(row):
     """Return the instrument id for a given product row.
     Input:
@@ -129,15 +140,26 @@ def get_suffix(row):
     """
     return str(row['productSubGroupDescription']).lower()
 
-def get_filtered_products(table):
+def get_filtered_products(table, visit=None):
     """Return product rows of an observation table with accepted instrument letter code
-    and suffxes.
+    and suffxes. If visit is specified, only return the product rows of the targeted
+    visit.
     Input:
         table:  an observation table from mast query.
+        visit:  two character visit.
     """
     result = Observations.get_product_list(table)
     result = filter_table(is_accepted_instrument_letter_code, result)
     result = filter_table(is_accepted_instrument_suffix, result)
+    if visit is not None:
+        # to_delete = [n for (n, row) in enumerate(result) if not is_targeted_visit(row, visit)]
+        to_delete = []
+        for (n, row) in enumerate(result):
+            if not is_targeted_visit(row, visit):
+                to_delete.append(n)
+        copy = result.copy()
+        copy.remove_rows(to_delete)
+        result = copy
     return result
 
 def get_trl_products(table):
@@ -159,6 +181,10 @@ def download_files(table, dir, logger=None, testing=False):
         logger:         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
+    # When there is 0 product row from query result, we don't create the directory
+    if len(table) == 0:
+        logger.warn('Empty result from mast query')
+        return
     if not os.path.isdir(dir): # pragma: no cover
         os.makedirs(dir)
 

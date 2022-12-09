@@ -20,8 +20,8 @@ from hst_helper import HST_DIR
 parser = argparse.ArgumentParser(
     description='query-hst-products: Perform mast query with a given proposal id')
 
-parser.add_argument('proposal_ids', type=str, default='',
-    help='The proposal ids for the mast query')
+parser.add_argument('proposal_id', type=str, default='',
+    help='The proposal id for the mast query')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help='Path and name for the log file. The name always has the current date and time '+
@@ -33,7 +33,7 @@ parser.add_argument('--quiet', '-q', action='store_true',
 
 # Parse and validate the command line
 args = parser.parse_args()
-proposal_id = args.proposal_ids
+proposal_id = args.proposal_id
 LOG_DIR = HST_DIR['pipeline'] + '/hst_'  + proposal_id.zfill(5) + '/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.query-hst-products-' + proposal_id)
