@@ -9,7 +9,7 @@ from hst_helper.query_utils import (download_files,
                                     query_mast_slice)
 from hst_helper.fs_utils import get_program_dir_path
 
-def retrieve_hst_visit(proposal_id, visit, logger=None):
+def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     """
     Retrieve all accepted files for a given proposal id & visit
     Inputs:
@@ -31,4 +31,6 @@ def retrieve_hst_visit(proposal_id, visit, logger=None):
     filtered_products = get_filtered_products(table, visit)
     files_dir = get_program_dir_path(proposal_id, visit, root_dir='staging')
     # Download all accepted files
-    download_files(filtered_products, files_dir, logger)
+    download_files(filtered_products, files_dir, logger, testing)
+
+    return len(filtered_products)
