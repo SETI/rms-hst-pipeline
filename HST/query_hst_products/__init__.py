@@ -15,9 +15,11 @@ from hst_helper.query_utils import (download_files,
 from hst_helper.fs_utils import (backup_file,
                                  create_program_dir,
                                  file_md5,
-                                 get_downloaded_file_path,
                                  get_program_dir_path,
                                  get_visit)
+
+# A dictionary keyed by IPPPSSOOT and stores observation id from mast as the value.
+products_obs_dict = {}
 
 def query_hst_products(proposal_id, logger=None):
     """Return all accepted products from mast with a given proposal id .
@@ -43,16 +45,18 @@ def query_hst_products(proposal_id, logger=None):
     files_dict = defaultdict(list)
     trl_files_dict = defaultdict(list)
     for row in filtered_products:
-        productFilename = row['productFilename']
-        format_term, _, _ = productFilename.partition('_')
+        product_fname = row['productFilename']
+        obs_id = row['obs_id']
+        products_obs_dict[product_fname] = obs_id
+        format_term, _, _ = product_fname.partition('_')
         visit = get_visit(format_term)
 
-        files_dict[visit].append(productFilename)
-        if 'trl' in productFilename:
-            trl_files_dict[visit].append(productFilename)
+        files_dict[visit].append(product_fname)
+        if 'trl' in product_fname:
+            trl_files_dict[visit].append(product_fname)
 
         suffix = row['productSubGroupDescription']
-        logger.info(f'File: {productFilename} with suffix: {suffix}')
+        logger.info(f'File: {product_fname} with suffix: {suffix}')
 
      # Create program and all visits directories
     logger.info('Create program and visit directories that do not already exist.')
@@ -161,3 +165,17 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
         is_visit_diff = True
 
     return is_visit_diff
+
+def get_downloaded_file_path(proposal_id, fname, visit=None, root_dir='staging'):
+    """Return the file path of a downloaded file.
+    Input:
+        proposal_id:    a proposal id.
+        fname:          the file name.
+        visit:          two character visit if the file is stored under visit dir.
+        root_dir:       the root directory of the store file.
+
+    """
+    return (get_program_dir_path(proposal_id, visit, root_dir) +
+            '/mastDownload/HST/' +
+            products_obs_dict[fname] +
+            f'/{fname}')

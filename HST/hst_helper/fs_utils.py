@@ -56,20 +56,6 @@ def get_visit(format_term):
     """
     return format_term[4:6]
 
-def get_downloaded_file_path(proposal_id, fname, visit=None, root_dir='staging'):
-    """Return the file path of a downloaded file.
-    Input:
-        proposal_id:    a proposal id.
-        fname:          the file name.
-        visit:          two character visit if the file is stored under visit dir.
-        root_dir:       the root directory of the store file.
-
-    """
-    return (get_program_dir_path(proposal_id, visit, root_dir) +
-            '/mastDownload/HST/' +
-            get_format_term(fname) +
-            f'/{fname}')
-
 def file_md5(filepath):
     """Find the hexadecimal digest (checksum) of a file in the filesystem.
     Input:
