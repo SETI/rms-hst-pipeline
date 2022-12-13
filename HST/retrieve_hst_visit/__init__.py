@@ -11,6 +11,7 @@ from hst_helper.fs_utils import get_program_dir_path
 
 def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     """Retrieve all accepted files for a given proposal id & visit.
+
     Inputs:
         proposal_id:    a proposal id.
         visit:          two character visit.

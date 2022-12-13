@@ -23,15 +23,15 @@ parser = argparse.ArgumentParser(
     description='retrieve-hst-visit: Perform mast query with a given proposal id')
 
 parser.add_argument('--proposal_id', '-pid', type=str, default='',
-    help='The proposal id for the mast query')
+    help='The proposal id for the mast query.')
 
 parser.add_argument('--visit', '-vi', type=str, default='',
-    help='The two character visit of an observation')
+    help='The two character visit of an observation.')
 
 parser.add_argument('--log', '-l', type=str, default='',
-    help='Path and name for the log file. The name always has the current date and time '+
-         'appended. If not specified, the file will be written to the current logs '  +
-         'directory and named "retrieve-hst-visit-<date>.log".')
+    help="""Path and name for the log file. The name always has the current date and time
+         appended. If not specified, the file will be written to the current logs
+         directory and named "retrieve-hst-visit-<date>.log".""")
 
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')

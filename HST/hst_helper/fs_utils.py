@@ -12,6 +12,7 @@ from . import HST_DIR
 def create_program_dir(proposal_id, visit=None, root_dir='pipeline'):
     """Create the program directory for IPPPSSOOT from a proposal id, return the path of
     the directory. If visit is specified, create the visit directory as well.
+
     Input:
         proposal_id:    a proposal id.
         visit:          the two character designation for the HST visit
@@ -26,6 +27,7 @@ def create_program_dir(proposal_id, visit=None, root_dir='pipeline'):
 def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline'):
     """Return the program directory for IPPPSSOOT from a proposal id. If visit is
     specified, return the visit directory.
+
     Input:
         proposal_id:    a proposal id.
         visit:          the two character designation for the HST visit
@@ -42,6 +44,7 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline'):
 
 def get_format_term(filename):
     """Return IPPPSSOOT for a given file name.
+
     Input:
         filename:   a product file name
     """
@@ -49,7 +52,8 @@ def get_format_term(filename):
     return format_term
 
 def get_visit(format_term):
-    """Return the two characters of HST visit
+    """Return the two characters of HST visit.
+
     Input:
         format_term:    the first 8 or 9 characters of the file name (IPPPSSOOT).
     """
@@ -57,21 +61,23 @@ def get_visit(format_term):
 
 def file_md5(filepath):
     """Find the hexadecimal digest (checksum) of a file in the filesystem.
+
     Input:
         filepath:   the path of the targeted file
     """
-    CHUNK = 4096
+    chunk_size = 4096
     hasher = md5()
     with open(filepath, 'rb') as f:
         while True:
-            chunk = f.read(CHUNK)
+            chunk = f.read(chunk_size)
             if not chunk:
                 break
             hasher.update(chunk)
     return hasher.hexdigest()
 
 def backup_file(proposal_id, visit, filepath):
-    """Rename and move a file to the /backups
+    """Rename and move a file to the /backups.
+
     Input:
         proposal_id:    the proposal id.
         visit:          the two character visit.

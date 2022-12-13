@@ -20,9 +20,9 @@ import sys
 
 from query_hst_moving_targets import query_hst_moving_targets
 from hst_helper import (START_DATE,
-                         END_DATE,
-                         RETRY,
-                         HST_DIR)
+                        END_DATE,
+                        RETRY,
+                        HST_DIR)
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -35,7 +35,7 @@ parser.add_argument('--proposal_ids', '-pid', nargs='+', type=str, default='',
 #     help='The proposal ids for the mast query')
 
 parser.add_argument('--instruments', '-inst', nargs='+', type=str, default='',
-    help='The instruments for the mast query')
+    help='The instruments for the mast query.')
 
 parser.add_argument('--start', type=str, action='store', default='',
     help='Optional start date from MAST in (yyyy, mm, dd) format.')
@@ -47,9 +47,9 @@ parser.add_argument('--retry', '-r', type=str, action='store', default='',
     help='Optional max number of Mast connection retry.')
 
 parser.add_argument('--log', '-l', type=str, default='',
-    help='Path and name for the log file. The name always has the current date and time '+
-         'appended. If not specified, the file will be written to the current logs '  +
-         'directory and named "query-hst-moving-targets-<date>.log".')
+    help="""Path and name for the log file. The name always has the current date and time
+         appended. If not specified, the file will be written to the current logs
+         directory and named "query-hst-moving-targets-<date>.log".""")
 
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')

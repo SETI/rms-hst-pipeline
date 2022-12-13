@@ -20,6 +20,7 @@ from product_labels.suffix_info import (ACCEPTED_SUFFIXES,
 
 def ymd_tuple_to_mjd(ymd):
     """Return Modified Julian Date.
+
     Input:
         ymd:    a tuple of year, month, and day.
     """
@@ -36,6 +37,7 @@ def query_mast_slice(proposal_id=None,
                      testing=False):
     """Return a slice of mast database as a table object with a given proposal id,
     instrument, start_date, and end_date.
+
     Input:
         proposal_id:    a proposal id.
         instrument:     a instrument name.
@@ -79,6 +81,7 @@ def query_mast_slice(proposal_id=None,
 
 def filter_table(row_predicate, table):
     """Return a copy of the filtered table object based on the return of row_predicate.
+
     Input:
         row_predicate:    a function with the condition used to filter the table.
         table:            target table to be filtered.
@@ -91,6 +94,7 @@ def filter_table(row_predicate, table):
 def is_accepted_instrument_letter_code(row):
     """Check if a product row has accepted letter code in the first letter of the
     product filename.
+
     Input:
         row:    an observation table row.
     """
@@ -99,6 +103,7 @@ def is_accepted_instrument_letter_code(row):
 def is_accepted_instrument_suffix(row):
     """Check if a product row has accepted suffex in the productSubGroupDescription field
     of the table.
+
     Input:
         row:    an observation table row.
     """
@@ -111,6 +116,7 @@ def is_accepted_instrument_suffix(row):
 def is_trl_suffix(row):
     """Check if a product row has trl in the productSubGroupDescription field
     of the table.
+
     Input:
         row:    an observation table row.
     """
@@ -118,6 +124,7 @@ def is_trl_suffix(row):
 
 def is_targeted_visit(row, visit):
     """Check if a product row is related to a given visit.
+
     Input:
         row:    an observation table row.
         visit:  two character visit.
@@ -128,6 +135,7 @@ def is_targeted_visit(row, visit):
 
 def get_instrument_id(row):
     """Return the instrument id for a given product row.
+
     Input:
         row:    an observation table row.
     """
@@ -135,6 +143,7 @@ def get_instrument_id(row):
 
 def get_suffix(row):
     """Return the product file suffix for a given product row.
+
     Input:
         row:    an observation table row.
     """
@@ -144,6 +153,7 @@ def get_filtered_products(table, visit=None):
     """Return product rows of an observation table with accepted instrument letter code
     and suffxes. If visit is specified, only return the product rows of the targeted
     visit.
+
     Input:
         table:  an observation table from mast query.
         visit:  two character visit.
@@ -163,7 +173,8 @@ def get_filtered_products(table, visit=None):
     return result
 
 def get_trl_products(table):
-    """Return product rows of an observation table with trl suffix
+    """Return product rows of an observation table with trl suffix.
+
     Input:
         table:  an observation table from mast query.
     """
@@ -173,7 +184,8 @@ def get_trl_products(table):
     return result
 
 def download_files(table, dir, logger=None, testing=False):
-    """Download files from mast for a given product table and proposal id
+    """Download files from mast for a given product table and proposal id.
+
     Input:
         table:          an observation table from mast query.
         proposal_id:    a proposal id.

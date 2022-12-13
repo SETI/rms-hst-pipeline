@@ -22,12 +22,12 @@ parser = argparse.ArgumentParser(
     description='query-hst-products: Perform mast query with a given proposal id')
 
 parser.add_argument('proposal_id', type=str, default='',
-    help='The proposal id for the mast query')
+    help='The proposal id for the mast query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
-    help='Path and name for the log file. The name always has the current date and time '+
-         'appended. If not specified, the file will be written to the current logs '  +
-         'directory and named "query-hst-products-<date>.log".')
+    help="""Path and name for the log file. The name always has the current date and time
+         appended. If not specified, the file will be written to the current logs
+         directory and named "query-hst-products-<date>.log".""")
 
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')

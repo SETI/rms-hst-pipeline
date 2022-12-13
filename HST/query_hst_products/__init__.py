@@ -22,7 +22,8 @@ from hst_helper.fs_utils import (backup_file,
 products_obs_dict = {}
 
 def query_hst_products(proposal_id, logger=None):
-    """Return all accepted products from mast with a given proposal id .
+    """Return all accepted products from mast with a given proposal id.
+
     Input:
         proposal_id:    a proposal id.
     """
@@ -95,6 +96,7 @@ def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=
     will contain a list of file names of the visit in alphabetical order.
     if checksum_included is True, the file will contain a dictionary keyed by file names
     and the corresponding checksums as the values.
+
     Input:
         proposal_id:        a proposal id.
         files_dict:         a dictionary keyed by two character visit and store a list of
@@ -123,6 +125,7 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
     the same, keep the current txt file. If they are different, move the current txt
     file to the backups directory, and generate the new txt file based on the new results
     from Mast.
+
     Input:
         proposal_id:        a proposal id.
         files_dict:         a dictionary keyed by two character visit and store a list of
@@ -168,6 +171,7 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
 
 def get_downloaded_file_path(proposal_id, fname, visit=None, root_dir='staging'):
     """Return the file path of a downloaded file.
+
     Input:
         proposal_id:    a proposal id.
         fname:          the file name.

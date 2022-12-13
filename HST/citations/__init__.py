@@ -5,7 +5,7 @@
 import re
 import textwrap
 from xml.sax.saxutils import escape
-from collections.abs import Iterable
+from collections.abc import Iterable
 
 from .citation_information_from_apt import citation_information_from_apt
 from .citation_information_from_pro import citation_information_from_pro
