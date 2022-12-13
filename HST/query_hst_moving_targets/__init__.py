@@ -14,8 +14,7 @@ def query_hst_moving_targets(proposal_ids=[],
                              end_date=END_DATE,
                              logger=None,
                              max_retries=RETRY):
-    """Task: query-hst-moving-targets
-    Return a list of proposal ids with moving targets.
+    """Return a list of proposal ids with moving targets.
     Input:
         proposal_ids:   a list of proposal ids.
         instruments:    a list of instruments.

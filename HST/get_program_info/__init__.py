@@ -19,8 +19,7 @@ from hst_helper import (DOCUMENT_SUFFIXES,
 from citations import Citation_Information
 
 def get_program_info(proposal_id, download_dir=None, logger=None):
-    """
-    Download proposal files and generate PROGRAM_INFO_FILE for the given proposal ID
+    """Download proposal files and generate PROGRAM_INFO_FILE for the given proposal ID
     Input:
         proposal_id:    a proposal id.
     """
@@ -70,8 +69,7 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
     return False
 
 def is_proposal_file_different(new_contents, filepath):
-    """
-    Return a boolean flag to determine if a proposal file needs to be replaced/created.
+    """Return a boolean flag to determine if a proposal file needs to be replaced/created.
     Input:
         contents:   the contents of the newly retrieved proposal file.
         filepath:   the file path of the existing proposal file or the file path used to
@@ -88,7 +86,7 @@ def is_proposal_file_different(new_contents, filepath):
         return True
 
 def create_program_info_file(filepath):
-    """Create and store citation info in PROGRAM_INFO_FILE
+    """Create and store citation info in PROGRAM_INFO_FILE.
     Input:
         filepath:   the file path of a proposal file used to get the citation info.
     """
@@ -98,8 +96,7 @@ def create_program_info_file(filepath):
     citation_info.write(program_info_filepath)
 
 def download_proposal_files(proposal_id, download_dir, logger=None):
-    """
-    Download proposal files for the given proposal ID into a directory and return a
+    """Download proposal files for the given proposal ID into a directory and return a
     set of the basenames of the files successfully downloaded.
     Input:
         proposal_id:    a proposal id.
