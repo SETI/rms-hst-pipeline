@@ -3,6 +3,7 @@
 # pipeline/query-hst-products.py
 #
 # Syntax:
+# query-hst-products.py [-h] [--log LOG] [--quiet] proposal_id
 #
 # Enter the --help option to see more information.
 ##########################################################################################
@@ -30,6 +31,11 @@ parser.add_argument('--log', '-l', type=str, default='',
 
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
+
+# Make sure some query constraints are passed in
+if len(sys.argv) == 1:
+    parser.print_help()
+    parser.exit()
 
 # Parse and validate the command line
 args = parser.parse_args()

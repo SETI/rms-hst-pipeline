@@ -58,6 +58,7 @@ parser.add_argument('--quiet', '-q', action='store_true',
 if len(sys.argv) == 1:
     parser.print_help()
     parser.exit()
+
 # Parse and validate the command line
 args = parser.parse_args()
 LOG_DIR = HST_DIR['pipeline'] + '/logs'
