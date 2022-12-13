@@ -60,8 +60,7 @@ if args.log:
         parts = os.path.splitext(args.log)
         logpath = parts[0] + '-' + now + parts[1]
 else:
-    if not os.path.isdir(LOG_DIR):
-        os.makedirs(LOG_DIR)
+    os.makedirs(LOG_DIR, exist_ok=True)
     logpath = LOG_DIR + '/retrieve-hst-visit-' + now + '.log'
 
 logger.add_handler(pdslogger.file_handler(logpath))

@@ -78,10 +78,7 @@ def is_proposal_file_different(new_contents, filepath):
     if os.path.exists(filepath):
         with open(filepath, 'rb') as f:
             file_contents = f.read()
-        if file_contents == new_contents:
-            return False
-        else:
-            return True
+        return file_contents != new_contents
     else:
         return True
 

@@ -185,8 +185,7 @@ def download_files(table, dir, logger=None, testing=False):
     if len(table) == 0:
         logger.warn('Empty result from mast query')
         return
-    if not os.path.isdir(dir): # pragma: no cover
-        os.makedirs(dir)
+    os.makedirs(dir, exist_ok=True)
 
     if len(table) > 0:
         logger.info('Download files to ' + dir)

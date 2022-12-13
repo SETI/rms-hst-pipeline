@@ -19,9 +19,8 @@ def create_program_dir(proposal_id, visit=None, root_dir='pipeline'):
                         or 'bundles'.
     """
     program_dir = get_program_dir_path(proposal_id, visit, root_dir)
+    os.makedirs(program_dir, exist_ok=True)
 
-    if not os.path.isdir(program_dir):
-        os.makedirs(program_dir)
     return program_dir
 
 def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline'):
@@ -84,7 +83,6 @@ def backup_file(proposal_id, visit, filepath):
     basename, _, ext = fname.partition('.')
     new_path = f'{backups_dir}/{basename}-{now}.{ext}'
     # create backups dir if it doesn't exist
-    if not os.path.isdir(backups_dir):
-        os.makedirs(backups_dir)
+    os.makedirs(backups_dir, exist_ok=True)
     # move file to the back up dir
     shutil.move(filepath, new_path)
