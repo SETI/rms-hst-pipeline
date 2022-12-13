@@ -5,6 +5,7 @@
 import re
 import textwrap
 from xml.sax.saxutils import escape
+from collections.abs import Iterable
 
 from .citation_information_from_apt import citation_information_from_apt
 from .citation_information_from_pro import citation_information_from_pro
@@ -153,7 +154,7 @@ class Citation_Information:
             f.write('\n')
             f.write(self.title)
             f.write('\n')
-            if isinstance(self.abstract, list):
+            if isinstance(self.abstract, Iterable):
                 for line in self.abstract:
                     f.write(str(line))
                     f.write('\n')
