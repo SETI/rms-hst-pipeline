@@ -20,7 +20,7 @@
         - update to IM 1.6.0.0
         - changed data type for hst_pi_name to UTF8_Text_Preserved
         - added class: HST, Parameters_ACS, Parameters_WFC3
-        - renamed class hst_helper_Parameters to Parameters_General
+        - renamed class HST_General_Parameters to Parameters_General
         - renamed class WFPC2_Parameters to Parameters_WFPC2
         - added attributes gyroscope_mode, moving_target_flag, repeat_exposure_count, subarray_flag
         - to be done add definitions to attributes
