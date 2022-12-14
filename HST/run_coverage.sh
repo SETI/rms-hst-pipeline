@@ -1,2 +1,3 @@
-coverage run -m pytest query_mast/tests
+coverage run -m pytest */tests
 coverage html
+coverage report

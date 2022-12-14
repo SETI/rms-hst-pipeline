@@ -1,0 +1,18 @@
+[run]
+branch = True
+include =
+    ../HST/*
+omit =
+    */venv/*
+    *pdscache.py
+    xmltemplate.py
+    *finder_colors.py
+    *pdslogger.py
+    *translator.py
+    */tests/*
+[html]
+Title = Coverage Report for HST pipeline
+
+[report]
+exclude_lines =
+  pragma: no cover
