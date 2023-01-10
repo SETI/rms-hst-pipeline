@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 ##########################################################################################
-# pipeline/query-hst-moving-targets.py
+# pipeline/pipeline_query_hst_moving_targets.py
 #
 # Syntax:
-# query-hst-moving-targets.py [-h]
-#                             [--proposal_ids PROPOSAL_IDS [PROPOSAL_IDS ...]]
-#                             [--instruments INSTRUMENTS [INSTRUMENTS ...]]
-#                             [--start START] [--end END] [--retry RETRY]
-#                             [--log LOG] [--quiet]
+# pipeline_query_hst_moving_targets.py [-h]
+#                                      [--proposal_ids PROPOSAL_IDS [PROPOSAL_IDS ...]]
+#                                      [--instruments INSTRUMENTS [INSTRUMENTS ...]]
+#                                      [--start START] [--end END]
+#                                      [--retry RETRY] [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 ##########################################################################################
@@ -30,9 +30,6 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('--proposal_ids', '-pid', nargs='+', type=str, default='',
     help='The proposal ids for the mast query')
-
-# parser.add_argument('proposal_ids', nargs='+', type=str,
-#     help='The proposal ids for the mast query')
 
 parser.add_argument('--instruments', '-inst', nargs='+', type=str, default='',
     help='The instruments for the mast query.')

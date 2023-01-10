@@ -3,7 +3,11 @@
 # pipeline/label-products.py
 #
 # Syntax:
-#   pipeline/label-products.py [options] path [path ...]
+# pipeline_label_products.py [-h] [--proposal_id PROPOSAL_ID] [--visit VISIT]
+#                            [--old OLD] [--select SELECT] [--date DATE]
+#                            [--replace-nans] [--reset-dates] [--log LOG]
+#                            [--quiet]
+#                            path [path ...]
 #
 # Enter the --help option to see more information.
 ##########################################################################################
@@ -19,6 +23,12 @@ from product_labels import label_hst_fits_directories
 # Set up parser
 parser = argparse.ArgumentParser(
     description='label-hst: Create and update PDS4 labels for HST data products')
+
+parser.add_argument('--proposal_id', '-pid', type=str, default='',
+    help='The proposal id for the mast query.')
+
+parser.add_argument('--visit', '-vi', type=str, default='',
+    help='The two character visit of an observation.')
 
 parser.add_argument('path', nargs='+', type=str,
     help="""The path to a directory containing a "logically complete" set of HST FITS
