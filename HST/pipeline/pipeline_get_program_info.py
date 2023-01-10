@@ -21,7 +21,7 @@ from hst_helper import HST_DIR
 parser = argparse.ArgumentParser(
     description='get-program-info: Perform mast query with a given proposal id')
 
-parser.add_argument('proposal_id', type=str, default='',
+parser.add_argument('proposal_id', type=str, default='', required=True,
     help='The proposal id for the mast query.')
 
 parser.add_argument('--log', '-l', type=str, default='',

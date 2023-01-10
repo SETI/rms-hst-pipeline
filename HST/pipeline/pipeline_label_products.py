@@ -19,6 +19,7 @@ import pdslogger
 import sys
 
 from product_labels import label_hst_fits_directories
+from hst_helper import HST_DIR
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -30,7 +31,7 @@ parser.add_argument('--proposal_id', '-pid', type=str, default='',
 parser.add_argument('--visit', '-vi', type=str, default='',
     help='The two character visit of an observation.')
 
-parser.add_argument('path', nargs='+', type=str,
+parser.add_argument('--path', '-p', type=str, action='store', default='',
     help="""The path to a directory containing a "logically complete" set of HST FITS
          files downloaded from MAST. "Logically complete" means that every file that
          a given file might  need to refer to is also in the same directory. A
@@ -66,8 +67,27 @@ parser.add_argument('--log', '-l', type=str, default='',
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
 
+# Make sure some params are passed in
+if len(sys.argv) == 1:
+    parser.print_help()
+    parser.exit()
+
 # Parse and validate the command line
 args = parser.parse_args()
+target_path = args.path
+proposal_id = args.proposal_id
+visit = args.visit
+
+LOG_DIR = (HST_DIR['pipeline'] + '/hst_' + proposal_id.zfill(5) + '/visit_'
+           + visit.zfill(2) + '/logs')
+
+# If proposal id and visit are both passed in, it will look for fits files under the
+# staging directory for that specific proposal id and visit. Otherwise it will look for
+# passed in path.
+# TBD: Do we want to set both proposal id and visit as the required params?
+if proposal_id and visit and not target_path:
+    target_path = (HST_DIR['staging'] + '/hst_' + proposal_id.zfill(5) + '/visit_'
+                   + visit.zfill(2))
 
 logger = pdslogger.PdsLogger('pds.hst.label-products')
 if not args.quiet:
@@ -82,14 +102,19 @@ if args.log:
         parts = os.path.splitext(args.log)
         logpath = parts[0] + '-' + now + parts[1]
 else:
-    logpath = 'hst-label-products-' + now + '.log'
+    os.makedirs(LOG_DIR, exist_ok=True)
+    logpath = LOG_DIR + '/label-hst-products-' + now + '.log'
 
 logger.add_handler(pdslogger.file_handler(logpath))
 
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('label-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-label_hst_fits_directories(args.path,
+print('======================')
+print(f'target_path: {target_path}')
+print(f'logpath: {logpath}')
+
+label_hst_fits_directories(target_path,
                            match_pattern = args.select,
                            old_directories = [args.old],
                            retrieval_date = args.date,

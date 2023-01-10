@@ -22,10 +22,10 @@ from hst_helper import HST_DIR
 parser = argparse.ArgumentParser(
     description='retrieve-hst-visit: Perform mast query with a given proposal id')
 
-parser.add_argument('--proposal_id', '-pid', type=str, default='',
+parser.add_argument('--proposal_id', '-pid', type=str, default='', required=True,
     help='The proposal id for the mast query.')
 
-parser.add_argument('--visit', '-vi', type=str, default='',
+parser.add_argument('--visit', '-vi', type=str, default='', required=True,
     help='The two character visit of an observation.')
 
 parser.add_argument('--log', '-l', type=str, default='',
