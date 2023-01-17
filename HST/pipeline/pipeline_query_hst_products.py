@@ -19,7 +19,8 @@ from hst_helper import HST_DIR
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description='query-hst-products: Perform mast query with a given proposal id')
+    description="""query-hst-products: Perform mast query with a given proposal id and
+                download all TRL files for this HST program.""")
 
 parser.add_argument('proposal_id', type=str, default='', required=True,
     help='The proposal id for the mast query.')

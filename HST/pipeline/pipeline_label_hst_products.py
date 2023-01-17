@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 ##########################################################################################
-# pipeline/label-products.py
+# pipeline/pipeline_label_hst_products.py
 #
 # Syntax:
-# pipeline_label_products.py [-h] [--proposal_id PROPOSAL_ID] [--visit VISIT]
-#                            [--old OLD] [--select SELECT] [--date DATE]
-#                            [--replace-nans] [--reset-dates] [--log LOG]
-#                            [--quiet]
-#                            path [path ...]
+# pipeline_label_hst_products.py [-h] [--proposal_id PROPOSAL_ID] [--visit VISIT]
+#                            [--path PATH] [--old OLD] [--select SELECT]
+#                            [--date DATE] [--replace-nans] [--reset-dates]
+#                            [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 ##########################################################################################
@@ -23,7 +22,8 @@ from hst_helper import HST_DIR
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description='label-hst: Create and update PDS4 labels for HST data products')
+    description="""label-hst-products:productste and update PDS4 labels for HST data
+                products.""")
 
 parser.add_argument('--proposal_id', '-pid', type=str, default='',
     help='The proposal id for the mast query.')
@@ -62,7 +62,7 @@ parser.add_argument('--reset-dates', '-D', action='store_true',
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time
          appended. If not specified, the file will be written to the current working
-         directory and named "label-hst-files-<date>.log".""")
+         directory and named "label-hst-products-<date>.log".""")
 
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
@@ -89,7 +89,7 @@ if proposal_id and visit and not target_path:
     target_path = (HST_DIR['staging'] + '/hst_' + proposal_id.zfill(5) + '/visit_'
                    + visit.zfill(2))
 
-logger = pdslogger.PdsLogger('pds.hst.label-products')
+logger = pdslogger.PdsLogger('pds.hst.label-hst-products')
 if not args.quiet:
     logger.add_handler(pdslogger.stdout_handler)
 
@@ -97,7 +97,7 @@ if not args.quiet:
 now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
 if args.log:
     if os.path.isdir(args.log):
-        logpath = os.path.join(args.log, 'hst-label-products-' + now + '.log')
+        logpath = os.path.join(args.log, 'label-hst-products-' + now + '.log')
     else:
         parts = os.path.splitext(args.log)
         logpath = parts[0] + '-' + now + parts[1]
@@ -108,7 +108,7 @@ else:
 logger.add_handler(pdslogger.file_handler(logpath))
 
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
-logger.open('label-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
+logger.open('label-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
 print('======================')
 print(f'target_path: {target_path}')

@@ -26,7 +26,8 @@ from hst_helper import (START_DATE,
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description='query-hst-moving-targets: Perform mast query with a given proposal id')
+    description="""query-hst-moving-targets: Perform mast query with given query
+                constraints.""")
 
 parser.add_argument('--proposal_ids', '-pid', nargs='+', type=str, default='',
     help='The proposal ids for the mast query')
