@@ -3,15 +3,19 @@
 ##########################################################################################
 import os
 import pdslogger
+import shutil
 
 from product_labels.suffix_info import (BROWSE_SUFFIX_INFO,
                                         ACCEPTED_BROWSE_SUFFIXES,
                                         INSTRUMENT_FROM_LETTER_CODE)
 
-from hst_helper.fs_utils import get_program_dir_path
+from hst_helper.fs_utils import (get_program_dir_path,
+                                 get_instrument_id,
+                                 get_file_suffix)
 
 def prepare_browse_products(proposal_id, visit, logger=None, testing=False):
-    """Retrieve all accepted files for a given proposal id & visit.
+    """With a given proposal id & visit, save browse products to browse_{inst_id}_{suffix}
+    under staging dir.
 
     Inputs:
         proposal_id:    a proposal id.
@@ -30,16 +34,17 @@ def prepare_browse_products(proposal_id, visit, logger=None, testing=False):
 
     files_dir = get_program_dir_path(proposal_id, visit, root_dir='staging')
 
-
-    print("Print BROWSE_SUFFIX_INFO=================")
-    print(files_dir)
-    print(ACCEPTED_BROWSE_SUFFIXES)
-
+    # Walk through all the downloaded files from MAST (with ACCEPTED_SUFFIXES)
     for root, dirs, files in os.walk(files_dir):
-        print(root)
-        print(dirs)
-        print(files)
-        # for file in files:
-        #     print(os.path.join(root, file))
+        for file in files:
+            fp = os.path.join(root, file)
+            suffix = get_file_suffix(file)
+            inst_id = get_instrument_id(file)
+            # Copy & save browse products under browse_{inst_id}_{suffix}
+            if inst_id is not None and suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id]:
+                browse_dir = get_program_dir_path(proposal_id, None, 'staging')
+                browse_dir += f"/browse_{inst_id.lower()}_{suffix}/visit_{visit}/"
+                os.makedirs(browse_dir, exist_ok=True)
+                shutil.copy(fp, browse_dir+file)
 
     return

@@ -110,10 +110,6 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('label-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-print('======================')
-print(f'target_path: {target_path}')
-print(f'logpath: {logpath}')
-
 label_hst_fits_directories(target_path,
                            match_pattern = args.select,
                            old_directories = [args.old],

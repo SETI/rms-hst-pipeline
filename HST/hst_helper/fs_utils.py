@@ -8,6 +8,9 @@ import shutil
 from hashlib import md5
 
 from . import HST_DIR
+from product_labels.suffix_info import (BROWSE_SUFFIX_INFO,
+                                        ACCEPTED_BROWSE_SUFFIXES,
+                                        INSTRUMENT_FROM_LETTER_CODE)
 
 def create_program_dir(proposal_id, visit=None, root_dir='pipeline'):
     """Create the program directory for IPPPSSOOT from a proposal id, return the path of
@@ -50,6 +53,25 @@ def get_format_term(filename):
     """
     format_term, _, _ = filename.partition('_')
     return format_term
+
+def get_instrument_id(filename):
+    """Return instrument id for a given file name.
+
+    Input:
+        filename:   a product file name
+    """
+    letter_code = filename.lower()[0]
+    return (INSTRUMENT_FROM_LETTER_CODE[letter_code]
+            if letter_code in INSTRUMENT_FROM_LETTER_CODE else None)
+def get_file_suffix(filename):
+    """Return suffix for a given file name.
+
+    Input:
+        filename:   a product file name
+    """
+    filename, _, _ = filename.rpartition('.')
+    _ ,_ , suffix = filename.partition('_')
+    return suffix
 
 def get_visit(format_term):
     """Return the two characters of HST visit.

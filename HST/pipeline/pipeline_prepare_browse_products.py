@@ -47,7 +47,8 @@ proposal_id = args.proposal_id
 visit = args.visit.zfill(2)
 LOG_DIR = HST_DIR['pipeline'] + f'/hst_{proposal_id.zfill(5)}/visit_{visit}/logs'
 
-logger = pdslogger.PdsLogger('pds.hst.prepare-browse-products-' + proposal_id)
+logger = pdslogger.PdsLogger('pds.hst.prepare-browse-products-' + proposal_id
+                             + f'-visit_{visit.zfill(2)}')
 if not args.quiet:
     logger.add_handler(pdslogger.stdout_handler)
 
@@ -67,7 +68,7 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('prepare-browse-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-logger.info(f'Retrieve accepted files for proposal id: {proposal_id} & visit: {visit}')
+logger.info(f'Prepare browse products for proposal id: {proposal_id} & visit: {visit}')
 prepare_browse_products(proposal_id, visit, logger)
 
 logger.close()
