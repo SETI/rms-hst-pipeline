@@ -5,9 +5,7 @@ import os
 import pdslogger
 import shutil
 
-from product_labels.suffix_info import (BROWSE_SUFFIX_INFO,
-                                        ACCEPTED_BROWSE_SUFFIXES,
-                                        INSTRUMENT_FROM_LETTER_CODE)
+from product_labels.suffix_info import ACCEPTED_BROWSE_SUFFIXES
 
 from hst_helper.fs_utils import (get_program_dir_path,
                                  get_instrument_id,
