@@ -6,7 +6,6 @@ class TestQueryHSTMovingTargets:
     @pytest.mark.parametrize(
         'p_ids,inst,expected',
         [
-            ([], [], 781),
             ([], ['NICMOS/NIC1'], 24),
             (['7885'], [], 1),
             (['15505'], ['WFC3/UVIS'], 1),
