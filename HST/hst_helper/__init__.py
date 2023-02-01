@@ -16,8 +16,8 @@ HST_DIR = {'staging': os.environ['HST_STAGING'],
            'bundles': os.environ['HST_BUNDLES']}
 
 # suffixes for proposal files
-DOCUMENT_SUFFIXES = ('apt', 'pdf', 'pro', 'prop')
-DOCUMENT_SUFFIXES_FOR_CITATION_INFO = ('apt', 'pro')
+DOCUMENT_EXT = ('apt', 'pdf', 'pro', 'prop')
+DOCUMENT_EXT_FOR_CITATION_INFO = ('apt', 'pro')
 
 # File names
 PROGRAM_INFO_FILE = 'program-info.txt'

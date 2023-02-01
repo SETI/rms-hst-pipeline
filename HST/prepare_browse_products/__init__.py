@@ -11,7 +11,7 @@ from hst_helper.fs_utils import (get_program_dir_path,
                                  get_instrument_id,
                                  get_file_suffix)
 
-def prepare_browse_products(proposal_id, visit, logger=None, testing=False):
+def prepare_browse_products(proposal_id, visit, logger=None):
     """With a given proposal id & visit, save browse products to browse_{inst_id}_{suffix}
     under staging dir.
 
@@ -43,6 +43,9 @@ def prepare_browse_products(proposal_id, visit, logger=None, testing=False):
                 browse_dir = get_program_dir_path(proposal_id, None, 'staging')
                 browse_dir += f"/browse_{inst_id.lower()}_{suffix}/visit_{visit}/"
                 os.makedirs(browse_dir, exist_ok=True)
+                logger.info(f'Move browse products to: {browse_dir+file}')
                 shutil.copy(fp, browse_dir+file)
+
+    logger.close()
 
     return

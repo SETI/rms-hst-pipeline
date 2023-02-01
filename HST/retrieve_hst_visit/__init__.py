@@ -33,4 +33,5 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     # Download all accepted files
     download_files(filtered_products, files_dir, logger, testing)
 
+    logger.close()
     return len(filtered_products)

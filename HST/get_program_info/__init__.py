@@ -12,8 +12,8 @@ import urllib.request
 from hst_helper.fs_utils import (backup_file,
                                  get_program_dir_path)
 
-from hst_helper import (DOCUMENT_SUFFIXES,
-                        DOCUMENT_SUFFIXES_FOR_CITATION_INFO,
+from hst_helper import (DOCUMENT_EXT,
+                        DOCUMENT_EXT_FOR_CITATION_INFO,
                         PROGRAM_INFO_FILE)
 
 from citations import Citation_Information
@@ -108,7 +108,7 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
     # A table contains a list of tuple (url for a proposal file, stored file name)
     table = [
         (f'https://www.stsci.edu/hst/phase2-public/{proposal_id}.{suffix}',
-         str(proposal_id).zfill(5)+f'.{suffix}') for suffix in DOCUMENT_SUFFIXES
+         str(proposal_id).zfill(5)+f'.{suffix}') for suffix in DOCUMENT_EXT
     ]
 
     res = set()
@@ -123,7 +123,7 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
             # Create or update program info file
             _, _, ext = basename.rpartition('.')
             if (not is_program_info_file_created and
-                ext in DOCUMENT_SUFFIXES_FOR_CITATION_INFO):
+                ext in DOCUMENT_EXT_FOR_CITATION_INFO):
                 logger.info(f'Create program info file from {basename}')
                 create_program_info_file(filepath)
                 is_program_info_file_created = True
