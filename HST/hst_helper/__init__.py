@@ -2,6 +2,7 @@
 # hst_helper/__init__.py
 ##########################################################################################
 import os
+from collections import defaultdict
 
 # default start and end date of observation in query mast constraints
 START_DATE = (1900, 1, 1)
@@ -23,3 +24,6 @@ DOCUMENT_EXT_FOR_CITATION_INFO = ('apt', 'pro')
 PROGRAM_INFO_FILE = 'program-info.txt'
 PRODUCTS_FILE = 'products.txt'
 TRL_CHECKSUMS_FILE = 'trl_checksums.txt'
+
+# Instrument ids dictionary, keyed by propoposal id and store the list of instrument ids
+INST_ID_DICT = defaultdict(set)

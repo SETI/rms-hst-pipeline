@@ -10,7 +10,7 @@ class TestQueryMast:
         ]
     )
     def test_retrieve_hst_visit(self, proposal_id, visit, expected):
-        res = retrieve_hst_visit(proposal_id, visit, testing=True)
+        res = retrieve_hst_visit(proposal_id, visit, None, testing=True)
         assert res == expected
 
     @pytest.mark.parametrize(

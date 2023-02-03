@@ -1,6 +1,7 @@
 ##########################################################################################
 # document_label/__init__.py
 ##########################################################################################
+import csv
 import datetime
 import os
 import pdslogger
@@ -9,7 +10,9 @@ import shutil
 from hst_helper import (DOCUMENT_EXT,
                         PROGRAM_INFO_FILE)
 
-from hst_helper.fs_utils import (get_program_dir_path,
+from hst_helper import INST_ID_DICT
+from hst_helper.fs_utils import (get_formatted_proposal_id,
+                                 get_program_dir_path,
                                  get_instrument_id,
                                  get_file_suffix)
 
@@ -27,7 +30,6 @@ def label_hst_document_directory(proposal_id, logger):
         logger:         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
-
     logger.info(f'Label hst document directory with proposal id: {proposal_id}')
     try:
         proposal_id = int(proposal_id)
@@ -35,7 +37,7 @@ def label_hst_document_directory(proposal_id, logger):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    formatted_proposal_id = str(proposal_id).zfill(5)
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
     # Create documents directory and move proposal files over
     logger.info(f'Create documents directory and move proposal files.')
@@ -102,4 +104,51 @@ def label_hst_document_directory(proposal_id, logger):
     elif TEMPLATE.ERROR_COUNT > 1:
         logger.error(f'{TEMPLATE.ERROR_COUNT} errors encountered', label_path)
 
-    return
+    logger.close()
+
+def create_document_collection_csv(proposal_id, logger):
+    """With a given proposal id, create document collection csv in the final bundle.
+
+    Inputs:
+        proposal_id:    a proposal id.
+        logger:         pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    logger.info(f'Create document collection csv with proposal id: {proposal_id}')
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+
+     # Create collection csv file
+    if formatted_proposal_id not in INST_ID_DICT:
+        # Walk through all the downloaded files from MAST in staging directory
+        files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+        for root, dirs, files in os.walk(files_dir):
+            for file in files:
+                inst_id = get_instrument_id(file)
+                formatted_proposal_id = str(proposal_id).zfill(5)
+                if inst_id is not None:
+                    INST_ID_DICT[formatted_proposal_id].add(inst_id)
+
+    # Set collection csv filename
+    document_collection_dir = bundles_dir + '/document/collection.csv'
+
+    # Construct collection data, each item in the list is a row in the csv file
+    document_lidvid = (f'P,urn:nasa:pds:hst_{formatted_proposal_id}'
+                      + f':document:{formatted_proposal_id}'
+                      + f'::{version_id[0]}.{version_id[1]}').split(',')
+    collection_data = [document_lidvid]
+    for inst in INST_ID_DICT[formatted_proposal_id]:
+        inst = inst.lower()
+        data_handbook_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-dhb'.split(',')
+        collection_data.append(data_handbook_lid)
+        inst_handbook_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-ihb'.split(',')
+        collection_data.append(inst_handbook_lid)
+
+    # open the file in the write mode
+    with open(document_collection_dir, 'w') as f:
+        # create the csv writer
+        writer = csv.writer(f)
+
+        # write rows to the csv file
+        writer.writerows(collection_data)
+
+    logger.close()

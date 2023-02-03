@@ -7,7 +7,9 @@ import shutil
 
 from product_labels.suffix_info import ACCEPTED_BROWSE_SUFFIXES
 
-from hst_helper.fs_utils import (get_program_dir_path,
+from hst_helper import INST_ID_DICT
+from hst_helper.fs_utils import (get_formatted_proposal_id,
+                                 get_program_dir_path,
                                  get_instrument_id,
                                  get_file_suffix)
 
@@ -30,14 +32,17 @@ def prepare_browse_products(proposal_id, visit, logger=None):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    files_dir = get_program_dir_path(proposal_id, visit, root_dir='staging')
-
     # Walk through all the downloaded files from MAST (with ACCEPTED_SUFFIXES)
+    files_dir = get_program_dir_path(proposal_id, visit, root_dir='staging')
     for root, dirs, files in os.walk(files_dir):
         for file in files:
             fp = os.path.join(root, file)
             suffix = get_file_suffix(file)
             inst_id = get_instrument_id(file)
+
+            formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+            INST_ID_DICT[formatted_proposal_id].add(inst_id)
+
             # Copy & save browse products under browse_{inst_id}_{suffix}
             if inst_id is not None and suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id]:
                 browse_dir = get_program_dir_path(proposal_id, None, 'staging')
@@ -45,7 +50,5 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 os.makedirs(browse_dir, exist_ok=True)
                 logger.info(f'Move browse products to: {browse_dir+file}')
                 shutil.copy(fp, browse_dir+file)
-
-    logger.close()
 
     return

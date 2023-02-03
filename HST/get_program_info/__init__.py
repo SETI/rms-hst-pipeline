@@ -10,6 +10,7 @@ import urllib.parse
 import urllib.request
 
 from hst_helper.fs_utils import (backup_file,
+                                 get_formatted_proposal_id,
                                  get_program_dir_path)
 
 from hst_helper import (DOCUMENT_EXT,
@@ -105,10 +106,11 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
         download_dir:   the directory to store proposal files
     """
     logger = logger or pdslogger.EasyLogger()
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     # A table contains a list of tuple (url for a proposal file, stored file name)
     table = [
         (f'https://www.stsci.edu/hst/phase2-public/{proposal_id}.{suffix}',
-         str(proposal_id).zfill(5)+f'.{suffix}') for suffix in DOCUMENT_EXT
+         formatted_proposal_id+f'.{suffix}') for suffix in DOCUMENT_EXT
     ]
 
     res = set()
@@ -127,6 +129,5 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
                 logger.info(f'Create program info file from {basename}')
                 create_program_info_file(filepath)
                 is_program_info_file_created = True
-    logger.close()
 
     return res

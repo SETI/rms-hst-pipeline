@@ -38,10 +38,11 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline'):
                         or 'bundles'.
     """
     root = HST_DIR[root_dir]
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     if visit is None:
-        program_dir = root + '/hst_' + str(proposal_id).zfill(5)
+        program_dir = root + '/hst_' + formatted_proposal_id
     else:
-        program_dir = root + '/hst_' + str(proposal_id).zfill(5) + f'/visit_{visit}'
+        program_dir = root + '/hst_' + formatted_proposal_id + f'/visit_{visit}'
 
     return program_dir
 
@@ -63,6 +64,7 @@ def get_instrument_id(filename):
     letter_code = filename.lower()[0]
     return (INSTRUMENT_FROM_LETTER_CODE[letter_code]
             if letter_code in INSTRUMENT_FROM_LETTER_CODE else None)
+
 def get_file_suffix(filename):
     """Return suffix for a given file name.
 
@@ -96,6 +98,14 @@ def file_md5(filepath):
                 break
             hasher.update(chunk)
     return hasher.hexdigest()
+
+def get_formatted_proposal_id(proposal_id):
+    """Prepend 0 to the given proposal id if necessary
+
+    Input:
+        proposal_id:   the proposal id.
+    """
+    return str(proposal_id).zfill(5)
 
 def backup_file(proposal_id, visit, filepath):
     """Rename and move a file to the /backups.
