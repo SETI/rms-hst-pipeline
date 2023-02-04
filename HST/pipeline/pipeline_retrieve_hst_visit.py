@@ -69,7 +69,6 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('retrieve-hst-visit ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-logger.info(f'Retrieve accepted files for proposal id: {proposal_id} & visit: {visit}')
 retrieve_hst_visit(proposal_id, visit, logger)
 
 logger.close()

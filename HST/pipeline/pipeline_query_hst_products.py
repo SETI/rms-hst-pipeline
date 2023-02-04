@@ -63,7 +63,6 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-logger.info('Query hst products for proposal id: ' + str(proposal_id))
 visit_li = query_hst_products(proposal_id, logger)
 logger.info('List of visits in which any files are new or chagned: ' + str(visit_li))
 # TODO: TASK QUEUE

@@ -8,9 +8,7 @@ import shutil
 from hashlib import md5
 
 from . import HST_DIR
-from product_labels.suffix_info import (BROWSE_SUFFIX_INFO,
-                                        ACCEPTED_BROWSE_SUFFIXES,
-                                        INSTRUMENT_FROM_LETTER_CODE)
+from product_labels.suffix_info import INSTRUMENT_FROM_LETTER_CODE
 
 def create_program_dir(proposal_id, visit=None, root_dir='pipeline'):
     """Create the program directory for IPPPSSOOT from a proposal id, return the path of

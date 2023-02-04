@@ -63,7 +63,6 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('finalize-hst-bundle ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-logger.info(f'Finalize hst bundle for proposal id: {proposal_id}')
 finalize_hst_bundle(proposal_id, logger)
 
 logger.close()

@@ -68,7 +68,6 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('prepare-browse-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-logger.info(f'Prepare browse products for proposal id: {proposal_id} & visit: {visit}')
 prepare_browse_products(proposal_id, visit, logger)
 
 logger.close()
