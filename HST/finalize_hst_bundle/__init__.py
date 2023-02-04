@@ -15,7 +15,7 @@ import shutil
 
 # from citations import Citation_Information
 # from xmltemplate import XmlTemplate
-from document_label import label_hst_document_directory
+from finalize_document import label_hst_document_directory
 
 def finalize_hst_bundle(proposal_id, logger=None):
     """With a given proposal id, finalize hst bundle.
