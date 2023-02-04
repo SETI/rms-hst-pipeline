@@ -51,8 +51,6 @@ def label_hst_document_directory(proposal_id, logger):
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     document_dir = bundles_dir + f'/document/{formatted_proposal_id}'
-
-    # Create documents directory
     os.makedirs(document_dir, exist_ok=True)
 
     # Search for proposal files & program info file stored at pipeline directory
