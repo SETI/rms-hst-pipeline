@@ -38,6 +38,7 @@ def finalize_hst_bundle(proposal_id, logger=None):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
+    # Generate the final document directory
     label_hst_document_directory(proposal_id, logger)
 
 
