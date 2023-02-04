@@ -4,9 +4,9 @@
 #
 # Syntax:
 # pipeline_label_hst_products.py [-h] [--proposal_id PROPOSAL_ID] [--visit VISIT]
-#                            [--path PATH] [--old OLD] [--select SELECT]
-#                            [--date DATE] [--replace-nans] [--reset-dates]
-#                            [--log LOG] [--quiet]
+#                                [--path PATH] [--old OLD] [--select SELECT]
+#                                [--date DATE] [--replace-nans] [--reset-dates]
+#                                [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 ##########################################################################################

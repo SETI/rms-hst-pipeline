@@ -41,5 +41,4 @@ def finalize_hst_bundle(proposal_id, logger=None):
     # Generate the final document directory
     label_hst_document_directory(proposal_id, logger)
 
-
     return
