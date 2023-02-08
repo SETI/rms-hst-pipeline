@@ -16,6 +16,7 @@ import shutil
 # from citations import Citation_Information
 # from xmltemplate import XmlTemplate
 from finalize_document import label_hst_document_directory
+from finalize_schema import label_hst_schema_directory
 
 def finalize_hst_bundle(proposal_id, logger=None):
     """With a given proposal id, finalize hst bundle.
@@ -39,6 +40,9 @@ def finalize_hst_bundle(proposal_id, logger=None):
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
     # Generate the final document directory
+    # TODO: unccoment this step
     label_hst_document_directory(proposal_id, logger)
+    # Generate the final schema directory
+    label_hst_schema_directory(proposal_id, logger)
 
     return

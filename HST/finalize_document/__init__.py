@@ -1,5 +1,5 @@
 ##########################################################################################
-# document_label/__init__.py
+# finalize_document/__init__.py
 ##########################################################################################
 import csv
 import datetime
@@ -8,21 +8,21 @@ import pdslogger
 import shutil
 
 from hst_helper import (DOCUMENT_EXT,
+                        INST_ID_DICT,
                         PROGRAM_INFO_FILE)
-
-from hst_helper import INST_ID_DICT
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path,
                                  get_instrument_id)
-from hst_helper.general_utils import create_xml_label
+from hst_helper.general_utils import (create_xml_label,
+                                      create_csv)
 
 from citations import Citation_Information
 from product_labels.xml_support import get_modification_history
 
 DOC_LABEL_TEMPLATE = 'DOCUMENT_LABEL.xml'
-DOC_COL_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
+COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
 CSV_FILENAME = 'collection.csv'
-DOC_COL_LABEL = 'collection.xml'
+COL_DOC_LABEL = 'collection.xml'
 
 def label_hst_document_directory(proposal_id, logger):
     """With a given proposal id, create document directory in the final bundle.
@@ -104,10 +104,10 @@ def label_hst_document_directory(proposal_id, logger):
     records_num = len(INST_ID_DICT[formatted_proposal_id]) * 2 + 1
 
     # Get the mod history for document collection label if it's already existed.
-    doc_col_label_path = bundles_dir + f'/document/{DOC_COL_LABEL}'
+    col_doc_label_path = bundles_dir + f'/document/{COL_DOC_LABEL}'
     mod_history = []
-    if os.path.exists(doc_col_label_path):
-        with open(doc_col_label_path) as f:
+    if os.path.exists(col_doc_label_path):
+        with open(col_doc_label_path) as f:
             xml_content = f.read()
             modification_history = get_modification_history(xml_content)
             old_version = modification_history[-1][1]
@@ -181,13 +181,7 @@ def create_document_collection_csv(proposal_id, data_dict, logger):
         inst_hb_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-ihb\r\n'.split(',')
         collection_data.append(inst_hb_lid)
 
-    # open the file in the write mode
-    with open(document_collection_dir, 'w') as f:
-        # create the csv writer
-        writer = csv.writer(f)
-
-        # write rows to the csv file
-        writer.writerows(collection_data)
+    create_csv(document_collection_dir, collection_data, logger)
 
 def create_document_collection_label(proposal_id, data_dict, logger):
     """With a given proposal id, create document collection label in the final bundle.
@@ -202,12 +196,12 @@ def create_document_collection_label(proposal_id, data_dict, logger):
 
     # Create document collection label
     logger.info('Create label for document collection using '
-                + f'templates/{DOC_COL_LABEL_TEMPLATE}.')
+                + f'templates/{COL_DOC_LABEL_TEMPLATE}.')
     # Document collection label template path
-    doc_col_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_col_template = (doc_col_dir + f'/../templates/{DOC_COL_LABEL_TEMPLATE}')
+    col_doc_dir = os.path.dirname(os.path.abspath(__file__))
+    col_doc_template = (col_doc_dir + f'/../templates/{COL_DOC_LABEL_TEMPLATE}')
     # Document collection label path
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    doc_col_label_path = bundles_dir + f'/document/{DOC_COL_LABEL}'
+    col_doc_label_path = bundles_dir + f'/document/{COL_DOC_LABEL}'
 
-    create_xml_label(doc_col_template,doc_col_label_path, data_dict, logger)
+    create_xml_label(col_doc_template,col_doc_label_path, data_dict, logger)
