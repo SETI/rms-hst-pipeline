@@ -6,15 +6,6 @@ import os
 import pdslogger
 import shutil
 
-# from hst_helper import (DOCUMENT_EXT,
-#                         PROGRAM_INFO_FILE)
-
-# from hst_helper.fs_utils import (get_program_dir_path,
-#                                  get_instrument_id,
-#                                  get_file_suffix)
-
-# from citations import Citation_Information
-# from xmltemplate import XmlTemplate
 from finalize_document import label_hst_document_directory
 from finalize_schema import label_hst_schema_directory
 

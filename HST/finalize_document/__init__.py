@@ -8,13 +8,14 @@ import pdslogger
 import shutil
 
 from hst_helper import (DOCUMENT_EXT,
-                        INST_ID_DICT,
                         PROGRAM_INFO_FILE)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
-                                 get_program_dir_path,
-                                 get_instrument_id)
+                                 get_program_dir_path)
 from hst_helper.general_utils import (create_xml_label,
-                                      create_csv)
+                                      create_csv,
+                                      get_citation_info,
+                                      get_instrument_id_set,
+                                      get_mod_history_from_old_label)
 
 from citations import Citation_Information
 from product_labels.xml_support import get_modification_history
@@ -56,19 +57,16 @@ def label_hst_document_directory(proposal_id, logger):
     # Search for proposal files & program info file stored at pipeline directory
     # Move them to bundles directory and collect neccessary data for the label
     logger.info('Move over proposal files.')
-    citation_info = None
     proposal_files_li = []
     for file in os.listdir(pipeline_dir):
         basename, _, ext = file.rpartition('.')
         if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
             proposal_files_li.append((basename, file))
             fp = pipeline_dir + f'/{file}'
-            if citation_info is None:
-                citation_info = Citation_Information.create_from_file(fp)
+
             # Move the proposal files and program info file to the documents directory
             shutil.copy(fp, document_dir + f'/{file}')
             # shutil.move(fp, document_dir + f'/{file}')
-
 
     # Collect data to construct data dictionary used for the document label
     # Get version id
@@ -88,40 +86,27 @@ def label_hst_document_directory(proposal_id, logger):
     timetag = os.path.getmtime(__file__)
     label_date = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
 
+    # get citation info
+    citation_info = get_citation_info(proposal_id, logger)
     # Get imstrument id
-    if formatted_proposal_id not in INST_ID_DICT:
-        # Walk through all the downloaded files from MAST in staging directory
-        files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
-        for root, dirs, files in os.walk(files_dir):
-            for file in files:
-                inst_id = get_instrument_id(file)
-                formatted_proposal_id = str(proposal_id).zfill(5)
-                if inst_id is not None:
-                    INST_ID_DICT[formatted_proposal_id].add(inst_id)
+    inst_ids = get_instrument_id_set(proposal_id, logger)
 
     # Number of document inventory:
     # 2 handbooks per instrument + the proposal file directory
-    records_num = len(INST_ID_DICT[formatted_proposal_id]) * 2 + 1
+    records_num = len(inst_ids) * 2 + 1
 
     # Get the mod history for document collection label if it's already existed.
     col_doc_label_path = bundles_dir + f'/document/{COL_DOC_LABEL}'
-    mod_history = []
-    if os.path.exists(col_doc_label_path):
-        with open(col_doc_label_path) as f:
-            xml_content = f.read()
-            modification_history = get_modification_history(xml_content)
-            old_version = modification_history[-1][1]
-            if old_version != version_id:
-                mod_history = modification_history
+    mod_history = get_mod_history_from_old_label(col_doc_label_path, version_id)
 
     data_dict = {
         'prop_id': proposal_id,
         'collection_name': 'document',
         'citation_info': citation_info,
         'version_id': version_id,
-        'label_date'     : label_date,
+        'label_date': label_date,
         'proposal_files_li': proposal_files_li,
-        'inst_id_li': list(INST_ID_DICT[formatted_proposal_id]),
+        'inst_id_li': list(inst_ids),
         'csv_filename': CSV_FILENAME,
         'records_num': records_num,
         'mod_history': mod_history,
@@ -153,17 +138,6 @@ def create_document_collection_csv(proposal_id, data_dict, logger):
     logger.info(f'Create document collection csv with proposal id: {proposal_id}')
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
-     # Create collection csv file
-    if formatted_proposal_id not in INST_ID_DICT:
-        # Walk through all the downloaded files from MAST in staging directory
-        files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
-        for root, dirs, files in os.walk(files_dir):
-            for file in files:
-                inst_id = get_instrument_id(file)
-                formatted_proposal_id = str(proposal_id).zfill(5)
-                if inst_id is not None:
-                    INST_ID_DICT[formatted_proposal_id].add(inst_id)
-
     # Set collection csv filename
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     document_collection_dir = bundles_dir + f'/document/{CSV_FILENAME}'
@@ -174,7 +148,8 @@ def create_document_collection_csv(proposal_id, data_dict, logger):
                       + f':document:{formatted_proposal_id}'
                       + f'::{version_id[0]}.{version_id[1]}').split(',')
     collection_data = [document_lidvid]
-    for inst in INST_ID_DICT[formatted_proposal_id]:
+    inst_ids = get_instrument_id_set(proposal_id, logger)
+    for inst in inst_ids:
         inst = inst.lower()
         data_hb_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-dhb\r\n'.split(',')
         collection_data.append(data_hb_lid)

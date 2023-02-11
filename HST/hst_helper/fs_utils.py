@@ -53,7 +53,7 @@ def get_format_term(filename):
     format_term, _, _ = filename.partition('_')
     return format_term
 
-def get_instrument_id(filename):
+def get_instrument_id_from_fname(filename):
     """Return instrument id for a given file name.
 
     Input:

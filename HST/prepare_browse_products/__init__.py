@@ -10,7 +10,7 @@ from product_labels.suffix_info import ACCEPTED_BROWSE_SUFFIXES
 from hst_helper import INST_ID_DICT
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path,
-                                 get_instrument_id,
+                                 get_instrument_id_from_fname,
                                  get_file_suffix)
 
 def prepare_browse_products(proposal_id, visit, logger=None):
@@ -38,7 +38,7 @@ def prepare_browse_products(proposal_id, visit, logger=None):
         for file in files:
             fp = os.path.join(root, file)
             suffix = get_file_suffix(file)
-            inst_id = get_instrument_id(file)
+            inst_id = get_instrument_id_from_fname(file)
 
             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
             INST_ID_DICT[formatted_proposal_id].add(inst_id)

@@ -108,7 +108,7 @@ def is_accepted_instrument_suffix(row):
         row:    an observation table row.
     """
     suffix = get_suffix(row)
-    instrument_id = get_instrument_id(row)
+    instrument_id = get_instrument_id_from_table_row(row)
     # For files like n4wl03fxq_raw.jpg with "--" will raise an error
     # return is_accepted(suffix, instrument_id)
     return suffix in ACCEPTED_SUFFIXES[instrument_id]
@@ -133,7 +133,7 @@ def is_targeted_visit(row, visit):
     format_term = get_format_term(filename)
     return get_visit(format_term) == str(visit)
 
-def get_instrument_id(row):
+def get_instrument_id_from_table_row(row):
     """Return the instrument id for a given product row.
 
     Input:

@@ -28,6 +28,10 @@ TRL_CHECKSUMS_FILE = 'trl_checksums.txt'
 # Instrument ids dictionary, keyed by propoposal id and store the list of instrument ids
 INST_ID_DICT = defaultdict(set)
 
+# Citation info dictionary, keyed by proposal id nad store the citation info of a
+# proposal id
+CITATION_INFO_DICT = {}
+
 # TODO: These are for schema csv & label, need to figure how to determine the schema
 # inventories and version
 PDS4_LIDVID = 'S,urn:nasa:pds:system_bundle:xml_schema:pds-xml_schema::1.19'
