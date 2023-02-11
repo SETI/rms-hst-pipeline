@@ -31,7 +31,6 @@ def finalize_hst_bundle(proposal_id, logger=None):
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
     # Generate the final document directory
-    # TODO: unccoment this step
     label_hst_document_directory(proposal_id, logger)
     # Generate the final schema directory
     label_hst_schema_directory(proposal_id, logger)
