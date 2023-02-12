@@ -29,10 +29,10 @@ parser = argparse.ArgumentParser(
     description="""query-hst-moving-targets: Perform mast query with given query
                 constraints.""")
 
-parser.add_argument('--proposal_ids', '-pid', nargs='+', type=str, default='',
+parser.add_argument('--proposal_ids', '--prog_id', nargs='+', type=str, default='',
     help='The proposal ids for the mast query')
 
-parser.add_argument('--instruments', '-inst', nargs='+', type=str, default='',
+parser.add_argument('--instruments', '-i', nargs='+', type=str, default='',
     help='The instruments for the mast query.')
 
 parser.add_argument('--start', type=str, action='store', default='',

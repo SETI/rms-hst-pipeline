@@ -23,10 +23,10 @@ parser = argparse.ArgumentParser(
     description="""retrieve-hst-visit: Retrieve all the identified files for a given
                 proposal id and visit.""")
 
-parser.add_argument('--proposal_id', '-pid', type=str, default='', required=True,
+parser.add_argument('--proposal_id', '--prog_id', type=str, default='', required=True,
     help='The proposal id for the mast query.')
 
-parser.add_argument('--visit', '-vi', type=str, default='', required=True,
+parser.add_argument('--visit', '--vi', type=str, default='', required=True,
     help='The two character visit of an observation.')
 
 parser.add_argument('--log', '-l', type=str, default='',

@@ -25,13 +25,13 @@ parser = argparse.ArgumentParser(
     description="""label-hst-products:productste and update PDS4 labels for HST data
                 products.""")
 
-parser.add_argument('--proposal_id', '-pid', type=str, default='',
+parser.add_argument('--proposal_id', '--prog_id', type=str, default='',
     help='The proposal id for the mast query.')
 
-parser.add_argument('--visit', '-vi', type=str, default='',
+parser.add_argument('--visit', '--vi', type=str, default='',
     help='The two character visit of an observation.')
 
-parser.add_argument('--path', '-p', type=str, action='store', default='',
+parser.add_argument('--path', type=str, action='store', default='',
     help="""The path to a directory containing a "logically complete" set of HST FITS
          files downloaded from MAST. "Logically complete" means that every file that
          a given file might  need to refer to is also in the same directory. A

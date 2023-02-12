@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(
     description="""finalize-hst-bundle: package a complete set of files in the staging
     directories as a new bundle or as updates to an existing bundle.""")
 
-parser.add_argument('--proposal_id', '-pid', type=str, default='', required=True,
+parser.add_argument('--proposal_id', '--prog_id', type=str, default='', required=True,
     help='The proposal id for the mast query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
