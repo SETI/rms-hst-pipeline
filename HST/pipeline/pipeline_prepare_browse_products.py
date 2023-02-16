@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(
     description="""prepare-browse-products: Prepare the browse products and their labels
                 and save them in the corresponding staging folders.""")
 
-parser.add_argument('--proposal_id', '--prog_id', type=str, default='', required=True,
+parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
     help='The proposal id for the mast query.')
 
 parser.add_argument('--visit', '--vi', type=str, default='', required=True,

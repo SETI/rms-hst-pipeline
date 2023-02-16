@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(
     description="""label-hst-products:productste and update PDS4 labels for HST data
                 products.""")
 
-parser.add_argument('--proposal_id', '--prog_id', type=str, default='',
+parser.add_argument('--proposal_id', '--prog-id', type=str, default='',
     help='The proposal id for the mast query.')
 
 parser.add_argument('--visit', '--vi', type=str, default='',

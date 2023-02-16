@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(
     description="""get-program-info: Retrieve the proposal files via a web query for a
                 given proposal id.""")
 
-parser.add_argument('--proposal_id', '--prog_id', type=str, default='', required=True,
+parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
     help='The proposal id for the mast query.')
 
 parser.add_argument('--log', '-l', type=str, default='',

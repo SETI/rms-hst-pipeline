@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(
     description="""query-hst-products: Perform mast query with a given proposal id and
                 download all TRL files for this HST program.""")
 
-parser.add_argument('--proposal_id', '--prog_id', type=str, default='', required=True,
+parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
     help='The proposal id for the mast query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
