@@ -48,20 +48,71 @@ def label_hst_context_directory(proposal_id, logger):
     context_dir = bundles_dir + '/context'
     os.makedirs(context_dir, exist_ok=True)
 
-    # Create context csv
-    collection_context_csv = context_dir + f'/{CSV_FILENAME}'
+    #  Collect data to construct data dictionary used for the context label
+    citation_info = get_citation_info(proposal_id, logger)
     inst_ids = get_instrument_id_set(proposal_id, logger)
-    # TODO: need to determine the version id for each entry in the csv
+
+    # get target identification
+    col_ctxt_label_path = context_dir + f'{COL_CTXT_LABEL}'
+    target_info = get_target_id_form_label(proposal_id, col_ctxt_label_path)
+
+     # Get label date
+    timetag = os.path.getmtime(__file__)
+    label_date = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
+
+    version_id = (1, 0)
+    col_ctxt_label_path = context_dir + f'/{COL_CTXT_LABEL}'
+    mod_history = get_mod_history_from_label(col_ctxt_label_path, version_id)
+
+    # Number of document inventory:
+    # num of target ids + 3 (inst, inst_host, investigation)
+    records_num = len(target_info) + 3
+
+    data_dict = {
+        'prop_id': proposal_id,
+        'collection_name': 'context',
+        'citation_info': citation_info,
+        'target_identifications': target_info,
+        'version_id': version_id,
+        'label_date': label_date,
+        'inst_id_li': list(inst_ids),
+        'csv_filename': CSV_FILENAME,
+        'records_num': records_num,
+        'mod_history': mod_history,
+    }
+
+    # Create context collection csv
+    create_context_collection_csv(proposal_id, context_dir, data_dict, logger)
+    # Create context collection label
+    create_context_collection_label(proposal_id, data_dict, logger)
+
+
+def create_context_collection_csv(proposal_id, context_dir, data_dict, logger):
+    """With a given proposal id, path to context dir and data dictionary, create
+    context collection csv in the final bundle.
+
+    Inputs:
+        proposal_id:    a proposal id.
+        context_dir:    context directory path.
+        data_dict:      data dictonary to fill in the label template.
+        logger:         pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    logger.info(f'Create context collection csv with proposal id: {proposal_id}')
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+
+    # Set collection csv filename
+    collection_context_csv = context_dir + f'/{CSV_FILENAME}'
+
+     # TODO: need to determine the version id for each entry in the csv
     collection_context_data = []
-    for inst in inst_ids:
+    for inst in data_dict['inst_id_li']:
         inst = inst.lower()
         inst_lidvid = f'S,urn:nasa:pds:context:instrument:hst.{inst}::1.0'.split(',')
         collection_context_data.append(inst_lidvid)
 
     # get target identification
-    col_ctxt_label_path = bundles_dir + f'/context/{COL_CTXT_LABEL}'
-    target_info = get_target_id_form_label(proposal_id, col_ctxt_label_path)
-
+    target_ids = data_dict['target_identifications']
 
     csv_entries = [
         'S,urn:nasa:pds:context:instrument_host:spacecraft.hst::1.0'.split(','),
@@ -69,26 +120,33 @@ def label_hst_context_directory(proposal_id, logger):
          + f'hst_{formatted_proposal_id}::1.0').split(',')
     ]
 
-    for targ in target_info:
+    for targ in target_ids:
         target = f'{targ["type"].lower()}.{targ["name"].lower()}'
         targ_ctxt_livid = f'S,urn:nasa:pds:context:target:{target}::1.0'.split(',')
         csv_entries.append(targ_ctxt_livid)
     collection_context_data += csv_entries
 
-    create_context_collection_csv(collection_context_csv, collection_context_data, logger)
+    create_csv(collection_context_csv, collection_context_data, logger)
 
-
-
-def create_context_collection_csv(csv_path, row_data, logger):
-    """With a given proposal id, create context collection csv in the final bundle.
+def create_context_collection_label(proposal_id, data_dict, logger):
+    """With a given proposal id, create context collection label in the final bundle.
 
     Inputs:
-        csv_path:   the path of the csv file.
-        row_data:   a list of row data to be written in the csv file. Each item of the
-                    list is a list of column values for the row.
-        logger:     pdslogger to use; None for default EasyLogger.
+        proposal_id:    a proposal id.
+        data_dict:      data dictonary to fill in the label template.
+        logger:         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
-    logger.info('Create context collection csv')
+    logger.info(f'Create context collection csv with proposal id: {proposal_id}')
 
-    create_csv(csv_path, row_data, logger)
+    # Create context collection label
+    logger.info('Create label for context collection using '
+                + f'templates/{COL_CTXT_LABEL_TEMPLATE}.')
+    # context collection label template path
+    col_ctxt_dir = os.path.dirname(os.path.abspath(__file__))
+    col_ctxt_template = (col_ctxt_dir + f'/../templates/{COL_CTXT_LABEL_TEMPLATE}')
+    # context collection label path
+    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
+    col_ctxt_label_path = bundles_dir + f'/context/{COL_CTXT_LABEL}'
+
+    create_xml_label(col_ctxt_template, col_ctxt_label_path, data_dict, logger)
