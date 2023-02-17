@@ -9,18 +9,14 @@ import shutil
 
 from hst_helper import (PDS4_LIDVID,
                         HST_LIDVID,
-                        DISP_LIDVID,
-                        INST_ID_DICT)
+                        DISP_LIDVID)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)
 from hst_helper.general_utils import (create_xml_label,
                                       create_csv,
                                       get_citation_info,
                                       get_instrument_id_set,
-                                      get_mod_history_from_old_label)
-
-from citations import Citation_Information
-from product_labels.xml_support import get_modification_history
+                                      get_mod_history_from_label)
 
 CSV_FILENAME = 'collection_schema.csv'
 COL_SCH_LABEL = 'collection_schema.xml'
@@ -48,7 +44,7 @@ def label_hst_schema_directory(proposal_id, logger):
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
     # Create schema directory
-    logger.info(f'Create directory directory for proposal id: {proposal_id}.')
+    logger.info(f'Create schema directory for proposal id: {proposal_id}.')
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     schema_dir = bundles_dir + '/schema'
     os.makedirs(schema_dir, exist_ok=True)
@@ -70,7 +66,7 @@ def label_hst_schema_directory(proposal_id, logger):
     # Get the mod history for schema collection label if it's already existed.
     version_id = (1, 0)
     col_sch_label_path = bundles_dir + f'/schema/{COL_SCH_LABEL}'
-    mod_history = get_mod_history_from_old_label(col_sch_label_path, version_id)
+    mod_history = get_mod_history_from_label(col_sch_label_path, version_id)
 
     # Get label date
     timetag = os.path.getmtime(__file__)

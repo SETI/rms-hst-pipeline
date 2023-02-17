@@ -15,7 +15,7 @@ from hst_helper.general_utils import (create_xml_label,
                                       create_csv,
                                       get_citation_info,
                                       get_instrument_id_set,
-                                      get_mod_history_from_old_label)
+                                      get_mod_history_from_label)
 
 from citations import Citation_Information
 from product_labels.xml_support import get_modification_history
@@ -47,8 +47,8 @@ def label_hst_document_directory(proposal_id, logger):
 
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
-    # Create documents directory and move proposal files over
-    logger.info(f'Create documents directory for proposal id: {proposal_id}.')
+    # Create document directory and move proposal files over
+    logger.info(f'Create document directory for proposal id: {proposal_id}.')
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     document_dir = bundles_dir + f'/document/{formatted_proposal_id}'
@@ -64,7 +64,7 @@ def label_hst_document_directory(proposal_id, logger):
             proposal_files_li.append((basename, file))
             fp = pipeline_dir + f'/{file}'
 
-            # Move the proposal files and program info file to the documents directory
+            # Move the proposal files and program info file to the document directory
             shutil.copy(fp, document_dir + f'/{file}')
             # shutil.move(fp, document_dir + f'/{file}')
 
@@ -97,7 +97,7 @@ def label_hst_document_directory(proposal_id, logger):
 
     # Get the mod history for document collection label if it's already existed.
     col_doc_label_path = bundles_dir + f'/document/{COL_DOC_LABEL}'
-    mod_history = get_mod_history_from_old_label(col_doc_label_path, version_id)
+    mod_history = get_mod_history_from_label(col_doc_label_path, version_id)
 
     data_dict = {
         'prop_id': proposal_id,
@@ -151,9 +151,9 @@ def create_document_collection_csv(proposal_id, data_dict, logger):
     inst_ids = get_instrument_id_set(proposal_id, logger)
     for inst in inst_ids:
         inst = inst.lower()
-        data_hb_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-dhb\r\n'.split(',')
+        data_hb_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-dhb'.split(',')
         collection_data.append(data_hb_lid)
-        inst_hb_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-ihb\r\n'.split(',')
+        inst_hb_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-ihb'.split(',')
         collection_data.append(inst_hb_lid)
 
     create_csv(document_collection_dir, collection_data, logger)

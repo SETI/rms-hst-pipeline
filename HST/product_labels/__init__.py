@@ -238,8 +238,6 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         ##################################################################################
 
         previous_fullpath = old_fullpath_vs_basename.get(basename, '')
-        print("==========+")
-        print(previous_fullpath)
         if previous_fullpath:
             with open(previous_fullpath[:-5] + LABEL_SUFFIX) as f:
                 xml_content = f.read()

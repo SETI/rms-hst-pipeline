@@ -9,12 +9,14 @@ import pdslogger
 from hst_helper import (CITATION_INFO_DICT,
                         DOCUMENT_EXT,
                         INST_ID_DICT,
-                        PROGRAM_INFO_FILE)
+                        PROGRAM_INFO_FILE,
+                        TARG_ID_DICT)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path,
                                  get_instrument_id_from_fname)
 
-from product_labels.xml_support import get_modification_history
+from product_labels.xml_support import (get_modification_history,
+                                        get_target_identifications)
 from citations import Citation_Information
 from xmltemplate import XmlTemplate
 
@@ -77,7 +79,7 @@ def get_citation_info(proposal_id, logger):
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
 
     for file in os.listdir(pipeline_dir):
-        basename, _, ext = file.rpartition('.')
+        _, _, ext = file.rpartition('.')
         if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
             fp = pipeline_dir + f'/{file}'
             if formatted_proposal_id not in CITATION_INFO_DICT:
@@ -110,7 +112,7 @@ def get_instrument_id_set(proposal_id, logger):
 
     return INST_ID_DICT[formatted_proposal_id]
 
-def get_mod_history_from_old_label(prev_label_path, current_version_id):
+def get_mod_history_from_label(prev_label_path, current_version_id):
     """Compare current version id with the one in the exisiting (old) label. Return a
     list of modification history to be used in new label.
 
@@ -128,3 +130,41 @@ def get_mod_history_from_old_label(prev_label_path, current_version_id):
                 mod_history = modification_history
 
     return mod_history
+
+def get_target_id_form_label(proposal_id, prev_label_path):
+    """Get the target identification info from the exisitng label, if there is no
+    existing label, walk through all downloaded files from Mast, store data in the
+    TARG_ID_DICT, and return a lsit of target ids for a given propsal id.
+
+    Inputs:
+        proposal_id:          a proposal id.
+        prev_label_path:      the path of the exisiting xml label
+    """
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    if formatted_proposal_id not in TARG_ID_DICT:
+        if os.path.exists(prev_label_path):
+            with open(prev_label_path) as f:
+                xml_content = f.read()
+                # use the old identification if available
+                if xml_content:
+                        target_ids = get_target_identifications(xml_content)
+                        for targ in target_ids:
+                            if targ not in TARG_ID_DICT[formatted_proposal_id]:
+                                TARG_ID_DICT[formatted_proposal_id].append(targ)
+        else:
+            # TODO: might need to walk through bundles dir depending on if the files have
+            # been moved to the bundles dir.
+            # Walk through all the downloaded files from MAST in staging directory
+            files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+            for root, _, files in os.walk(files_dir):
+                for file in files:
+                    if file.endswith('.xml'):
+                        fp = os.path.join(root, file)
+                        with open(fp) as f:
+                            xml_content = f.read()
+                            target_ids = get_target_identifications(xml_content)
+                            for targ in target_ids:
+                                if targ not in TARG_ID_DICT[formatted_proposal_id]:
+                                    TARG_ID_DICT[formatted_proposal_id].append(targ)
+
+    return TARG_ID_DICT[formatted_proposal_id]
