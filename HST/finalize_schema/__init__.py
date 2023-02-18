@@ -13,6 +13,7 @@ from hst_helper import (PDS4_LIDVID,
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)
 from hst_helper.general_utils import (create_xml_label,
+                                      create_collection_label,
                                       create_csv,
                                       get_citation_info,
                                       get_instrument_id_set,
@@ -85,7 +86,8 @@ def label_hst_schema_directory(proposal_id, logger):
     }
 
     # Create schema collection label
-    create_schema_collection_label(proposal_id, data_dict, logger)
+    create_collection_label(proposal_id, 'schema', data_dict,
+                            COL_SCH_LABEL, COL_SCH_LABEL_TEMPLATE, logger)
 
 def create_schema_collection_csv(csv_path, row_data, logger):
     """With a given proposal id, create schema collection csv in the final bundle.
@@ -100,26 +102,3 @@ def create_schema_collection_csv(csv_path, row_data, logger):
     logger.info('Create schema collection csv')
 
     create_csv(csv_path, row_data, logger)
-
-def create_schema_collection_label(proposal_id, data_dict, logger):
-    """With a given proposal id, create schema collection label in the final bundle.
-
-    Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      data dictonary to fill in the label template.
-        logger:         pdslogger to use; None for default EasyLogger.
-    """
-    logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Create schema collection csv with proposal id: {proposal_id}')
-
-    # Create schema collection label
-    logger.info('Create label for schema collection using '
-                + f'templates/{COL_SCH_LABEL_TEMPLATE}.')
-    # schema collection label template path
-    col_sch_dir = os.path.dirname(os.path.abspath(__file__))
-    col_sch_template = (col_sch_dir + f'/../templates/{COL_SCH_LABEL_TEMPLATE}')
-    # schema collection label path
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    col_sch_label_path = bundles_dir + f'/schema/{COL_SCH_LABEL}'
-
-    create_xml_label(col_sch_template, col_sch_label_path, data_dict, logger)

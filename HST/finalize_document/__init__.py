@@ -12,6 +12,7 @@ from hst_helper import (DOCUMENT_EXT,
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)
 from hst_helper.general_utils import (create_xml_label,
+                                      create_collection_label,
                                       create_csv,
                                       get_citation_info,
                                       get_instrument_id_set,
@@ -124,7 +125,8 @@ def label_hst_document_directory(proposal_id, logger):
     # Create document collection csv
     create_document_collection_csv(proposal_id, data_dict, logger)
     # Create document collection label
-    create_document_collection_label(proposal_id, data_dict, logger)
+    create_collection_label(proposal_id, 'document', data_dict,
+                            COL_DOC_LABEL, COL_DOC_LABEL_TEMPLATE, logger)
 
 def create_document_collection_csv(proposal_id, data_dict, logger):
     """With a given proposal id, create document collection csv in the final bundle.
@@ -157,26 +159,3 @@ def create_document_collection_csv(proposal_id, data_dict, logger):
         collection_data.append(inst_hb_lid)
 
     create_csv(document_collection_dir, collection_data, logger)
-
-def create_document_collection_label(proposal_id, data_dict, logger):
-    """With a given proposal id, create document collection label in the final bundle.
-
-    Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      data dictonary to fill in the label template.
-        logger:         pdslogger to use; None for default EasyLogger.
-    """
-    logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Create document collection csv with proposal id: {proposal_id}')
-
-    # Create document collection label
-    logger.info('Create label for document collection using '
-                + f'templates/{COL_DOC_LABEL_TEMPLATE}.')
-    # Document collection label template path
-    col_doc_dir = os.path.dirname(os.path.abspath(__file__))
-    col_doc_template = (col_doc_dir + f'/../templates/{COL_DOC_LABEL_TEMPLATE}')
-    # Document collection label path
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    col_doc_label_path = bundles_dir + f'/document/{COL_DOC_LABEL}'
-
-    create_xml_label(col_doc_template,col_doc_label_path, data_dict, logger)

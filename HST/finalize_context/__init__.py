@@ -10,11 +10,12 @@ import shutil
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)
 from hst_helper.general_utils import (create_xml_label,
+                                      create_collection_label,
                                       create_csv,
                                       get_citation_info,
                                       get_instrument_id_set,
                                       get_mod_history_from_label,
-                                      get_target_id_form_label)
+                                      get_target_id_from_label)
 
 CSV_FILENAME = 'collection_context.csv'
 COL_CTXT_LABEL = 'collection_context.xml'
@@ -54,7 +55,7 @@ def label_hst_context_directory(proposal_id, logger):
 
     # get target identification
     col_ctxt_label_path = context_dir + f'{COL_CTXT_LABEL}'
-    target_info = get_target_id_form_label(proposal_id, col_ctxt_label_path)
+    target_info = get_target_id_from_label(proposal_id, col_ctxt_label_path)
 
      # Get label date
     timetag = os.path.getmtime(__file__)
@@ -84,7 +85,8 @@ def label_hst_context_directory(proposal_id, logger):
     # Create context collection csv
     create_context_collection_csv(proposal_id, context_dir, data_dict, logger)
     # Create context collection label
-    create_context_collection_label(proposal_id, data_dict, logger)
+    create_collection_label(proposal_id, 'context', data_dict,
+                            COL_CTXT_LABEL, COL_CTXT_LABEL_TEMPLATE, logger)
 
 
 def create_context_collection_csv(proposal_id, context_dir, data_dict, logger):
@@ -127,26 +129,3 @@ def create_context_collection_csv(proposal_id, context_dir, data_dict, logger):
     collection_context_data += csv_entries
 
     create_csv(collection_context_csv, collection_context_data, logger)
-
-def create_context_collection_label(proposal_id, data_dict, logger):
-    """With a given proposal id, create context collection label in the final bundle.
-
-    Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      data dictonary to fill in the label template.
-        logger:         pdslogger to use; None for default EasyLogger.
-    """
-    logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Create context collection csv with proposal id: {proposal_id}')
-
-    # Create context collection label
-    logger.info('Create label for context collection using '
-                + f'templates/{COL_CTXT_LABEL_TEMPLATE}.')
-    # context collection label template path
-    col_ctxt_dir = os.path.dirname(os.path.abspath(__file__))
-    col_ctxt_template = (col_ctxt_dir + f'/../templates/{COL_CTXT_LABEL_TEMPLATE}')
-    # context collection label path
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    col_ctxt_label_path = bundles_dir + f'/context/{COL_CTXT_LABEL}'
-
-    create_xml_label(col_ctxt_template, col_ctxt_label_path, data_dict, logger)

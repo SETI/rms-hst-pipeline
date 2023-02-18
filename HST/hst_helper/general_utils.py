@@ -20,6 +20,33 @@ from product_labels.xml_support import (get_modification_history,
 from citations import Citation_Information
 from xmltemplate import XmlTemplate
 
+def create_collection_label(
+    proposal_id, cateogry, data_dict, label_name, template_name, logger
+):
+    """With a given proposal id, create collection label in the final bundle.
+
+    Inputs:
+        proposal_id:    a proposal id.
+        category:       collection category: document,, and context.
+        data_dict:      data dictonary to fill in the label template.
+        label_name:     the name of the collection label
+        template:       the name of the template being used.
+        logger:         pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    logger.info(f'Create collection csv with proposal id: {proposal_id}')
+
+    # Create collection label
+    logger.info('Create label for collection using '
+                + f'templates/{template_name}.')
+    # Collection label template path
+    col_dir = os.path.dirname(os.path.abspath(__file__))
+    col_template = (col_dir + f'/../templates/{template_name}')
+    # Collection label path
+    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
+    col_label_path = bundles_dir + f'/{cateogry}/{label_name}'
+
+    create_xml_label(col_template, col_label_path, data_dict, logger)
 
 def create_xml_label(template_path, label_path, data_dict, logger):
     """Create xml label with given template path, label path, and data dictionary.
@@ -131,7 +158,7 @@ def get_mod_history_from_label(prev_label_path, current_version_id):
 
     return mod_history
 
-def get_target_id_form_label(proposal_id, prev_label_path):
+def get_target_id_from_label(proposal_id, prev_label_path):
     """Get the target identification info from the exisitng label, if there is no
     existing label, walk through all downloaded files from Mast, store data in the
     TARG_ID_DICT, and return a lsit of target ids for a given propsal id.
