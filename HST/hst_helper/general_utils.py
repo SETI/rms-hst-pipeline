@@ -10,18 +10,20 @@ from hst_helper import (CITATION_INFO_DICT,
                         DOCUMENT_EXT,
                         INST_ID_DICT,
                         PROGRAM_INFO_FILE,
-                        TARG_ID_DICT)
+                        TARG_ID_DICT,
+                        TIME_DICT)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path,
                                  get_instrument_id_from_fname)
 
 from product_labels.xml_support import (get_modification_history,
-                                        get_target_identifications)
+                                        get_target_identifications,
+                                        get_time_coordinates)
 from citations import Citation_Information
 from xmltemplate import XmlTemplate
 
 def create_collection_label(
-    proposal_id, cateogry, data_dict, label_name, template_name, logger
+    proposal_id, cateogry, data_dict, label_name, template_name, logger, target_dir=None
 ):
     """With a given proposal id, create collection label in the final bundle.
 
@@ -31,6 +33,7 @@ def create_collection_label(
         data_dict:      data dictonary to fill in the label template.
         label_name:     the name of the collection label
         template:       the name of the template being used.
+        target_dir:     the target dir used to obtain the roll up info.
         logger:         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
@@ -45,6 +48,11 @@ def create_collection_label(
     # Collection label path
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     col_label_path = bundles_dir + f'/{cateogry}/{label_name}'
+
+    if target_dir is not None:
+        start_date, stop_date = get_roll_up_time_from_label(proposal_id, target_dir)
+        data_dict['start_date'] = start_date
+        data_dict['stop_date'] = stop_date
 
     create_xml_label(col_template, col_label_path, data_dict, logger)
 
@@ -158,14 +166,15 @@ def get_mod_history_from_label(prev_label_path, current_version_id):
 
     return mod_history
 
-def get_target_id_from_label(proposal_id, prev_label_path):
+def get_target_id_from_label(proposal_id, prev_label_path, target_dir):
     """Get the target identification info from the exisitng label, if there is no
-    existing label, walk through all downloaded files from Mast, store data in the
+    existing label, walk through all files from target_dir, store data in the
     TARG_ID_DICT, and return a lsit of target ids for a given propsal id.
 
     Inputs:
-        proposal_id:          a proposal id.
-        prev_label_path:      the path of the exisiting xml label
+        proposal_id:        a proposal id.
+        prev_label_path:    the path of the exisiting xml label
+        target_dir:         the target directory to get the roll up info.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     if formatted_proposal_id not in TARG_ID_DICT:
@@ -179,11 +188,8 @@ def get_target_id_from_label(proposal_id, prev_label_path):
                             if targ not in TARG_ID_DICT[formatted_proposal_id]:
                                 TARG_ID_DICT[formatted_proposal_id].append(targ)
         else:
-            # TODO: might need to walk through bundles dir depending on if the files have
-            # been moved to the bundles dir.
-            # Walk through all the downloaded files from MAST in staging directory
-            files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
-            for root, _, files in os.walk(files_dir):
+            # Walk through all files from target dir
+            for root, _, files in os.walk(target_dir):
                 for file in files:
                     if file.endswith('.xml'):
                         fp = os.path.join(root, file)
@@ -195,3 +201,44 @@ def get_target_id_from_label(proposal_id, prev_label_path):
                                     TARG_ID_DICT[formatted_proposal_id].append(targ)
 
     return TARG_ID_DICT[formatted_proposal_id]
+
+def get_roll_up_time_from_label(proposal_id, target_dir):
+    """Get the roll up start and start date by walking through all files from target_dir,
+    store data in the TIME_DICT, and return a start & stop date tuple.
+
+    Inputs:
+        proposal_id:        a proposal id.
+        prev_label_path:    the path of the exisiting xml label
+        target_dir:         the target directory to get the roll up info.
+    """
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    if formatted_proposal_id not in TIME_DICT:
+        min_start = None
+        max_stop = None
+        for root, _, files in os.walk(target_dir):
+            for file in files:
+                if file.endswith('.xml'):
+                    fp = os.path.join(root, file)
+                    with open(fp) as f:
+                        xml_content = f.read()
+                        start, stop = get_time_coordinates(xml_content)
+                        min_start = start if min_start is None else min(min_start, start)
+                        max_stop = stop if max_stop is None else max(max_stop, stop)
+
+        start_date = date_time_to_date(min_start)
+        stop_date = date_time_to_date(max_stop)
+        TIME_DICT[formatted_proposal_id] = (start_date, stop_date)
+
+    return TIME_DICT[formatted_proposal_id]
+
+def date_time_to_date(date_time: str) -> str:
+    """
+    Take in a date_time string and return a date string, for exampel:
+    "2005-01-19T15:41:05Z" to "2005-01-19"
+    """
+    try:
+        idx = date_time.index("T")
+    except:
+        raise ValueError("Failed to convert from date_time to date")
+
+    return date_time[:idx]

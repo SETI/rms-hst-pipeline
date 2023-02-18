@@ -20,6 +20,7 @@ from hst_helper.general_utils import (create_xml_label,
 CSV_FILENAME = 'collection_context.csv'
 COL_CTXT_LABEL = 'collection_context.xml'
 COL_CTXT_LABEL_TEMPLATE = 'CONTEXT_COLLECTION_LABEL.xml'
+INV_LABEL_TEMPLATE = 'INVESTIGATION_LABEL.xml'
 
 def label_hst_context_directory(proposal_id, logger):
     """With a given proposal id, create context directory in the final bundle.
@@ -51,13 +52,25 @@ def label_hst_context_directory(proposal_id, logger):
 
     #  Collect data to construct data dictionary used for the context label
     citation_info = get_citation_info(proposal_id, logger)
+    formatted_title = (citation_info.title
+        + ", HST Cycle "
+        + str(citation_info.cycle)
+        + " Program "
+        + str(citation_info.propno)
+        + ", "
+        + citation_info.publication_year
+        + "."
+    )
     inst_ids = get_instrument_id_set(proposal_id, logger)
 
     # get target identification
     col_ctxt_label_path = context_dir + f'{COL_CTXT_LABEL}'
-    target_info = get_target_id_from_label(proposal_id, col_ctxt_label_path)
+    # TODO: might need to walk through bundles dir depending on if the files have
+    # been moved to the bundles dir.
+    files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+    target_info = get_target_id_from_label(proposal_id, col_ctxt_label_path, files_dir)
 
-     # Get label date
+     # Get label dat
     timetag = os.path.getmtime(__file__)
     label_date = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
 
@@ -73,6 +86,7 @@ def label_hst_context_directory(proposal_id, logger):
         'prop_id': proposal_id,
         'collection_name': 'context',
         'citation_info': citation_info,
+        'formatted_title': formatted_title,
         'target_identifications': target_info,
         'version_id': version_id,
         'label_date': label_date,
@@ -88,6 +102,10 @@ def label_hst_context_directory(proposal_id, logger):
     create_collection_label(proposal_id, 'context', data_dict,
                             COL_CTXT_LABEL, COL_CTXT_LABEL_TEMPLATE, logger)
 
+    # Create investigation label
+    inv_label = f'individual.hst_{formatted_proposal_id}.xml'
+    create_collection_label(proposal_id, 'context', data_dict,
+                            inv_label, INV_LABEL_TEMPLATE, logger, files_dir)
 
 def create_context_collection_csv(proposal_id, context_dir, data_dict, logger):
     """With a given proposal id, path to context dir and data dictionary, create
