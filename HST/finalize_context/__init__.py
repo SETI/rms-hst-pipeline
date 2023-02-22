@@ -1,11 +1,9 @@
 ##########################################################################################
 # finalize_context/__init__.py
 ##########################################################################################
-import csv
 import datetime
 import os
 import pdslogger
-import shutil
 
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)

@@ -231,10 +231,13 @@ def get_roll_up_time_from_label(proposal_id, target_dir):
 
     return TIME_DICT[formatted_proposal_id]
 
-def date_time_to_date(date_time: str) -> str:
+def date_time_to_date(date_time):
     """
     Take in a date_time string and return a date string, for exampel:
     "2005-01-19T15:41:05Z" to "2005-01-19"
+
+    Inputs:
+        date_time:        a date time string like "2005-01-19T15:41:05Z".
     """
     try:
         idx = date_time.index("T")

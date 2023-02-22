@@ -5,7 +5,8 @@ import os
 import pdslogger
 import shutil
 
-from product_labels.suffix_info import ACCEPTED_BROWSE_SUFFIXES
+from product_labels.suffix_info import (ACCEPTED_BROWSE_SUFFIXES,
+                                        ACCEPTED_SUFFIXES)
 
 from hst_helper import INST_ID_DICT
 from hst_helper.fs_utils import (get_formatted_proposal_id,
@@ -43,12 +44,21 @@ def prepare_browse_products(proposal_id, visit, logger=None):
             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
             INST_ID_DICT[formatted_proposal_id].add(inst_id)
 
-            # Copy & save browse products under browse_{inst_id}_{suffix}
-            if inst_id is not None and suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id]:
-                browse_dir = get_program_dir_path(proposal_id, None, 'staging')
-                browse_dir += f"/browse_{inst_id.lower()}_{suffix}/visit_{visit}/"
-                os.makedirs(browse_dir, exist_ok=True)
-                logger.info(f'Move browse products to: {browse_dir+file}')
-                shutil.copy(fp, browse_dir+file)
-
-    return
+            # Copy & save browse products under browse_{inst_id}_{suffix} and rest of
+            # products under data_{inst_id}_{suffix}
+            # TODO: maybe use move instead of copy and remove empty folder (?)
+            if inst_id is not None:
+                if suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id]:
+                    browse_dir = get_program_dir_path(proposal_id, None, 'staging')
+                    browse_dir += f"/browse_{inst_id.lower()}_{suffix}/visit_{visit}/"
+                    os.makedirs(browse_dir, exist_ok=True)
+                    logger.info(f'Move browse products to: {browse_dir+file}')
+                    shutil.copy(fp, browse_dir+file)
+                    # shutil.move(fp, browse_dir+file)
+                elif suffix in ACCEPTED_SUFFIXES[inst_id]:
+                    data_dir = get_program_dir_path(proposal_id, None, 'staging')
+                    data_dir += f"/data_{inst_id.lower()}_{suffix}/visit_{visit}/"
+                    os.makedirs(data_dir, exist_ok=True)
+                    logger.info(f'Move data products to: {data_dir+file}')
+                    shutil.copy(fp, data_dir+file)
+                    # shutil.move(fp, data_dir+file)
