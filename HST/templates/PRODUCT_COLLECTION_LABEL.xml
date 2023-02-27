@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch"
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1"
+                xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                                    https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd">
+
+$ONCE(formatted_prop_id=str(prop_id).zfill(5))
+$ONCE(collection_type = "Miscellaneous" if processing_level == "Ancillary" else "Data")
+    <Identification_Area>
+        <logical_identifier>
+            urn:nasa:pds:hst_$formatted_prop_id$:$collection_name$
+        </logical_identifier>
+        <version_id>$version_id[0]$.$version_id[1]$</version_id>
+        <title>$collection_title$</title>
+        <information_model_version>1.15.0.0</information_model_version>
+        <product_class>Product_Collection</product_class>
+        <Citation_Information>
+            <author_list>$citation_info.author_list$</author_list>
+            <publication_year>$citation_info.publication_year$</publication_year>
+            <description>$citation_info.description$</description>
+        </Citation_Information>
+        <Modification_History>
+            $FOR(mod=mod_history)
+            <Modification_Detail>
+                <modification_date>$mod[0]$</modification_date>
+                <version_id>$mod[1][0]$.$mod[1][1]$</version_id>
+                <description>
+                    $WRAP(10, 90, mod[2])$
+                </description>
+            </Modification_Detail>
+            $END_FOR
+            <Modification_Detail>
+                <modification_date>$label_date$</modification_date>
+                <version_id>$version_id[0]$.$version_id[1]$</version_id>
+                <description>
+                $IF(version_id == (1,0))
+                    Initial PDS4 version
+                $ELSE
+                    Context version: $version_id[0]$.$version_id[1]$
+                $END_IF
+                </description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+$IF("miscellaneous" not in collection_name)
+    <Context_Area>
+        <Time_Coordinates>
+            <start_date_time>$start_date_time$</start_date_time>
+            <stop_date_time>$stop_date_time$</stop_date_time>
+        </Time_Coordinates>
+        <Primary_Result_Summary>
+            <purpose>Science</purpose>
+            <processing_level>$processing_level$</processing_level>
+            <description>
+                $WRAP(8, 90, collection_title)$
+            </description>
+            <Science_Facets>
+            $FOR(w=wavelength_ranges)
+                <wavelength_range>$w$</wavelength_range>
+            $END_FOR
+                <discipline_name>Ring-Moon Systems</discipline_name>
+            </Science_Facets>
+        </Primary_Result_Summary>
+        <Investigation_Area>
+            <name>HST observing program $prop_id$</name>
+            <type>Individual Investigation</type>
+            <Internal_Reference>
+            <lidvid_reference>
+                urn:nasa:pds:context:investigation:individual.hst_$formatted_prop_id$::$version_id[0]$.$version_id[1]$
+            </lidvid_reference>
+            <reference_type>collection_to_investigation</reference_type>
+            </Internal_Reference>
+        </Investigation_Area>
+        <Observing_System>
+            <name>Hubble Space Telescope $instrument_name$</name>
+            <Observing_System_Component>
+            <name>Hubble Space Telescope</name>
+            <type>Host</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+                <reference_type>is_instrument_host</reference_type>
+            </Internal_Reference>
+            </Observing_System_Component>
+            <Observing_System_Component>
+            <name>$instrument_name$</name>
+            <type>Instrument</type>
+            <Internal_Reference>
+                <lid_reference>urn:nasa:pds:context:instrument:hst.$inst_id$</lid_reference>
+                <reference_type>is_instrument</reference_type>
+            </Internal_Reference>
+            </Observing_System_Component>
+        </Observing_System>
+        <Target_Identification>
+            <name>Uranus</name>
+            <type>Planet</type>
+            <Internal_Reference>
+            <lid_reference>urn:nasa:pds:context:target:planet.uranus</lid_reference>
+            <reference_type>collection_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+    $FOR(target=target_identifications)
+        <Target_Identification>
+            <name>$target[0]$</name>$NOESCAPE("" if target[0] != "UNK" else "  <!--Unknown target-->")$
+        $FOR(alt=target[1])
+            <alternate_designation>$alt$</alternate_designation>
+        $END_FOR
+            <type>$target[2]$</type>
+        $IF(target[3])
+            <description>
+        $FOR(rec=target[3])
+            $rec$
+        $END_FOR
+            </description>
+        $END_IF
+            <Internal_Reference>
+                <lid_reference>
+                $target[4]$
+                </lid_reference>
+                <reference_type>data_to_target</reference_type>
+            </Internal_Reference>
+        </Target_Identification>
+    $END_FOR
+    </Context_Area>
+    <Reference_List>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id$-dhb</lid_reference>
+            <reference_type>collection_to_document</reference_type>
+            <comment>The Data Handbook for $inst_id.upper()$</comment>
+        </Internal_Reference>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id$-ihb</lid_reference>
+            <reference_type>collection_to_document</reference_type>
+            <comment>The Instrument Handbook for $inst_id.upper()$</comment>
+        </Internal_Reference>
+    </Reference_List>
+$END_IF
+    <Collection>
+        <collection_type>$collection_type$</collection_type>
+    </Collection>
+    <File_Area_Inventory>
+        <File>
+            <file_name>collection_$collection_name$.csv</file_name>
+        </File>
+        <Inventory>
+            <offset unit="byte">0</offset>
+            <parsing_standard_id>PDS DSV 1</parsing_standard_id>
+            <records>$records_num$</records>
+            <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
+            <field_delimiter>Comma</field_delimiter>
+            <Record_Delimited>
+            <fields>2</fields>
+            <groups>0</groups>
+            <Field_Delimited>
+                <name>Member Status</name>
+                <field_number>1</field_number>
+                <data_type>ASCII_String</data_type>
+                <maximum_field_length unit="byte">1</maximum_field_length>
+            </Field_Delimited>
+            <Field_Delimited>
+                <name>LIDVID_LID</name>
+                <field_number>2</field_number>
+                <data_type>ASCII_LIDVID_LID</data_type>
+                <maximum_field_length unit="byte">255</maximum_field_length>
+            </Field_Delimited>
+            </Record_Delimited>
+            <reference_type>inventory_has_member_product</reference_type>
+        </Inventory>
+    </File_Area_Inventory>
+</Product_Collection>

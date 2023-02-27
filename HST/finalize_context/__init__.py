@@ -68,7 +68,7 @@ def label_hst_context_directory(proposal_id, logger):
     files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
     target_info = get_target_id_from_label(proposal_id, col_ctxt_label_path, files_dir)
 
-     # Get label dat
+    # Get label dat
     timetag = os.path.getmtime(__file__)
     label_date = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
 

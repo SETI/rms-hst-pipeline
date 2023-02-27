@@ -215,6 +215,40 @@ def get_primary_result_summary(xml_content):
 
     return (purposes, processing_levels, wavelength_ranges, domains)
 
+INST_PARAMS = re.compile(r'</?hst:Instrument_Parameters>')
+INST_ID = re.compile(r'</?hst:instrument_id>')
+CHANNEL_ID = re.compile(r'</?hst:channel_id>')
+DETECTOR_ID = re.compile(r'</?hst:detector_id>')
+OBS_TYPE = re.compile(r'</?hst:observation_type>')
+
+def get_instrument_params(xml_content):
+    """Quickly retrieve the instrument params from the content of an XML label.
+
+    Input:
+        xml_content     the full content of the XML label, as a single character string.
+
+    Return:             a tuple (inst_id, channel_id, detector_id, obs_type)
+    """
+
+    # Isolate the text between "<Time_Coordinates>" and "</Time_Coordinates>"
+    parts = INST_PARAMS.split(xml_content)
+    text = parts[1]
+
+    # Extract the fields from each Time_Coordinates object
+    parts = INST_ID.split(text)
+    inst_id = parts[1].strip()
+
+    parts = CHANNEL_ID.split(text)
+    channel_id = parts[1].strip()
+
+    parts = DETECTOR_ID.split(text)
+    detector_id = parts[1].strip()
+
+    parts = OBS_TYPE.split(text)
+    obs_type = parts[1].strip()
+
+    return (inst_id, channel_id, detector_id, obs_type)
+
 # Probably not needed
 # def labels_are_equivalent(new_content, old_content):
 #     """Compare the content of two XML labels and return True if they are functionally
@@ -256,4 +290,3 @@ def get_primary_result_summary(xml_content):
 #     return new_words == old_words
 
 ##########################################################################################
-

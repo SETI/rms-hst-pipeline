@@ -16,25 +16,28 @@ from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path,
                                  get_instrument_id_from_fname)
 
-from product_labels.xml_support import (get_modification_history,
+from product_labels.xml_support import (get_instrument_params,
+                                        get_modification_history,
+                                        get_primary_result_summary,
                                         get_target_identifications,
                                         get_time_coordinates)
 from citations import Citation_Information
 from xmltemplate import XmlTemplate
 
 def create_collection_label(
-    proposal_id, cateogry, data_dict, label_name, template_name, logger, target_dir=None
+    proposal_id, collection_name, data_dict,
+    label_name, template_name, logger, target_dir=None
 ):
     """With a given proposal id, create collection label in the final bundle.
 
     Inputs:
-        proposal_id:    a proposal id.
-        category:       collection category: document,, and context.
-        data_dict:      data dictonary to fill in the label template.
-        label_name:     the name of the collection label
-        template:       the name of the template being used.
-        target_dir:     the target dir used to obtain the roll up info.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id:        a proposal id.
+        collection_name:    collection name in the bundles.
+        data_dict:          data dictonary to fill in the label template.
+        label_name:         the name of the collection label
+        template:           the name of the template being used.
+        logger:             pdslogger to use; None for default EasyLogger.
+        target_dir:         the target dir used to obtain the roll up info.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create collection csv with proposal id: {proposal_id}')
@@ -47,12 +50,15 @@ def create_collection_label(
     col_template = (col_dir + f'/../templates/{template_name}')
     # Collection label path
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    col_label_path = bundles_dir + f'/{cateogry}/{label_name}'
+    col_label_path = bundles_dir + f'/{collection_name}/{label_name}'
 
+    # For roll up info
     if target_dir is not None:
-        start_date, stop_date = get_roll_up_time_from_label(proposal_id, target_dir)
-        data_dict['start_date'] = start_date
-        data_dict['stop_date'] = stop_date
+        min_start, max_stop = get_roll_up_time_from_label(proposal_id, target_dir)
+        data_dict['start_date_time'] = min_start
+        data_dict['stop_date_time'] = max_stop
+        data_dict['start_date'] = date_time_to_date(min_start) if min_start else None
+        data_dict['stop_date'] = date_time_to_date(max_stop) if max_stop else None
 
     create_xml_label(col_template, col_label_path, data_dict, logger)
 
@@ -191,7 +197,7 @@ def get_target_id_from_label(proposal_id, prev_label_path, target_dir):
             # Walk through all files from target dir
             for root, _, files in os.walk(target_dir):
                 for file in files:
-                    if file.endswith('.xml'):
+                    if not file.startswith('collection_') and file.endswith('.xml'):
                         fp = os.path.join(root, file)
                         with open(fp) as f:
                             xml_content = f.read()
@@ -208,16 +214,17 @@ def get_roll_up_time_from_label(proposal_id, target_dir):
 
     Inputs:
         proposal_id:        a proposal id.
-        prev_label_path:    the path of the exisiting xml label
-        target_dir:         the target directory to get the roll up info.
+        target_dir:         the targeted labels directory to get the roll up info.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    if formatted_proposal_id not in TIME_DICT:
+    _, _, collection_name = target_dir.rpartition('/')
+    if (formatted_proposal_id not in TIME_DICT or
+        collection_name not in TIME_DICT[formatted_proposal_id]):
         min_start = None
         max_stop = None
         for root, _, files in os.walk(target_dir):
             for file in files:
-                if file.endswith('.xml'):
+                if not file.startswith('collection_') and file.endswith('.xml'):
                     fp = os.path.join(root, file)
                     with open(fp) as f:
                         xml_content = f.read()
@@ -225,11 +232,9 @@ def get_roll_up_time_from_label(proposal_id, target_dir):
                         min_start = start if min_start is None else min(min_start, start)
                         max_stop = stop if max_stop is None else max(max_stop, stop)
 
-        start_date = date_time_to_date(min_start)
-        stop_date = date_time_to_date(max_stop)
-        TIME_DICT[formatted_proposal_id] = (start_date, stop_date)
+        TIME_DICT[formatted_proposal_id][collection_name] = (min_start, max_stop)
 
-    return TIME_DICT[formatted_proposal_id]
+    return TIME_DICT[formatted_proposal_id][collection_name]
 
 def date_time_to_date(date_time):
     """
@@ -245,3 +250,57 @@ def date_time_to_date(date_time):
         raise ValueError("Failed to convert from date_time to date")
 
     return date_time[:idx]
+
+def get_inst_params_from_label(target_dir):
+    """Get the instrument params from a product label.
+
+    Inputs:
+        target_dir: the targeted labels directory to get the instrument params.
+    """
+    for root, _, files in os.walk(target_dir):
+            for file in files:
+                if not file.startswith('collection_') and file.endswith('.xml'):
+                    fp = os.path.join(root, file)
+                    with open(fp) as f:
+                        xml_content = f.read()
+                        # TODO: will there be multiple channel ids in one collection
+                        # product? Now we assume only all products with the same
+                        # collection name will have one channel id
+                        inst_params = get_instrument_params(xml_content)
+                        return inst_params
+
+def get_primary_res_from_label(target_dir):
+    """Get the primary results from a product label.
+
+    Inputs:
+        target_dir: the targeted labels directory to get the primary results.
+    """
+    for root, _, files in os.walk(target_dir):
+            for file in files:
+                if not file.startswith('collection_') and file.endswith('.xml'):
+                    fp = os.path.join(root, file)
+                    with open(fp) as f:
+                        xml_content = f.read()
+                        primary_res = get_primary_result_summary(xml_content)
+                        return primary_res
+
+def get_rec_num_from_label(target_dir):
+    """Get the number of total files for a given collection name directory.
+
+    Inputs:
+        target_dir: the targeted labels directory to get the number of total files.
+    """
+    files_li = []
+    for root, _, files in os.walk(target_dir):
+            for file in files:
+                if not file.startswith('collection_') and file.endswith('.xml'):
+                    fp = os.path.join(root, file)
+                    print('-------')
+                    print(fp)
+                    if file not in files_li:
+                        files_li.append(file)
+    return len(files_li)
+                    # with open(fp) as f:
+                    #     xml_content = f.read()
+                    #     primary_res = get_primary_result_summary(xml_content)
+                    #     return primary_res

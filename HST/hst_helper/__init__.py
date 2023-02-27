@@ -36,8 +36,8 @@ CITATION_INFO_DICT = {}
 TARG_ID_DICT = defaultdict(list)
 
 # time coordinates dictionary, keyed by propoposal id and store the roll up start/stop
-# time for a given proposal id
-TIME_DICT = defaultdict(list)
+# time for a collection name of a given proposal id
+TIME_DICT = defaultdict(dict)
 
 # TODO: These are for schema csv & label, need to figure how to determine the schema
 # inventories and version
@@ -49,3 +49,6 @@ DISP_LIDVID = 'S,urn:nasa:pds:system_bundle:xml_schema:disp-xml_schema::1.17'
 INFORMATION_MODEL_VERSION = '1.15.0.0'
 HST_SHORT_VERSION = '1D00_1000'
 DISP_SHORT_VERSION = '1B00'
+
+# Collection names in the bundles
+COL_NAME_PREFIX = ['data_', 'miscellaneous_', 'browse_']
