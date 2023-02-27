@@ -103,21 +103,21 @@ $IF("miscellaneous" not in collection_name)
         </Target_Identification>
     $FOR(target=target_identifications)
         <Target_Identification>
-            <name>$target[0]$</name>$NOESCAPE("" if target[0] != "UNK" else "  <!--Unknown target-->")$
-        $FOR(alt=target[1])
+            <name>$target['name']$</name>$NOESCAPE("" if target['name'] != "UNK" else "  <!--Unknown target-->")$
+        $FOR(alt=target['alternate_designations'])
             <alternate_designation>$alt$</alternate_designation>
         $END_FOR
-            <type>$target[2]$</type>
-        $IF(target[3])
+            <type>$target['type']$</type>
+        $IF(target['description'])
             <description>
-        $FOR(rec=target[3])
+        $FOR(rec=target['description'])
             $rec$
         $END_FOR
             </description>
         $END_IF
             <Internal_Reference>
                 <lid_reference>
-                $target[4]$
+                urn:nasa:pds:context:target:$target['type'].lower()$.$target['name'].lower()$
                 </lid_reference>
                 <reference_type>data_to_target</reference_type>
             </Internal_Reference>

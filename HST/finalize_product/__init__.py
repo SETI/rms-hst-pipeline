@@ -7,25 +7,18 @@ import pdslogger
 import shutil
 
 from product_labels.suffix_info import (INSTRUMENT_NAMES,
-                                        collection_name,
-                                        get_processing_level,
                                         get_collection_title_fmt)
-from product_labels.wavelength_ranges   import wavelength_ranges
 
 from hst_helper import COL_NAME_PREFIX
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_format_term,
                                  get_program_dir_path)
-from hst_helper.general_utils import (create_xml_label,
-                                      create_collection_label,
+from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
-                                      get_inst_params_from_label,
+                                      date_time_to_date,
                                       get_citation_info,
-                                      get_instrument_id_set,
-                                      get_mod_history_from_label,
-                                      get_primary_res_from_label,
-                                      get_rec_num_from_label,
-                                      get_target_id_from_label)
+                                      get_collection_label_data,
+                                      get_mod_history_from_label)
 
 COL_DATA_LABEL_TEMPLATE = 'PRODUCT_COLLECTION_LABEL.xml'
 
@@ -61,7 +54,18 @@ def label_hst_data_directory(proposal_id, logger):
 
                 # Get channel id
                 prod_dir = os.path.join(bundles_dir, dir)
-                _, channel_id, _, _ = get_inst_params_from_label(prod_dir)
+
+                # Get label data
+                # TODO: might need to walk through bundles dir depending on if the files have
+                # been moved to the bundles dir.
+                label_data = get_collection_label_data(proposal_id, prod_dir, logger)
+                target_info = label_data['target']
+                _, processing_lvl, wavelength_ranges, _ = label_data['primary_res']
+                _, channel_id, _, _ = label_data['inst_params']
+                records_num = label_data['records']
+                min_start, max_stop = label_data['time']
+                start_date = date_time_to_date(min_start) if min_start else None
+                stop_date = date_time_to_date(max_stop) if max_stop else None
 
                 # Get collection title
                 _, inst_id, suffix = dir.split('_')
@@ -71,10 +75,6 @@ def label_hst_data_directory(proposal_id, logger):
                                        '{IC}', inst_id.upper() + f'/{channel_id}')
                 collection_title = collection_title.replace('{P}', str(proposal_id))
 
-                #  Get primary results
-                (_, processing_lvl,
-                 wavelength_ranges, _) = get_primary_res_from_label(prod_dir)
-
                 # Get citation info
                 citation_info = get_citation_info(proposal_id, logger)
 
@@ -82,23 +82,12 @@ def label_hst_data_directory(proposal_id, logger):
                 col_data_label_name = f'collection_{col_name}.xml'
                 mod_history = get_mod_history_from_label(col_data_label_name, version_id)
 
-                # get target identification
-                # TODO: might need to walk through bundles dir depending on if the files have
-                # been moved to the bundles dir.
-                # files_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-                col_data_label_path = os.path.join(prod_dir, col_data_label_name)
-                target_info = get_target_id_from_label(proposal_id,
-                                                       col_data_label_path,
-                                                       prod_dir)
-
                 # Get label date
                 timetag = os.path.getmtime(__file__)
                 label_date = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
-
-                records_num =  get_rec_num_from_label(prod_dir)
-
                 data_dict = {
                     'prop_id': proposal_id,
+                    'inst_id': inst_id,
                     'collection_name': col_name,
                     'collection_title': collection_title,
                     'citation_info': citation_info,
@@ -108,18 +97,18 @@ def label_hst_data_directory(proposal_id, logger):
                     'target_identifications': target_info,
                     'version_id': version_id,
                     'label_date': label_date,
-                    'inst_id': inst_id,
-                    # 'csv_filename': CSV_FILENAME,
                     'records_num': records_num,
                     'mod_history': mod_history,
+                    'start_date_time': min_start,
+                    'stop_date_time': max_stop,
+                    'start_date': start_date,
+                    'stop_date': stop_date
                 }
-
 
                 # Create context collection label
                 create_collection_label(proposal_id, col_name,
                                         data_dict, col_data_label_name,
-                                        COL_DATA_LABEL_TEMPLATE, logger, prod_dir)
-
+                                        COL_DATA_LABEL_TEMPLATE, logger)
 
     # Create product collection csv
     create_product_collection_csv(proposal_id, None, logger)

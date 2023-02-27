@@ -9,7 +9,10 @@ import pdslogger
 from hst_helper import (CITATION_INFO_DICT,
                         DOCUMENT_EXT,
                         INST_ID_DICT,
+                        INST_PARAMS_DICT,
+                        PRIMARY_RES_DICT,
                         PROGRAM_INFO_FILE,
+                        RECORDS_DICT,
                         TARG_ID_DICT,
                         TIME_DICT)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
@@ -26,7 +29,7 @@ from xmltemplate import XmlTemplate
 
 def create_collection_label(
     proposal_id, collection_name, data_dict,
-    label_name, template_name, logger, target_dir=None
+    label_name, template_name, logger
 ):
     """With a given proposal id, create collection label in the final bundle.
 
@@ -51,14 +54,6 @@ def create_collection_label(
     # Collection label path
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     col_label_path = bundles_dir + f'/{collection_name}/{label_name}'
-
-    # For roll up info
-    if target_dir is not None:
-        min_start, max_stop = get_roll_up_time_from_label(proposal_id, target_dir)
-        data_dict['start_date_time'] = min_start
-        data_dict['stop_date_time'] = max_stop
-        data_dict['start_date'] = date_time_to_date(min_start) if min_start else None
-        data_dict['stop_date'] = date_time_to_date(max_stop) if max_stop else None
 
     create_xml_label(col_template, col_label_path, data_dict, logger)
 
@@ -172,15 +167,12 @@ def get_mod_history_from_label(prev_label_path, current_version_id):
 
     return mod_history
 
-def get_target_id_from_label(proposal_id, prev_label_path, target_dir):
-    """Get the target identification info from the exisitng label, if there is no
-    existing label, walk through all files from target_dir, store data in the
-    TARG_ID_DICT, and return a lsit of target ids for a given propsal id.
+def get_target_id_from_label(proposal_id, prev_label_path):
+    """Get the target identification info from the exisitng label.
 
     Inputs:
         proposal_id:        a proposal id.
         prev_label_path:    the path of the exisiting xml label
-        target_dir:         the target directory to get the roll up info.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     if formatted_proposal_id not in TARG_ID_DICT:
@@ -193,48 +185,8 @@ def get_target_id_from_label(proposal_id, prev_label_path, target_dir):
                         for targ in target_ids:
                             if targ not in TARG_ID_DICT[formatted_proposal_id]:
                                 TARG_ID_DICT[formatted_proposal_id].append(targ)
-        else:
-            # Walk through all files from target dir
-            for root, _, files in os.walk(target_dir):
-                for file in files:
-                    if not file.startswith('collection_') and file.endswith('.xml'):
-                        fp = os.path.join(root, file)
-                        with open(fp) as f:
-                            xml_content = f.read()
-                            target_ids = get_target_identifications(xml_content)
-                            for targ in target_ids:
-                                if targ not in TARG_ID_DICT[formatted_proposal_id]:
-                                    TARG_ID_DICT[formatted_proposal_id].append(targ)
 
     return TARG_ID_DICT[formatted_proposal_id]
-
-def get_roll_up_time_from_label(proposal_id, target_dir):
-    """Get the roll up start and start date by walking through all files from target_dir,
-    store data in the TIME_DICT, and return a start & stop date tuple.
-
-    Inputs:
-        proposal_id:        a proposal id.
-        target_dir:         the targeted labels directory to get the roll up info.
-    """
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    _, _, collection_name = target_dir.rpartition('/')
-    if (formatted_proposal_id not in TIME_DICT or
-        collection_name not in TIME_DICT[formatted_proposal_id]):
-        min_start = None
-        max_stop = None
-        for root, _, files in os.walk(target_dir):
-            for file in files:
-                if not file.startswith('collection_') and file.endswith('.xml'):
-                    fp = os.path.join(root, file)
-                    with open(fp) as f:
-                        xml_content = f.read()
-                        start, stop = get_time_coordinates(xml_content)
-                        min_start = start if min_start is None else min(min_start, start)
-                        max_stop = stop if max_stop is None else max(max_stop, stop)
-
-        TIME_DICT[formatted_proposal_id][collection_name] = (min_start, max_stop)
-
-    return TIME_DICT[formatted_proposal_id][collection_name]
 
 def date_time_to_date(date_time):
     """
@@ -251,56 +203,84 @@ def date_time_to_date(date_time):
 
     return date_time[:idx]
 
-def get_inst_params_from_label(target_dir):
-    """Get the instrument params from a product label.
+def get_collection_label_data(proposal_id, target_dir, logger):
+    """Walk through the given target directory of a proposal id to get the collection
+    label data used for label creation. Return a dictionary containing target id, time,
+    instrument params, primary results and the number of records. Here are the keys of
+    the returned dictionary 'target', 'time', 'inst_params', 'primary_res', and 'records'.
 
     Inputs:
-        target_dir: the targeted labels directory to get the instrument params.
+        proposal_id:    a proposal id.
+        target_dir:     the targeted labels directory to get the number of total files.
     """
-    for root, _, files in os.walk(target_dir):
-            for file in files:
-                if not file.startswith('collection_') and file.endswith('.xml'):
-                    fp = os.path.join(root, file)
-                    with open(fp) as f:
-                        xml_content = f.read()
-                        # TODO: will there be multiple channel ids in one collection
-                        # product? Now we assume only all products with the same
-                        # collection name will have one channel id
-                        inst_params = get_instrument_params(xml_content)
-                        return inst_params
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    _, _, collection_name = target_dir.rpartition('/')
+    logger = logger or pdslogger.EasyLogger()
+    logger.info(f'Get collection label data for: {proposal_id} {collection_name}')
+    res = {}
 
-def get_primary_res_from_label(target_dir):
-    """Get the primary results from a product label.
-
-    Inputs:
-        target_dir: the targeted labels directory to get the primary results.
-    """
-    for root, _, files in os.walk(target_dir):
-            for file in files:
-                if not file.startswith('collection_') and file.endswith('.xml'):
-                    fp = os.path.join(root, file)
-                    with open(fp) as f:
-                        xml_content = f.read()
-                        primary_res = get_primary_result_summary(xml_content)
-                        return primary_res
-
-def get_rec_num_from_label(target_dir):
-    """Get the number of total files for a given collection name directory.
-
-    Inputs:
-        target_dir: the targeted labels directory to get the number of total files.
-    """
     files_li = []
+    min_start = None
+    max_stop = None
+
+    if formatted_proposal_id in TARG_ID_DICT:
+        res['target'] = TARG_ID_DICT[formatted_proposal_id]
+    if (formatted_proposal_id in TIME_DICT and
+        collection_name in TIME_DICT[formatted_proposal_id]):
+        res['time'] = TIME_DICT[formatted_proposal_id][collection_name]
+    if (formatted_proposal_id in INST_PARAMS_DICT and
+        collection_name in INST_PARAMS_DICT[formatted_proposal_id]):
+        res['inst_params'] = INST_PARAMS_DICT[formatted_proposal_id][collection_name]
+    if (formatted_proposal_id in PRIMARY_RES_DICT and
+        collection_name in PRIMARY_RES_DICT[formatted_proposal_id]):
+        res['primary_res'] = PRIMARY_RES_DICT[formatted_proposal_id][collection_name]
+    if (formatted_proposal_id in RECORDS_DICT and
+        collection_name in RECORDS_DICT[formatted_proposal_id]):
+        res['records'] = RECORDS_DICT[formatted_proposal_id][collection_name]
+
     for root, _, files in os.walk(target_dir):
             for file in files:
                 if not file.startswith('collection_') and file.endswith('.xml'):
                     fp = os.path.join(root, file)
-                    print('-------')
-                    print(fp)
-                    if file not in files_li:
-                        files_li.append(file)
-    return len(files_li)
-                    # with open(fp) as f:
-                    #     xml_content = f.read()
-                    #     primary_res = get_primary_result_summary(xml_content)
-                    #     return primary_res
+                    with open(fp) as f:
+                        xml_content = f.read()
+                        # target identifications
+                        if 'target' not in res:
+                            target_ids = get_target_identifications(xml_content)
+                            for targ in target_ids:
+                                if targ not in TARG_ID_DICT[formatted_proposal_id]:
+                                    TARG_ID_DICT[formatted_proposal_id].append(targ)
+                        # roll up start/stop time
+                        if 'time' not in res:
+                            start, stop = get_time_coordinates(xml_content)
+                            min_start = start if min_start is None else min(min_start,
+                                                                            start)
+                            max_stop = stop if max_stop is None else max(max_stop, stop)
+                        # instrument params
+                        if 'inst_params' not in res:
+                            INST_PARAMS_DICT[formatted_proposal_id][collection_name]  = (
+                                get_instrument_params(xml_content)
+                            )
+                            res['inst_params'] = (INST_PARAMS_DICT[formatted_proposal_id]
+                                                                  [collection_name])
+                        # primary results
+                        if 'primary_res' not in res:
+                            PRIMARY_RES_DICT[formatted_proposal_id][collection_name] = (
+                                get_primary_result_summary(xml_content)
+                            )
+                            res['primary_res'] = (PRIMARY_RES_DICT[formatted_proposal_id]
+                                                                  [collection_name])
+                        # records
+                        if file not in files_li:
+                            files_li.append(file)
+
+    if 'target' not in res:
+        res['target'] = TARG_ID_DICT[formatted_proposal_id]
+    if 'time' not in res:
+        TIME_DICT[formatted_proposal_id][collection_name] = (min_start, max_stop)
+        res['time'] = TIME_DICT[formatted_proposal_id][collection_name]
+    if 'records' not in res:
+        RECORDS_DICT[formatted_proposal_id][collection_name] = len(files_li)
+        res['records'] = RECORDS_DICT[formatted_proposal_id][collection_name]
+
+    return res

@@ -11,18 +11,6 @@ from finalize_schema import label_hst_schema_directory
 from finalize_context import label_hst_context_directory
 from finalize_product import label_hst_data_directory
 
-from hst_helper.fs_utils import (get_formatted_proposal_id,
-                                 get_format_term,
-                                 get_program_dir_path,
-                                 get_instrument_id_from_fname,
-                                 get_file_suffix)
-from hst_helper.general_utils import (create_xml_label,
-                                      create_collection_label,
-                                      create_csv,
-                                      get_citation_info,
-                                      get_instrument_id_set,
-                                      get_mod_history_from_label)
-
 def finalize_hst_bundle(proposal_id, logger=None):
     """With a given proposal id, finalize hst bundle.
     1. Create documents/schema/context/kernel directories.

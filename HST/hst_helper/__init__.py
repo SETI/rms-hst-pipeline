@@ -32,12 +32,17 @@ INST_ID_DICT = defaultdict(set)
 # proposal id
 CITATION_INFO_DICT = {}
 
-# Instrument ids dictionary, keyed by propoposal id and store the list of target id info
+# Target identifications dictionary, keyed by propoposal id and store the list of target
+# id info
 TARG_ID_DICT = defaultdict(list)
 
-# time coordinates dictionary, keyed by propoposal id and store the roll up start/stop
-# time for a collection name of a given proposal id
+# The following dictionaries are keyed by proposal id and store internal dictionaries
+# keyed by collection name with the label data (roll up start/stop time, instrument
+# params, primary results, and records as the values.
 TIME_DICT = defaultdict(dict)
+INST_PARAMS_DICT = defaultdict(dict)
+PRIMARY_RES_DICT = defaultdict(dict)
+RECORDS_DICT = defaultdict(dict)
 
 # TODO: These are for schema csv & label, need to figure how to determine the schema
 # inventories and version

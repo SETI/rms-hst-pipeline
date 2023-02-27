@@ -18,9 +18,6 @@ from hst_helper.general_utils import (create_xml_label,
                                       get_instrument_id_set,
                                       get_mod_history_from_label)
 
-from citations import Citation_Information
-from product_labels.xml_support import get_modification_history
-
 DOC_LABEL_TEMPLATE = 'DOCUMENT_LABEL.xml'
 COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
 CSV_FILENAME = 'collection.csv'
