@@ -4,7 +4,6 @@
 import datetime
 import os
 import pdslogger
-import shutil
 
 from product_labels.suffix_info import (INSTRUMENT_NAMES,
                                         get_collection_title_fmt)
@@ -39,11 +38,6 @@ def label_hst_data_directory(proposal_id, logger):
     except ValueError:
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
-
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-
-    # Move files
-    move_files_from_staging_to_bundles(proposal_id, logger)
 
     # Collect data to construct data dictionary used for the labels
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
@@ -112,28 +106,6 @@ def label_hst_data_directory(proposal_id, logger):
 
     # Create product collection csv
     create_product_collection_csv(proposal_id, None, logger)
-
-def move_files_from_staging_to_bundles(proposal_id, logger):
-    """Move files from staging folder to bundles folder
-
-    Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
-    """
-    # TODO: change copying files to moving files?
-    # 1. Move existing files based on PDS4-VERSIONING.txt (need to get this file)
-    # 2. Walk through all the downloaded files from MAST in the staging folder and move
-    # them over to the bundles folder
-    staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    for dir in os.listdir(staging_dir):
-        for col_name in COL_NAME_PREFIX:
-            if dir.startswith(col_name):
-                staging_prod_dir = os.path.join(staging_dir, dir)
-                bundles_prod_dir = os.path.join(bundles_dir, dir)
-                os.makedirs(bundles_prod_dir, exist_ok=True)
-                logger.info(f'Move {dir} from staging to bundles directory')
-                shutil.copytree(staging_prod_dir, bundles_prod_dir, dirs_exist_ok=True)
 
 def create_product_collection_csv(proposal_id, data_dict, logger):
     """With a given proposal id, create product collection csv in the final bundle.

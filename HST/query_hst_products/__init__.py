@@ -3,6 +3,7 @@
 ##########################################################################################
 import os
 import pdslogger
+import shutil
 
 from collections import defaultdict
 
@@ -88,6 +89,10 @@ def query_hst_products(proposal_id, logger=None):
         for f in trl_files:
             filepath = get_downloaded_file_path(proposal_id, f)
             os.remove(filepath)
+
+    # Clean up the empty mastDownload directory
+    staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+    shutil.rmtree(staging_dir + '/mastDownload')
 
     return visit_diff
 
