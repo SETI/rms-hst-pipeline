@@ -9,7 +9,7 @@ import pdslogger
 from finalize_document import label_hst_document_directory
 from finalize_schema import label_hst_schema_directory
 from finalize_context import label_hst_context_directory
-from finalize_product import label_hst_data_directory
+from finalize_data_product import label_hst_data_directory
 from organize_files import organize_files_from_staging_to_bundles
 
 def finalize_hst_bundle(proposal_id, logger=None):
