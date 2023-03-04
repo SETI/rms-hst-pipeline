@@ -21,7 +21,9 @@ $ONCE(formatted_prop_id=str(prop_id).zfill(5))
         <Citation_Information>
             <author_list>$citation_info.author_list$</author_list>
             <publication_year>$citation_info.publication_year$</publication_year>
-            <description>$citation_info.description$</description>
+            <description>
+                $WRAP(16, 90, citation_info.description)$
+            </description>
         </Citation_Information>
     </Identification_Area>
     <Reference_List>

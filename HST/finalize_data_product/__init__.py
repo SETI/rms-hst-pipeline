@@ -99,16 +99,16 @@ def label_hst_data_directory(proposal_id, logger):
                     'stop_date': stop_date
                 }
 
-                # Create context collection label
+                # Create data product collection label
                 create_collection_label(proposal_id, col_name,
                                         data_dict, col_data_label_name,
                                         COL_DATA_LABEL_TEMPLATE, logger)
 
-    # Create product collection csv
-    create_product_collection_csv(proposal_id, None, logger)
+    # Create data product collection csv
+    create_data_product_collection_csv(proposal_id, None, logger)
 
-def create_product_collection_csv(proposal_id, data_dict, logger):
-    """With a given proposal id, create product collection csv in the final bundle.
+def create_data_product_collection_csv(proposal_id, data_dict, logger):
+    """With a given proposal id, create data product collection csv in the final bundle.
 
     Inputs:
         proposal_id:    a proposal id.

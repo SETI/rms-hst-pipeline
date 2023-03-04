@@ -53,7 +53,10 @@ def create_collection_label(
     col_template = (col_dir + f'/../templates/{template_name}')
     # Collection label path
     bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    col_label_path = bundles_dir + f'/{collection_name}/{label_name}'
+    if collection_name == 'bundle':
+        col_label_path = bundles_dir + f'/{label_name}'
+    else:
+        col_label_path = bundles_dir + f'/{collection_name}/{label_name}'
 
     create_xml_label(col_template, col_label_path, data_dict, logger)
 

@@ -11,6 +11,7 @@ from finalize_schema import label_hst_schema_directory
 from finalize_context import label_hst_context_directory
 from finalize_data_product import label_hst_data_directory
 from organize_files import organize_files_from_staging_to_bundles
+from label_bundle import label_hst_bundle
 
 def finalize_hst_bundle(proposal_id, logger=None):
     """With a given proposal id, finalize hst bundle.
@@ -43,3 +44,5 @@ def finalize_hst_bundle(proposal_id, logger=None):
     organize_files_from_staging_to_bundles(proposal_id, logger)
     # Move and create data collection files
     label_hst_data_directory(proposal_id, logger)
+    # Create bundle label
+    label_hst_bundle(proposal_id, logger)
