@@ -7,15 +7,13 @@ import pdslogger
 
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)
-from hst_helper.general_utils import (create_xml_label,
-                                      create_collection_label,
+from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
                                       date_time_to_date,
                                       get_citation_info,
                                       get_collection_label_data,
                                       get_instrument_id_set,
-                                      get_mod_history_from_label,
-                                      get_target_id_from_label)
+                                      get_mod_history_from_label)
 
 CSV_FILENAME = 'collection_context.csv'
 COL_CTXT_LABEL = 'collection_context.xml'

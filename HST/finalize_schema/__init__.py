@@ -12,8 +12,7 @@ from hst_helper import (PDS4_LIDVID,
                         DISP_LIDVID)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)
-from hst_helper.general_utils import (create_xml_label,
-                                      create_collection_label,
+from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
                                       get_citation_info,
                                       get_instrument_id_set,

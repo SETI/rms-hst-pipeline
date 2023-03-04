@@ -10,10 +10,8 @@ import shutil
 from product_labels.suffix_info import (INSTRUMENT_NAMES,
                                         get_collection_title_fmt)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
-                                 get_format_term,
                                  get_program_dir_path)
 from hst_helper.general_utils import (create_collection_label,
-                                      create_csv,
                                       date_time_to_date,
                                       get_citation_info,
                                       get_collection_label_data,
