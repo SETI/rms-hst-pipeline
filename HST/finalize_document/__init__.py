@@ -1,8 +1,6 @@
 ##########################################################################################
 # finalize_document/__init__.py
 ##########################################################################################
-import csv
-import datetime
 import os
 import pdslogger
 import shutil
@@ -14,7 +12,6 @@ from hst_helper.fs_utils import (get_formatted_proposal_id,
 from hst_helper.general_utils import (create_xml_label,
                                       create_collection_label,
                                       create_csv,
-                                      get_citation_info,
                                       get_instrument_id_set,
                                       get_mod_history_from_label)
 
@@ -23,7 +20,7 @@ COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
 CSV_FILENAME = 'collection.csv'
 COL_DOC_LABEL = 'collection.xml'
 
-def label_hst_document_directory(proposal_id, logger):
+def label_hst_document_directory(proposal_id, data_dict, logger):
     """With a given proposal id, create document directory in the final bundle.
     1. Create document directory.
     2. Move/copy proposal files over from pipeline directory.
@@ -33,6 +30,7 @@ def label_hst_document_directory(proposal_id, logger):
 
     Inputs:
         proposal_id:    a proposal id.
+        data_dict:      a data dictionary used to create the label.
         logger:         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
@@ -80,35 +78,23 @@ def label_hst_document_directory(proposal_id, logger):
     except FileNotFoundError:
         pass
 
-    # Get label date
-    timetag = os.path.getmtime(__file__)
-    label_date = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
-
-    # get citation info
-    citation_info = get_citation_info(proposal_id, logger)
-    # Get imstrument id
-    inst_ids = get_instrument_id_set(proposal_id, logger)
-
     # Number of document inventory:
     # 2 handbooks per instrument + the proposal file directory
-    records_num = len(inst_ids) * 2 + 1
+    records_num = len(data_dict['inst_id_li']) * 2 + 1
 
     # Get the mod history for document collection label if it's already existed.
     col_doc_label_path = bundles_dir + f'/document/{COL_DOC_LABEL}'
     mod_history = get_mod_history_from_label(col_doc_label_path, version_id)
 
-    data_dict = {
-        'prop_id': proposal_id,
+    doc_data_dict = {
         'collection_name': 'document',
-        'citation_info': citation_info,
         'version_id': version_id,
-        'label_date': label_date,
         'proposal_files_li': proposal_files_li,
-        'inst_id_li': list(inst_ids),
         'csv_filename': CSV_FILENAME,
         'records_num': records_num,
         'mod_history': mod_history,
     }
+    doc_data_dict = {**doc_data_dict, **data_dict}
 
     # Create document label
     logger.info(f'Create label for proposal files using {DOC_LABEL_TEMPLATE}.')
@@ -117,12 +103,12 @@ def label_hst_document_directory(proposal_id, logger):
     doc_template = this_dir + f'/../templates/{DOC_LABEL_TEMPLATE}'
     # Document label path
     doc_label = document_dir + f'/{formatted_proposal_id}.xml'
-    create_xml_label(doc_template, doc_label, data_dict, logger)
+    create_xml_label(doc_template, doc_label, doc_data_dict, logger)
 
     # Create document collection csv
-    create_document_collection_csv(proposal_id, data_dict, logger)
+    create_document_collection_csv(proposal_id, doc_data_dict, logger)
     # Create document collection label
-    create_collection_label(proposal_id, 'document', data_dict,
+    create_collection_label(proposal_id, 'document', doc_data_dict,
                             COL_DOC_LABEL, COL_DOC_LABEL_TEMPLATE, logger)
 
 def create_document_collection_csv(proposal_id, data_dict, logger):
