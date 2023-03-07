@@ -15,7 +15,8 @@ from hst_helper import (CITATION_INFO_DICT,
                         RECORDS_DICT,
                         TARG_ID_DICT,
                         TIME_DICT)
-from hst_helper.fs_utils import (get_formatted_proposal_id,
+from hst_helper.fs_utils import (get_deliverable_path,
+                                 get_formatted_proposal_id,
                                  get_program_dir_path,
                                  get_instrument_id_from_fname)
 
@@ -52,11 +53,11 @@ def create_collection_label(
     col_dir = os.path.dirname(os.path.abspath(__file__))
     col_template = (col_dir + f'/../templates/{template_name}')
     # Collection label path
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
+    deliverable_path = get_deliverable_path(proposal_id)
     if collection_name == 'bundle':
-        col_label_path = bundles_dir + f'/{label_name}'
+        col_label_path = deliverable_path + f'/{label_name}'
     else:
-        col_label_path = bundles_dir + f'/{collection_name}/{label_name}'
+        col_label_path = deliverable_path + f'/{collection_name}/{label_name}'
 
     create_xml_label(col_template, col_label_path, data_dict, logger)
 

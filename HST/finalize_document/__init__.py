@@ -7,7 +7,8 @@ import shutil
 
 from hst_helper import (DOCUMENT_EXT,
                         PROGRAM_INFO_FILE)
-from hst_helper.fs_utils import (get_formatted_proposal_id,
+from hst_helper.fs_utils import (get_deliverable_path,
+                                 get_formatted_proposal_id,
                                  get_program_dir_path)
 from hst_helper.general_utils import (create_xml_label,
                                       create_collection_label,
@@ -46,8 +47,8 @@ def label_hst_document_directory(proposal_id, data_dict, logger):
     # Create document directory and move proposal files over
     logger.info(f'Create document directory for proposal id: {proposal_id}.')
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    document_dir = bundles_dir + f'/document/{formatted_proposal_id}'
+    deliverable_path = get_deliverable_path(proposal_id)
+    document_dir = deliverable_path + f'/document/{formatted_proposal_id}'
     os.makedirs(document_dir, exist_ok=True)
 
     # Search for proposal files & program info file stored at pipeline directory
@@ -83,7 +84,7 @@ def label_hst_document_directory(proposal_id, data_dict, logger):
     records_num = len(data_dict['inst_id_li']) * 2 + 1
 
     # Get the mod history for document collection label if it's already existed.
-    col_doc_label_path = bundles_dir + f'/document/{COL_DOC_LABEL}'
+    col_doc_label_path = deliverable_path + f'/document/{COL_DOC_LABEL}'
     mod_history = get_mod_history_from_label(col_doc_label_path, version_id)
 
     doc_data_dict = {
@@ -124,8 +125,8 @@ def create_document_collection_csv(proposal_id, data_dict, logger):
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
     # Set collection csv filename
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    document_collection_dir = bundles_dir + f'/document/{CSV_FILENAME}'
+    deliverable_path = get_deliverable_path(proposal_id)
+    document_collection_dir = deliverable_path + f'/document/{CSV_FILENAME}'
 
     # Construct collection data, each item in the list is a row in the csv file
     version_id = data_dict['version_id']

@@ -4,7 +4,7 @@
 import os
 import pdslogger
 
-from hst_helper.fs_utils import get_program_dir_path
+from hst_helper.fs_utils import get_deliverable_path
 from hst_helper.general_utils import (create_collection_label,
                                       get_mod_history_from_label)
 
@@ -29,13 +29,13 @@ def label_hst_bundle(proposal_id, data_dict, logger):
 
     # Get the mod history for bundle label if it's already existed.
     version_id = (1, 0)
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    bundle_label_path = bundles_dir + f'/{BUNDLE_LABEL}'
+    deliverable_path = get_deliverable_path(proposal_id)
+    bundle_label_path = deliverable_path + f'/{BUNDLE_LABEL}'
     mod_history = get_mod_history_from_label(bundle_label_path, version_id)
 
     # TODO: determine the version of each entry
     bundle_entries = []
-    for col_name in os.listdir(bundles_dir):
+    for col_name in os.listdir(deliverable_path):
         if '.' not in col_name:
             col_type, _, _ = col_name.partition('_')
             col_ver = (1,0)

@@ -54,6 +54,17 @@ def finalize_hst_bundle(proposal_id, logger=None):
     label_hst_data_directory(proposal_id, logger)
     # Create bundle label
     label_hst_bundle(proposal_id, data_dict, logger)
+    # bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
+    # for root, dirs, files in os.walk(bundles_dir, topdown=True):
+    #     print("0-0-0-0-0")
+    #     for name in files:
+    #         print('----------')
+    #         print(name)
+    #         print(os.path.join(root, name))
+    #     for name in dirs:
+    #         print('AAAAAAAAA')
+    #         print(name)
+    #         print(os.path.join(root, name))
 
 def get_general_label_data(proposal_id, logger):
     """Get general label data used in document/schema/context/bundle labels

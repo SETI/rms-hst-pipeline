@@ -8,7 +8,7 @@ from hst_helper import (PDS4_LIDVID,
                         HST_LIDVID,
                         DISP_LIDVID)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
-                                 get_program_dir_path)
+                                 get_deliverable_path)
 from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
                                       get_mod_history_from_label)
@@ -41,8 +41,8 @@ def label_hst_schema_directory(proposal_id, data_dict, logger):
 
     # Create schema directory
     logger.info(f'Create schema directory for proposal id: {proposal_id}.')
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    schema_dir = bundles_dir + '/schema'
+    deliverable_path = get_deliverable_path(proposal_id)
+    schema_dir = deliverable_path + '/schema'
     os.makedirs(schema_dir, exist_ok=True)
 
     # Create schema csv
@@ -57,7 +57,7 @@ def label_hst_schema_directory(proposal_id, data_dict, logger):
     records_num = 3
     # Get the mod history for schema collection label if it's already existed.
     version_id = (1, 0)
-    col_sch_label_path = bundles_dir + f'/schema/{COL_SCH_LABEL}'
+    col_sch_label_path = deliverable_path + f'/schema/{COL_SCH_LABEL}'
     mod_history = get_mod_history_from_label(col_sch_label_path, version_id)
 
     sch_data_dict = {

@@ -11,7 +11,7 @@ from product_labels.suffix_info import (INSTRUMENT_NAMES,
 from hst_helper import COL_NAME_PREFIX
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_format_term,
-                                 get_program_dir_path)
+                                 get_deliverable_path)
 from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
                                       date_time_to_date,
@@ -40,14 +40,15 @@ def label_hst_data_directory(proposal_id, logger):
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
     # Collect data to construct data dictionary used for the labels
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    for dir in os.listdir(bundles_dir):
+    # bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
+    deliverable_path = get_deliverable_path(proposal_id)
+    for dir in os.listdir(deliverable_path):
         for col_name in COL_NAME_PREFIX:
             if dir.startswith(col_name): # work on data_directory
                 col_name = dir
 
                 # Get channel id
-                prod_dir = os.path.join(bundles_dir, dir)
+                prod_dir = os.path.join(deliverable_path, dir)
 
                 # Get label data
                 # TODO: might need to walk through bundles dir depending on if the files have
@@ -116,12 +117,13 @@ def create_data_product_collection_csv(proposal_id, data_dict, logger):
         logger:         pdslogger to use; None for default EasyLogger.
     """
     prod_ver = (1,0)
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    for dir in os.listdir(bundles_dir):
+    # bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
+    deliverable_path = get_deliverable_path(proposal_id)
+    for dir in os.listdir(deliverable_path):
         for col_name in COL_NAME_PREFIX:
             if dir.startswith(col_name):
                 collection_data = []
-                bundles_prod_dir = os.path.join(bundles_dir, dir)
+                bundles_prod_dir = os.path.join(deliverable_path, dir)
                 for root, _, files in os.walk(bundles_prod_dir):
                     for file in files:
                         if not file.startswith('collection_') and file.endswith('.xml'):

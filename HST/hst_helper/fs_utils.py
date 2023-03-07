@@ -44,6 +44,19 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline'):
 
     return program_dir
 
+def get_deliverable_path(proposal_id):
+    """Return the final deliverable path in the bundles directory for a given proposal
+    id.
+
+    Input:
+        proposal_id:    a proposal id.
+    """
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    return (get_program_dir_path(proposal_id, None, 'bundles') +
+            '/hst_' +
+            formatted_proposal_id +
+            '-deliverable')
+
 def get_format_term(filename):
     """Return IPPPSSOOT for a given file name.
 

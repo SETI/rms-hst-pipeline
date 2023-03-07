@@ -5,7 +5,7 @@ import os
 import pdslogger
 
 from hst_helper.fs_utils import (get_formatted_proposal_id,
-                                 get_program_dir_path)
+                                 get_deliverable_path)
 from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
                                       get_mod_history_from_label)
@@ -40,8 +40,9 @@ def label_hst_context_directory(proposal_id, data_dict, logger):
 
     # Create context directory
     logger.info(f'Create context directory for proposal id: {proposal_id}.')
-    bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    context_dir = bundles_dir + '/context'
+    # bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
+    deliverable_path = get_deliverable_path(proposal_id)
+    context_dir = deliverable_path + '/context'
     os.makedirs(context_dir, exist_ok=True)
 
     version_id = (1, 0)
