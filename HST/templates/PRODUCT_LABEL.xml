@@ -91,7 +91,7 @@ $ELSE_IF(version_id[1] == 0)
 $ELSE
           Version $version_id[0]$.$version_id[1]$ is a minor update to this data product, due to a revision of the
           HST migration pipeline by the PDS Ring-Moon Systems Node. This label was
-          generated using HST pipeline version $label_version$ ($label_date$) and XML labeling software 
+          generated using HST pipeline version $label_version$ ($label_date$) and XML labeling software
           version $VERSION_ID()$.
 
           The FITS data file is unchanged from version $version_id[0]$.0.
@@ -309,9 +309,7 @@ $IF(processing_level != "Ancillary")
   $FOR(info=browse_info)
 
     <Internal_Reference>
-      <lidvid_reference>
-        urn:nasa:pds:hst_$prop_id$:$info.collection_name$:$ipppssoot$$info.lid_suffix$::$version_id[0]$.0
-      </lidvid_reference>
+      <lidvid_reference>urn:nasa:pds:hst_$prop_id$:$info.collection_name$:$ipppssoot$$info.lid_suffix$::$version_id[0]$.0</lidvid_reference>
       <reference_type>data_to_$"thumb" if "thumb" in info.suffix else "browse"$</reference_type>
     $IF("thumb" in info.suffix)
       <comment>Thumbnail browse product</comment>
@@ -327,9 +325,7 @@ $FOR(ref=reference_basenames)
 
   $ONCE(ref_dict=by_basename[ref])
     <Internal_Reference>
-      <lidvid_reference>
-        urn:nasa:pds:hst_$prop_id$:$ref_dict["collection_name"]$:$ref_dict["ipppssoot"]$$ref_dict["lid_suffix"]$::$ref_dict["version_id"][0]$.$ref_dict["version_id"][1]$
-      </lidvid_reference>
+      <lidvid_reference>urn:nasa:pds:hst_$prop_id$:$ref_dict["collection_name"]$:$ref_dict["ipppssoot"]$$ref_dict["lid_suffix"]$::$ref_dict["version_id"][0]$.$ref_dict["version_id"][1]$</lidvid_reference>
       <reference_type>data_to_$ref_dict["processing_level"].lower()$_product</reference_type>
       <comment>
         $WRAP(8, 90, ref_dict["basename"] + ": " + ref_dict["product_title"])$

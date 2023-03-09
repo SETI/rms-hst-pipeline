@@ -40,7 +40,6 @@ def label_hst_context_directory(proposal_id, data_dict, logger):
 
     # Create context directory
     logger.info(f'Create context directory for proposal id: {proposal_id}.')
-    # bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     deliverable_path = get_deliverable_path(proposal_id)
     context_dir = deliverable_path + '/context'
     os.makedirs(context_dir, exist_ok=True)

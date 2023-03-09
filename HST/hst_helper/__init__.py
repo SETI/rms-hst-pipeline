@@ -36,6 +36,11 @@ CITATION_INFO_DICT = {}
 # id info
 TARG_ID_DICT = defaultdict(list)
 
+# Version id dictionary keyed by proposal id and store a internal dictionary keyed by
+# file name with the version id as the value.
+# TODO: construct this when we determine the vid for all files, for now put 1.0
+VID_DICT = defaultdict(dict)
+
 # The following dictionaries are keyed by proposal id and store internal dictionaries
 # keyed by collection name with the label data (roll up start/stop time, instrument
 # params, primary results, and records as the values.

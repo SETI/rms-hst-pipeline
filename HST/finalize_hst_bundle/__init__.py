@@ -6,7 +6,10 @@ import os
 import pdslogger
 
 from product_labels.suffix_info import INSTRUMENT_NAMES
-from hst_helper.fs_utils import get_program_dir_path
+from hst_helper.fs_utils import (get_deliverable_path,
+                                 get_program_dir_path,
+                                 get_formatted_proposal_id,
+                                 file_md5)
 from hst_helper.general_utils import (date_time_to_date,
                                       get_citation_info,
                                       get_collection_label_data,
@@ -18,6 +21,7 @@ from finalize_context import label_hst_context_directory
 from finalize_data_product import label_hst_data_directory
 from organize_files import organize_files_from_staging_to_bundles
 from label_bundle import label_hst_bundle
+from create_manifest_files import create_manifest_files
 
 def finalize_hst_bundle(proposal_id, logger=None):
     """With a given proposal id, finalize hst bundle.
@@ -54,17 +58,8 @@ def finalize_hst_bundle(proposal_id, logger=None):
     label_hst_data_directory(proposal_id, logger)
     # Create bundle label
     label_hst_bundle(proposal_id, data_dict, logger)
-    # bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    # for root, dirs, files in os.walk(bundles_dir, topdown=True):
-    #     print("0-0-0-0-0")
-    #     for name in files:
-    #         print('----------')
-    #         print(name)
-    #         print(os.path.join(root, name))
-    #     for name in dirs:
-    #         print('AAAAAAAAA')
-    #         print(name)
-    #         print(os.path.join(root, name))
+    # Create manifest files
+    create_manifest_files(proposal_id, logger)
 
 def get_general_label_data(proposal_id, logger):
     """Get general label data used in document/schema/context/bundle labels

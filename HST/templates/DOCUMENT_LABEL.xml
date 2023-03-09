@@ -28,9 +28,7 @@ $ONCE(formatted_prop_id=str(prop_id).zfill(5))
     </Identification_Area>
     <Reference_List>
         <Internal_Reference>
-            <lidvid_reference>
-                urn:nasa:pds:context:investigation:individual.hst_$formatted_prop_id$::$version_id[0]$.$version_id[1]$
-            </lidvid_reference>
+            <lidvid_reference>urn:nasa:pds:context:investigation:individual.hst_$formatted_prop_id$::$version_id[0]$.$version_id[1]$</lidvid_reference>
             <reference_type>$collection_name$_to_investigation</reference_type>
         </Internal_Reference>
     </Reference_List>

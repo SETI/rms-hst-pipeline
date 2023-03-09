@@ -40,7 +40,6 @@ def label_hst_data_directory(proposal_id, logger):
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
     # Collect data to construct data dictionary used for the labels
-    # bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     deliverable_path = get_deliverable_path(proposal_id)
     for dir in os.listdir(deliverable_path):
         for col_name in COL_NAME_PREFIX:
@@ -117,7 +116,6 @@ def create_data_product_collection_csv(proposal_id, data_dict, logger):
         logger:         pdslogger to use; None for default EasyLogger.
     """
     prod_ver = (1,0)
-    # bundles_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     deliverable_path = get_deliverable_path(proposal_id)
     for dir in os.listdir(deliverable_path):
         for col_name in COL_NAME_PREFIX:
