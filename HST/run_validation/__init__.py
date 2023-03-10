@@ -36,8 +36,6 @@ def run_validation(proposal_id, logger=None):
     create_manifest_files(proposal_id, logger)
 
     bundle_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    print('0-0-0-0-0-0-00-0-0-0-')
-    print(bundle_dir)
     run(["./validate-pdart", bundle_dir, bundle_dir, bundle_dir])
 
 

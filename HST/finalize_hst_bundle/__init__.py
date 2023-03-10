@@ -44,21 +44,21 @@ def finalize_hst_bundle(proposal_id, logger=None):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    # # Get the general label data used in document/schema/context/bundle labels
-    # data_dict = get_general_label_data(proposal_id, logger)
-    # # Generate the final document directory
-    # label_hst_document_directory(proposal_id, data_dict, logger)
-    # # Generate the final schema directory
-    # label_hst_schema_directory(proposal_id, data_dict, logger)
-    # # Generate the final context directory
-    # label_hst_context_directory(proposal_id, data_dict, logger)
-    # # Organize files, move from staging to bundles
-    # organize_files_from_staging_to_bundles(proposal_id, logger)
-    # # Move and create data collection files
-    # label_hst_data_directory(proposal_id, logger)
-    # # Create bundle label
-    # label_hst_bundle(proposal_id, data_dict, logger)
-    # # Create manifest files
+    # Get the general label data used in document/schema/context/bundle labels
+    data_dict = get_general_label_data(proposal_id, logger)
+    # Generate the final document directory
+    label_hst_document_directory(proposal_id, data_dict, logger)
+    # Generate the final schema directory
+    label_hst_schema_directory(proposal_id, data_dict, logger)
+    # Generate the final context directory
+    label_hst_context_directory(proposal_id, data_dict, logger)
+    # Organize files, move from staging to bundles
+    organize_files_from_staging_to_bundles(proposal_id, logger)
+    # Move and create data collection files
+    label_hst_data_directory(proposal_id, logger)
+    # Create bundle label
+    label_hst_bundle(proposal_id, data_dict, logger)
+    # Create manifest files
     run_validation(proposal_id, logger)
 
 def get_general_label_data(proposal_id, logger):
