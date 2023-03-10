@@ -1,8 +1,9 @@
 ##########################################################################################
-# create_manifest_files/__init__.py
+# run_validation/__init__.py
 ##########################################################################################
 import os
 import pdslogger
+from subprocess import run
 
 from hst_helper.fs_utils import (get_deliverable_path,
                                  get_program_dir_path,
@@ -14,7 +15,33 @@ TM_FNAME = 'transfer.manifest.txt'
 
 VID = '1.0'
 
-def create_manifest_files(proposal_id, logger=None):
+def run_validation(proposal_id, logger=None):
+    """Run validator and generate report.
+    1. Create checksum_manifest.txt & transfer.manifest.txt
+    2. run validate
+
+    Inputs:
+        proposal_id:    a proposal id.
+        logger:         pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+
+    logger.info(f'Run validation for proposal id: {proposal_id}')
+    try:
+        proposal_id = int(proposal_id)
+    except ValueError:
+        logger.exception(ValueError)
+        raise ValueError(f'Proposal id: {proposal_id} is not valid.')
+
+    create_manifest_files(proposal_id, logger)
+
+    bundle_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
+    print('0-0-0-0-0-0-00-0-0-0-')
+    print(bundle_dir)
+    run(["./validate-pdart", bundle_dir, bundle_dir, bundle_dir])
+
+
+def create_manifest_files(proposal_id, logger):
     """With a given proposal id, create checksum manifest and transfer manifest files.
 
     Inputs:
