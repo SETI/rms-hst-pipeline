@@ -55,7 +55,7 @@ def finalize_hst_bundle(proposal_id, logger=None):
     label_hst_data_directory(proposal_id, logger)
     # Create bundle label
     label_hst_bundle(proposal_id, data_dict, logger)
-    # Create manifest files
+    # Create manifest files & run validator
     run_validation(proposal_id, logger)
 
 def get_general_label_data(proposal_id, logger):
