@@ -107,9 +107,7 @@ $ONCE(inst_ids=(', ').join(inst_id_li))
             </description>
         $END_IF
             <Internal_Reference>
-                <lid_reference>
-                    urn:nasa:pds:context:target:$target['type'].lower()$.$target['name'].lower()$
-                </lid_reference>
+                <lid_reference>$target['lid']$</lid_reference>
                 <reference_type>bundle_to_target</reference_type>
             </Internal_Reference>
         </Target_Identification>
@@ -118,12 +116,12 @@ $ONCE(inst_ids=(', ').join(inst_id_li))
     <Reference_List>
     $FOR(inst_id=inst_id_li)
         <Internal_Reference>
-            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id$-dhb</lid_reference>
+            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id.lower()$-dhb</lid_reference>
             <reference_type>bundle_to_document</reference_type>
             <comment>The Data Handbook for $inst_id$</comment>
         </Internal_Reference>
         <Internal_Reference>
-            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id$-ihb</lid_reference>
+            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id.lower()$-ihb</lid_reference>
             <reference_type>bundle_to_document</reference_type>
             <comment>The Instrument Handbook for $inst_id$</comment>
         </Internal_Reference>

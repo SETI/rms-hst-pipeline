@@ -55,9 +55,7 @@ $ONCE(inst_ids=(', ').join(inst_id_li))
         $END_FOR
         $FOR(targ=target_identifications)
         <Internal_Reference>
-            <lid_reference>
-            urn:nasa:pds:context:target:$targ['type'].lower()$.$targ['name'].lower()$
-            </lid_reference>
+            <lid_reference>$target['lid']$</lid_reference>
             <reference_type>investigation_to_target</reference_type>
         </Internal_Reference>
         $END_FOR

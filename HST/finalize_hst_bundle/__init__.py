@@ -9,6 +9,7 @@ from product_labels.suffix_info import INSTRUMENT_NAMES
 from hst_helper.fs_utils import get_program_dir_path
 from hst_helper.general_utils import (date_time_to_date,
                                       get_citation_info,
+                                      get_clean_target_text,
                                       get_collection_label_data,
                                       get_instrument_id_set)
 
@@ -18,6 +19,7 @@ from finalize_context import label_hst_context_directory
 from finalize_data_product import label_hst_data_directory
 from organize_files import organize_files_from_staging_to_bundles
 from label_bundle import label_hst_bundle
+from create_target_label import create_target_label
 from run_validation import run_validation
 
 def finalize_hst_bundle(proposal_id, logger=None):
@@ -51,10 +53,12 @@ def finalize_hst_bundle(proposal_id, logger=None):
     label_hst_context_directory(proposal_id, data_dict, logger)
     # Organize files, move from staging to bundles
     organize_files_from_staging_to_bundles(proposal_id, logger)
-    # Move and create data collection files
+    # Create data collection files
     label_hst_data_directory(proposal_id, logger)
     # Create bundle label
     label_hst_bundle(proposal_id, data_dict, logger)
+    # Create target lable if it doesn't exist in PDS page
+    create_target_label(proposal_id, data_dict, logger)
     # Create manifest files & run validator
     run_validation(proposal_id, logger)
 
@@ -92,6 +96,14 @@ def get_general_label_data(proposal_id, logger):
     min_start, max_stop = label_data['time']
     start_date = date_time_to_date(min_start) if min_start else None
     stop_date = date_time_to_date(max_stop) if max_stop else None
+
+    # get clean text for target lidvid
+    for targ in target_info:
+        name = get_clean_target_text(targ['name']).lower()
+        type = get_clean_target_text(targ['type']).lower()
+        targ['formatted_name'] = name
+        targ['formatted_type'] = type
+        targ['lid'] = f'urn:nasa:pds:context:target:{type}.{name}'
 
     data_dict = {
         'prop_id': proposal_id,

@@ -38,7 +38,6 @@ def run_validation(proposal_id, logger=None):
     bundle_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     run(["./validate-pdart", bundle_dir, bundle_dir, bundle_dir])
 
-
 def create_manifest_files(proposal_id, logger):
     """With a given proposal id, create checksum manifest and transfer manifest files.
 

@@ -39,7 +39,7 @@ def create_collection_label(
         collection_name:    collection name in the bundles.
         data_dict:          data dictonary to fill in the label template.
         label_name:         the name of the collection label
-        template:           the name of the template being used.
+        template_name:      the name of the template being used.
         logger:             pdslogger to use; None for default EasyLogger.
         target_dir:         the target dir used to obtain the roll up info.
     """
@@ -288,3 +288,17 @@ def get_collection_label_data(proposal_id, target_dir, logger):
         res['records'] = RECORDS_DICT[formatted_proposal_id][collection_name]
 
     return res
+
+def get_clean_target_text(text: str) -> str:
+    """Get the target text used in target label in PDS page.
+
+    Inputs:
+        text:    a text of the target name or type.
+    """
+    SPECIAL_CHARS = "!#$%^&*/ "
+    REMOVED_CHARS = "()"
+    for char in SPECIAL_CHARS:
+        text = text.replace(char, "_")
+    for char in REMOVED_CHARS:
+        text = text.replace(char, "")
+    return text

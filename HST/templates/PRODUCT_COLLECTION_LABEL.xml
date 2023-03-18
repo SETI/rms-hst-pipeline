@@ -106,9 +106,7 @@ $IF("miscellaneous" not in collection_name)
             </description>
         $END_IF
             <Internal_Reference>
-                <lid_reference>
-                    urn:nasa:pds:context:target:$target['type'].lower()$.$target['name'].lower()$
-                </lid_reference>
+                <lid_reference>$target['lid']$</lid_reference>
                 <reference_type>collection_to_target</reference_type>
             </Internal_Reference>
         </Target_Identification>
@@ -116,12 +114,12 @@ $IF("miscellaneous" not in collection_name)
     </Context_Area>
     <Reference_List>
         <Internal_Reference>
-            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id$-dhb</lid_reference>
+            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id.lower()$-dhb</lid_reference>
             <reference_type>collection_to_document</reference_type>
             <comment>The Data Handbook for $inst_id.upper()$</comment>
         </Internal_Reference>
         <Internal_Reference>
-            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id$-ihb</lid_reference>
+            <lid_reference>urn:nasa:pds:hst-support:document:$inst_id.lower()$-ihb</lid_reference>
             <reference_type>collection_to_document</reference_type>
             <comment>The Instrument Handbook for $inst_id.upper()$</comment>
         </Internal_Reference>

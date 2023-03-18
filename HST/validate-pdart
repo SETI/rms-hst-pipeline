@@ -1,5 +1,6 @@
 #!/bin/bash
-CONTEXT_PRODUCTS=../tmp-context-products.json
+# Use the tmp-context-products.json under HST
+CONTEXT_PRODUCTS=./tmp-context-products.json
 XMLDIR=../xml
 # Remove this scaffolding when switching to the new HST_Parameters implementation.
 NEW=-new
