@@ -51,6 +51,11 @@ class TaskQueue(Base):
 def create_task_queue_table():
     Base.metadata.create_all(engine)
 
+def init_task_queue_table():
+    create_task_queue_table()
+    # Make sure all entries are clear if the database exists
+    erase_all_task_queue()
+
 def add_a_prog_id_task_queue(proposal_id, task_num, status):
     """
     Add an entry of the given proposal id with its task num and task status to the task

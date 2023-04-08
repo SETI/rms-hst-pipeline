@@ -20,6 +20,7 @@ from hst_helper.general_utils import (date_time_to_date,
 from .task_queue_db import (add_a_prog_id_task_queue,
                             create_task_queue_table,
                             erase_all_task_queue,
+                            init_task_queue_table,
                             remove_a_prog_id_task_queue,
                             update_a_prog_id_task_queue)
 
@@ -64,7 +65,7 @@ def run_pipeline(proposal_ids, logger=None):
     # 1. init tq dict for prog id to start with task num 0
 
     try:
-        create_task_queue_table()
+        init_task_queue_table()
     except OperationalError as e:
         if 'alreadt exists' in e.__repr__():
             pass
@@ -84,7 +85,7 @@ def run_pipeline(proposal_ids, logger=None):
         add_a_prog_id_task_queue(prog_id.zfill(5), 0, 0)
     # erase_all_task_queue()
     # update_a_prog_id_task_queue(prog_id,3,1)
-    remove_a_prog_id_task_queue(prog_id)
+    # remove_a_prog_id_task_queue(prog_id)
 
 
         # Start pipeline for current prog_id
