@@ -98,7 +98,7 @@ def file_md5(filepath):
     """Find the hexadecimal digest (checksum) of a file in the filesystem.
 
     Input:
-        filepath:   the path of the targeted file
+        filepath:   the path of the targeted file.
     """
     chunk_size = 4096
     hasher = md5()
