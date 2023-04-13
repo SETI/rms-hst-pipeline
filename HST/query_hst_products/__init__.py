@@ -94,7 +94,7 @@ def query_hst_products(proposal_id, logger=None):
     staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
     shutil.rmtree(staging_dir + '/mastDownload')
 
-    return visit_diff
+    return (visit_diff, list(files_dict.keys()))
 
 def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=False):
     """Create {fname}.txt in the pipeline visit directory of a proposal id. The file

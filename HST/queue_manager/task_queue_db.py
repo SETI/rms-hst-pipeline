@@ -74,6 +74,10 @@ def add_a_prog_id_task_queue(proposal_id, task_num, priority, status):
                           status=status)
         session.add(new_entry)
     else:
+        # If the current or later task has been queued, we return False. This is a flag to
+        # avoid spawning duplicated subprocess
+        if entry.task_num >= task_num:
+            return False
         entry.task_num = task_num
         entry.priority = priority
         entry.status = status
@@ -144,7 +148,10 @@ def get_next_task_to_be_run():
     # Get the task with the highest priority & task num, this will prioritize finishing
     # a pipeline process over running tasks at early pipeline stage or starting a new
     # pipeline process.
-    query = (session.query(TaskQueue).where(TaskQueue.priority==subquery)
+    query = (session.query(TaskQueue).filter(
+                                        TaskQueue.priority==subquery,
+                                        TaskQueue.status==0
+                                      )
                                      .order_by(TaskQueue.task_num.desc())
                                      .first())
     return query

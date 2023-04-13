@@ -63,8 +63,8 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-visit_li = query_hst_products(proposal_id, logger)
-logger.info('List of visits in which any files are new or chagned: ' + str(visit_li))
+new_visit_li, all_visits = query_hst_products(proposal_id, logger)
+logger.info('List of visits in which any files are new or chagned: ' + str(new_visit_li))
 # TODO: TASK QUEUE
 # - if list is not empty, queue update-hst-program with the list of visits
 # - if list is empty, re-queue query-hst-products with a 30-day delay
