@@ -19,7 +19,7 @@ import pdslogger
 import sys
 
 from query_hst_moving_targets import query_hst_moving_targets
-from queue_manager import queue_in_next_task
+from queue_manager import queue_next_task
 from hst_helper import (START_DATE,
                         END_DATE,
                         RETRY,
@@ -102,8 +102,8 @@ logger.info('List of program ids: ' + str(pid_li))
 # - if there is a missing HST_PIPELINE/hst_<nnnnn> missing, queue query-hst-products
 # - re-queue query-hst-moving-targets with a 30-day delay
 for proposal_id in proposal_ids:
-    print(f'============Queue in task: 1 for {proposal_id}===========')
-    queue_in_next_task(proposal_id, 1, logger)
+    print(f'===========Queue in query-hst-products, task: 1 for {proposal_id}===========')
+    queue_next_task(proposal_id, 'all', 1, logger)
 
 logger.close()
 

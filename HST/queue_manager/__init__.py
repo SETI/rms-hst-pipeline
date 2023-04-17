@@ -38,22 +38,26 @@ SUBPROCESS_LIST = []
 TASK_NUM_TO_CMD_MAPPING = {
     0: 'HST/pipeline/pipeline_query_hst_moving_targets.py --prog-id {P}',
     1: 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P}',
-    2: 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}',
-    3: 'HST/pipeline/pipeline_retrieve_hst_visit.py --prog-id {P} --vi {V}',
-    4: 'HST/pipeline/pipeline_label_hst_products.py --prog-id {P} --vi {V}',
-    5: 'HST/pipeline/pipeline_prepare_browse_products.py --prog-id {P}',
-    6: 'HST/pipeline/pipeline_finalize_hst_bundle.py --prog-id {P}',
+    2: 'Placeholder for update-hst-program, TODO: add this module',
+    3: 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}',
+    4: 'Placeholder for update-hst-visit, TODO: add this module',
+    5: 'HST/pipeline/pipeline_retrieve_hst_visit.py --prog-id {P} --vi {V}',
+    6: 'HST/pipeline/pipeline_label_hst_products.py --prog-id {P} --vi {V}',
+    7: 'HST/pipeline/pipeline_prepare_browse_products.py --prog-id {P}',
+    8: 'HST/pipeline/pipeline_finalize_hst_bundle.py --prog-id {P}',
 }
 
 # Task to prority mapping. The larger the number, the higher the priority.
 TASK_NUM_TO_PRI_MAPPING = {
     0: 1,
     1: 1,
-    2: 5,
-    3: 4,
-    4: 5,
-    5: 5,
+    2: 2,
+    3: 5,
+    4: 3,
+    5: 4,
     6: 5,
+    7: 5,
+    8: 5
 }
 
 def run_pipeline(proposal_ids, logger=None):
@@ -83,20 +87,37 @@ def run_pipeline(proposal_ids, logger=None):
             pass
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         print(f'============Queue in the first task: 0 for {formatted_proposal_id}===========')
-        queue_in_next_task(formatted_proposal_id, 0, logger)
-        # add_a_prog_id_task_queue(formatted_proposal_id, 2, 3, 0)
+        queue_next_task(formatted_proposal_id, 'all', 0, logger)
+        # add_a_prog_id_task_queue(formatted_proposal_id, 'all', 2, 3, 0)
+        # add_a_prog_id_task_queue(formatted_proposal_id, '01', 2, 3, 0)
         # update_a_prog_id_task_status(formatted_proposal_id, 1)
-    # add_a_prog_id_task_queue('09059'.zfill(5), 4, 5, 0)
-    # add_a_prog_id_task_queue('12345'.zfill(5), 3, 6, 1)
+    # Add
+    # add_a_prog_id_task_queue('09059'.zfill(5),'all', 4, 5, 0)
+    # add_a_prog_id_task_queue('09059'.zfill(5),'01', 2, 5, 0)
+    # add_a_prog_id_task_queue('07885'.zfill(5),'all', 3, 6, 1)
+    # add_a_prog_id_task_queue('07885'.zfill(5),'02', 4, 6, 1)
+    # add_a_prog_id_task_queue('07885'.zfill(5),'01', 5, 5, 1)
+    # add_a_prog_id_task_queue('07885'.zfill(5),'01', 5, 4, 0)
+    # add_a_prog_id_task_queue('12345'.zfill(5),'all', 3, 6, 1)
+    # Update
+    # update_a_prog_id_task_queue('07885'.zfill(5),'01', 2, 7, 0)
+    # update_a_prog_id_task_status('07885'.zfill(5),'02', 1)
+    # update_a_prog_id_task_status('07885'.zfill(5),'01', 0)
+    # update_a_prog_id_task_status('12345'.zfill(5),'all', 0)
+    # update_a_prog_id_task_status('12345'.zfill(5),'01', 1)
+    # Remove one entry:
+    # remove_a_prog_id_task_queue('07885'.zfill(5), '01')
+    # Remove all entry:
     # erase_all_task_queue()
-    # update_a_prog_id_task_queue(prog_id,3,1)
-    # remove_a_prog_id_task_queue(prog_id)
+    # Get next task
+    # task = get_next_task_to_be_run()
+    # print('!!!!!!!!!!!!!!!!!!!!')
+    # print(task)
 
 
         # Start pipeline for current prog_id
 
-
-def queue_in_next_task(proposal_id, task_num, logger):
+def queue_next_task(proposal_id, visit, task_num, logger):
     """Queue in the next task for a given proposal id to database, and wait for the open
     subprocess slot to execute the corresponding command. Once there is an open slot,
     update the task queue status
@@ -107,57 +128,66 @@ def queue_in_next_task(proposal_id, task_num, logger):
 
     Inputs:
         proposal_id:    the proposal if of the current task.
+        visit:          two character visit.
         task_num:       a number represents the current task.
         logger:         pdslogger to use; None for default EasyLogger.
+
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Queue in the next task for: {formatted_proposal_id}, task num: {task_num}')
+    logger.info(f'Queue in the next task for: {formatted_proposal_id}'
+                + f', task num: {task_num}')
 
-    priority = TASK_NUM_TO_PRI_MAPPING[0]
+    priority = TASK_NUM_TO_PRI_MAPPING[task_num]
     # if the task has been queued, we don't spawn duplicated subprocess.
-    spawn_subproc = add_a_prog_id_task_queue(formatted_proposal_id, task_num, priority, 0)
+    spawn_subproc = add_a_prog_id_task_queue(formatted_proposal_id, visit,
+                                             task_num, priority, 0)
     if spawn_subproc is False:
         return
 
-    cmd_parts = (TASK_NUM_TO_CMD_MAPPING[task_num].replace('{P}', formatted_proposal_id)
-                                                  .split(' '))
+    cmd_parts = TASK_NUM_TO_CMD_MAPPING[task_num].replace('{P}', formatted_proposal_id)
+    cmd_parts = cmd_parts.replace('{V}', visit)
+    cmd_parts = cmd_parts.split(' ')
+
     program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
     args = [sys.executable, program_path] + cmd_parts[1::]
     max_allowed_time = MAX_ALLOWED_TIME
     # spawn the task subprocess
-    run_and_maybe_wait(args,  max_allowed_time, formatted_proposal_id, logger)
+    run_and_maybe_wait(args,  max_allowed_time, formatted_proposal_id, visit, logger)
 
-
-def run_and_maybe_wait(args,  max_allowed_time, proposal_id, logger):
+def run_and_maybe_wait(args,  max_allowed_time, proposal_id, visit, logger):
     """Run one subprocess, waiting as necessary for a slot to open up.
 
     Inputs:
         args:               the command of a subprocess to be executed.
         max_allowed_time:   the max time for a subprocess to be done before killing it.
-        proposal_id:        the proposal if of the current task
+        proposal_id:        the proposal if of the current task.
+        visit:          two character visit.
         logger:             pdslogger to use; None for default EasyLogger.
     """
     # wait for an open subprocess slot
     wait_for_subprocess()
 
-    # query database and see if there is a higher priority job waiting to be run, if so
-    # spawn that subprocess first
+    # query database and see if there is a higher priority job waiting (status: 0) to
+    # be run, if so, spawn that subprocess first.
     task = get_next_task_to_be_run()
-    if task is not None and task.proposal_id != proposal_id:
-        # TODO: handle visits {V}
-        cmd_parts = (TASK_NUM_TO_CMD_MAPPING[task.task_num].replace('{P}', proposal_id)
-                                                           .split(' '))
+    if (task is not None
+        and task.proposal_id != proposal_id
+        and task.visit != visit):
+        cmd_parts = TASK_NUM_TO_CMD_MAPPING[task.task_num].replace('{P}',
+                                                                   task.proposal_id)
+        cmd_parts = cmd_parts.replace('{V}', task.visit)
+        cmd_parts = cmd_parts.split(' ')
+
         program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
         sub_args = [sys.executable, program_path] + cmd_parts[1::]
         run_and_maybe_wait(sub_args,  max_allowed_time, task.proposal_id, logger)
 
     # Update the task status to running (1)
-    update_a_prog_id_task_status(proposal_id, 1)
+    update_a_prog_id_task_status(proposal_id, visit, 1)
     logger.debug("Spawning subprocess %s", str(args))
     pid = subprocess.Popen(args)
     SUBPROCESS_LIST.append((pid, time.time(), time.time()+max_allowed_time, proposal_id))
-
 
 def wait_for_subprocess(all=False):
     """Wait for one (or all) subprocess slots to open up.
