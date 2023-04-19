@@ -11,7 +11,7 @@ from sqlalchemy import (create_engine,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from hst_helper import DB_URI
+from . import DB_URI
 
 engine = create_engine(DB_URI, echo = True)
 Base = declarative_base()
@@ -20,9 +20,9 @@ class TaskQueue(Base):
     """
     A database representation of the task queue. Each row represents the task queue of
     a proposal id & visit, and it will have columns of the proposal id, visit,task num
-    (current task), task priority and status (current task status). Each row will have
-    an unique combination of proposal id & visit columns. These will make sure tasks for
-    these cases can be run parallely:
+    (current task), task priority, status (current task status), and task command. Each
+    row will have an unique combination of proposal id & visit columns. These will make
+    sure tasks for these cases can be run in parallel:
     - tasks of different proposal ids
     - tasks for different visits of the same propsal id
     """
@@ -35,6 +35,7 @@ class TaskQueue(Base):
     task_num = Column(Integer, nullable=False)
     priority = Column(Integer, nullable=False)
     status = Column(Integer, nullable=False)
+    cmd = Column(String, nullable=False)
 
     def __repr__(self) -> str:
         return (
@@ -43,6 +44,7 @@ class TaskQueue(Base):
             f", task_num={self.task_num!r})"
             f", priority={self.priority!r})"
             f", status={self.status!r})"
+            f", cmd={self.cmd!r})"
         )
 
 def drop_task_queue_table():
@@ -57,16 +59,17 @@ def init_task_queue_table():
     # Make sure all entries are clear if the database exists
     erase_all_task_queue()
 
-def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status):
+def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, cmd):
     """
-    Add an entry of the given proposal id with its task num and task status to the task
-    queue table. If the proposal id exists in the table, we update the entry.
+    Add an entry of the given proposal id & visit with its task num and task status to
+    the task queue table. If the proposal id exists in the table, we update the entry.
     Input:
         proposal_id:   a proposal id of the task queue.
-        visit:         two character visit.
+        visit:         a two character visit or ''.
         task_num:      a number represents the current task.
         priority:      a number reporeents task priority.
         status:        the status of the current task, 0 is wating and 1 is running.
+        cmd:           the command to run the task.
     """
 
     Session = sessionmaker(engine)
@@ -81,7 +84,8 @@ def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status):
                               visit=visit,
                               task_num=task_num,
                               priority=priority,
-                              status=status)
+                              status=status,
+                              cmd=cmd)
         session.add(new_entry)
     else:
         # If the current or a later task has been queued, we return False. This is a
@@ -91,9 +95,10 @@ def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status):
         entry.task_num = task_num
         entry.priority = priority
         entry.status = status
+        entry.cmd = cmd
     session.commit()
 
-def update_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status):
+def update_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, cmd):
     """
     Update an entry of the given proposal id & visit with its task num and task status
     to the task queue table.
@@ -103,6 +108,7 @@ def update_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status):
         task_num:      a number represents the current task.
         priority:      a number reporeents task priority.
         status:        the status of the current task, 0 is wating and 1 is running.
+        cmd:           the command to run the task.
     """
     Session = sessionmaker(engine)
     session = Session()
@@ -114,6 +120,7 @@ def update_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status):
         row.task_num = task_num
         row.priority = priority
         row.status = status
+        row.cmd = cmd
         session.commit()
 
 def update_a_prog_id_task_status(proposal_id, visit, status):

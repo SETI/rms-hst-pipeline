@@ -103,7 +103,7 @@ logger.info('List of program ids: ' + str(pid_li))
 # - re-queue query-hst-moving-targets with a 30-day delay
 for proposal_id in proposal_ids:
     print(f'===========Queue in query-hst-products, task: 1 for {proposal_id}===========')
-    queue_next_task(proposal_id, 'all', 1, logger)
+    queue_next_task(proposal_id, '', 1, logger)
 
 logger.close()
 

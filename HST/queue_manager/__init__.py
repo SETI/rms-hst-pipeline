@@ -25,25 +25,30 @@ from .task_queue_db import (add_a_prog_id_task_queue,
                             update_a_prog_id_task_status,
                             update_a_prog_id_task_queue)
 
+# task queue db
+DB_URI = 'sqlite:///task_queue.db'
+# python executable
 PYTHON_EXE = sys.executable
 # root of pds-hst-pipeline dir
 HST_SOURCE_ROOT = os.environ["PDS_HST_PIPELINE"]
 # max allowed suborprocess time in seconds
 MAX_ALLOWED_TIME = 60 * 60
-MAX_SUBPROCESS_CNT = 3
+# max number of subprocesses to run at a time
+MAX_SUBPROCESS_CNT = 2
 SUBPROCESS_LIST = []
 
-# Task to script command mapping. {P} will be replaced by proposal
-# id and {V} will be replaced by visit number.
+# Task to script command mapping. {P} will be replaced by proposal id and {V} will be
+# replaced by a two character visit or multiple visits separated by spaces (for
+# pipeline_update_hst_program).
 TASK_NUM_TO_CMD_MAPPING = {
     0: 'HST/pipeline/pipeline_query_hst_moving_targets.py --prog-id {P}',
     1: 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P}',
-    2: 'Placeholder for update-hst-program, TODO: add this module',
+    2: 'HST/pipeline/pipeline_update_hst_program.py --prog-id {P} --vi {V}',
     3: 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}',
-    4: 'Placeholder for update-hst-visit, TODO: add this module',
+    4: 'HST/pipeline/pipeline_update_hst_visit.py --prog-id {P} --vi {V}',
     5: 'HST/pipeline/pipeline_retrieve_hst_visit.py --prog-id {P} --vi {V}',
     6: 'HST/pipeline/pipeline_label_hst_products.py --prog-id {P} --vi {V}',
-    7: 'HST/pipeline/pipeline_prepare_browse_products.py --prog-id {P}',
+    7: 'HST/pipeline/pipeline_prepare_browse_products.py --prog-id {P} --vi {V}',
     8: 'HST/pipeline/pipeline_finalize_hst_bundle.py --prog-id {P}',
 }
 
@@ -87,7 +92,7 @@ def run_pipeline(proposal_ids, logger=None):
             pass
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         print(f'============Queue in the first task: 0 for {formatted_proposal_id}===========')
-        queue_next_task(formatted_proposal_id, 'all', 0, logger)
+        queue_next_task(formatted_proposal_id, '', 0, logger)
         # add_a_prog_id_task_queue(formatted_proposal_id, 'all', 2, 3, 0)
         # add_a_prog_id_task_queue(formatted_proposal_id, '01', 2, 3, 0)
         # update_a_prog_id_task_status(formatted_proposal_id, 1)
@@ -117,7 +122,7 @@ def run_pipeline(proposal_ids, logger=None):
 
         # Start pipeline for current prog_id
 
-def queue_next_task(proposal_id, visit, task_num, logger):
+def queue_next_task(proposal_id, visit_info, task_num, logger):
     """Queue in the next task for a given proposal id to database, and wait for the open
     subprocess slot to execute the corresponding command. Once there is an open slot,
     update the task queue status
@@ -128,7 +133,7 @@ def queue_next_task(proposal_id, visit, task_num, logger):
 
     Inputs:
         proposal_id:    the proposal if of the current task.
-        visit:          two character visit.
+        visit_info:     a two character visit, a list of visits or ''.
         task_num:       a number represents the current task.
         logger:         pdslogger to use; None for default EasyLogger.
 
@@ -138,22 +143,28 @@ def queue_next_task(proposal_id, visit, task_num, logger):
     logger.info(f'Queue in the next task for: {formatted_proposal_id}'
                 + f', task num: {task_num}')
 
+    visit_arg = ' '.join(visit_info) if type(visit_info) is list else visit_info
+    visit = '' if type(visit_info) is list else visit_info
+
     priority = TASK_NUM_TO_PRI_MAPPING[task_num]
+    cmd = TASK_NUM_TO_CMD_MAPPING[task_num].replace('{P}', formatted_proposal_id)
+    cmd = cmd.replace('{V}', visit_arg)
     # if the task has been queued, we don't spawn duplicated subprocess.
     spawn_subproc = add_a_prog_id_task_queue(formatted_proposal_id, visit,
-                                             task_num, priority, 0)
+                                             task_num, priority, 0, cmd)
     if spawn_subproc is False:
         return
 
-    cmd_parts = TASK_NUM_TO_CMD_MAPPING[task_num].replace('{P}', formatted_proposal_id)
-    cmd_parts = cmd_parts.replace('{V}', visit)
-    cmd_parts = cmd_parts.split(' ')
-
+    # cmd_parts = TASK_NUM_TO_CMD_MAPPING[task_num].replace('{P}', formatted_proposal_id)
+    # cmd_parts = cmd_parts.replace('{V}', visit_arg)
+    cmd_parts = cmd.split(' ')
     program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
     args = [sys.executable, program_path] + cmd_parts[1::]
     max_allowed_time = MAX_ALLOWED_TIME
     # spawn the task subprocess
-    run_and_maybe_wait(args,  max_allowed_time, formatted_proposal_id, visit, logger)
+    pid = run_and_maybe_wait(args,  max_allowed_time,
+                             formatted_proposal_id, visit, logger)
+    return pid
 
 def run_and_maybe_wait(args,  max_allowed_time, proposal_id, visit, logger):
     """Run one subprocess, waiting as necessary for a slot to open up.
@@ -171,23 +182,31 @@ def run_and_maybe_wait(args,  max_allowed_time, proposal_id, visit, logger):
     # query database and see if there is a higher priority job waiting (status: 0) to
     # be run, if so, spawn that subprocess first.
     task = get_next_task_to_be_run()
+    # print('====================================NEXT')
+    # print(f'passed in prog id: {proposal_id}')
+    # print(f'passed in visit: {visit}')
+    # print(len(SUBPROCESS_LIST))
+    # print(task)
     if (task is not None
         and task.proposal_id != proposal_id
         and task.visit != visit):
-        cmd_parts = TASK_NUM_TO_CMD_MAPPING[task.task_num].replace('{P}',
-                                                                   task.proposal_id)
-        cmd_parts = cmd_parts.replace('{V}', task.visit)
-        cmd_parts = cmd_parts.split(' ')
-
+        # print('1111111111111111111111')
+        # cmd_parts = TASK_NUM_TO_CMD_MAPPING[task.task_num].replace('{P}',
+        #                                                            task.proposal_id)
+        # cmd_parts = cmd_parts.replace('{V}', task.visit)
+        cmd_parts = task.cmd.split(' ')
         program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
         sub_args = [sys.executable, program_path] + cmd_parts[1::]
         run_and_maybe_wait(sub_args,  max_allowed_time, task.proposal_id, logger)
-
+    # else:
+    #     print('22222222222222222222222')
     # Update the task status to running (1)
     update_a_prog_id_task_status(proposal_id, visit, 1)
     logger.debug("Spawning subprocess %s", str(args))
     pid = subprocess.Popen(args)
     SUBPROCESS_LIST.append((pid, time.time(), time.time()+max_allowed_time, proposal_id))
+
+    return pid
 
 def wait_for_subprocess(all=False):
     """Wait for one (or all) subprocess slots to open up.
@@ -208,7 +227,6 @@ def wait_for_subprocess(all=False):
             if pid.poll() is not None:
                 # The subprocess completed, make the slot available for next subprocess
                 del SUBPROCESS_LIST[i]
-                # TODO: update the queue manager (json), next step waiting
                 break
 
             if cur_time > proc_max_time:
