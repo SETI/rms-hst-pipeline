@@ -102,7 +102,7 @@ logger.info('List of program ids: ' + str(pid_li))
 # - if there is a missing HST_PIPELINE/hst_<nnnnn> missing, queue query-hst-products
 # - re-queue query-hst-moving-targets with a 30-day delay
 for proposal_id in proposal_ids:
-    print(f'===========Queue in query-hst-products, task: 1 for {proposal_id}===========')
+    logger.info(f'Queue query_hst_products for {proposal_id}')
     queue_next_task(proposal_id, '', 1, logger)
 
 logger.close()

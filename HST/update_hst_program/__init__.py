@@ -5,10 +5,6 @@ import pdslogger
 
 from queue_manager import queue_next_task
 from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
-from hst_helper.query_utils import (download_files,
-                                    get_filtered_products,
-                                    query_mast_slice)
-from hst_helper.fs_utils import get_program_dir_path
 
 def update_hst_program(proposal_id, visit_li, logger=None):
     """Overall task to create a new bundle or to manage the update of an existing bundle.
@@ -28,17 +24,19 @@ def update_hst_program(proposal_id, visit_li, logger=None):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    print(f'===========Queue in get_program_info, task: 3 for {proposal_id}===========')
+    logger.info(f'Queue get_program_info for {proposal_id}')
     p1 = queue_next_task(proposal_id, '', 3, logger)
     p1.wait()
+
     pid_li = []
     for vi in visit_li:
-       print(f'===========Queue in update_hst_visit, task: 4 for {proposal_id} & vi {vi}===========')
-       pid = queue_next_task(proposal_id, vi, 4, logger)
-       pid_li.append(pid)
+        logger.info(f'Queue update_hst_visit for {proposal_id} visit {vi}')
+        pid = queue_next_task(proposal_id, vi, 4, logger)
+        pid_li.append(pid)
     for p in pid_li:
         p.wait()
-    print(f'===========Queue in finalize-hst-bundle, task: 8 for {proposal_id}===========')
+
+    logger.info(f'Queue finalize_hst_bundle for {proposal_id}')
     p2 =  queue_next_task(proposal_id, '', 8, logger)
     p2.wait()
     # Remove all task queue for the given proposal id

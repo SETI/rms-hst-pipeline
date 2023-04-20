@@ -3,8 +3,6 @@
 ##########################################################################################
 from sqlalchemy import (create_engine,
                         func,
-                        MetaData,
-                        Table,
                         Column,
                         Integer,
                         String)

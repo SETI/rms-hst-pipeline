@@ -9,21 +9,12 @@ import time
 
 from sqlalchemy.exc import OperationalError
 
-from product_labels.suffix_info import INSTRUMENT_NAMES
 from hst_helper.fs_utils import get_formatted_proposal_id
-from hst_helper.general_utils import (date_time_to_date,
-                                      get_citation_info,
-                                      get_clean_target_text,
-                                      get_collection_label_data,
-                                      get_instrument_id_set)
+
 from .task_queue_db import (add_a_prog_id_task_queue,
-                            create_task_queue_table,
-                            erase_all_task_queue,
                             get_next_task_to_be_run,
                             init_task_queue_table,
-                            remove_a_prog_id_task_queue,
-                            update_a_prog_id_task_status,
-                            update_a_prog_id_task_queue)
+                            update_a_prog_id_task_status)
 
 # task queue db
 DB_URI = 'sqlite:///task_queue.db'
@@ -87,40 +78,12 @@ def run_pipeline(proposal_ids, logger=None):
         try:
             proposal_id = int(prog_id)
         except ValueError:
-            # logger.exception(ValueError)
             logger.warn(f'Proposal id: {prog_id} is not valid.')
             pass
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-        print(f'============Queue in the first task: 0 for {formatted_proposal_id}===========')
+        # Start hst pipeline for each proposal id
+        logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
         queue_next_task(formatted_proposal_id, '', 0, logger)
-        # add_a_prog_id_task_queue(formatted_proposal_id, 'all', 2, 3, 0)
-        # add_a_prog_id_task_queue(formatted_proposal_id, '01', 2, 3, 0)
-        # update_a_prog_id_task_status(formatted_proposal_id, 1)
-    # Add
-    # add_a_prog_id_task_queue('09059'.zfill(5),'all', 4, 5, 0)
-    # add_a_prog_id_task_queue('09059'.zfill(5),'01', 2, 5, 0)
-    # add_a_prog_id_task_queue('07885'.zfill(5),'all', 3, 6, 1)
-    # add_a_prog_id_task_queue('07885'.zfill(5),'02', 4, 6, 1)
-    # add_a_prog_id_task_queue('07885'.zfill(5),'01', 5, 5, 1)
-    # add_a_prog_id_task_queue('07885'.zfill(5),'01', 5, 4, 0)
-    # add_a_prog_id_task_queue('12345'.zfill(5),'all', 3, 6, 1)
-    # Update
-    # update_a_prog_id_task_queue('07885'.zfill(5),'01', 2, 7, 0)
-    # update_a_prog_id_task_status('07885'.zfill(5),'02', 1)
-    # update_a_prog_id_task_status('07885'.zfill(5),'01', 0)
-    # update_a_prog_id_task_status('12345'.zfill(5),'all', 0)
-    # update_a_prog_id_task_status('12345'.zfill(5),'01', 1)
-    # Remove one entry:
-    # remove_a_prog_id_task_queue('07885'.zfill(5), '01')
-    # Remove all entry:
-    # erase_all_task_queue()
-    # Get next task
-    # task = get_next_task_to_be_run()
-    # print('!!!!!!!!!!!!!!!!!!!!')
-    # print(task)
-
-
-        # Start pipeline for current prog_id
 
 def queue_next_task(proposal_id, visit_info, task_num, logger):
     """Queue in the next task for a given proposal id to database, and wait for the open
@@ -155,8 +118,6 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
     if spawn_subproc is False:
         return
 
-    # cmd_parts = TASK_NUM_TO_CMD_MAPPING[task_num].replace('{P}', formatted_proposal_id)
-    # cmd_parts = cmd_parts.replace('{V}', visit_arg)
     cmd_parts = cmd.split(' ')
     program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
     args = [sys.executable, program_path] + cmd_parts[1::]
@@ -182,25 +143,15 @@ def run_and_maybe_wait(args,  max_allowed_time, proposal_id, visit, logger):
     # query database and see if there is a higher priority job waiting (status: 0) to
     # be run, if so, spawn that subprocess first.
     task = get_next_task_to_be_run()
-    # print('====================================NEXT')
-    # print(f'passed in prog id: {proposal_id}')
-    # print(f'passed in visit: {visit}')
-    # print(len(SUBPROCESS_LIST))
-    # print(task)
+
     if (task is not None
         and task.proposal_id != proposal_id
         and task.visit != visit):
-        # print('1111111111111111111111')
-        # cmd_parts = TASK_NUM_TO_CMD_MAPPING[task.task_num].replace('{P}',
-        #                                                            task.proposal_id)
-        # cmd_parts = cmd_parts.replace('{V}', task.visit)
         cmd_parts = task.cmd.split(' ')
         program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
         sub_args = [sys.executable, program_path] + cmd_parts[1::]
         run_and_maybe_wait(sub_args,  max_allowed_time, task.proposal_id, logger)
-    # else:
-    #     print('22222222222222222222222')
-    # Update the task status to running (1)
+
     update_a_prog_id_task_status(proposal_id, visit, 1)
     logger.debug("Spawning subprocess %s", str(args))
     pid = subprocess.Popen(args)
