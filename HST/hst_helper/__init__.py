@@ -1,5 +1,6 @@
 ##########################################################################################
 # hst_helper/__init__.py
+# This file contains gobal variables shared between multiple tasks.
 ##########################################################################################
 import os
 from collections import defaultdict
@@ -66,6 +67,3 @@ COL_NAME_PREFIX = ['data_', 'miscellaneous_', 'browse_']
 # For citation info, need to fake it to something that will pass the XsdValidator.jar
 # for now. required pattern for dummy value: 10\\.\\S+/\\S+
 DOI = "10.1/2",
-
-# TASK QUEUE DB
-DB_URI = 'sqlite:///task_queue.db'

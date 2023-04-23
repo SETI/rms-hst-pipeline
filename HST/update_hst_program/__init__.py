@@ -26,19 +26,23 @@ def update_hst_program(proposal_id, visit_li, logger=None):
 
     logger.info(f'Queue get_program_info for {proposal_id}')
     p1 = queue_next_task(proposal_id, '', 3, logger)
-    p1.wait()
+    p1.communicate()
 
     pid_li = []
+    print('====================')
+    print(visit_li)
     for vi in visit_li:
         logger.info(f'Queue update_hst_visit for {proposal_id} visit {vi}')
         pid = queue_next_task(proposal_id, vi, 4, logger)
         pid_li.append(pid)
     for p in pid_li:
-        p.wait()
+        p.communicate()
+    logger.info(f'All visits for {proposal_id} have completed update_hst_visit.')
 
     logger.info(f'Queue finalize_hst_bundle for {proposal_id}')
     p2 =  queue_next_task(proposal_id, '', 8, logger)
-    p2.wait()
-    # Remove all task queue for the given proposal id
+    p2.communicate()
+    # Remove all task queue for the given proposal id from db
     remove_all_task_queue_for_a_prog_id(proposal_id)
-    # TODO: Add finish notification
+
+    logger.info(f'HST pipeline for {proposal_id} is done.')

@@ -120,7 +120,8 @@ def get_citation_info(proposal_id, logger):
 
     for file in os.listdir(pipeline_dir):
         _, _, ext = file.rpartition('.')
-        if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
+        # We don't have an implementation to create citation info from pdf.
+        if (ext in DOCUMENT_EXT and ext != 'pdf') or file == PROGRAM_INFO_FILE:
             fp = pipeline_dir + f'/{file}'
             if formatted_proposal_id not in CITATION_INFO_DICT:
                 CITATION_INFO_DICT[formatted_proposal_id] = (

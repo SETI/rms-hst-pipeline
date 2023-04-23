@@ -66,13 +66,15 @@ logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
 new_visit_li, all_visits = query_hst_products(proposal_id, logger)
 logger.info('List of visits in which any files are new or chagned: ' + str(new_visit_li))
-# TODO: TASK QUEUE
+
 # - if list is not empty, queue update-hst-program with the list of visits
-logger.info(f'Queue update_hst_program for {proposal_id}')
-queue_next_task(proposal_id, all_visits, 2, logger)
+if len(new_visit_li) != 0:
+    logger.info(f'Queue update_hst_program for {proposal_id}')
+    queue_next_task(proposal_id, new_visit_li, 2, logger)
+
+# TODO: TASK QUEUE
 # - if list is empty, re-queue query-hst-products with a 30-day delay
 # - re-queue query-hst-products with a 90-day delay
-
 
 logger.close()
 

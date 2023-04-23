@@ -12,49 +12,33 @@ from sqlalchemy.exc import OperationalError
 from hst_helper.fs_utils import get_formatted_proposal_id
 
 from .task_queue_db import (add_a_prog_id_task_queue,
+                            create_task_queue_table,
+                            erase_all_task_queue,
                             get_next_task_to_be_run,
                             init_task_queue_table,
                             update_a_prog_id_task_status)
 
-# task queue db
-DB_URI = 'sqlite:///task_queue.db'
-# python executable
-PYTHON_EXE = sys.executable
-# root of pds-hst-pipeline dir
-HST_SOURCE_ROOT = os.environ["PDS_HST_PIPELINE"]
-# max allowed suborprocess time in seconds
-MAX_ALLOWED_TIME = 60 * 60
-# max number of subprocesses to run at a time
-MAX_SUBPROCESS_CNT = 2
-SUBPROCESS_LIST = []
+from .config import (DB_PATH,
+                     PYTHON_EXE,
+                     HST_SOURCE_ROOT,
+                     MAX_ALLOWED_TIME,
+                     MAX_SUBPROCESS_CNT,
+                     SUBPROCESS_LIST,
+                     TASK_NUM_TO_CMD_MAPPING,
+                     TASK_NUM_TO_PRI_MAPPING)
 
-# Task to script command mapping. {P} will be replaced by proposal id and {V} will be
-# replaced by a two character visit or multiple visits separated by spaces (for
-# pipeline_update_hst_program).
-TASK_NUM_TO_CMD_MAPPING = {
-    0: 'HST/pipeline/pipeline_query_hst_moving_targets.py --prog-id {P}',
-    1: 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P}',
-    2: 'HST/pipeline/pipeline_update_hst_program.py --prog-id {P} --vi {V}',
-    3: 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}',
-    4: 'HST/pipeline/pipeline_update_hst_visit.py --prog-id {P} --vi {V}',
-    5: 'HST/pipeline/pipeline_retrieve_hst_visit.py --prog-id {P} --vi {V}',
-    6: 'HST/pipeline/pipeline_label_hst_products.py --prog-id {P} --vi {V}',
-    7: 'HST/pipeline/pipeline_prepare_browse_products.py --prog-id {P} --vi {V}',
-    8: 'HST/pipeline/pipeline_finalize_hst_bundle.py --prog-id {P}',
-}
-
-# Task to prority mapping. The larger the number, the higher the priority.
-TASK_NUM_TO_PRI_MAPPING = {
-    0: 1,
-    1: 1,
-    2: 2,
-    3: 5,
-    4: 3,
-    5: 4,
-    6: 5,
-    7: 5,
-    8: 5
-}
+# # task queue db
+# DB_NAME = 'task_queue.db'
+# DB_URI = 'sqlite:///task_queue.db'
+# # python executable
+# PYTHON_EXE = sys.executable
+# # root of pds-hst-pipeline dir
+# HST_SOURCE_ROOT = os.environ["PDS_HST_PIPELINE"]
+# # max allowed suborprocess time in seconds
+# MAX_ALLOWED_TIME = 60 * 60
+# # max number of subprocesses to run at a time
+# MAX_SUBPROCESS_CNT = 2
+# SUBPROCESS_LIST = []
 
 def run_pipeline(proposal_ids, logger=None):
     """With a given list of proposal ids, run pipeline for each program id.
@@ -70,7 +54,10 @@ def run_pipeline(proposal_ids, logger=None):
         init_task_queue_table()
     except OperationalError as e:
         if 'alreadt exists' in e.__repr__():
+            erase_all_task_queue()
             pass
+        elif 'no such table' in e.__repr__():
+            create_task_queue_table()
         else:
             logger.error('Failed to create task queue table!')
 
@@ -82,6 +69,7 @@ def run_pipeline(proposal_ids, logger=None):
             pass
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         # Start hst pipeline for each proposal id
+        logger.info(f'Start to run pipeline for {proposal_id}')
         logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
         queue_next_task(formatted_proposal_id, '', 0, logger)
 
@@ -101,6 +89,11 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
         logger:         pdslogger to use; None for default EasyLogger.
 
     """
+    # if DB doesn't exist, log a warning message and return
+    if not os.path.exists(DB_PATH):
+        logger.warn(f'Task queue db: {DB_PATH} does not exist.')
+        return
+
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Queue in the next task for: {formatted_proposal_id}'
@@ -120,10 +113,10 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
 
     cmd_parts = cmd.split(' ')
     program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
-    args = [sys.executable, program_path] + cmd_parts[1::]
+    args = [PYTHON_EXE, program_path] + cmd_parts[1::]
     max_allowed_time = MAX_ALLOWED_TIME
     # spawn the task subprocess
-    pid = run_and_maybe_wait(args,  max_allowed_time,
+    pid = run_and_maybe_wait(args, max_allowed_time,
                              formatted_proposal_id, visit, logger)
     return pid
 
@@ -143,14 +136,13 @@ def run_and_maybe_wait(args,  max_allowed_time, proposal_id, visit, logger):
     # query database and see if there is a higher priority job waiting (status: 0) to
     # be run, if so, spawn that subprocess first.
     task = get_next_task_to_be_run()
-
     if (task is not None
         and task.proposal_id != proposal_id
         and task.visit != visit):
         cmd_parts = task.cmd.split(' ')
         program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
-        sub_args = [sys.executable, program_path] + cmd_parts[1::]
-        run_and_maybe_wait(sub_args,  max_allowed_time, task.proposal_id, logger)
+        sub_args = [PYTHON_EXE, program_path] + cmd_parts[1::]
+        run_and_maybe_wait(sub_args,  max_allowed_time, task.proposal_id, visit, logger)
 
     update_a_prog_id_task_status(proposal_id, visit, 1)
     logger.debug("Spawning subprocess %s", str(args))
@@ -173,14 +165,14 @@ def wait_for_subprocess(all=False):
     cur_time = time.time()
     while len(SUBPROCESS_LIST) > 0:
         for i in range(len(SUBPROCESS_LIST)):
-            pid, proc_start_time, proc_max_time, prog_id = SUBPROCESS_LIST[i]
+            pid, _, proc_max_time, _ = SUBPROCESS_LIST[i]
 
             if pid.poll() is not None:
                 # The subprocess completed, make the slot available for next subprocess
                 del SUBPROCESS_LIST[i]
                 break
 
-            if cur_time > proc_max_time:
+            if cur_time > proc_max_time and pid:
                 # If a subprocess has been running for too long, kill it
                 # Note no offset file will be written in this case
                 pid.kill()

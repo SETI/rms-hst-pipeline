@@ -9,7 +9,7 @@ from sqlalchemy import (create_engine,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from . import DB_URI
+from .config import DB_URI
 
 engine = create_engine(DB_URI, echo = True)
 Base = declarative_base()
@@ -25,7 +25,7 @@ class TaskQueue(Base):
     - tasks for different visits of the same propsal id
     """
 
-    __tablename__ = "tq"
+    __tablename__ = "task_queue"
 
     id = Column(Integer, primary_key=True, nullable=False)
     proposal_id = Column(String, nullable=False)
