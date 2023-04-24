@@ -27,19 +27,6 @@ from .config import (DB_PATH,
                      TASK_NUM_TO_CMD_MAPPING,
                      TASK_NUM_TO_PRI_MAPPING)
 
-# # task queue db
-# DB_NAME = 'task_queue.db'
-# DB_URI = 'sqlite:///task_queue.db'
-# # python executable
-# PYTHON_EXE = sys.executable
-# # root of pds-hst-pipeline dir
-# HST_SOURCE_ROOT = os.environ["PDS_HST_PIPELINE"]
-# # max allowed suborprocess time in seconds
-# MAX_ALLOWED_TIME = 60 * 60
-# # max number of subprocesses to run at a time
-# MAX_SUBPROCESS_CNT = 2
-# SUBPROCESS_LIST = []
-
 def run_pipeline(proposal_ids, logger=None):
     """With a given list of proposal ids, run pipeline for each program id.
 
