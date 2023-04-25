@@ -154,7 +154,7 @@ class Citation_Information:
             f.write('\n')
             f.write(self.title)
             f.write('\n')
-            if isinstance(self.abstract, Iterable):
+            if isinstance(self.abstract, list):
                 for line in self.abstract:
                     f.write(str(line))
                     f.write('\n')
