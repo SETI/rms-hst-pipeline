@@ -22,7 +22,6 @@ def label_hst_context_directory(proposal_id, data_dict, logger):
     3. create context xml label.
     4. create individual hst xml label.
 
-
     Inputs:
         proposal_id:    a proposal id.
         data_dict:      a data dictionary used to create the label.
