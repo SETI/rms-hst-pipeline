@@ -10,6 +10,10 @@
 #                                      [--retry RETRY] [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
+#
+# Perform query-hst-moving-targets tasks with these actions:
+# - Return a list of proposal ids with moving targets based on the query constraints.
+# - Queue query-hst-products task if HST_PIPELINE/hst_<nnnnn> directory is missing.
 ##########################################################################################
 
 import argparse
@@ -99,7 +103,7 @@ pid_li = query_hst_moving_targets(proposal_ids=proposal_ids,
                                   max_retries=retry)
 logger.info('List of program ids: ' + str(pid_li))
 
-# - if there is a missing HST_PIPELINE/hst_<nnnnn> missing, queue query-hst-products
+# - if there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
 for proposal_id in proposal_ids:
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
     if not os.path.exists(pipeline_dir):

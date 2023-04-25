@@ -1,6 +1,8 @@
 ##########################################################################################
 # queue_manager/task_queue_db.py
 ##########################################################################################
+import os
+
 from sqlalchemy import (create_engine,
                         func,
                         Column,
@@ -9,7 +11,8 @@ from sqlalchemy import (create_engine,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from .config import DB_URI
+from queue_manager.config import (DB_PATH,
+                                  DB_URI)
 
 engine = create_engine(DB_URI, echo = True)
 Base = declarative_base()
@@ -46,21 +49,39 @@ class TaskQueue(Base):
         )
 
 def drop_task_queue_table():
+    """
+    Drop the task queue table in the database.
+    """
     TaskQueue.__table__.drop(engine)
 
 def create_task_queue_table():
+    """
+    Create a database with the task queue table.
+    """
     Base.metadata.create_all(engine)
 
 def init_task_queue_table():
+    """
+    Initialize the database by dropping the existing task queue table, and create a new
+    & empty one.
+    """
     drop_task_queue_table()
     create_task_queue_table()
     # Make sure all entries are clear if the database exists
     erase_all_task_queue()
 
+def db_exists():
+    """
+    Check if the database exists before performing CRUD to it. Return a boolean flag.
+    """
+    return os.path.exists(DB_PATH)
+
+
 def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, cmd):
     """
     Add an entry of the given proposal id & visit with its task num and task status to
     the task queue table. If the proposal id exists in the table, we update the entry.
+
     Input:
         proposal_id:   a proposal id of the task queue.
         visit:         a two character visit or ''.
@@ -69,6 +90,8 @@ def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, cmd
         status:        the status of the current task, 0 is wating and 1 is running.
         cmd:           the command to run the task.
     """
+    if not db_exists():
+        return
 
     Session = sessionmaker(engine)
     session = Session()
@@ -100,6 +123,7 @@ def update_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, 
     """
     Update an entry of the given proposal id & visit with its task num and task status
     to the task queue table.
+
     Input:
         proposal_id:   a proposal id of the task queue.
         visit:         two character visit.
@@ -108,6 +132,9 @@ def update_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, 
         status:        the status of the current task, 0 is wating and 1 is running.
         cmd:           the command to run the task.
     """
+    if not db_exists():
+        return
+
     Session = sessionmaker(engine)
     session = Session()
     row = session.query(TaskQueue).filter(
@@ -125,11 +152,15 @@ def update_a_prog_id_task_status(proposal_id, visit, status):
     """
     Update an entry of the given proposal id & visit with its task num and task status
     to the task queue table.
+
     Input:
         proposal_id:   a proposal id of the task queue.
         visit:         two character visit.
         status:        the status of the current task, 0 is wating and 1 is running.
     """
+    if not db_exists():
+        return
+
     Session = sessionmaker(engine)
     session = Session()
     row = session.query(TaskQueue).filter(
@@ -146,6 +177,9 @@ def remove_a_prog_id_task_queue(proposal_id, visit):
     Input:
         proposal_id:   a proposal id of the task queue.
     """
+    if not db_exists():
+        return
+
     Session = sessionmaker(engine)
     session = Session()
     session.query(TaskQueue).filter(
@@ -157,9 +191,13 @@ def remove_a_prog_id_task_queue(proposal_id, visit):
 def remove_all_task_queue_for_a_prog_id(proposal_id):
     """
     Remove all task queue entries of the given proposal id to the task queue table.
+
     Input:
         proposal_id:   a proposal id of the task queue.
     """
+    if not db_exists():
+        return
+
     Session = sessionmaker(engine)
     session = Session()
     session.query(TaskQueue).filter(TaskQueue.proposal_id==proposal_id).delete()
@@ -169,6 +207,9 @@ def erase_all_task_queue():
     """
     Remove all entries in the task queue table.
     """
+    if not db_exists():
+        return
+
     Session = sessionmaker(engine)
     session = Session()
     session.query(TaskQueue).delete()
@@ -178,6 +219,9 @@ def get_next_task_to_be_run():
     """
     Get the next task to be run from database. Return the table row entry.
     """
+    if not db_exists():
+        return
+
     Session = sessionmaker(engine)
     session = Session()
     # Get the tasks with the highest priority & waiting status

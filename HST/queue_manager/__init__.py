@@ -11,21 +11,22 @@ from sqlalchemy.exc import OperationalError
 
 from hst_helper.fs_utils import get_formatted_proposal_id
 
-from .task_queue_db import (add_a_prog_id_task_queue,
-                            create_task_queue_table,
-                            erase_all_task_queue,
-                            get_next_task_to_be_run,
-                            init_task_queue_table,
-                            update_a_prog_id_task_status)
+from queue_manager.task_queue_db import (add_a_prog_id_task_queue,
+                                         create_task_queue_table,
+                                         db_exists,
+                                         erase_all_task_queue,
+                                         get_next_task_to_be_run,
+                                         init_task_queue_table,
+                                         update_a_prog_id_task_status)
 
-from .config import (DB_PATH,
-                     PYTHON_EXE,
-                     HST_SOURCE_ROOT,
-                     MAX_ALLOWED_TIME,
-                     MAX_SUBPROCESS_CNT,
-                     SUBPROCESS_LIST,
-                     TASK_NUM_TO_CMD_MAPPING,
-                     TASK_NUM_TO_PRI_MAPPING)
+from queue_manager.config import (DB_PATH,
+                                  PYTHON_EXE,
+                                  HST_SOURCE_ROOT,
+                                  MAX_ALLOWED_TIME,
+                                  MAX_SUBPROCESS_CNT,
+                                  SUBPROCESS_LIST,
+                                  TASK_NUM_TO_CMD_MAPPING,
+                                  TASK_NUM_TO_PRI_MAPPING)
 
 def run_pipeline(proposal_ids, logger=None):
     """With a given list of proposal ids, run pipeline for each program id.
@@ -42,7 +43,6 @@ def run_pipeline(proposal_ids, logger=None):
     except OperationalError as e:
         if 'alreadt exists' in e.__repr__():
             erase_all_task_queue()
-            pass
         elif 'no such table' in e.__repr__():
             create_task_queue_table()
         else:
@@ -77,7 +77,7 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
 
     """
     # if DB doesn't exist, log a warning message and return
-    if not os.path.exists(DB_PATH):
+    if not db_exists():
         logger.warn(f'Task queue db: {DB_PATH} does not exist.')
         return
 

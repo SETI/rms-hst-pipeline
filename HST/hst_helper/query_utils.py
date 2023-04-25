@@ -12,11 +12,13 @@ from astroquery.mast import Observations
 from . import (START_DATE,
                END_DATE,
                RETRY)
-from .fs_utils import (get_format_term,
-                       get_visit)
+from hst_helper.fs_utils import (get_formatted_proposal_id,
+                                 get_format_term,
+                                 get_visit)
 from product_labels.suffix_info import (ACCEPTED_SUFFIXES,
                                         ACCEPTED_LETTER_CODES,
                                         INSTRUMENT_FROM_LETTER_CODE)
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
 def ymd_tuple_to_mjd(ymd):
     """Return Modified Julian Date.
@@ -60,7 +62,8 @@ def query_mast_slice(proposal_id=None,
     }
 
     if proposal_id is not None:
-        query_params['proposal_id'] = str(proposal_id)
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+        query_params['proposal_id'] = formatted_proposal_id
     if instrument is not None:
         query_params['instrument_name'] = str(instrument)
     if start_date is not None and end_date is not None:
@@ -76,6 +79,13 @@ def query_mast_slice(proposal_id=None,
             retry = retry + 1
             logger.info(f'retry #{retry}: {e}')
             time.sleep(1)
+
+    # Before raising the error, remove the task queue of the proposal id from database.
+    # TODO: Maybe just update the task status from running to waiting, so we can restart
+    # from current failed task when restarting the pipeline.
+    if proposal_id is not None:
+        remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+
     logger.exception(RuntimeError)
     raise RuntimeError('Query mast timed out. Number of retries: ' + str(max_retries))
 
