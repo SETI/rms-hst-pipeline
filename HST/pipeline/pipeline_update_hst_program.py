@@ -7,6 +7,11 @@
 #                              [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
+#
+# Perform update_hst_program task with these actions:
+# - Queue get_program_info and wait for it to complete.
+# - Queue update_hst_visit and wait until all visits have completed.
+# - Queue finialize_hst_bundle and wait for it to complete.
 ##########################################################################################
 
 import argparse
@@ -15,8 +20,8 @@ import os
 import pdslogger
 import sys
 
-from update_hst_program import update_hst_program
 from hst_helper import HST_DIR
+from update_hst_program import update_hst_program
 
 # Set up parser
 parser = argparse.ArgumentParser(

@@ -7,7 +7,7 @@
 #
 # Enter the --help option to see more information.
 #
-# Perform pipeline_query_hst_products task with these actions:
+# Perform query_hst_products task with these actions:
 # - Query MAST to get:
 #   - a complete list of the accepted files for a given proposal id. Update or create
 #     products.txt in <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/.

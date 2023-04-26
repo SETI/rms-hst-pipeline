@@ -1,6 +1,14 @@
 ##########################################################################################
 # update_hst_program/__init__.py
+#
+# update_hst_program is the main function called in update_hst_program pipeline task
+# script. It will do these actions:
+# - Queue get_program_info and wait for it to complete.
+# - For each visit in the visit list, queue update_hst_visit and wait until all visits
+#   have completed.
+# - Queue finialize_hst_bundle and wait for it to complete.
 ##########################################################################################
+
 import pdslogger
 
 from queue_manager import queue_next_task
@@ -29,8 +37,6 @@ def update_hst_program(proposal_id, visit_li, logger=None):
     p1.communicate()
 
     pid_li = []
-    print('====================')
-    print(visit_li)
     for vi in visit_li:
         logger.info(f'Queue update_hst_visit for {proposal_id} visit {vi}')
         pid = queue_next_task(proposal_id, vi, 4, logger)

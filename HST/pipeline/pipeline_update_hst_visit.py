@@ -7,6 +7,11 @@
 #                              [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
+#
+# Perform update_hst_visit task for the given proposal id & visit with these actions:
+# - Queue retrieve_hst_visit and wait for it to complete.
+# - Queue label_hst_products and wait for it to complete.
+# - Queue prepare_browse_products and wait for it to complete.
 ##########################################################################################
 
 import argparse
@@ -15,8 +20,8 @@ import os
 import pdslogger
 import sys
 
-from update_hst_visit import update_hst_visit
 from hst_helper import HST_DIR
+from update_hst_visit import update_hst_visit
 
 # Set up parser
 parser = argparse.ArgumentParser(
