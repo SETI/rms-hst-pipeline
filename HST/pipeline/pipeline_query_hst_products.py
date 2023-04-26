@@ -25,8 +25,10 @@ import pdslogger
 import sys
 
 from hst_helper import HST_DIR
+from hst_helper.fs_utils import get_formatted_proposal_id
 from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -74,8 +76,15 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-new_visit_li, all_visits = query_hst_products(proposal_id, logger)
-logger.info('List of visits in which any files are new or chagned: ' + str(new_visit_li))
+try:
+    new_visit_li, all_visits = query_hst_products(proposal_id, logger)
+    logger.info('List of visits in which any files are new or chagned: '
+                + str(new_visit_li))
+except:
+    # Before raising the error, remove the task queue of the proposal id from database.
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    raise
 
 # If list is not empty, queue update-hst-program with the list of visits
 if len(new_visit_li) != 0:
