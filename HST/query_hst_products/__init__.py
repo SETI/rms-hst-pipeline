@@ -92,17 +92,18 @@ def query_hst_products(proposal_id, logger=None):
     try:
         download_files(trl_products, trl_dir, logger)
     except:
-        # Downloading failed, removed all the files to restore a clean directory.
+        # Downloading failed, removed all the trl files to restore a clean directory.
         # We will only have either all files downloaded or zero file downloaded.
-        for f in os.listdir(dir):
-            os.remove(os.path.join(dir, f))
+        for f in os.listdir(trl_dir):
+            if 'mastDownload' in f:
+                dir_path = os.path.join(trl_dir, f)
+                shutil.rmtree(dir_path)
 
         # Before raising the error, remove the task queue of the proposal id from
         # database.
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
-
-        logger.exception('MAST downlaod failure')
+        logger.exception('MAST trl files downlaod failure')
         raise
 
     # Compare and create PRODUCTS_FILE & TRL_CHECKSUMS_FILE
