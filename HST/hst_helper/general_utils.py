@@ -6,19 +6,19 @@ import datetime
 import os
 import pdslogger
 
-from hst_helper import (CITATION_INFO_DICT,
-                        DOCUMENT_EXT,
-                        INST_ID_DICT,
-                        INST_PARAMS_DICT,
-                        PRIMARY_RES_DICT,
-                        PROGRAM_INFO_FILE,
-                        RECORDS_DICT,
-                        TARG_ID_DICT,
-                        TIME_DICT)
-from hst_helper.fs_utils import (get_deliverable_path,
-                                 get_formatted_proposal_id,
-                                 get_program_dir_path,
-                                 get_instrument_id_from_fname)
+from . import (CITATION_INFO_DICT,
+               DOCUMENT_EXT,
+               INST_ID_DICT,
+               INST_PARAMS_DICT,
+               PRIMARY_RES_DICT,
+               PROGRAM_INFO_FILE,
+               RECORDS_DICT,
+               TARG_ID_DICT,
+               TIME_DICT)
+from .fs_utils import (get_deliverable_path,
+                       get_formatted_proposal_id,
+                       get_program_dir_path,
+                       get_instrument_id_from_fname)
 
 from product_labels.xml_support import (get_instrument_params,
                                         get_modification_history,

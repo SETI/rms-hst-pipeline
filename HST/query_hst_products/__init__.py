@@ -1,29 +1,49 @@
 ##########################################################################################
 # query_hst_products/__init__.py
+#
+# query_hst_products is the main function called in query_hst_products pipeline task
+# script. It will do these actions:
+# - Query MAST to get all available visits and files in this program.
+# - Create directories <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/ if they don't exist.
+# - Download all TRL files to <HST_STAGING>/hst_<nnnnn>/.
+# - For each visit:
+#   - Update or create products.txt in <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/.
+#   - Update or create trl_checksums.txt in <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/.
+# - Delete all TRL files.
+# - Return the tuple of changed visits & all available visists.
 ##########################################################################################
+
 import os
 import pdslogger
 import shutil
-
 from collections import defaultdict
 
 from hst_helper import (PRODUCTS_FILE,
                         TRL_CHECKSUMS_FILE)
+from hst_helper.fs_utils import (backup_file,
+                                 create_program_dir,
+                                 file_md5,
+                                 get_formatted_proposal_id,
+                                 get_program_dir_path,
+                                 get_visit)
 from hst_helper.query_utils import (download_files,
                                     get_filtered_products,
                                     get_trl_products,
                                     query_mast_slice)
-from hst_helper.fs_utils import (backup_file,
-                                 create_program_dir,
-                                 file_md5,
-                                 get_program_dir_path,
-                                 get_visit)
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
 # A dictionary keyed by IPPPSSOOT and stores observation id from mast as the value.
 products_obs_dict = {}
 
 def query_hst_products(proposal_id, logger=None):
-    """Return all accepted products from mast with a given proposal id.
+    """Return a tuple of a list of visits in which any files are new or changed and a
+    of all visits for the given proposal id. These actions are performed:
+        - Query MAST for all available visits and files in this program.
+        - Create directories <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/ if they don't exist.
+        - Download all TRL files to <HST_STAGING>/hst_<nnnnn>/.
+        - Compare and create PRODUCTS_FILE & TRL_CHECKSUMS_FILE.
+        - Delete all TRL files.
+        - Return the tuple of changed visits & all available visists.
 
     Input:
         proposal_id:    a proposal id.
@@ -38,10 +58,9 @@ def query_hst_products(proposal_id, logger=None):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    # Query mast
+    # Query MAST for all available visits and files in this program
     table = query_mast_slice(proposal_id=proposal_id, logger=logger)
     filtered_products = get_filtered_products(table)
-
     # Log all accepted file names
     logger.info(f'List out all accepted files from mast for {proposal_id}')
     files_dict = defaultdict(list)
@@ -60,7 +79,7 @@ def query_hst_products(proposal_id, logger=None):
         suffix = row['productSubGroupDescription']
         logger.info(f'File: {product_fname} with suffix: {suffix}')
 
-     # Create program and all visits directories
+    # Create program and all visits directories if they don't exist.
     logger.info('Create program and visit directories that do not already exist.')
     for visit in files_dict:
         create_program_dir(proposal_id, visit)
@@ -69,7 +88,22 @@ def query_hst_products(proposal_id, logger=None):
     trl_dir = create_program_dir(proposal_id=proposal_id, root_dir='staging')
     logger.info(f'Download all TRL files for {proposal_id} to {trl_dir}')
     trl_products = get_trl_products(table)
-    download_files(trl_products, trl_dir, logger)
+
+    try:
+        download_files(trl_products, trl_dir, logger)
+    except:
+        # Downloading failed, removed all the files to restore a clean directory.
+        # We will only have either all files downloaded or zero file downloaded.
+        for f in os.listdir(dir):
+            os.remove(os.path.join(dir, f))
+
+        # Before raising the error, remove the task queue of the proposal id from
+        # database.
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+        remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+
+        logger.exception('MAST downlaod failure')
+        raise
 
     # Compare and create PRODUCTS_FILE & TRL_CHECKSUMS_FILE
     logger.info(f'Create {PRODUCTS_FILE} and {TRL_CHECKSUMS_FILE}')

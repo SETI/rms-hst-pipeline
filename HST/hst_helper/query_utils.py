@@ -12,9 +12,9 @@ from astroquery.mast import Observations
 from . import (START_DATE,
                END_DATE,
                RETRY)
-from hst_helper.fs_utils import (get_formatted_proposal_id,
-                                 get_format_term,
-                                 get_visit)
+from .fs_utils import (get_formatted_proposal_id,
+                       get_format_term,
+                       get_visit)
 from product_labels.suffix_info import (ACCEPTED_SUFFIXES,
                                         ACCEPTED_LETTER_CODES,
                                         INSTRUMENT_FROM_LETTER_CODE)

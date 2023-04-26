@@ -6,6 +6,16 @@
 # pipeline_query_hst_products.py [-h] [--log LOG] [--quiet] proposal_id
 #
 # Enter the --help option to see more information.
+#
+# Perform pipeline_query_hst_products task with these actions:
+# - Query MAST to get:
+#   - a complete list of the accepted files for a given proposal id. Update or create
+#     products.txt in <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/.
+#   - a list of all TRL files and their checksums. Update or create trl_checksums.txt
+#     in <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/.
+#   - Return a list of visits with changed or new files.
+#   - Queue update_hst_program if the list of visits with changed or new files is not
+#     emtpy.
 ##########################################################################################
 
 import argparse
@@ -14,9 +24,9 @@ import os
 import pdslogger
 import sys
 
+from hst_helper import HST_DIR
 from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
-from hst_helper import HST_DIR
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -67,7 +77,7 @@ logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 new_visit_li, all_visits = query_hst_products(proposal_id, logger)
 logger.info('List of visits in which any files are new or chagned: ' + str(new_visit_li))
 
-# - if list is not empty, queue update-hst-program with the list of visits
+# If list is not empty, queue update-hst-program with the list of visits
 if len(new_visit_li) != 0:
     logger.info(f'Queue update_hst_program for {proposal_id}')
     queue_next_task(proposal_id, new_visit_li, 2, logger)
