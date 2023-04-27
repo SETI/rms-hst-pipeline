@@ -6,6 +6,15 @@
 # pipeline_get_program_info.py [-h] [--log LOG] [--quiet] proposal_id
 #
 # Enter the --help option to see more information.
+#
+# Perform get_program_info to retrieve the online files that describe a program (such as
+# .apt or .pro) and assemble other program-level information. These are the actions:
+# - Download the proposal files via a web query.
+# - If these files are the same as the existing ones, return.
+# - Otherwise:
+#   - Rename and back up the existing ones to backups/ subdirectory.
+#   - Save the newly downloaded files.
+# - Regenerate the new program-info.txt.
 ##########################################################################################
 
 import argparse
@@ -16,6 +25,8 @@ import sys
 
 from get_program_info import get_program_info
 from hst_helper import HST_DIR
+from hst_helper.fs_utils import get_formatted_proposal_id
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -62,7 +73,13 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('get-program-info ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-get_program_info(proposal_id, None, logger)
+try:
+    get_program_info(proposal_id, None, logger)
+except:
+    # Before raising the error, remove the task queue of the proposal id from database.
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    raise
 
 logger.close()
 
