@@ -78,7 +78,6 @@ def db_exists():
     """
     return os.path.exists(DB_PATH)
 
-
 def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, cmd):
     """
     Add an entry of the given proposal id & visit with its task num and task status to
@@ -120,35 +119,6 @@ def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, cmd
         entry.status = status
         entry.cmd = cmd
     session.commit()
-
-def update_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, cmd):
-    """
-    Update an entry of the given proposal id & visit with its task num and task status
-    to the task queue table.
-
-    Input:
-        proposal_id:   a proposal id of the task queue.
-        visit:         two character visit.
-        task_num:      a number represents the current task.
-        priority:      a number reporeents task priority.
-        status:        the status of the current task, 0 is wating and 1 is running.
-        cmd:           the command to run the task.
-    """
-    if not db_exists():
-        return
-
-    Session = sessionmaker(engine)
-    session = Session()
-    row = session.query(TaskQueue).filter(
-                                       TaskQueue.proposal_id==proposal_id,
-                                       TaskQueue.visit==visit
-                                   ).first()
-    if row is not None:
-        row.task_num = task_num
-        row.priority = priority
-        row.status = status
-        row.cmd = cmd
-        session.commit()
 
 def update_a_prog_id_task_status(proposal_id, visit, status):
     """
