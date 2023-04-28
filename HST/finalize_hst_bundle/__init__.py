@@ -1,25 +1,32 @@
 ##########################################################################################
 # finalize_hst_bundle/__init__.py
+#
+# finalize_hst_bundle is the main function called in finalize_hst_bundle pipeline task
+# script. It will do these actions:
+# - Create documents/schema/context/kernel directories.
+# - Move new files into the proper directories under <HST_BUNDLES>/hst_<nnnnn>/.
+# - Create the new collection csv & xml and the bundle xml files
+# - Run the validator.
 ##########################################################################################
+
 import datetime
 import os
 import pdslogger
 
-from product_labels.suffix_info import INSTRUMENT_NAMES
+from create_target_label import create_target_label
+from finalize_document import label_hst_document_directory
+from finalize_schema import label_hst_schema_directory
+from finalize_context import label_hst_context_directory
+from finalize_data_product import label_hst_data_directory
 from hst_helper.fs_utils import get_program_dir_path
 from hst_helper.general_utils import (date_time_to_date,
                                       get_citation_info,
                                       get_clean_target_text,
                                       get_collection_label_data,
                                       get_instrument_id_set)
-
-from finalize_document import label_hst_document_directory
-from finalize_schema import label_hst_schema_directory
-from finalize_context import label_hst_context_directory
-from finalize_data_product import label_hst_data_directory
-from organize_files import organize_files_from_staging_to_bundles
 from label_bundle import label_hst_bundle
-from create_target_label import create_target_label
+from organize_files import organize_files_from_staging_to_bundles
+from product_labels.suffix_info import INSTRUMENT_NAMES
 from run_validation import run_validation
 
 def finalize_hst_bundle(proposal_id, logger=None):
@@ -72,18 +79,18 @@ def get_general_label_data(proposal_id, logger):
     # Get citation info
     citation_info = get_citation_info(proposal_id, logger)
     formatted_title = (citation_info.title
-    + ", HST Cycle "
+    + ', HST Cycle '
     + str(citation_info.cycle)
-    + " Program "
+    + ' Program '
     + str(citation_info.propno)
-    + ", "
+    + ', '
     + citation_info.publication_year
-    + "."
+    + '.'
     )
 
     # Get label date
     timetag = os.path.getmtime(__file__)
-    label_date = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
+    label_date = datetime.datetime.fromtimestamp(timetag).strftime('%Y-%m-%d')
 
     # Get imstrument id
     inst_ids = get_instrument_id_set(proposal_id, logger)

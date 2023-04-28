@@ -1,6 +1,9 @@
 ##########################################################################################
 # finalize_context/__init__.py
+#
+# Create context directory, collection csv & xml, and investigation xml.
 ##########################################################################################
+
 import os
 import pdslogger
 

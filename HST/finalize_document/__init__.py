@@ -1,6 +1,12 @@
 ##########################################################################################
 # finalize_document/__init__.py
+#
+# - Create document directory.
+# - Move/copy proposal files over from pipeline directory.
+# - Create document xml.
+# - Create document collection csv & xml.
 ##########################################################################################
+
 import os
 import pdslogger
 import shutil
