@@ -1,8 +1,13 @@
 ##########################################################################################
 # queue_manager/task_queue_db.py
+#
+# This file is related to sqllite task queue database created by sqlalchemy. All the
+# database related operatins are included here.
 ##########################################################################################
 import os
 
+from queue_manager.config import (DB_PATH,
+                                  DB_URI)
 from sqlalchemy import (create_engine,
                         func,
                         Column,
@@ -10,9 +15,6 @@ from sqlalchemy import (create_engine,
                         String)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
-from queue_manager.config import (DB_PATH,
-                                  DB_URI)
 
 engine = create_engine(DB_URI, echo = True)
 Base = declarative_base()
@@ -28,7 +30,7 @@ class TaskQueue(Base):
     - tasks for different visits of the same propsal id
     """
 
-    __tablename__ = "task_queue"
+    __tablename__ = 'task_queue'
 
     id = Column(Integer, primary_key=True, nullable=False)
     proposal_id = Column(String, nullable=False)
@@ -40,12 +42,12 @@ class TaskQueue(Base):
 
     def __repr__(self) -> str:
         return (
-            f"TaskQueue(proposal_id={self.proposal_id!r}"
-            f", visit={self.visit!r})"
-            f", task_num={self.task_num!r})"
-            f", priority={self.priority!r})"
-            f", status={self.status!r})"
-            f", cmd={self.cmd!r})"
+            f'TaskQueue(proposal_id={self.proposal_id!r}'
+            f', visit={self.visit!r})'
+            f', task_num={self.task_num!r})'
+            f', priority={self.priority!r})'
+            f', status={self.status!r})'
+            f', cmd={self.cmd!r})'
         )
 
 def drop_task_queue_table():

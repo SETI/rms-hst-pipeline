@@ -1,6 +1,9 @@
 ##########################################################################################
 # queue_manager/config.py
+#
+# This file contains configuration & variables used for task queue & queue mananger.
 ##########################################################################################
+
 import os
 import sys
 
@@ -9,7 +12,7 @@ from hst_helper import HST_DIR
 # python executable
 PYTHON_EXE = sys.executable
 # root of pds-hst-pipeline dir
-HST_SOURCE_ROOT = os.environ["PDS_HST_PIPELINE"]
+HST_SOURCE_ROOT = os.environ['PDS_HST_PIPELINE']
 
 # task queue db
 DB_PATH = f'{HST_DIR["pipeline"]}/task_queue.db'

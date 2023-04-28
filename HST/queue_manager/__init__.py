@@ -1,16 +1,18 @@
 ##########################################################################################
 # queue_manager/__init__.py
+#
+# Queue manager module that will queue in the next task for the hst pipeline process.
+# - run_pipeline will start a hst pipeline process for the given proposal id list.
+# - queue_next_task will Queue in the next task for a given proposal id to database, and
+#   wait for the open subprocess slot to execute the corresponding command.
 ##########################################################################################
+
 import os
 import pdslogger
 import subprocess
-import sys
 import time
 
-from sqlalchemy.exc import OperationalError
-
 from hst_helper.fs_utils import get_formatted_proposal_id
-
 from queue_manager.task_queue_db import (add_a_prog_id_task_queue,
                                          create_task_queue_table,
                                          db_exists,
@@ -18,7 +20,6 @@ from queue_manager.task_queue_db import (add_a_prog_id_task_queue,
                                          get_next_task_to_be_run,
                                          init_task_queue_table,
                                          update_a_prog_id_task_status)
-
 from queue_manager.config import (DB_PATH,
                                   PYTHON_EXE,
                                   HST_SOURCE_ROOT,
@@ -27,6 +28,7 @@ from queue_manager.config import (DB_PATH,
                                   SUBPROCESS_LIST,
                                   TASK_NUM_TO_CMD_MAPPING,
                                   TASK_NUM_TO_PRI_MAPPING)
+from sqlalchemy.exc import OperationalError
 
 def run_pipeline(proposal_ids, logger=None):
     """With a given list of proposal ids, run pipeline for each program id.

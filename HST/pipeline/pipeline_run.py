@@ -6,6 +6,8 @@
 # pipeline_run.py [-h] --proposal_id PROPOSAL_ID [--log LOG]
 #                                 [--quiet]
 # Enter the --help option to see more information.
+#
+# The script to start hst pipeline process for the given proposal ids.
 ##########################################################################################
 
 import argparse
@@ -14,8 +16,8 @@ import os
 import pdslogger
 import sys
 
-from queue_manager import run_pipeline
 from hst_helper import HST_DIR
+from queue_manager import run_pipeline
 
 # Set up parser
 parser = argparse.ArgumentParser(
