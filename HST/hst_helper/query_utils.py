@@ -1,14 +1,16 @@
 ##########################################################################################
 # hst_helper/query_utils.py
+#
+# This file contains helper functions related to MAST query, including querying MAST,
+# getting file suffix & instrument ids from the table row, downloading files, and etc.
 ##########################################################################################
-import os
-import time
 
 import julian
+import os
 import pdslogger
+import time
 
 from astroquery.mast import Observations
-
 from . import (START_DATE,
                END_DATE,
                RETRY)
@@ -119,7 +121,7 @@ def is_accepted_instrument_suffix(row):
     """
     suffix = get_suffix(row)
     instrument_id = get_instrument_id_from_table_row(row)
-    # For files like n4wl03fxq_raw.jpg with "--" will raise an error
+    # For files like n4wl03fxq_raw.jpg with '--' will raise an error
     # return is_accepted(suffix, instrument_id)
     return suffix in ACCEPTED_SUFFIXES[instrument_id]
 

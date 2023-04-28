@@ -1,11 +1,14 @@
 ##########################################################################################
 # hst_helper/fs_utils.py
+#
+# This file contains helper functions related file system, includig creating directories,
+# getting program directory path, get file suffix, get file checksum, and etc.
 ##########################################################################################
+
 import datetime
+from hashlib import md5
 import os
 import shutil
-
-from hashlib import md5
 
 from . import HST_DIR
 from product_labels.suffix_info import INSTRUMENT_FROM_LETTER_CODE

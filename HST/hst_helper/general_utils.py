@@ -1,8 +1,12 @@
 ##########################################################################################
 # hst_helper/general_utils.py
+#
+# This file contains general helper functions like creating csv & xml based on the passed
+# in data, getting data info from xml label, getting instrument ids for a given proposal
+# id, getting citation info, and etc.
 ##########################################################################################
+
 import csv
-import datetime
 import os
 import pdslogger
 
@@ -19,13 +23,12 @@ from .fs_utils import (get_deliverable_path,
                        get_formatted_proposal_id,
                        get_program_dir_path,
                        get_instrument_id_from_fname)
-
+from citations import Citation_Information
 from product_labels.xml_support import (get_instrument_params,
                                         get_modification_history,
                                         get_primary_result_summary,
                                         get_target_identifications,
                                         get_time_coordinates)
-from citations import Citation_Information
 from xmltemplate import XmlTemplate
 
 def create_collection_label(
@@ -202,9 +205,9 @@ def date_time_to_date(date_time):
         date_time:        a date time string like "2005-01-19T15:41:05Z".
     """
     try:
-        idx = date_time.index("T")
+        idx = date_time.index('T')
     except:
-        raise ValueError("Failed to convert from date_time to date")
+        raise ValueError('Failed to convert from date_time to date')
 
     return date_time[:idx]
 
@@ -296,10 +299,10 @@ def get_clean_target_text(text: str) -> str:
     Inputs:
         text:    a text of the target name or type.
     """
-    SPECIAL_CHARS = "!#$%^&*/ "
-    REMOVED_CHARS = "()"
+    SPECIAL_CHARS = '!#$%^&*/ '
+    REMOVED_CHARS = '()'
     for char in SPECIAL_CHARS:
-        text = text.replace(char, "_")
+        text = text.replace(char, '_')
     for char in REMOVED_CHARS:
-        text = text.replace(char, "")
+        text = text.replace(char, '')
     return text
