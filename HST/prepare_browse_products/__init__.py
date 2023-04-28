@@ -1,6 +1,13 @@
 ##########################################################################################
 # prepare_browse_products/__init__.py
+#
+# prepare_browse_products is the main function called in prepare_browse_products pipeline
+# task script. It will move data files from downloaded directories (under staging) to
+# newly structured directories (under staging):
+#   - browse_{inst_id}_{suffix}
+#   - data_{inst_id}_{suffix}
 ##########################################################################################
+
 import os
 import pdslogger
 import shutil
@@ -57,6 +64,8 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 elif suffix in ACCEPTED_SUFFIXES[inst_id]:
                     prod_dir += f"/{col_name}/visit_{visit}/"
                     logger.info(f'Move data products to: {prod_dir+file}')
+
+                # Copy files to newly structured directories
                 os.makedirs(prod_dir, exist_ok=True)
                 shutil.copy(fp, prod_dir+file)
                 # shutil.move(fp, prod_dir+file)

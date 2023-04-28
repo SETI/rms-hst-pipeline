@@ -30,7 +30,6 @@ from hst_helper.fs_utils import get_program_dir_path
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import queue_next_task
 
-
 # Set up parser
 parser = argparse.ArgumentParser(
     description="""query-hst-moving-targets: Perform mast query with given query

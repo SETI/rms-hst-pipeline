@@ -21,6 +21,8 @@ import pdslogger
 import sys
 
 from hst_helper import HST_DIR
+from hst_helper.fs_utils import get_formatted_proposal_id
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 from update_hst_visit import update_hst_visit
 
 # Set up parser
@@ -74,7 +76,13 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('update-hst-visit ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-update_hst_visit(proposal_id, visit, logger)
+try:
+    update_hst_visit(proposal_id, visit, logger)
+except:
+    # Before raising the error, remove the task queue of the proposal id from database.
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    raise
 
 logger.close()
 
