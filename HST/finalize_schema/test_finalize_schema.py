@@ -104,8 +104,8 @@ class TestFinalizeSchema:
         ],
     )
     def test_label_hst_schema_directory(self, p_id):
-        data_dict = get_general_label_data(p_id)
-        data_dict = {**data_dict, **self.data_dict}
+        # data_dict = get_general_label_data(p_id)
+        # data_dict = {**data_dict, **self.data_dict}
         label_path = label_hst_schema_directory(p_id, self.data_dict, None, True)
 
         if os.path.isfile(label_path):

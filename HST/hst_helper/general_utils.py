@@ -33,7 +33,7 @@ from xmltemplate import XmlTemplate
 
 def create_collection_label(
     proposal_id, collection_name, data_dict,
-    label_name, template_name, logger
+    label_name, template_name, logger=None, testing=False
 ):
     """With a given proposal id, create collection label in the final bundle.
 
@@ -45,6 +45,8 @@ def create_collection_label(
         template_name:      the name of the template being used.
         logger:             pdslogger to use; None for default EasyLogger.
         target_dir:         the target dir used to obtain the roll up info.
+        testing:            the flag used to determine if we are calling the function for
+                            testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create collection csv with proposal id: {proposal_id}')
@@ -56,7 +58,7 @@ def create_collection_label(
     col_dir = os.path.dirname(os.path.abspath(__file__))
     col_template = (col_dir + f'/../templates/{template_name}')
     # Collection label path
-    deliverable_path = get_deliverable_path(proposal_id)
+    deliverable_path = get_deliverable_path(proposal_id, testing)
     if collection_name == 'bundle':
         col_label_path = deliverable_path + f'/{label_name}'
     else:

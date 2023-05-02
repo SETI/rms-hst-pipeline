@@ -77,7 +77,8 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
 
     # Create schema collection label
     return create_collection_label(proposal_id, 'schema', sch_data_dict,
-                                   COL_SCH_LABEL, COL_SCH_LABEL_TEMPLATE, logger)
+                                   COL_SCH_LABEL, COL_SCH_LABEL_TEMPLATE,
+                                   logger, testing)
 
 def create_schema_collection_csv(csv_path, row_data, logger):
     """With a given proposal id, create schema collection csv in the final bundle.

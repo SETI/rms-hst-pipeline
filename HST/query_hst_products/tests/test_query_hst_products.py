@@ -12,6 +12,6 @@ class TestQueryHSTProducts:
         ],
     )
     def test_query_hst_products(self, p_id, expected):
-        visit_diff = query_hst_products(proposal_id=p_id)
+        visit_diff, _ = query_hst_products(proposal_id=p_id)
         print(visit_diff)
         assert visit_diff == expected
