@@ -1,10 +1,14 @@
 ##########################################################################################
 # create_target_label/__init__.py
+#
+# Create target label if it doesn't exist in the PDS4 page:
+# https://pds.nasa.gov/data/pds4/context-pds4/target/
 ##########################################################################################
+
+import bs4
 from collections import defaultdict
 import json
 import pdslogger
-import bs4
 import urllib
 
 from hst_helper.general_utils import create_collection_label
