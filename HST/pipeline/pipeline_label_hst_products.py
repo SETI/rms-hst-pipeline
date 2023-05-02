@@ -9,6 +9,13 @@
 #                                [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
+#
+# Perform label_hst_products task with these actions:
+# - Compare the staged FITS files to those in an existing bundle, if any.
+# - Create a new XML label for each file.
+# - Reset the modification dates of the FITS files to match their production date at MAST.
+# - If any file contains NaNs, rename the original file with “-original” appended,
+#   and then rewrite the file without NaNs.
 ##########################################################################################
 
 import argparse
@@ -17,8 +24,10 @@ import os
 import pdslogger
 import sys
 
-from product_labels import label_hst_fits_directories
 from hst_helper import HST_DIR
+from hst_helper.fs_utils import get_formatted_proposal_id
+from product_labels import label_hst_fits_directories
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -110,13 +119,20 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('label-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-label_hst_fits_directories(target_path,
-                           match_pattern = args.select,
-                           old_directories = [args.old],
-                           retrieval_date = args.date,
-                           logger = logger,
-                           reset_dates = args.reset_dates,
-                           replace_nans = args.replace_nans)
+try:
+    label_hst_fits_directories(target_path,
+                               match_pattern = args.select,
+                               old_directories = [args.old],
+                               retrieval_date = args.date,
+                               logger = logger,
+                               reset_dates = args.reset_dates,
+                               replace_nans = args.replace_nans)
+except:
+    # Before raising the error, remove the task queue of the proposal id from database.
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    raise
+
 logger.close()
 
 ##########################################################################################

@@ -1,31 +1,34 @@
 ##########################################################################################
 # hst_helper/general_utils.py
+#
+# This file contains general helper functions like creating csv & xml based on the passed
+# in data, getting data info from xml label, getting instrument ids for a given proposal
+# id, getting citation info, and etc.
 ##########################################################################################
+
 import csv
-import datetime
 import os
 import pdslogger
 
-from hst_helper import (CITATION_INFO_DICT,
-                        DOCUMENT_EXT,
-                        INST_ID_DICT,
-                        INST_PARAMS_DICT,
-                        PRIMARY_RES_DICT,
-                        PROGRAM_INFO_FILE,
-                        RECORDS_DICT,
-                        TARG_ID_DICT,
-                        TIME_DICT)
-from hst_helper.fs_utils import (get_deliverable_path,
-                                 get_formatted_proposal_id,
-                                 get_program_dir_path,
-                                 get_instrument_id_from_fname)
-
+from . import (CITATION_INFO_DICT,
+               DOCUMENT_EXT,
+               INST_ID_DICT,
+               INST_PARAMS_DICT,
+               PRIMARY_RES_DICT,
+               PROGRAM_INFO_FILE,
+               RECORDS_DICT,
+               TARG_ID_DICT,
+               TIME_DICT)
+from .fs_utils import (get_deliverable_path,
+                       get_formatted_proposal_id,
+                       get_program_dir_path,
+                       get_instrument_id_from_fname)
+from citations import Citation_Information
 from product_labels.xml_support import (get_instrument_params,
                                         get_modification_history,
                                         get_primary_result_summary,
                                         get_target_identifications,
                                         get_time_coordinates)
-from citations import Citation_Information
 from xmltemplate import XmlTemplate
 
 def create_collection_label(
@@ -60,6 +63,8 @@ def create_collection_label(
         col_label_path = deliverable_path + f'/{collection_name}/{label_name}'
 
     create_xml_label(col_template, col_label_path, data_dict, logger)
+
+    return col_label_path
 
 def create_xml_label(template_path, label_path, data_dict, logger):
     """Create xml label with given template path, label path, and data dictionary.
@@ -120,7 +125,8 @@ def get_citation_info(proposal_id, logger):
 
     for file in os.listdir(pipeline_dir):
         _, _, ext = file.rpartition('.')
-        if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
+        # We don't have an implementation to create citation info from pdf.
+        if (ext in DOCUMENT_EXT and ext != 'pdf') or file == PROGRAM_INFO_FILE:
             fp = pipeline_dir + f'/{file}'
             if formatted_proposal_id not in CITATION_INFO_DICT:
                 CITATION_INFO_DICT[formatted_proposal_id] = (
@@ -201,9 +207,9 @@ def date_time_to_date(date_time):
         date_time:        a date time string like "2005-01-19T15:41:05Z".
     """
     try:
-        idx = date_time.index("T")
+        idx = date_time.index('T')
     except:
-        raise ValueError("Failed to convert from date_time to date")
+        raise ValueError('Failed to convert from date_time to date')
 
     return date_time[:idx]
 
@@ -295,10 +301,10 @@ def get_clean_target_text(text: str) -> str:
     Inputs:
         text:    a text of the target name or type.
     """
-    SPECIAL_CHARS = "!#$%^&*/ "
-    REMOVED_CHARS = "()"
+    SPECIAL_CHARS = '!#$%^&*/ '
+    REMOVED_CHARS = '()'
     for char in SPECIAL_CHARS:
-        text = text.replace(char, "_")
+        text = text.replace(char, '_')
     for char in REMOVED_CHARS:
-        text = text.replace(char, "")
+        text = text.replace(char, '')
     return text

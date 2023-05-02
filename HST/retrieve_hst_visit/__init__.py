@@ -1,8 +1,16 @@
 ##########################################################################################
 # retrieve_hst_visit/__init__.py
+#
+# retrieve_hst_visit is the main function called in retrieve_hst_visit pipeline task
+# script. It will download all identified files from MAST to
+# <HST_STAGING>/hst_<nnnnn>/visit_<ss>/ directory.
 ##########################################################################################
-import os
+
 import pdslogger
+import shutil
+
+from hst_helper.fs_utils import get_formatted_proposal_id
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
 from hst_helper.query_utils import (download_files,
                                     get_filtered_products,
@@ -31,6 +39,21 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     filtered_products = get_filtered_products(table, visit)
     files_dir = get_program_dir_path(proposal_id, visit, root_dir='staging')
     # Download all accepted files
-    download_files(filtered_products, files_dir, logger, testing)
+    # download_files(filtered_products, files_dir, logger, testing)
+
+    try:
+        # Download all accepted files
+        download_files(filtered_products, files_dir, logger, testing)
+    except:
+        # Downloading failed, removed the visit folder under the staging directory.
+        # We will only have either all files downloaded or zero file downloaded.
+        shutil.rmtree(files_dir)
+
+        # Before raising the error, remove the task queue of the proposal id from
+        # database.
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+        remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+        logger.exception('MAST trl files downlaod failure')
+        raise
 
     return len(filtered_products)

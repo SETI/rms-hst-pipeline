@@ -1,12 +1,14 @@
 ##########################################################################################
 # finalize_data_product/__init__.py
+#
+# - Move data directory from staging to bundles directory.
+# - Create data csv.
+# - Create data xml label.
 ##########################################################################################
+
 import datetime
 import os
 import pdslogger
-
-from product_labels.suffix_info import (INSTRUMENT_NAMES,
-                                        get_collection_title_fmt)
 
 from hst_helper import COL_NAME_PREFIX
 from hst_helper.fs_utils import (get_formatted_proposal_id,
@@ -18,6 +20,8 @@ from hst_helper.general_utils import (create_collection_label,
                                       get_citation_info,
                                       get_collection_label_data,
                                       get_mod_history_from_label)
+from product_labels.suffix_info import (INSTRUMENT_NAMES,
+                                        get_collection_title_fmt)
 
 COL_DATA_LABEL_TEMPLATE = 'PRODUCT_COLLECTION_LABEL.xml'
 
@@ -78,7 +82,7 @@ def label_hst_data_directory(proposal_id, logger):
 
                 # Get label date
                 timetag = os.path.getmtime(__file__)
-                label_date = datetime.datetime.fromtimestamp(timetag).strftime("%Y-%m-%d")
+                label_date = datetime.datetime.fromtimestamp(timetag).strftime('%Y-%m-%d')
                 data_dict = {
                     'prop_id': proposal_id,
                     'inst_id': inst_id,

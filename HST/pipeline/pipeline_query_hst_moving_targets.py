@@ -10,6 +10,10 @@
 #                                      [--retry RETRY] [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
+#
+# Perform query_hst_moving_targets task with these actions:
+# - Return a list of proposal ids with moving targets based on the query constraints.
+# - Queue query_hst_products task if HST_PIPELINE/hst_<nnnnn> directory is missing.
 ##########################################################################################
 
 import argparse
@@ -18,11 +22,13 @@ import os
 import pdslogger
 import sys
 
-from query_hst_moving_targets import query_hst_moving_targets
 from hst_helper import (START_DATE,
                         END_DATE,
                         RETRY,
                         HST_DIR)
+from hst_helper.fs_utils import get_program_dir_path
+from query_hst_moving_targets import query_hst_moving_targets
+from queue_manager import queue_next_task
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -96,8 +102,17 @@ pid_li = query_hst_moving_targets(proposal_ids=proposal_ids,
                                   logger=logger,
                                   max_retries=retry)
 logger.info('List of program ids: ' + str(pid_li))
+
+# If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
+for proposal_id in proposal_ids:
+    pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
+    if not os.path.exists(pipeline_dir):
+        logger.info(f'Queue query_hst_products for {proposal_id}')
+        queue_next_task(proposal_id, '', 1, logger)
+    else:
+        logger.info(f'{pipeline_dir} exists')
+
 # TODO: TASK QUEUE
-# - if there is a missing HST_PIPELINE/hst_<nnnnn> missing, queue query-hst-products
 # - re-queue query-hst-moving-targets with a 30-day delay
 
 logger.close()

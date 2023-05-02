@@ -1,13 +1,17 @@
 ##########################################################################################
 # finalize_schema/__init__.py
+#
+# Create schema directory, and schema csv & xml.
 ##########################################################################################
+
 import os
 import pdslogger
 
 from hst_helper import (PDS4_LIDVID,
                         HST_LIDVID,
                         DISP_LIDVID)
-from hst_helper.fs_utils import (get_formatted_proposal_id,
+from hst_helper.fs_utils import (create_col_dir_in_bundle,
+                                 get_formatted_proposal_id,
                                  get_deliverable_path)
 from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
@@ -17,7 +21,7 @@ CSV_FILENAME = 'collection_schema.csv'
 COL_SCH_LABEL = 'collection_schema.xml'
 COL_SCH_LABEL_TEMPLATE = 'SCHEMA_COLLECTION_LABEL.xml'
 
-def label_hst_schema_directory(proposal_id, data_dict, logger):
+def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create schema directory in the final bundle.
     1. Create schema directory.
     2. Create schema csv.
@@ -28,6 +32,8 @@ def label_hst_schema_directory(proposal_id, data_dict, logger):
         proposal_id:    a proposal id.
         data_dict:      a data dictionary used to create the label.
         logger:         pdslogger to use; None for default EasyLogger.
+        testing:        the flag used to determine if we are calling the function for
+                        testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst schema directory with proposal id: {proposal_id}')
@@ -41,9 +47,9 @@ def label_hst_schema_directory(proposal_id, data_dict, logger):
 
     # Create schema directory
     logger.info(f'Create schema directory for proposal id: {proposal_id}.')
-    deliverable_path = get_deliverable_path(proposal_id)
-    schema_dir = deliverable_path + '/schema'
-    os.makedirs(schema_dir, exist_ok=True)
+    deliverable_path, schema_dir = create_col_dir_in_bundle(proposal_id,
+                                                            'schema',
+                                                            testing)
 
     # Create schema csv
     collection_schema_csv = schema_dir + f'/{CSV_FILENAME}'
@@ -70,8 +76,8 @@ def label_hst_schema_directory(proposal_id, data_dict, logger):
     sch_data_dict = {**sch_data_dict, **data_dict}
 
     # Create schema collection label
-    create_collection_label(proposal_id, 'schema', sch_data_dict,
-                            COL_SCH_LABEL, COL_SCH_LABEL_TEMPLATE, logger)
+    return create_collection_label(proposal_id, 'schema', sch_data_dict,
+                                   COL_SCH_LABEL, COL_SCH_LABEL_TEMPLATE, logger)
 
 def create_schema_collection_csv(csv_path, row_data, logger):
     """With a given proposal id, create schema collection csv in the final bundle.

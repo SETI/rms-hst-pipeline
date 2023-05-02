@@ -1,6 +1,11 @@
 ##########################################################################################
 # query_hst_moving_targets/__init__.py
+#
+# query_hst_moving_targets is the main function called in query_hst_moving_targets
+# pipeline task script.
+# It'll get a list of proposal ids from the MAST query with the given query constraints.
 ##########################################################################################
+
 import pdslogger
 
 from hst_helper import (START_DATE,
