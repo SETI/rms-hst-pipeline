@@ -35,7 +35,7 @@ def create_target_label(proposal_id, data_dict, logger=None):
     with urllib.request.urlopen(PDS_URL) as response:
         html = response.read()
     soup = bs4.BeautifulSoup(html, 'html.parser')
-    a_tags = soup.find_all("a")
+    a_tags = soup.find_all('a')
     pds_targ_list = [a.string for a in a_tags if a.string]
 
     # Get the target info (name & type) from the passed in data dict, and check to see
