@@ -64,6 +64,8 @@ def create_collection_label(
 
     create_xml_label(col_template, col_label_path, data_dict, logger)
 
+    return col_label_path
+
 def create_xml_label(template_path, label_path, data_dict, logger):
     """Create xml label with given template path, label path, and data dictionary.
 

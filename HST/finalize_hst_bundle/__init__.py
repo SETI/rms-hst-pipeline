@@ -69,15 +69,17 @@ def finalize_hst_bundle(proposal_id, logger=None):
     # Create manifest files & run validator
     run_validation(proposal_id, logger)
 
-def get_general_label_data(proposal_id, logger):
+def get_general_label_data(proposal_id, logger=None, testing=False):
     """Get general label data used in document/schema/context/bundle labels
 
     Inputs:
         proposal_id:    a proposal id.
         logger:         pdslogger to use; None for default EasyLogger.
     """
+    logger = logger or pdslogger.EasyLogger()
+
     # Get citation info
-    citation_info = get_citation_info(proposal_id, logger)
+    citation_info = get_citation_info(proposal_id, logger) if not testing else None
     formatted_title = (citation_info.title
     + ', HST Cycle '
     + str(citation_info.cycle)

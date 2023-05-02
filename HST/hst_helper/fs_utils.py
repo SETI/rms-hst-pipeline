@@ -28,7 +28,7 @@ def create_program_dir(proposal_id, visit=None, root_dir='pipeline'):
 
     return program_dir
 
-def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline'):
+def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline', testing=False):
     """Return the program directory for IPPPSSOOT from a proposal id. If visit is
     specified, return the visit directory.
 
@@ -37,9 +37,17 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline'):
         visit:          the two character designation for the HST visit
         root_dir:       root directory of the program, it's either 'staging', 'pipeline'
                         or 'bundles'.
+        testing:        the flag used to determine if we are calling the function for
+                        testing purpose with the test directory.
     """
     root = HST_DIR[root_dir]
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    # Create separate directories for testing. Tests will setup and tear down the testing
+    # dirctories so the regular directories will remain intact.
+    if not testing:
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    else:
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id) + '-testing'
+
     if visit is None:
         program_dir = root + '/hst_' + formatted_proposal_id
     else:
@@ -47,15 +55,17 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline'):
 
     return program_dir
 
-def get_deliverable_path(proposal_id):
+def get_deliverable_path(proposal_id, testing=False):
     """Return the final deliverable path in the bundles directory for a given proposal
     id.
 
     Input:
         proposal_id:    a proposal id.
+        testing:        the flag used to determine if we are calling the function for
+                        testing purpose with the test directory.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    return (get_program_dir_path(proposal_id, None, 'bundles') +
+    return (get_program_dir_path(proposal_id, None, 'bundles', testing) +
             '/hst_' +
             formatted_proposal_id +
             '-deliverable')
@@ -138,3 +148,20 @@ def backup_file(proposal_id, visit, filepath):
     os.makedirs(backups_dir, exist_ok=True)
     # move file to the back up dir
     shutil.move(filepath, new_path)
+
+def create_col_dir_in_bundle(proposal_id, collection_name, testing=False):
+    """Create the collection directory in the final bundle directory for a given propsal
+    id & collection name. Return a tupel of the path of the final bundle & collection
+    directories.
+
+    Input:
+        proposal_id:     the proposal id.
+        collection_name: the collection name for the directory.
+        testing:         the flag used to determine if we are calling the function for
+                         testing purpose with the test directory.
+    """
+    deliverable_path = get_deliverable_path(proposal_id, testing)
+    col_dir = deliverable_path + '/' + collection_name
+    os.makedirs(col_dir, exist_ok=True)
+
+    return (deliverable_path, col_dir)
