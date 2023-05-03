@@ -4,12 +4,11 @@ import os
 import pytest
 import shutil
 
-from . import label_hst_schema_directory
+from finalize_schema import label_hst_schema_directory
 from citations import Citation_Information
-from finalize_hst_bundle import get_general_label_data
 from hst_helper.fs_utils import get_program_dir_path
 
-class TestFinalizeSchema:
+class TestLabelCreations:
     def setup_method(self) -> None:
         # data dictionary used to create the label
         self.data_dict = {
@@ -104,13 +103,10 @@ class TestFinalizeSchema:
         ],
     )
     def test_label_hst_schema_directory(self, p_id):
-        # data_dict = get_general_label_data(p_id)
-        # data_dict = {**data_dict, **self.data_dict}
         label_path = label_hst_schema_directory(p_id, self.data_dict, None, True)
 
         if os.path.isfile(label_path):
             calculated_contents = _golden_file_contents(label_path)
-            print(calculated_contents)
         assert_golden_file_equal("test_schema_label.golden.xml", calculated_contents)
 
 

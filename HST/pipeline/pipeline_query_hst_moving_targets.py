@@ -58,6 +58,9 @@ parser.add_argument('--log', '-l', type=str, default='',
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
 
+parser.add_argument('--taskqueue', '--tq', action='store_true',
+    help='Run the script with task queue.')
+
 # Make sure some query constraints are passed in
 if len(sys.argv) == 1:
     parser.print_help()
@@ -93,6 +96,7 @@ instruments = args.instruments if args.instruments else []
 start_date = args.start if args.start else START_DATE
 end_date = args.end if args.end else END_DATE
 retry = args.retry if args.retry else RETRY
+taskqueue = args.taskqueue
 
 logger.info('Mast query constraints: ' + str(args))
 pid_li = query_hst_moving_targets(proposal_ids=proposal_ids,
@@ -103,17 +107,18 @@ pid_li = query_hst_moving_targets(proposal_ids=proposal_ids,
                                   max_retries=retry)
 logger.info('List of program ids: ' + str(pid_li))
 
-# If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
-for proposal_id in proposal_ids:
-    pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
-    if not os.path.exists(pipeline_dir):
-        logger.info(f'Queue query_hst_products for {proposal_id}')
-        queue_next_task(proposal_id, '', 1, logger)
-    else:
-        logger.info(f'{pipeline_dir} exists')
+if taskqueue:
+    # If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
+    for proposal_id in proposal_ids:
+        pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
+        if not os.path.exists(pipeline_dir):
+            logger.info(f'Queue query_hst_products for {proposal_id}')
+            queue_next_task(proposal_id, '', 1, logger)
+        else:
+            logger.info(f'{pipeline_dir} exists')
 
-# TODO: TASK QUEUE
-# - re-queue query-hst-moving-targets with a 30-day delay
+    # TODO: TASK QUEUE
+    # - re-queue query-hst-moving-targets with a 30-day delay
 
 logger.close()
 

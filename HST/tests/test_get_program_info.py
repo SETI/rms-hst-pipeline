@@ -1,7 +1,6 @@
 from get_program_info import get_program_info
 import pytest
 
-import os
 import shutil
 import tempfile
 

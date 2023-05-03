@@ -28,8 +28,8 @@ SUBPROCESS_LIST = []
 # replaced by a two character visit or multiple visits separated by spaces (for
 # pipeline_update_hst_program).
 TASK_NUM_TO_CMD_MAPPING = {
-    0: 'HST/pipeline/pipeline_query_hst_moving_targets.py --prog-id {P}',
-    1: 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P}',
+    0: 'HST/pipeline/pipeline_query_hst_moving_targets.py --prog-id {P} --tq',
+    1: 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P} --tq',
     2: 'HST/pipeline/pipeline_update_hst_program.py --prog-id {P} --vi {V}',
     3: 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}',
     4: 'HST/pipeline/pipeline_update_hst_visit.py --prog-id {P} --vi {V}',

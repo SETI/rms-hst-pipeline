@@ -169,4 +169,5 @@ lidvid_error_log.txt
 HST/logs/
 
 # task queue db
-HST/*db
+HST/*.db
+*.db

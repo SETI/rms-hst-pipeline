@@ -46,6 +46,9 @@ parser.add_argument('--log', '-l', type=str, default='',
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
 
+parser.add_argument('--taskqueue', '--tq', action='store_true',
+    help='Run the script with task queue.')
+
 # Make sure some query constraints are passed in
 if len(sys.argv) == 1:
     parser.print_help()
@@ -54,6 +57,7 @@ if len(sys.argv) == 1:
 # Parse and validate the command line
 args = parser.parse_args()
 proposal_id = args.proposal_id
+taskqueue = args.taskqueue
 LOG_DIR = HST_DIR['pipeline'] + '/hst_'  + proposal_id.zfill(5) + '/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.query-hst-products-' + proposal_id)
@@ -86,14 +90,15 @@ except:
     remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
     raise
 
-# If list is not empty, queue update-hst-program with the list of visits
-if len(new_visit_li) != 0:
-    logger.info(f'Queue update_hst_program for {proposal_id}')
-    queue_next_task(proposal_id, new_visit_li, 2, logger)
+if taskqueue:
+    # If list is not empty, queue update-hst-program with the list of visits
+    if len(new_visit_li) != 0:
+        logger.info(f'Queue update_hst_program for {proposal_id}')
+        queue_next_task(proposal_id, new_visit_li, 2, logger)
 
-# TODO: TASK QUEUE
-# - if list is empty, re-queue query-hst-products with a 30-day delay
-# - re-queue query-hst-products with a 90-day delay
+    # TODO: TASK QUEUE
+    # - if list is empty, re-queue query-hst-products with a 30-day delay
+    # - re-queue query-hst-products with a 90-day delay
 
 logger.close()
 
