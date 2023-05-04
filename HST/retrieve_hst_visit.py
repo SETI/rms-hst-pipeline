@@ -24,6 +24,8 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
         proposal_id:    a proposal id.
         visit:          two character visit.
         logger:         pdslogger to use; None for default EasyLogger.
+        testing:        the flag used to determine if we are calling the function for
+                        testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
 
@@ -37,9 +39,7 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     # Query mast
     table = query_mast_slice(proposal_id=proposal_id, logger=logger)
     filtered_products = get_filtered_products(table, visit)
-    files_dir = get_program_dir_path(proposal_id, visit, root_dir='staging')
-    # Download all accepted files
-    # download_files(filtered_products, files_dir, logger, testing)
+    files_dir = get_program_dir_path(proposal_id, visit, 'staging', testing)
 
     try:
         # Download all accepted files

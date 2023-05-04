@@ -1,15 +1,20 @@
-from get_program_info import get_program_info
-import pytest
+##########################################################################################
+# tests/test_get_program_info.py
+#
+# Tests related to get_prgroam_info task
+##########################################################################################
 
+import pytest
 import shutil
 import tempfile
 
+from get_program_info import get_program_info
 
 class TestGetProgramInfo:
-    def setup_method(self) -> None:
+    def setup_method(self):
         self.download_dir = tempfile.mkdtemp()
 
-    def teardown_method(self) -> None:
+    def teardown_method(self):
         shutil.rmtree(self.download_dir)
 
     @pytest.mark.parametrize(

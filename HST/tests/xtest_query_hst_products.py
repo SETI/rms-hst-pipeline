@@ -8,12 +8,9 @@ class TestQueryHSTProducts:
     @pytest.mark.parametrize(
         'p_id,expected',
         [
-            ('9296', []),
+            ('9059', ['01']),
         ],
     )
     def test_query_hst_products(self, p_id, expected):
         visit_diff, visits = query_hst_products(p_id)
-        print('================')
-        print(visit_diff)
-        print(visits)
-        # assert visit_diff == expected
+        assert visits == expected

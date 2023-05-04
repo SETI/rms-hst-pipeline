@@ -46,7 +46,7 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline', testing=F
     if not testing:
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     else:
-        formatted_proposal_id = get_formatted_proposal_id(proposal_id) + '-testing'
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id) + '_testing'
 
     if visit is None:
         program_dir = root + '/hst_' + formatted_proposal_id

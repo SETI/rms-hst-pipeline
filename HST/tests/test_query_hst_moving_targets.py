@@ -1,6 +1,11 @@
-from query_hst_moving_targets import query_hst_moving_targets
-import pytest
+##########################################################################################
+# tests/test_query_hst_moving_targets.py
+#
+# Tests related to query_hst_moving_targets task
+##########################################################################################
 
+import pytest
+from query_hst_moving_targets import query_hst_moving_targets
 
 class TestQueryHSTMovingTargets:
     @pytest.mark.parametrize(
