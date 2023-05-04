@@ -95,8 +95,8 @@ def assert_golden_file_equal(basename, calculated_contents):
     """
     Finds the golden file and compares its contents with the given string.
     Raises an exception via the unittest.TestCase argument if they are
-    unequal.  If the file does not yet exist, it writes the given string to
-    the file.  Inventories must be written with CR/NL line-termination, so
+    unequal. If the file does not yet exist, it writes the given string to
+    the file. Inventories must be written with CR/NL line-termination, so
     a parameter for that is provided.
     """
     filepath = golden_filepath(basename)
@@ -106,4 +106,4 @@ def assert_golden_file_equal(basename, calculated_contents):
     else:
         with open(filepath, "wb") as f:
             f.write(calculated_contents)
-            print(f"Golden file {basename!r} did not exist but it was created.")
+            assert False, f"Golden file {basename!r} did not exist but it was created."

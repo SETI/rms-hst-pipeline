@@ -4,15 +4,13 @@
 # Create schema directory, and schema csv & xml.
 ##########################################################################################
 
-import os
 import pdslogger
 
 from hst_helper import (PDS4_LIDVID,
                         HST_LIDVID,
                         DISP_LIDVID)
 from hst_helper.fs_utils import (create_col_dir_in_bundle,
-                                 get_formatted_proposal_id,
-                                 get_deliverable_path)
+                                 get_formatted_proposal_id)
 from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
                                       get_mod_history_from_label)
@@ -26,7 +24,6 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
     1. Create schema directory.
     2. Create schema csv.
     3. create schema xml label.
-
 
     Inputs:
         proposal_id:    a proposal id.
@@ -47,9 +44,7 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
 
     # Create schema directory
     logger.info(f'Create schema directory for proposal id: {proposal_id}.')
-    deliverable_path, schema_dir = create_col_dir_in_bundle(proposal_id,
-                                                            'schema',
-                                                            testing)
+    _, schema_dir = create_col_dir_in_bundle(proposal_id, 'schema', testing)
 
     # Create schema csv
     collection_schema_csv = schema_dir + f'/{CSV_FILENAME}'
@@ -63,7 +58,7 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
     records_num = 3
     # Get the mod history for schema collection label if it's already existed.
     version_id = (1, 0)
-    col_sch_label_path = deliverable_path + f'/schema/{COL_SCH_LABEL}'
+    col_sch_label_path = schema_dir + f'/{COL_SCH_LABEL}'
     mod_history = get_mod_history_from_label(col_sch_label_path, version_id)
 
     sch_data_dict = {

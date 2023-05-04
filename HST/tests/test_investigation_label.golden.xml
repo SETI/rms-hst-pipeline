@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch"
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Context xmlns="http://pds.nasa.gov/pds4/pds/v1"
+             xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                                https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd">
+
+    <Identification_Area>
+        <logical_identifier>
+            urn:nasa:pds:context:investigation:individual.hst_07885
+        </logical_identifier>
+        <version_id>1.0</version_id>
+        <title>
+            Uranus Nearing Equinox: Vertical Aerosol Distribution of Atmospheric Structure, HST Cycle 7 Program 7885, 1999.
+        </title>
+        <information_model_version>1.15.0.0</information_model_version>
+        <product_class>Product_Context</product_class>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2023-03-17</modification_date>
+                <version_id>1.0</version_id>
+                <description>
+                    Initial set up of the investigation product.
+                </description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Reference_List>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+            <reference_type>investigation_to_instrument_host</reference_type>
+        </Internal_Reference>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:context:instrument:hst.nicmos</lid_reference>
+            <reference_type>investigation_to_instrument</reference_type>
+        </Internal_Reference>
+        <Internal_Reference>
+            <lid_reference>urn:nasa:pds:context:target:planet.uranus</lid_reference>
+            <reference_type>investigation_to_target</reference_type>
+        </Internal_Reference>
+    </Reference_List>
+    <Investigation>
+        <name>
+            Uranus Nearing Equinox: Vertical Aerosol Distribution of Atmospheric Structure, HST Cycle 7 Program 7885, 1999.
+        </name>
+        <type>Individual Investigation</type>
+        <start_date>1998-08-05</start_date>
+        <stop_date>1998-08-08</stop_date>
+        <description>
+            Recent HST images confirm that Uranus is undergoing atmospheric changes as the
+            planet inches toward equinox in 2007 (parts of its northern hemisphere are now
+            moving into sunlight after being in darkness for many years). GO 6818 (Hammel et
+            al.) yielded excellent PC1 imaging of Uranus (NICMOS provides even better
+            discrimination for vertical aerosol distribution than PC1, but was not available
+            in Cycle 6). The data revealed strongly wavelength-dependent latitudinal
+            structure and the presence of visible-wavelength cloud features in the northern
+            hemisphere - the first ever so detected in the modern era. One orbit of GO 7429
+            (Tomasko and Karkoschka) was devoted to Uranus NICMOS imaging in six filters.
+            Like the PC1 images, the NICMOS images show strongly wavelength-dependent
+            latitudinal banding and reveal several discrete features near 30 degrees north -
+            these features have the highest contrast ever seen for a Uranian cloud. The
+            timescale of the changes on Uranus is unknown, but some models predict it could
+            be rapid. Furthermore, this is the first opportunity to detect some regions of
+            the northern hemisphere on Uranus. NICMOS will be used to image Uranus during
+            this unique epoch of change. Adequate sampling of all longitudes in the northern
+            hemisphere, where the newly detected features appear, requires 3 orbits. When
+            possible, observations will be coordinated with ground-based imaging,
+            spectroscopy, and photometry.
+        </description>
+  </Investigation>
+</Product_Context>

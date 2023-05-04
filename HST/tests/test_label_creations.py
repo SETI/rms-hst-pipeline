@@ -12,6 +12,7 @@ from .utils import (assert_golden_file_equal,
                     golden_file_contents,
                     LBL_DATA_DICT)
 from finalize_schema import label_hst_schema_directory
+from finalize_context import label_hst_context_directory
 from hst_helper.fs_utils import get_program_dir_path
 
 class TestLabelCreations:
@@ -29,15 +30,40 @@ class TestLabelCreations:
         for testing_dir in self.testing_dir:
             shutil.rmtree(testing_dir)
 
-    @pytest.mark.parametrize(
-        'p_id',
-        [
-            ('7885'),
-        ],
-    )
+    # Test schema label creation
+    @pytest.mark.parametrize('p_id', [('7885')])
     def test_label_hst_schema_directory(self, p_id):
         label_path = label_hst_schema_directory(p_id, self.data_dict, None, True)
 
         if os.path.isfile(label_path):
             calculated_contents = golden_file_contents(label_path)
         assert_golden_file_equal("test_schema_label.golden.xml", calculated_contents)
+
+    # Test context label creation
+    @pytest.mark.parametrize('p_id', [('7885')])
+    def test_label_hst_context_directory_ctxt_lbl(self, p_id):
+        data_dict = {
+            'collection_name': 'context',
+            'csv_filename': 'collection_context.csv',
+        }
+        data_dict = {**self.data_dict, **data_dict}
+        label_path, _ = label_hst_context_directory(p_id, data_dict, None, True)
+
+        if os.path.isfile(label_path):
+            calculated_contents = golden_file_contents(label_path)
+        assert_golden_file_equal("test_context_label.golden.xml", calculated_contents)
+
+    # Test investigation label creation
+    @pytest.mark.parametrize('p_id', [('7885')])
+    def test_label_hst_context_directory_inv_lbl(self, p_id):
+        data_dict = {
+            'collection_name': 'context',
+            'csv_filename': 'collection_context.csv',
+        }
+        data_dict = {**self.data_dict, **data_dict}
+        _, label_path = label_hst_context_directory(p_id, data_dict, None, True)
+
+        if os.path.isfile(label_path):
+            calculated_contents = golden_file_contents(label_path)
+        assert_golden_file_equal("test_investigation_label.golden.xml",
+                                 calculated_contents)

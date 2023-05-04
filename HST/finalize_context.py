@@ -4,11 +4,10 @@
 # Create context directory, collection csv & xml, and investigation xml.
 ##########################################################################################
 
-import os
 import pdslogger
 
-from hst_helper.fs_utils import (get_formatted_proposal_id,
-                                 get_deliverable_path)
+from hst_helper.fs_utils import (create_col_dir_in_bundle,
+                                 get_formatted_proposal_id)
 from hst_helper.general_utils import (create_collection_label,
                                       create_csv,
                                       get_mod_history_from_label)
@@ -18,7 +17,7 @@ COL_CTXT_LABEL = 'collection_context.xml'
 COL_CTXT_LABEL_TEMPLATE = 'CONTEXT_COLLECTION_LABEL.xml'
 INV_LABEL_TEMPLATE = 'INVESTIGATION_LABEL.xml'
 
-def label_hst_context_directory(proposal_id, data_dict, logger):
+def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create context directory in the final bundle.
     1. Create context directory.
     2. Create context csv.
@@ -29,6 +28,8 @@ def label_hst_context_directory(proposal_id, data_dict, logger):
         proposal_id:    a proposal id.
         data_dict:      a data dictionary used to create the label.
         logger:         pdslogger to use; None for default EasyLogger.
+        testing:        the flag used to determine if we are calling the function for
+                        testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst context directory with proposal id: {proposal_id}')
@@ -42,9 +43,7 @@ def label_hst_context_directory(proposal_id, data_dict, logger):
 
     # Create context directory
     logger.info(f'Create context directory for proposal id: {proposal_id}.')
-    deliverable_path = get_deliverable_path(proposal_id)
-    context_dir = deliverable_path + '/context'
-    os.makedirs(context_dir, exist_ok=True)
+    _, context_dir = create_col_dir_in_bundle(proposal_id, 'context', testing)
 
     version_id = (1, 0)
     col_ctxt_label_path = context_dir + f'/{COL_CTXT_LABEL}'
@@ -66,13 +65,17 @@ def label_hst_context_directory(proposal_id, data_dict, logger):
     # Create context collection csv
     create_context_collection_csv(proposal_id, context_dir, ctx_data_dict, logger)
     # Create context collection label
-    create_collection_label(proposal_id, 'context', ctx_data_dict,
-                            COL_CTXT_LABEL, COL_CTXT_LABEL_TEMPLATE, logger)
+    ctxt_lbl_path = create_collection_label(proposal_id, 'context', ctx_data_dict,
+                                            COL_CTXT_LABEL, COL_CTXT_LABEL_TEMPLATE,
+                                            logger, testing)
 
     # Create investigation label
     inv_label = f'individual.hst_{formatted_proposal_id}.xml'
-    create_collection_label(proposal_id, 'context', ctx_data_dict,
-                            inv_label, INV_LABEL_TEMPLATE, logger)
+    inv_lbl_path = create_collection_label(proposal_id, 'context', ctx_data_dict,
+                                           inv_label, INV_LABEL_TEMPLATE,
+                                           logger, testing)
+
+    return (ctxt_lbl_path, inv_lbl_path)
 
 def create_context_collection_csv(proposal_id, context_dir, data_dict, logger):
     """With a given proposal id, path to context dir and data dictionary, create
