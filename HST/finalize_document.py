@@ -13,7 +13,8 @@ import shutil
 
 from hst_helper import (DOCUMENT_EXT,
                         PROGRAM_INFO_FILE)
-from hst_helper.fs_utils import (get_deliverable_path,
+from hst_helper.fs_utils import (create_col_dir_in_bundle,
+                                 get_deliverable_path,
                                  get_formatted_proposal_id,
                                  get_program_dir_path)
 from hst_helper.general_utils import (create_xml_label,
@@ -27,7 +28,7 @@ COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
 CSV_FILENAME = 'collection.csv'
 COL_DOC_LABEL = 'collection.xml'
 
-def label_hst_document_directory(proposal_id, data_dict, logger):
+def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create document directory in the final bundle.
     1. Create document directory.
     2. Move/copy proposal files over from pipeline directory.
@@ -39,6 +40,8 @@ def label_hst_document_directory(proposal_id, data_dict, logger):
         proposal_id:    a proposal id.
         data_dict:      a data dictionary used to create the label.
         logger:         pdslogger to use; None for default EasyLogger.
+        testing:        the flag used to determine if we are calling the function for
+                        testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst document directory with proposal id: {proposal_id}')
@@ -52,45 +55,47 @@ def label_hst_document_directory(proposal_id, data_dict, logger):
 
     # Create document directory and move proposal files over
     logger.info(f'Create document directory for proposal id: {proposal_id}.')
-    pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
-    deliverable_path = get_deliverable_path(proposal_id)
-    document_dir = deliverable_path + f'/document/{formatted_proposal_id}'
-    os.makedirs(document_dir, exist_ok=True)
+    _, document_dir = create_col_dir_in_bundle(proposal_id, 'document', testing)
 
-    # Search for proposal files & program info file stored at pipeline directory
-    # Move them to bundles directory and collect neccessary data for the label
-    logger.info('Move over proposal files.')
-    proposal_files_li = []
-    for file in os.listdir(pipeline_dir):
-        basename, _, ext = file.rpartition('.')
-        if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
-            proposal_files_li.append((basename, file))
-            fp = pipeline_dir + f'/{file}'
-
-            # Move the proposal files and program info file to the document directory
-            shutil.copy(fp, document_dir + f'/{file}')
-            # shutil.move(fp, document_dir + f'/{file}')
-
-    # Collect data to construct data dictionary used for the document label
-    # Get version id
-    # Increase the minor version number if a proposal file exists in backups. Note: a
-    # propsal file is in backups if it's different than the latest file via web query.
+    # For testing purpose, data_dict is pre-constructed, no need to walk through
+    # directories that might not exist.
     version_id = (1, 0)
-    backups_dir = get_program_dir_path(proposal_id, None) + '/backups'
-    try:
-        for file in os.listdir(backups_dir):
-            for name_info in proposal_files_li:
-                if name_info[0] in file:
-                    version_id = (version_id[0], version_id[1]+1)
-    except FileNotFoundError:
-        pass
+    proposal_files_li = []
+    if not testing:
+        # Search for proposal files & program info file stored at pipeline directory
+        # Move them to bundles directory and collect neccessary data for the label
+        pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
+        logger.info('Move over proposal files.')
+
+        for file in os.listdir(pipeline_dir):
+            basename, _, ext = file.rpartition('.')
+            if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
+                proposal_files_li.append((basename, file))
+                fp = pipeline_dir + f'/{file}'
+
+                # Move the proposal files and program info file to the document directory
+                shutil.copy(fp, document_dir + f'/{file}')
+                # shutil.move(fp, document_dir + f'/{file}')
+
+        # Collect data to construct data dictionary used for the document label
+        # Get version id
+        # Increase the minor version number if a proposal file exists in backups. Note: a
+        # propsal file is in backups if it's different than the latest file via web query.
+        backups_dir = get_program_dir_path(proposal_id, None) + '/backups'
+        try:
+            for file in os.listdir(backups_dir):
+                for name_info in proposal_files_li:
+                    if name_info[0] in file:
+                        version_id = (version_id[0], version_id[1]+1)
+        except FileNotFoundError:
+            pass
 
     # Number of document inventory:
     # 2 handbooks per instrument + the proposal file directory
     records_num = len(data_dict['inst_id_li']) * 2 + 1
 
     # Get the mod history for document collection label if it's already existed.
-    col_doc_label_path = deliverable_path + f'/document/{COL_DOC_LABEL}'
+    col_doc_label_path = document_dir + f'/{COL_DOC_LABEL}'
     mod_history = get_mod_history_from_label(col_doc_label_path, version_id)
 
     doc_data_dict = {
@@ -107,31 +112,34 @@ def label_hst_document_directory(proposal_id, data_dict, logger):
     logger.info(f'Create label for proposal files using {DOC_LABEL_TEMPLATE}.')
     # Document label template path
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_template = this_dir + f'/../templates/{DOC_LABEL_TEMPLATE}'
+    doc_template = this_dir + f'/templates/{DOC_LABEL_TEMPLATE}'
     # Document label path
     doc_label = document_dir + f'/{formatted_proposal_id}.xml'
     create_xml_label(doc_template, doc_label, doc_data_dict, logger)
 
     # Create document collection csv
-    create_document_collection_csv(proposal_id, doc_data_dict, logger)
+    create_document_collection_csv(proposal_id, doc_data_dict, logger, testing)
     # Create document collection label
-    create_collection_label(proposal_id, 'document', doc_data_dict,
-                            COL_DOC_LABEL, COL_DOC_LABEL_TEMPLATE, logger)
+    return create_collection_label(proposal_id, 'document', doc_data_dict,
+                                   COL_DOC_LABEL, COL_DOC_LABEL_TEMPLATE,
+                                   logger, testing)
 
-def create_document_collection_csv(proposal_id, data_dict, logger):
+def create_document_collection_csv(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create document collection csv in the final bundle.
 
     Inputs:
         proposal_id:    a proposal id.
         data_dict:      data dictonary to fill in the label template.
         logger:         pdslogger to use; None for default EasyLogger.
+        testing:        the flag used to determine if we are calling the function for
+                        testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create document collection csv with proposal id: {proposal_id}')
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
     # Set collection csv filename
-    deliverable_path = get_deliverable_path(proposal_id)
+    deliverable_path = get_deliverable_path(proposal_id, testing)
     document_collection_dir = deliverable_path + f'/document/{CSV_FILENAME}'
 
     # Construct collection data, each item in the list is a row in the csv file

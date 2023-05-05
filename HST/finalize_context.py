@@ -77,7 +77,7 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
 
     return (ctxt_lbl_path, inv_lbl_path)
 
-def create_context_collection_csv(proposal_id, context_dir, data_dict, logger):
+def create_context_collection_csv(proposal_id, context_dir, data_dict, logger=None):
     """With a given proposal id, path to context dir and data dictionary, create
     context collection csv in the final bundle.
 

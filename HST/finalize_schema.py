@@ -40,8 +40,6 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-
     # Create schema directory
     logger.info(f'Create schema directory for proposal id: {proposal_id}.')
     _, schema_dir = create_col_dir_in_bundle(proposal_id, 'schema', testing)
@@ -75,7 +73,7 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
                                    COL_SCH_LABEL, COL_SCH_LABEL_TEMPLATE,
                                    logger, testing)
 
-def create_schema_collection_csv(csv_path, row_data, logger):
+def create_schema_collection_csv(csv_path, row_data, logger=None):
     """With a given proposal id, create schema collection csv in the final bundle.
 
     Inputs:
