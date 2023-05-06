@@ -18,7 +18,9 @@ COL_CTXT_LABEL_TEMPLATE = 'CONTEXT_COLLECTION_LABEL.xml'
 INV_LABEL_TEMPLATE = 'INVESTIGATION_LABEL.xml'
 
 def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=False):
-    """With a given proposal id, create context directory in the final bundle.
+    """With a given proposal id, create context directory in the final bundle. Return a
+    tuple of the path of context collection label and the path of investigation label.
+    These are the actions performed:
     1. Create context directory.
     2. Create context csv.
     3. create context xml label.
@@ -65,17 +67,17 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
     # Create context collection csv
     create_context_collection_csv(proposal_id, context_dir, ctx_data_dict, logger)
     # Create context collection label
-    ctxt_lbl_path = create_collection_label(proposal_id, 'context', ctx_data_dict,
-                                            COL_CTXT_LABEL, COL_CTXT_LABEL_TEMPLATE,
-                                            logger, testing)
+    ctxt_col_lbl = create_collection_label(proposal_id, 'context', ctx_data_dict,
+                                           COL_CTXT_LABEL, COL_CTXT_LABEL_TEMPLATE,
+                                           logger, testing)
 
     # Create investigation label
     inv_label = f'individual.hst_{formatted_proposal_id}.xml'
-    inv_lbl_path = create_collection_label(proposal_id, 'context', ctx_data_dict,
-                                           inv_label, INV_LABEL_TEMPLATE,
-                                           logger, testing)
+    inv_lbl = create_collection_label(proposal_id, 'context', ctx_data_dict,
+                                      inv_label, INV_LABEL_TEMPLATE,
+                                      logger, testing)
 
-    return (ctxt_lbl_path, inv_lbl_path)
+    return (ctxt_col_lbl, inv_lbl)
 
 def create_context_collection_csv(proposal_id, context_dir, data_dict, logger=None):
     """With a given proposal id, path to context dir and data dictionary, create

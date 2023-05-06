@@ -109,14 +109,13 @@ def label_hst_data_directory(proposal_id, logger):
                                         COL_DATA_LABEL_TEMPLATE, logger)
 
     # Create data product collection csv
-    create_data_product_collection_csv(proposal_id, None, logger)
+    create_data_product_collection_csv(proposal_id, logger)
 
-def create_data_product_collection_csv(proposal_id, data_dict, logger):
+def create_data_product_collection_csv(proposal_id, logger):
     """With a given proposal id, create data product collection csv in the final bundle.
 
     Inputs:
         proposal_id:    a proposal id.
-        data_dict:      data dictonary to fill in the label template.
         logger:         pdslogger to use; None for default EasyLogger.
     """
     prod_ver = (1,0)
@@ -126,7 +125,7 @@ def create_data_product_collection_csv(proposal_id, data_dict, logger):
             if dir.startswith(col_name):
                 collection_data = []
                 bundles_prod_dir = os.path.join(deliverable_path, dir)
-                for root, _, files in os.walk(bundles_prod_dir):
+                for _, _, files in os.walk(bundles_prod_dir):
                     for file in files:
                         if not file.startswith('collection_') and file.endswith('.xml'):
                             format_term = get_format_term(file)

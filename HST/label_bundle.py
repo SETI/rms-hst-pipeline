@@ -11,13 +11,16 @@ from hst_helper.general_utils import (create_collection_label,
 BUNDLE_LABEL = 'bundle.xml'
 BUNDLE_LABEL_TEMPLATE = 'BUNDLE_LABEL.xml'
 
-def label_hst_bundle(proposal_id, data_dict, logger):
-    """With a given proposal id, create the bundle label.
+def label_hst_bundle(proposal_id, data_dict, logger=None, testing=False):
+    """With a given proposal id, create the bundle label. Return the path of the bundle
+    label.
 
     Inputs:
         proposal_id:    a proposal id.
         data_dict:      a data dictionary used to create the label.
         logger:         pdslogger to use; None for default EasyLogger.
+        testing:        the flag used to determine if we are calling the function for
+                        testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst bundle directory with proposal id: {proposal_id}')
@@ -29,7 +32,7 @@ def label_hst_bundle(proposal_id, data_dict, logger):
 
     # Get the mod history for bundle label if it's already existed.
     version_id = (1, 0)
-    deliverable_path = get_deliverable_path(proposal_id)
+    deliverable_path = get_deliverable_path(proposal_id, testing)
     bundle_label_path = deliverable_path + f'/{BUNDLE_LABEL}'
     mod_history = get_mod_history_from_label(bundle_label_path, version_id)
 
@@ -51,5 +54,5 @@ def label_hst_bundle(proposal_id, data_dict, logger):
     bundle_data_dict = {**bundle_data_dict, **data_dict}
 
     # Create bundle collection label
-    create_collection_label(proposal_id, 'bundle', bundle_data_dict,
-                            BUNDLE_LABEL, BUNDLE_LABEL_TEMPLATE, logger)
+    return create_collection_label(proposal_id, 'bundle', bundle_data_dict,
+                                   BUNDLE_LABEL, BUNDLE_LABEL_TEMPLATE, logger)

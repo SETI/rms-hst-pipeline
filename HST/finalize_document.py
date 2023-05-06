@@ -29,7 +29,9 @@ CSV_FILENAME = 'collection.csv'
 COL_DOC_LABEL = 'collection.xml'
 
 def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
-    """With a given proposal id, create document directory in the final bundle.
+    """With a given proposal id, create document directory in the final bundle. Return a
+    tupel of the path of document collection label and the path of document label. These
+    are the actions performed:
     1. Create document directory.
     2. Move/copy proposal files over from pipeline directory.
     3. Create document label.
@@ -114,15 +116,17 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
     this_dir = os.path.dirname(os.path.abspath(__file__))
     doc_template = this_dir + f'/templates/{DOC_LABEL_TEMPLATE}'
     # Document label path
-    doc_label = document_dir + f'/{formatted_proposal_id}.xml'
-    create_xml_label(doc_template, doc_label, doc_data_dict, logger)
+    doc_lbl = document_dir + f'/{formatted_proposal_id}.xml'
+    create_xml_label(doc_template, doc_lbl, doc_data_dict, logger)
 
     # Create document collection csv
     create_document_collection_csv(proposal_id, doc_data_dict, logger, testing)
     # Create document collection label
-    return create_collection_label(proposal_id, 'document', doc_data_dict,
+    doc_col_lbl = create_collection_label(proposal_id, 'document', doc_data_dict,
                                    COL_DOC_LABEL, COL_DOC_LABEL_TEMPLATE,
                                    logger, testing)
+
+    return (doc_col_lbl, doc_lbl)
 
 def create_document_collection_csv(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create document collection csv in the final bundle.
