@@ -55,4 +55,5 @@ def label_hst_bundle(proposal_id, data_dict, logger=None, testing=False):
 
     # Create bundle collection label
     return create_collection_label(proposal_id, 'bundle', bundle_data_dict,
-                                   BUNDLE_LABEL, BUNDLE_LABEL_TEMPLATE, logger)
+                                   BUNDLE_LABEL, BUNDLE_LABEL_TEMPLATE,
+                                   logger, testing)
