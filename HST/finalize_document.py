@@ -74,11 +74,11 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
             basename, _, ext = file.rpartition('.')
             if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
                 proposal_files_li.append((basename, file))
-                fp = pipeline_dir + f'/{file}'
+                file_path = pipeline_dir + f'/{file}'
 
                 # Move the proposal files and program info file to the document directory
-                shutil.copy(fp, document_dir + f'/{file}')
-                # shutil.move(fp, document_dir + f'/{file}')
+                shutil.copy(file_path, document_dir + f'/{file}')
+                # shutil.move(file_path, document_dir + f'/{file}')
 
         # Collect data to construct data dictionary used for the document label
         # Get version id

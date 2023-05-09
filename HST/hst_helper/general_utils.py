@@ -128,10 +128,10 @@ def get_citation_info(proposal_id, logger):
         _, _, ext = file.rpartition('.')
         # We don't have an implementation to create citation info from pdf.
         if (ext in DOCUMENT_EXT and ext != 'pdf') or file == PROGRAM_INFO_FILE:
-            fp = pipeline_dir + f'/{file}'
+            file_path = pipeline_dir + f'/{file}'
             if formatted_proposal_id not in CITATION_INFO_DICT:
                 CITATION_INFO_DICT[formatted_proposal_id] = (
-                                                Citation_Information.create_from_file(fp))
+                                                Citation_Information.create_from_file(file_path))
             return CITATION_INFO_DICT[formatted_proposal_id]
 
 def get_instrument_id_set(proposal_id, logger):
@@ -252,8 +252,8 @@ def get_collection_label_data(proposal_id, target_dir, logger):
     for root, _, files in os.walk(target_dir):
             for file in files:
                 if not file.startswith('collection_') and file.endswith('.xml'):
-                    fp = os.path.join(root, file)
-                    with open(fp) as f:
+                    file_path = os.path.join(root, file)
+                    with open(file_path) as f:
                         xml_content = f.read()
                         # target identifications
                         if 'target' not in res:

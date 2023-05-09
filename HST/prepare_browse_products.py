@@ -45,7 +45,7 @@ def prepare_browse_products(proposal_id, visit, logger=None):
     files_dir = get_program_dir_path(proposal_id, visit, root_dir='staging')
     for root, dirs, files in os.walk(files_dir):
         for file in files:
-            fp = os.path.join(root, file)
+            file_path = os.path.join(root, file)
             suffix = get_file_suffix(file)
             inst_id = get_instrument_id_from_fname(file)
 
@@ -67,5 +67,5 @@ def prepare_browse_products(proposal_id, visit, logger=None):
 
                 # Copy files to newly structured directories
                 os.makedirs(prod_dir, exist_ok=True)
-                shutil.copy(fp, prod_dir + file)
-                # shutil.move(fp, prod_dir+file)
+                shutil.copy(file_path, prod_dir + file)
+                # shutil.move(file_path, prod_dir+file)

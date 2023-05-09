@@ -82,12 +82,12 @@ def create_manifest_files(proposal_id, logger):
 
     cm_files_li = sorted(cm_files_li)
     with open(cm_path, 'w') as f:
-        for fp, logical_fp in cm_files_li:
-                checksum = file_md5(fp)
-                f.write('%s  %s\n' % (checksum, logical_fp))
+        for file_path, logical_file_path in cm_files_li:
+                checksum = file_md5(file_path)
+                f.write('%s  %s\n' % (checksum, logical_file_path))
 
     tm_files_li = sorted(tm_files_li)
     max_width = max(len(lidvid) for (lidvid, _) in tm_files_li)
     with open(tm_path, 'w') as f:
-        for lidvid, logical_fp in tm_files_li:
-            f.write('%-*s %s\n' % (max_width, lidvid, logical_fp))
+        for lidvid, logical_file_path in tm_files_li:
+            f.write('%-*s %s\n' % (max_width, lidvid, logical_file_path))
