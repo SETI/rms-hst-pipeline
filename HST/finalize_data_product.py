@@ -27,6 +27,7 @@ COL_DATA_LABEL_TEMPLATE = 'PRODUCT_COLLECTION_LABEL.xml'
 
 def label_hst_data_directory(proposal_id, logger):
     """With a given proposal id, move data directory in the final bundle.
+
     1. Move data directory from staging to bundles directory.
     2. Create data csv.
     3. create data xml label.
@@ -46,9 +47,9 @@ def label_hst_data_directory(proposal_id, logger):
     # Collect data to construct data dictionary used for the labels
     deliverable_path = get_deliverable_path(proposal_id)
     for dir in os.listdir(deliverable_path):
-        for col_name in COL_NAME_PREFIX:
-            if dir.startswith(col_name): # work on data_directory
-                col_name = dir
+        for col_prefix in COL_NAME_PREFIX:
+            if dir.startswith(col_prefix): # work on data_directory
+                collection_name = dir
 
                 # Get channel id
                 prod_dir = os.path.join(deliverable_path, dir)
@@ -77,7 +78,7 @@ def label_hst_data_directory(proposal_id, logger):
                 citation_info = get_citation_info(proposal_id, logger)
 
                 version_id = (1, 0)
-                col_data_label_name = f'collection_{col_name}.xml'
+                col_data_label_name = f'collection_{collection_name}.xml'
                 mod_history = get_mod_history_from_label(col_data_label_name, version_id)
 
                 # Get label date
@@ -86,7 +87,7 @@ def label_hst_data_directory(proposal_id, logger):
                 data_dict = {
                     'prop_id': proposal_id,
                     'inst_id': inst_id,
-                    'collection_name': col_name,
+                    'collection_name': collection_name,
                     'collection_title': collection_title,
                     'citation_info': citation_info,
                     'processing_level': processing_lvl[0],
@@ -104,7 +105,7 @@ def label_hst_data_directory(proposal_id, logger):
                 }
 
                 # Create data product collection label
-                create_collection_label(proposal_id, col_name,
+                create_collection_label(proposal_id, collection_name,
                                         data_dict, col_data_label_name,
                                         COL_DATA_LABEL_TEMPLATE, logger)
 
@@ -121,8 +122,8 @@ def create_data_product_collection_csv(proposal_id, logger):
     prod_ver = (1,0)
     deliverable_path = get_deliverable_path(proposal_id)
     for dir in os.listdir(deliverable_path):
-        for col_name in COL_NAME_PREFIX:
-            if dir.startswith(col_name):
+        for col_prefix in COL_NAME_PREFIX:
+            if dir.startswith(col_prefix):
                 collection_data = []
                 bundles_prod_dir = os.path.join(deliverable_path, dir)
                 for _, _, files in os.walk(bundles_prod_dir):
@@ -131,8 +132,8 @@ def create_data_product_collection_csv(proposal_id, logger):
                             format_term = get_format_term(file)
                             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
                             prod_lidvid = (f'P,urn:nasa:pds:hst_{formatted_proposal_id}'
-                                        + f':{dir}:{format_term}::'
-                                        + f'{prod_ver[0]}.{prod_ver[1]}').split(',')
+                                           f':{dir}:{format_term}::'
+                                           f'{prod_ver[0]}.{prod_ver[1]}').split(',')
                             if prod_lidvid not in collection_data:
                                 collection_data.append(prod_lidvid)
                 prod_csv = bundles_prod_dir + f'/collection_{dir}.csv'

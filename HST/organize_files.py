@@ -29,8 +29,8 @@ def organize_files_from_staging_to_bundles(proposal_id, logger):
     staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
     deliverable_path = get_deliverable_path(proposal_id)
     for dir in os.listdir(staging_dir):
-        for col_name in COL_NAME_PREFIX:
-            if dir.startswith(col_name):
+        for col_prefix in COL_NAME_PREFIX:
+            if dir.startswith(col_prefix):
                 staging_prod_dir = os.path.join(staging_dir, dir)
                 bundles_prod_dir = os.path.join(deliverable_path, dir)
                 os.makedirs(bundles_prod_dir, exist_ok=True)

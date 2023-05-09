@@ -22,6 +22,7 @@ COL_SCH_LABEL_TEMPLATE = 'SCHEMA_COLLECTION_LABEL.xml'
 def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create schema directory in the final bundle. Return the
     path of the schema collectione label. These are the actions performed:
+
     1. Create schema directory.
     2. Create schema csv.
     3. create schema xml label.

@@ -3,6 +3,7 @@
 #
 # update_hst_program is the main function called in update_hst_program pipeline task
 # script. It will do these actions:
+#
 # - Queue get_program_info and wait for it to complete.
 # - For each visit in the visit list, queue update_hst_visit and wait until all visits
 #   have completed.
@@ -25,7 +26,7 @@ def update_hst_program(proposal_id, visit_li, logger=None):
     logger = logger or pdslogger.EasyLogger()
 
     logger.info(f'Update hst program with proposal id: {proposal_id} '
-                + f'& visit li: {visit_li}')
+                f'& visit li: {visit_li}')
     try:
         _ = int(proposal_id)
     except ValueError:

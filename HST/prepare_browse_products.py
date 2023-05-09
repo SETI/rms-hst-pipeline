@@ -34,7 +34,7 @@ def prepare_browse_products(proposal_id, visit, logger=None):
     logger = logger or pdslogger.EasyLogger()
 
     logger.info('Prepare browse products with '
-                + f'proposal id: {proposal_id} & visit: {visit}')
+                f'proposal id: {proposal_id} & visit: {visit}')
     try:
         proposal_id = int(proposal_id)
     except ValueError:
@@ -63,9 +63,9 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                     logger.info(f'Move browse products to: {prod_dir+file}')
                 elif suffix in ACCEPTED_SUFFIXES[inst_id]:
                     prod_dir += f"/{col_name}/visit_{visit}/"
-                    logger.info(f'Move data products to: {prod_dir+file}')
+                    logger.info(f'Move data products to: {prod_dir + file}')
 
                 # Copy files to newly structured directories
                 os.makedirs(prod_dir, exist_ok=True)
-                shutil.copy(fp, prod_dir+file)
+                shutil.copy(fp, prod_dir + file)
                 # shutil.move(fp, prod_dir+file)

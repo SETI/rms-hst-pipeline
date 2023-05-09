@@ -21,6 +21,7 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
     """With a given proposal id, create context directory in the final bundle. Return a
     tuple of the path of context collection label and the path of investigation label.
     These are the actions performed:
+
     1. Create context directory.
     2. Create context csv.
     3. create context xml label.
@@ -109,7 +110,7 @@ def create_context_collection_csv(proposal_id, context_dir, data_dict, logger=No
     csv_entries = [
         'S,urn:nasa:pds:context:instrument_host:spacecraft.hst::1.0'.split(','),
         ('S,urn:nasa:pds:context:investigation:individual.'
-         + f'hst_{formatted_proposal_id}::1.0').split(',')
+         f'hst_{formatted_proposal_id}::1.0').split(',')
     ]
 
     for targ in target_ids:

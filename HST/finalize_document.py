@@ -32,6 +32,7 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
     """With a given proposal id, create document directory in the final bundle. Return a
     tupel of the path of document collection label and the path of document label. These
     are the actions performed:
+
     1. Create document directory.
     2. Move/copy proposal files over from pipeline directory.
     3. Create document label.
@@ -149,8 +150,8 @@ def create_document_collection_csv(proposal_id, data_dict, logger=None, testing=
     # Construct collection data, each item in the list is a row in the csv file
     version_id = data_dict['version_id']
     document_lidvid = (f'P,urn:nasa:pds:hst_{formatted_proposal_id}'
-                      + f':document:{formatted_proposal_id}'
-                      + f'::{version_id[0]}.{version_id[1]}').split(',')
+                       f':document:{formatted_proposal_id}'
+                       f'::{version_id[0]}.{version_id[1]}').split(',')
     collection_data = [document_lidvid]
     inst_ids = get_instrument_id_set(proposal_id, logger)
     for inst in inst_ids:

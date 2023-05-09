@@ -3,6 +3,7 @@
 #
 # query_hst_products is the main function called in query_hst_products pipeline task
 # script. It will do these actions:
+#
 # - Query MAST to get all available visits and files in this program.
 # - Create directories <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/ if they don't exist.
 # - Download all TRL files to <HST_STAGING>/hst_<nnnnn>/.
@@ -38,6 +39,7 @@ products_obs_dict = {}
 def query_hst_products(proposal_id, logger=None):
     """Return a tuple of a list of visits in which any files are new or changed and a
     of all visits for the given proposal id. These actions are performed:
+
         - Query MAST for all available visits and files in this program.
         - Create directories <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/ if they don't exist.
         - Download all TRL files to <HST_STAGING>/hst_<nnnnn>/.

@@ -89,7 +89,7 @@ def query_mast_slice(proposal_id=None,
         remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
 
     logger.exception(RuntimeError)
-    raise RuntimeError('Query mast timed out. Number of retries: ' + str(max_retries))
+    raise RuntimeError(f'Query mast timed out. Number of retries: {max_retries}')
 
 def filter_table(row_predicate, table):
     """Return a copy of the filtered table object based on the return of row_predicate.
@@ -212,6 +212,6 @@ def download_files(table, dir, logger=None, testing=False):
     os.makedirs(dir, exist_ok=True)
 
     if len(table) > 0:
-        logger.info('Download files to ' + dir)
+        logger.info(f'Download files to {dir}')
         if not testing: # pragma: no cover, no need to download files during the test
             Observations.download_products(table, download_dir=dir)

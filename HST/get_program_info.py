@@ -3,6 +3,7 @@
 #
 # get_program_info is the main function called in get_program_info pipeline task script.
 # It will do these actions:
+#
 # - Download the proposal files via a web query.
 # - If these files are the same as the existing ones, return.
 # - Otherwise:
@@ -119,7 +120,7 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
     # A table contains a list of tuple (url for a proposal file, stored file name)
     table = [
         (f'https://www.stsci.edu/hst/phase2-public/{proposal_id}.{suffix}',
-         formatted_proposal_id+f'.{suffix}') for suffix in DOCUMENT_EXT
+         formatted_proposal_id + f'.{suffix}') for suffix in DOCUMENT_EXT
     ]
 
     res = set()

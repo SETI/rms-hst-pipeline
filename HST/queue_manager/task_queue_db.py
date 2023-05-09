@@ -26,6 +26,7 @@ class TaskQueue(Base):
     (current task), task priority, status (current task status), and task command. Each
     row will have an unique combination of proposal id & visit columns. These will make
     sure tasks for these cases can be run in parallel:
+
     - tasks of different proposal ids
     - tasks for different visits of the same propsal id
     """

@@ -11,6 +11,7 @@
 # Enter the --help option to see more information.
 #
 # Perform label_hst_products task with these actions:
+#
 # - Compare the staged FITS files to those in an existing bundle, if any.
 # - Create a new XML label for each file.
 # - Reset the modification dates of the FITS files to match their production date at MAST.

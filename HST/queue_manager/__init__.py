@@ -66,6 +66,7 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
     """Queue in the next task for a given proposal id to database, and wait for the open
     subprocess slot to execute the corresponding command. Once there is an open slot,
     update the task queue status
+
     1. Update the next task for a given proposal id to database. (task status: 0)
     2. Wait for an open slot in subprocess list, once there is an open slot, update
     the task status to 1 in the database.
@@ -86,7 +87,7 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Queue in the next task for: {formatted_proposal_id}'
-                + f', task num: {task_num}')
+                f', task num: {task_num}')
 
     visit_arg = ' '.join(visit_info) if type(visit_info) is list else visit_info
     visit = '' if type(visit_info) is list else visit_info

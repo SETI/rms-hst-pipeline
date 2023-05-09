@@ -3,6 +3,7 @@
 #
 # update_hst_visit is the main function called in update_hst_visit pipeline task script.
 # It will do these actions:
+#
 # - Queue retrieve_hst_visit and wait for it to complete.
 # - Queue label_hst_products and wait for it to complete.
 # - Queue prepare_browse_products and wait for it to complete.

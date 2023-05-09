@@ -52,8 +52,7 @@ def create_collection_label(
     logger.info(f'Create collection csv with proposal id: {proposal_id}')
 
     # Create collection label
-    logger.info('Create label for collection using '
-                + f'templates/{template_name}.')
+    logger.info(f'Create label for collection using templates/{template_name}.')
     # Collection label template path
     col_dir = os.path.dirname(os.path.abspath(__file__))
     col_template = (col_dir + f'/../templates/{template_name}')

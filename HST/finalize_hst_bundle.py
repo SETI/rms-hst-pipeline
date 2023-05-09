@@ -3,6 +3,7 @@
 #
 # finalize_hst_bundle is the main function called in finalize_hst_bundle pipeline task
 # script. It will do these actions:
+#
 # - Create documents/schema/context/kernel directories.
 # - Move new files into the proper directories under <HST_BUNDLES>/hst_<nnnnn>/.
 # - Create the new collection csv & xml and the bundle xml files
@@ -31,6 +32,7 @@ from run_validation import run_validation
 
 def finalize_hst_bundle(proposal_id, logger=None):
     """With a given proposal id, finalize hst bundle.
+
     1. Create documents/schema/context/kernel directories.
     2. TODO: Move existing/superseded files based on PDS4-VERSIONING.txt.
     3. Move new files into the proper directories under <HST_BUNDLES>/hst_<nnnnn>/.
@@ -64,7 +66,7 @@ def finalize_hst_bundle(proposal_id, logger=None):
     label_hst_data_directory(proposal_id, logger)
     # Create bundle label
     label_hst_bundle(proposal_id, data_dict, logger)
-    # Create target lable if it doesn't exist in PDS page
+    # Create target label if it doesn't exist in PDS page
     create_target_label(proposal_id, data_dict, logger)
     # Create manifest files & run validator
     run_validation(proposal_id, logger)

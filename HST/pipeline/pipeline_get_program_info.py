@@ -9,6 +9,7 @@
 #
 # Perform get_program_info to retrieve the online files that describe a program (such as
 # .apt or .pro) and assemble other program-level information. These are the actions:
+#
 # - Download the proposal files via a web query.
 # - If these files are the same as the existing ones, return.
 # - Otherwise:

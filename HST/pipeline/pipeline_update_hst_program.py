@@ -9,6 +9,7 @@
 # Enter the --help option to see more information.
 #
 # Perform update_hst_program task with these actions:
+#
 # - Queue get_program_info and wait for it to complete.
 # - Queue update_hst_visit and wait until all visits have completed.
 # - Queue finialize_hst_bundle and wait for it to complete.

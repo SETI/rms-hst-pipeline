@@ -12,6 +12,7 @@
 # Enter the --help option to see more information.
 #
 # Perform query_hst_moving_targets task with these actions:
+#
 # - Return a list of proposal ids with moving targets based on the query constraints.
 # - Queue query_hst_products task if HST_PIPELINE/hst_<nnnnn> directory is missing.
 ##########################################################################################
