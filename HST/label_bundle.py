@@ -54,7 +54,7 @@ def label_hst_bundle(proposal_id, data_dict, logger=None, testing=False):
         'processing_level': 'Raw',
         'bundle_entry_li': bundle_entries
     }
-    bundle_data_dict = {**bundle_data_dict, **data_dict}
+    bundle_data_dict.update(data_dict)
 
     # Create bundle collection label
     return create_collection_label(proposal_id, 'bundle', bundle_data_dict,

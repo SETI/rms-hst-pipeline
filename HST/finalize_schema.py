@@ -68,7 +68,7 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
         'records_num': records_num,
         'mod_history': mod_history,
     }
-    sch_data_dict = {**sch_data_dict, **data_dict}
+    sch_data_dict.update(data_dict)
 
     # Create schema collection label
     return create_collection_label(proposal_id, 'schema', sch_data_dict,
