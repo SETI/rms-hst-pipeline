@@ -19,7 +19,7 @@ PDS_URL = 'https://pds.nasa.gov/data/pds4/context-pds4/target/'
 TARGET_LABEL_TEMPLATE = 'TARGET_LABEL.xml'
 
 def create_target_label(proposal_id, data_dict, logger=None):
-    """Create target lable under context collection if it doesn't exist in PDS page.
+    """Create target label under context collection if it doesn't exist in PDS page.
 
     Inputs:
         proposal_id    a proposal id.

@@ -131,7 +131,7 @@ def create_pds4_labels(
             context_coll_dir_path = fs.path.join(bundle_dir_path, "context$")
             label_deltas.makedir(context_coll_dir_path)
 
-            # Create target lable if it doesn't exist in PDS page.
+            # Create target label if it doesn't exist in PDS page.
             self._create_context_target_label(context_coll_dir_path, collection_lidvid)
             # Create investigation label
             self._create_context_investigation_label(
@@ -145,7 +145,7 @@ def create_pds4_labels(
             self, context_coll_dir_path: str, collection_lidvid: str
         ) -> None:
             """
-            Create target lable under context collection if it doesn't exist
+            Create target label under context collection if it doesn't exist
             in PDS page.
             """
             # Get all the targets in PDS page
