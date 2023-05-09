@@ -1,6 +1,10 @@
 ##########################################################################################
-# organize_files/__init__.py
+# organize_files.py
+#
+# Move all data product files for a given proposal id from the staging folder to the
+# bundle folder.
 ##########################################################################################
+
 import os
 import pdslogger
 import shutil
@@ -13,8 +17,8 @@ def organize_files_from_staging_to_bundles(proposal_id, logger):
     """Move files from staging folder to bundles folder
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Organize files for proposal id: {proposal_id}')

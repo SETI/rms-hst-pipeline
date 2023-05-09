@@ -1,5 +1,5 @@
 ##########################################################################################
-# create_target_label/__init__.py
+# create_target_label.py
 #
 # Create target label if it doesn't exist in the PDS4 page:
 # https://pds.nasa.gov/data/pds4/context-pds4/target/
@@ -22,9 +22,9 @@ def create_target_label(proposal_id, data_dict, logger=None):
     """Create target lable under context collection if it doesn't exist in PDS page.
 
     Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      a data dictionary used to create the label.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        data_dict      a data dictionary used to create the label.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
 
@@ -86,8 +86,8 @@ def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
     validation, for development purpose only.
 
     Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      a data dictionary used to create the label.
+        proposal_id    a proposal id.
+        data_dict      a data dictionary used to create the label.
     """
     # TODO: figure out the version id for all context data
     vid = '1.0'

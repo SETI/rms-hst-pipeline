@@ -84,12 +84,12 @@ def add_a_prog_id_task_queue(proposal_id, visit, task_num, priority, status, cmd
     the task queue table. If the proposal id exists in the table, we update the entry.
 
     Input:
-        proposal_id:   a proposal id of the task queue.
-        visit:         a two character visit or ''.
-        task_num:      a number represents the current task.
-        priority:      a number reporeents task priority.
-        status:        the status of the current task, 0 is wating and 1 is running.
-        cmd:           the command to run the task.
+        proposal_id    a proposal id of the task queue.
+        visit          a two character visit or ''.
+        task_num       a number represents the current task.
+        priority       a number reporeents task priority.
+        status         the status of the current task, 0 is wating and 1 is running.
+        cmd            the command to run the task.
     """
     if not db_exists():
         return
@@ -126,9 +126,9 @@ def update_a_prog_id_task_status(proposal_id, visit, status):
     to the task queue table.
 
     Input:
-        proposal_id:   a proposal id of the task queue.
-        visit:         two character visit.
-        status:        the status of the current task, 0 is wating and 1 is running.
+        proposal_id    a proposal id of the task queue.
+        visit          two character visit.
+        status         the status of the current task, 0 is wating and 1 is running.
     """
     if not db_exists():
         return
@@ -147,7 +147,7 @@ def remove_a_prog_id_task_queue(proposal_id, visit):
     """
     Remove a task queue entry of the given proposal id & visit to the task queue table.
     Input:
-        proposal_id:   a proposal id of the task queue.
+        proposal_id    a proposal id of the task queue.
     """
     if not db_exists():
         return
@@ -165,7 +165,7 @@ def remove_all_task_queue_for_a_prog_id(proposal_id):
     Remove all task queue entries of the given proposal id to the task queue table.
 
     Input:
-        proposal_id:   a proposal id of the task queue.
+        proposal_id    a proposal id of the task queue.
     """
     if not db_exists():
         return

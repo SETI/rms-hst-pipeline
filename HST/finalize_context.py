@@ -1,5 +1,5 @@
 ##########################################################################################
-# finalize_context/__init__.py
+# finalize_context.py
 #
 # Create context directory, collection csv & xml, and investigation xml.
 ##########################################################################################
@@ -27,11 +27,11 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
     4. create individual hst xml label.
 
     Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      a data dictionary used to create the label.
-        logger:         pdslogger to use; None for default EasyLogger.
-        testing:        the flag used to determine if we are calling the function for
-                        testing purpose with the test directory.
+        proposal_id    a proposal id.
+        data_dict      a data dictionary used to create the label.
+        logger         pdslogger to use; None for default EasyLogger.
+        testing        the flag used to determine if we are calling the function for
+                       testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst context directory with proposal id: {proposal_id}')
@@ -84,10 +84,10 @@ def create_context_collection_csv(proposal_id, context_dir, data_dict, logger=No
     context collection csv in the final bundle.
 
     Inputs:
-        proposal_id:    a proposal id.
-        context_dir:    context directory path.
-        data_dict:      data dictonary to fill in the label template.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        context_dir    context directory path.
+        data_dict      data dictonary to fill in the label template.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create context collection csv with proposal id: {proposal_id}')

@@ -1,5 +1,5 @@
 ##########################################################################################
-# finalize_hst_bundle/__init__.py
+# finalize_hst_bundle.py
 #
 # finalize_hst_bundle is the main function called in finalize_hst_bundle pipeline task
 # script. It will do these actions:
@@ -38,8 +38,8 @@ def finalize_hst_bundle(proposal_id, logger=None):
     5. Run the validator.
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
 
@@ -73,8 +73,8 @@ def get_general_label_data(proposal_id, logger=None, testing=False):
     """Get general label data used in document/schema/context/bundle labels
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
 

@@ -1,6 +1,7 @@
 ##########################################################################################
-# run_validation/__init__.py
+# run_validation.py
 ##########################################################################################
+
 import os
 import pdslogger
 from subprocess import run
@@ -21,8 +22,8 @@ def run_validation(proposal_id, logger=None):
     2. run validate
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
 
@@ -42,8 +43,8 @@ def create_manifest_files(proposal_id, logger):
     """With a given proposal id, create checksum manifest and transfer manifest files.
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
 

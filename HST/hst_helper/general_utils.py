@@ -38,15 +38,15 @@ def create_collection_label(
     """With a given proposal id, create collection label in the final bundle.
 
     Inputs:
-        proposal_id:        a proposal id.
-        collection_name:    collection name in the bundles.
-        data_dict:          data dictonary to fill in the label template.
-        label_name:         the name of the collection label
-        template_name:      the name of the template being used.
-        logger:             pdslogger to use; None for default EasyLogger.
-        target_dir:         the target dir used to obtain the roll up info.
-        testing:            the flag used to determine if we are calling the function for
-                            testing purpose with the test directory.
+        proposal_id        a proposal id.
+        collection_name    collection name in the bundles.
+        data_dict          data dictonary to fill in the label template.
+        label_name         the name of the collection label
+        template_name      the name of the template being used.
+        logger             pdslogger to use; None for default EasyLogger.
+        target_dir         the target dir used to obtain the roll up info.
+        testing            the flag used to determine if we are calling the function for
+                           testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create collection csv with proposal id: {proposal_id}')
@@ -72,9 +72,9 @@ def create_xml_label(template_path, label_path, data_dict, logger):
     """Create xml label with given template path, label path, and data dictionary.
 
     Inputs:
-        template_path:    the path of the label template.
-        label_path:       the path of the label to be created.
-        logger:           pdslogger to use; None for default EasyLogger.
+        template_path    the path of the label template.
+        label_path       the path of the label to be created.
+        logger           pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create label using template from: {template_path}.')
@@ -92,10 +92,10 @@ def create_csv(csv_path, data, logger):
     """Create csv with given csv file path and data to be written into the csv file.
 
     Inputs:
-        csv_path:    the path of the csv file.
-        data:        a list that contains row data to be written into the csv file. Each
-                     row data in the list is a list of column values for the row.
-        logger:      pdslogger to use; None for default EasyLogger.
+        csv_path    the path of the csv file.
+        data        a list that contains row data to be written into the csv file. Each
+                    row data in the list is a list of column values for the row.
+        logger      pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create csv: {csv_path}.')
@@ -114,8 +114,8 @@ def get_citation_info(proposal_id, logger):
     obtain the citation info for a given proposal id.
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     if formatted_proposal_id in CITATION_INFO_DICT:
@@ -140,8 +140,8 @@ def get_instrument_id_set(proposal_id, logger):
     a set of instrument ids for a given propsal id.
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
@@ -165,8 +165,8 @@ def get_mod_history_from_label(prev_label_path, current_version_id):
     list of modification history to be used in new label.
 
     Inputs:
-        prev_label_path:      the path of the exisiting xml label
-        current_version_id:   the current version id of the new bundle
+        prev_label_path       the path of the exisiting xml label
+        current_version_id    the current version id of the new bundle
     """
     mod_history = []
     if os.path.exists(prev_label_path):
@@ -183,8 +183,8 @@ def get_target_id_from_label(proposal_id, prev_label_path):
     """Get the target identification info from the exisitng label.
 
     Inputs:
-        proposal_id:        a proposal id.
-        prev_label_path:    the path of the exisiting xml label
+        proposal_id        a proposal id.
+        prev_label_path    the path of the exisiting xml label
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     if formatted_proposal_id not in TARG_ID_DICT:
@@ -206,7 +206,7 @@ def date_time_to_date(date_time):
     "2005-01-19T15:41:05Z" to "2005-01-19"
 
     Inputs:
-        date_time:        a date time string like "2005-01-19T15:41:05Z".
+        date_time    a date time string like "2005-01-19T15:41:05Z".
     """
     try:
         idx = date_time.index('T')
@@ -222,8 +222,8 @@ def get_collection_label_data(proposal_id, target_dir, logger):
     the returned dictionary 'target', 'time', 'inst_params', 'primary_res', and 'records'.
 
     Inputs:
-        proposal_id:    a proposal id.
-        target_dir:     the targeted labels directory to get the number of total files.
+        proposal_id    a proposal id.
+        target_dir     the targeted labels directory to get the number of total files.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     _, _, collection_name = target_dir.rpartition('/')
@@ -301,7 +301,7 @@ def get_clean_target_text(text: str) -> str:
     """Get the target text used in target label in PDS page.
 
     Inputs:
-        text:    a text of the target name or type.
+        text    a text of the target name or type.
     """
     SPECIAL_CHARS = '!#$%^&*/ '
     REMOVED_CHARS = '()'

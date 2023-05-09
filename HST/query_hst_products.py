@@ -1,5 +1,5 @@
 ##########################################################################################
-# query_hst_products/__init__.py
+# query_hst_products.py
 #
 # query_hst_products is the main function called in query_hst_products pipeline task
 # script. It will do these actions:
@@ -46,7 +46,7 @@ def query_hst_products(proposal_id, logger=None):
         - Return the tuple of changed visits & all available visists.
 
     Input:
-        proposal_id:    a proposal id.
+        proposal_id    a proposal id.
     """
     visit_diff = []
     logger = logger or pdslogger.EasyLogger()
@@ -138,13 +138,13 @@ def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=
     and the corresponding checksums as the values.
 
     Input:
-        proposal_id:        a proposal id.
-        files_dict:         a dictionary keyed by two character visit and store a list of
-                            files for the corresponding visit.
-        visit:              two character visit.
-        fname:              the file name.
-        checksum_included:  a flag used to deteremine if we want to include checksum
-                            of each file in the generated file.
+        proposal_id          a proposal id.
+        files_dict           a dictionary keyed by two character visit and store a list
+                             of files for the corresponding visit.
+        visit                two character visit.
+        fname                the file name.
+        checksum_included    a flag used to deteremine if we want to include checksum
+                             of each file in the generated file.
 
     """
     file_path = get_program_dir_path(proposal_id, visit) + f'/{fname}'
@@ -167,13 +167,13 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
     from Mast.
 
     Input:
-        proposal_id:        a proposal id.
-        files_dict:         a dictionary keyed by two character visit and store a list of
-                            files for the corresponding visit.
-        visit:              two character visit.
-        fname:              the file name.
-        checksum_included:  a flag used to deteremine if we want to include checksum
-                            of each file in the generated file.
+        proposal_id          a proposal id.
+        files_dict           a dictionary keyed by two character visit and store a list
+                             of files for the corresponding visit.
+        visit                two character visit.
+        fname                the file name.
+        checksum_included    a flag used to deteremine if we want to include checksum
+                             of each file in the generated file.
 
     """
     is_visit_diff = False
@@ -213,10 +213,10 @@ def get_downloaded_file_path(proposal_id, fname, visit=None, root_dir='staging')
     """Return the file path of a downloaded file.
 
     Input:
-        proposal_id:    a proposal id.
-        fname:          the file name.
-        visit:          two character visit if the file is stored under visit dir.
-        root_dir:       the root directory of the store file.
+        proposal_id    a proposal id.
+        fname          the file name.
+        visit          two character visit if the file is stored under visit dir.
+        root_dir       the root directory of the store file.
 
     """
     return (get_program_dir_path(proposal_id, visit, root_dir) +

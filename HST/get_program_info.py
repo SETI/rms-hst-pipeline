@@ -1,5 +1,5 @@
 ##########################################################################################
-# get_program_info/__init__.py
+# get_program_info.py
 #
 # get_program_info is the main function called in get_program_info pipeline task script.
 # It will do these actions:
@@ -31,7 +31,7 @@ def get_program_info(proposal_id, download_dir=None, logger=None):
     """Download proposal files and generate PROGRAM_INFO_FILE for the given proposal ID.
 
     Input:
-        proposal_id:    a proposal id.
+        proposal_id    a proposal id.
     """
     logger = logger or pdslogger.EasyLogger()
 
@@ -47,10 +47,10 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
     """Return a boolean flag to determine if a proposal file is retrieved.
 
     Input:
-        proposal_id:    a proposal id.
-        url:            the url to retrieve the text of a proposal file
-        filepath:       the file path of the existing proposal file or the file path used
-                        to store the newly retrieved proposal file.
+        proposal_id    a proposal id.
+        url            the url to retrieve the text of a proposal file
+        filepath       the file path of the existing proposal file or the file path used
+                       to store the newly retrieved proposal file.
     """
     logger = logger or pdslogger.EasyLogger()
 
@@ -84,8 +84,8 @@ def is_proposal_file_different(new_contents, filepath):
     """Return a boolean flag to determine if a proposal file needs to be replaced/created.
 
     Input:
-        contents:   the contents of the newly retrieved proposal file.
-        filepath:   the file path of the existing proposal file or the file path used to
+        contents    the contents of the newly retrieved proposal file.
+        filepath    the file path of the existing proposal file or the file path used to
                     store the newly retrieved proposal file.
     """
     if os.path.exists(filepath):
@@ -99,7 +99,7 @@ def create_program_info_file(filepath):
     """Create and store citation info in PROGRAM_INFO_FILE.
 
     Input:
-        filepath:   the file path of a proposal file used to get the citation info.
+        filepath    the file path of a proposal file used to get the citation info.
     """
     citation_info = Citation_Information.create_from_file(filepath)
     program_dir, _, _ = filepath.rpartition('/')
@@ -111,8 +111,8 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
     set of the basenames of the files successfully downloaded.
 
     Input:
-        proposal_id:    a proposal id.
-        download_dir:   the directory to store proposal files
+        proposal_id     a proposal id.
+        download_dir    the directory to store proposal files.
     """
     logger = logger or pdslogger.EasyLogger()
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)

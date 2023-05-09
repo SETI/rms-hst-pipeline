@@ -19,9 +19,9 @@ def update_hst_visit(proposal_id, visit, logger=None):
     Queue task prepare_browse_products for the given visit and wait for it to complete.
 
     Inputs:
-        proposal_id:    a proposal id.
-        visit:          two character visit.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        visit          two character visit.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
 

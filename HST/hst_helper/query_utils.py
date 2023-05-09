@@ -26,7 +26,7 @@ def ymd_tuple_to_mjd(ymd):
     """Return Modified Julian Date.
 
     Input:
-        ymd:    a tuple of year, month, and day.
+        ymd    a tuple of year, month, and day.
     """
     y, m, d = ymd
     days = julian.day_from_ymd(y, m, d)
@@ -43,12 +43,12 @@ def query_mast_slice(proposal_id=None,
     instrument, start_date, and end_date.
 
     Input:
-        proposal_id:    a proposal id.
-        instrument:     a instrument name.
-        start_date:     observation start datetime.
-        end_date:       observation end datetime.
-        logger:         pdslogger to use; None for default EasyLogger.
-        max_retries:    number of retries when there is a connection to mast.
+        proposal_id    a proposal id.
+        instrument     a instrument name.
+        start_date     observation start datetime.
+        end_date       observation end datetime.
+        logger         pdslogger to use; None for default EasyLogger.
+        max_retries    number of retries when there is a connection to mast.
     """
     logger = logger or pdslogger.EasyLogger()
     start_date = ymd_tuple_to_mjd(start_date)
@@ -95,8 +95,8 @@ def filter_table(row_predicate, table):
     """Return a copy of the filtered table object based on the return of row_predicate.
 
     Input:
-        row_predicate:    a function with the condition used to filter the table.
-        table:            target table to be filtered.
+        row_predicate    a function with the condition used to filter the table.
+        table            target table to be filtered.
     """
     to_delete = [n for (n, row) in enumerate(table) if not row_predicate(row)]
     copy = table.copy()
@@ -108,7 +108,7 @@ def is_accepted_instrument_letter_code(row):
     product filename.
 
     Input:
-        row:    an observation table row.
+        row    an observation table row.
     """
     return row['obs_id'][0].lower() in ACCEPTED_LETTER_CODES
 
@@ -117,7 +117,7 @@ def is_accepted_instrument_suffix(row):
     of the table.
 
     Input:
-        row:    an observation table row.
+        row    an observation table row.
     """
     suffix = get_suffix(row)
     instrument_id = get_instrument_id_from_table_row(row)
@@ -130,7 +130,7 @@ def is_trl_suffix(row):
     of the table.
 
     Input:
-        row:    an observation table row.
+        row    an observation table row.
     """
     return get_suffix(row) == 'trl'
 
@@ -138,8 +138,8 @@ def is_targeted_visit(row, visit):
     """Check if a product row is related to a given visit.
 
     Input:
-        row:    an observation table row.
-        visit:  two character visit.
+        row      an observation table row.
+        visit    two character visit.
     """
     filename = row['productFilename']
     format_term = get_format_term(filename)
@@ -149,7 +149,7 @@ def get_instrument_id_from_table_row(row):
     """Return the instrument id for a given product row.
 
     Input:
-        row:    an observation table row.
+        row    an observation table row.
     """
     return INSTRUMENT_FROM_LETTER_CODE[row['obs_id'][0].lower()]
 
@@ -157,7 +157,7 @@ def get_suffix(row):
     """Return the product file suffix for a given product row.
 
     Input:
-        row:    an observation table row.
+        row    an observation table row.
     """
     return str(row['productSubGroupDescription']).lower()
 
@@ -167,8 +167,8 @@ def get_filtered_products(table, visit=None):
     visit.
 
     Input:
-        table:  an observation table from mast query.
-        visit:  two character visit.
+        table    an observation table from mast query.
+        visit    two character visit.
     """
     result = Observations.get_product_list(table)
     result = filter_table(is_accepted_instrument_letter_code, result)
@@ -188,7 +188,7 @@ def get_trl_products(table):
     """Return product rows of an observation table with trl suffix.
 
     Input:
-        table:  an observation table from mast query.
+        table    an observation table from mast query.
     """
     result = Observations.get_product_list(table)
     result = filter_table(is_accepted_instrument_letter_code, result)
@@ -199,10 +199,10 @@ def download_files(table, dir, logger=None, testing=False):
     """Download files from mast for a given product table and proposal id.
 
     Input:
-        table:          an observation table from mast query.
-        proposal_id:    a proposal id.
-        dir:            the directory we want to store the downloaded files.
-        logger:         pdslogger to use; None for default EasyLogger.
+        table          an observation table from mast query.
+        proposal_id    a proposal id.
+        dir            the directory we want to store the downloaded files.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
     # When there is 0 product row from query result, we don't create the directory

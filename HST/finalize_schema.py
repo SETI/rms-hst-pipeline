@@ -1,5 +1,5 @@
 ##########################################################################################
-# finalize_schema/__init__.py
+# finalize_schema.py
 #
 # Create schema directory, and schema csv & xml.
 ##########################################################################################
@@ -27,11 +27,11 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
     3. create schema xml label.
 
     Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      a data dictionary used to create the label.
-        logger:         pdslogger to use; None for default EasyLogger.
-        testing:        the flag used to determine if we are calling the function for
-                        testing purpose with the test directory.
+        proposal_id    a proposal id.
+        data_dict      a data dictionary used to create the label.
+        logger         pdslogger to use; None for default EasyLogger.
+        testing        the flag used to determine if we are calling the function for
+                       testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst schema directory with proposal id: {proposal_id}')
@@ -78,10 +78,10 @@ def create_schema_collection_csv(csv_path, row_data, logger=None):
     """With a given proposal id, create schema collection csv in the final bundle.
 
     Inputs:
-        csv_path:   the path of the csv file.
-        row_data:   a list of row data to be written in the csv file. Each item of the
+        csv_path    the path of the csv file.
+        row_data    a list of row data to be written in the csv file. Each item of the
                     list is a list of column values for the row.
-        logger:     pdslogger to use; None for default EasyLogger.
+        logger      pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info('Create schema collection csv')

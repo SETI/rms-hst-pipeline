@@ -1,6 +1,9 @@
 ##########################################################################################
-# label_bundle/__init__.py
+# label_bundle.py
+#
+# Create bundle label for a given proposal id in the bundle directory.
 ##########################################################################################
+
 import os
 import pdslogger
 
@@ -16,11 +19,11 @@ def label_hst_bundle(proposal_id, data_dict, logger=None, testing=False):
     label.
 
     Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      a data dictionary used to create the label.
-        logger:         pdslogger to use; None for default EasyLogger.
-        testing:        the flag used to determine if we are calling the function for
-                        testing purpose with the test directory.
+        proposal_id    a proposal id.
+        data_dict      a data dictionary used to create the label.
+        logger         pdslogger to use; None for default EasyLogger.
+        testing        the flag used to determine if we are calling the function for
+                       testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst bundle directory with proposal id: {proposal_id}')

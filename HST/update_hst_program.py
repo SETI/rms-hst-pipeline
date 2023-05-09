@@ -18,9 +18,9 @@ def update_hst_program(proposal_id, visit_li, logger=None):
     """Overall task to create a new bundle or to manage the update of an existing bundle.
 
     Inputs:
-        proposal_id:    a proposal id.
-        visit_li:       a list of visits in which any files are new or changed.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        visit_li       a list of visits in which any files are new or changed.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
 

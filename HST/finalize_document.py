@@ -1,5 +1,5 @@
 ##########################################################################################
-# finalize_document/__init__.py
+# finalize_document.py
 #
 # - Create document directory.
 # - Move/copy proposal files over from pipeline directory.
@@ -39,11 +39,11 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
     5. Create document collection label.
 
     Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      a data dictionary used to create the label.
-        logger:         pdslogger to use; None for default EasyLogger.
-        testing:        the flag used to determine if we are calling the function for
-                        testing purpose with the test directory.
+        proposal_id    a proposal id.
+        data_dict      a data dictionary used to create the label.
+        logger         pdslogger to use; None for default EasyLogger.
+        testing        the flag used to determine if we are calling the function for
+                       testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst document directory with proposal id: {proposal_id}')
@@ -132,11 +132,11 @@ def create_document_collection_csv(proposal_id, data_dict, logger=None, testing=
     """With a given proposal id, create document collection csv in the final bundle.
 
     Inputs:
-        proposal_id:    a proposal id.
-        data_dict:      data dictonary to fill in the label template.
-        logger:         pdslogger to use; None for default EasyLogger.
-        testing:        the flag used to determine if we are calling the function for
-                        testing purpose with the test directory.
+        proposal_id    a proposal id.
+        data_dict      data dictonary to fill in the label template.
+        logger         pdslogger to use; None for default EasyLogger.
+        testing        the flag used to determine if we are calling the function for
+                       testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create document collection csv with proposal id: {proposal_id}')

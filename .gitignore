@@ -171,3 +171,6 @@ HST/logs/
 # task queue db
 HST/*.db
 *.db
+
+# .vscode
+.vscode

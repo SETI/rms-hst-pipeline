@@ -34,8 +34,8 @@ def run_pipeline(proposal_ids, logger=None):
     """With a given list of proposal ids, run pipeline for each program id.
 
     Inputs:
-        proposal_ids:    a list of proposal ids.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_ids    a list of proposal ids.
+        logger          pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Run pipeline with proposal ids: {proposal_ids}')
@@ -72,10 +72,10 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
     3. Run the task command (spawn the subprocess)
 
     Inputs:
-        proposal_id:    the proposal if of the current task.
-        visit_info:     a two character visit, a list of visits or ''.
-        task_num:       a number represents the current task.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    the proposal if of the current task.
+        visit_info     a two character visit, a list of visits or ''.
+        task_num       a number represents the current task.
+        logger         pdslogger to use; None for default EasyLogger.
 
     """
     # if DB doesn't exist, log a warning message and return
@@ -113,11 +113,11 @@ def run_and_maybe_wait(args,  max_allowed_time, proposal_id, visit, logger):
     """Run one subprocess, waiting as necessary for a slot to open up.
 
     Inputs:
-        args:               the command of a subprocess to be executed.
-        max_allowed_time:   the max time for a subprocess to be done before killing it.
-        proposal_id:        the proposal if of the current task.
-        visit:          two character visit.
-        logger:             pdslogger to use; None for default EasyLogger.
+        args                the command of a subprocess to be executed.
+        max_allowed_time    the max time for a subprocess to be done before killing it.
+        proposal_id         the proposal if of the current task.
+        visit               two character visit.
+        logger              pdslogger to use; None for default EasyLogger.
     """
     # wait for an open subprocess slot
     wait_for_subprocess()
@@ -144,7 +144,7 @@ def wait_for_subprocess(all=False):
     """Wait for one (or all) subprocess slots to open up.
 
     Inputs:
-        all:    a flag to determine if we are waiting for all subprocess slots to open up.
+        all    a flag to determine if we are waiting for all subprocess slots to open up.
     """
     subprocess_count = MAX_SUBPROCESS_CNT
 

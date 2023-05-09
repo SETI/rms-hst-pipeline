@@ -1,5 +1,5 @@
 ##########################################################################################
-# prepare_browse_products/__init__.py
+# prepare_browse_products.py
 #
 # prepare_browse_products is the main function called in prepare_browse_products pipeline
 # task script. It will move data files from downloaded directories (under staging) to
@@ -27,9 +27,9 @@ def prepare_browse_products(proposal_id, visit, logger=None):
     under staging dir.
 
     Inputs:
-        proposal_id:    a proposal id.
-        visit:          two character visit.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        visit          two character visit.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
 

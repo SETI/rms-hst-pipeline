@@ -1,5 +1,5 @@
 ##########################################################################################
-# retrieve_hst_visit/__init__.py
+# retrieve_hst_visit.py
 #
 # retrieve_hst_visit is the main function called in retrieve_hst_visit pipeline task
 # script. It will download all identified files from MAST to
@@ -21,11 +21,11 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     """Retrieve all accepted files for a given proposal id & visit.
 
     Inputs:
-        proposal_id:    a proposal id.
-        visit:          two character visit.
-        logger:         pdslogger to use; None for default EasyLogger.
-        testing:        the flag used to determine if we are calling the function for
-                        testing purpose with the test directory.
+        proposal_id    a proposal id.
+        visit          two character visit.
+        logger         pdslogger to use; None for default EasyLogger.
+        testing        the flag used to determine if we are calling the function for
+                       testing purpose with the test directory.
     """
     logger = logger or pdslogger.EasyLogger()
 

@@ -1,5 +1,5 @@
 ##########################################################################################
-# finalize_data_product/__init__.py
+# finalize_data_product.py
 #
 # - Move data directory from staging to bundles directory.
 # - Create data csv.
@@ -32,8 +32,8 @@ def label_hst_data_directory(proposal_id, logger):
     3. create data xml label.
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst data directory with proposal id: {proposal_id}')
@@ -115,8 +115,8 @@ def create_data_product_collection_csv(proposal_id, logger):
     """With a given proposal id, create data product collection csv in the final bundle.
 
     Inputs:
-        proposal_id:    a proposal id.
-        logger:         pdslogger to use; None for default EasyLogger.
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
     """
     prod_ver = (1,0)
     deliverable_path = get_deliverable_path(proposal_id)

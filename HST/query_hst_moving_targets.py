@@ -1,5 +1,5 @@
 ##########################################################################################
-# query_hst_moving_targets/__init__.py
+# query_hst_moving_targets.py
 #
 # query_hst_moving_targets is the main function called in query_hst_moving_targets
 # pipeline task script.
@@ -22,12 +22,12 @@ def query_hst_moving_targets(proposal_ids=[],
     """Return a list of proposal ids with moving targets.
 
     Input:
-        proposal_ids:   a list of proposal ids.
-        instruments:    a list of instruments.
-        start_date:     observation start datetime.
-        end_date:       observation end datetime.
-        logger:         pdslogger to use; None for default EasyLogger.
-        max_retries:    number of retries when there is a connection to mast.
+        proposal_ids    a list of proposal ids.
+        instruments     a list of instruments.
+        start_date      observation start datetime.
+        end_date        observation end datetime.
+        logger          pdslogger to use; None for default EasyLogger.
+        max_retries     number of retries when there is a connection to mast.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info('Run query_hst_moving_targets')
