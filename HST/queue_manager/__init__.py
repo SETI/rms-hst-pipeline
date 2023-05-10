@@ -78,6 +78,7 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
         task_num       a number represents the current task.
         logger         pdslogger to use; None for default EasyLogger.
 
+    Returns:    the child process that executes the given task.
     """
     # if DB doesn't exist, log a warning message and return
     if not db_exists():
@@ -110,7 +111,7 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
                              formatted_proposal_id, visit, logger)
     return pid
 
-def run_and_maybe_wait(args,  max_allowed_time, proposal_id, visit, logger):
+def run_and_maybe_wait(args, max_allowed_time, proposal_id, visit, logger):
     """Run one subprocess, waiting as necessary for a slot to open up.
 
     Inputs:
@@ -119,6 +120,8 @@ def run_and_maybe_wait(args,  max_allowed_time, proposal_id, visit, logger):
         proposal_id         the proposal if of the current task.
         visit               two character visit.
         logger              pdslogger to use; None for default EasyLogger.
+
+    Returns:    the child process that executes the given args.
     """
     # wait for an open subprocess slot
     wait_for_subprocess()
