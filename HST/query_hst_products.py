@@ -149,7 +149,7 @@ def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=
                              of each file in the generated file.
 
     """
-    file_path = get_program_dir_path(proposal_id, visit) + f'/{fname}'
+    file_path = f'{get_program_dir_path(proposal_id, visit)}/{fname}'
     files_li = files_dict[visit]
 
     with open(file_path, 'w') as f:
@@ -179,7 +179,7 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
 
     """
     is_visit_diff = False
-    txt_file_path = get_program_dir_path(proposal_id, visit) + f'/{fname}'
+    txt_file_path = f'{get_program_dir_path(proposal_id, visit)}/{fname}'
     files_li = files_dict[visit]
     files_li.sort()
     if checksum_included:
@@ -221,7 +221,5 @@ def get_downloaded_file_path(proposal_id, fname, visit=None, root_dir='staging')
         root_dir       the root directory of the store file.
 
     """
-    return (get_program_dir_path(proposal_id, visit, root_dir) +
-            '/mastDownload/HST/' +
-            products_obs_dict[fname] +
-            f'/{fname}')
+    return (f'{get_program_dir_path(proposal_id, visit, root_dir)}/mastDownload/HST/'
+            f'{products_obs_dict[fname]}/{fname}')

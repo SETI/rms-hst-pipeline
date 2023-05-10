@@ -55,13 +55,13 @@ def create_collection_label(
     logger.info(f'Create label for collection using templates/{template_name}.')
     # Collection label template path
     col_dir = os.path.dirname(os.path.abspath(__file__))
-    col_template = (col_dir + f'/../templates/{template_name}')
+    col_template = f'{col_dir}/../templates/{template_name}'
     # Collection label path
     deliverable_path = get_deliverable_path(proposal_id, testing)
     if collection_name == 'bundle':
-        col_label_path = deliverable_path + f'/{label_name}'
+        col_label_path = f'{deliverable_path}/{label_name}'
     else:
-        col_label_path = deliverable_path + f'/{collection_name}/{label_name}'
+        col_label_path = f'{deliverable_path}/{collection_name}/{label_name}'
 
     create_xml_label(col_template, col_label_path, data_dict, logger)
 
@@ -128,7 +128,7 @@ def get_citation_info(proposal_id, logger):
         _, _, ext = file.rpartition('.')
         # We don't have an implementation to create citation info from pdf.
         if (ext in DOCUMENT_EXT and ext != 'pdf') or file == PROGRAM_INFO_FILE:
-            file_path = pipeline_dir + f'/{file}'
+            file_path = f'{pipeline_dir}/{file}'
             if formatted_proposal_id not in CITATION_INFO_DICT:
                 CITATION_INFO_DICT[formatted_proposal_id] = (
                                                 Citation_Information.create_from_file(file_path))

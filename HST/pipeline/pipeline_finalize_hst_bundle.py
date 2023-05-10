@@ -47,7 +47,7 @@ if len(sys.argv) == 1:
 # Parse and validate the command line
 args = parser.parse_args()
 proposal_id = args.proposal_id
-LOG_DIR = HST_DIR['pipeline'] + f'/hst_{proposal_id.zfill(5)}/logs'
+LOG_DIR = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.finalize-hst-bundle-' + proposal_id)
 if not args.quiet:

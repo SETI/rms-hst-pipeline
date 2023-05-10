@@ -49,7 +49,7 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
     _, context_dir = create_col_dir_in_bundle(proposal_id, 'context', testing)
 
     version_id = (1, 0)
-    col_ctxt_label_path = context_dir + f'/{COL_CTXT_LABEL}'
+    col_ctxt_label_path = f'{context_dir}/{COL_CTXT_LABEL}'
     mod_history = get_mod_history_from_label(col_ctxt_label_path, version_id)
 
     # Number of document inventory:
@@ -95,7 +95,7 @@ def create_context_collection_csv(proposal_id, context_dir, data_dict, logger=No
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
     # Set collection csv filename
-    collection_context_csv = context_dir + f'/{CSV_FILENAME}'
+    collection_context_csv = f'{context_dir}/{CSV_FILENAME}'
 
      # TODO: need to determine the version id for each entry in the csv
     collection_context_data = []

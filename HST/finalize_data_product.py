@@ -71,7 +71,7 @@ def label_hst_data_directory(proposal_id, logger):
                 collection_title = get_collection_title_fmt(suffix, inst_id.upper())
                 collection_title = collection_title.replace('{I}', inst_id.upper())
                 collection_title = collection_title.replace(
-                                       '{IC}', inst_id.upper() + f'/{channel_id}')
+                                       '{IC}', f'{inst_id.upper()}/{channel_id}')
                 collection_title = collection_title.replace('{P}', str(proposal_id))
 
                 # Get citation info
@@ -136,5 +136,5 @@ def create_data_product_collection_csv(proposal_id, logger):
                                            f'{prod_ver[0]}.{prod_ver[1]}').split(',')
                             if prod_lidvid not in collection_data:
                                 collection_data.append(prod_lidvid)
-                prod_csv = bundles_prod_dir + f'/collection_{dir}.csv'
+                prod_csv = f'{bundles_prod_dir}/collection_{dir}.csv'
                 create_csv(prod_csv, collection_data, logger)

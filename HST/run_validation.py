@@ -55,8 +55,8 @@ def create_manifest_files(proposal_id, logger):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    cm_path = get_program_dir_path(proposal_id, None, 'bundles') + f'/{CM_FNAME}'
-    tm_path = get_program_dir_path(proposal_id, None, 'bundles') + f'/{TM_FNAME}'
+    cm_path = f'{get_program_dir_path(proposal_id, None, "bundles")}/{CM_FNAME}'
+    tm_path = f'{get_program_dir_path(proposal_id, None, "bundles")}/{TM_FNAME}'
     deliverable_path = get_deliverable_path(proposal_id)
     cm_files_li = set()
     tm_files_li = set()
@@ -68,16 +68,16 @@ def create_manifest_files(proposal_id, logger):
             _, _, file_logical_path = file_path.partition('deliverable/')
             cm_files_li.add((file_path, file_logical_path))
             if 'bundle' in file_logical_path:
-                lidvid = lidvid_prefix + f'::{VID}'
+                lidvid = f'{lidvid_prefix}::{VID}'
             elif 'collection' in file_logical_path:
                 col_name, _, _ = file_logical_path.partition('/')
-                lidvid = lidvid_prefix + f'{col_name}::{VID}'
+                lidvid = f'{lidvid_prefix}:{col_name}::{VID}'
             elif 'individual' not in file_logical_path:
                 try:
                     col_name, _, fname = file_logical_path.rpartition('.')[0].split('/')
                 except ValueError:
                     continue # ignore files like .DS_Store
-                lidvid = lidvid_prefix + f'{col_name}:{fname}::{VID}'
+                lidvid = f'{lidvid_prefix}:{col_name}:{fname}::{VID}'
             tm_files_li.add((lidvid, file_logical_path))
 
     cm_files_li = sorted(cm_files_li)

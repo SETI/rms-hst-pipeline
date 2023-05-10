@@ -59,10 +59,10 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 prod_dir = get_program_dir_path(proposal_id, None, 'staging')
                 col_name = collection_name(suffix, inst_id)
                 if suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id]:
-                    prod_dir += f"/browse_{inst_id.lower()}_{suffix}/visit_{visit}/"
-                    logger.info(f'Move browse products to: {prod_dir+file}')
+                    prod_dir += f'/browse_{inst_id.lower()}_{suffix}/visit_{visit}/'
+                    logger.info(f'Move browse products to: {prod_dir + file}')
                 elif suffix in ACCEPTED_SUFFIXES[inst_id]:
-                    prod_dir += f"/{col_name}/visit_{visit}/"
+                    prod_dir += f'/{col_name}/visit_{visit}/'
                     logger.info(f'Move data products to: {prod_dir + file}')
 
                 # Copy files to newly structured directories

@@ -47,7 +47,7 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
     _, schema_dir = create_col_dir_in_bundle(proposal_id, 'schema', testing)
 
     # Create schema csv
-    collection_schema_csv = schema_dir + f'/{CSV_FILENAME}'
+    collection_schema_csv = f'{schema_dir}/{CSV_FILENAME}'
     collection_schema_data = [PDS4_LIDVID.split(','),
                               HST_LIDVID.split(','),
                               DISP_LIDVID.split(',')]
@@ -58,7 +58,7 @@ def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=Fals
     records_num = 3
     # Get the mod history for schema collection label if it's already existed.
     version_id = (1, 0)
-    col_sch_label_path = schema_dir + f'/{COL_SCH_LABEL}'
+    col_sch_label_path = f'{schema_dir}/{COL_SCH_LABEL}'
     mod_history = get_mod_history_from_label(col_sch_label_path, version_id)
 
     sch_data_dict = {

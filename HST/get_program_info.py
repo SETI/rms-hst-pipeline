@@ -75,7 +75,7 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
     # For the case when all propsal files are downloaded but program info file
     # doesn't exist.
     program_dir, _, _ = filepath.rpartition('/')
-    program_info_filepath = program_dir + '/' + PROGRAM_INFO_FILE
+    program_info_filepath = f'{program_dir}/{PROGRAM_INFO_FILE}'
     if not os.path.exists(program_info_filepath):
         create_program_info_file(filepath)
 
@@ -104,7 +104,7 @@ def create_program_info_file(filepath):
     """
     citation_info = Citation_Information.create_from_file(filepath)
     program_dir, _, _ = filepath.rpartition('/')
-    program_info_filepath = program_dir + '/' + PROGRAM_INFO_FILE
+    program_info_filepath = f'{program_dir}/{PROGRAM_INFO_FILE}'
     citation_info.write(program_info_filepath)
 
 def download_proposal_files(proposal_id, download_dir, logger=None):
@@ -120,7 +120,7 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
     # A table contains a list of tuple (url for a proposal file, stored file name)
     table = [
         (f'https://www.stsci.edu/hst/phase2-public/{proposal_id}.{suffix}',
-         formatted_proposal_id + f'.{suffix}') for suffix in DOCUMENT_EXT
+         f'{formatted_proposal_id}.{suffix}') for suffix in DOCUMENT_EXT
     ]
 
     res = set()

@@ -78,7 +78,7 @@ def query_mast_slice(proposal_id=None,
             table = Observations.query_criteria(**query_params)
             return table
         except ConnectionError as e:
-            retry = retry + 1
+            retry += 1
             logger.info(f'retry #{retry}: {e}')
             time.sleep(1)
 

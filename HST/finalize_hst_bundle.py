@@ -82,15 +82,8 @@ def get_general_label_data(proposal_id, logger=None, testing=False):
 
     # Get citation info
     citation_info = get_citation_info(proposal_id, logger) if not testing else None
-    formatted_title = (citation_info.title
-    + ', HST Cycle '
-    + str(citation_info.cycle)
-    + ' Program '
-    + str(citation_info.propno)
-    + ', '
-    + citation_info.publication_year
-    + '.'
-    )
+    formatted_title = (f'{citation_info.title}, HST Cycle {citation_info.cycle} Program '
+                       f'{citation_info.propno}, {citation_info.publication_year}.')
 
     # Get label date
     timetag = os.path.getmtime(__file__)

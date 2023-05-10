@@ -36,7 +36,7 @@ def label_hst_bundle(proposal_id, data_dict, logger=None, testing=False):
     # Get the mod history for bundle label if it's already existed.
     version_id = (1, 0)
     deliverable_path = get_deliverable_path(proposal_id, testing)
-    bundle_label_path = deliverable_path + f'/{BUNDLE_LABEL}'
+    bundle_label_path = f'{deliverable_path}/{BUNDLE_LABEL}'
     mod_history = get_mod_history_from_label(bundle_label_path, version_id)
 
     # TODO: determine the version of each entry

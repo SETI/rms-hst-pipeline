@@ -54,7 +54,7 @@ if len(sys.argv) == 1:
 args = parser.parse_args()
 proposal_id = args.proposal_id
 visit_li = args.visit_li if args.visit_li else []
-LOG_DIR = HST_DIR['pipeline'] + f'/hst_{proposal_id.zfill(5)}/logs'
+LOG_DIR = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.update-hst-program-' + proposal_id)
 if not args.quiet:

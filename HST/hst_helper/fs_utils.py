@@ -46,12 +46,12 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline', testing=F
     if not testing:
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     else:
-        formatted_proposal_id = get_formatted_proposal_id(proposal_id) + '_testing'
+        formatted_proposal_id = f'{get_formatted_proposal_id(proposal_id)}_testing'
 
     if visit is None:
-        program_dir = root + '/hst_' + formatted_proposal_id
+        program_dir = f'{root}/hst_{formatted_proposal_id}'
     else:
-        program_dir = root + '/hst_' + formatted_proposal_id + f'/visit_{visit}'
+        program_dir = f'{root}/hst_{formatted_proposal_id}/visit_{visit}'
 
     return program_dir
 
@@ -65,10 +65,8 @@ def get_deliverable_path(proposal_id, testing=False):
                        testing purpose with the test directory.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    return (get_program_dir_path(proposal_id, None, 'bundles', testing) +
-            '/hst_' +
-            formatted_proposal_id +
-            '-deliverable')
+    return (f'{get_program_dir_path(proposal_id, None, "bundles", testing)}'
+            f'/hst_{formatted_proposal_id}-deliverable')
 
 def get_format_term(filename):
     """Return IPPPSSOOT for a given file name.
@@ -139,7 +137,7 @@ def backup_file(proposal_id, visit, filepath):
         visit          the two character visit.
         filepath       the current filepath to be renamed & moved.
     """
-    backups_dir = get_program_dir_path(proposal_id, visit) + '/backups'
+    backups_dir = f'{get_program_dir_path(proposal_id, visit)}/backups'
     now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
     _, _, fname = filepath.rpartition('/')
     basename, _, ext = fname.partition('.')
@@ -161,7 +159,7 @@ def create_col_dir_in_bundle(proposal_id, collection_name, testing=False):
                            testing purpose with the test directory.
     """
     deliverable_path = get_deliverable_path(proposal_id, testing)
-    col_dir = deliverable_path + '/' + collection_name
+    col_dir = f'{deliverable_path}/{collection_name}'
     os.makedirs(col_dir, exist_ok=True)
 
     return (deliverable_path, col_dir)

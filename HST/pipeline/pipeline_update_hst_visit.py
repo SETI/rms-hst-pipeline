@@ -54,10 +54,10 @@ if len(sys.argv) == 1:
 args = parser.parse_args()
 proposal_id = args.proposal_id
 visit = args.visit.zfill(2)
-LOG_DIR = HST_DIR['pipeline'] + f'/hst_{proposal_id.zfill(5)}/logs'
+LOG_DIR = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
 
-logger = pdslogger.PdsLogger('pds.hst.update-hst-visit-' + proposal_id
-                             + f'-visit_{visit.zfill(2)}')
+logger = pdslogger.PdsLogger(f'pds.hst.update-hst-visit-{proposal_id}'
+                             f'-visit_{visit.zfill(2)}')
 if not args.quiet:
     logger.add_handler(pdslogger.stdout_handler)
 

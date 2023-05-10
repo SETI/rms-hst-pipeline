@@ -74,11 +74,11 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
             basename, _, ext = file.rpartition('.')
             if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
                 proposal_files_li.append((basename, file))
-                file_path = pipeline_dir + f'/{file}'
+                file_path = f'{pipeline_dir}/{file}'
 
                 # Move the proposal files and program info file to the document directory
-                shutil.copy(file_path, document_dir + f'/{file}')
-                # shutil.move(file_path, document_dir + f'/{file}')
+                shutil.copy(file_path, f'{document_dir}/{file}')
+                # shutil.move(file_path, f'{document_dir}/{file}')
 
         # Collect data to construct data dictionary used for the document label
         # Get version id
@@ -98,7 +98,7 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
     records_num = len(data_dict['inst_id_li']) * 2 + 1
 
     # Get the mod history for document collection label if it's already existed.
-    col_doc_label_path = document_dir + f'/{COL_DOC_LABEL}'
+    col_doc_label_path = f'{document_dir}/{COL_DOC_LABEL}'
     mod_history = get_mod_history_from_label(col_doc_label_path, version_id)
 
     doc_data_dict = {
@@ -115,9 +115,9 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
     logger.info(f'Create label for proposal files using {DOC_LABEL_TEMPLATE}.')
     # Document label template path
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_template = this_dir + f'/templates/{DOC_LABEL_TEMPLATE}'
+    doc_template = f'{this_dir}/templates/{DOC_LABEL_TEMPLATE}'
     # Document label path
-    doc_lbl = document_dir + f'/{formatted_proposal_id}.xml'
+    doc_lbl = f'{document_dir}/{formatted_proposal_id}.xml'
     create_xml_label(doc_template, doc_lbl, doc_data_dict, logger)
 
     # Create document collection csv
@@ -145,7 +145,7 @@ def create_document_collection_csv(proposal_id, data_dict, logger=None, testing=
 
     # Set collection csv filename
     deliverable_path = get_deliverable_path(proposal_id, testing)
-    document_collection_dir = deliverable_path + f'/document/{CSV_FILENAME}'
+    document_collection_dir = f'{deliverable_path}/document/{CSV_FILENAME}'
 
     # Construct collection data, each item in the list is a row in the csv file
     version_id = data_dict['version_id']
