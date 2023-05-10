@@ -33,6 +33,8 @@ def get_program_info(proposal_id, download_dir=None, logger=None):
 
     Input:
         proposal_id    a proposal id.
+
+    Returns:    a set of the basenames of the files successfully downloaded.
     """
     logger = logger or pdslogger.EasyLogger()
 
@@ -52,6 +54,8 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
         url            the url to retrieve the text of a proposal file
         filepath       the file path of the existing proposal file or the file path used
                        to store the newly retrieved proposal file.
+
+    Returns:    a boolean that indicates if a proposal file is retrieved.
     """
     logger = logger or pdslogger.EasyLogger()
 
@@ -88,6 +92,8 @@ def is_proposal_file_different(new_contents, filepath):
         contents    the contents of the newly retrieved proposal file.
         filepath    the file path of the existing proposal file or the file path used to
                     store the newly retrieved proposal file.
+
+    Returns:    a boolean that indicates if a proposal file needs to be replaced/created.
     """
     if os.path.exists(filepath):
         with open(filepath, 'rb') as f:
@@ -114,6 +120,8 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
     Input:
         proposal_id     a proposal id.
         download_dir    the directory to store proposal files.
+
+    Returns:    a set of the basenames of the files successfully downloaded.
     """
     logger = logger or pdslogger.EasyLogger()
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)

@@ -37,8 +37,7 @@ from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 products_obs_dict = {}
 
 def query_hst_products(proposal_id, logger=None):
-    """Return a tuple of a list of visits in which any files are new or changed and a
-    of all visits for the given proposal id. These actions are performed:
+    """These actions are performed:
 
         - Query MAST for all available visits and files in this program.
         - Create directories <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/ if they don't exist.
@@ -49,6 +48,9 @@ def query_hst_products(proposal_id, logger=None):
 
     Input:
         proposal_id    a proposal id.
+
+    Returns:    a tuple of a list of visits in which any files are new or changed and a
+                list of all visits for the given proposal id.
     """
     visit_diff = []
     logger = logger or pdslogger.EasyLogger()
@@ -162,7 +164,7 @@ def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=
                 f.write('%s:%s\n' % (file, checksum))
 
 def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=False):
-    """Return a flag to indicate whether any files are new or changed in the visit.
+    """Return a flag to indicate if any files are new or changed in the visit.
     Compare the contents of current txt file with the results from Mast. If they are
     the same, keep the current txt file. If they are different, move the current txt
     file to the backups directory, and generate the new txt file based on the new results
@@ -177,6 +179,7 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
         checksum_included    a flag used to deteremine if we want to include checksum
                              of each file in the generated file.
 
+    Returns:    a boolean that indicates if any files are new or changed in the visit.
     """
     is_visit_diff = False
     txt_file_path = f'{get_program_dir_path(proposal_id, visit)}/{fname}'
@@ -220,6 +223,7 @@ def get_downloaded_file_path(proposal_id, fname, visit=None, root_dir='staging')
         visit          two character visit if the file is stored under visit dir.
         root_dir       the root directory of the store file.
 
+    Returns:    the file path of a downloaded file.
     """
     return (f'{get_program_dir_path(proposal_id, visit, root_dir)}/mastDownload/HST/'
             f'{products_obs_dict[fname]}/{fname}')

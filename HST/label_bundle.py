@@ -24,6 +24,8 @@ def label_hst_bundle(proposal_id, data_dict, logger=None, testing=False):
         logger         pdslogger to use; None for default EasyLogger.
         testing        the flag used to determine if we are calling the function for
                        testing purpose with the test directory.
+
+    Returns:    the path of the newly created bundle label.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst bundle directory with proposal id: {proposal_id}')

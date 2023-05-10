@@ -29,8 +29,7 @@ CSV_FILENAME = 'collection.csv'
 COL_DOC_LABEL = 'collection.xml'
 
 def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
-    """With a given proposal id, create document directory in the final bundle. Return a
-    tupel of the path of document collection label and the path of document label. These
+    """With a given proposal id, create document directory in the final bundle. These
     are the actions performed:
 
     1. Create document directory.
@@ -45,6 +44,9 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
         logger         pdslogger to use; None for default EasyLogger.
         testing        the flag used to determine if we are calling the function for
                        testing purpose with the test directory.
+
+    Returns:    a tupel of the path of document collection label and the path of
+                document label.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst document directory with proposal id: {proposal_id}')

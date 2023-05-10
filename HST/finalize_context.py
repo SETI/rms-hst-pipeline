@@ -18,9 +18,8 @@ COL_CTXT_LABEL_TEMPLATE = 'CONTEXT_COLLECTION_LABEL.xml'
 INV_LABEL_TEMPLATE = 'INVESTIGATION_LABEL.xml'
 
 def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=False):
-    """With a given proposal id, create context directory in the final bundle. Return a
-    tuple of the path of context collection label and the path of investigation label.
-    These are the actions performed:
+    """With a given proposal id, create context directory in the final bundle. These are
+    the actions performed:
 
     1. Create context directory.
     2. Create context csv.
@@ -33,6 +32,9 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
         logger         pdslogger to use; None for default EasyLogger.
         testing        the flag used to determine if we are calling the function for
                        testing purpose with the test directory.
+
+    Returns:    a tuple of the path of context collection label and the path of
+                investigation label.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Label hst context directory with proposal id: {proposal_id}')

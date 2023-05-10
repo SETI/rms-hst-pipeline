@@ -77,6 +77,9 @@ def get_general_label_data(proposal_id, logger=None, testing=False):
     Inputs:
         proposal_id    a proposal id.
         logger         pdslogger to use; None for default EasyLogger.
+
+    Returns:    a dictionary of general data that will be used for the creation of
+                document/schema/context/bundle labels.
     """
     logger = logger or pdslogger.EasyLogger()
 

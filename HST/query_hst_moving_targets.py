@@ -28,6 +28,8 @@ def query_hst_moving_targets(proposal_ids=[],
         end_date        observation end datetime.
         logger          pdslogger to use; None for default EasyLogger.
         max_retries     number of retries when there is a connection to mast.
+
+    Returns:    a list of proposal ids with moving targets.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info('Run query_hst_moving_targets')
