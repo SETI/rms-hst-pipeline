@@ -203,10 +203,10 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
             backup_file(proposal_id, visit, txt_file_path)
             # generate the new txt file
             generate_files_txt(proposal_id, files_dict, visit,
-                               f'{fname}', checksum_included)
+                               fname, checksum_included)
     else:
         # Generate txt file if it doesn't exist
-        generate_files_txt(proposal_id, files_dict, visit, f'{fname}', checksum_included)
+        generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included)
         is_visit_diff = True
 
     return is_visit_diff

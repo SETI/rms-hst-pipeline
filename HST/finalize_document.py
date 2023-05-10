@@ -124,8 +124,8 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
     create_document_collection_csv(proposal_id, doc_data_dict, logger, testing)
     # Create document collection label
     doc_col_lbl = create_collection_label(proposal_id, 'document', doc_data_dict,
-                                   COL_DOC_LABEL, COL_DOC_LABEL_TEMPLATE,
-                                   logger, testing)
+                                          COL_DOC_LABEL, COL_DOC_LABEL_TEMPLATE,
+                                          logger, testing)
 
     return (doc_col_lbl, doc_lbl)
 

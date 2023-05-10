@@ -89,7 +89,7 @@ def get_general_label_data(proposal_id, logger=None, testing=False):
     timetag = os.path.getmtime(__file__)
     label_date = datetime.datetime.fromtimestamp(timetag).strftime('%Y-%m-%d')
 
-    # Get imstrument id
+    # Get instrument id
     inst_ids = get_instrument_id_set(proposal_id, logger)
 
     # Get target id, time, instrument params, primary results and the number of records

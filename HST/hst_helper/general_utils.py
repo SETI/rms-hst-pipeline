@@ -144,7 +144,7 @@ def get_instrument_id_set(proposal_id, logger):
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
-    # Get imstrument id
+    # Get instrument id
     if formatted_proposal_id not in INST_ID_DICT:
         logger = logger or pdslogger.EasyLogger()
         logger.info(f'Get instrument ids for: {proposal_id}.')
