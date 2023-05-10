@@ -47,6 +47,8 @@ def create_collection_label(
         target_dir         the target dir used to obtain the roll up info.
         testing            the flag used to determine if we are calling the function for
                            testing purpose with the test directory.
+
+    Returns:    the path of the newly created collection label.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create collection csv with proposal id: {proposal_id}')
@@ -115,6 +117,8 @@ def get_citation_info(proposal_id, logger):
     Inputs:
         proposal_id    a proposal id.
         logger         pdslogger to use; None for default EasyLogger.
+
+    Returns:    the Citation_Information object of the given proposal id.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     if formatted_proposal_id in CITATION_INFO_DICT:
@@ -131,7 +135,8 @@ def get_citation_info(proposal_id, logger):
             file_path = f'{pipeline_dir}/{file}'
             if formatted_proposal_id not in CITATION_INFO_DICT:
                 CITATION_INFO_DICT[formatted_proposal_id] = (
-                                                Citation_Information.create_from_file(file_path))
+                    Citation_Information.create_from_file(file_path)
+                )
             return CITATION_INFO_DICT[formatted_proposal_id]
 
 def get_instrument_id_set(proposal_id, logger):
@@ -141,6 +146,8 @@ def get_instrument_id_set(proposal_id, logger):
     Inputs:
         proposal_id    a proposal id.
         logger         pdslogger to use; None for default EasyLogger.
+
+    Returns:    a set of instrument ids for the given proposal id.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
@@ -166,6 +173,9 @@ def get_mod_history_from_label(prev_label_path, current_version_id):
     Inputs:
         prev_label_path       the path of the exisiting xml label
         current_version_id    the current version id of the new bundle
+
+    Returns:    a list of tuples (modification_date, version_id, description), one for
+                each Modification_Detail.
     """
     mod_history = []
     if os.path.exists(prev_label_path):
@@ -184,6 +194,15 @@ def get_target_id_from_label(proposal_id, prev_label_path):
     Inputs:
         proposal_id        a proposal id.
         prev_label_path    the path of the exisiting xml label
+
+    Returns:    a list of the target identification info tuples (name,
+                alternate_designations, type, description, lid_reference)
+        name                the preferred name;
+        alt_designations    a list of strings indicating alternative names;
+        body_type           "Asteroid", "Centaur", etc.;
+        description         a list of strings, to be separated by newlines inside the
+                            description attribute of the XML Target_Identification object;
+        lid                 the LID of the object, omitting "urn:...:target:".
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     if formatted_proposal_id not in TARG_ID_DICT:
@@ -206,6 +225,8 @@ def date_time_to_date(date_time):
 
     Inputs:
         date_time    a date time string like "2005-01-19T15:41:05Z".
+
+    Returns:    a date string.
     """
     try:
         idx = date_time.index('T')
@@ -216,13 +237,15 @@ def date_time_to_date(date_time):
 
 def get_collection_label_data(proposal_id, target_dir, logger):
     """Walk through the given target directory of a proposal id to get the collection
-    label data used for label creation. Return a dictionary containing target id, time,
-    instrument params, primary results and the number of records. Here are the keys of
-    the returned dictionary 'target', 'time', 'inst_params', 'primary_res', and 'records'.
+    label data used for label creation.
 
     Inputs:
         proposal_id    a proposal id.
         target_dir     the targeted labels directory to get the number of total files.
+
+    Returns:    a dictionary containing target id, time, instrument params, primary
+                results and the number of records. Here are the keys of the returned
+                dictionary 'target', 'time', 'inst_params', 'primary_res', and 'records'.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     _, _, collection_name = target_dir.rpartition('/')
@@ -301,6 +324,8 @@ def get_clean_target_text(text: str) -> str:
 
     Inputs:
         text    a text of the target name or type.
+
+    Returns:    a string with special characters replaced by '_' and '()' removed.
     """
     SPECIAL_CHARS = '!#$%^&*/ '
     REMOVED_CHARS = '()'

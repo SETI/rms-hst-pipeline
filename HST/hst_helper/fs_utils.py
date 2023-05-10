@@ -22,6 +22,8 @@ def create_program_dir(proposal_id, visit=None, root_dir='pipeline'):
         visit          the two character designation for the HST visit
         root_dir       root directory of the program, it's either 'staging', 'pipeline'
                        or 'bundles'.
+
+    Returns:    the path of the newly created program directory.
     """
     program_dir = get_program_dir_path(proposal_id, visit, root_dir)
     os.makedirs(program_dir, exist_ok=True)
@@ -39,6 +41,8 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline', testing=F
                        or 'bundles'.
         testing        the flag used to determine if we are calling the function for
                        testing purpose with the test directory.
+
+    Returns:    the path of the newly created program directory.
     """
     root = HST_DIR[root_dir]
     # Create separate directories for testing. Tests will setup and tear down the testing
@@ -63,6 +67,8 @@ def get_deliverable_path(proposal_id, testing=False):
         proposal_id    a proposal id.
         testing        the flag used to determine if we are calling the function for
                        testing purpose with the test directory.
+
+    Returns:    the final deliverable path in the bundles directory.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     return (f'{get_program_dir_path(proposal_id, None, "bundles", testing)}'
@@ -72,7 +78,9 @@ def get_format_term(filename):
     """Return IPPPSSOOT for a given file name.
 
     Input:
-        filename   a product file name
+        filename   a product file name.
+
+    Returns:    the IPPPSSOOT.
     """
     format_term, _, _ = filename.partition('_')
     return format_term
@@ -81,7 +89,9 @@ def get_instrument_id_from_fname(filename):
     """Return instrument id for a given file name.
 
     Input:
-        filename   a product file name
+        filename   a product file name.
+
+    Returns:    the instrument id or None.
     """
     letter_code = filename.lower()[0]
     return (INSTRUMENT_FROM_LETTER_CODE[letter_code]
@@ -92,6 +102,8 @@ def get_file_suffix(filename):
 
     Input:
         filename    a product file name
+
+    Returns:    the suffix of the given file.
     """
     filename, _, _ = filename.rpartition('.')
     _ ,_ , suffix = filename.partition('_')
@@ -102,6 +114,8 @@ def get_visit(format_term):
 
     Input:
         format_term    the first 8 or 9 characters of the file name (IPPPSSOOT).
+
+    Returns:    the two-character visit code.
     """
     return format_term[4:6]
 
@@ -110,6 +124,8 @@ def file_md5(filepath):
 
     Input:
         filepath    the path of the targeted file.
+
+    Returns:    the checksum of the given file.
     """
     chunk_size = 4096
     hasher = md5()
@@ -126,6 +142,9 @@ def get_formatted_proposal_id(proposal_id):
 
     Input:
         proposal_id    the proposal id.
+
+    Returns:    the five-digit proposal id with prepended zero's if the given proposal
+                id has less than five digits.
     """
     return str(proposal_id).zfill(5)
 
@@ -149,7 +168,7 @@ def backup_file(proposal_id, visit, filepath):
 
 def create_col_dir_in_bundle(proposal_id, collection_name, testing=False):
     """Create the collection directory in the final bundle directory for a given propsal
-    id & collection name. Return a tupel of the path of the final bundle & collection
+    id & collection name. Return a tuple of the path of the final bundle & collection
     directories.
 
     Input:
@@ -157,6 +176,8 @@ def create_col_dir_in_bundle(proposal_id, collection_name, testing=False):
         collection_name    the collection name for the directory.
         testing            the flag used to determine if we are calling the function for
                            testing purpose with the test directory.
+
+    Returns:    a tuple of the path of the final bundle & collection directories.
     """
     deliverable_path = get_deliverable_path(proposal_id, testing)
     col_dir = f'{deliverable_path}/{collection_name}'
