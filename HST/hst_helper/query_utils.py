@@ -14,7 +14,7 @@ from astroquery.mast import Observations
 from . import (START_DATE,
                END_DATE,
                RETRY)
-from .fs_utils import (get_formatted_proposal_id,
+from hst_helper.fs_utils import (get_formatted_proposal_id,
                        get_format_term,
                        get_visit)
 from product_labels.suffix_info import (ACCEPTED_SUFFIXES,
@@ -135,7 +135,11 @@ def is_accepted_instrument_suffix(row):
     instrument_id = get_instrument_id_from_table_row(row)
     # For files like n4wl03fxq_raw.jpg with '--' will raise an error
     # return is_accepted(suffix, instrument_id)
-    return suffix in ACCEPTED_SUFFIXES[instrument_id]
+    if instrument_id is not None:
+        return suffix in ACCEPTED_SUFFIXES[instrument_id]
+    else:
+        # skip files starting with "HST..."
+        return False
 
 def is_trl_suffix(row):
     """Check if a product row has trl in the productSubGroupDescription field
@@ -170,7 +174,10 @@ def get_instrument_id_from_table_row(row):
 
     Returns:    the instrument id.
     """
-    return INSTRUMENT_FROM_LETTER_CODE[row['obs_id'][0].lower()]
+    try:
+        return INSTRUMENT_FROM_LETTER_CODE[row['obs_id'][0].lower()]
+    except KeyError: # For file name starts with "H", we skip the row
+        return None
 
 def get_suffix(row):
     """Return the product file suffix for a given product row.
