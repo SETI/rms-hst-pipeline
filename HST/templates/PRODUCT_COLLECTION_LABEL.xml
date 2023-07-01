@@ -47,7 +47,7 @@ $ONCE(collection_type = "Miscellaneous" if processing_level == "Ancillary" else 
             </Modification_Detail>
         </Modification_History>
     </Identification_Area>
-$IF("miscellaneous" not in collection_name)
+$IF("miscellaneous" not in collection_name and "browse" not in collection_name)
     <Context_Area>
         <Time_Coordinates>
             <start_date_time>$start_date_time$</start_date_time>
