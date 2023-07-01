@@ -16,7 +16,8 @@ from product_labels.suffix_info import (ACCEPTED_BROWSE_SUFFIXES,
                                         ACCEPTED_SUFFIXES,
                                         collection_name)
 
-from hst_helper import INST_ID_DICT
+from hst_helper import (INST_ID_DICT,
+                        BROWSE_PROD_EXT)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path,
                                  get_instrument_id_from_fname,
@@ -52,13 +53,15 @@ def prepare_browse_products(proposal_id, visit, logger=None):
             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
             INST_ID_DICT[formatted_proposal_id].add(inst_id)
 
+            _, _, file_ext = file.rpartition('.')
             # Copy & save browse products under browse_{inst_id}_{suffix} and rest of
             # products under data_{inst_id}_{suffix}
             # TODO: maybe use move instead of copy and remove empty folder (?)
             if inst_id is not None:
                 prod_dir = get_program_dir_path(proposal_id, None, 'staging')
                 col_name = collection_name(suffix, inst_id)
-                if suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id]:
+                if (suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id] and
+                    file_ext in BROWSE_PROD_EXT):
                     prod_dir += f'/browse_{inst_id.lower()}_{suffix}/visit_{visit}/'
                     logger.info(f'Move browse products to: {prod_dir + file}')
                 elif suffix in ACCEPTED_SUFFIXES[inst_id]:

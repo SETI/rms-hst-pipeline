@@ -67,6 +67,9 @@ DISP_SHORT_VERSION = '1B00'
 # Collection names in the bundles
 COL_NAME_PREFIX = ['data_', 'miscellaneous_', 'browse_']
 
+# Browse product files extension
+BROWSE_PROD_EXT = ['jpg', 'jpeg', 'png']
+
 # For citation info, need to fake it to something that will pass the XsdValidator.jar
 # for now. required pattern for dummy value: 10\\.\\S+/\\S+
 DOI = '10.1/2'

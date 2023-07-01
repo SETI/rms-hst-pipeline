@@ -10,7 +10,8 @@ import datetime
 import os
 import pdslogger
 
-from hst_helper import COL_NAME_PREFIX
+from hst_helper import (COL_NAME_PREFIX,
+                        BROWSE_PROD_EXT)
 from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_format_term,
                                  get_deliverable_path)
@@ -55,42 +56,60 @@ def label_hst_data_directory(proposal_id, logger):
                 prod_dir = os.path.join(deliverable_path, dir)
 
                 # Get label data
-                # TODO: might need to walk through bundles dir depending on if the files have
-                # been moved to the bundles dir.
-                label_data = get_collection_label_data(proposal_id, prod_dir, logger)
-                target_info = label_data['target']
-                _, processing_lvl, wavelength_ranges, _ = label_data['primary_res']
-                _, channel_id, _, _ = label_data['inst_params']
-                records_num = label_data['records']
-                min_start, max_stop = label_data['time']
-                start_date = date_time_to_date(min_start) if min_start else None
-                stop_date = date_time_to_date(max_stop) if max_stop else None
+                # TODO: might need to walk through bundles dir depending on if the files
+                # have been moved to the bundles dir.
+                try:
+                    label_data = get_collection_label_data(proposal_id, prod_dir, logger)
+                    target_info = label_data['target']
 
-                # Get collection title
-                _, inst_id, suffix = dir.split('_')
-                collection_title = get_collection_title_fmt(suffix, inst_id.upper())
-                collection_title = collection_title.replace('{I}', inst_id.upper())
-                collection_title = collection_title.replace(
-                                       '{IC}', f'{inst_id.upper()}/{channel_id}')
-                collection_title = collection_title.replace('{P}', str(proposal_id))
+                    # For browse products, we don't have primary_res & inst_params since
+                    # those products don't have data .xml label
+                    try:
+                        _, proc_lvl, wavelength_ranges, _ = label_data['primary_res']
+                        processing_lvl = proc_lvl[0]
+                    except KeyError:
+                        processing_lvl = None
+                        wavelength_ranges = None
+                    try:
+                        _, channel_id, _, _ = label_data['inst_params']
+                    except KeyError:
+                        channel_id = None
 
-                # Get citation info
-                citation_info = get_citation_info(proposal_id, logger)
+                    records_num = label_data['records']
+                    min_start, max_stop = label_data['time']
+                    start_date = date_time_to_date(min_start) if min_start else None
+                    stop_date = date_time_to_date(max_stop) if max_stop else None
 
-                version_id = (1, 0)
-                col_data_label_name = f'collection_{collection_name}.xml'
-                mod_history = get_mod_history_from_label(col_data_label_name, version_id)
+                    # Get collection title
+                    _, inst_id, suffix = dir.split('_')
+                    collection_title = get_collection_title_fmt(suffix, inst_id.upper())
+                    collection_title = collection_title.replace('{I}', inst_id.upper())
+                    collection_title = collection_title.replace(
+                                        '{IC}', f'{inst_id.upper()}/{channel_id}')
+                    collection_title = collection_title.replace('{P}', str(proposal_id))
 
-                # Get label date
-                timetag = os.path.getmtime(__file__)
-                label_date = datetime.datetime.fromtimestamp(timetag).strftime('%Y-%m-%d')
+                    # Get citation info
+                    citation_info = get_citation_info(proposal_id, logger)
+
+                    version_id = (1, 0)
+                    col_data_label_name = f'collection_{collection_name}.xml'
+                    mod_history = get_mod_history_from_label(col_data_label_name,
+                                                             version_id)
+
+                    # Get label date
+                    timetag = os.path.getmtime(__file__)
+                    label_date = (datetime.datetime.fromtimestamp(timetag)
+                                                   .strftime('%Y-%m-%d'))
+                except Exception as e:
+                    logger.exception(e)
+                    raise
                 data_dict = {
                     'prop_id': proposal_id,
                     'inst_id': inst_id,
                     'collection_name': collection_name,
                     'collection_title': collection_title,
                     'citation_info': citation_info,
-                    'processing_level': processing_lvl[0],
+                    'processing_level': processing_lvl,
                     'wavelength_ranges': wavelength_ranges,
                     'instrument_name': INSTRUMENT_NAMES[inst_id.upper()],
                     'target_identifications': target_info,
@@ -128,7 +147,10 @@ def create_data_product_collection_csv(proposal_id, logger):
                 bundles_prod_dir = os.path.join(deliverable_path, dir)
                 for _, _, files in os.walk(bundles_prod_dir):
                     for file in files:
-                        if not file.startswith('collection_') and file.endswith('.xml'):
+                        _, _, ext = file.rpartition('.')
+                        # if not file.startswith('collection_') and file.endswith('.xml'):
+                        if (not file.startswith('collection_') and
+                            ext in ['xml'] + BROWSE_PROD_EXT):
                             format_term = get_format_term(file)
                             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
                             prod_lidvid = (f'P,urn:nasa:pds:hst_{formatted_proposal_id}'

@@ -14,7 +14,7 @@ from astroquery.mast import Observations
 from . import (START_DATE,
                END_DATE,
                RETRY)
-from hst_helper.fs_utils import (get_formatted_proposal_id,
+from .fs_utils import (get_formatted_proposal_id,
                        get_format_term,
                        get_visit)
 from product_labels.suffix_info import (ACCEPTED_SUFFIXES,
@@ -133,7 +133,6 @@ def is_accepted_instrument_suffix(row):
     """
     suffix = get_suffix(row)
     instrument_id = get_instrument_id_from_table_row(row)
-    # For files like n4wl03fxq_raw.jpg with '--' will raise an error
     # return is_accepted(suffix, instrument_id)
     if instrument_id is not None:
         return suffix in ACCEPTED_SUFFIXES[instrument_id]
@@ -187,7 +186,15 @@ def get_suffix(row):
 
     Returns:    the suffix of the product file.
     """
-    return str(row['productSubGroupDescription']).lower()
+    suffix = str(row['productSubGroupDescription']).lower()
+    # For files like .jpg or .png, this will be '--', so we derive suffix from file names.
+    if suffix == '--':
+        filename = str(row['productFilename'])
+        fname, _, _ = filename.rpartition('.')
+        _, _, suffix = fname.rpartition('_')
+        return suffix
+    else:
+        return suffix
 
 def get_filtered_products(table, visit=None):
     """Return product rows of an observation table with accepted instrument letter code
@@ -206,7 +213,8 @@ def get_filtered_products(table, visit=None):
     result = filter_table(is_accepted_instrument_letter_code, result)
     result = filter_table(is_accepted_instrument_suffix, result)
     if visit is not None:
-        # to_delete = [n for (n, row) in enumerate(result) if not is_targeted_visit(row, visit)]
+        # to_delete = [n for (n, row) in enumerate(result) if not
+        # is_targeted_visit(row, visit)]
         to_delete = []
         for (n, row) in enumerate(result):
             if not is_targeted_visit(row, visit):
