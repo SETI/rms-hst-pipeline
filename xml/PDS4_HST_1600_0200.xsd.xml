@@ -9,11 +9,11 @@
     elementFormDefault="qualified"
     attributeFormDefault="unqualified"
     version="0.2.0.0">
- 
+
     <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1600.xsd"/>
- 
+
   <xs:annotation>
-    <xs:documentation>    	
+    <xs:documentation>
     	version 0.1.0.0  2016-03-11
         - preliminary draft.
      	version 0.2.0.0  2016-06-03
@@ -26,7 +26,7 @@
         - to be done add definitions to attributes
       </xs:documentation>
   </xs:annotation>
- 
+
   <xs:element name="HST" type="hst:HST"> </xs:element>
 
   <xs:complexType name="HST">

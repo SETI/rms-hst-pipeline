@@ -213,10 +213,10 @@ def fix_title(title: str) -> str:
 
             # Handle possessives
             if word.endswith("'s"):
-                return capitalize1(word[:-2]) + "'s'
+                return capitalize1(word[:-2]) + "'s"
 
             # Handle other common punctuation
-            for punc in '.,;:-/()'?':
+            for punc in ".,;:-/()'?":
                 if punc in word:
                     wordlets = word.split(punc)
                     wordlets = [capitalize1(w) for w in wordlets]

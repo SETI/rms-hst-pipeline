@@ -1,0 +1,51 @@
+#!/bin/bash
+# Use the tmp-context-products.json under HST
+CONTEXT_PRODUCTS=./tmp-context-products.json
+XMLDIR=../xml
+# Remove this scaffolding when switching to the new HST_Parameters implementation.
+NEW=-new
+SCHEMAS="${XMLDIR}/PDS4_HST_1D00_1000${NEW}.xsd.xml, ${XMLDIR}/PDS4_DISP_1B00.xsd.xml"
+SCHEMATRONS="${XMLDIR}/PDS4_HST_1D00_1000${NEW}.sch.xml, ${XMLDIR}/PDS4_DISP_1B00.sch.xml"
+
+die(){
+    echo $@ >&2
+}
+
+usage(){
+    die Usage: "$(basename $0)" "<bundle-dir>" "<manifest-dir>" "<report-dir>"
+}
+
+if [ $# -ne 3 ]; then
+    usage
+    exit 1
+fi
+
+BUNDLE_DIR=$1
+MANIFEST_DIR=$2
+REPORT_DIR=$3
+REPORT_FILEPATH="${REPORT_DIR}"/validation-report.txt
+
+# NOTE: the -D is temporary until we have a tool to remove NaNs from
+# data.
+
+# NOTE: the --add-context line is also temporary until we have context
+# products ready.
+validate "${BUNDLE_DIR}" -M "${MANIFEST_DIR}"/checksum.manifest.txt -R pds4.bundle \
+    -D \
+    --add-context-products "${CONTEXT_PRODUCTS}" \
+    -S ${SCHEMATRONS} -x ${SCHEMAS} \
+    -r "${REPORT_FILEPATH}"
+validate --version
+if [ ! -f "${REPORT_FILEPATH}" ]; then
+    die A PDS4 validation report was not generated.
+    exit 1
+fi
+
+# The validation tool returns a success error code even if the
+# validation fails, so we have to kludge around that.
+if grep -q FAIL "${REPORT_FILEPATH}"; then
+    die Validation contains failures.
+    exit 1
+fi
+
+exit 0

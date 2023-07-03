@@ -77,8 +77,8 @@ NAME_TRANSLATIONS = [
     ('M?rcio', 'Márcio'),
     ('GR"U N', 'Grün'),
     ("Zolt'a n", 'Zoltán'),
-    ('Andre'', 'André'),
-    ('Rene'', 'René'),
+    ("Andre'", 'André'),
+    ("Rene'", 'René'),
     ('Marti n', 'Martín'),
     ("Jos'e", 'José'),
     ("Jose'", 'José'),
@@ -151,7 +151,7 @@ def fix_authors(authors):
                 words[j] = word + '.'
 
         # Ensure no space, then a capital after "O'", "D'", "A'", "Mc"
-        for prefix in ('O'', 'D'', 'A'', 'Mc'):
+        for prefix in ("O'", "D'", "A'", "Mc"):
             if prefix in words:
                 author = ' '.join(words)
                 author = author.replace(prefix + ' ', prefix)

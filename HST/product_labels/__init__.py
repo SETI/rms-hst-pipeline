@@ -673,7 +673,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         except (ValueError, KeyError):
             ranges = ['UNK']
             logger.error('Undetermined wavelength range for ' +
-                         hst_dictionary['filter_name'], ref_fullpath)
+                         hst_dictionary['filter_name'], fullpath)
 
         ipppssoot_dict['wavelength_ranges'] = ranges
 

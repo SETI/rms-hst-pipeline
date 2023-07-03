@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch"
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Collection xmlns="http://pds.nasa.gov/pds4/pds/v1"
+                xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                           https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd">
+
+$ONCE(formatted_prop_id=str(prop_id).zfill(5))
+$ONCE(inst_ids=(', ').join(inst_id_li))
+    <Identification_Area>
+        <logical_identifier>
+            urn:nasa:pds:hst_$formatted_prop_id$:$collection_name$
+        </logical_identifier>
+        <version_id>$version_id[0]$.$version_id[1]$</version_id>
+        <title>
+            Schema collection of $inst_ids$ observations obtained from HST Observing Program $prop_id$.
+        </title>
+        <information_model_version>1.15.0.0</information_model_version>
+        <product_class>Product_Collection</product_class>
+        <Citation_Information>
+            <author_list>$citation_info.author_list$</author_list>
+            <publication_year>$citation_info.publication_year$</publication_year>
+            <description>
+                $WRAP(16, 90, citation_info.description)$
+            </description>
+        </Citation_Information>
+        <Modification_History>
+            $FOR(mod=mod_history)
+            <Modification_Detail>
+                <modification_date>$mod[0]$</modification_date>
+                <version_id>$mod[1][0]$.$mod[1][1]$</version_id>
+                <description>
+                    $WRAP(20, 90, mod[2])$
+                </description>
+            </Modification_Detail>
+            $END_FOR
+            <Modification_Detail>
+                <modification_date>$label_date$</modification_date>
+                <version_id>$version_id[0]$.$version_id[1]$</version_id>
+                <description>
+                $IF(version_id == (1,0))
+                    This is the initial PDS4 version of this data document.
+                $ELSE
+                    Schema version: $version_id[0]$.$version_id[1]$
+                $END_IF
+                </description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Collection>
+        <collection_type>$collection_name.title()$</collection_type>
+    </Collection>
+    <File_Area_Inventory>
+        <File>
+            <file_name>$csv_filename$</file_name>
+        </File>
+        <Inventory>
+            <offset unit="byte">0</offset>
+            <parsing_standard_id>PDS DSV 1</parsing_standard_id>
+            <records>$records_num$</records>
+            <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
+            <field_delimiter>Comma</field_delimiter>
+            <Record_Delimited>
+                <fields>2</fields>
+                <groups>0</groups>
+                <Field_Delimited>
+                    <name>Member Status</name>
+                    <field_number>1</field_number>
+                    <data_type>ASCII_String</data_type>
+                    <maximum_field_length unit="byte">1</maximum_field_length>
+                </Field_Delimited>
+                <Field_Delimited>
+                    <name>LIDVID_LID</name>
+                    <field_number>2</field_number>
+                    <data_type>ASCII_LIDVID_LID</data_type>
+                    <maximum_field_length unit="byte">255</maximum_field_length>
+                </Field_Delimited>
+            </Record_Delimited>
+            <reference_type>inventory_has_member_product</reference_type>
+        </Inventory>
+    </File_Area_Inventory>
+</Product_Collection>
