@@ -27,7 +27,7 @@ class TestQueryMast:
     @pytest.mark.parametrize(
         'proposal_id,visit,expected',
         [
-            ('7885', '01', 105),
+            ('7885', '01', 135),
             ('7885', '04', 0),
         ]
     )

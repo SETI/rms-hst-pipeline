@@ -108,7 +108,7 @@ class TestLabelCreations:
     @pytest.mark.parametrize('p_id', [('7885')])
     def test_create_collection_label_data_prod_col_lbl(self, p_id):
         data_dict = {
-            'collection_name': 'browse_nicmos_cal',
+            'collection_name': 'data_nicmos_cal',
             'csv_filename': 'collection_document.csv',
             'processing_level': 'Calibrated',
             'inst_id': 'nicmos',
