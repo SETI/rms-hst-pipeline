@@ -90,7 +90,7 @@ if __name__ == "__main__":
     filter_dict = {}
     for inst in target_inst:
         obs = Observations.query_criteria(
-            dataproduct_type=["image"],
+            # dataproduct_type=["image"],
             dataRights="PUBLIC",
             obs_collection=["HST"],
             instrument_name=inst,
