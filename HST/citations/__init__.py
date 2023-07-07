@@ -66,6 +66,7 @@ YEARS_FOR_CYCLE = {  # YEARS_FOR_CYCLE[cycle_number] = (start_year, end_year)
     27: (2019, 2020),
     28: (2020, 2021),
     29: (2021, 2022),
+    30: (2022, 2023),
 }
 
 # Servicing Missions:
