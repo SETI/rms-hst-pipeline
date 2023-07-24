@@ -118,11 +118,15 @@ def get_header_date(hdulist):
         raise ValueError(f'unsupported FITSDATE format: "{value}"')
 
     # Some files have IRAF-TLM "hh:mm:ss (dd/mm/yyyy)
+    # For cases like 5217, some files have IRAF-TLM value "2010-02-17T16:49:27", so we
+    # also check the YYYY_MM_DD_HH_MM_SS_PATTERN here.
     value = header0.get('IRAF-TLM', '')
     match = IRAF_TLM_PATTERN.fullmatch(value)
     if match:
         (hh_mm_ss, dd, mm, yyyy) = match.groups()
         dates_found.append(f'{yyyy}-{mm}-{dd}T{hh_mm_ss}')
+    elif match := YYYY_MM_DD_HH_MM_SS_PATTERN.fullmatch(value):
+        dates_found.append(value)
     elif value:
         raise ValueError(f'unsupported IRAF-TLM format: "{value}"')
 
