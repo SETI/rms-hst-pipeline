@@ -998,7 +998,6 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ############################################################
     # Return the dictionary
     ############################################################
-    print('FINAL RETURN DICT------------------')
     return hst_dictionary
 
 ##########################################################################################
