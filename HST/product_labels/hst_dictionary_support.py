@@ -545,7 +545,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
                 # second; join with a plus.
                 filters = [filter1, filter2]
                 filters.sort()
-                return '+'.join(filters)
+                filter_name = '+'.join(filters)
 
         elif instrument_id == 'FGS':
             filter_name = header0['CAST_FLT']
@@ -998,7 +998,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ############################################################
     # Return the dictionary
     ############################################################
-
+    print('FINAL RETURN DICT------------------')
     return hst_dictionary
 
 ##########################################################################################
