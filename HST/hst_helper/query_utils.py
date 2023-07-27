@@ -75,15 +75,16 @@ def query_mast_slice(proposal_id=None,
     if start_date is not None and end_date is not None:
         query_params['t_obs_release'] = (start_date, end_date)
 
+    cur_retry = 0
     for retry in range(max_retries):
         try:
             if testing and max_retries > 1:
                 raise ConnectionError
             table = Observations.query_criteria(**query_params)
             return table
-        except ConnectionError as e:
-            retry += 1
-            logger.info(f'retry #{retry}: {e}')
+        except (ConnectionError, TimeoutError) as e:
+            cur_retry += 1
+            logger.info(f'retry #{cur_retry}: {e}')
             time.sleep(1)
 
     # Before raising the error, remove the task queue of the proposal id from database.
@@ -256,4 +257,8 @@ def download_files(table, dir, logger=None, testing=False):
     if len(table) > 0:
         logger.info(f'Download files to {dir}')
         if not testing: # pragma: no cover, no need to download files during the test
-            Observations.download_products(table, download_dir=dir)
+            try:
+                Observations.download_products(table, download_dir=dir)
+            except Exception as e: # errors when downloading files
+                logger.exception(e)
+                raise
