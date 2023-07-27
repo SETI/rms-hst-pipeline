@@ -198,8 +198,6 @@ class Citation_Information:
             info = citation_information_from_apt(filename)
         elif filename_lc.endswith('.pro'):
             info = citation_information_from_pro(filename)
-        elif filename_lc.endswith('.txt'):
-            info = citation_information_from_text(filename)
         else:
             raise ValueError('unrecognized file format: ' + filename)
 

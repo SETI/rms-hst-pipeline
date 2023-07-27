@@ -75,10 +75,11 @@ logger.open('retrieve-hst-visit ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
 try:
     retrieve_hst_visit(proposal_id, visit, logger)
-except:
+except Exception as e:
     # Before raising the error, remove the task queue of the proposal id from database.
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    logger.error(e)
     raise
 
 logger.close()

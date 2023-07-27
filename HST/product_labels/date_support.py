@@ -26,6 +26,7 @@
 #   Set the file's modification date.
 ##########################################################################################
 
+import astropy
 import datetime
 import os
 import re
@@ -131,7 +132,10 @@ def get_header_date(hdulist):
         raise ValueError(f'unsupported IRAF-TLM format: "{value}"')
 
     # Most files have DATE "yyyy-mm-dd" or "dd/mm/yy"
-    value = header0.get('DATE', '')
+    try:
+        value = header0.get('DATE', '')
+    except astropy.io.fits.verify.VerifyError:
+        value = ''
     match = YYYY_MM_DD_PATTERN.fullmatch(value)
     if match:
         dates_found.append(value)
