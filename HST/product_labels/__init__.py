@@ -613,7 +613,10 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
             # Maybe this is supposed to happen
             spt_hdulist = pyfits.open(ipppssoot_dict['spt_fullpath'])
-            scidata = spt_hdulist[0].header['SCIDATA']
+            try:
+                scidata = spt_hdulist[0].header['SCIDATA']
+            except KeyError:
+                scidata = None
             spt_hdulist.close()
 
             if scidata:
