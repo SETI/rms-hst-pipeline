@@ -480,11 +480,19 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     # "ipppssoot_dict": dictionary for this file's IPPPSSOOT.
     #####################################################################################
 
+    removed_ipppssoot = []
     for ipppssoot, ipppssoot_dict in info_by_ipppssoot.items():
         all_suffixes = set(ipppssoot_dict.keys())
         ipppssoot_dict['all_suffixes'] = all_suffixes
         ipppssoot_dict['ipppssoot'] = ipppssoot
-        ipppssoot_dict['timetags'] = trl_timetags_by_ipppssoot[ipppssoot]
+        # ipppssoot_dict['timetags'] = trl_timetags_by_ipppssoot[ipppssoot]
+        try:
+            ipppssoot_dict['timetags'] = trl_timetags_by_ipppssoot[ipppssoot]
+        except KeyError:
+            # If trl timetags is missing, we remove this ipppssoot from info_by_ipppssoot
+            logger.error(f'Missing trl timetags for {ipppssoot}')
+            removed_ipppssoot.append(ipppssoot)
+
         ipppssoot_dict['by_basename'] = info_by_basename
         ipppssoot_dict['by_ipppssoot'] = info_by_ipppssoot
 
@@ -493,6 +501,14 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             basenamed_dict['by_basename'] = info_by_basename
             basenamed_dict['by_ipppssoot'] = info_by_ipppssoot
             basenamed_dict['ipppssoot_dict'] = ipppssoot_dict
+
+    # Bypass this ipppssoot by removing them from info_by_ipppssoot & info_by_basename
+    for ipppssoot in removed_ipppssoot:
+        del info_by_ipppssoot[ipppssoot]
+        for basename in list(info_by_basename):
+            if ipppssoot in basename:
+                del info_by_basename[basename]
+
 
     ######################################################################################
     # "associates"        : list of tuples (associated ipppssoot, memtype) for this
