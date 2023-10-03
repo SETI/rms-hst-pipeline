@@ -51,3 +51,10 @@ TASK_NUM_TO_PRI_MAPPING = {
     7: 5,
     8: 5
 }
+
+TASK_NUM_TO_NEXT_TASK_MAPPING = {
+    0: [1],
+    1: [2],
+    2: [3, 4, 8],
+    4: [5, 6, 7]
+}

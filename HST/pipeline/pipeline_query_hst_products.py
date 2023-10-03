@@ -31,6 +31,9 @@ from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
 from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
+
+from queue_manager.config import SUBPROCESS_LIST
+
 # Set up parser
 parser = argparse.ArgumentParser(
     description="""query-hst-products: Perform mast query with a given proposal id and
@@ -92,14 +95,15 @@ except:
     raise
 
 if taskqueue:
+    # queue_next_task(proposal_id, new_visit_li, 2, logger)
     # If list is not empty, queue update-hst-program with the list of visits
     if len(new_visit_li) != 0:
         logger.info(f'Queue update_hst_program for {proposal_id}')
         queue_next_task(proposal_id, new_visit_li, 2, logger)
-
     # TODO: TASK QUEUE
     # - if list is empty, re-queue query-hst-products with a 30-day delay
     # - re-queue query-hst-products with a 90-day delay
+# print(new_visit_li)
 
 logger.close()
 

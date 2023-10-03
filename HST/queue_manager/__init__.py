@@ -9,16 +9,21 @@
 
 import os
 import pdslogger
+import psutil
 import subprocess
 import time
 
 from hst_helper.fs_utils import get_formatted_proposal_id
 from queue_manager.task_queue_db import (add_a_prog_id_task_queue,
+                                         add_a_subprocess,
                                          create_task_queue_table,
                                          db_exists,
                                          erase_all_task_queue,
+                                         get_all_subprocess_info,
                                          get_next_task_to_be_run,
+                                         get_total_number_of_subprocesses,
                                          init_task_queue_table,
+                                         remove_a_subprocess_by_pid,
                                          update_a_prog_id_task_status)
 from queue_manager.config import (DB_PATH,
                                   PYTHON_EXE,
@@ -50,6 +55,8 @@ def run_pipeline(proposal_ids, logger=None):
         else:
             logger.error('Failed to create task queue table!')
 
+    # Kick start the pipeline for each proposal id
+    # proc_li = []
     for prog_id in proposal_ids:
         try:
             proposal_id = int(prog_id)
@@ -109,6 +116,7 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
     # spawn the task subprocess
     pid = run_and_maybe_wait(args, max_allowed_time,
                              formatted_proposal_id, visit, logger)
+
     return pid
 
 def run_and_maybe_wait(args, max_allowed_time, proposal_id, visit, logger):
@@ -124,6 +132,8 @@ def run_and_maybe_wait(args, max_allowed_time, proposal_id, visit, logger):
     Returns:    the child process that executes the given args.
     """
     # wait for an open subprocess slot
+    print('############# before wait for subprocess in run_and_maybe_wait ############')
+    print(get_all_subprocess_info())
     wait_for_subprocess()
 
     # query database and see if there is a higher priority job waiting (status: 0) to
@@ -140,7 +150,7 @@ def run_and_maybe_wait(args, max_allowed_time, proposal_id, visit, logger):
     update_a_prog_id_task_status(proposal_id, visit, 1)
     logger.debug("Spawning subprocess %s", str(args))
     pid = subprocess.Popen(args)
-    SUBPROCESS_LIST.append((pid, time.time(), time.time()+max_allowed_time, proposal_id))
+    add_a_subprocess(pid.pid, time.time(), time.time()+max_allowed_time, proposal_id)
 
     return pid
 
@@ -156,23 +166,29 @@ def wait_for_subprocess(all=False):
        subprocess_count = 0
 
     cur_time = time.time()
-    while len(SUBPROCESS_LIST) > 0:
-        for i in range(len(SUBPROCESS_LIST)):
-            pid, _, proc_max_time, _ = SUBPROCESS_LIST[i]
 
-            if pid.poll() is not None:
+    while get_total_number_of_subprocesses() > 0:
+        subproc_info = get_all_subprocess_info()
+        for info in subproc_info:
+            pid, _, proc_max_time, _ = info
+
+            if psutil.pid_exists(pid) == False:
                 # The subprocess completed, make the slot available for next subprocess
-                del SUBPROCESS_LIST[i]
+                remove_a_subprocess_by_pid(pid)
                 break
 
             if cur_time > proc_max_time and pid:
                 # If a subprocess has been running for too long, kill it
                 # Note no offset file will be written in this case
-                pid.kill()
-                del SUBPROCESS_LIST[i]
+                try:
+                    p = psutil.Process(pid)
+                    p.terminate()
+                except ProcessLookupError:
+                    pass
+                remove_a_subprocess_by_pid(pid)
                 break
 
-        if len(SUBPROCESS_LIST) <= subprocess_count:
+        if get_total_number_of_subprocesses() <= subprocess_count:
             # A slot opened up! Or all processes finished. Depending on what we're
             # waiting for.
             break

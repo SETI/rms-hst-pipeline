@@ -31,6 +31,8 @@ from hst_helper.fs_utils import get_program_dir_path
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import queue_next_task
 
+from queue_manager.config import SUBPROCESS_LIST
+
 # Set up parser
 parser = argparse.ArgumentParser(
     description="""query-hst-moving-targets: Perform mast query with given query
@@ -112,6 +114,8 @@ if taskqueue:
     # If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
     for proposal_id in proposal_ids:
         pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
+        logger.info(f'Queue query_hst_products for {proposal_id}')
+        # queue_next_task(proposal_id, '', 1, logger)
         if not os.path.exists(pipeline_dir):
             logger.info(f'Queue query_hst_products for {proposal_id}')
             queue_next_task(proposal_id, '', 1, logger)
