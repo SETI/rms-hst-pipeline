@@ -20,7 +20,8 @@ import sys
 from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
 from retrieve_hst_visit import retrieve_hst_visit
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import (remove_all_subprocess_for_a_prog_id,
+                                         remove_all_task_queue_for_a_prog_id)
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -79,6 +80,7 @@ except Exception as e:
     # Before raising the error, remove the task queue of the proposal id from database.
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    remove_all_subprocess_for_a_prog_id(formatted_proposal_id)
     logger.error(e)
     raise
 

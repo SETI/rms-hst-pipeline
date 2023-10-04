@@ -29,10 +29,8 @@ from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
 from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
-
-
-from queue_manager.config import SUBPROCESS_LIST
+from queue_manager.task_queue_db import (remove_all_subprocess_for_a_prog_id,
+                                         remove_all_task_queue_for_a_prog_id)
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -85,13 +83,15 @@ LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
 try:
-    new_visit_li, all_visits = query_hst_products(proposal_id, logger)
+    # new_visit_li, all_visits = query_hst_products(proposal_id, logger)
+    new_visit_li = []
     logger.info('List of visits in which any files are new or chagned: '
                 + str(new_visit_li))
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    remove_all_subprocess_for_a_prog_id(formatted_proposal_id)
     raise
 
 if taskqueue:
@@ -103,7 +103,6 @@ if taskqueue:
     # TODO: TASK QUEUE
     # - if list is empty, re-queue query-hst-products with a 30-day delay
     # - re-queue query-hst-products with a 90-day delay
-# print(new_visit_li)
 
 logger.close()
 

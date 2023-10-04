@@ -20,7 +20,8 @@ from .fs_utils import (get_formatted_proposal_id,
 from product_labels.suffix_info import (ACCEPTED_SUFFIXES,
                                         ACCEPTED_LETTER_CODES,
                                         INSTRUMENT_FROM_LETTER_CODE)
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import (remove_all_subprocess_for_a_prog_id,
+                                         remove_all_task_queue_for_a_prog_id)
 
 def ymd_tuple_to_mjd(ymd):
     """Return Modified Julian Date.
@@ -92,6 +93,7 @@ def query_mast_slice(proposal_id=None,
     # from current failed task when restarting the pipeline.
     if proposal_id is not None:
         remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+        remove_all_subprocess_for_a_prog_id(formatted_proposal_id)
 
     logger.exception(RuntimeError)
     raise RuntimeError(f'Query mast timed out. Number of retries: {max_retries}')

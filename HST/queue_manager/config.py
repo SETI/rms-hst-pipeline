@@ -22,7 +22,6 @@ DB_URI = f'sqlite:///{DB_PATH}'
 MAX_ALLOWED_TIME = 60 * 60
 # max number of subprocesses to run at a time for one hst pipeline on a proposal id
 MAX_SUBPROCESS_CNT = 10
-SUBPROCESS_LIST = []
 
 # Task to script command mapping. {P} will be replaced by proposal id and {V} will be
 # replaced by a two character visit or multiple visits separated by spaces (for
@@ -52,9 +51,15 @@ TASK_NUM_TO_PRI_MAPPING = {
     8: 5
 }
 
-TASK_NUM_TO_NEXT_TASK_MAPPING = {
-    0: [1],
-    1: [2],
-    2: [3, 4, 8],
-    4: [5, 6, 7]
+# Current task to previous task mapping
+TASK_NUM_TO_PREV_TASK_MAPPING = {
+    0: None,
+    1: 0,
+    2: 1,
+    3: 2,
+    4: 3,
+    5: 4,
+    6: 5,
+    7: 6,
+    8: 4,
 }

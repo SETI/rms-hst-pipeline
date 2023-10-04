@@ -24,7 +24,7 @@ Base = declarative_base()
 class TaskQueue(Base):
     """
     A database representation of the task queue. Each row represents the task queue of
-    a proposal id & visit, and it will have columns of the proposal id, visit,task num
+    a proposal id & visit, and it will have columns of the proposal id, visit, task num
     (current task), task priority, status (current task status), and task command. Each
     row will have an unique combination of proposal id & visit columns. These will make
     sure tasks for these cases can be run in parallel:
@@ -56,24 +56,27 @@ class TaskQueue(Base):
 class SubprocessList(Base):
     """
     A database representation of the subprocess list. Each row represents the subprocess
-    being run by subprocess.Popen(), and it will have columns of pid, start time, max
-    end time (start time + max_allowed_time), and proposal_id. pid will be a
-    subprocess.Popen instance so it's stored using PickleType.
+    being run by subprocess.Popen(), and it will have columns of pid, task_num, start
+    time, max end time (start time + max_allowed_time), visit and proposal_id.
     """
 
     __tablename__ = 'subprocess_list'
 
     id = Column(Integer, primary_key=True, nullable=False)
     pid = Column(Integer, nullable=False)
+    task_num = Column(Integer, nullable=False)
     start_time = Column(Float, nullable=False)
     max_end_time = Column(Float, nullable=False)
+    visit = Column(String, nullable=False)
     proposal_id = Column(String, nullable=False)
 
     def __repr__(self) -> str:
         return (
             f'SubprocessList(pid={self.pid!r}'
+            f', task_num={self.task_num!r})'
             f', start_time={self.start_time!r})'
             f', max_end_time={self.max_end_time!r})'
+            f', visit={self.visit!r})'
             f', proposal_id={self.proposal_id!r})'
         )
 
@@ -238,16 +241,18 @@ def get_next_task_to_be_run():
                                      .first())
     return query
 
-def add_a_subprocess(pid, start_time, max_end_time, proposal_id):
+def add_a_subprocess(pid, task_num, start_time, max_end_time, visit, proposal_id):
     """
     Add an entry of the subprocess to the subprocess list table. If the pid exists in the
     table, we just exit.
 
     Input:
-        pid             the subprocess.Popen instance created when a subprocess is run
-        start_time      the start time of a subprocess
-        max_end_time    the max possible end time of a subprocess
-        proposal_id     a proposal id
+        pid             the subprocess.Popen instance created when a subprocess is run.
+        task_num        a number represents the current task.
+        start_time      the start time of a subprocess.
+        max_end_time    the max possible end time of a subprocess.
+        visit           two character visit or ''.
+        proposal_id     a proposal id.
     """
     if not db_exists():
         return
@@ -259,11 +264,37 @@ def add_a_subprocess(pid, start_time, max_end_time, proposal_id):
     entry = session.query(SubprocessList).filter(SubprocessList.pid==pid).first()
     if entry is None:
         new_entry = SubprocessList(pid=pid,
-                                start_time=start_time,
-                                max_end_time=max_end_time,
-                                proposal_id=proposal_id)
+                                   task_num=task_num,
+                                   start_time=start_time,
+                                   max_end_time=max_end_time,
+                                   visit=visit,
+                                   proposal_id=proposal_id)
         session.add(new_entry)
         session.commit()
+
+def get_pid_by_task_visit_prog_id(task_num, visit, proposal_id):
+    """
+    Get the subprocess id with the given task_num ,visit & proposal_id
+
+    Input:
+        task_num        a number represents the current task.
+        visit           two character visit or ''.
+        proposal_id     a proposal id.
+    """
+    Session = sessionmaker(engine)
+    session = Session()
+    if visit != '':
+        query = session.query(SubprocessList).filter(
+                                                  SubprocessList.task_num==task_num,
+                                                  SubprocessList.visit==visit,
+                                                  SubprocessList.proposal_id==proposal_id
+                                              )
+    else:
+        query = session.query(SubprocessList).filter(
+                                                  SubprocessList.task_num==task_num,
+                                                  SubprocessList.proposal_id==proposal_id
+                                              )
+    return [subproc.pid for subproc in query]
 
 def get_total_number_of_subprocesses():
     """
@@ -277,7 +308,7 @@ def get_total_number_of_subprocesses():
 
 def get_all_subprocess_info():
     """
-    Get a list of all the subprocess ids. Return the list of ids.
+    Get a list of all the subprocess info. Return the list of subprocess info.
     """
     if not db_exists():
         return
@@ -285,8 +316,9 @@ def get_all_subprocess_info():
     Session = sessionmaker(engine)
     session = Session()
     all_subproc = session.query(SubprocessList)
-    return ([(subproc.pid, subproc.start_time, subproc.max_end_time, subproc.proposal_id)
-            for subproc in all_subproc])
+    return ([(subproc.pid, subproc.task_num, subproc.start_time,
+              subproc.max_end_time, subproc.visit, subproc.proposal_id)
+              for subproc in all_subproc])
 
 def remove_a_subprocess_by_pid(pid):
     """
@@ -300,4 +332,19 @@ def remove_a_subprocess_by_pid(pid):
     Session = sessionmaker(engine)
     session = Session()
     session.query(SubprocessList).filter(SubprocessList.pid==pid).delete()
+    session.commit()
+
+def remove_all_subprocess_for_a_prog_id(proposal_id):
+    """
+    Remove all subprocess entries of the given proposal id to the subprocess list table.
+
+    Input:
+        proposal_id    a proposal id of the task queue.
+    """
+    if not db_exists():
+        return
+
+    Session = sessionmaker(engine)
+    session = Session()
+    session.query(SubprocessList).filter(SubprocessList.proposal_id==proposal_id).delete()
     session.commit()
