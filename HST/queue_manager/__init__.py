@@ -21,7 +21,7 @@ from queue_manager.task_queue_db import (add_a_prog_id_task_queue,
                                          erase_all_task_queue,
                                          get_all_subprocess_info,
                                          get_next_task_to_be_run,
-                                         get_pid_by_task_visit_prog_id,
+                                         get_pid_by_prog_id_task_and_visit,
                                          get_total_number_of_subprocesses,
                                          init_task_queue_table,
                                          remove_a_subprocess_by_pid,
@@ -133,20 +133,22 @@ def run_and_maybe_wait(task_num, args, max_allowed_time, proposal_id, visit, log
 
     Returns:    the child process that executes the given args.
     """
-    # wait for an open subprocess slot
-    wait_for_subprocess(task_num, visit)
-
     # query database and see if there is a higher priority job waiting (status: 0) to
     # be run, if so, spawn that subprocess first.
     task = get_next_task_to_be_run()
-    if (task is not None
+    while (task is not None
         and task.proposal_id != proposal_id
         and task.visit != visit):
         cmd_parts = task.cmd.split(' ')
         program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
         sub_args = [PYTHON_EXE, program_path] + cmd_parts[1::]
         run_and_maybe_wait(task.task_num, sub_args,  max_allowed_time,
-                           task.proposal_id, visit, logger)
+                           task.proposal_id, task.visit, logger)
+        # logger.debug("Spawning subprocess %s", str(sub_args))
+        task = get_next_task_to_be_run()
+
+    # wait for an open subprocess slot
+    wait_for_subprocess(task_num, visit, proposal_id)
 
     update_a_prog_id_task_status(proposal_id, visit, 1)
     logger.debug("Spawning subprocess %s", str(args))
@@ -156,11 +158,12 @@ def run_and_maybe_wait(task_num, args, max_allowed_time, proposal_id, visit, log
 
     return pid
 
-def wait_for_subprocess(task_num, all=False):
+def wait_for_subprocess(task_num, visit, proposal_id, all=False):
     """Wait for one (or all) subprocess slots to open up.
 
     Inputs:
         task_num    a number represents the current task.
+        visit       a two character visit or ''.
         all         a flag to determine if we are waiting for all subprocess slots to
                     open up.
     """
@@ -169,15 +172,12 @@ def wait_for_subprocess(task_num, all=False):
     if all:
        subprocess_count = 0
 
-    cur_time = time.time()
-
     while get_total_number_of_subprocesses() > 0:
         subproc_info = get_all_subprocess_info()
         for info in subproc_info:
             pid, _, _, proc_max_time, visit, prog_id = info
             prev_task = TASK_NUM_TO_PREV_TASK_MAPPING[task_num]
-            prev_pid_li = get_pid_by_task_visit_prog_id(prev_task, visit, prog_id)
-
+            prev_pid_li = get_pid_by_prog_id_task_and_visit(prog_id, prev_task, visit)
             # If the subprocess is to be executed at the end of previous task, open the
             # slot occupied by previous task.
             if len(prev_pid_li) > 0:
@@ -195,6 +195,7 @@ def wait_for_subprocess(task_num, all=False):
                 remove_a_subprocess_by_pid(pid)
                 break
 
+            cur_time = time.time()
             if cur_time > proc_max_time and pid:
                 # If a subprocess has been running for too long, kill it
                 # Note no offset file will be written in this case

@@ -259,9 +259,13 @@ def add_a_subprocess(pid, task_num, start_time, max_end_time, visit, proposal_id
 
     Session = sessionmaker(engine)
     session = Session()
-    # Add an entry of the subprocess to the subprocess list table if the subprocess id
-    # doesn't exist.
-    entry = session.query(SubprocessList).filter(SubprocessList.pid==pid).first()
+    # Add an entry of the subprocess to the subprocess list table if the subprocess task,
+    # visit, and proposal id don't exist.
+    entry = session.query(SubprocessList).filter(
+                                              SubprocessList.task_num==task_num,
+                                              SubprocessList.visit==visit,
+                                              SubprocessList.proposal_id==proposal_id
+                                          ).first()
     if entry is None:
         new_entry = SubprocessList(pid=pid,
                                    task_num=task_num,
@@ -272,14 +276,14 @@ def add_a_subprocess(pid, task_num, start_time, max_end_time, visit, proposal_id
         session.add(new_entry)
         session.commit()
 
-def get_pid_by_task_visit_prog_id(task_num, visit, proposal_id):
+def get_pid_by_prog_id_task_and_visit(proposal_id, task_num, visit):
     """
     Get the subprocess id with the given task_num ,visit & proposal_id
 
     Input:
+        proposal_id     a proposal id.
         task_num        a number represents the current task.
         visit           two character visit or ''.
-        proposal_id     a proposal id.
     """
     Session = sessionmaker(engine)
     session = Session()
@@ -323,6 +327,7 @@ def get_all_subprocess_info():
 def remove_a_subprocess_by_pid(pid):
     """
     Remove a subprocess entry of the process id in the subprocess list table.
+
     Input:
         pid:    a process id
     """
@@ -332,6 +337,32 @@ def remove_a_subprocess_by_pid(pid):
     Session = sessionmaker(engine)
     session = Session()
     session.query(SubprocessList).filter(SubprocessList.pid==pid).delete()
+    session.commit()
+
+def remove_a_subprocess_by_prog_id_task_and_visit(proposal_id, task_num, visit):
+    """
+    Remove a subprocess entry of the given task, visit, and proposal id in the subprocess
+    list table.
+
+    Input:
+        proposal_id     a proposal id.
+        task_num        a number represents the current task.
+        visit           two character visit or ''.
+    """
+    if not db_exists():
+        return
+
+    Session = sessionmaker(engine)
+    session = Session()
+    if visit != '':
+        session.query(SubprocessList).filter(SubprocessList.task_num==task_num,
+                                             SubprocessList.visit==visit,
+                                             SubprocessList.proposal_id==proposal_id
+                                            ).delete()
+    else:
+        session.query(SubprocessList).filter(SubprocessList.task_num==task_num,
+                                             SubprocessList.proposal_id==proposal_id
+                                            ).delete()
     session.commit()
 
 def remove_all_subprocess_for_a_prog_id(proposal_id):

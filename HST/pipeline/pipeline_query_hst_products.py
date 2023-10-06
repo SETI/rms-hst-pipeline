@@ -29,7 +29,8 @@ from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
 from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import (remove_all_subprocess_for_a_prog_id,
+from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and_visit,
+                                         remove_all_subprocess_for_a_prog_id,
                                          remove_all_task_queue_for_a_prog_id)
 
 # Set up parser
@@ -83,8 +84,7 @@ LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
 try:
-    # new_visit_li, all_visits = query_hst_products(proposal_id, logger)
-    new_visit_li = []
+    new_visit_li, all_visits = query_hst_products(proposal_id, logger)
     logger.info('List of visits in which any files are new or chagned: '
                 + str(new_visit_li))
 except:
@@ -95,11 +95,15 @@ except:
     raise
 
 if taskqueue:
-    # queue_next_task(proposal_id, new_visit_li, 2, logger)
-    # If list is not empty, queue update-hst-program with the list of visits
-    if len(new_visit_li) != 0:
-        logger.info(f'Queue update_hst_program for {proposal_id}')
+    remove_a_subprocess_by_prog_id_task_and_visit(proposal_id, 1, '')
+    if len(new_visit_li) == 0:
+        queue_next_task(proposal_id, all_visits, 2, logger)
+    else:
         queue_next_task(proposal_id, new_visit_li, 2, logger)
+    # If list is not empty, queue update-hst-program with the list of visits
+    # if len(new_visit_li) != 0:
+    #     logger.info(f'Queue update_hst_program for {proposal_id}')
+    #     queue_next_task(proposal_id, new_visit_li, 2, logger)
     # TODO: TASK QUEUE
     # - if list is empty, re-queue query-hst-products with a 30-day delay
     # - re-queue query-hst-products with a 90-day delay

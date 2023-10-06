@@ -326,6 +326,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
         return detector_number_dict
 
+    detector_ids = []
     try:
         if (instrument_id, channel_id) in {('ACS', 'WFC'), ('WFC3', 'UVIS')}:
             detector_number_dict = detector_number_vs_extver(ref_hdulist, 'CCDCHIP')

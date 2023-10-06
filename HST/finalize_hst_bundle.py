@@ -30,6 +30,8 @@ from organize_files import organize_files_from_staging_to_bundles
 from product_labels.suffix_info import INSTRUMENT_NAMES
 from run_validation import run_validation
 
+from hst_helper import CITATION_INFO_DICT
+
 def finalize_hst_bundle(proposal_id, logger=None):
     """With a given proposal id, finalize hst bundle.
 

@@ -13,7 +13,8 @@
 import pdslogger
 
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import (remove_all_subprocess_for_a_prog_id,
+from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and_visit,
+                                         remove_all_subprocess_for_a_prog_id,
                                          remove_all_task_queue_for_a_prog_id)
 
 def update_hst_program(proposal_id, visit_li, logger=None):
@@ -34,9 +35,11 @@ def update_hst_program(proposal_id, visit_li, logger=None):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
+    remove_a_subprocess_by_prog_id_task_and_visit(proposal_id, 2, '')
     logger.info(f'Queue get_program_info for {proposal_id}')
     p1 = queue_next_task(proposal_id, '', 3, logger)
-    p1.communicate()
+    if p1 is not None:
+        p1.communicate()
 
     pid_li = []
     for vi in visit_li:
@@ -44,12 +47,14 @@ def update_hst_program(proposal_id, visit_li, logger=None):
         pid = queue_next_task(proposal_id, vi, 4, logger)
         pid_li.append(pid)
     for p in pid_li:
-        p.communicate()
+        if p is not None:
+            p.communicate()
     logger.info(f'All visits for {proposal_id} have completed update_hst_visit.')
 
     logger.info(f'Queue finalize_hst_bundle for {proposal_id}')
     p2 =  queue_next_task(proposal_id, '', 8, logger)
-    p2.communicate()
+    if p2 is not None:
+        p2.communicate()
     # Remove all task queue & subprocess for the given proposal id from db
     remove_all_task_queue_for_a_prog_id(proposal_id)
     remove_all_subprocess_for_a_prog_id(proposal_id)

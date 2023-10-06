@@ -118,8 +118,12 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     # This is not strictly necessary but creates cleaner logs by suppressing the overall
     # common directory path
     if not root:
-        min_filepath = min(filepaths)
-        max_filepath = max(filepaths)
+        try:
+            min_filepath = min(filepaths)
+            max_filepath = max(filepaths)
+        except ValueError as e:
+            logger.error(str(e) + ','.join(filepaths))
+
         for k, chars in enumerate(zip(min_filepath, max_filepath)):
             if chars[0] != chars[1]:
                 break
@@ -274,11 +278,15 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # Open the (original) FITS file
         original_path = fullpath + '-original'
-        if os.path.exists(original_path):
-            hdulist = pyfits.open(original_path)
-        else:
-            hdulist = pyfits.open(fullpath)
-
+        try:
+            if os.path.exists(original_path):
+                path = original_path
+                hdulist = pyfits.open(original_path)
+            else:
+                path = fullpath
+                hdulist = pyfits.open(fullpath)
+        except OSError as e:
+            logger.error(str(e) + path)
         # If this is an association file, read its contents for the IPPPSSOOT
         if suffix == 'asn':
             logger.info('Reading associations', filepath)
