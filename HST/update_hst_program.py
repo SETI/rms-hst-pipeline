@@ -41,14 +41,11 @@ def update_hst_program(proposal_id, visit_li, logger=None):
     if p1 is not None:
         p1.communicate()
 
-    pid_li = []
     for vi in visit_li:
         logger.info(f'Queue update_hst_visit for {proposal_id} visit {vi}')
         pid = queue_next_task(proposal_id, vi, 4, logger)
-        pid_li.append(pid)
-    for p in pid_li:
-        if p is not None:
-            p.communicate()
+        if pid is not None:
+            pid.communicate()
     logger.info(f'All visits for {proposal_id} have completed update_hst_visit.')
 
     logger.info(f'Queue finalize_hst_bundle for {proposal_id}')

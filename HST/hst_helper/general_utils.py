@@ -273,40 +273,40 @@ def get_collection_label_data(proposal_id, target_dir, logger):
         res['records'] = RECORDS_DICT[formatted_proposal_id][collection_name]
 
     for root, _, files in os.walk(target_dir):
-            for file in files:
-                if not file.startswith('collection_') and file.endswith('.xml'):
-                    file_path = os.path.join(root, file)
-                    with open(file_path) as f:
-                        xml_content = f.read()
-                        # target identifications
-                        if 'target' not in res:
-                            target_ids = get_target_identifications(xml_content)
-                            for targ in target_ids:
-                                if targ not in TARG_ID_DICT[formatted_proposal_id]:
-                                    TARG_ID_DICT[formatted_proposal_id].append(targ)
-                        # roll up start/stop time
-                        if 'time' not in res:
-                            start, stop = get_time_coordinates(xml_content)
-                            min_start = start if min_start is None else min(min_start,
-                                                                            start)
-                            max_stop = stop if max_stop is None else max(max_stop, stop)
-                        # instrument params
-                        if 'inst_params' not in res:
-                            INST_PARAMS_DICT[formatted_proposal_id][collection_name]  = (
-                                get_instrument_params(xml_content)
-                            )
-                            res['inst_params'] = (INST_PARAMS_DICT[formatted_proposal_id]
-                                                                  [collection_name])
-                        # primary results
-                        if 'primary_res' not in res:
-                            PRIMARY_RES_DICT[formatted_proposal_id][collection_name] = (
-                                get_primary_result_summary(xml_content)
-                            )
-                            res['primary_res'] = (PRIMARY_RES_DICT[formatted_proposal_id]
-                                                                  [collection_name])
-                        # records
-                        if file not in files_li:
-                            files_li.append(file)
+        for file in files:
+            if not file.startswith('collection_') and file.endswith('.xml'):
+                file_path = os.path.join(root, file)
+                with open(file_path) as f:
+                    xml_content = f.read()
+                    # target identifications
+                    if 'target' not in res:
+                        target_ids = get_target_identifications(xml_content)
+                        for targ in target_ids:
+                            if targ not in TARG_ID_DICT[formatted_proposal_id]:
+                                TARG_ID_DICT[formatted_proposal_id].append(targ)
+                    # roll up start/stop time
+                    if 'time' not in res:
+                        start, stop = get_time_coordinates(xml_content)
+                        min_start = start if min_start is None else min(min_start,
+                                                                        start)
+                        max_stop = stop if max_stop is None else max(max_stop, stop)
+                    # instrument params
+                    if 'inst_params' not in res:
+                        INST_PARAMS_DICT[formatted_proposal_id][collection_name]  = (
+                            get_instrument_params(xml_content)
+                        )
+                        res['inst_params'] = (INST_PARAMS_DICT[formatted_proposal_id]
+                                                                [collection_name])
+                    # primary results
+                    if 'primary_res' not in res:
+                        PRIMARY_RES_DICT[formatted_proposal_id][collection_name] = (
+                            get_primary_result_summary(xml_content)
+                        )
+                        res['primary_res'] = (PRIMARY_RES_DICT[formatted_proposal_id]
+                                                                [collection_name])
+                    # records
+                    if file not in files_li:
+                        files_li.append(file)
 
     if 'target' not in res:
         res['target'] = TARG_ID_DICT[formatted_proposal_id]

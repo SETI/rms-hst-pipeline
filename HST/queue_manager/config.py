@@ -19,7 +19,7 @@ DB_PATH = f'{HST_DIR["pipeline"]}/task_queue.db'
 DB_URI = f'sqlite:///{DB_PATH}'
 
 # max allowed suborprocess time in seconds
-MAX_ALLOWED_TIME = 60 * 60
+MAX_ALLOWED_TIME = 60 * 30
 # max number of subprocesses to run at a time for one hst pipeline on a proposal id
 MAX_SUBPROCESS_CNT = 10
 

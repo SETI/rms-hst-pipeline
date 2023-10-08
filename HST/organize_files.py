@@ -36,3 +36,4 @@ def organize_files_from_staging_to_bundles(proposal_id, logger):
                 os.makedirs(bundles_prod_dir, exist_ok=True)
                 logger.info(f'Move {dir} from staging to bundles directory')
                 shutil.copytree(staging_prod_dir, bundles_prod_dir, dirs_exist_ok=True)
+                shutil.rmtree(staging_prod_dir)

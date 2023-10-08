@@ -115,10 +115,7 @@ if taskqueue:
         pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
         logger.info(f'Queue query_hst_products for {proposal_id}')
         remove_a_subprocess_by_prog_id_task_and_visit(proposal_id, 0, '')
-        # print('DDDDDDDDDDDDDDDD')
         queue_next_task(proposal_id, '', 1, logger)
-
-        # print('DDDDDDDEEEEEEEEE')
         # if not os.path.exists(pipeline_dir):
         #     logger.info(f'Queue query_hst_products for {proposal_id}')
         #     queue_next_task(proposal_id, '', 1, logger)
