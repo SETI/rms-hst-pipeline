@@ -39,6 +39,7 @@ Pillow==9.0.0
 platformdirs==2.4.1
 pluggy==0.13.1
 prompt-toolkit==3.0.30
+psutil==5.9.5
 ptyprocess==0.7.0
 pure-eval==0.2.2
 py==1.11.0
