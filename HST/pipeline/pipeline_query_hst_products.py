@@ -96,14 +96,11 @@ except:
 
 if taskqueue:
     remove_a_subprocess_by_prog_id_task_and_visit(proposal_id, 1, '')
-    if len(new_visit_li) == 0:
-        queue_next_task(proposal_id, all_visits, 2, logger)
-    else:
-        queue_next_task(proposal_id, new_visit_li, 2, logger)
     # If list is not empty, queue update-hst-program with the list of visits
-    # if len(new_visit_li) != 0:
-    #     logger.info(f'Queue update_hst_program for {proposal_id}')
-    #     queue_next_task(proposal_id, new_visit_li, 2, logger)
+    if len(new_visit_li) != 0:
+        logger.info(f'Queue update_hst_program for {proposal_id}')
+        queue_next_task(proposal_id, new_visit_li, 2, logger)
+
     # TODO: TASK QUEUE
     # - if list is empty, re-queue query-hst-products with a 30-day delay
     # - re-queue query-hst-products with a 90-day delay
