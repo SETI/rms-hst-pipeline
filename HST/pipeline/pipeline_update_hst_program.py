@@ -34,7 +34,7 @@ parser = argparse.ArgumentParser(
                 proposal id and visit.""")
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
-    help='The proposal id for the mast query.')
+    help='The proposal id for the MAST query.')
 
 parser.add_argument('--visit_li', '--vi', nargs='+', type=str, default='', required=True,
     help='A list of the two character visits of an observation.')

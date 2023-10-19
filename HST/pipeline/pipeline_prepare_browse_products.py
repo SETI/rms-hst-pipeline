@@ -30,7 +30,7 @@ parser = argparse.ArgumentParser(
                 and save them in the corresponding staging folders.""")
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
-    help='The proposal id for the mast query.')
+    help='The proposal id for the MAST query.')
 
 parser.add_argument('--visit', '--vi', type=str, default='', required=True,
     help='The two character visit of an observation.')

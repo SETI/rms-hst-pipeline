@@ -8,11 +8,11 @@
 import os
 from collections import defaultdict
 
-# default start and end date of observation in query mast constraints
+# default start and end date of observation in query MAST constraints
 START_DATE = (1900, 1, 1)
 END_DATE = (2025, 1, 1)
 
-# default number of connection retry when connecting to mast failed.
+# default number of connection retry when connecting to MAST failed.
 RETRY = 1
 
 # file directories

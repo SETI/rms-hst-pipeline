@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(
     directories as a new bundle or as updates to an existing bundle.""")
 
 parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='', required=True,
-    help='The proposal id for the mast query.')
+    help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time

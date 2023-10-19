@@ -35,11 +35,11 @@ from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""query-hst-products: Perform mast query with a given proposal id and
+    description="""query-hst-products: Perform MAST query with a given proposal id and
                 download all TRL files for this HST program.""")
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
-    help='The proposal id for the mast query.')
+    help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time

@@ -51,7 +51,7 @@ def query_mast_slice(proposal_id=None,
         start_date     observation start datetime.
         end_date       observation end datetime.
         logger         pdslogger to use; None for default EasyLogger.
-        max_retries    number of retries when there is a connection to mast.
+        max_retries    number of retries when there is a connection to MAST.
 
     Returns:    a slice of MAST database as a table object.
     """
@@ -96,7 +96,7 @@ def query_mast_slice(proposal_id=None,
         remove_all_subprocess_for_a_prog_id(formatted_proposal_id)
 
     logger.exception(RuntimeError)
-    raise RuntimeError(f'Query mast timed out. Number of retries: {max_retries}')
+    raise RuntimeError(f'Query MAST timed out. Number of retries: {max_retries}')
 
 def filter_table(row_predicate, table):
     """Return a copy of the filtered table object based on the return of row_predicate.
@@ -205,7 +205,7 @@ def get_filtered_products(table, visit=None):
     visit.
 
     Input:
-        table    an observation table from mast query.
+        table    an observation table from MAST query.
         visit    two character visit.
 
     Returns:    the product rows of an observation table with accepted instrument letter
@@ -231,7 +231,7 @@ def get_trl_products(table):
     """Return product rows of an observation table with trl suffix.
 
     Input:
-        table    an observation table from mast query.
+        table    an observation table from MAST query.
 
     Returns:    the product rows of an observation table with trl suffix.
     """
@@ -241,10 +241,10 @@ def get_trl_products(table):
     return result
 
 def download_files(table, dir, logger=None, testing=False):
-    """Download files from mast for a given product table and proposal id.
+    """Download files from MAST for a given product table and proposal id.
 
     Input:
-        table          an observation table from mast query.
+        table          an observation table from MAST query.
         proposal_id    a proposal id.
         dir            the directory we want to store the downloaded files.
         logger         pdslogger to use; None for default EasyLogger.
@@ -252,7 +252,7 @@ def download_files(table, dir, logger=None, testing=False):
     logger = logger or pdslogger.EasyLogger()
     # When there is 0 product row from query result, we don't create the directory
     if len(table) == 0:
-        logger.warn('Empty result from mast query')
+        logger.warn('Empty result from MAST query')
         return
     os.makedirs(dir, exist_ok=True)
 

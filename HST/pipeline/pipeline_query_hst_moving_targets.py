@@ -34,14 +34,14 @@ from queue_manager.task_queue_db import remove_a_subprocess_by_prog_id_task_and_
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""query-hst-moving-targets: Perform mast query with given query
+    description="""query-hst-moving-targets: Perform MAST query with given query
                 constraints.""")
 
 parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='',
-    help='The proposal ids for the mast query')
+    help='The proposal ids for the MAST query')
 
 parser.add_argument('--instruments', '-i', nargs='+', type=str, default='',
-    help='The instruments for the mast query.')
+    help='The instruments for the MAST query.')
 
 parser.add_argument('--start', type=str, action='store', default='',
     help='Optional start date from MAST in (yyyy, mm, dd) format.')
@@ -50,7 +50,7 @@ parser.add_argument('--end', type=str, action='store', default='',
     help='Optional end date from MAST in (yyyy, mm, dd) format.')
 
 parser.add_argument('--retry', '-r', type=str, action='store', default='',
-    help='Optional max number of Mast connection retry.')
+    help='Optional max number of MAST connection retry.')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time
@@ -100,7 +100,7 @@ end_date = args.end if args.end else END_DATE
 retry = args.retry if args.retry else RETRY
 taskqueue = args.taskqueue
 
-logger.info('Mast query constraints: ' + str(args))
+logger.info('MAST query constraints: ' + str(args))
 pid_li = query_hst_moving_targets(proposal_ids=proposal_ids,
                                   instruments=instruments,
                                   start_date=start_date,

@@ -39,7 +39,7 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
-    # Query mast
+    # Query MAST
     table = query_mast_slice(proposal_id=proposal_id, logger=logger)
     filtered_products = get_filtered_products(table, visit)
     files_dir = get_program_dir_path(proposal_id, visit, 'staging', testing)

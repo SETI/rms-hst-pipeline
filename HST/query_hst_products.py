@@ -34,7 +34,7 @@ from hst_helper.query_utils import (download_files,
 from queue_manager.task_queue_db import (remove_all_subprocess_for_a_prog_id,
                                          remove_all_task_queue_for_a_prog_id)
 
-# A dictionary keyed by IPPPSSOOT and stores observation id from mast as the value.
+# A dictionary keyed by IPPPSSOOT and stores observation id from MAST as the value.
 products_obs_dict = {}
 
 def query_hst_products(proposal_id, logger=None):
@@ -67,7 +67,7 @@ def query_hst_products(proposal_id, logger=None):
     table = query_mast_slice(proposal_id=proposal_id, logger=logger)
     filtered_products = get_filtered_products(table)
     # Log all accepted file names
-    logger.info(f'List out all accepted files from mast for {proposal_id}')
+    logger.info(f'List out all accepted files from MAST for {proposal_id}')
     files_dict = defaultdict(list)
     trl_files_dict = defaultdict(list)
     for row in filtered_products:
@@ -167,10 +167,10 @@ def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=
 
 def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=False):
     """Return a flag to indicate if any files are new or changed in the visit.
-    Compare the contents of current txt file with the results from Mast. If they are
+    Compare the contents of current txt file with the results from MAST. If they are
     the same, keep the current txt file. If they are different, move the current txt
     file to the backups directory, and generate the new txt file based on the new results
-    from Mast.
+    from MAST.
 
     Input:
         proposal_id          a proposal id.
@@ -201,7 +201,7 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
         files_from_txt = [line.rstrip() for line in text_file]
         text_file.close()
 
-        # compare the list from Mast with the contents of the old txt file
+        # compare the list from MAST with the contents of the old txt file
         if files_from_txt != files_li:
             is_visit_diff = True
             # move the old txt file to backups
