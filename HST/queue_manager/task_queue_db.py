@@ -1,8 +1,8 @@
 ##########################################################################################
 # queue_manager/task_queue_db.py
 #
-# This file is related to sqllite task queue database created by sqlalchemy. All the
-# database related operatins are included here.
+# This file is related to SQLite task queue database created by sqlalchemy. All the
+# database related operations are included here.
 ##########################################################################################
 import os
 
@@ -13,12 +13,11 @@ from sqlalchemy import (create_engine,
                         Column,
                         Float,
                         Integer,
-                        PickleType,
                         String)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine(DB_URI, echo = True)
+engine = create_engine(DB_URI, echo=True)
 Base = declarative_base()
 
 class TaskQueue(Base):

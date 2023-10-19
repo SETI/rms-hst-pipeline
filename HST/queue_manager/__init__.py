@@ -49,12 +49,13 @@ def run_pipeline(proposal_ids, logger=None):
     try:
         init_task_queue_table()
     except OperationalError as e:
-        if 'alreadt exists' in e.__repr__():
+        if 'already exists' in e.__repr__():
             erase_all_task_queue()
         elif 'no such table' in e.__repr__():
             create_task_queue_table()
         else:
             logger.error('Failed to create task queue table!')
+            raise Exception('Failed to create task queue table!') # fatal error
 
     # Kick start the pipeline for each proposal id
     # proc_li = []
@@ -63,10 +64,10 @@ def run_pipeline(proposal_ids, logger=None):
             proposal_id = int(prog_id)
         except ValueError:
             logger.warn(f'Proposal id: {prog_id} is not valid.')
-            pass
+
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         # Start hst pipeline for each proposal id
-        logger.info(f'Start to run pipeline for {proposal_id}')
+        logger.info(f'Starting to run pipeline for {proposal_id}')
         logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
         queue_next_task(formatted_proposal_id, '', 0, logger)
 
@@ -98,8 +99,8 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
     logger.info(f'Queue in the next task for: {formatted_proposal_id}'
                 f', task num: {task_num}')
 
-    visit_arg = ' '.join(visit_info) if type(visit_info) is list else visit_info
-    visit = '' if type(visit_info) is list else visit_info
+    visit_arg = ' '.join(visit_info) if isinstance(visit_info, list) else visit_info
+    visit = '' if isinstance(visit_info, list) else visit_info
 
     priority = TASK_NUM_TO_PRI_MAPPING[task_num]
     cmd = TASK_NUM_TO_CMD_MAPPING[task_num].replace('{P}', formatted_proposal_id)
@@ -112,7 +113,7 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
 
     cmd_parts = cmd.split(' ')
     program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
-    args = [PYTHON_EXE, program_path] + cmd_parts[1::]
+    args = [PYTHON_EXE, program_path] + cmd_parts[1:]
     max_allowed_time = MAX_ALLOWED_TIME
     # spawn the task subprocess
     pid = run_and_maybe_wait(task_num, args, max_allowed_time,
@@ -137,8 +138,8 @@ def run_and_maybe_wait(task_num, args, max_allowed_time, proposal_id, visit, log
     # be run, if so, spawn that subprocess first.
     task = get_next_task_to_be_run()
     while (task is not None
-        and task.proposal_id != proposal_id
-        and task.visit != visit):
+           and task.proposal_id != proposal_id
+           and task.visit != visit):
         cmd_parts = task.cmd.split(' ')
         program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
         sub_args = [PYTHON_EXE, program_path] + cmd_parts[1::]
@@ -148,7 +149,7 @@ def run_and_maybe_wait(task_num, args, max_allowed_time, proposal_id, visit, log
         task = get_next_task_to_be_run()
 
     # wait for an open subprocess slot
-    wait_for_subprocess(task_num, visit, proposal_id)
+    wait_for_subprocess(task_num)
 
     update_a_prog_id_task_status(proposal_id, visit, 1)
     logger.debug("Spawning subprocess %s", str(args))
@@ -158,12 +159,11 @@ def run_and_maybe_wait(task_num, args, max_allowed_time, proposal_id, visit, log
 
     return pid
 
-def wait_for_subprocess(task_num, visit, proposal_id, all=False):
+def wait_for_subprocess(task_num, all=False):
     """Wait for one (or all) subprocess slots to open up.
 
     Inputs:
         task_num    a number represents the current task.
-        visit       a two character visit or ''.
         all         a flag to determine if we are waiting for all subprocess slots to
                     open up.
     """
@@ -185,7 +185,7 @@ def wait_for_subprocess(task_num, visit, proposal_id, all=False):
                     remove_a_subprocess_by_pid(prev_pid)
                 break
 
-            if psutil.pid_exists(pid) == False:
+            if not psutil.pid_exists(pid):
                 # The subprocess completed, make the slot available for next subprocess
                 remove_a_subprocess_by_pid(pid)
                 break
@@ -198,7 +198,6 @@ def wait_for_subprocess(task_num, visit, proposal_id, all=False):
             cur_time = time.time()
             if cur_time > proc_max_time and pid:
                 # If a subprocess has been running for too long, kill it
-                # Note no offset file will be written in this case
                 try:
                     psutil.Process(pid).terminate()
                 except ProcessLookupError:
