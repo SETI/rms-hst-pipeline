@@ -152,7 +152,7 @@ def run_and_maybe_wait(task_num, args, max_allowed_time, proposal_id, visit, log
     wait_for_subprocess(task_num)
 
     update_a_prog_id_task_status(proposal_id, visit, 1)
-    logger.debug("Spawning subprocess %s", str(args))
+    logger.debug("Spawning subprocess", str(args))
     pid = subprocess.Popen(args)
     add_a_subprocess(pid.pid, task_num, time.time(),
                      time.time()+max_allowed_time, visit, proposal_id)
