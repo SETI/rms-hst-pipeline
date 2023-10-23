@@ -6,6 +6,8 @@
     - 'HST_PIPELINE' (for logs and program info)
     - 'HST_BUNDLES' (for final bundles)
     - 'PDS_HST_PIPELINE' (path of pds-hst-pipeline repo, this is where we execute the shell commands of each task)
+#
+# Example commands
 - Example Commands to run the full pipeline with all tasks:
     - Run with one proposal id:
         - `python pipeline/pipeline_run.py --prog-id 07885`
