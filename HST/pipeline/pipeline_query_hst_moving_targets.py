@@ -119,7 +119,7 @@ if taskqueue:
             logger.info(f'Queue query_hst_products for {proposal_id}')
             queue_next_task(proposal_id, '', 1, logger)
         else:
-            logger.info(f'{pipeline_dir} already exists. Pipeline stops.')
+            logger.info(f'{pipeline_dir} already exists. Pipeline stops')
 
     # TODO: TASK QUEUE
     # - re-queue query-hst-moving-targets with a 30-day delay

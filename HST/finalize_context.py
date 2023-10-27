@@ -47,7 +47,7 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
     # Create context directory
-    logger.info(f'Create context directory for proposal id: {proposal_id}.')
+    logger.info(f'Create context directory for proposal id: {proposal_id}')
     _, context_dir = create_col_dir_in_bundle(proposal_id, 'context', testing)
 
     version_id = (1, 0)

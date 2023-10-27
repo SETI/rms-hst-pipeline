@@ -54,7 +54,7 @@ def create_collection_label(
     logger.info(f'Create collection csv with proposal id: {proposal_id}')
 
     # Create collection label
-    logger.info(f'Create label for collection using templates/{template_name}.')
+    logger.info(f'Create label for collection using templates/{template_name}')
     # Collection label template path
     col_dir = os.path.dirname(os.path.abspath(__file__))
     col_template = f'{col_dir}/../templates/{template_name}'
@@ -78,11 +78,11 @@ def create_xml_label(template_path, label_path, data_dict, logger):
         logger           pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Create label using template from: {template_path}.')
+    logger.info(f'Create label using template from: {template_path}')
     TEMPLATE = XmlTemplate(template_path)
     XmlTemplate.set_logger(logger)
 
-    logger.info('Insert data to the label template.')
+    logger.info('Insert data to the label template')
     TEMPLATE.write(data_dict, label_path)
     if TEMPLATE.ERROR_COUNT == 1:
         logger.error('1 error encountered', label_path)
@@ -99,7 +99,7 @@ def create_csv(csv_path, data, logger):
         logger      pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Create csv: {csv_path}.')
+    logger.info(f'Create csv: {csv_path}')
 
 
     # open the file in the write mode
@@ -124,7 +124,7 @@ def get_citation_info(proposal_id, logger):
     if formatted_proposal_id in CITATION_INFO_DICT:
         return CITATION_INFO_DICT[formatted_proposal_id]
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Get citation info for: {proposal_id}.')
+    logger.info(f'Get citation info for: {proposal_id}')
 
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
 
@@ -154,7 +154,7 @@ def get_instrument_id_set(proposal_id, logger):
     # Get instrument id
     if formatted_proposal_id not in INST_ID_DICT:
         logger = logger or pdslogger.EasyLogger()
-        logger.info(f'Get instrument ids for: {proposal_id}.')
+        logger.info(f'Get instrument ids for: {proposal_id}')
         # Walk through all the downloaded files from MAST in staging directory
         files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
         for root, dirs, files in os.walk(files_dir):

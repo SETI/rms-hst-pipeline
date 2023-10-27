@@ -63,7 +63,7 @@ def run_pipeline(proposal_ids, logger=None):
         try:
             proposal_id = int(prog_id)
         except ValueError:
-            logger.warn(f'Proposal id: {prog_id} is not valid.')
+            logger.warn(f'Proposal id: {prog_id} is not valid')
 
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         # Start hst pipeline for each proposal id
@@ -91,7 +91,7 @@ def queue_next_task(proposal_id, visit_info, task_num, logger):
     """
     # if DB doesn't exist, log a warning message and return
     if not db_exists():
-        logger.warn(f'Task queue db: {DB_PATH} does not exist.')
+        logger.warn(f'Task queue db: {DB_PATH} does not exist')
         return
 
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)

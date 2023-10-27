@@ -85,7 +85,7 @@ def query_hst_products(proposal_id, logger=None):
         logger.info(f'File: {product_fname} with suffix: {suffix}')
 
     # Create program and all visits directories if they don't exist.
-    logger.info('Create program and visit directories that do not already exist.')
+    logger.info('Create program and visit directories that do not already exist')
     for visit in files_dict:
         create_program_dir(proposal_id, visit)
 

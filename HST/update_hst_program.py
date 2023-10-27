@@ -46,7 +46,7 @@ def update_hst_program(proposal_id, visit_li, logger=None):
         pid = queue_next_task(proposal_id, vi, 4, logger)
         if pid is not None:
             pid.communicate()
-    logger.info(f'All visits for {proposal_id} have completed update_hst_visit.')
+    logger.info(f'All visits for {proposal_id} have completed update_hst_visit')
 
     logger.info(f'Queue finalize_hst_bundle for {proposal_id}')
     p2 =  queue_next_task(proposal_id, '', 8, logger)
@@ -56,4 +56,4 @@ def update_hst_program(proposal_id, visit_li, logger=None):
     remove_all_task_queue_for_a_prog_id(proposal_id)
     remove_all_subprocess_for_a_prog_id(proposal_id)
 
-    logger.info(f'HST pipeline for {proposal_id} is done.')
+    logger.info(f'HST pipeline for {proposal_id} is done')
