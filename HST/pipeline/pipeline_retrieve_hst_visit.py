@@ -26,8 +26,8 @@ from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""retrieve-hst-visit: Retrieve all the identified files for a given
-                proposal id and visit.""")
+    description="""pipeline_retrieve_hst_visit: Retrieve all the identified files for a
+                given proposal id and visit.""")
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')

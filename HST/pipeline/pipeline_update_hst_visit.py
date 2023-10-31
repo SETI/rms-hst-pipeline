@@ -30,7 +30,7 @@ from update_hst_visit import update_hst_visit
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""update-hst-visit: Update all the identified files for a given
+    description="""pipeline_update_hst_visit: Update all the identified files for a given
                 proposal id and visit.""")
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,

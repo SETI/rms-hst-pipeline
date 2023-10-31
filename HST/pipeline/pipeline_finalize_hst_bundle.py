@@ -27,8 +27,9 @@ from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""finalize-hst-bundle: package a complete set of files in the staging
-    directories as a new bundle or as updates to an existing bundle.""")
+    description="""pipeline_finalize_hst_bundle: package a complete set of files in the
+                staging directories as a new bundle or as updates to an existing bundle.
+                """)
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')

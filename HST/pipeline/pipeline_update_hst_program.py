@@ -30,8 +30,8 @@ from update_hst_program import update_hst_program
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""update-hst-program: Update all the identified files for a given
-                proposal id and visit.""")
+    description="""pipeline_update_hst_program: Update all the identified files for a
+                given proposal id and visit.""")
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')

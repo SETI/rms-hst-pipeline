@@ -34,8 +34,8 @@ from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""label-hst-products:productste and update PDS4 labels for HST data
-                products.""")
+    description="""pipeline_label_hst_products:productste and update PDS4 labels for HST
+                data products.""")
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='',
     help='The proposal id for the MAST query.')

@@ -33,8 +33,8 @@ from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""get-program-info: Retrieve the proposal files via a web query for a
-                given proposal id.""")
+    description="""pipeline_get_program_info: Retrieve the proposal files via a web query
+                for a given proposal id.""")
 
 parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')

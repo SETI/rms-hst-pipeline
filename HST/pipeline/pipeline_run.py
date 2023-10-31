@@ -21,8 +21,8 @@ from queue_manager import run_pipeline
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""run-pipeline: package a complete set of files in the staging
-    directories as a new bundle or as updates to an existing bundle.""")
+    description="""pipeline_run: package a complete set of files in the staging
+                directories as a new bundle or as updates to an existing bundle.""")
 
 parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='', required=True,
     help='The proposal id for the MAST query.')

@@ -34,7 +34,7 @@ from queue_manager.task_queue_db import remove_a_subprocess_by_prog_id_task_and_
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""query-hst-moving-targets: Perform MAST query with given query
+    description="""pipeline_query_hst_moving_targets: Perform MAST query with given query
                 constraints.""")
 
 parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='',
