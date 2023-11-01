@@ -1,0 +1,11 @@
+astroquery
+coverage
+fs
+pip-tools
+psutil
+pyparsing
+pytest
+rms-julian
+SQLAlchemy
+unidecode
+urllib3
