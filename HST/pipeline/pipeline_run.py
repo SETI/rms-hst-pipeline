@@ -37,11 +37,11 @@ parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
 
 parser.add_argument('--max_subproc_cnt', '--max_subproc',
-    type=int, action='store', default='',
+    type=int, action='store', default=10,
     help='Max number of subprocesses to run at a time for one pipeline process.')
 
 parser.add_argument('--max_allowed_time', '--max_time',
-    type=int, action='store', default='',
+    type=int, action='store', default=1800,
     help='Max allowed subprocess time in seconds before it gets killed.')
 
 # Make sure some params are passed in
