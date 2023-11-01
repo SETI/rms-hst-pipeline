@@ -18,14 +18,15 @@ import sys
 
 from hst_helper import HST_DIR
 from queue_manager import run_pipeline
+import queue_manager
 
 # Set up parser
 parser = argparse.ArgumentParser(
     description="""pipeline_run: package a complete set of files in the staging
                 directories as a new bundle or as updates to an existing bundle.""")
 
-parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='', required=True,
-    help='The proposal id for the MAST query.')
+parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='',
+    required=True, help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time
@@ -35,6 +36,14 @@ parser.add_argument('--log', '-l', type=str, default='',
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
 
+parser.add_argument('--max_subproc_cnt', '--max_subproc',
+    type=int, action='store', default='',
+    help='Max number of subprocesses to run at a time for one pipeline process.')
+
+parser.add_argument('--max_allowed_time', '--max_time',
+    type=int, action='store', default='',
+    help='Max allowed subprocess time in seconds before it gets killed.')
+
 # Make sure some params are passed in
 if len(sys.argv) == 1:
     parser.print_help()
@@ -43,6 +52,10 @@ if len(sys.argv) == 1:
 # Parse and validate the command line
 args = parser.parse_args()
 proposal_ids = args.proposal_ids if args.proposal_ids else []
+if args.max_allowed_time:
+    queue_manager.MAX_ALLOWED_TIME = args.max_allowed_time
+if args.max_subproc_cnt:
+    queue_manager.MAX_SUBPROCESS_CNT = args.max_subproc_cnt
 LOG_DIR = HST_DIR['pipeline'] + '/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.run-pipeline')
