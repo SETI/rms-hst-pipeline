@@ -6,6 +6,8 @@ psutil
 pyparsing
 pytest
 rms-julian
+rms-pdslogger
+rms-pdstemplate
 SQLAlchemy
 unidecode
 urllib3

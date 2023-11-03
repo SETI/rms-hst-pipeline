@@ -28,14 +28,14 @@ from .wavelength_ranges       import wavelength_ranges
 from .xml_support             import get_modification_history, get_target_identifications
 
 from target_identifications import hst_target_identifications
-from xmltemplate import XmlTemplate
+from pdstemplate import PdsTemplate
 
 LABEL_SUFFIX = '.xml'
 DEBUG_DESCRIPTIONS = False
 
 this_dir = os.path.split(suffix_info.__file__)[0]
 template = this_dir + '/../templates/PRODUCT_LABEL.xml'
-TEMPLATE = XmlTemplate(template)
+TEMPLATE = PdsTemplate(template)
 
 # From https://archive.stsci.edu/hlsp/ipppssoot.html, valid last chars of the IPPPSSOOT
 STANDARD_TRANSMISSION_TAILS = {'b', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'}
@@ -138,7 +138,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         logger.info('Root of file paths: ' + root)
         logger.replace_root(root)
 
-    XmlTemplate.set_logger(logger)
+    PdsTemplate.set_logger(logger)
 
     # Make sure the retrieval date, if any, is valid
     if retrieval_date:

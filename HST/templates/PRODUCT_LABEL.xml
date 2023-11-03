@@ -5,7 +5,7 @@
     schematypens="http://purl.oclc.org/dsdl/schematron"?>
 
 <!-- RMS HST Product-Label pipeline version $label_version$ ($label_date$) -->
-<!-- RMS XmlTemplate module version $VERSION_ID()$ -->
+<!-- RMS PdsTemplate module version $VERSION_ID()$ -->
 
 $ONCE(PRODUCT = "Product_Ancillary" if processing_level == "Ancillary" else "Product_Observational")
 $ONCE(CONTEXT_AREA = "Context_Area" if processing_level == "Ancillary" else "Observation_Area")

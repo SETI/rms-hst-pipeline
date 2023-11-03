@@ -29,7 +29,7 @@ from product_labels.xml_support import (get_instrument_params,
                                         get_primary_result_summary,
                                         get_target_identifications,
                                         get_time_coordinates)
-from xmltemplate import XmlTemplate
+from pdstemplate import PdsTemplate
 
 def create_collection_label(
     proposal_id, collection_name, data_dict,
@@ -79,8 +79,8 @@ def create_xml_label(template_path, label_path, data_dict, logger):
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Create label using template from: {template_path}')
-    TEMPLATE = XmlTemplate(template_path)
-    XmlTemplate.set_logger(logger)
+    TEMPLATE = PdsTemplate(template_path)
+    PdsTemplate.set_logger(logger)
 
     logger.info('Insert data to the label template')
     TEMPLATE.write(data_dict, label_path)
