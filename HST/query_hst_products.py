@@ -104,7 +104,7 @@ def query_hst_products(proposal_id, logger=None):
                 dir_path = os.path.join(trl_dir, f)
                 shutil.rmtree(dir_path)
 
-        # Before raising the error, remove the task queue& subprocess of the proposal id
+        # Before raising the error, remove the task queue & subprocess of the proposal id
         # from database.
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         remove_all_task_queue_for_a_prog_id(formatted_proposal_id)

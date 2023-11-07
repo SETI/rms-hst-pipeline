@@ -27,7 +27,6 @@ from hst_helper import (START_DATE,
                         END_DATE,
                         RETRY,
                         HST_DIR)
-from hst_helper.fs_utils import get_program_dir_path
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import queue_next_task
 from queue_manager.task_queue_db import remove_a_subprocess_by_prog_id_task_and_visit
@@ -112,14 +111,9 @@ logger.info('List of program ids: ' + str(pid_li))
 if taskqueue:
     # If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
     for proposal_id in proposal_ids:
-        pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
         logger.info(f'Queue query_hst_products for {proposal_id}')
         remove_a_subprocess_by_prog_id_task_and_visit(proposal_id, 0, '')
-        if not os.path.exists(pipeline_dir):
-            logger.info(f'Queue query_hst_products for {proposal_id}')
-            queue_next_task(proposal_id, '', 1, logger)
-        else:
-            logger.info(f'{pipeline_dir} already exists. Pipeline stops')
+        queue_next_task(proposal_id, '', 1, logger)
 
     # TODO: TASK QUEUE
     # - re-queue query-hst-moving-targets with a 30-day delay

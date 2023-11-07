@@ -26,7 +26,8 @@ import pdslogger
 import sys
 
 from hst_helper import HST_DIR
-from hst_helper.fs_utils import get_formatted_proposal_id
+from hst_helper.fs_utils import (get_formatted_proposal_id,
+                                 get_program_dir_path)
 from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
 from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and_visit,
@@ -85,7 +86,7 @@ logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
 try:
     new_visit_li, all_visits = query_hst_products(proposal_id, logger)
-    logger.info('List of visits in which any files are new or chagned: '
+    logger.info('List of visits in which any files are new or changed: '
                 + str(new_visit_li))
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
@@ -100,6 +101,10 @@ if taskqueue:
     if len(new_visit_li) != 0:
         logger.info(f'Queue update_hst_program for {proposal_id}')
         queue_next_task(proposal_id, new_visit_li, 2, logger)
+    else:
+        staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+        logger.info(f'No new or changed files, {staging_dir} is fully populated.'
+                    +  ' Pipeline stops')
 
     # TODO: TASK QUEUE
     # - if list is empty, re-queue query-hst-products with a 30-day delay

@@ -5,7 +5,6 @@ include =
 omit =
     */venv/*
     *pdscache.py
-    xmltemplate.py
     *finder_colors.py
     *pdslogger.py
     *translator.py
