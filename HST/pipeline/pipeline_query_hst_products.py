@@ -30,9 +30,7 @@ from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)
 from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import (remove_a_subprocess_by_prog_id_task_and_visit,
-                                         remove_all_subprocess_for_a_prog_id,
-                                         remove_all_task_queue_for_a_prog_id)
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -92,11 +90,9 @@ except:
     # Before raising the error, remove the task queue of the proposal id from database.
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
-    remove_all_subprocess_for_a_prog_id(formatted_proposal_id)
     raise
 
 if taskqueue:
-    remove_a_subprocess_by_prog_id_task_and_visit(proposal_id, 1, '')
     # If list is not empty, queue update-hst-program with the list of visits
     if len(new_visit_li) != 0:
         logger.info(f'Queue update_hst_program for {proposal_id}')

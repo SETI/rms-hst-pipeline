@@ -16,8 +16,7 @@ from hst_helper.fs_utils import (get_formatted_proposal_id,
 from hst_helper.query_utils import (download_files,
                                     get_filtered_products,
                                     query_mast_slice)
-from queue_manager.task_queue_db import (remove_all_subprocess_for_a_prog_id,
-                                         remove_all_task_queue_for_a_prog_id)
+from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
 
 def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     """Retrieve all accepted files for a given proposal id & visit.
@@ -59,7 +58,6 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
         # database.
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
-        remove_all_subprocess_for_a_prog_id(formatted_proposal_id)
         logger.exception('MAST trl files downlaod failure')
         raise
 
