@@ -24,43 +24,95 @@ MAX_ALLOWED_TIME = 60 * 30
 MAX_SUBPROCESS_CNT = 10
 SUBPROCESS_LIST = []
 
-# Task to script command mapping. {P} will be replaced by proposal id and {V} will be
-# replaced by a two character visit or multiple visits separated by spaces (for
-# pipeline_update_hst_program).
-TASK_NUM_TO_CMD_MAPPING = {
-    0: 'HST/pipeline/pipeline_query_hst_moving_targets.py --prog-id {P} --tq',
-    1: 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P} --tq',
-    2: 'HST/pipeline/pipeline_update_hst_program.py --prog-id {P} --vi {V}',
-    3: 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}',
-    4: 'HST/pipeline/pipeline_update_hst_visit.py --prog-id {P} --vi {V}',
-    5: 'HST/pipeline/pipeline_retrieve_hst_visit.py --prog-id {P} --vi {V}',
-    6: 'HST/pipeline/pipeline_label_hst_products.py --prog-id {P} --vi {V}',
-    7: 'HST/pipeline/pipeline_prepare_browse_products.py --prog-id {P} --vi {V}',
-    8: 'HST/pipeline/pipeline_finalize_hst_bundle.py --prog-id {P}',
+# A dictionary keyed by task name, and its corresponding task tuple as the value. Each
+# tuple contains (task order, task priority, and task command).
+# task order: the executing order of a task when running pipeline with a proposal id.
+# task priority: the larger the number, the higher the priority.
+# task command: the script command for each task. {P} will be replaced by proposal id and
+#               {V} will be replaced by a two character visit or multiple visits separated
+#               by spaces (for pipeline_update_hst_program).
+TASK_INFO = {
+    'query_moving_targ': (
+        0, 1, 'HST/pipeline/pipeline_query_hst_moving_targets.py --prog-id {P} --tq'
+    ),
+    'query_prod': (
+        1, 1, 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P} --tq'
+    ),
+    'update_prog': (
+        2, 2, 'HST/pipeline/pipeline_update_hst_program.py --prog-id {P} --vi {V}'
+    ),
+    'get_prog_info': (
+        3, 5, 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}'
+    ),
+    'update_visit': (
+        4, 3, 'HST/pipeline/pipeline_update_hst_visit.py --prog-id {P} --vi {V}'
+    ),
+    'retrieve_visit': (
+        5, 4, 'HST/pipeline/pipeline_retrieve_hst_visit.py --prog-id {P} --vi {V}'
+    ),
+    'label_prod': (
+        6, 5, 'HST/pipeline/pipeline_label_hst_products.py --prog-id {P} --vi {V}'
+    ),
+    'prep_browse_prod': (
+        7, 5, 'HST/pipeline/pipeline_prepare_browse_products.py --prog-id {P} --vi {V}'
+    ),
+    'finalize_bundle': (
+        8, 5, 'HST/pipeline/pipeline_finalize_hst_bundle.py --prog-id {P}'
+    )
 }
 
-# Task to prority mapping. The larger the number, the higher the priority.
-TASK_NUM_TO_PRI_MAPPING = {
-    0: 1,
-    1: 1,
-    2: 2,
-    3: 5,
-    4: 3,
-    5: 4,
-    6: 5,
-    7: 5,
-    8: 5
-}
+# # Task to script command mapping. {P} will be replaced by proposal id and {V} will be
+# # replaced by a two character visit or multiple visits separated by spaces (for
+# # pipeline_update_hst_program).
+# TASK_TO_CMD_MAPPING = {
+#     'query_moving_targ': 'HST/pipeline/pipeline_query_hst_moving_targets.py' +
+#                          ' --prog-id {P} --tq',
+#     'query_prod': 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P} --tq',
+#     'update_prog': 'HST/pipeline/pipeline_update_hst_program.py --prog-id {P} --vi {V}',
+#     'get_prog_info': 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}',
+#     'update_visit': 'HST/pipeline/pipeline_update_hst_visit.py --prog-id {P} --vi {V}',
+#     'retrieve_visit': 'HST/pipeline/pipeline_retrieve_hst_visit.py' +
+#                       ' --prog-id {P} --vi {V}',
+#     'label_prod': 'HST/pipeline/pipeline_label_hst_products.py --prog-id {P} --vi {V}',
+#     'prep_browse_prod': 'HST/pipeline/pipeline_prepare_browse_products.py' +
+#                         ' --prog-id {P} --vi {V}',
+#     'finalize_bundle': 'HST/pipeline/pipeline_finalize_hst_bundle.py --prog-id {P}',
+# }
 
-# Current task to previous task mapping
-TASK_NUM_TO_PREV_TASK_MAPPING = {
-    0: None,
-    1: 0,
-    2: 1,
-    3: 2,
-    4: 3,
-    5: 4,
-    6: 5,
-    7: 6,
-    8: 4,
-}
+# TASK_ORDER = {
+#     'query_moving_targ': 0,
+#     'query_prod': 1,
+#     'update_prog': 2,
+#     'get_prog_info': 3,
+#     'update_visit': 4,
+#     'retrieve_visit': 5,
+#     'label_prod': 6,
+#     'prep_browse_prod': 7,
+#     'finalize_bundle': 8
+# }
+
+# # Task to prority mapping. The larger the number, the higher the priority.
+# TASK_TO_PRI_MAPPING = {
+#     'query_moving_targ': 1,
+#     'query_prod': 1,
+#     'update_prog': 2,
+#     'get_prog_info': 5,
+#     'update_visit': 3,
+#     'retrieve_visit': 4,
+#     'label_prod': 5,
+#     'prep_browse_prod': 5,
+#     'finalize_bundle': 5
+# }
+
+# # Current task to previous task mapping
+# TASK_TO_PREV_TASK_MAPPING = {
+#     'query_moving_targ': None,
+#     'query_prod': 'query_moving_targ',
+#     'update_prog': 'query_prod',
+#     'get_prog_info': 'update_prog',
+#     'update_visit': 'get_prog_info',
+#     'retrieve_visit': 'update_visit',
+#     'label_prod': 'retrieve_visit',
+#     'prep_browse_prod': 'label_prod',
+#     'finalize_bundle': 'update_visit',
+# }

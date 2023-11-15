@@ -30,7 +30,8 @@ from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_program_dir_path)
 from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import (remove_a_task,
+                                         remove_all_tasks_for_a_prog_id)
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -89,19 +90,20 @@ try:
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    remove_all_tasks_for_a_prog_id(formatted_proposal_id)
     raise
 
 if taskqueue:
     # If list is not empty, queue update-hst-program with the list of visits
     if len(new_visit_li) != 0:
         logger.info(f'Queue update_hst_program for {proposal_id}')
-        queue_next_task(proposal_id, new_visit_li, 2, logger)
+        queue_next_task(proposal_id, new_visit_li, 'update_prog', logger)
     else:
         staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
         logger.info(f'No new or changed files, {staging_dir} is fully populated.'
                     +  ' Pipeline stops')
 
+    remove_a_task(proposal_id, '', 'query_prod')
     # TODO: TASK QUEUE
     # - if list is empty, re-queue query-hst-products with a 30-day delay
     # - re-queue query-hst-products with a 90-day delay

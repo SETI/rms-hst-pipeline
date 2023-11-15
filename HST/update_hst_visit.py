@@ -12,7 +12,7 @@
 import pdslogger
 
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import remove_a_prog_id_task_queue
+from queue_manager.task_queue_db import remove_all_tasks_for_a_prog_id_and_visit
 
 def update_hst_visit(proposal_id, visit, logger=None):
     """Queue retrieve_hst_visit for the given visit and wait for it to complete.
@@ -34,19 +34,19 @@ def update_hst_visit(proposal_id, visit, logger=None):
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
     logger.info(f'Queue retrieve_hst_visit for {proposal_id} visit {visit}')
-    p1 = queue_next_task(proposal_id, visit, 5, logger)
+    p1 = queue_next_task(proposal_id, visit, 'retrieve_visit', logger)
     if p1 is not None:
         p1.communicate()
 
     logger.info(f'Queue label_hst_products for {proposal_id} visit {visit}')
-    p2 = queue_next_task(proposal_id, visit, 6, logger)
+    p2 = queue_next_task(proposal_id, visit, 'label_prod', logger)
     if p2 is not None:
         p2.communicate()
 
     logger.info(f'Queue prepare_browse_products for {proposal_id} visit {visit}')
-    p3 = queue_next_task(proposal_id, visit, 7, logger)
+    p3 = queue_next_task(proposal_id, visit, 'prep_browse_prod', logger)
     if p3 is not None:
         p3.communicate()
 
     # Remove the task queue for the given proposal id & visit from db
-    remove_a_prog_id_task_queue(proposal_id, visit)
+    remove_all_tasks_for_a_prog_id_and_visit(proposal_id, visit)

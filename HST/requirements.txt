@@ -63,8 +63,6 @@ pip-tools==7.3.0
     # via -r requirements.in
 pluggy==1.3.0
     # via pytest
-psutil==5.9.6
-    # via -r requirements.in
 pycparser==2.21
     # via cffi
 pyerfa==2.0.1.1
@@ -98,7 +96,7 @@ rms-pdslogger==0.0.5
     #   rms-pdstemplate
 rms-pdstemplate==0.0.3
     # via -r requirements.in
-rms-textkernel==0.0.4
+rms-textkernel==1.0.0
     # via
     #   rms-julian
     #   rms-pdslogger

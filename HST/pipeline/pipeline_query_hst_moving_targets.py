@@ -29,6 +29,7 @@ from hst_helper import (START_DATE,
                         HST_DIR)
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import queue_next_task
+from queue_manager.task_queue_db import remove_a_task
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -111,8 +112,8 @@ if taskqueue:
     # If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
     for proposal_id in proposal_ids:
         logger.info(f'Queue query_hst_products for {proposal_id}')
-        queue_next_task(proposal_id, '', 1, logger)
-
+        queue_next_task(proposal_id, '', 'query_prod', logger)
+        remove_a_task(proposal_id, '', 'query_moving_targ')
     # TODO: TASK QUEUE
     # - re-queue query-hst-moving-targets with a 30-day delay
 

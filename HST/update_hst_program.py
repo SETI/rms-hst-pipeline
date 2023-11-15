@@ -13,7 +13,7 @@
 import pdslogger
 
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import remove_all_tasks_for_a_prog_id
 
 def update_hst_program(proposal_id, visit_li, logger=None):
     """Overall task to create a new bundle or to manage the update of an existing bundle.
@@ -34,22 +34,22 @@ def update_hst_program(proposal_id, visit_li, logger=None):
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
     logger.info(f'Queue get_program_info for {proposal_id}')
-    p1 = queue_next_task(proposal_id, '', 3, logger)
+    p1 = queue_next_task(proposal_id, '', 'get_prog_info', logger)
     if p1 is not None:
         p1.communicate()
 
     for vi in visit_li:
         logger.info(f'Queue update_hst_visit for {proposal_id} visit {vi}')
-        pid = queue_next_task(proposal_id, vi, 4, logger)
+        pid = queue_next_task(proposal_id, vi, 'update_visit', logger)
         if pid is not None:
             pid.communicate()
     logger.info(f'All visits for {proposal_id} have completed update_hst_visit')
 
     logger.info(f'Queue finalize_hst_bundle for {proposal_id}')
-    p2 =  queue_next_task(proposal_id, '', 8, logger)
+    p2 =  queue_next_task(proposal_id, '', 'finalize_bundle', logger)
     if p2 is not None:
         p2.communicate()
     # Remove all task queue & subprocess for the given proposal id from db
-    remove_all_task_queue_for_a_prog_id(proposal_id)
+    remove_all_tasks_for_a_prog_id(proposal_id)
 
     logger.info(f'HST pipeline for {proposal_id} is done')
