@@ -82,6 +82,7 @@ else:
 logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
+formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     new_visit_li, all_visits = query_hst_products(proposal_id, logger)
@@ -89,7 +90,6 @@ try:
                 + str(new_visit_li))
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     remove_all_tasks_for_a_prog_id(formatted_proposal_id)
     raise
 
@@ -97,13 +97,13 @@ if taskqueue:
     # If list is not empty, queue update-hst-program with the list of visits
     if len(new_visit_li) != 0:
         logger.info(f'Queue update_hst_program for {proposal_id}')
-        queue_next_task(proposal_id, new_visit_li, 'update_prog', logger)
+        queue_next_task(formatted_proposal_id, new_visit_li, 'update_prog', logger)
     else:
         staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
         logger.info(f'No new or changed files, {staging_dir} is fully populated.'
                     +  ' Pipeline stops')
 
-    remove_a_task(proposal_id, '', 'query_prod')
+    remove_a_task(formatted_proposal_id, '', 'query_prod')
     # TODO: TASK QUEUE
     # - if list is empty, re-queue query-hst-products with a 30-day delay
     # - re-queue query-hst-products with a 90-day delay

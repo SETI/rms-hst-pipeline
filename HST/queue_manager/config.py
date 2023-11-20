@@ -21,7 +21,7 @@ DB_URI = f'sqlite:///{DB_PATH}'
 # max allowed subprocess time in seconds
 MAX_ALLOWED_TIME = 60 * 30
 # max number of subprocesses to run at a time for one hst pipeline on a proposal id
-MAX_SUBPROCESS_CNT = 10
+MAX_SUBPROCESS_CNT = 20
 SUBPROCESS_LIST = []
 
 # A dictionary keyed by task name, and its corresponding task tuple as the value. Each

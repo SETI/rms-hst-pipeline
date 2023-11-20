@@ -11,9 +11,11 @@
 ##########################################################################################
 
 import pdslogger
+import time
 
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import remove_all_tasks_for_a_prog_id
+from queue_manager.task_queue_db import (is_a_task_done,
+                                         remove_all_tasks_for_a_prog_id)
 
 def update_hst_program(proposal_id, visit_li, logger=None):
     """Overall task to create a new bundle or to manage the update of an existing bundle.
@@ -34,21 +36,28 @@ def update_hst_program(proposal_id, visit_li, logger=None):
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
     logger.info(f'Queue get_program_info for {proposal_id}')
-    p1 = queue_next_task(proposal_id, '', 'get_prog_info', logger)
-    if p1 is not None:
-        p1.communicate()
+    queue_next_task(proposal_id, '', 'get_prog_info', logger)
+
+    # TODO: exit here, create a separate script to run update hst visit
+    # or loop here to check database make sure get_prog_info is all removed
+    while not is_a_task_done(proposal_id, '', 'get_prog_info'):
+        time.sleep(1)
+    logger.info(f'Get program info for {proposal_id} has completed!')
 
     for vi in visit_li:
         logger.info(f'Queue update_hst_visit for {proposal_id} visit {vi}')
-        pid = queue_next_task(proposal_id, vi, 'update_visit', logger)
-        if pid is not None:
-            pid.communicate()
+        queue_next_task(proposal_id, vi, 'update_visit', logger)
+
+    for vi in visit_li:
+        while not is_a_task_done(proposal_id, vi, 'update_visit'):
+            time.sleep(1)
     logger.info(f'All visits for {proposal_id} have completed update_hst_visit')
 
     logger.info(f'Queue finalize_hst_bundle for {proposal_id}')
-    p2 =  queue_next_task(proposal_id, '', 'finalize_bundle', logger)
-    if p2 is not None:
-        p2.communicate()
+    queue_next_task(proposal_id, '', 'finalize_bundle', logger)
+
+    while not is_a_task_done(proposal_id, '', 'finalize_bundle'):
+        time.sleep(1)
     # Remove all task queue & subprocess for the given proposal id from db
     remove_all_tasks_for_a_prog_id(proposal_id)
 

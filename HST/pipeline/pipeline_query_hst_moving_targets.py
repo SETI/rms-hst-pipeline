@@ -27,6 +27,7 @@ from hst_helper import (START_DATE,
                         END_DATE,
                         RETRY,
                         HST_DIR)
+from hst_helper.fs_utils import get_formatted_proposal_id
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import queue_next_task
 from queue_manager.task_queue_db import remove_a_task
@@ -91,7 +92,6 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-moving-targets ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-
 proposal_ids = args.proposal_ids if args.proposal_ids else []
 instruments = args.instruments if args.instruments else []
 start_date = args.start if args.start else START_DATE
@@ -112,8 +112,9 @@ if taskqueue:
     # If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
     for proposal_id in proposal_ids:
         logger.info(f'Queue query_hst_products for {proposal_id}')
-        queue_next_task(proposal_id, '', 'query_prod', logger)
-        remove_a_task(proposal_id, '', 'query_moving_targ')
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+        queue_next_task(formatted_proposal_id, '', 'query_prod', logger)
+        remove_a_task(formatted_proposal_id, '', 'query_moving_targ')
     # TODO: TASK QUEUE
     # - re-queue query-hst-moving-targets with a 30-day delay
 

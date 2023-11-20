@@ -65,30 +65,17 @@ def run_pipeline(proposal_ids, logger=None):
         logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
         queue_next_task(formatted_proposal_id, '', 'query_moving_targ', logger)
 
-    # task_num = get_total_number_of_tasks()
-    # while taskqueue table is not empty
-    # get the next task to run
-    #
-    # PIPELINE_DONE = False
+    # spawning subprocesses
     while get_total_number_of_tasks() > 0:
+        task = get_next_task_to_be_run()
 
-        if len(SUBPROCESS_LIST) < MAX_SUBPROCESS_CNT:
-            task = get_next_task_to_be_run()
-
-            if task is not None:
-                # print('==========================')
-                # print(task.task)
-                cmd_parts = task.cmd.split(' ')
-                program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
-                sub_args = [PYTHON_EXE, program_path] + cmd_parts[1::]
-                max_allowed_time = MAX_ALLOWED_TIME
-                pid = run_and_maybe_wait(sub_args, max_allowed_time, task.proposal_id,
-                                         task.visit, task.task, logger)
-                # pid.communicate()
-                # TODO: add intelligence to wait for some tasks to be done before spawning
-                # the sub task, if those pre-req tasks are not done, we continue to next
-                # loop to look for other task
-
+        if task is not None:
+            cmd_parts = task.cmd.split(' ')
+            program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
+            sub_args = [PYTHON_EXE, program_path] + cmd_parts[1::]
+            max_allowed_time = MAX_ALLOWED_TIME
+            run_and_maybe_wait(sub_args, max_allowed_time, task.proposal_id,
+                               task.visit, task.task, logger)
             # logger.debug("Spawning subprocess %s", str(sub_args))
         time.sleep(1)
 
@@ -118,7 +105,7 @@ def queue_next_task(proposal_id, visit_info, task, logger):
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Queue in the next task for: {formatted_proposal_id}'
-                f', task num: {task}')
+                f', task: {task}, visit: {visit_info}')
 
     visit_arg = ' '.join(visit_info) if isinstance(visit_info, list) else visit_info
     visit = '' if isinstance(visit_info, list) else visit_info
@@ -134,17 +121,6 @@ def queue_next_task(proposal_id, visit_info, task, logger):
         return
 
     return True
-    # cmd_parts = cmd.split(' ')
-    # program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
-    # args = [PYTHON_EXE, program_path] + cmd_parts[1:]
-    # max_allowed_time = MAX_ALLOWED_TIME
-
-    # Move this to the center spawning place
-    # spawn the task subprocess
-    # pid = run_and_maybe_wait(args, max_allowed_time,
-    #                          formatted_proposal_id, visit, logger)
-
-    # return pid
 
 def run_and_maybe_wait(args, max_allowed_time, proposal_id, visit, task, logger):
     """Run one subprocess, waiting as necessary for a slot to open up.
@@ -159,29 +135,13 @@ def run_and_maybe_wait(args, max_allowed_time, proposal_id, visit, task, logger)
 
     Returns:    the child process that executes the given args.
     """
-    # # query database and see if there is a higher priority job waiting (status: 0) to
-    # # be run, if so, spawn that subprocess first.
-    # task = get_next_task_to_be_run()
-    # while (task is not None
-    #        and task.proposal_id != proposal_id
-    #        and task.visit != visit):
-    #     cmd_parts = task.cmd.split(' ')
-    #     program_path = os.path.join(HST_SOURCE_ROOT, cmd_parts[0])
-    #     sub_args = [PYTHON_EXE, program_path] + cmd_parts[1::]
-    #     run_and_maybe_wait(sub_args, max_allowed_time,
-    #                        task.proposal_id, task.visit, logger)
-    #     # logger.debug("Spawning subprocess %s", str(sub_args))
-    #     task = get_next_task_to_be_run()
-
     # wait for an open subprocess slot
     wait_for_subprocess()
 
     update_a_task_status(proposal_id, visit, task, 1)
     logger.debug("Spawning subprocess", str(args))
     pid = subprocess.Popen(args)
-    SUBPROCESS_LIST.append((pid, time.time(), time.time()+max_allowed_time, proposal_id))
-
-    return pid
+    SUBPROCESS_LIST.append((pid, time.time(), time.time()+max_allowed_time, proposal_id, args))
 
 def wait_for_subprocess(all=False):
     """Wait for one (or all) subprocess slots to open up.
@@ -198,19 +158,19 @@ def wait_for_subprocess(all=False):
     cur_time = time.time()
     while len(SUBPROCESS_LIST) > 0:
         for i in range(len(SUBPROCESS_LIST)):
-            pid, _, proc_max_time, _ = SUBPROCESS_LIST[i]
+            pid, _, proc_max_time, _, _ = SUBPROCESS_LIST[i]
 
-        if pid.poll() is not None:
-            # The subprocess completed, make the slot available for next subprocess
-            del SUBPROCESS_LIST[i]
-            break
+            if pid.poll() is not None:
+                # The subprocess completed, make the slot available for next subprocess
+                del SUBPROCESS_LIST[i]
+                break
 
-        if cur_time > proc_max_time and pid:
-            # If a subprocess has been running for too long, kill it
-            # Note no offset file will be written in this case
-            pid.kill()
-            del SUBPROCESS_LIST[i]
-            break
+            if cur_time > proc_max_time and pid:
+                # If a subprocess has been running for too long, kill it
+                # Note no offset file will be written in this case
+                pid.kill()
+                del SUBPROCESS_LIST[i]
+                break
 
         if len(SUBPROCESS_LIST) <= subprocess_count:
             # A slot opened up! Or all processes finished. Depending on what we're

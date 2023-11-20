@@ -20,7 +20,8 @@ import sys
 from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
 from retrieve_hst_visit import retrieve_hst_visit
-from queue_manager.task_queue_db import remove_all_tasks_for_a_prog_id
+from queue_manager.task_queue_db import (remove_a_task,
+                                         remove_all_tasks_for_a_prog_id)
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -72,16 +73,17 @@ else:
 logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('retrieve-hst-visit ' + ' '.join(sys.argv[1:]), limits=LIMITS)
+formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     retrieve_hst_visit(proposal_id, visit, logger)
 except Exception as e:
     # Before raising the error, remove the task queue of the proposal id from database.
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     remove_all_tasks_for_a_prog_id(formatted_proposal_id)
     logger.error(e)
     raise
 
+remove_a_task(formatted_proposal_id, visit, 'retrieve_visit')
 logger.close()
 
 ##########################################################################################

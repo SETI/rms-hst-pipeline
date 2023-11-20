@@ -263,3 +263,24 @@ def get_total_number_of_tasks():
     total_tasks =  session.query(TaskQueue).count()
     session.close()
     return total_tasks
+
+def is_a_task_done(proposal_id, visit, task):
+    """
+    Check if a specific task for a given proposal id, visit, and task is done. (remove
+    from the database)
+
+    Input:
+        proposal_id    a proposal id of the task queue.
+        visit          two character visit.
+        task           a number represents the current task.
+    """
+    Session = sessionmaker(engine)
+    session = Session()
+
+    entry = session.query(TaskQueue).filter(
+                                        TaskQueue.proposal_id==proposal_id,
+                                        TaskQueue.visit==visit,
+                                        TaskQueue.task==task
+                                    ).first()
+    session.close()
+    return True if entry is None else False
