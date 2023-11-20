@@ -13,6 +13,8 @@
         - `python pipeline/pipeline_run.py --prog-id 07885`
     - Run with multiple proposal ids:
         - `python pipeline/pipeline_run.py --prog-id 13736 05167 10341 14930 06679`
+    - Run with specific number of subprocesses and max allowed running time for each task (in sec):
+        - `python pipeline/pipeline_run.py --prog-id 07885 13736 --max_subproc 30 --max_time 1860`
 - Example commands to run each specific task: (use `7885` as an example)
     - These are the commands being run when executing `pipeline_run.py`
         ```
