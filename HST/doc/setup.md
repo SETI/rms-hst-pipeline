@@ -9,6 +9,10 @@
 #
 # Example commands
 - Example Commands to run the full pipeline with all tasks:
+    - Run with the full ids (pre-fetch from MAST with True moving target flag):
+        - `python pipeline/pipeline_run.py`
+    - Query MAST with True moving target flag to get the latest ids, and then run pipeline with them:
+        - `python pipeline/pipeline_run.py --get-ids`
     - Run with one proposal id:
         - `python pipeline/pipeline_run.py --prog-id 07885`
     - Run with multiple proposal ids:

@@ -3,8 +3,10 @@
 # pipeline/pipeline_run.py
 #
 # Syntax:
-# pipeline_run.py [-h] --proposal_id PROPOSAL_ID [--log LOG]
-#                                 [--quiet]
+# pipeline_run.py [-h] [--proposal_ids PROPOSAL_IDS [PROPOSAL_IDS ...]] [--log LOG]
+#                 [--quiet] [--max_subproc_cnt MAX_SUBPROC_CNT]
+#                 [--max_allowed_time MAX_ALLOWED_TIME] [--get-ids]
+#
 # Enter the --help option to see more information.
 #
 # The script to start hst pipeline process for the given proposal ids.
@@ -23,7 +25,8 @@ import queue_manager
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""pipeline_run: run pipeline with the given proposal ids.""")
+    description="""pipeline_run: run pipeline with the default list of ids or the given
+                proposal ids.""")
 
 parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='',
     help='The proposal id for the MAST query.')
