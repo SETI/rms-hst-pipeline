@@ -19,6 +19,7 @@ import pdslogger
 import sys
 
 from hst_helper import HST_DIR
+from organize_files import clean_up_staging_dir
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import run_pipeline
 import queue_manager
@@ -28,7 +29,7 @@ parser = argparse.ArgumentParser(
     description="""pipeline_run: run pipeline with the default list of ids or the given
                 proposal ids.""")
 
-parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='',
+parser.add_argument('--proposal-ids', '--prog-id', nargs='+', type=str, default='',
     help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
@@ -39,11 +40,11 @@ parser.add_argument('--log', '-l', type=str, default='',
 parser.add_argument('--quiet', '-q', action='store_true',
     help='Do not also log to the terminal.')
 
-parser.add_argument('--max_subproc_cnt', '--max_subproc',
-    type=int, action='store', default=10,
+parser.add_argument('--max-subproc-cnt', '--max-subproc',
+    type=int, action='store', default=20,
     help='Max number of subprocesses to run at a time for one pipeline process.')
 
-parser.add_argument('--max_allowed_time', '--max_time',
+parser.add_argument('--max-allowed-time', '--max-time',
     type=int, action='store', default=1800,
     help='Max allowed subprocess time in seconds before it gets killed.')
 
@@ -156,10 +157,8 @@ ids_li = ['15648', '13667', '10161', '11113', '08152', '15142', '11650', '04600'
 args = parser.parse_args()
 get_ids = args.get_ids
 
-if args.max_allowed_time:
-    queue_manager.MAX_ALLOWED_TIME = args.max_allowed_time
-if args.max_subproc_cnt:
-    queue_manager.MAX_SUBPROCESS_CNT = args.max_subproc_cnt
+queue_manager.MAX_ALLOWED_TIME = args.max_allowed_time
+queue_manager.MAX_SUBPROCESS_CNT = args.max_subproc_cnt
 
 LOG_DIR = HST_DIR['pipeline'] + '/logs'
 
@@ -193,7 +192,9 @@ if get_ids and not args.proposal_ids:
 proposal_ids = args.proposal_ids if args.proposal_ids else ids_li
 
 run_pipeline(proposal_ids, logger)
-
+# Clean up the staging directories
+for id in proposal_ids:
+    clean_up_staging_dir(id, logger)
 logger.close()
 
 ##########################################################################################

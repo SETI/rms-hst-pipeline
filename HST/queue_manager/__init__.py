@@ -43,9 +43,9 @@ def run_pipeline(proposal_ids, logger=None):
     try:
         init_task_queue_table()
     except OperationalError as e:
-        if 'already exists' in e.__repr__():
+        if 'already exists' in repr(e):
             erase_all_task_queue()
-        elif 'no such table' in e.__repr__():
+        elif 'no such table' in repr(e):
             create_task_queue_table()
         else:
             logger.error('Failed to create task queue table!')

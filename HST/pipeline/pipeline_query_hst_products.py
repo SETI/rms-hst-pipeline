@@ -38,7 +38,7 @@ parser = argparse.ArgumentParser(
     description="""pipeline_query_hst_products: Perform MAST query with a given proposal
                 id and download all TRL files for this HST program.""")
 
-parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
+parser.add_argument('--proposal-id', '--prog-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
