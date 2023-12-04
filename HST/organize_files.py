@@ -54,6 +54,7 @@ def clean_up_staging_dir(proposal_id, logger):
         staging_prod_dir = os.path.join(staging_dir, dir)
         # Clean up the empty mastDownload directory
         if dir.startswith(MAST_DOWNLOAD_DIRNAME):
+            logger.info(f'Remove {dir} from staging directory')
             shutil.rmtree(staging_prod_dir)
         for col_prefix in COL_NAME_PREFIX:
             if dir.startswith(col_prefix):
