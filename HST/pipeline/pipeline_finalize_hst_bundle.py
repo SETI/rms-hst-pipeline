@@ -3,8 +3,8 @@
 # pipeline/pipeline_finalize_hst_bundle.py
 #
 # Syntax:
-# pipeline_finalize_hst_bundle.py [-h] --proposal_id PROPOSAL_ID [--log LOG]
-#                                 [--quiet]
+# pipeline_finalize_hst_bundle.py [-h] --proposal-id PROPOSAL_ID [--log LOG] [--quiet]
+#
 # Enter the --help option to see more information.
 #
 # Perform finalize_hst_bundle task to package a complete set of files in the staging

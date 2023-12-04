@@ -3,7 +3,8 @@
 # pipeline/pipeline_query_hst_products.py
 #
 # Syntax:
-# pipeline_query_hst_products.py [-h] [--log LOG] [--quiet] proposal_id
+# pipeline_query_hst_products.py [-h] --proposal-id PROPOSAL_ID [--log LOG]
+#                                [--quiet] [--taskqueue]
 #
 # Enter the --help option to see more information.
 #

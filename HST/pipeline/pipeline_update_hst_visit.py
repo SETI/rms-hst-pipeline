@@ -3,7 +3,7 @@
 # pipeline/pipeline_update_hst_visit.py
 #
 # Syntax:
-# pipeline_update_hst_visit.py [-h] --proposal_id PROPOSAL_ID --visit VISIT
+# pipeline_update_hst_visit.py [-h] --proposal-id PROPOSAL_ID --visit VISIT
 #                              [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.

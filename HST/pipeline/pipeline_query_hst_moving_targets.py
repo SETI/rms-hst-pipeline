@@ -3,11 +3,11 @@
 # pipeline/pipeline_query_hst_moving_targets.py
 #
 # Syntax:
-# pipeline_query_hst_moving_targets.py [-h]
-#                                      [--proposal_ids PROPOSAL_IDS [PROPOSAL_IDS ...]]
+# pipeline_query_hst_moving_targets.py [-h] [--proposal-ids PROPOSAL_IDS
+#                                            [PROPOSAL_IDS ...]]
 #                                      [--instruments INSTRUMENTS [INSTRUMENTS ...]]
 #                                      [--start START] [--end END]
-#                                      [--retry RETRY] [--log LOG] [--quiet]
+#                                      [--retry RETRY] [--log LOG] [--quiet] [--taskqueue]
 #
 # Enter the --help option to see more information.
 #

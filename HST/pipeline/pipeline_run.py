@@ -3,9 +3,10 @@
 # pipeline/pipeline_run.py
 #
 # Syntax:
-# pipeline_run.py [-h] [--proposal_ids PROPOSAL_IDS [PROPOSAL_IDS ...]] [--log LOG]
-#                 [--quiet] [--max_subproc_cnt MAX_SUBPROC_CNT]
-#                 [--max_allowed_time MAX_ALLOWED_TIME] [--get-ids]
+# pipeline_run.py [-h] [--proposal-ids PROPOSAL_IDS [PROPOSAL_IDS ...]]
+#                 [--log LOG] [--quiet]
+#                 [--max-subproc-cnt MAX_SUBPROC_CNT]
+#                 [--max-allowed-time MAX_ALLOWED_TIME] [--get-ids]
 #
 # Enter the --help option to see more information.
 #

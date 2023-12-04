@@ -3,7 +3,7 @@
 # pipeline/pipeline_get_program_info.py
 #
 # Syntax:
-# pipeline_get_program_info.py [-h] [--log LOG] [--quiet] proposal_id
+# pipeline_get_program_info.py [-h] --proposal-id PROPOSAL_ID [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 #

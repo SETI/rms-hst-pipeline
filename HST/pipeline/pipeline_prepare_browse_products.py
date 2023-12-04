@@ -3,8 +3,9 @@
 # pipeline/pipeline_prepare_browse_products.py
 #
 # Syntax:
-# pipeline_prepare_browse_products.py [-h] --proposal_id PROPOSAL_ID --visit
-#                                     VISIT [--log LOG] [--quiet]
+# pipeline_prepare_browse_products.py [-h] --proposal-id PROPOSAL_ID --visit VISIT
+#                                     [--log LOG] [--quiet]
+#
 # Enter the --help option to see more information.
 #
 # Perform prepare_browse_products task to prepare the browse products and their labels,

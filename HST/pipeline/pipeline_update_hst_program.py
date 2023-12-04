@@ -3,8 +3,9 @@
 # pipeline/pipeline_update_hst_program.py
 #
 # Syntax:
-# pipeline_update_hst_program.py [-h] --proposal_id PROPOSAL_ID --visit VISIT
-#                              [--log LOG] [--quiet]
+# pipeline_update_hst_program.py [-h] --proposal-id PROPOSAL_ID
+#                                --visit-list VISIT_LIST [VISIT_LIST ...]
+#                                [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 #
