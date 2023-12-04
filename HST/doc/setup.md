@@ -14,25 +14,25 @@
     - Query MAST with True moving target flag to get the latest ids, and then run pipeline with them:
         - `python pipeline/pipeline_run.py --get-ids`
     - Run with one proposal id:
-        - `python pipeline/pipeline_run.py --prog-id 07885`
+        - `python pipeline/pipeline_run.py --proposal-ids 07885`
     - Run with multiple proposal ids:
-        - `python pipeline/pipeline_run.py --prog-id 13736 05167 10341 14930 06679`
+        - `python pipeline/pipeline_run.py --proposal-ids 13736 05167 10341 14930 06679`
     - Run with specific number of subprocesses and max allowed running time for each task (in sec):
-        - `python pipeline/pipeline_run.py --prog-id 07885 13736 --max-subproc 30 --max-time 1860`
+        - `python pipeline/pipeline_run.py --proposal-ids 07885 13736 --max-subproc 30 --max-time 1860`
 - Example commands to run each specific task: (use `7885` as an example)
     - These are the commands being run when executing `pipeline_run.py`
         ```
-        python pipeline/pipeline_query_hst_moving_targets.py --prog-id 7885
-        python pipeline/pipeline_query_hst_products.py --prog-id 7885
-        python pipeline/pipeline_get_program_info.py --prog-id 7885
-        python pipeline/pipeline_retrieve_hst_visit.py --prog-id 7885 --vi 01
-        python pipeline/pipeline_retrieve_hst_visit.py --prog-id 7885 --vi 02
-        python pipeline/pipeline_retrieve_hst_visit.py --prog-id 7885 --vi 03
-        python pipeline/pipeline_label_hst_products.py --prog-id 7885 --vi 01
-        python pipeline/pipeline_label_hst_products.py --prog-id 7885 --vi 02
-        python pipeline/pipeline_label_hst_products.py --prog-id 7885 --vi 03
-        python pipeline/pipeline_prepare_browse_products.py --prog-id 7885 --vi 01
-        python pipeline/pipeline_prepare_browse_products.py --prog-id 7885 --vi 02
-        python pipeline/pipeline_prepare_browse_products.py --prog-id 7885 --vi 03
-        python pipeline/pipeline_finalize_hst_bundle.py --prog-id 7885
+        python pipeline/pipeline_query_hst_moving_targets.py --proposal-ids 7885
+        python pipeline/pipeline_query_hst_products.py --proposal-id 7885
+        python pipeline/pipeline_get_program_info.py --proposal-id 7885
+        python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 01
+        python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 02
+        python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 03
+        python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 01
+        python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 02
+        python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 03
+        python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 01
+        python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 02
+        python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 03
+        python pipeline/pipeline_finalize_hst_bundle.py --proposal-id 7885
         ```

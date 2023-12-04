@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(
     description="""pipeline_get_program_info: Retrieve the proposal files via a web query
                 for a given proposal id.""")
 
-parser.add_argument('--proposal-id', '--prog-id', type=str, default='', required=True,
+parser.add_argument('--proposal-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',

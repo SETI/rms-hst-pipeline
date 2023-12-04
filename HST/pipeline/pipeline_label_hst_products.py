@@ -36,7 +36,7 @@ parser = argparse.ArgumentParser(
     description="""pipeline_label_hst_products:productste and update PDS4 labels for HST
                 data products.""")
 
-parser.add_argument('--proposal-id', '--prog-id', type=str, default='',
+parser.add_argument('--proposal-id', type=str, default='',
     help='The proposal id for the MAST query.')
 
 parser.add_argument('--visit', '--vi', type=str, default='',

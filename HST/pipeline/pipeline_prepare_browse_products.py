@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(
     description="""pipeline_prepare_browse_products: Prepare the browse products and their
                 labels and save them in the corresponding staging folders.""")
 
-parser.add_argument('--proposal-id', '--prog-id', type=str, default='', required=True,
+parser.add_argument('--proposal-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')
 
 parser.add_argument('--visit', '--vi', type=str, default='', required=True,

@@ -34,30 +34,39 @@ SUBPROCESS_LIST = []
 #               by spaces (for pipeline_update_hst_program).
 TASK_INFO = {
     'query_moving_targ': (
-        0, 1, 'HST/pipeline/pipeline_query_hst_moving_targets.py --prog-id {P} --tq'
+        0, 1,
+        'HST/pipeline/pipeline_query_hst_moving_targets.py --proposal-ids {P} --tq'
     ),
     'query_prod': (
-        1, 1, 'HST/pipeline/pipeline_query_hst_products.py --prog-id {P} --tq'
+        1, 1,
+        'HST/pipeline/pipeline_query_hst_products.py --proposal-id {P} --tq'
     ),
     'update_prog': (
-        2, 2, 'HST/pipeline/pipeline_update_hst_program.py --prog-id {P} --vi {V}'
+        2, 2,
+        'HST/pipeline/pipeline_update_hst_program.py --proposal-id {P} --vi {V}'
     ),
     'get_prog_info': (
-        3, 5, 'HST/pipeline/pipeline_get_program_info.py --prog-id {P}'
+        3, 5,
+        'HST/pipeline/pipeline_get_program_info.py --proposal-id {P}'
     ),
     'update_visit': (
-        4, 3, 'HST/pipeline/pipeline_update_hst_visit.py --prog-id {P} --vi {V}'
+        4, 3,
+        'HST/pipeline/pipeline_update_hst_visit.py --proposal-id {P} --vi {V}'
     ),
     'retrieve_visit': (
-        5, 4, 'HST/pipeline/pipeline_retrieve_hst_visit.py --prog-id {P} --vi {V}'
+        5, 4,
+        'HST/pipeline/pipeline_retrieve_hst_visit.py --proposal-id {P} --vi {V}'
     ),
     'label_prod': (
-        6, 5, 'HST/pipeline/pipeline_label_hst_products.py --prog-id {P} --vi {V}'
+        6, 5,
+        'HST/pipeline/pipeline_label_hst_products.py --proposal-id {P} --vi {V}'
     ),
     'prep_browse_prod': (
-        7, 5, 'HST/pipeline/pipeline_prepare_browse_products.py --prog-id {P} --vi {V}'
+        7, 5,
+        'HST/pipeline/pipeline_prepare_browse_products.py --proposal-id {P} --vi {V}'
     ),
     'finalize_bundle': (
-        8, 5, 'HST/pipeline/pipeline_finalize_hst_bundle.py --prog-id {P}'
+        8, 5,
+        'HST/pipeline/pipeline_finalize_hst_bundle.py --proposal-id {P}'
     )
 }

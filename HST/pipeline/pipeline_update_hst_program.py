@@ -32,7 +32,7 @@ parser = argparse.ArgumentParser(
     description="""pipeline_update_hst_program: Update all the identified files for a
                 given proposal id and visit.""")
 
-parser.add_argument('--proposal-id', '--prog-id', type=str, default='', required=True,
+parser.add_argument('--proposal-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')
 
 parser.add_argument('--visit-li', '--vi', nargs='+', type=str, default='', required=True,

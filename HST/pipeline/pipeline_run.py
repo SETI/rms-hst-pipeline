@@ -29,7 +29,7 @@ parser = argparse.ArgumentParser(
     description="""pipeline_run: run pipeline with the default list of ids or the given
                 proposal ids.""")
 
-parser.add_argument('--proposal-ids', '--prog-id', nargs='+', type=str, default='',
+parser.add_argument('--proposal-ids', nargs='+', type=str, default='',
     help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',

@@ -37,7 +37,7 @@ parser = argparse.ArgumentParser(
     description="""pipeline_query_hst_moving_targets: Perform MAST query with given query
                 constraints.""")
 
-parser.add_argument('--proposal-ids', '--prog-id', nargs='+', type=str, default='',
+parser.add_argument('--proposal-ids', nargs='+', type=str, default='',
     help='The proposal ids for the MAST query')
 
 parser.add_argument('--instruments', '-i', nargs='+', type=str, default='',
