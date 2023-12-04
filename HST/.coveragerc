@@ -4,8 +4,6 @@ include =
     ../HST/*
 omit =
     */venv/*
-    *pdscache.py
-    *translator.py
     */tests/*
 [html]
 Title = Coverage Report for HST pipeline
