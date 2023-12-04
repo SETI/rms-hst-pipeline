@@ -43,7 +43,7 @@ TASK_INFO = {
     ),
     'update_prog': (
         2, 2,
-        'HST/pipeline/pipeline_update_hst_program.py --proposal-id {P} --vi {V}'
+        'HST/pipeline/pipeline_update_hst_program.py --proposal-id {P} --visit-list {V}'
     ),
     'get_prog_info': (
         3, 5,
