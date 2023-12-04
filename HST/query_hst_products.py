@@ -130,10 +130,6 @@ def query_hst_products(proposal_id, logger=None):
             filepath = get_downloaded_file_path(proposal_id, f)
             os.remove(filepath)
 
-    # Clean up the empty mastDownload directory
-    staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
-    shutil.rmtree(staging_dir + '/mastDownload')
-
     return (visit_diff, list(files_dict.keys()))
 
 def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=False):

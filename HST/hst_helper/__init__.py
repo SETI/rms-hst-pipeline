@@ -67,6 +67,9 @@ DISP_SHORT_VERSION = '1B00'
 # Collection names in the bundles
 COL_NAME_PREFIX = ['data_', 'miscellaneous_', 'browse_']
 
+# MAST download directory name
+MAST_DOWNLOAD_DIRNAME = 'mastDownload'
+
 # Browse product files extension
 BROWSE_PROD_EXT = ['jpg', 'jpeg', 'png']
 
