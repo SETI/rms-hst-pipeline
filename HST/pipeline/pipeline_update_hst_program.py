@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--proposal-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')
 
-parser.add_argument('--visit-list', '--vi', nargs='+', type=str, default='', required=True,
+parser.add_argument('--visit-list', nargs='+', type=str, default='', required=True,
     help='A list of the two character visits of an observation.')
 
 parser.add_argument('--log', '-l', type=str, default='',
