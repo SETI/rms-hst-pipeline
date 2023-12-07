@@ -3,9 +3,8 @@
 # pipeline/pipeline_update_hst_program.py
 #
 # Syntax:
-# pipeline_update_hst_program.py [-h] --proposal-id PROPOSAL_ID
-#                                --visit-list VISIT_LIST [VISIT_LIST ...]
-#                                [--log LOG] [--quiet]
+# pipeline_update_hst_program.py [-h] --proposal-id PROPOSAL_ID --visits
+#                                VISITS [VISITS ...] [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 #
@@ -36,7 +35,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--proposal-id', type=str, default='', required=True,
     help='The proposal id for the MAST query.')
 
-parser.add_argument('--visit-list', nargs='+', type=str, default='', required=True,
+parser.add_argument('--visits', nargs='+', type=str, default='', required=True,
     help='A list of the two character visits of an observation.')
 
 parser.add_argument('--log', '-l', type=str, default='',
@@ -55,7 +54,7 @@ if len(sys.argv) == 1:
 # Parse and validate the command line
 args = parser.parse_args()
 proposal_id = args.proposal_id
-visit_li = args.visit_list if args.visit_list else []
+visits = args.visits if args.visits else []
 LOG_DIR = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.update-hst-program-' + proposal_id)
@@ -81,13 +80,13 @@ formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     # TODO: uncomment this after debugging
-    update_hst_program(formatted_proposal_id, visit_li, logger)
+    update_hst_program(formatted_proposal_id, visits, logger)
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
     remove_all_tasks_for_a_prog_id(formatted_proposal_id)
     raise
 
-visit = '' if isinstance(visit_li, list) else visit_li
+visit = '' if isinstance(visits, list) else visits
 remove_a_task(formatted_proposal_id, visit, 'update_prog')
 logger.close()
 
