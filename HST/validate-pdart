@@ -4,8 +4,8 @@ CONTEXT_PRODUCTS=./tmp-context-products.json
 XMLDIR=../xml
 # Remove this scaffolding when switching to the new HST_Parameters implementation.
 NEW=-new
-SCHEMAS="${XMLDIR}/PDS4_HST_1D00_1000${NEW}.xsd.xml, ${XMLDIR}/PDS4_DISP_1B00.xsd.xml"
-SCHEMATRONS="${XMLDIR}/PDS4_HST_1D00_1000${NEW}.sch.xml, ${XMLDIR}/PDS4_DISP_1B00.sch.xml"
+SCHEMAS="${XMLDIR}/PDS4_HST_1D00_1000${NEW}.xsd.xml, ${XMLDIR}/PDS4_DISP_1L00_1510.xsd.xml"
+SCHEMATRONS="${XMLDIR}/PDS4_HST_1D00_1000${NEW}.sch.xml, ${XMLDIR}/PDS4_DISP_1L00_1510.sch.xml"
 
 die(){
     echo $@ >&2

@@ -9,7 +9,7 @@
 
 $ONCE(PRODUCT = "Product_Ancillary" if processing_level == "Ancillary" else "Product_Observational")
 $ONCE(CONTEXT_AREA = "Context_Area" if processing_level == "Ancillary" else "Observation_Area")
-$ONCE(FILE_AREA = "File_Area" if processing_level == "Ancillary" else "File_Area_Observational")
+$ONCE(FILE_AREA = "File_Area_Ancillary" if processing_level == "Ancillary" else "File_Area_Observational")
 <$PRODUCT$
   xmlns="http://pds.nasa.gov/pds4/pds/v1"
   xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
@@ -25,9 +25,7 @@ $ONCE(formatted_prop_id=str(prop_id).zfill(5))
 $ONCE(inst_id=hst_dictionary["instrument_id"])
 $ONCE(ipppssoot=hst_dictionary["mast_observation_id"])
   <Identification_Area>
-    <logical_identifier>
-      urn:nasa:pds:hst_$prop_id$:$collection_name$:$ipppssoot$$lid_suffix$
-    </logical_identifier>
+    <logical_identifier>urn:nasa:pds:hst_$prop_id$:$collection_name$:$ipppssoot$$lid_suffix$</logical_identifier>
     <version_id>$version_id[0]$.$version_id[1]$</version_id>
     <title>
       $WRAP(6, 90, basename + ": " + product_title)$
@@ -210,12 +208,12 @@ $END_FOR
           <hst:hst_target_name>$hst_dictionary["hst_target_name"]$</hst:hst_target_name>
 $IF(hst_dictionary["moving_target_flag"] == "UNK")
           <hst:moving_target_flag nilReason="unknown"></hst:moving_target_flag>  <!--Missing moving target info-->
-          <hst:moving_target_keyword nilReason="unknown"></hst:moving_target_keyword>  <!--Missing moving target info-->
+          <hst:moving_target_keywords nilReason="unknown"></hst:moving_target_keywords>  <!--Missing moving target info-->
           <hst:moving_target_description nilReason="unknown"></hst:moving_target_description>  <!--Missing moving target info-->
 $ELSE_IF(hst_dictionary["moving_target_flag"])
           <hst:moving_target_flag>true</hst:moving_target_flag>
   $FOR(keyword,k,count=hst_dictionary["moving_target_keywords"])
-          <hst:moving_target_keyword>$keyword$</hst:moving_target_keyword>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
+          <hst:moving_target_keywords>$keyword$</hst:moving_target_keywords>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
   $END_FOR
   $FOR(description,k,count=hst_dictionary["moving_target_descriptions"])
     $IF(len(description) > 40 and ',' in description)
@@ -228,7 +226,7 @@ $ELSE_IF(hst_dictionary["moving_target_flag"])
   $END_FOR
 $ELSE
           <hst:moving_target_flag>false</hst:moving_target_flag>
-          <hst:moving_target_keyword nilReason="inapplicable"></hst:moving_target_keyword>  <!--Not a moving target-->
+          <hst:moving_target_keywords nilReason="inapplicable"></hst:moving_target_keywords>  <!--Not a moving target-->
           <hst:moving_target_description nilReason="inapplicable"></hst:moving_target_description>  <!--Not a moving target-->
 $END_IF
           $ONCE(x=hst_dictionary["aperture_name"])
@@ -254,20 +252,20 @@ $END_FOR
           $ONCE(x=hst_dictionary["bandwidth"])
           <hst:bandwidth unit="micrometer"$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:bandwidth>
           $ONCE(x=hst_dictionary["spectral_resolution"])
-          <hst:spectral_resolution unit="micrometer"$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:spectral_resolution>
+          <hst:spectral_resolution unit="micrometer">$x if x else ""$</hst:spectral_resolution>
         </hst:Wavelength_Filter_Grating_Parameters>
         <hst:Operational_Parameters>
           $ONCE(x=hst_dictionary["instrument_mode_id"])
           <hst:instrument_mode_id$"" if x else ' nilReason="inapplicable"'$>$x$</hst:instrument_mode_id>
           $ONCE(x=hst_dictionary["gain_setting"])
-          <hst:gain_setting$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:gain_setting>
+          <hst:gain_setting>$x if x else ""$</hst:gain_setting>
           <hst:coronagraph_flag>$BOOL(hst_dictionary["coronagraph_flag"])$</hst:coronagraph_flag>
           <hst:cosmic_ray_split_count>$hst_dictionary["cosmic_ray_split_count"]$</hst:cosmic_ray_split_count>
           <hst:repeat_exposure_count>$hst_dictionary["repeat_exposure_count"]$</hst:repeat_exposure_count>
           <hst:subarray_flag>$BOOL(hst_dictionary["subarray_flag"])$</hst:subarray_flag>
           <hst:binning_mode>$hst_dictionary["binning_mode"]$</hst:binning_mode>
           $ONCE(x=hst_dictionary["plate_scale"])
-          <hst:plate_scale unit="mrad"$"" if x else ' nilReason="missing"'$>$x/1000. if x else ""$</hst:plate_scale>
+          <hst:plate_scale>$x/1000. if x else ""$</hst:plate_scale>
         </hst:Operational_Parameters>
         <hst:Processing_Parameters>
           $ONCE(x=hst_dictionary["mast_pipeline_version_id"].replace("UNK", ""))
@@ -393,14 +391,14 @@ $FOR(hdu_dict,k=hdu_dictionaries)
       <Record_Binary>
         <fields>$ddict["fields"]$</fields>
         <groups>$ddict["groups"]$</groups>
-        <record_length>$ddict["record_length"]$</record_length>
+        <record_length unit="byte">$ddict["record_length"]$</record_length>
     $FOR(j=range(ddict["fields"]))
         <Field_Binary>
           <name>$ddict["names"][j]$</name>
           <field_number>$ddict["field_numbers"][j]$</field_number>
-          <field_location>$ddict["field_locations"][j]$</field_location>
+          <field_location unit="byte">$ddict["field_locations"][j]$</field_location>
           <data_type>$ddict["data_types"][j]$</data_type>
-          <field_length>$ddict["field_lengths"][j]$</field_length>
+          <field_length unit="byte">$ddict["field_lengths"][j]$</field_length>
       $IF(field_format=ddict["field_formats"][j])
           <field_format>$field_format$</field_format>
       $END_IF
