@@ -248,9 +248,9 @@ $END_FOR
         <hst:Wavelength_Filter_Grating_Parameters>
           <hst:filter_name>$hst_dictionary["filter_name"]$</hst:filter_name>
           $ONCE(x=hst_dictionary["center_filter_wavelength"])
-          <hst:center_filter_wavelength unit="micrometer"$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:center_filter_wavelength>
+          <hst:center_filter_wavelength unit="micrometer">$x if x else ""$</hst:center_filter_wavelength>
           $ONCE(x=hst_dictionary["bandwidth"])
-          <hst:bandwidth unit="micrometer"$"" if x else ' nilReason="inapplicable"'$>$x if x else ""$</hst:bandwidth>
+          <hst:bandwidth unit="micrometer">$x if x else ""$</hst:bandwidth>
           $ONCE(x=hst_dictionary["spectral_resolution"])
           <hst:spectral_resolution unit="micrometer">$x if x else ""$</hst:spectral_resolution>
         </hst:Wavelength_Filter_Grating_Parameters>

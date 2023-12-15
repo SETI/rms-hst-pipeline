@@ -291,7 +291,7 @@ def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None):
 
         # Get the data class and axes
         if naxis == 1:
-            data_class = 'Array_1D'
+            data_class = 'Array'
             elements = [naxis1]
             axis_names = ['Sample']
             is_empty = (naxis1 == 0)
@@ -594,6 +594,6 @@ def repair_hdu_dictionaries(hdu_dicts, filepath, logger):
             logger.warn(f'HDU #{k} name repaired {extname} to {name}', filepath)
 
         if hdu_dict['data']['data_class'] == 'Array_1D_Image':
-            hdu_dict['data']['data_class'] = 'Array_1D'
+            hdu_dict['data']['data_class'] = 'Array'
 
 ##########################################################################################
