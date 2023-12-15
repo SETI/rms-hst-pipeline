@@ -239,7 +239,8 @@ def get_next_task_to_be_run():
     Session = sessionmaker(engine)
     session = Session()
     # Get the tasks with the highest priority & waiting status
-    subquery = session.query(func.max(TaskQueue.priority)).filter(TaskQueue.status==0)
+    subquery = (session.query(func.max(TaskQueue.priority)).filter(TaskQueue.status==0)
+                                                           .scalar_subquery())
     # Get the task with the highest priority & task num, this will prioritize finishing
     # a pipeline process over running tasks at early pipeline stage or starting a new
     # pipeline process.

@@ -38,8 +38,6 @@ def update_hst_program(proposal_id, visit_li, logger=None):
     logger.info(f'Queue get_program_info for {proposal_id}')
     queue_next_task(proposal_id, '', 'get_prog_info', logger)
 
-    # TODO: exit here, create a separate script to run update hst visit
-    # or loop here to check database make sure get_prog_info is all removed
     while not is_a_task_done(proposal_id, '', 'get_prog_info'):
         time.sleep(1)
     logger.info(f'Get program info for {proposal_id} has completed!')

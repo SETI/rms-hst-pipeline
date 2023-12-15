@@ -818,7 +818,8 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     obstype = merged.get('OBSTYPE', '')
-
+    if obstype == 'SPECTROSCOPIC':
+        obstype = 'SPECTROGRAPHIC'
     observation_type = obstype
 
     if observation_type not in ('IMAGING', 'SPECTROGRAPHIC'):

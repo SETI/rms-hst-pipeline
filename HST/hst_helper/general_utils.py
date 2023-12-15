@@ -10,12 +10,12 @@ import csv
 import os
 import pdslogger
 
-from . import (CITATION_INFO_DICT,
+from . import (BROWSE_PROD_EXT,
+               CITATION_INFO_DICT,
                DOCUMENT_EXT_FOR_CITATION_INFO,
                INST_ID_DICT,
                INST_PARAMS_DICT,
                PRIMARY_RES_DICT,
-               PROGRAM_INFO_FILE,
                RECORDS_DICT,
                TARG_ID_DICT,
                TIME_DICT)
@@ -274,8 +274,14 @@ def get_collection_label_data(proposal_id, target_dir, logger):
 
     for root, _, files in os.walk(target_dir):
         for file in files:
+             # For browse files
+            if is_browse_prod(file):
+                if file not in files_li:
+                    files_li.append(file)
+                continue
             if not file.startswith('collection_') and file.endswith('.xml'):
                 file_path = os.path.join(root, file)
+                # Read the xml files
                 with open(file_path) as f:
                     xml_content = f.read()
                     # target identifications
@@ -334,3 +340,16 @@ def get_clean_target_text(text: str) -> str:
     for char in REMOVED_CHARS:
         text = text.replace(char, '')
     return text
+
+def is_browse_prod(filename):
+    """Check if a file is a browse product by checking its extension
+
+    Inputs:
+        filename    the name of a file
+
+    Returns:        a boolean
+    """
+    for ext in BROWSE_PROD_EXT:
+        if filename.endswith(ext):
+            return True
+    return False
