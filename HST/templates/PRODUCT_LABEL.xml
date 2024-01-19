@@ -207,9 +207,9 @@ $END_FOR
         <hst:Pointing_Parameters>
           <hst:hst_target_name>$hst_dictionary["hst_target_name"]$</hst:hst_target_name>
 $IF(hst_dictionary["moving_target_flag"] == "UNK")
-          <hst:moving_target_flag nilReason="unknown"></hst:moving_target_flag>  <!--Missing moving target info-->
-          <hst:moving_target_keywords nilReason="unknown"></hst:moving_target_keywords>  <!--Missing moving target info-->
-          <hst:moving_target_description nilReason="unknown"></hst:moving_target_description>  <!--Missing moving target info-->
+          <hst:moving_target_flag xsi:nil="true" nilReason="unknown"></hst:moving_target_flag>  <!--Missing moving target info-->
+          <hst:moving_target_keywords xsi:nil="true" nilReason="unknown"></hst:moving_target_keywords>  <!--Missing moving target info-->
+          <hst:moving_target_description xsi:nil="true" nilReason="unknown"></hst:moving_target_description>  <!--Missing moving target info-->
 $ELSE_IF(hst_dictionary["moving_target_flag"])
           <hst:moving_target_flag>true</hst:moving_target_flag>
   $FOR(keyword,k,count=hst_dictionary["moving_target_keywords"])
@@ -226,13 +226,13 @@ $ELSE_IF(hst_dictionary["moving_target_flag"])
   $END_FOR
 $ELSE
           <hst:moving_target_flag>false</hst:moving_target_flag>
-          <hst:moving_target_keywords nilReason="inapplicable"></hst:moving_target_keywords>  <!--Not a moving target-->
-          <hst:moving_target_description nilReason="inapplicable"></hst:moving_target_description>  <!--Not a moving target-->
+          <hst:moving_target_keywords xsi:nil="true" nilReason="inapplicable"></hst:moving_target_keywords>  <!--Not a moving target-->
+          <hst:moving_target_description xsi:nil="true" nilReason="inapplicable"></hst:moving_target_description>  <!--Not a moving target-->
 $END_IF
           $ONCE(x=hst_dictionary["aperture_name"])
-          <hst:aperture_name$"" if x else ' nilReason="inapplicable"'$>$x$</hst:aperture_name>
+          <hst:aperture_name$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x$</hst:aperture_name>
           $ONCE(x=hst_dictionary["proposed_aperture_name"])
-          <hst:proposed_aperture_name$"" if x else ' nilReason="inapplicable"'$>$x$</hst:proposed_aperture_name>
+          <hst:proposed_aperture_name$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x$</hst:proposed_aperture_name>
 $FOR(detector,k,count=hst_dictionary["targeted_detector_ids"])
           <hst:targeted_detector_id>$detector$</hst:targeted_detector_id>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
 $END_FOR
@@ -248,32 +248,32 @@ $END_FOR
         <hst:Wavelength_Filter_Grating_Parameters>
           <hst:filter_name>$hst_dictionary["filter_name"]$</hst:filter_name>
           $ONCE(x=hst_dictionary["center_filter_wavelength"])
-          <hst:center_filter_wavelength unit="micrometer">$x if x else ""$</hst:center_filter_wavelength>
+          <hst:center_filter_wavelength unit="micrometer"$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x if x else ""$</hst:center_filter_wavelength>
           $ONCE(x=hst_dictionary["bandwidth"])
-          <hst:bandwidth unit="micrometer">$x if x else ""$</hst:bandwidth>
+          <hst:bandwidth unit="micrometer"$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x if x else ""$</hst:bandwidth>
           $ONCE(x=hst_dictionary["spectral_resolution"])
-          <hst:spectral_resolution unit="micrometer">$x if x else ""$</hst:spectral_resolution>
+          <hst:spectral_resolution unit="micrometer"$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x if x else ""$</hst:spectral_resolution>
         </hst:Wavelength_Filter_Grating_Parameters>
         <hst:Operational_Parameters>
           $ONCE(x=hst_dictionary["instrument_mode_id"])
-          <hst:instrument_mode_id$"" if x else ' nilReason="inapplicable"'$>$x$</hst:instrument_mode_id>
+          <hst:instrument_mode_id$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x$</hst:instrument_mode_id>
           $ONCE(x=hst_dictionary["gain_setting"])
-          <hst:gain_setting>$x if x else ""$</hst:gain_setting>
+          <hst:gain_setting$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x if x else ""$</hst:gain_setting>
           <hst:coronagraph_flag>$BOOL(hst_dictionary["coronagraph_flag"])$</hst:coronagraph_flag>
           <hst:cosmic_ray_split_count>$hst_dictionary["cosmic_ray_split_count"]$</hst:cosmic_ray_split_count>
           <hst:repeat_exposure_count>$hst_dictionary["repeat_exposure_count"]$</hst:repeat_exposure_count>
           <hst:subarray_flag>$BOOL(hst_dictionary["subarray_flag"])$</hst:subarray_flag>
           <hst:binning_mode>$hst_dictionary["binning_mode"]$</hst:binning_mode>
           $ONCE(x=hst_dictionary["plate_scale"])
-          <hst:plate_scale>$x/1000. if x else ""$</hst:plate_scale>
+          <hst:plate_scale unit="mrad"$"" if x else ' xsi:nil="true" nilReason="missing"'$>$x/1000. if x else ""$</hst:plate_scale>
         </hst:Operational_Parameters>
         <hst:Processing_Parameters>
           $ONCE(x=hst_dictionary["mast_pipeline_version_id"].replace("UNK", ""))
-          <hst:mast_pipeline_version_id$"" if x else ' nilReason="missing"'$>$x$</hst:mast_pipeline_version_id>
+          <hst:mast_pipeline_version_id$"" if x else ' xsi:nil="true" nilReason="missing"'$>$x$</hst:mast_pipeline_version_id>
           $ONCE(x=hst_dictionary["hst_quality_id"].replace("UNK", ""))
-          <hst:hst_quality_id$"" if x else ' nilReason="missing"'$>$x$</hst:hst_quality_id>
+          <hst:hst_quality_id$"" if x else ' xsi:nil="true" nilReason="missing"'$>$x$</hst:hst_quality_id>
 $IF(hst_dictionary["hst_quality_comment"] in ("UNK", ""))
-          <hst:hst_quality_comment nilReason="missing"></hst:hst_quality_comment>
+          <hst:hst_quality_comment xsi:nil="true" nilReason="missing"></hst:hst_quality_comment>
 $ELSE
           <hst:hst_quality_comment>
             $WRAP(12, 90, hst_dictionary["hst_quality_comment"].rstrip(".") + ".")$
