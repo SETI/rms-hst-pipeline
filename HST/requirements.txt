@@ -100,6 +100,8 @@ rms-textkernel==1.0.0
     # via
     #   rms-julian
     #   rms-pdslogger
+rms-translator==0.0.1
+    # via -r requirements.in
 six==1.16.0
     # via
     #   fs

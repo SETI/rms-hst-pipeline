@@ -132,7 +132,7 @@ EXTRA_DESCRIPTIONS = {
 }
 
 DATA_CLASS_TO_NOUN = {
-    'Array'            : ('data array', 'data arrays'),
+    'Array_1D'            : ('data array', 'data arrays'),
     'Array_2D'         : ('data array', 'data arrays'),
     'Array_2D_Image'   : ('image', 'images'),
     'Array_3D_Image'   : ('image', 'images'),
