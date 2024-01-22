@@ -76,8 +76,9 @@ def query_hst_products(proposal_id, logger=None):
         format_term, _, _ = product_fname.partition('_')
         visit = get_visit(format_term)
 
-        files_dict[visit].append(product_fname)
-        if 'trl' in product_fname:
+        if product_fname not in files_dict[visit]:
+            files_dict[visit].append(product_fname)
+        if 'trl' in product_fname and product_fname not in trl_files_dict[visit]:
             trl_files_dict[visit].append(product_fname)
 
         suffix = row['productSubGroupDescription']
@@ -128,7 +129,10 @@ def query_hst_products(proposal_id, logger=None):
     for visit, trl_files in trl_files_dict.items():
         for f in trl_files:
             filepath = get_downloaded_file_path(proposal_id, f)
-            os.remove(filepath)
+            try:
+                os.remove(filepath)
+            except FileNotFoundError:
+                pass
 
     return (visit_diff, list(files_dict.keys()))
 

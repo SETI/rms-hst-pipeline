@@ -56,12 +56,12 @@ FOC_OBSERVATION_TYPE_FROM_OPMODE = {
 }
 
 FOC_PLATE_SCALES = {    # (instrument_mode_id, observation_type) from Table 7a,b,c
-    ('F96/ZOOM', 'IMAGING'      ): 0.014,
-    ('F96'     , 'IMAGING'      ): 0.014,
-    ('F96/ZOOM', 'TIME-SERIES'  ): 0.014,
-    ('F96'     , 'TIME-SERIES'  ): 0.014,
-    ('F48/ZOOM', 'IMAGING'      ): 0.028,
-    ('F48'     , 'IMAGING'      ): 0.028,
+    ('F96/ZOOM', 'IMAGING'       ): 0.014,
+    ('F96'     , 'IMAGING'       ): 0.014,
+    ('F96/ZOOM', 'TIME-SERIES'   ): 0.014,
+    ('F96'     , 'TIME-SERIES'   ): 0.014,
+    ('F48/ZOOM', 'IMAGING'       ): 0.028,
+    ('F48'     , 'IMAGING'       ): 0.028,
     ('F48/ZOOM', 'SPECTROGRAPHIC'): 0.056,
     ('F48'     , 'SPECTROGRAPHIC'): 0.028,
 }

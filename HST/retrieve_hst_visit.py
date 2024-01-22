@@ -52,7 +52,10 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
         # the trl file under pipeline directory. We will only have either all files
         # downloaded or zero file downloaded.
         shutil.rmtree(files_dir)
-        os.remove(f'{get_program_dir_path(proposal_id, visit)}/{TRL_CHECKSUMS_FILE}')
+        try:
+            os.remove(f'{get_program_dir_path(proposal_id, visit)}/{TRL_CHECKSUMS_FILE}')
+        except FileNotFoundError:
+            pass
 
         # Before raising the error, remove the task queue of the proposal id from
         # database.
