@@ -14,18 +14,18 @@
     elementFormDefault="qualified"
     attributeFormDefault="unqualified"
     version="1.0.0.0">
- 
-    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1D00.xsd"/>
- 
+
+    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1L00.xsd"/>
+
   <xs:annotation>
     <xs:documentation>
 
         version 1.0  2020-08-25
         - Initial version
-    
+
     </xs:documentation>
   </xs:annotation>
- 
+
   <xs:element name="HST_Parameters" type="hst:HST_Parameters"> </xs:element>
 
   <xs:complexType name="Exposure_Parameters">
