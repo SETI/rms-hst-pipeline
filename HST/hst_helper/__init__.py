@@ -8,11 +8,11 @@
 import os
 from collections import defaultdict
 
-# default start and end date of observation in query mast constraints
+# default start and end date of observation in query MAST constraints
 START_DATE = (1900, 1, 1)
 END_DATE = (2025, 1, 1)
 
-# default number of connection retry when connecting to mast failed.
+# default number of connection retry when connecting to MAST failed.
 RETRY = 1
 
 # file directories
@@ -66,6 +66,9 @@ DISP_SHORT_VERSION = '1B00'
 
 # Collection names in the bundles
 COL_NAME_PREFIX = ['data_', 'miscellaneous_', 'browse_']
+
+# MAST download directory name
+MAST_DOWNLOAD_DIRNAME = 'mastDownload'
 
 # Browse product files extension
 BROWSE_PROD_EXT = ['jpg', 'jpeg', 'png']

@@ -27,7 +27,7 @@ def query_hst_moving_targets(proposal_ids=[],
         start_date      observation start datetime.
         end_date        observation end datetime.
         logger          pdslogger to use; None for default EasyLogger.
-        max_retries     number of retries when there is a connection to mast.
+        max_retries     number of retries when there is a connection to MAST.
 
     Returns:    a list of proposal ids with moving targets.
     """
@@ -36,7 +36,7 @@ def query_hst_moving_targets(proposal_ids=[],
 
     table = []
     if len(proposal_ids) == 0 and len(instruments) == 0:
-        # Query Mast for data observed between start_date & end_date
+        # Query MAST for data observed between start_date & end_date
         res = query_mast_slice(start_date=start_date,
                                end_date=end_date,
                                logger=logger,
@@ -44,7 +44,7 @@ def query_hst_moving_targets(proposal_ids=[],
         if len(res) != 0:
             table.append(res)
     elif len(instruments) == 0:
-        # Query Mast for each proposal id
+        # Query MAST for each proposal id
         for id in proposal_ids:
             res = query_mast_slice(proposal_id=id,
                                    start_date=start_date,
@@ -54,7 +54,7 @@ def query_hst_moving_targets(proposal_ids=[],
             if len(res) != 0:
                 table.append(res)
     elif len(proposal_ids) == 0:
-        # Query Mast for each instrument
+        # Query MAST for each instrument
         for inst in instruments:
             res = query_mast_slice(instrument=inst,
                                    start_date=start_date,
@@ -64,7 +64,7 @@ def query_hst_moving_targets(proposal_ids=[],
             if len(res) != 0:
                 table.append(res)
     else:
-        # Query Mast for all the combinations of proposal ids & instruments
+        # Query MAST for all the combinations of proposal ids & instruments
         for id in proposal_ids:
             for inst in instruments:
                 res = query_mast_slice(proposal_id=id,
@@ -76,7 +76,7 @@ def query_hst_moving_targets(proposal_ids=[],
                 if len(res) != 0:
                     table.append(res)
 
-    # Get all the unique proposal ids from tables obtained from Mast query
+    # Get all the unique proposal ids from tables obtained from MAST query
     p_id_li = []
     for t in table:
         for row in t:

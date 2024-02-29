@@ -28,14 +28,14 @@ from .wavelength_ranges       import wavelength_ranges
 from .xml_support             import get_modification_history, get_target_identifications
 
 from target_identifications import hst_target_identifications
-from xmltemplate import XmlTemplate
+from pdstemplate import PdsTemplate
 
 LABEL_SUFFIX = '.xml'
 DEBUG_DESCRIPTIONS = False
 
 this_dir = os.path.split(suffix_info.__file__)[0]
 template = this_dir + '/../templates/PRODUCT_LABEL.xml'
-TEMPLATE = XmlTemplate(template)
+TEMPLATE = PdsTemplate(template)
 
 # From https://archive.stsci.edu/hlsp/ipppssoot.html, valid last chars of the IPPPSSOOT
 STANDARD_TRANSMISSION_TAILS = {'b', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'}
@@ -118,8 +118,12 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     # This is not strictly necessary but creates cleaner logs by suppressing the overall
     # common directory path
     if not root:
-        min_filepath = min(filepaths)
-        max_filepath = max(filepaths)
+        try:
+            min_filepath = min(filepaths)
+            max_filepath = max(filepaths)
+        except ValueError as e:
+            logger.error(str(e) + ','.join(filepaths))
+
         for k, chars in enumerate(zip(min_filepath, max_filepath)):
             if chars[0] != chars[1]:
                 break
@@ -134,7 +138,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         logger.info('Root of file paths: ' + root)
         logger.replace_root(root)
 
-    XmlTemplate.set_logger(logger)
+    PdsTemplate.set_logger(logger)
 
     # Make sure the retrieval date, if any, is valid
     if retrieval_date:
@@ -274,11 +278,15 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # Open the (original) FITS file
         original_path = fullpath + '-original'
-        if os.path.exists(original_path):
-            hdulist = pyfits.open(original_path)
-        else:
-            hdulist = pyfits.open(fullpath)
-
+        try:
+            if os.path.exists(original_path):
+                path = original_path
+                hdulist = pyfits.open(original_path)
+            else:
+                path = fullpath
+                hdulist = pyfits.open(fullpath)
+        except OSError as e:
+            logger.error(str(e) + path)
         # If this is an association file, read its contents for the IPPPSSOOT
         if suffix == 'asn':
             logger.info('Reading associations', filepath)
@@ -480,11 +488,19 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     # "ipppssoot_dict": dictionary for this file's IPPPSSOOT.
     #####################################################################################
 
+    removed_ipppssoot = []
     for ipppssoot, ipppssoot_dict in info_by_ipppssoot.items():
         all_suffixes = set(ipppssoot_dict.keys())
         ipppssoot_dict['all_suffixes'] = all_suffixes
         ipppssoot_dict['ipppssoot'] = ipppssoot
-        ipppssoot_dict['timetags'] = trl_timetags_by_ipppssoot[ipppssoot]
+        # ipppssoot_dict['timetags'] = trl_timetags_by_ipppssoot[ipppssoot]
+        try:
+            ipppssoot_dict['timetags'] = trl_timetags_by_ipppssoot[ipppssoot]
+        except KeyError:
+            # If trl timetags is missing, we remove this ipppssoot from info_by_ipppssoot
+            logger.error(f'Missing trl timetags for {ipppssoot}')
+            removed_ipppssoot.append(ipppssoot)
+
         ipppssoot_dict['by_basename'] = info_by_basename
         ipppssoot_dict['by_ipppssoot'] = info_by_ipppssoot
 
@@ -493,6 +509,14 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             basenamed_dict['by_basename'] = info_by_basename
             basenamed_dict['by_ipppssoot'] = info_by_ipppssoot
             basenamed_dict['ipppssoot_dict'] = ipppssoot_dict
+
+    # Bypass this ipppssoot by removing them from info_by_ipppssoot & info_by_basename
+    for ipppssoot in removed_ipppssoot:
+        del info_by_ipppssoot[ipppssoot]
+        for basename in list(info_by_basename):
+            if ipppssoot in basename:
+                del info_by_basename[basename]
+
 
     ######################################################################################
     # "associates"        : list of tuples (associated ipppssoot, memtype) for this
@@ -613,7 +637,10 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
             # Maybe this is supposed to happen
             spt_hdulist = pyfits.open(ipppssoot_dict['spt_fullpath'])
-            scidata = spt_hdulist[0].header['SCIDATA']
+            try:
+                scidata = spt_hdulist[0].header['SCIDATA']
+            except KeyError:
+                scidata = None
             spt_hdulist.close()
 
             if scidata:

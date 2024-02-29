@@ -3,11 +3,11 @@
 # pipeline/pipeline_query_hst_moving_targets.py
 #
 # Syntax:
-# pipeline_query_hst_moving_targets.py [-h]
-#                                      [--proposal_ids PROPOSAL_IDS [PROPOSAL_IDS ...]]
+# pipeline_query_hst_moving_targets.py [-h] [--proposal-ids PROPOSAL_IDS
+#                                            [PROPOSAL_IDS ...]]
 #                                      [--instruments INSTRUMENTS [INSTRUMENTS ...]]
 #                                      [--start START] [--end END]
-#                                      [--retry RETRY] [--log LOG] [--quiet]
+#                                      [--retry RETRY] [--log LOG] [--quiet] [--taskqueue]
 #
 # Enter the --help option to see more information.
 #
@@ -27,20 +27,21 @@ from hst_helper import (START_DATE,
                         END_DATE,
                         RETRY,
                         HST_DIR)
-from hst_helper.fs_utils import get_program_dir_path
+from hst_helper.fs_utils import get_formatted_proposal_id
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import queue_next_task
+from queue_manager.task_queue_db import remove_a_task
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""query-hst-moving-targets: Perform mast query with given query
+    description="""pipeline_query_hst_moving_targets: Perform MAST query with given query
                 constraints.""")
 
-parser.add_argument('--proposal_ids', '--prog-id', nargs='+', type=str, default='',
-    help='The proposal ids for the mast query')
+parser.add_argument('--proposal-ids', nargs='+', type=str, default='',
+    help='The proposal ids for the MAST query')
 
 parser.add_argument('--instruments', '-i', nargs='+', type=str, default='',
-    help='The instruments for the mast query.')
+    help='The instruments for the MAST query.')
 
 parser.add_argument('--start', type=str, action='store', default='',
     help='Optional start date from MAST in (yyyy, mm, dd) format.')
@@ -49,7 +50,7 @@ parser.add_argument('--end', type=str, action='store', default='',
     help='Optional end date from MAST in (yyyy, mm, dd) format.')
 
 parser.add_argument('--retry', '-r', type=str, action='store', default='',
-    help='Optional max number of Mast connection retry.')
+    help='Optional max number of MAST connection retry.')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time
@@ -91,7 +92,6 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-moving-targets ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-
 proposal_ids = args.proposal_ids if args.proposal_ids else []
 instruments = args.instruments if args.instruments else []
 start_date = args.start if args.start else START_DATE
@@ -99,7 +99,7 @@ end_date = args.end if args.end else END_DATE
 retry = args.retry if args.retry else RETRY
 taskqueue = args.taskqueue
 
-logger.info('Mast query constraints: ' + str(args))
+logger.info('MAST query constraints: ' + str(args))
 pid_li = query_hst_moving_targets(proposal_ids=proposal_ids,
                                   instruments=instruments,
                                   start_date=start_date,
@@ -111,13 +111,10 @@ logger.info('List of program ids: ' + str(pid_li))
 if taskqueue:
     # If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
     for proposal_id in proposal_ids:
-        pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
-        if not os.path.exists(pipeline_dir):
-            logger.info(f'Queue query_hst_products for {proposal_id}')
-            queue_next_task(proposal_id, '', 1, logger)
-        else:
-            logger.info(f'{pipeline_dir} exists')
-
+        logger.info(f'Queue query_hst_products for {proposal_id}')
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+        queue_next_task(formatted_proposal_id, '', 'query_prod', logger)
+        remove_a_task(formatted_proposal_id, '', 'query_moving_targ')
     # TODO: TASK QUEUE
     # - re-queue query-hst-moving-targets with a 30-day delay
 

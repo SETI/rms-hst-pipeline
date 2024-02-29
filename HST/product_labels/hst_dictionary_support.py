@@ -52,18 +52,18 @@ FOC_OBSERVATION_TYPE_FROM_OPMODE = {
     'ACQ'  : 'IMAGING',
     'IMAGE': 'IMAGING',
     'OCC'  : 'TIME-SERIES',
-    'SPEC' : 'SPECTROSCOPIC',
+    'SPEC' : 'SPECTROGRAPHIC',
 }
 
 FOC_PLATE_SCALES = {    # (instrument_mode_id, observation_type) from Table 7a,b,c
-    ('F96/ZOOM', 'IMAGING'      ): 0.014,
-    ('F96'     , 'IMAGING'      ): 0.014,
-    ('F96/ZOOM', 'TIME-SERIES'  ): 0.014,
-    ('F96'     , 'TIME-SERIES'  ): 0.014,
-    ('F48/ZOOM', 'IMAGING'      ): 0.028,
-    ('F48'     , 'IMAGING'      ): 0.028,
-    ('F48/ZOOM', 'SPECTROSCOPIC'): 0.056,
-    ('F48'     , 'SPECTROSCOPIC'): 0.028,
+    ('F96/ZOOM', 'IMAGING'       ): 0.014,
+    ('F96'     , 'IMAGING'       ): 0.014,
+    ('F96/ZOOM', 'TIME-SERIES'   ): 0.014,
+    ('F96'     , 'TIME-SERIES'   ): 0.014,
+    ('F48/ZOOM', 'IMAGING'       ): 0.028,
+    ('F48'     , 'IMAGING'       ): 0.028,
+    ('F48/ZOOM', 'SPECTROGRAPHIC'): 0.056,
+    ('F48'     , 'SPECTROGRAPHIC'): 0.028,
 }
 
 FOS_APERTURE_NAMES = {
@@ -326,6 +326,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
         return detector_number_dict
 
+    detector_ids = []
     try:
         if (instrument_id, channel_id) in {('ACS', 'WFC'), ('WFC3', 'UVIS')}:
             detector_number_dict = detector_number_vs_extver(ref_hdulist, 'CCDCHIP')
@@ -545,7 +546,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
                 # second; join with a plus.
                 filters = [filter1, filter2]
                 filters.sort()
-                return '+'.join(filters)
+                filter_name = '+'.join(filters)
 
         elif instrument_id == 'FGS':
             filter_name = header0['CAST_FLT']
@@ -817,16 +818,15 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     obstype = merged.get('OBSTYPE', '')
-
+    if obstype == 'SPECTROSCOPIC':
+        obstype = 'SPECTROGRAPHIC'
     observation_type = obstype
-    if observation_type == 'SPECTROGRAPHIC':
-        observation_type = 'SPECTROSCOPIC'
 
-    if observation_type not in ('IMAGING', 'SPECTROSCOPIC'):
+    if observation_type not in ('IMAGING', 'SPECTROGRAPHIC'):
         if instrument_id in ('ACS', 'FGS', 'NICMOS', 'WFC3', 'WFPC', 'WFPC2'):
             observation_type = 'IMAGING'
         elif instrument_id in ('COS', 'FOS', 'GHRS'):
-            observation_type = 'SPECTROSCOPIC'
+            observation_type = 'SPECTROGRAPHIC'
         elif instrument_id == 'HSP':
             observation_type = 'TIME-SERIES'
         elif instrument_id == 'FOC':
@@ -998,7 +998,6 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ############################################################
     # Return the dictionary
     ############################################################
-
     return hst_dictionary
 
 ##########################################################################################

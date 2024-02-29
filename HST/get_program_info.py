@@ -16,6 +16,7 @@
 import fs.path
 import os
 import pdslogger
+from socket import timeout
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -61,10 +62,13 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
 
     # Check if a proposal file is retrieved
     try:
-        resp = urllib.request.urlopen(url)
+        resp = urllib.request.urlopen(url, timeout=600)
         new_contents = resp.read()
     except urllib.error.URLError as e:
-        logger.info(f'file from {url} is not found for {proposal_id}')
+        if isinstance(e.reason, timeout):
+            logger.error(f'Timeout Error. \nURL: {url}')
+        else:
+            logger.info(f'file from {url} is not found for {proposal_id}')
         return False
 
     if is_proposal_file_different(new_contents, filepath):
