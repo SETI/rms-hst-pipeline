@@ -208,12 +208,12 @@ $END_FOR
           <hst:hst_target_name>$hst_dictionary["hst_target_name"]$</hst:hst_target_name>
 $IF(hst_dictionary["moving_target_flag"] == "UNK")
           <hst:moving_target_flag xsi:nil="true" nilReason="unknown"></hst:moving_target_flag>  <!--Missing moving target info-->
-          <hst:moving_target_keywords xsi:nil="true" nilReason="unknown"></hst:moving_target_keywords>  <!--Missing moving target info-->
+          <hst:moving_target_keyword xsi:nil="true" nilReason="unknown"></hst:moving_target_keyword>  <!--Missing moving target info-->
           <hst:moving_target_description xsi:nil="true" nilReason="unknown"></hst:moving_target_description>  <!--Missing moving target info-->
 $ELSE_IF(hst_dictionary["moving_target_flag"])
           <hst:moving_target_flag>true</hst:moving_target_flag>
-  $FOR(keyword,k,count=hst_dictionary["moving_target_keywords"])
-          <hst:moving_target_keywords>$keyword$</hst:moving_target_keywords>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
+  $FOR(keyword,k,count=hst_dictionary["moving_target_keyword"])
+          <hst:moving_target_keyword>$keyword$</hst:moving_target_keyword>$NOESCAPE("" if count <= 1 else f"  <!-- {k+1} of {count} -->")$
   $END_FOR
   $FOR(description,k,count=hst_dictionary["moving_target_descriptions"])
     $IF(len(description) > 40 and ',' in description)
@@ -226,7 +226,7 @@ $ELSE_IF(hst_dictionary["moving_target_flag"])
   $END_FOR
 $ELSE
           <hst:moving_target_flag>false</hst:moving_target_flag>
-          <hst:moving_target_keywords xsi:nil="true" nilReason="inapplicable"></hst:moving_target_keywords>  <!--Not a moving target-->
+          <hst:moving_target_keyword xsi:nil="true" nilReason="inapplicable"></hst:moving_target_keyword>  <!--Not a moving target-->
           <hst:moving_target_description xsi:nil="true" nilReason="inapplicable"></hst:moving_target_description>  <!--Not a moving target-->
 $END_IF
           $ONCE(x=hst_dictionary["aperture_name"])

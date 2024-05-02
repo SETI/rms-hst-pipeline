@@ -791,7 +791,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         except KeyError:
             break
 
-    hst_dictionary['moving_target_keywords'] = keywords or []
+    hst_dictionary['moving_target_keyword'] = keywords or []
 
     ##############################
     # moving_target_flag

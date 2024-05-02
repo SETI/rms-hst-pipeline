@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!-- PDS4 XML/Schema for Name Space Id:hst  Version:1.0.0.0 - Tue Aug 25 11:55:45 EDT 2020 -->
-  <!-- Generated from the PDS4 Information Model Version 1.13.0.0 - System Build 10a -->
+  <!-- PDS4 XML/Schema for Name Space Id:hst  Version:1.0.0.0 - Tue Apr 30 13:00:12 UTC 2024 -->
+  <!-- Generated from the PDS4 Information Model Version 1.17.0.0 - System Build 12.0 -->
   <!-- *** This PDS4 product schema is an operational deliverable. *** -->
   <!--                                                                           -->
   <!--               Dictionary Stack                                            -->
-  <!-- 1.13.0.0 - pds: - Common Dictionary - N/A                                 -->
-  <!-- 1.0.0.0 - hst: - Hubble Space Telescope Dictionary Full - ingest_hst_1D00 -->
+  <!-- 1.17.0.0 - pds: - Common Dictionary                                       -->
+  <!-- 1.0.0.0 - hst: - Hubble Space Telescope Mission Dictionary                -->
   <!--                                                                           -->
   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://pds.nasa.gov/pds4/mission/hst/v1"
@@ -14,18 +14,21 @@
     elementFormDefault="qualified"
     attributeFormDefault="unqualified"
     version="1.0.0.0">
-
-    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1L00.xsd"/>
-
+ 
+    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1H00.xsd"/>
+ 
   <xs:annotation>
     <xs:documentation>
 
-        version 1.0  2020-08-25
-        - Initial version
-
+      Note: Several pre-release versions are tagged within the ldd-hst repo on GitHub.
+      These were written between 2020 and 2024 by Mark Showalter and Mitch Gordon.
+      
+      version 1.0  2024-04-15
+      - Initial release version
+    
     </xs:documentation>
   </xs:annotation>
-
+ 
   <xs:element name="HST_Parameters" type="hst:HST_Parameters"> </xs:element>
 
   <xs:complexType name="Exposure_Parameters">
@@ -41,8 +44,8 @@
 
   <xs:complexType name="HST_Parameters">
     <xs:annotation>
-      <xs:documentation> Contains all HST-specific parameters.
-        </xs:documentation>
+      <xs:documentation> Contains parameters specific to the Hubble
+        Space Telescope. </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:element name="Program_Parameters" type="hst:Program_Parameters" minOccurs="1" maxOccurs="1"> </xs:element>
@@ -52,6 +55,7 @@
       <xs:element name="Exposure_Parameters" type="hst:Exposure_Parameters" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="Wavelength_Filter_Grating_Parameters" type="hst:Wavelength_Filter_Grating_Parameters" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="Operational_Parameters" type="hst:Operational_Parameters" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="Processing_Parameters" type="hst:Processing_Parameters" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
   </xs:complexType>
 
@@ -67,10 +71,10 @@
       <xs:element name="observation_type" type="hst:observation_type" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
     <!-- Begin assert statements for schematron - Enumerated Values -->
-    <!-- <xs:assert test="hst:instrument_id = ('ACS', 'COS', 'FOC', 'FOS', 'GHRS', 'HSP', 'NICMOS', 'STIS', 'WF/PC', 'WFC3', 'WFPC2')"/> -->
-    <!-- <xs:assert test="hst:channel_id = ('CCD', 'FOC', 'FOS', 'FUV', 'FUV-MAMA', 'GHRS', 'HRC', 'HSP', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV', 'NUV-MAMA', 'PC', 'SBC', 'UVIS', 'WFC', 'WFPC2')"/> -->
-    <!-- <xs:assert test="hst:detector_id = ('AMBER', 'BLUE', 'CCD', 'FOC', 'FUV', 'FUV-MAMA', 'GHRS1', 'GHRS2', 'HRC', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV', 'NUV-MAMA', 'PC1', 'PC5', 'PC6', 'PC7', 'PC8', 'PMT', 'POL', 'SBC', 'UV1', 'UV2', 'UVIS1', 'UVIS2', 'VIS', 'WF1', 'WF2', 'WF3', 'WF4', 'WFC1', 'WFC2')"/> -->
-    <!-- <xs:assert test="hst:observation_type = ('IMAGING', 'SPECTROGRAPHIC', 'TIME-SERIES')"/> -->
+    <!-- <xs:assert test="hst:instrument_id = ('ACS', 'COS', 'FGS', 'FOC', 'FOS', 'GHRS', 'HSP', 'NICMOS', 'STIS', 'WFC3', 'WFPC', 'WFPC2')"/> -->
+    <!-- <xs:assert test="hst:channel_id = ('AMBER', 'BLUE', 'CCD', 'D1', 'D2', 'FGS', 'FOC', 'FUV', 'FUV-MAMA', 'HRC', 'HSP', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV', 'NUV-MAMA', 'PC', 'SBC', 'UVIS', 'WF', 'WFC', 'WFPC2')"/> -->
+    <!-- <xs:assert test="hst:detector_id = ('AMBER', 'BLUE', 'CCD', 'D1', 'D2', 'FGS1', 'FGS1R', 'FGS2', 'FGS2R', 'FGS3', 'FOC', 'FUV-MAMA', 'FUVA', 'FUVB', 'HRC', 'IR', 'NIC1', 'NIC2', 'NIC3', 'NUV', 'NUV-MAMA', 'PC1', 'PC5', 'PC6', 'PC7', 'PC8', 'PMT', 'POL', 'SBC', 'UV1', 'UV2', 'UVIS1', 'UVIS2', 'VIS', 'WF1', 'WF2', 'WF3', 'WF4', 'WFC1', 'WFC2')"/> -->
+    <!-- <xs:assert test="hst:observation_type = ('IMAGING', 'SPECTROSCOPIC', 'TIME-SERIES')"/> -->
     <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
 
@@ -80,14 +84,14 @@
         and operations of an instrument. </xs:documentation>
     </xs:annotation>
     <xs:sequence>
-      <xs:element name="instrument_mode_id" type="hst:instrument_mode_id" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="gain_setting" type="hst:gain_setting" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="instrument_mode_id" nillable="true" type="hst:instrument_mode_id" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="gain_setting" nillable="true" type="hst:gain_setting" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="coronagraph_flag" type="hst:coronagraph_flag" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="cosmic_ray_split_count" type="hst:cosmic_ray_split_count" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="repeat_exposure_count" type="hst:repeat_exposure_count" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="subarray_flag" type="hst:subarray_flag" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="binning_mode" type="hst:binning_mode" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="plate_scale" type="hst:plate_scale" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="plate_scale" nillable="true" type="hst:plate_scale" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
   </xs:complexType>
 
@@ -99,11 +103,23 @@
     <xs:sequence>
       <xs:element name="hst_target_name" type="hst:hst_target_name" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="moving_target_flag" type="hst:moving_target_flag" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="moving_target_keywords" type="hst:moving_target_keywords" minOccurs="1" maxOccurs="4"> </xs:element>
-      <xs:element name="moving_target_description" type="hst:moving_target_description" minOccurs="1" maxOccurs="4"> </xs:element>
-      <xs:element name="aperture_name" type="hst:aperture_name" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="proposed_aperture_name" type="hst:proposed_aperture_name" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="moving_target_keyword" nillable="true" type="hst:moving_target_keyword" minOccurs="1" maxOccurs="4"> </xs:element>
+      <xs:element name="moving_target_description" nillable="true" type="hst:moving_target_description" minOccurs="1" maxOccurs="4"> </xs:element>
+      <xs:element name="aperture_name" nillable="true" type="hst:aperture_name" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="proposed_aperture_name" nillable="true" type="hst:proposed_aperture_name" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="targeted_detector_id" type="hst:targeted_detector_id" minOccurs="1" maxOccurs="4"> </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Processing_Parameters">
+    <xs:annotation>
+      <xs:documentation> Contains attributes related to the processing
+        of the data after receipt. </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="mast_pipeline_version_id" nillable="true" type="hst:mast_pipeline_version_id" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="hst_quality_id" nillable="true" type="hst:hst_quality_id" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="hst_quality_comment" nillable="true" type="hst:hst_quality_comment" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
   </xs:complexType>
 
@@ -116,6 +132,7 @@
       <xs:element name="mast_observation_id" type="hst:mast_observation_id" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="hst_proposal_id" type="hst:hst_proposal_id" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="hst_pi_name" type="hst:hst_pi_name" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="visit_id" type="hst:visit_id" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
   </xs:complexType>
 
@@ -137,9 +154,9 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element name="filter_name" type="hst:filter_name" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="center_filter_wavelength" type="hst:center_filter_wavelength" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="bandwidth" type="hst:bandwidth" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element name="spectral_resolution" type="hst:spectral_resolution" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="center_filter_wavelength" nillable="true" type="hst:center_filter_wavelength" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="bandwidth" nillable="true" type="hst:bandwidth" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="spectral_resolution" nillable="true" type="hst:spectral_resolution" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
   </xs:complexType>
 
@@ -151,24 +168,22 @@
       </xs:documentation>
     </xs:annotation>
 
-  <xs:simpleType name="aperture_name">
+  <xs:complexType name="aperture_name">
     <xs:annotation>
       <xs:documentation> The name of the aperture used for the
         observation. For HST data files, this is generally the value of
         FITS keyword APERTURE. Note that these values are
         instrument-specific; see the relevant HST Instrument Handbooks
-        and Data Handbooks for further details. WF/PC, WFPC2, and HSP
-        data files do not indicate which aperture was used. However, the
-        value can be found in the associated file _shf.fits or _spt.fits
-        files as the value of FITS keyword APER_1. For FOS data
-        products, this is the value of FITS keyword APER_ID.
+        and Data Handbooks for further details. For FOC data, this
+        attribute should be nil with nilReason = "inapplicable".
         </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="pds:ASCII_Short_String_Collapsed">
-     <xs:minLength value="1"/>
-     <xs:maxLength value="255"/>
-	   </xs:restriction>
-  </xs:simpleType>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Short_String_Collapsed">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="bandwidth_WO_Units">
     <xs:restriction base="pds:ASCII_Real">
@@ -184,11 +199,13 @@
         value of FITS keyword BANDWID, divided by 10,000 to convert
         units from Angstroms to microns. The value is not provided for
         other HST instruments. For other HST instruments, this attribute
-        is assigned a value of zero. </xs:documentation>
+        should be nil with nilReason = "inapplicable".
+        </xs:documentation>
     </xs:annotation>
     <xs:simpleContent>
       <xs:extension base="hst:bandwidth_WO_Units">
         <xs:attribute name="unit" type="pds:Units_of_Length" use="required" />
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
@@ -206,7 +223,7 @@
         always equal.) Note that, for some HST products, the values of
         BINAXIS1 and BINAXIS2 can be found in the global FITS header;
         for others, it is found in the second header, which is the first
-        data header. For WF/PC and WFPC2, this attribute is derived from
+        data header. For WFPC and WFPC2, this attribute is derived from
         the value of MODE: - MODE = FULL -> binning_mode = 1 - MODE =
         AREA -> binning_mode = 2 For instruments that do not support
         binning options, the value of this attribute is always 1.
@@ -232,11 +249,13 @@
         is the value of FITS keyword CENTRWV, divided by 10,000 to
         convert units from Angstroms to microns. The value is not
         provided for other HST instruments. For other HST instruments,
-        this attribute is assigned a value of zero. </xs:documentation>
+        this attribute should be nil with nilReason = "inapplicable".
+        </xs:documentation>
     </xs:annotation>
     <xs:simpleContent>
       <xs:extension base="hst:center_filter_wavelength_WO_Units">
         <xs:attribute name="unit" type="pds:Units_of_Length" use="required" />
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
@@ -246,15 +265,9 @@
       <xs:documentation> An abbreviated name or acronym for the specific
         channel of the HST instrument used for this observation. Here,
         "channel" refers to a distinct optical path used by one or more
-        of the instrument's detectors. In most HST data files, this is
-        the value of FITS keyword DETECTOR. For NICMOS data products,
-        this attribute is derived from the value of FITS keyword CAMERA,
-        as follows: - CAMERA = 1 -> channel_id = NIC1; - CAMERA = 2 ->
-        channel_id = NIC2; - CAMERA = 3 -> channel_id = NIC3. For WF/PC,
-        this attribute is the value of FITS keyword CAMERA, either PC or
-        WFC. For HST instruments, such as WFPC2, that do not have
-        multiple channels, this attribute has the same value as the
-        instrument_id attribute. </xs:documentation>
+        of the instrument's detectors. For HST instruments that do not
+        have multiple channels, such as WFPC2, this attribute has the
+        same value as the instrument_id attribute. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -269,11 +282,12 @@
         this attribute is generally derived from the value of the FITS
         keyword APERTURE. For ACS/HRC products, the coronagraph is in
         use if APERTURE is HRC-CORON1.8, HRC-CORON3.0, or HRC-OCCULT0.8.
-        For STIS products, a coronagraph is in use if APERTURE is
-        52X0.2F1, 52X0.2F1-R, 50CORON, or begins with either "BAR" or
-        "WEDGE". For NICMOS/NIC2 products, a coronagraph is in use if
-        APERTURE is NIC2-CORON. For HST instruments that do not have a
-        coronagraph, this attribute always has a value of false.
+        This also corresponds to the FITS keyword OBSTYPE being set to
+        CORONAGRAPHIC. For STIS products, a coronagraph is in use if
+        APERTURE is 52X0.2F1, 52X0.2F1-R, 50CORON, or begins with either
+        "BAR" or "WEDGE". For NICMOS/NIC2 products, a coronagraph is in
+        use if APERTURE is NIC2-CORON. This attribute is always false
+        for HST instruments that do not have a coronagraph.
         </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Boolean">
@@ -302,32 +316,7 @@
       <xs:documentation> This identifier specifies which of the
         detectors of this instrument and channel obtained the data found
         in this HST product. This parameter is repeated if multiple
-        detectors were used. For WFPC2 data products, this is derived
-        from the sequence of unique values of FITS keyword DETECTOR
-        among all the FITS headers in the file. Values are PC1, WF2,
-        WF3, and WF4, based on DETECTOR values of 1-4. For ACS/WFC and
-        WFC3/UVIS data products, this is derived from the sequence of
-        unique values of FITS keyword CCDCHIP, which can have values of
-        1, 2, or -999. For ACS/WFC data products: - CCDCHIP = 1 ->
-        detector_id = WFC1; - CCDCHIP = 2 -> detector_id = WFC2; -
-        CCDCHIP = -999 -> detector_id is duplicated, with values of both
-        WFC1 and WFC2. For WFC3/UVIS data products: - CCDCHIP = 1 ->
-        detector_id = UVIS1; - CCDCHIP = 2 -> detector_id = UVIS2; -
-        CCDCHIP = -999 -> detector_id is duplicated, with values of both
-        UVIS1 and UVIS2. For COS/FUV data products: - SEGMENT = FUVA ->
-        detector_id = FUVA; - SEGMENT = FUVB -> detector_id = FUVB; -
-        SEGMENT = BOTH -> detector_id is repeated, with values of both
-        FUVA and FUVB; - SEGMENT = N/A -> no FUV detector was used. For
-        GHRS data products: - DETECTOR = 1 -> detector_id = GHRS1 -
-        DETECTOR = 2 -> detector_id = GHRS2 For HSP data products, this
-        can be determined from the value of the FITS keyword CONFIG,
-        which is found in the _shf.fits files. The format is "HSP/det"
-        or "HSP/det1/det2", indicating up to two detectors. For WF/PC
-        data products, the detectors are indicated within a FITS TABLE
-        extension of the data file. Under most circumstances, all four
-        detectors are used, either WF1, WF2, WF3, and WF4, or PC5, PC6,
-        PC7, and PC8. However, it is possible for a product to contain a
-        subset of these. For instruments that do not have multiple
+        detectors were used. For instruments that do not have multiple
         detectors, this attribute occurs just once and has the same
         value as the channel_id attribute. </xs:documentation>
     </xs:annotation>
@@ -440,20 +429,22 @@
 	   </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="gain_setting">
+  <xs:complexType name="gain_setting">
     <xs:annotation>
       <xs:documentation> The commanded gain of the CCD, typically in
         units of electrons per DN. For WFPC2 data products, this is the
         value of FITS keyword ATODGAIN, either 7 or 15. For ACS, STIS,
-        and WFC3, it is the value of FITS keyword CCDGAIN. For HST
-        instruments that do not have gain settings, this attribute is
-        assigned a value of zero. </xs:documentation>
+        and WFC3, it is the value of FITS keyword CCDGAIN. For FGS data
+        files and for HST instruments that do not have gain settings,
+        this attribute should be nil with nilReason = "inapplicable".
+        </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="pds:ASCII_Real">
-     <xs:minInclusive value="-1.7976931348623157e308"/>
-     <xs:maxInclusive value="1.7976931348623157e308"/>
-	   </xs:restriction>
-  </xs:simpleType>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Real">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="gyroscope_mode">
     <xs:annotation>
@@ -467,7 +458,7 @@
         </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Integer">
-     <xs:minInclusive value="1"/>
+     <xs:minInclusive value="2"/>
      <xs:maxInclusive value="3"/>
 	   </xs:restriction>
   </xs:simpleType>
@@ -496,6 +487,40 @@
 	   </xs:restriction>
   </xs:simpleType>
 
+  <xs:complexType name="hst_quality_comment">
+    <xs:annotation>
+      <xs:documentation> Data quality comments found in the FITS header
+        of the data product. This attribute is filled in by the HST
+        pipeline is populated if there are problems with the exposure.
+        This attribute may be missing from older data products. In such
+        cases, this attribute should be nil with nilReason = "missing".
+        </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Short_String_Collapsed">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="hst_quality_id">
+    <xs:annotation>
+      <xs:documentation> Data quality summary found in the FITS header
+        of the data product, which can be populated by the HST pipeline
+        if there are problems with the exposure. Possible values include
+        "OK", "GSFAIL", "EXPSHORT", and "TDF-DOWN". If multiple values
+        are provided, they are separated by semicolons. This attribute
+        may be missing from older data products. In such cases, this
+        attribute should be nil with nilReason = "missing".
+        </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Short_String_Collapsed">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
   <xs:simpleType name="hst_target_name">
     <xs:annotation>
       <xs:documentation> The target of the observation as defined by the
@@ -522,24 +547,20 @@
 	   </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="instrument_mode_id">
+  <xs:complexType name="instrument_mode_id">
     <xs:annotation>
       <xs:documentation> The operating mode of the instrument. For most
         HST data products, this is the value of FITS keyword OBSMODE.
         Consult the relevant HST handbooks for details about each mode.
-        For WF/PC and WFPC2 products, this is the value of FITS keyword
-        MODE rather than OBSMODE. Possible values are: - FULL:
-        full-resolution (800x800 image) - AREA: half-resolution (400x400
-        image) For FOC products, this is the value of FITS keyword
-        OPTCRLY, with typical values of either F48 or F96. For HSP
-        products, this is the value of FITS keyword OPMODE, as is found
-        in the _shf.fits files. </xs:documentation>
+        For FGS data files, this attribute should be nil with nilReason
+        = "inapplicable". </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="pds:ASCII_Short_String_Collapsed">
-     <xs:minLength value="1"/>
-     <xs:maxLength value="255"/>
-	   </xs:restriction>
-  </xs:simpleType>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Short_String_Collapsed">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="mast_observation_id">
     <xs:annotation>
@@ -570,7 +591,22 @@
 	   </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="moving_target_description">
+  <xs:complexType name="mast_pipeline_version_id">
+    <xs:annotation>
+      <xs:documentation> The value of keyword "OPUS_VER" found in the
+        FITS header, if any. It is updated when data files are
+        re-calibrated. This attribute is often missing from older data
+        products. In such cases, this attribute should be nil with
+        nilReason = "missing". </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Short_String_Collapsed">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="moving_target_description">
     <xs:annotation>
       <xs:documentation> The detailed information used for targeting
         HST. This includes information about standard targets such as
@@ -582,14 +618,15 @@
         associated _shf.fits or _spt.fits file. They are the values of
         FITS keywords MT_LV_1, MT_LV_2, etc. Consult with HST
         documentation for detailed interpretations. If no MT_LV keywords
-        appear in the FITS header, this attribute has a single value of
-        "Not applicable". </xs:documentation>
+        appear in the FITS header, this attribute should be nil with
+        nilReason = "inapplicable". </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="pds:ASCII_Short_String_Collapsed">
-     <xs:minLength value="1"/>
-     <xs:maxLength value="255"/>
-	   </xs:restriction>
-  </xs:simpleType>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Short_String_Collapsed">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="moving_target_flag">
     <xs:annotation>
@@ -603,7 +640,7 @@
 	   </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="moving_target_keywords">
+  <xs:complexType name="moving_target_keyword">
     <xs:annotation>
       <xs:documentation> Keyword values used in the HST planning
         software to define a moving target. These often provide
@@ -612,31 +649,35 @@
         EUROPA", and "ASTEROID 216". These values are obtained from the
         FITS header of the _shf.fits or _spt.fits file, given as values
         of keywords TARKEY1, TARKEY2, etc. If no TARKEY keywords appear
-        in the FITS header, this attribute has a single value of "Not
-        applicable". </xs:documentation>
+        in the FITS header, this attribute should be nil with nilReason
+        = "inapplicable". </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="pds:ASCII_Short_String_Collapsed">
-     <xs:minLength value="1"/>
-     <xs:maxLength value="255"/>
-	   </xs:restriction>
-  </xs:simpleType>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Short_String_Collapsed">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="observation_type">
     <xs:annotation>
-      <xs:documentation> The type of the observation. For most HST data
-        files, this is the value of FITS keyword OBSTYPE, either IMAGING
-        or SPECTROGRAPHIC. IMAGING indicates that a 2-D image with two
-        spatial axes was obtained. SPECTROGRAPHIC indicates that one of
-        the axes of the data array is related to wavelength. TIME-SERIES
-        indicates a data array in which the primary axis sampling is by
-        time. The FITS keyword OBSTYPE does not appear in some data
-        products. However, several instruments produce only one type of
-        observation. Observations from ACS, NICMOS, WFC3, WF/PC, and
-        WFPC2 are always IMAGES; observations from COS, FOS, and GHRS
-        are always SPECTROSCOPIC. For ACS/HRC, the FITS keyword OBSTYPE
-        can have a value of CORONAGRAPHIC. However, the value of this
-        attribute is IMAGING; the coronagraph_flag attribute indicates
-        whether the coronagraph was used. </xs:documentation>
+      <xs:documentation> The type of the observation: one of IMAGING,
+        SPECTROSCOPIC, or TIME-SERIES. IMAGING indicates that a 2-D
+        image with two spatial axes was obtained. SPECTROSCOPIC
+        indicates that one of the axes of the data array is related to
+        wavelength. TIME-SERIES indicates that one of the axes is
+        sampling time. For many HST data files, this is the value of
+        FITS keyword OBSTYPE. Where OBSTYPE does not appear, this value
+        depends on other information. - All ACS, NICMOS, WFC3, WFPC, and
+        WFPC2 observations are IMAGING. - All COS, FOS, and GHRS
+        observations are SPECTROSCOPIC. - All HSP observations are
+        TIME-SERIES. - For FOC, the observation_type depends on the
+        value of FITS keyword OPMODE: IMAGING if OPMODE is "ACQ" or
+        "IMAGE"; TIME-SERIES of OPMODE is "OCC"; SPECTROSCOPIC if OPMODE
+        is "SPEC". Note that, for ACS/HRC, the FITS keyword OBSTYPE can
+        have a value of CORONAGRAPHIC. In such cases, the value of this
+        attribute is IMAGING and the coronagraph_flag attribute
+        indicates whether the coronagraph was used. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
@@ -644,7 +685,7 @@
 	   </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="plate_scale">
+  <xs:complexType name="plate_scale">
     <xs:annotation>
       <xs:documentation> This attribute indicates approximate spatial
         size of one pixel in the data product, in units of arcseconds
@@ -652,29 +693,34 @@
         FITS keyword PLATESC. For other HST instruments, we provide the
         value if it can be readily determined. In cases where a product
         contains data from detectors with different plate scales, it is
-        the smallest value. For non-imaging instruments, the value is
-        zero. </xs:documentation>
+        the smallest value. For non-imaging instruments, this attribute
+        should be nil with nilReason = "inapplicable".
+        </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="pds:ASCII_Real">
-     <xs:minInclusive value="-1.7976931348623157e308"/>
-     <xs:maxInclusive value="1.7976931348623157e308"/>
-	   </xs:restriction>
-  </xs:simpleType>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Real">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
-  <xs:simpleType name="proposed_aperture_name">
+  <xs:complexType name="proposed_aperture_name">
     <xs:annotation>
       <xs:documentation> The name of the proposed aperture used for the
         observation. For some data files, this is the value of FITS
         keyword PROPAPER. It is needed because the proposed aperture
         need not be the same as the aperture actually used. If the FITS
         keyword PROPAPER is missing or has a blank value, the value of
-        FITS keyword APERTURE is used instead. </xs:documentation>
+        FITS keyword APERTURE is used instead. For FOC data, this
+        attribute should be nil with nilReason = "inapplicable".
+        </xs:documentation>
     </xs:annotation>
-    <xs:restriction base="pds:ASCII_Short_String_Collapsed">
-     <xs:minLength value="1"/>
-     <xs:maxLength value="255"/>
-	   </xs:restriction>
-  </xs:simpleType>
+    <xs:simpleContent>
+      <xs:extension base="pds:ASCII_Short_String_Collapsed">
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="repeat_exposure_count">
     <xs:annotation>
@@ -703,11 +749,13 @@
         data product, in microns. For STIS data files, this is the value
         of FITS keyword SPECRES, divided by 10,000 to convert units from
         Angstroms to microns. For other HST instruments, this attribute
-        is assigned a value of zero. </xs:documentation>
+        should be nil with nilReason = "inapplicable".
+        </xs:documentation>
     </xs:annotation>
     <xs:simpleContent>
       <xs:extension base="hst:spectral_resolution_WO_Units">
         <xs:attribute name="unit" type="pds:Units_of_Length" use="required" />
+        <xs:attribute name="nilReason" type="pds:nil_reason" use="optional" />
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
@@ -760,11 +808,24 @@
         FQ437N, FQ492N, FQ508N, FQ619N, FQ674N, FQ750N, FQ889N, and
         FQ937N; UVIS2 for filters FQ232N, FQ243N, FQ422M, FQ436N,
         FQ575N, FQ634N, FQ672N, FQ727N, FQ906N, and FQ924N. (See Table
-        6.4 of the WFC3 Instrument Handbook.) For WF/PC, this is derived
+        6.4 of the WFC3 Instrument Handbook.) For WFPC, this is derived
         from the aperture value: - WF1 for aperture W1; WF2 for aperture
         W2, etc. - PC5 for aperture P5; PC6 for aperture P6, etc. For
         COS/FUV, this attribute will always match the value(s) of
         detector_id. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="pds:ASCII_Short_String_Collapsed">
+     <xs:minLength value="1"/>
+     <xs:maxLength value="255"/>
+	   </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="visit_id">
+    <xs:annotation>
+      <xs:documentation> The two-digit "base 36" code identifying the
+        visit number for this observations. An individual visit can
+        comprise one or more orbits of HST around the Earth.
+        </xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
      <xs:minLength value="1"/>
