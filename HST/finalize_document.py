@@ -111,7 +111,8 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
         'records_num': records_num,
         'mod_history': mod_history,
     }
-    doc_data_dict.update(data_dict)
+    # doc_data_dict.update(data_dict)
+    doc_data_dict = {**data_dict, **doc_data_dict}
 
     # Create document label
     logger.info(f'Create label for proposal files using {DOC_LABEL_TEMPLATE}')

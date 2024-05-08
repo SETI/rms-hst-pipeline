@@ -65,7 +65,9 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
         'records_num': records_num,
         'mod_history': mod_history,
     }
-    ctx_data_dict.update(data_dict)
+    # ctx_data_dict.update(data_dict)
+    ctx_data_dict = {**data_dict, **ctx_data_dict}
+
 
     # Create context collection csv
     create_context_collection_csv(proposal_id, context_dir, ctx_data_dict, logger)
