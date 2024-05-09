@@ -85,7 +85,7 @@ def get_time_coordinates(ref_hdulist, spt_hdulist, filepath='', logger=None):
             d = int(ptime[5:8])
             day = julian.day_from_yd(y,d)
             ymd = julian.ymd_from_day(day)
-            isodate = julian.ymd_format_from_day(day) + 'T' + ptime[9:]
+            isodate = julian.ymd_format_from_day(day) + 'T' + ptime[9:] + 'Z'
             isodates.append(isodate)
 
         return tuple(isodates) + (False,)
