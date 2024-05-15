@@ -39,7 +39,7 @@ def update_hst_visit(proposal_id, visit, logger=None):
     queue_next_task(proposal_id, visit, 'retrieve_visit', logger)
 
     while not is_a_task_done(proposal_id, visit, 'retrieve_visit'):
-        time.sleep(1)
+        time.sleep(60)
     logger.info(f'Retrieve hst visit for {proposal_id} visit {visit} has completed!')
 
     logger.info(f'Queue label_hst_products for {proposal_id} visit {visit}')

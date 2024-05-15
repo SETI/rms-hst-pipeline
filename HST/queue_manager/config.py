@@ -18,8 +18,8 @@ HST_SOURCE_ROOT = os.environ['PDS_HST_PIPELINE']
 DB_PATH = f'{HST_DIR["pipeline"]}/task_queue.db'
 DB_URI = f'sqlite:///{DB_PATH}'
 
-# max allowed subprocess time in seconds
-MAX_ALLOWED_TIME = 60 * 30
+# max allowed subprocess time in seconds, downloading may take hours
+MAX_ALLOWED_TIME = 60 * 60 * 24
 # max number of subprocesses allowed to run at the same time for the pipeline process for
 # all ids.
 MAX_SUBPROCESS_CNT = 20

@@ -20,6 +20,7 @@ from queue_manager.task_queue_db import (add_a_task,
                                          get_next_task_to_be_run,
                                          get_total_number_of_tasks,
                                          init_task_queue_table,
+                                         remove_a_task,
                                          update_a_task_status)
 from queue_manager.config import (DB_PATH,
                                   HST_SOURCE_ROOT,
@@ -136,14 +137,15 @@ def run_and_maybe_wait(args, max_allowed_time, proposal_id, visit, task, logger)
     Returns:    the child process that executes the given args.
     """
     # wait for an open subprocess slot
-    wait_for_subprocess()
+    wait_for_subprocess(logger)
 
     update_a_task_status(proposal_id, visit, task, 1)
     logger.debug("Spawning subprocess", str(args))
     pid = subprocess.Popen(args)
-    SUBPROCESS_LIST.append((pid, time.time(), time.time()+max_allowed_time, proposal_id, args))
+    SUBPROCESS_LIST.append((pid, time.time(), time.time()+max_allowed_time,
+                            proposal_id, visit, task, args))
 
-def wait_for_subprocess(all=False):
+def wait_for_subprocess(logger, all=False):
     """Wait for one (or all) subprocess slots to open up.
 
     Inputs:
@@ -158,11 +160,12 @@ def wait_for_subprocess(all=False):
     cur_time = time.time()
     while len(SUBPROCESS_LIST) > 0:
         for i in range(len(SUBPROCESS_LIST)):
-            pid, _, proc_max_time, _, _ = SUBPROCESS_LIST[i]
-
+            pid, _, proc_max_time, proposal_id, vi, task, args = SUBPROCESS_LIST[i]
             if pid.poll() is not None:
                 # The subprocess completed, make the slot available for next subprocess
                 del SUBPROCESS_LIST[i]
+                logger.info(f'Remove completed subprocess for: {proposal_id}'
+                            f', args: {args}')
                 break
 
             if cur_time > proc_max_time and pid:
@@ -170,6 +173,12 @@ def wait_for_subprocess(all=False):
                 # Note no offset file will be written in this case
                 pid.kill()
                 del SUBPROCESS_LIST[i]
+                logger.info('Remove subprocess running too long '
+                            f'(over {MAX_ALLOWED_TIME} seconds, possible hang) '
+                            f'for: {proposal_id}, args: {args}')
+                # Remove hung task in the queue
+                formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+                remove_a_task(formatted_proposal_id, vi, task)
                 break
 
         if len(SUBPROCESS_LIST) <= subprocess_count:

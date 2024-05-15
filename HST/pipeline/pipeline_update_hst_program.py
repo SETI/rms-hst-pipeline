@@ -79,7 +79,6 @@ logger.open('update-hst-program ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
-    # TODO: uncomment this after debugging
     update_hst_program(formatted_proposal_id, visits, logger)
 except:
     # Before raising the error, remove the task queue of the proposal id from database.

@@ -284,4 +284,4 @@ def is_a_task_done(proposal_id, visit, task):
                                         TaskQueue.task==task
                                     ).first()
     session.close()
-    return True if entry is None else False
+    return True if not entry else False
