@@ -55,8 +55,9 @@ def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=Fal
     mod_history = get_mod_history_from_label(col_ctxt_label_path, version_id)
 
     # Number of document inventory:
-    # num of target ids + 3 (inst, inst_host, investigation)
-    records_num = len(data_dict['target_identifications']) + 3
+    # num of target ids + inst ids + inst_host + investigation
+    records_num = (len(data_dict['target_identifications']) +
+                   len(data_dict['inst_id_li']) + 2)
 
     ctx_data_dict = {
         'collection_name': 'context',
