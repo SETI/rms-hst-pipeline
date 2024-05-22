@@ -36,6 +36,8 @@
             <description>
                 $WRAP(12, 90, target['description'].strip())$
             </description>
+        $ELSE_IF(len(target['description']) == 0)
+            <description>none</description>
         $END_IF
     </Target>
 </Product_Context>
