@@ -50,6 +50,9 @@ def clean_up_staging_dir(proposal_id, logger):
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Clean up staging directory for proposal id: {proposal_id}')
     staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+    # Do nothing is the staging directory doesn't exist
+    if not os.path.isdir(staging_dir):
+        return
     for dir in os.listdir(staging_dir):
         staging_prod_dir = os.path.join(staging_dir, dir)
         # Clean up the empty mastDownload directory
