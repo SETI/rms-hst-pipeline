@@ -29,11 +29,6 @@ $ONCE(ipppssoot=hst_dictionary["mast_observation_id"])
     <version_id>$version_id[0]$.$version_id[1]$</version_id>
     <title>
       $WRAP(6, 90, basename + ": " + product_title)$
-$IF(not ipppssoot_dict['reference_suffix'])
-
-      Note that observation "$ipppssoot$" did not obtain science data. Only ancillary data
-      files documenting this activity are available.
-$END_IF
     </title>
     <information_model_version>1.15.0.0</information_model_version>
 $IF(processing_level == "Ancillary")
@@ -115,6 +110,11 @@ $IF(has_nans)
       NaN ("not-a-number") values inside some data arrays, but NaN values are not allowed
       in PDS4 data products. In this file, all NaN values have been replaced by a fixed
       constant, as specified below in the Special_Constants class.
+$END_IF
+$IF(not ipppssoot_dict['reference_suffix'])
+
+      Note that observation "$ipppssoot$" did not obtain science data. Only ancillary data
+      files documenting this activity are available.
 $END_IF
     </comment>
 
