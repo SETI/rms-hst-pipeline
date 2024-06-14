@@ -147,7 +147,6 @@ $END_FOR
     </Investigation_Area>
 
     <Observing_System>
-      <name>Hubble Space Telescope $instrument_name$</name>
       <Observing_System_Component>
         <name>Hubble Space Telescope</name>
         <type>Host</type>

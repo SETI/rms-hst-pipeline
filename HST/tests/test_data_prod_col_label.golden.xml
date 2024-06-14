@@ -58,22 +58,21 @@
             </Internal_Reference>
         </Investigation_Area>
         <Observing_System>
-            <name>Hubble Space Telescope Near-Infrared Camera and Multi-Object Spectrometer</name>
             <Observing_System_Component>
-            <name>Hubble Space Telescope</name>
-            <type>Host</type>
-            <Internal_Reference>
-                <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
-                <reference_type>is_instrument_host</reference_type>
-            </Internal_Reference>
+                <name>Hubble Space Telescope</name>
+                <type>Host</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
             </Observing_System_Component>
             <Observing_System_Component>
-            <name>Near-Infrared Camera and Multi-Object Spectrometer</name>
-            <type>Instrument</type>
-            <Internal_Reference>
-                <lid_reference>urn:nasa:pds:context:instrument:hst.nicmos</lid_reference>
-                <reference_type>is_instrument</reference_type>
-            </Internal_Reference>
+                <name>Near-Infrared Camera and Multi-Object Spectrometer</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:hst.nicmos</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
             </Observing_System_Component>
         </Observing_System>
         <Target_Identification>

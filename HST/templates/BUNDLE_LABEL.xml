@@ -74,8 +74,6 @@ $ONCE(inst_ids=(', ').join(inst_id_li))
             </Internal_Reference>
         </Investigation_Area>
         <Observing_System>
-        $FOR(inst_id=inst_id_li)
-            <name>Hubble Space Telescope $instrument_name_dict[inst_id]$</name>
             <Observing_System_Component>
                 <name>Hubble Space Telescope</name>
                 <type>Host</type>
@@ -84,6 +82,7 @@ $ONCE(inst_ids=(', ').join(inst_id_li))
                     <reference_type>is_instrument_host</reference_type>
                 </Internal_Reference>
             </Observing_System_Component>
+        $FOR(inst_id=inst_id_li)
             <Observing_System_Component>
                 <name>$instrument_name_dict[inst_id.upper()]$</name>
                 <type>Instrument</type>
