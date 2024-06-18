@@ -327,22 +327,6 @@ def get_collection_label_data(proposal_id, target_dir, logger):
 
     return res
 
-def get_clean_target_text(text: str) -> str:
-    """Get the target text used in target label in PDS page.
-
-    Inputs:
-        text    a text of the target name or type.
-
-    Returns:    a string with special characters replaced by '_' and '()' removed.
-    """
-    SPECIAL_CHARS = '!#$%^&* '
-    REMOVED_CHARS = '()/'
-    for char in SPECIAL_CHARS:
-        text = text.replace(char, '_')
-    for char in REMOVED_CHARS:
-        text = text.replace(char, '')
-    return text
-
 def is_browse_prod(filename):
     """Check if a file is a browse product by checking its extension
 

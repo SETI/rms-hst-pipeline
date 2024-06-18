@@ -22,7 +22,6 @@ from finalize_data_product import label_hst_data_directory
 from hst_helper.fs_utils import get_program_dir_path
 from hst_helper.general_utils import (date_time_to_date,
                                       get_citation_info,
-                                      get_clean_target_text,
                                       get_collection_label_data,
                                       get_instrument_id_set)
 from label_bundle import label_hst_bundle
@@ -108,11 +107,11 @@ def get_general_label_data(proposal_id, logger=None, testing=False):
 
     # get clean text for target lidvid
     for targ in target_info:
-        name = get_clean_target_text(targ['name']).lower()
-        type = get_clean_target_text(targ['type']).lower()
-        targ['formatted_name'] = name
-        targ['formatted_type'] = type
-        targ['lid'] = f'urn:nasa:pds:context:target:{type}.{name}'
+        lid = targ['lid']
+        targ_type, targ_name = lid.split('.')
+        targ['formatted_name'] = targ_name
+        targ['formatted_type'] = targ_type
+        targ['lid'] = f'urn:nasa:pds:context:target:{lid}'
 
     data_dict = {
         'prop_id': proposal_id,
