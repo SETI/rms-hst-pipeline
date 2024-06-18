@@ -335,8 +335,8 @@ def get_clean_target_text(text: str) -> str:
 
     Returns:    a string with special characters replaced by '_' and '()' removed.
     """
-    SPECIAL_CHARS = '!#$%^&*/ '
-    REMOVED_CHARS = '()'
+    SPECIAL_CHARS = '!#$%^&* '
+    REMOVED_CHARS = '()/'
     for char in SPECIAL_CHARS:
         text = text.replace(char, '_')
     for char in REMOVED_CHARS:
