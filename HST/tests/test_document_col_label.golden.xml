@@ -39,7 +39,7 @@
     </Collection>
     <File_Area_Inventory>
         <File>
-            <file_name>collection_document.csv</file_name>
+            <file_name>collection.csv</file_name>
         </File>
         <Inventory>
             <offset unit="byte">0</offset>
