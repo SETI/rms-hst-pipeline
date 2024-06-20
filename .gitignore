@@ -161,6 +161,7 @@ proposal_ids_all.txt
 
 # tmp context products json
 tmp-context-products.json
+tmp-context-products-*.json
 
 # lidvid error log
 lidvid_error_log.txt

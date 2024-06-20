@@ -108,7 +108,9 @@ def get_general_label_data(proposal_id, logger=None, testing=False):
     # get clean text for target lidvid
     for targ in target_info:
         lid = targ['lid']
-        targ_type, targ_name = lid.split('.')
+        lid_li = lid.split('.')
+        targ_type = lid_li[0]
+        targ_name = lid_li[-1]
         targ['formatted_name'] = targ_name
         targ['formatted_type'] = targ_type
         targ['lid'] = f'urn:nasa:pds:context:target:{lid}'

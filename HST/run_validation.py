@@ -4,6 +4,7 @@
 
 import os
 import pdslogger
+import shutil
 from subprocess import run
 
 from hst_helper.fs_utils import (get_deliverable_path,
@@ -37,7 +38,13 @@ def run_validation(proposal_id, logger=None):
     create_manifest_files(proposal_id, logger)
 
     bundle_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    run(["./validate-pdart", bundle_dir, bundle_dir, bundle_dir])
+    run(["./validate-pdart", bundle_dir, bundle_dir, bundle_dir, str(proposal_id)])
+
+    # remove tmp context json
+    try:
+        os.remove(f'tmp-context-products-{proposal_id}.json')
+    except FileNotFoundError:
+        pass
 
 def create_manifest_files(proposal_id, logger):
     """With a given proposal id, create checksum manifest and transfer manifest files.
