@@ -8,9 +8,7 @@
                                     https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd">
 
     <Identification_Area>
-        <logical_identifier>
-            urn:nasa:pds:hst_07885:context
-        </logical_identifier>
+        <logical_identifier>urn:nasa:pds:hst_07885:context</logical_identifier>
         <version_id>1.0</version_id>
         <title>
             Context collection of NICMOS observations obtained from HST Observing Program 7885.
@@ -46,7 +44,7 @@
         <Inventory>
             <offset unit="byte">0</offset>
             <parsing_standard_id>PDS DSV 1</parsing_standard_id>
-            <records>3</records>
+            <records>4</records>
             <record_delimiter>Carriage-Return Line-Feed</record_delimiter>
             <field_delimiter>Comma</field_delimiter>
             <Record_Delimited>

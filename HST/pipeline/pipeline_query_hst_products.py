@@ -3,7 +3,8 @@
 # pipeline/pipeline_query_hst_products.py
 #
 # Syntax:
-# pipeline_query_hst_products.py [-h] [--log LOG] [--quiet] proposal_id
+# pipeline_query_hst_products.py [-h] --proposal-id PROPOSAL_ID [--log LOG]
+#                                [--quiet] [--taskqueue]
 #
 # Enter the --help option to see more information.
 #
@@ -26,18 +27,20 @@ import pdslogger
 import sys
 
 from hst_helper import HST_DIR
-from hst_helper.fs_utils import get_formatted_proposal_id
+from hst_helper.fs_utils import (get_formatted_proposal_id,
+                                 get_program_dir_path)
 from query_hst_products import query_hst_products
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import (remove_a_task,
+                                         remove_all_tasks_for_a_prog_id)
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""query-hst-products: Perform mast query with a given proposal id and
-                download all TRL files for this HST program.""")
+    description="""pipeline_query_hst_products: Perform MAST query with a given proposal
+                id and download all TRL files for this HST program.""")
 
-parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
-    help='The proposal id for the mast query.')
+parser.add_argument('--proposal-id', type=str, default='', required=True,
+    help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time
@@ -80,23 +83,28 @@ else:
 logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-products ' + ' '.join(sys.argv[1:]), limits=LIMITS)
+formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     new_visit_li, all_visits = query_hst_products(proposal_id, logger)
-    logger.info('List of visits in which any files are new or chagned: '
+    logger.info('List of visits in which any files are new or changed: '
                 + str(new_visit_li))
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    remove_all_tasks_for_a_prog_id(formatted_proposal_id)
     raise
 
 if taskqueue:
     # If list is not empty, queue update-hst-program with the list of visits
     if len(new_visit_li) != 0:
         logger.info(f'Queue update_hst_program for {proposal_id}')
-        queue_next_task(proposal_id, new_visit_li, 2, logger)
+        queue_next_task(formatted_proposal_id, new_visit_li, 'update_prog', logger)
+    else:
+        staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+        logger.info(f'No new or changed files, {staging_dir} is fully populated.'
+                    +  ' Pipeline stops')
 
+    remove_a_task(formatted_proposal_id, '', 'query_prod')
     # TODO: TASK QUEUE
     # - if list is empty, re-queue query-hst-products with a 30-day delay
     # - re-queue query-hst-products with a 90-day delay

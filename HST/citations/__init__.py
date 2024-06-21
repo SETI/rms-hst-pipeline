@@ -66,6 +66,14 @@ YEARS_FOR_CYCLE = {  # YEARS_FOR_CYCLE[cycle_number] = (start_year, end_year)
     27: (2019, 2020),
     28: (2020, 2021),
     29: (2021, 2022),
+    30: (2022, 2023),
+    31: (2023, 2024),
+    32: (2024, 2025),
+    33: (2025, 2026),
+    34: (2026, 2027),
+    35: (2027, 2028),
+    36: (2028, 2029),
+    37: (2029, 2030),
 }
 
 # Servicing Missions:
@@ -197,8 +205,6 @@ class Citation_Information:
             info = citation_information_from_apt(filename)
         elif filename_lc.endswith('.pro'):
             info = citation_information_from_pro(filename)
-        elif filename_lc.endswith('.txt'):
-            info = citation_information_from_text(filename)
         else:
             raise ValueError('unrecognized file format: ' + filename)
 

@@ -8,9 +8,7 @@
                                     https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd">
 
     <Identification_Area>
-        <logical_identifier>
-            urn:nasa:pds:hst_07885:data_nicmos_cal
-        </logical_identifier>
+        <logical_identifier>urn:nasa:pds:hst_07885:data_nicmos_cal</logical_identifier>
         <version_id>1.0</version_id>
         <title>Calibrated NICMOS "_cal" image files from HST Program 7885.</title>
         <information_model_version>1.15.0.0</information_model_version>
@@ -60,22 +58,21 @@
             </Internal_Reference>
         </Investigation_Area>
         <Observing_System>
-            <name>Hubble Space Telescope Near-Infrared Camera and Multi-Object Spectrometer</name>
             <Observing_System_Component>
-            <name>Hubble Space Telescope</name>
-            <type>Host</type>
-            <Internal_Reference>
-                <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
-                <reference_type>is_instrument_host</reference_type>
-            </Internal_Reference>
+                <name>Hubble Space Telescope</name>
+                <type>Host</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
             </Observing_System_Component>
             <Observing_System_Component>
-            <name>Near-Infrared Camera and Multi-Object Spectrometer</name>
-            <type>Instrument</type>
-            <Internal_Reference>
-                <lid_reference>urn:nasa:pds:context:instrument:hst.nicmos</lid_reference>
-                <reference_type>is_instrument</reference_type>
-            </Internal_Reference>
+                <name>Near-Infrared Camera and Multi-Object Spectrometer</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:hst.nicmos</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
             </Observing_System_Component>
         </Observing_System>
         <Target_Identification>

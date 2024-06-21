@@ -22,13 +22,14 @@ from finalize_data_product import label_hst_data_directory
 from hst_helper.fs_utils import get_program_dir_path
 from hst_helper.general_utils import (date_time_to_date,
                                       get_citation_info,
-                                      get_clean_target_text,
                                       get_collection_label_data,
                                       get_instrument_id_set)
 from label_bundle import label_hst_bundle
 from organize_files import organize_files_from_staging_to_bundles
 from product_labels.suffix_info import INSTRUMENT_NAMES
 from run_validation import run_validation
+
+from hst_helper import CITATION_INFO_DICT
 
 def finalize_hst_bundle(proposal_id, logger=None):
     """With a given proposal id, finalize hst bundle.
@@ -106,11 +107,13 @@ def get_general_label_data(proposal_id, logger=None, testing=False):
 
     # get clean text for target lidvid
     for targ in target_info:
-        name = get_clean_target_text(targ['name']).lower()
-        type = get_clean_target_text(targ['type']).lower()
-        targ['formatted_name'] = name
-        targ['formatted_type'] = type
-        targ['lid'] = f'urn:nasa:pds:context:target:{type}.{name}'
+        lid = targ['lid']
+        lid_li = lid.split('.')
+        targ_type = lid_li[0]
+        targ_name = lid_li[-1]
+        targ['formatted_name'] = targ_name
+        targ['formatted_type'] = targ_type
+        targ['lid'] = f'urn:nasa:pds:context:target:{lid}'
 
     data_dict = {
         'prop_id': proposal_id,

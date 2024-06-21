@@ -21,19 +21,23 @@
         $END_FOR
         </Alias_List>
     $END_IF
-    <Modification_History>
-        <Modification_Detail>
-            <modification_date>$label_date$</modification_date>
-            <version_id>1.0</version_id>
-            <description>Initial PDS4 version</description>
-        </Modification_Detail>
-    </Modification_History>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>$label_date$</modification_date>
+                <version_id>1.0</version_id>
+                <description>Initial PDS4 version</description>
+            </Modification_Detail>
+        </Modification_History>
     </Identification_Area>
     <Target>
         <name>$target['name']$</name>
         <type>$target['type']$</type>
-        <description>
-            $WRAP(12, 90, target['description'].strip())$
-        </description>
+        $IF(len(target['description']))
+            <description>
+                $WRAP(12, 90, target['description'].strip())$
+            </description>
+        $ELSE_IF(len(target['description']) == 0)
+            <description>none</description>
+        $END_IF
     </Target>
 </Product_Context>

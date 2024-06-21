@@ -1621,7 +1621,7 @@ for instrument_id, mast_suffixes in ACCEPTED_BROWSE_SUFFIXES.items():
                                                                       # WFPC2
     for mast_suffix in mast_suffixes:
 
-        # Translate mast suffix to local suffix, e.g., "drc_large" -> "drc"
+        # Translate MAST suffix to local suffix, e.g., "drc_large" -> "drc"
         local_suffix = translator.get(mast_suffix, mast_suffix)
 
         # Translate local suffix to FITS suffix
@@ -1847,4 +1847,3 @@ def test_keys():
             assert suffix in ALL_SUFFIXES[instrument_id]
 
 ##########################################################################################
-

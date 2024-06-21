@@ -1,26 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!-- TBD_modelShortName XML/Schema for Name Space Id:disp  Version:1.11.0.0 - Sun Sep 23 16:29:35 PDT 2018 -->
-  <!-- Generated from the TBD_modelShortName Information Model Version 1.11.0.0 - System Build 9a -->
-  <!-- *** This TBD_modelShortName product schema is an operational deliverable. *** -->
+  <!-- PDS4 XML/Schema for Name Space Id:disp  Version:1.5.1.0 - Thu Nov 02 23:29:05 UTC 2023 -->
+  <!-- Generated from the PDS4 Information Model Version 1.21.0.0 - System Build 14.0 -->
+  <!-- *** This PDS4 product schema is an operational deliverable. *** -->
+  <!--                                                                           -->
+  <!--               Dictionary Stack                                            -->
+  <!-- 1.21.0.0 - pds: - Common Dictionary                                       -->
+  <!-- 1.5.1.0 - disp: - Display                                                 -->
+  <!--                                                                           -->
   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://pds.nasa.gov/pds4/disp/v1"
     xmlns:disp="http://pds.nasa.gov/pds4/disp/v1"
     xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
     elementFormDefault="qualified"
     attributeFormDefault="unqualified"
-    version="1.11.0.0">
+    version="1.5.1.0">
  
-    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd"/>
+    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1L00.xsd"/>
  
   <xs:annotation>
-    <xs:documentation>This dictionary describes how to display Array
-      data on a display device.</xs:documentation>
+    <xs:documentation>
+This dictionary describes how to display Array data on a display device.
+  
+    ## CHANGE LOG ##
+
+    1.5.0.0
+    - ported from 1.4.0.0 schema to LDD for PDS IM 1E00 and 1F00
+    - added two rules under Display_Settings_0, (1) to add at least one 
+      local_reference_type, for now - 'display_settings_to_array' and 
+      (2) to make sure local_identifier_reference values under Display matches 
+      the local_identifier attribute under Array_*
+      - This rule also seems to be inserted during LDDtool build 
+        so currently it is being duplicated.
+      
+    1.5.1.0 
+    - Added display_settings_validate_axis rules and tests for the new rules by Jesse S.
+  
+  
+    </xs:documentation>
   </xs:annotation>
  
-  <xs:element name="Color_Display_Settings" type="disp:Color_Display_Settings"> </xs:element>
-  <xs:element name="Display_Direction" type="disp:Display_Direction"> </xs:element>
   <xs:element name="Display_Settings" type="disp:Display_Settings"> </xs:element>
-  <xs:element name="Movie_Display_Settings" type="disp:Movie_Display_Settings"> </xs:element>
 
   <xs:complexType name="Color_Display_Settings">
     <xs:annotation>
@@ -52,8 +71,8 @@
       <xs:element name="vertical_display_direction" type="disp:vertical_display_direction" minOccurs="1" maxOccurs="1"> </xs:element>
     </xs:sequence>
     <!-- Begin assert statements for schematron - Enumerated Values -->
-    <!-- <xs:assert test="disp:vertical_display_direction = ('Bottom to Top', 'Top to Bottom')"/> -->
     <!-- <xs:assert test="disp:horizontal_display_direction = ('Left to Right', 'Right to Left')"/> -->
+    <!-- <xs:assert test="disp:vertical_display_direction = ('Bottom to Top', 'Top to Bottom')"/> -->
     <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
 
@@ -64,10 +83,10 @@
         device.</xs:documentation>
     </xs:annotation>
     <xs:sequence>
-      <xs:element ref="pds:Local_Internal_Reference" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element ref="disp:Display_Direction" minOccurs="1" maxOccurs="1"> </xs:element>
-      <xs:element ref="disp:Color_Display_Settings" minOccurs="0" maxOccurs="1"> </xs:element>
-      <xs:element ref="disp:Movie_Display_Settings" minOccurs="0" maxOccurs="1"> </xs:element>
+      <xs:element ref="pds:Local_Internal_Reference" minOccurs="0" maxOccurs="1"> </xs:element>
+      <xs:element name="Display_Direction" type="disp:Display_Direction" minOccurs="1" maxOccurs="1"> </xs:element>
+      <xs:element name="Color_Display_Settings" type="disp:Color_Display_Settings" minOccurs="0" maxOccurs="1"> </xs:element>
+      <xs:element name="Movie_Display_Settings" type="disp:Movie_Display_Settings" minOccurs="0" maxOccurs="1"> </xs:element>
     </xs:sequence>
   </xs:complexType>
 
@@ -88,8 +107,8 @@
       <xs:element name="loop_back_and_forth_flag" type="disp:loop_back_and_forth_flag" minOccurs="0" maxOccurs="1"> </xs:element>
     </xs:sequence>
     <!-- Begin assert statements for schematron - Enumerated Values -->
-    <!-- <xs:assert test="disp:loop_back_and_forth_flag = ('false', 'true')"/> -->
     <!-- <xs:assert test="disp:loop_flag = ('false', 'true')"/> -->
+    <!-- <xs:assert test="disp:loop_back_and_forth_flag = ('false', 'true')"/> -->
     <!-- End assert statements for schematron - Enumerated Values -->
   </xs:complexType>
 
@@ -189,8 +208,8 @@
         be displayed.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
-     <xs:minLength value="1"/>
-     <xs:maxLength value="255"/>
+     <xs:minLength value="13"/>
+     <xs:maxLength value="13"/>
 	   </xs:restriction>
   </xs:simpleType>
 
@@ -299,8 +318,8 @@
         displayed.</xs:documentation>
     </xs:annotation>
     <xs:restriction base="pds:ASCII_Short_String_Collapsed">
-     <xs:minLength value="1"/>
-     <xs:maxLength value="255"/>
+     <xs:minLength value="13"/>
+     <xs:maxLength value="13"/>
 	   </xs:restriction>
   </xs:simpleType>
 </xs:schema>

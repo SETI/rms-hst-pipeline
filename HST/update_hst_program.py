@@ -11,9 +11,11 @@
 ##########################################################################################
 
 import pdslogger
+import time
 
 from queue_manager import queue_next_task
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import (is_a_task_done,
+                                         remove_all_tasks_for_a_prog_id)
 
 def update_hst_program(proposal_id, visit_li, logger=None):
     """Overall task to create a new bundle or to manage the update of an existing bundle.
@@ -34,22 +36,28 @@ def update_hst_program(proposal_id, visit_li, logger=None):
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
     logger.info(f'Queue get_program_info for {proposal_id}')
-    p1 = queue_next_task(proposal_id, '', 3, logger)
-    p1.communicate()
+    queue_next_task(proposal_id, '', 'get_prog_info', logger)
 
-    pid_li = []
+    while not is_a_task_done(proposal_id, '', 'get_prog_info'):
+        time.sleep(1)
+    logger.info(f'Get program info for {proposal_id} has completed!')
+
     for vi in visit_li:
         logger.info(f'Queue update_hst_visit for {proposal_id} visit {vi}')
-        pid = queue_next_task(proposal_id, vi, 4, logger)
-        pid_li.append(pid)
-    for p in pid_li:
-        p.communicate()
-    logger.info(f'All visits for {proposal_id} have completed update_hst_visit.')
+        queue_next_task(proposal_id, vi, 'update_visit', logger)
+
+    for vi in visit_li:
+        while not is_a_task_done(proposal_id, vi, 'update_visit'):
+            time.sleep(1)
+    logger.info(f'All visits for {proposal_id} have completed update_hst_visit')
 
     logger.info(f'Queue finalize_hst_bundle for {proposal_id}')
-    p2 =  queue_next_task(proposal_id, '', 8, logger)
-    p2.communicate()
-    # Remove all task queue for the given proposal id from db
-    remove_all_task_queue_for_a_prog_id(proposal_id)
+    queue_next_task(proposal_id, '', 'finalize_bundle', logger)
 
-    logger.info(f'HST pipeline for {proposal_id} is done.')
+    while not is_a_task_done(proposal_id, '', 'finalize_bundle'):
+        time.sleep(1)
+    # Remove all task queue & subprocess for the given proposal id from db
+    logger.info(f'Pipeline is done. Remove all tasks from db for {proposal_id}')
+    remove_all_tasks_for_a_prog_id(proposal_id)
+
+    logger.info(f'HST pipeline for {proposal_id} is done')

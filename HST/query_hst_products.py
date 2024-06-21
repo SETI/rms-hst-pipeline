@@ -31,9 +31,9 @@ from hst_helper.query_utils import (download_files,
                                     get_filtered_products,
                                     get_trl_products,
                                     query_mast_slice)
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import remove_all_tasks_for_a_prog_id
 
-# A dictionary keyed by IPPPSSOOT and stores observation id from mast as the value.
+# A dictionary keyed by IPPPSSOOT and stores observation id from MAST as the value.
 products_obs_dict = {}
 
 def query_hst_products(proposal_id, logger=None):
@@ -66,7 +66,7 @@ def query_hst_products(proposal_id, logger=None):
     table = query_mast_slice(proposal_id=proposal_id, logger=logger)
     filtered_products = get_filtered_products(table)
     # Log all accepted file names
-    logger.info(f'List out all accepted files from mast for {proposal_id}')
+    logger.info(f'List out all accepted files from MAST for {proposal_id}')
     files_dict = defaultdict(list)
     trl_files_dict = defaultdict(list)
     for row in filtered_products:
@@ -76,15 +76,16 @@ def query_hst_products(proposal_id, logger=None):
         format_term, _, _ = product_fname.partition('_')
         visit = get_visit(format_term)
 
-        files_dict[visit].append(product_fname)
-        if 'trl' in product_fname:
+        if product_fname not in files_dict[visit]:
+            files_dict[visit].append(product_fname)
+        if 'trl' in product_fname and product_fname not in trl_files_dict[visit]:
             trl_files_dict[visit].append(product_fname)
 
         suffix = row['productSubGroupDescription']
         logger.info(f'File: {product_fname} with suffix: {suffix}')
 
     # Create program and all visits directories if they don't exist.
-    logger.info('Create program and visit directories that do not already exist.')
+    logger.info('Create program and visit directories that do not already exist')
     for visit in files_dict:
         create_program_dir(proposal_id, visit)
 
@@ -103,10 +104,11 @@ def query_hst_products(proposal_id, logger=None):
                 dir_path = os.path.join(trl_dir, f)
                 shutil.rmtree(dir_path)
 
-        # Before raising the error, remove the task queue of the proposal id from
-        # database.
+        # Before raising the error, remove the task queue & subprocess of the proposal id
+        # from database.
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-        remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+        remove_all_tasks_for_a_prog_id(formatted_proposal_id)
+
         logger.exception('MAST trl files downlaod failure')
         raise
 
@@ -127,11 +129,10 @@ def query_hst_products(proposal_id, logger=None):
     for visit, trl_files in trl_files_dict.items():
         for f in trl_files:
             filepath = get_downloaded_file_path(proposal_id, f)
-            os.remove(filepath)
-
-    # Clean up the empty mastDownload directory
-    staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
-    shutil.rmtree(staging_dir + '/mastDownload')
+            try:
+                os.remove(filepath)
+            except FileNotFoundError:
+                pass
 
     return (visit_diff, list(files_dict.keys()))
 
@@ -165,10 +166,10 @@ def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=
 
 def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=False):
     """Return a flag to indicate if any files are new or changed in the visit.
-    Compare the contents of current txt file with the results from Mast. If they are
+    Compare the contents of current txt file with the results from MAST. If they are
     the same, keep the current txt file. If they are different, move the current txt
     file to the backups directory, and generate the new txt file based on the new results
-    from Mast.
+    from MAST.
 
     Input:
         proposal_id          a proposal id.
@@ -199,7 +200,7 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
         files_from_txt = [line.rstrip() for line in text_file]
         text_file.close()
 
-        # compare the list from Mast with the contents of the old txt file
+        # compare the list from MAST with the contents of the old txt file
         if files_from_txt != files_li:
             is_visit_diff = True
             # move the old txt file to backups

@@ -3,7 +3,7 @@
 # pipeline/pipeline_update_hst_visit.py
 #
 # Syntax:
-# pipeline_update_hst_visit.py [-h] --proposal_id PROPOSAL_ID --visit VISIT
+# pipeline_update_hst_visit.py [-h] --proposal-id PROPOSAL_ID --visit VISIT
 #                              [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
@@ -23,16 +23,17 @@ import sys
 
 from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import (remove_a_task,
+                                         remove_all_tasks_for_a_prog_id)
 from update_hst_visit import update_hst_visit
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""update-hst-visit: Update all the identified files for a given
+    description="""pipeline_update_hst_visit: Update all the identified files for a given
                 proposal id and visit.""")
 
-parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
-    help='The proposal id for the mast query.')
+parser.add_argument('--proposal-id', type=str, default='', required=True,
+    help='The proposal id for the MAST query.')
 
 parser.add_argument('--visit', '--vi', type=str, default='', required=True,
     help='The two character visit of an observation.')
@@ -76,15 +77,16 @@ else:
 logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('update-hst-visit ' + ' '.join(sys.argv[1:]), limits=LIMITS)
+formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
-    update_hst_visit(proposal_id, visit, logger)
+    update_hst_visit(formatted_proposal_id, visit, logger)
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    remove_all_tasks_for_a_prog_id(formatted_proposal_id)
     raise
 
+remove_a_task(formatted_proposal_id, visit, 'update_visit')
 logger.close()
 
 ##########################################################################################

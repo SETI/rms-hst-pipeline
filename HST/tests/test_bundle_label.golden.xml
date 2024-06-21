@@ -60,7 +60,6 @@
             </Internal_Reference>
         </Investigation_Area>
         <Observing_System>
-            <name>Hubble Space Telescope Near-Infrared Camera and Multi-Object Spectrometer</name>
             <Observing_System_Component>
                 <name>Hubble Space Telescope</name>
                 <type>Host</type>

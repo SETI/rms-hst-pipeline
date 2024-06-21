@@ -49,9 +49,10 @@ def create_target_label(proposal_id, data_dict, logger=None):
     for targ in target_records:
         # TODO: handle the case for a target body with multiple names or types. Might
         # need a new task for this.
-        name = targ['formatted_name']
-        type = targ['formatted_type']
-        target = f'{type}.{name}'.lower()
+        # name = targ['formatted_name']
+        # type = targ['formatted_type']
+        lid = targ['lid']
+        _, _, target = lid.partition('target:')
         if target not in found_target_list:
             found_target_list.append((targ, target))
 
@@ -119,5 +120,5 @@ def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
             'lidvid': targ_lidvid,
         }
         json_data['Product_Context'].append(new_context)
-    with open('tmp-context-products.json', 'w') as tmp_json:
+    with open(f'tmp-context-products-{proposal_id}.json', 'w') as tmp_json:
         json.dump(json_data, tmp_json)

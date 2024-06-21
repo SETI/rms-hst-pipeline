@@ -592,8 +592,9 @@ def repair_hdu_dictionaries(hdu_dicts, filepath, logger):
             hdu_dict['data']['description'] = dname + '.'
 
             logger.warn(f'HDU #{k} name repaired {extname} to {name}', filepath)
-
-        if hdu_dict['data']['data_class'] == 'Array_1D_Image':
+        # TODO: use Array_1D for now, once DDWG has an update, change back to
+        # 'Array_1D_Spectrum'
+        if hdu_dict['data']['data_class'] in ['Array_1D_Image', 'Array_1D_Spectrum']:
             hdu_dict['data']['data_class'] = 'Array_1D'
 
 ##########################################################################################

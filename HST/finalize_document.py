@@ -59,7 +59,7 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
     # Create document directory and move proposal files over
-    logger.info(f'Create document directory for proposal id: {proposal_id}.')
+    logger.info(f'Create document directory for proposal id: {proposal_id}')
     _, document_dir = create_col_dir_in_bundle(proposal_id, 'document', testing)
 
     # For testing purpose, data_dict is pre-constructed, no need to walk through
@@ -70,7 +70,7 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
         # Search for proposal files & program info file stored at pipeline directory
         # Move them to bundles directory and collect neccessary data for the label
         pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
-        logger.info('Move over proposal files.')
+        logger.info('Move over proposal files')
 
         for file in os.listdir(pipeline_dir):
             basename, _, ext = file.rpartition('.')
@@ -111,10 +111,11 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
         'records_num': records_num,
         'mod_history': mod_history,
     }
-    doc_data_dict.update(data_dict)
+    # doc_data_dict.update(data_dict)
+    doc_data_dict = {**data_dict, **doc_data_dict}
 
     # Create document label
-    logger.info(f'Create label for proposal files using {DOC_LABEL_TEMPLATE}.')
+    logger.info(f'Create label for proposal files using {DOC_LABEL_TEMPLATE}')
     # Document label template path
     this_dir = os.path.dirname(os.path.abspath(__file__))
     doc_template = f'{this_dir}/templates/{DOC_LABEL_TEMPLATE}'

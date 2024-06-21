@@ -10,9 +10,7 @@
 $ONCE(formatted_prop_id=str(prop_id).zfill(5))
 $ONCE(collection_type = "Miscellaneous" if processing_level == "Ancillary" else "Data")
     <Identification_Area>
-        <logical_identifier>
-            urn:nasa:pds:hst_$formatted_prop_id$:$collection_name$
-        </logical_identifier>
+        <logical_identifier>urn:nasa:pds:hst_$formatted_prop_id$:$collection_name$</logical_identifier>
         <version_id>$version_id[0]$.$version_id[1]$</version_id>
         <title>$collection_title$</title>
         <information_model_version>1.15.0.0</information_model_version>
@@ -75,22 +73,21 @@ $IF("miscellaneous" not in collection_name and "browse" not in collection_name)
             </Internal_Reference>
         </Investigation_Area>
         <Observing_System>
-            <name>Hubble Space Telescope $instrument_name$</name>
             <Observing_System_Component>
-            <name>Hubble Space Telescope</name>
-            <type>Host</type>
-            <Internal_Reference>
-                <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
-                <reference_type>is_instrument_host</reference_type>
-            </Internal_Reference>
+                <name>Hubble Space Telescope</name>
+                <type>Host</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+                    <reference_type>is_instrument_host</reference_type>
+                </Internal_Reference>
             </Observing_System_Component>
             <Observing_System_Component>
-            <name>$instrument_name$</name>
-            <type>Instrument</type>
-            <Internal_Reference>
-                <lid_reference>urn:nasa:pds:context:instrument:hst.$inst_id$</lid_reference>
-                <reference_type>is_instrument</reference_type>
-            </Internal_Reference>
+                <name>$instrument_name$</name>
+                <type>Instrument</type>
+                <Internal_Reference>
+                    <lid_reference>urn:nasa:pds:context:instrument:hst.$inst_id$</lid_reference>
+                    <reference_type>is_instrument</reference_type>
+                </Internal_Reference>
             </Observing_System_Component>
         </Observing_System>
     $FOR(target=target_identifications)

@@ -103,6 +103,10 @@ def get_target_identifications(xml_content):
         else:
             info['description'] = parts[1]
 
+        parts = LID_REFERENCE.split(text)[1].strip()
+        _, _, lid = parts.partition('target:')
+        info['lid'] = lid
+
         info_list.append(info)
 
     return info_list

@@ -9,7 +9,8 @@ import os
 import pdslogger
 import shutil
 
-from hst_helper import COL_NAME_PREFIX
+from hst_helper import (COL_NAME_PREFIX,
+                        MAST_DOWNLOAD_DIRNAME)
 from hst_helper.fs_utils import (get_program_dir_path,
                                  get_deliverable_path)
 
@@ -36,3 +37,29 @@ def organize_files_from_staging_to_bundles(proposal_id, logger):
                 os.makedirs(bundles_prod_dir, exist_ok=True)
                 logger.info(f'Move {dir} from staging to bundles directory')
                 shutil.copytree(staging_prod_dir, bundles_prod_dir, dirs_exist_ok=True)
+
+def clean_up_staging_dir(proposal_id, logger):
+    """Remove organized directories (they are copied to the bundle directory) and empty
+    mastDownload directories (empty directories) from the staging folder. This step should
+    be run at the end of the pipeline process.
+
+    Inputs:
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    logger.info(f'Clean up staging directory for proposal id: {proposal_id}')
+    staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+    # Do nothing is the staging directory doesn't exist
+    if not os.path.isdir(staging_dir):
+        return
+    for dir in os.listdir(staging_dir):
+        staging_prod_dir = os.path.join(staging_dir, dir)
+        # Clean up the empty mastDownload directory
+        if dir.startswith(MAST_DOWNLOAD_DIRNAME):
+            logger.info(f'Remove {dir} from staging directory')
+            shutil.rmtree(staging_prod_dir)
+        for col_prefix in COL_NAME_PREFIX:
+            if dir.startswith(col_prefix):
+                logger.info(f'Remove {dir} from staging directory')
+                shutil.rmtree(staging_prod_dir)

@@ -3,7 +3,7 @@
 # pipeline/pipeline_get_program_info.py
 #
 # Syntax:
-# pipeline_get_program_info.py [-h] [--log LOG] [--quiet] proposal_id
+# pipeline_get_program_info.py [-h] --proposal-id PROPOSAL_ID [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 #
@@ -27,15 +27,16 @@ import sys
 from get_program_info import get_program_info
 from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import (remove_a_task,
+                                         remove_all_tasks_for_a_prog_id)
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""get-program-info: Retrieve the proposal files via a web query for a
-                given proposal id.""")
+    description="""pipeline_get_program_info: Retrieve the proposal files via a web query
+                for a given proposal id.""")
 
-parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
-    help='The proposal id for the mast query.')
+parser.add_argument('--proposal-id', type=str, default='', required=True,
+    help='The proposal id for the MAST query.')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time
@@ -73,15 +74,16 @@ else:
 logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('get-program-info ' + ' '.join(sys.argv[1:]), limits=LIMITS)
+formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     get_program_info(proposal_id, None, logger)
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    remove_all_tasks_for_a_prog_id(formatted_proposal_id)
     raise
 
+remove_a_task(formatted_proposal_id, '', 'get_prog_info')
 logger.close()
 
 ##########################################################################################

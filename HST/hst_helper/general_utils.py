@@ -10,16 +10,17 @@ import csv
 import os
 import pdslogger
 
-from . import (CITATION_INFO_DICT,
-               DOCUMENT_EXT,
+from . import (BROWSE_PROD_EXT,
+               CITATION_INFO_DICT,
+               DOCUMENT_EXT_FOR_CITATION_INFO,
                INST_ID_DICT,
                INST_PARAMS_DICT,
                PRIMARY_RES_DICT,
-               PROGRAM_INFO_FILE,
                RECORDS_DICT,
                TARG_ID_DICT,
                TIME_DICT)
 from .fs_utils import (get_deliverable_path,
+                       get_format_term,
                        get_formatted_proposal_id,
                        get_program_dir_path,
                        get_instrument_id_from_fname)
@@ -29,7 +30,7 @@ from product_labels.xml_support import (get_instrument_params,
                                         get_primary_result_summary,
                                         get_target_identifications,
                                         get_time_coordinates)
-from xmltemplate import XmlTemplate
+from pdstemplate import PdsTemplate
 
 def create_collection_label(
     proposal_id, collection_name, data_dict,
@@ -54,7 +55,7 @@ def create_collection_label(
     logger.info(f'Create collection csv with proposal id: {proposal_id}')
 
     # Create collection label
-    logger.info(f'Create label for collection using templates/{template_name}.')
+    logger.info(f'Create label for collection using templates/{template_name}')
     # Collection label template path
     col_dir = os.path.dirname(os.path.abspath(__file__))
     col_template = f'{col_dir}/../templates/{template_name}'
@@ -78,11 +79,11 @@ def create_xml_label(template_path, label_path, data_dict, logger):
         logger           pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Create label using template from: {template_path}.')
-    TEMPLATE = XmlTemplate(template_path)
-    XmlTemplate.set_logger(logger)
+    logger.info(f'Create label using template from: {template_path}')
+    TEMPLATE = PdsTemplate(template_path)
+    PdsTemplate.set_logger(logger)
 
-    logger.info('Insert data to the label template.')
+    logger.info('Insert data to the label template')
     TEMPLATE.write(data_dict, label_path)
     if TEMPLATE.ERROR_COUNT == 1:
         logger.error('1 error encountered', label_path)
@@ -99,7 +100,7 @@ def create_csv(csv_path, data, logger):
         logger      pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Create csv: {csv_path}.')
+    logger.info(f'Create csv: {csv_path}')
 
 
     # open the file in the write mode
@@ -124,14 +125,14 @@ def get_citation_info(proposal_id, logger):
     if formatted_proposal_id in CITATION_INFO_DICT:
         return CITATION_INFO_DICT[formatted_proposal_id]
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Get citation info for: {proposal_id}.')
+    logger.info(f'Get citation info for: {proposal_id}')
 
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
 
     for file in os.listdir(pipeline_dir):
         _, _, ext = file.rpartition('.')
         # We don't have an implementation to create citation info from pdf.
-        if (ext in DOCUMENT_EXT and ext != 'pdf') or file == PROGRAM_INFO_FILE:
+        if ext in DOCUMENT_EXT_FOR_CITATION_INFO:
             file_path = f'{pipeline_dir}/{file}'
             if formatted_proposal_id not in CITATION_INFO_DICT:
                 CITATION_INFO_DICT[formatted_proposal_id] = (
@@ -154,7 +155,7 @@ def get_instrument_id_set(proposal_id, logger):
     # Get instrument id
     if formatted_proposal_id not in INST_ID_DICT:
         logger = logger or pdslogger.EasyLogger()
-        logger.info(f'Get instrument ids for: {proposal_id}.')
+        logger.info(f'Get instrument ids for: {proposal_id}')
         # Walk through all the downloaded files from MAST in staging directory
         files_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
         for root, dirs, files in os.walk(files_dir):
@@ -273,40 +274,47 @@ def get_collection_label_data(proposal_id, target_dir, logger):
         res['records'] = RECORDS_DICT[formatted_proposal_id][collection_name]
 
     for root, _, files in os.walk(target_dir):
-            for file in files:
-                if not file.startswith('collection_') and file.endswith('.xml'):
-                    file_path = os.path.join(root, file)
-                    with open(file_path) as f:
-                        xml_content = f.read()
-                        # target identifications
-                        if 'target' not in res:
-                            target_ids = get_target_identifications(xml_content)
-                            for targ in target_ids:
-                                if targ not in TARG_ID_DICT[formatted_proposal_id]:
-                                    TARG_ID_DICT[formatted_proposal_id].append(targ)
-                        # roll up start/stop time
-                        if 'time' not in res:
-                            start, stop = get_time_coordinates(xml_content)
-                            min_start = start if min_start is None else min(min_start,
-                                                                            start)
-                            max_stop = stop if max_stop is None else max(max_stop, stop)
-                        # instrument params
-                        if 'inst_params' not in res:
-                            INST_PARAMS_DICT[formatted_proposal_id][collection_name]  = (
-                                get_instrument_params(xml_content)
-                            )
-                            res['inst_params'] = (INST_PARAMS_DICT[formatted_proposal_id]
-                                                                  [collection_name])
-                        # primary results
-                        if 'primary_res' not in res:
-                            PRIMARY_RES_DICT[formatted_proposal_id][collection_name] = (
-                                get_primary_result_summary(xml_content)
-                            )
-                            res['primary_res'] = (PRIMARY_RES_DICT[formatted_proposal_id]
-                                                                  [collection_name])
-                        # records
-                        if file not in files_li:
-                            files_li.append(file)
+        for file in files:
+            format_term = get_format_term(file)
+            # For browse files
+            if is_browse_prod(file):
+                if format_term not in files_li:
+                    files_li.append(format_term)
+                continue
+            if not file.startswith('collection_') and file.endswith('.xml'):
+                file_path = os.path.join(root, file)
+                # Read the xml files
+                with open(file_path) as f:
+                    xml_content = f.read()
+                    # target identifications
+                    if 'target' not in res:
+                        target_ids = get_target_identifications(xml_content)
+                        for targ in target_ids:
+                            if targ not in TARG_ID_DICT[formatted_proposal_id]:
+                                TARG_ID_DICT[formatted_proposal_id].append(targ)
+                    # roll up start/stop time
+                    if 'time' not in res:
+                        start, stop = get_time_coordinates(xml_content)
+                        min_start = start if min_start is None else min(min_start,
+                                                                        start)
+                        max_stop = stop if max_stop is None else max(max_stop, stop)
+                    # instrument params
+                    if 'inst_params' not in res:
+                        INST_PARAMS_DICT[formatted_proposal_id][collection_name]  = (
+                            get_instrument_params(xml_content)
+                        )
+                        res['inst_params'] = (INST_PARAMS_DICT[formatted_proposal_id]
+                                                                [collection_name])
+                    # primary results
+                    if 'primary_res' not in res:
+                        PRIMARY_RES_DICT[formatted_proposal_id][collection_name] = (
+                            get_primary_result_summary(xml_content)
+                        )
+                        res['primary_res'] = (PRIMARY_RES_DICT[formatted_proposal_id]
+                                                                [collection_name])
+                    # records
+                    if format_term not in files_li:
+                        files_li.append(format_term)
 
     if 'target' not in res:
         res['target'] = TARG_ID_DICT[formatted_proposal_id]
@@ -319,18 +327,15 @@ def get_collection_label_data(proposal_id, target_dir, logger):
 
     return res
 
-def get_clean_target_text(text: str) -> str:
-    """Get the target text used in target label in PDS page.
+def is_browse_prod(filename):
+    """Check if a file is a browse product by checking its extension
 
     Inputs:
-        text    a text of the target name or type.
+        filename    the name of a file
 
-    Returns:    a string with special characters replaced by '_' and '()' removed.
+    Returns:        a boolean
     """
-    SPECIAL_CHARS = '!#$%^&*/ '
-    REMOVED_CHARS = '()'
-    for char in SPECIAL_CHARS:
-        text = text.replace(char, '_')
-    for char in REMOVED_CHARS:
-        text = text.replace(char, '')
-    return text
+    for ext in BROWSE_PROD_EXT:
+        if filename.endswith(ext):
+            return True
+    return False

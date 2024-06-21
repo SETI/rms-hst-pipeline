@@ -3,8 +3,8 @@
 # pipeline/pipeline_update_hst_program.py
 #
 # Syntax:
-# pipeline_update_hst_program.py [-h] --proposal_id PROPOSAL_ID --visit VISIT
-#                              [--log LOG] [--quiet]
+# pipeline_update_hst_program.py [-h] --proposal-id PROPOSAL_ID --visits
+#                                VISITS [VISITS ...] [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 #
@@ -23,18 +23,19 @@ import sys
 
 from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
-from queue_manager.task_queue_db import remove_all_task_queue_for_a_prog_id
+from queue_manager.task_queue_db import (remove_a_task,
+                                         remove_all_tasks_for_a_prog_id)
 from update_hst_program import update_hst_program
 
 # Set up parser
 parser = argparse.ArgumentParser(
-    description="""update-hst-program: Update all the identified files for a given
-                proposal id and visit.""")
+    description="""pipeline_update_hst_program: Update all the identified files for a
+                given proposal id and visit.""")
 
-parser.add_argument('--proposal_id', '--prog-id', type=str, default='', required=True,
-    help='The proposal id for the mast query.')
+parser.add_argument('--proposal-id', type=str, default='', required=True,
+    help='The proposal id for the MAST query.')
 
-parser.add_argument('--visit_li', '--vi', nargs='+', type=str, default='', required=True,
+parser.add_argument('--visits', nargs='+', type=str, default='', required=True,
     help='A list of the two character visits of an observation.')
 
 parser.add_argument('--log', '-l', type=str, default='',
@@ -53,7 +54,7 @@ if len(sys.argv) == 1:
 # Parse and validate the command line
 args = parser.parse_args()
 proposal_id = args.proposal_id
-visit_li = args.visit_li if args.visit_li else []
+visits = args.visits if args.visits else []
 LOG_DIR = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
 
 logger = pdslogger.PdsLogger('pds.hst.update-hst-program-' + proposal_id)
@@ -75,15 +76,17 @@ else:
 logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('update-hst-program ' + ' '.join(sys.argv[1:]), limits=LIMITS)
+formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
-    update_hst_program(proposal_id, visit_li, logger)
+    update_hst_program(formatted_proposal_id, visits, logger)
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    remove_all_task_queue_for_a_prog_id(formatted_proposal_id)
+    remove_all_tasks_for_a_prog_id(formatted_proposal_id)
     raise
 
+visit = '' if isinstance(visits, list) else visits
+remove_a_task(formatted_proposal_id, visit, 'update_prog')
 logger.close()
 
 ##########################################################################################

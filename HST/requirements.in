@@ -1,0 +1,13 @@
+astroquery
+coverage
+fs
+pip-tools
+pyparsing
+pytest
+rms-julian
+rms-pdslogger
+rms-pdstemplate
+rms-translator
+SQLAlchemy
+unidecode
+urllib3
