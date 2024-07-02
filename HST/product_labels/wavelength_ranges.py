@@ -186,6 +186,10 @@ def ranges_from_one_filter(filter_name):
     # Check the list of exceptions first
     if filter_name in FILTER_EXCEPTIONS:
         return FILTER_EXCEPTIONS[filter_name]
+    # If there is no exact match in the exceptions, check for prefix
+    for filter in FILTER_EXCEPTIONS:
+        if filter_name.startswith(filter):
+            return FILTER_EXCEPTIONS[filter]
 
     # Otherwise, derive the wavelength ranges from the center wavelength
     # embedded within the filter name.
