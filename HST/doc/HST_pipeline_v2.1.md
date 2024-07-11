@@ -1,9 +1,9 @@
 #
 # The HST Migration Pipeline Architecture
 
-Version 2.0
+Version 2.1
 
-November 9, 2022
+July 9, 2024
 
 #
 # Terms
@@ -30,22 +30,22 @@ November 9, 2022
 - A visit is limited to ~ 6 orbits of HST, so this approach has the advantage of also limiting the volumes of data that the pipeline has to deal with at any given time.
 
 #
-# File System Organization (1)
+# File System Organization
 
 - I suggest we organize all information about the processing pipeline by program ID and visit within a single directory tree.
 - The directory path is always `<root>/hst_\nnnnn>/visit_<ss>/`, where nnnnn is the program ID (with leading zero if needed) and ss is the visit.
 - The root directory is always defined by the content of an environment variable “`HST_PIPELINE`”.
 - All processing logs are separated by visit and saved in within a subdirectory “`logs/`” inside each visit-level directory.
 - Any other information that needs to be managed by the pipeline can be saved in files within this tree.
-
-#
-# File System Organization (2)
-
 - We should not use this directory tree to store data files and their labels while in development.
 - I suggest we use the same hierarchy, but have them in a root directory defined by environment variable “`HST_STAGING`”.
 - The pipeline also needs to reference the location of all current HST bundles as defined by environment variable “`HST_BUNDLES`”.
 - See the document PDS4-VERSIONING.txt on Dropbox for the details about the layout of the `HST_BUNDLES` tree.
 - Note: It probably makes sense to move the target identification WEBCACHE out of GitHub and into this directory tree as `<HST_PIPELINE>/target-identifications/WEBCACHE`.
+- Summary:
+  - `HST_BUNDLES`: store final deliverable bundles.
+  - `HST_STAGING`: store data files downloaded from MAST.
+  - `HST_PIPELINE`: store data info for each proposal id, including pipeline logs, program info file, list of product names and trl checksum file.
 
 #
 # What is a Task?
@@ -60,14 +60,14 @@ November 9, 2022
 #
 # The Task Queue
 
-- The design and implementation of the Task Queue and the Queue Manager is TBD.
+- The design and implementation of the Task Queue and the Queue Manager is in `HST/queue_manager` module. Task at the later pipeline stage and with higher priority will be executed first, this will make sure the pipeline prioritize finishing a bundle over starting a new process.
 - Requirements include:
   - A task can add one or more new tasks to the queue, with a specified delay or level of priority, and then proceed asynchronously.
   - A task can add one or more new tasks to the queue, with a specified level of priority, and then wait for them to finish.
   - A task can ask the queue manager if a task that it sent to the queue manager is now complete.
 - Priorities are 1 (Lowest) to 5 (Highest).
   - Priorities are assigned so that once we begin processing an HST bundle, we prioritize finishing it over starting a different bundle.
-- Rob has agreed to research Queue Manager options for us.
+- Rob has agreed to research Queue Manager options for us. After Rob's research, we've agreed on implementing our own Queue Manager.
 
 #
 # Overview of Tasks
@@ -108,7 +108,7 @@ November 9, 2022
 - Actions:
   - Query MAST for any program IDs that meet the query constraints.
   - For each subdirectory of `<HST_PIPELINE>` that is missing, queue task **query-hst-products** for that program ID.
-  - Also re-queue task **query-hst-moving-targets** with a 30-day delay.
+  - Also re-queue task **query-hst-moving-targets** with a 30-day delay.  (To be implemented)
 
 #
 # Task: **query-hst-products** (1)
@@ -138,8 +138,8 @@ November 9, 2022
     - Delete the TRL files.
   - Create a list of visits in which any files are new or changed.
   - If the list is not empty, queue task **update-hst-program** with the list of visits.
-  - If the list was empty, re-queue task **query-hst-products** with a 30-day delay.
-  - Otherwise, re-queue task **query-hst-products** with a 90-day delay.
+  - If the list was empty, re-queue task **query-hst-products** with a 30-day delay. (To be implemented)
+  - Otherwise, re-queue task **query-hst-products** with a 90-day delay. (To be implemented)
 
 #
 # Task: **update-hst-program**
@@ -240,9 +240,14 @@ November 9, 2022
   - Files and labels are in `<HST_STAGING>/hst_<nnnnn>/visit_<ss>/`.
   - All the files and labels inside `<HST_STAGING>/hst_<nnnnn>` and its visit subdirectories are up to date.
 - Actions:
-  - Create the documents, schema, context, kernel? directories.
-  - Move existing, superseded files as described in PDS4-VERSIONING.txt
-  - Move the new files into their proper places in `<HST_BUNDLES>/hst_<nnnnn>/`.
-  - Create the new `collection.csv` and `bundle.xml` files.
-  - Run the validator.
-  - Question: Will we need this process to generate a doi? How do we handle that?
+  - Get the general label data used in document/schema/context/bundle labels
+  - Move existing, superseded files as described in PDS4-VERSIONING.txt (To be implemented)
+  - Generate the final document directory under `<HST_BUNDLES>/hst_<nnnnn>/`
+  - Generate the final schema directory under `<HST_BUNDLES>/hst_<nnnnn>/`
+  - Generate the final context directory under `<HST_BUNDLES>/hst_<nnnnn>/`
+  - Organize data files from MAST, move them from staging `<HST_STAGING>/hst_<nnnnn>/` to bundles `<HST_BUNDLES>/hst_<nnnnn>/` (keep files from MAST at staging directory, we could consider removing them since they are not used)
+  - Create data collection files for each collection directory under `<HST_BUNDLES>/hst_<nnnnn>/`
+  - Create bundle label under `<HST_BUNDLES>/hst_<nnnnn>/`
+  - Create target label under `<HST_BUNDLES>/hst_<nnnnn>/context` if it doesn't exist in PDS page
+  - Create manifest files & run validator
+  - Question: Will we need this process to generate a doi? How do we handle that? (To be implemented)
