@@ -50,7 +50,7 @@ pytz==2019.3
 pyvo==1.2
 PyYAML==6.0
 regex==2022.1.18
-requests==2.23.0
+requests==2.32.4
 scipy==1.8.1
 six==1.14.0
 sortedcontainers==2.1.0
