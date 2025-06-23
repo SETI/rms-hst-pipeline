@@ -183,7 +183,7 @@ def filter_number(filter_name):
     if not match:
         return 0
 
-    return int(match.group(2))
+    return int(match.group(1))
 
 def ranges_from_one_filter(filter_name):
     """The list of wavelength ranges associated with a single filter name."""

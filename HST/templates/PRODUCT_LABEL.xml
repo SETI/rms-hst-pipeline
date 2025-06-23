@@ -264,8 +264,7 @@ $END_FOR
           <hst:subarray_flag>$BOOL(hst_dictionary["subarray_flag"])$</hst:subarray_flag>
           <hst:binning_mode>$hst_dictionary["binning_mode"]$</hst:binning_mode>
           $ONCE(x=hst_dictionary["plate_scale"])
-          <!-- <hst:plate_scale unit="mrad"$"" if x else ' xsi:nil="true" nilReason="missing"'$>$x/1000. if x else ""$</hst:plate_scale> -->
-          <hst:plate_scale $"" if x else ' xsi:nil="true" nilReason="missing"'$>$x/1000. if x else ""$</hst:plate_scale>
+          <hst:plate_scale unit="mrad/pixel"$"" if x else ' xsi:nil="true" nilReason="missing"'$>$x/1000. if x else ""$</hst:plate_scale>
         </hst:Operational_Parameters>
         <hst:Processing_Parameters>
           $ONCE(x=hst_dictionary["mast_pipeline_version_id"].replace("UNK", ""))
