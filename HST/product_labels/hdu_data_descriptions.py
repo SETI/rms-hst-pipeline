@@ -61,6 +61,10 @@ DESCRIPTIONS = {
     'NDWTMP14': 'NICMOS telemetry: Cold well temperature.',
     'NDWTMP21': 'NICMOS telemetry: NIC2 cold mask temperature.',
     'NDWTMP22': 'NICMOS telemetry: NIC3 colds mast temperature.',
+    'N28VIN1': 'NICMOS parameter: Meaning unknown.',
+    'NCURRIN1': 'NICMOS parameter: Meaning unknown.',
+    'C6H': 'FOS parameter: Meaning unknown.',
+    'C8H': 'FOS parameter: Meaning unknown.',
 }
 
 # These are needed for the waivered instruments where HDU[0] contains data.
