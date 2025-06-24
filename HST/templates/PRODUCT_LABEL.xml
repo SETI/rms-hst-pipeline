@@ -229,7 +229,11 @@ $ELSE
           <hst:moving_target_description xsi:nil="true" nilReason="inapplicable"></hst:moving_target_description>  <!--Not a moving target-->
 $END_IF
           $ONCE(x=hst_dictionary["aperture_name"])
+    $IF(x == "UNK")
+          <hst:aperture_name xsi:nil="true" nilReason="missing"></hst:aperture_name>
+    $ELSE
           <hst:aperture_name$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x$</hst:aperture_name>
+    $END_IF
           $ONCE(x=hst_dictionary["proposed_aperture_name"])
           <hst:proposed_aperture_name$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x$</hst:proposed_aperture_name>
 $FOR(detector,k,count=hst_dictionary["targeted_detector_ids"])
@@ -255,7 +259,11 @@ $END_FOR
         </hst:Wavelength_Filter_Grating_Parameters>
         <hst:Operational_Parameters>
           $ONCE(x=hst_dictionary["instrument_mode_id"])
+    $IF(x == "UNK")
+          <hst:instrument_mode_id xsi:nil="true" nilReason="missing"></hst:instrument_mode_id>
+    $ELSE
           <hst:instrument_mode_id$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x$</hst:instrument_mode_id>
+    $END_IF
           $ONCE(x=hst_dictionary["gain_setting"])
           <hst:gain_setting$"" if x else ' xsi:nil="true" nilReason="inapplicable"'$>$x if x else ""$</hst:gain_setting>
           <hst:coronagraph_flag>$BOOL(hst_dictionary["coronagraph_flag"])$</hst:coronagraph_flag>

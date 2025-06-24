@@ -336,7 +336,7 @@ def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logg
                     description_fmt = EXTRA_DESCRIPTIONS[instrument_id][extname]
                 except KeyError:
                     logger.error(f'Unrecognized EXTNAME "{extname}" in HDU[{k}]',
-                                 filepath)
+                                 filepath + f', instrument_id: {instrument_id}')
                     description_fmt = ''
 
             hdu_words = local_words

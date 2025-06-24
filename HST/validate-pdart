@@ -2,8 +2,8 @@
 # Use the tmp-context-products.json under HST
 CONTEXT_PRODUCTS=./tmp-context-products
 XMLDIR=../xml
-SCHEMAS="${XMLDIR}/PDS4_HST_1M00_1000.xsd, ${XMLDIR}/PDS4_DISP_1L00_1510.xsd.xml"
-SCHEMATRONS="${XMLDIR}/PDS4_HST_1M00_1000.sch, ${XMLDIR}/PDS4_DISP_1L00_1510.sch.xml"
+SCHEMAS="${XMLDIR}/PDS4_HST_1M00_1100.xsd, ${XMLDIR}/PDS4_DISP_1L00_1510.xsd.xml"
+SCHEMATRONS="${XMLDIR}/PDS4_HST_1M00_1100.sch, ${XMLDIR}/PDS4_DISP_1L00_1510.sch.xml"
 
 die(){
     echo $@ >&2
