@@ -19,15 +19,21 @@ build==1.0.3
 certifi==2023.7.22
     # via requests
 cffi==1.16.0
-    # via xattr
+    # via
+    #   cryptography
+    #   xattr
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via pip-tools
 coverage==7.3.2
     # via -r requirements.in
+cryptography==45.0.4
+    # via secretstorage
 fs==2.4.16
     # via -r requirements.in
+greenlet==3.2.3
+    # via sqlalchemy
 html5lib==1.1
     # via astroquery
 idna==3.4
@@ -36,6 +42,10 @@ iniconfig==2.0.0
     # via pytest
 jaraco-classes==3.3.0
     # via keyring
+jeepney==0.9.0
+    # via
+    #   keyring
+    #   secretstorage
 keyring==24.2.0
     # via astroquery
 more-itertools==10.1.0
@@ -75,7 +85,7 @@ pyvo==1.4.2
     # via astroquery
 pyyaml==6.0.1
     # via astropy
-requests==2.31.0
+requests==2.32.4
     # via
     #   astroquery
     #   pyvo
@@ -96,6 +106,8 @@ rms-textkernel==1.0.0
     #   rms-pdslogger
 rms-translator==0.0.1
     # via -r requirements.in
+secretstorage==3.3.3
+    # via keyring
 six==1.16.0
     # via
     #   fs
