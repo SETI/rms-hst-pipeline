@@ -45,6 +45,26 @@ DESCRIPTIONS = {
                 'exposure began.',
     'SNAP2'   : 'Instrument and telescope parameters collected during the course of the '+
                 'exposure.',
+
+# These are just for NICMOS and I'm not sure what they mean
+    'MNCIRSPD': 'NICMOS Cooling System (NCS) telemetry: CIrc Rot SPeeD.',
+    'MNCORSPD': 'NICMOS Cooling System (NCS) telemetry: COmp Rot SPeeD.',
+    'MNCONTRL': 'NICMOS Cooling System (NCS) telemetry: CONTRoL point temperature.',
+    'MNPDSTPT': 'NICMOS Cooling System (NCS) telemetry: PiD SeT Point Temperature.',
+    'MNCRADAT': 'NICMOS Cooling System (NCS) telemetry: Cpl RAD A Temperature.',
+    'MNHTREJT': 'NICMOS Cooling System (NCS) telemetry: HeaT REJect Temperature.',
+    'MNPNCOLT': 'NICMOS Cooling System (NCS) telemetry: Pri NiC OutLet Temperature.',
+    'MNRNCILT': 'NICMOS Cooling System (NCS) telemetry: Red NiC InLet Temperature.',
+    'MNRNCOLT': 'NICMOS Cooling System (NCS) telemetry: Red NiC OutLet Temperature.',
+    'NDWTMP11': 'NICMOS telemetry: NIC1 mounting cup temperature.',
+    'NDWTMP13': 'NICMOS telemetry: NIC3 mounting cup temperature.',
+    'NDWTMP14': 'NICMOS telemetry: Cold well temperature.',
+    'NDWTMP21': 'NICMOS telemetry: NIC2 cold mask temperature.',
+    'NDWTMP22': 'NICMOS telemetry: NIC3 colds mast temperature.',
+    'N28VIN1': 'NICMOS parameter: Meaning unknown.',
+    'NCURRIN1': 'NICMOS parameter: Meaning unknown.',
+    'C6H': 'FOS parameter: Meaning unknown.',
+    'C8H': 'FOS parameter: Meaning unknown.',
 }
 
 # These are needed for the waivered instruments where HDU[0] contains data.
@@ -132,7 +152,7 @@ EXTRA_DESCRIPTIONS = {
 }
 
 DATA_CLASS_TO_NOUN = {
-    'Array_1D'            : ('data array', 'data arrays'),
+    'Array_1D'         : ('data array', 'data arrays'),
     'Array_2D'         : ('data array', 'data arrays'),
     'Array_2D_Image'   : ('image', 'images'),
     'Array_3D_Image'   : ('image', 'images'),
@@ -243,8 +263,8 @@ def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logg
                               if pair[1] in associated_suffix]
 
         if not selected_pairs:
-            logger.error(f'Missing associated suffix _{associated_suffix} for file',
-                         filepath)
+            logger.warn(f'Missing associated suffix _{associated_suffix} for file',
+                        filepath)
             associated_hdu_index = science_hdu_index
             associated_sci_class = sci_class
         else:
@@ -320,7 +340,7 @@ def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logg
                     description_fmt = EXTRA_DESCRIPTIONS[instrument_id][extname]
                 except KeyError:
                     logger.error(f'Unrecognized EXTNAME "{extname}" in HDU[{k}]',
-                                 filepath)
+                                 filepath + f', instrument_id: {instrument_id}')
                     description_fmt = ''
 
             hdu_words = local_words

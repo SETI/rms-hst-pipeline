@@ -434,7 +434,10 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
             aperture_name = FOS_APERTURE_NAMES[header0['APER_ID']]
         else:
             # This is valid for most instruments
-            aperture_name = get_or_log(header0, 'APERTURE')
+            # aperture_name = get_or_log(header0, 'APERTURE')
+            # aperture_name is nillable, if 'APERTURE' doesn't exist, set to 'UNK'
+            # nilReason="missing"
+            aperture_name = header0.get('APERTURE', 'UNK')
 
         hst_dictionary['aperture_name'] = aperture_name
 
@@ -735,7 +738,10 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
         else:
             # For most HST instruments, this should work...
-            instrument_mode_id = get_or_log(header0, 'OBSMODE')
+            # instrument_mode_id = get_or_log(header0, 'OBSMODE')
+            # instrument_mode_id is nillable, if 'OBSMODE' doesn't exist, set to 'UNK'
+            # nilReason="missing"
+            instrument_mode_id = header0.get('OBSMODE', 'UNK')
 
         hst_dictionary['instrument_mode_id'] = instrument_mode_id
 
