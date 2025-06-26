@@ -20,7 +20,7 @@ class TestGetProgramInfo:
     @pytest.mark.parametrize(
         'p_id,expected',
         [
-            ('7885', {"07885.pro"}),
+            ('7885', {"07885.pro", "07885.prop"}),
             ('9748', {"09748.apt", "09748.pro"}),
         ],
     )
