@@ -3,6 +3,8 @@ import os
 
 from citations import Citation_Information
 
+TEST_COPIES_DIR = 'golden_copies'
+
 LBL_DATA_DICT = {
     'prop_id': '7885',
     'collection_name': 'schema',

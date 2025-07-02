@@ -78,7 +78,9 @@ def label_hst_fits_directories(directories, root='', *,
         old_filepaths = get_filepaths(old_directories, old_root, match_pattern)
     else:
         old_filepaths = []
-
+    print('xxxxxxxx')
+    print(directories)
+    print(filepaths)
     label_hst_fits_filepaths(filepaths, root,
                              old_filepaths = old_filepaths,
                              old_root = old_root,

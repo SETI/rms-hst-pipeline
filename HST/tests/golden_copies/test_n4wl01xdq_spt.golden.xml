@@ -1,0 +1,535 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch"
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.sch"
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- RMS HST Product-Label pipeline version 1.0 (2025-07-01) -->
+<!-- RMS PdsTemplate module version 1.0 (2023-06-26) -->
+
+<Product_Ancillary
+  xmlns="http://pds.nasa.gov/pds4/pds/v1"
+  xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+  xmlns:hst="http://pds.nasa.gov/pds4/mission/hst/v1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                      https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd
+                      http://pds.nasa.gov/pds4/mission/hst/v1
+                      https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.xsd">
+
+  <Identification_Area>
+    <logical_identifier>urn:nasa:pds:hst_7885:miscellaneous_nicmos_spt:n4wl01xdq</logical_identifier>
+    <version_id>1.0</version_id>
+    <title>
+      n4wl01xdq_spt.fits: Support, planning, and telemetry data for this NICMOS/NIC1
+      observation from HST Program 7885.
+    </title>
+    <information_model_version>1.15.0.0</information_model_version>
+    <product_class>Product_Ancillary</product_class>
+
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>2025-07-02</modification_date>
+        <version_id>1.0</version_id>
+        <description>
+          This is the initial PDS4 version of this data product.
+
+          This FITS file was retrieved from MAST on 2009-03-01. It was originally produced
+          by MAST on or around 2009-03-01, using version OPUS 2008_5c of their HST
+          processing software.
+
+          Migration to the PDS4 standard was carried out by the PDS Ring-Moon Systems Node
+          using their HST migration pipeline version 1.0 (2025-07-01) and XML labeling
+          software version 1.0 (2023-06-26).
+        </description>
+      </Modification_Detail>
+    </Modification_History>
+  </Identification_Area>
+
+  <Context_Area>
+    <comment>
+      This is a copy of HST file "n4wl01xdq_spt.fits" as obtained from the Mikulski
+      Archive for Space Telescopes (MAST) on 2009-03-01. The file was produced by MAST on
+      or around 2009-03-01, using version OPUS 2008_5c of their HST processing pipeline.
+    </comment>
+
+    <Time_Coordinates>
+      <start_date_time>1998-08-05T01:26:05Z</start_date_time>
+      <stop_date_time>1998-08-05T01:26:53Z</stop_date_time>
+    </Time_Coordinates>
+
+    <Primary_Result_Summary>
+      <purpose>Science</purpose>
+      <processing_level>Ancillary</processing_level>
+      <description>
+        n4wl01xdq_spt.fits: Support, planning, and telemetry data for this NICMOS/NIC1
+        observation from HST Program 7885.
+      </description>
+      <Science_Facets>
+        <wavelength_range>Near Infrared</wavelength_range>
+        <wavelength_range>Infrared</wavelength_range>
+        <discipline_name>Ring-Moon Systems</discipline_name>
+      </Science_Facets>
+    </Primary_Result_Summary>
+
+    <Investigation_Area>
+      <name>HST observing program 7885</name>
+      <type>Individual Investigation</type>
+      <Internal_Reference>
+        <lid_reference>urn:nasa:pds:context:investigation:individual.hst_07885</lid_reference>
+        <reference_type>data_to_investigation</reference_type>
+      </Internal_Reference>
+    </Investigation_Area>
+
+    <Observing_System>
+      <Observing_System_Component>
+        <name>Hubble Space Telescope</name>
+        <type>Host</type>
+        <Internal_Reference>
+          <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+          <reference_type>is_instrument_host</reference_type>
+        </Internal_Reference>
+      </Observing_System_Component>
+      <Observing_System_Component>
+        <name>Near-Infrared Camera and Multi-Object Spectrometer</name>
+        <type>Instrument</type>
+        <Internal_Reference>
+          <lid_reference>urn:nasa:pds:context:instrument:hst.nicmos</lid_reference>
+          <reference_type>is_instrument</reference_type>
+        </Internal_Reference>
+      </Observing_System_Component>
+    </Observing_System>
+
+    <Target_Identification>
+      <name>Uranus</name>
+      <type>Planet</type>
+      <description>
+        NAIF ID: 799
+      </description>
+      <Internal_Reference>
+        <lid_reference>urn:nasa:pds:context:target:planet.uranus</lid_reference>
+        <reference_type>data_to_target</reference_type>
+      </Internal_Reference>
+    </Target_Identification>
+
+    <Mission_Area>
+      <hst:HST_Parameters>
+        <hst:Program_Parameters>
+          <hst:mast_observation_id>n4wl01xdq</hst:mast_observation_id>
+          <hst:hst_proposal_id>7885</hst:hst_proposal_id>
+          <hst:hst_pi_name>Hammel, Heidi B.</hst:hst_pi_name>
+          <hst:visit_id>01</hst:visit_id>
+        </hst:Program_Parameters>
+        <hst:Instrument_Parameters>
+          <hst:instrument_id>NICMOS</hst:instrument_id>
+
+          <hst:channel_id>NIC1</hst:channel_id>
+          <hst:detector_id>NIC1</hst:detector_id>
+          <hst:observation_type>IMAGING</hst:observation_type>
+        </hst:Instrument_Parameters>
+        <hst:Pointing_Parameters>
+          <hst:hst_target_name>URANUS</hst:hst_target_name>
+          <hst:moving_target_flag>true</hst:moving_target_flag>
+          <hst:moving_target_keyword>PLANET</hst:moving_target_keyword>  <!-- 1 of 2 -->
+          <hst:moving_target_keyword>URANUS</hst:moving_target_keyword>  <!-- 2 of 2 -->
+          <hst:moving_target_description>STD=URANUS</hst:moving_target_description>
+          <hst:aperture_name>NIC1-FIX</hst:aperture_name>
+          <hst:proposed_aperture_name>NIC1-FIX</hst:proposed_aperture_name>
+          <hst:targeted_detector_id>NIC1</hst:targeted_detector_id>
+        </hst:Pointing_Parameters>
+        <hst:Tracking_Parameters>
+          <hst:fine_guidance_sensor_lock_type>FINE</hst:fine_guidance_sensor_lock_type>
+          <hst:gyroscope_mode>3</hst:gyroscope_mode>
+        </hst:Tracking_Parameters>
+        <hst:Exposure_Parameters>
+          <hst:exposure_duration unit="s">47.958</hst:exposure_duration>
+          <hst:exposure_type>NORMAL</hst:exposure_type>
+        </hst:Exposure_Parameters>
+        <hst:Wavelength_Filter_Grating_Parameters>
+          <hst:filter_name>F090M</hst:filter_name>
+          <hst:center_filter_wavelength unit="micrometer" xsi:nil="true" nilReason="inapplicable"></hst:center_filter_wavelength>
+          <hst:bandwidth unit="micrometer" xsi:nil="true" nilReason="inapplicable"></hst:bandwidth>
+          <hst:spectral_resolution unit="micrometer" xsi:nil="true" nilReason="inapplicable"></hst:spectral_resolution>
+        </hst:Wavelength_Filter_Grating_Parameters>
+        <hst:Operational_Parameters>
+          <hst:instrument_mode_id>MULTIACCUM</hst:instrument_mode_id>
+          <hst:gain_setting xsi:nil="true" nilReason="inapplicable"></hst:gain_setting>
+          <hst:coronagraph_flag>false</hst:coronagraph_flag>
+          <hst:cosmic_ray_split_count>1</hst:cosmic_ray_split_count>
+          <hst:repeat_exposure_count>1</hst:repeat_exposure_count>
+          <hst:subarray_flag>false</hst:subarray_flag>
+          <hst:binning_mode>1</hst:binning_mode>
+          <hst:plate_scale unit="mrad/pixel">4.2e-05</hst:plate_scale>
+        </hst:Operational_Parameters>
+        <hst:Processing_Parameters>
+          <hst:mast_pipeline_version_id>OPUS 2008_5c</hst:mast_pipeline_version_id>
+          <hst:hst_quality_id>OK</hst:hst_quality_id>
+          <hst:hst_quality_comment>
+            NO APPARENT PROBLEMS.
+          </hst:hst_quality_comment>
+        </hst:Processing_Parameters>
+      </hst:HST_Parameters>
+    </Mission_Area>
+  </Context_Area>
+
+  <Reference_List>
+    <Internal_Reference>
+      <lid_reference>urn:nasa:pds:hst-support:document:nicmos-dhb</lid_reference>
+      <reference_type>data_to_document</reference_type>
+      <comment>Data Handbook for NICMOS</comment>
+    </Internal_Reference>
+
+    <Internal_Reference>
+      <lid_reference>urn:nasa:pds:hst-support:document:nicmos-ihb</lid_reference>
+      <reference_type>data_to_document</reference_type>
+      <comment>Instrument Handbook for NICMOS</comment>
+    </Internal_Reference>
+
+    <Internal_Reference>
+      <lidvid_reference>urn:nasa:pds:hst_7885:data_nicmos_raw:n4wl01xdq::1.0</lidvid_reference>
+      <reference_type>data_to_raw_product</reference_type>
+      <comment>
+        n4wl01xdq_raw.fits: Raw NICMOS data from HST Program 7885.
+      </comment>
+    </Internal_Reference>
+
+    <Internal_Reference>
+      <lidvid_reference>urn:nasa:pds:hst_7885:miscellaneous_nicmos_trl:n4wl01xdq::1.0</lidvid_reference>
+      <reference_type>data_to_ancillary_product</reference_type>
+      <comment>
+        n4wl01xdq_trl.fits: Trailer file with processing log for this NICMOS/NIC1
+        observation from HST Program 7885.
+      </comment>
+    </Internal_Reference>
+  </Reference_List>
+
+  <File_Area_Ancillary>
+    <File>
+      <file_name>n4wl01xdq_spt.fits</file_name>
+      <creation_date_time>2009-03-01T19:00:30Z</creation_date_time>
+      <md5_checksum>5c6412a773c068421dee10d0a5af43f1</md5_checksum>
+    </File>
+
+    <Header>
+      <name>PRIMARY FITS header</name>
+      <local_identifier>fits_header_0</local_identifier>
+      <offset unit="byte">0</offset>
+      <object_length unit="byte">23040</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        Primary FITS header. No data object is associated with this FITS header.
+      </description>
+    </Header>
+
+    <Header>
+      <name>FITS header #1 ("UDL_1")</name>
+      <local_identifier>fits_header_1</local_identifier>
+      <offset unit="byte">23040</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #1 ("UDL_1").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #1 ("UDL_1")</name>
+      <local_identifier>fits_data_object_1</local_identifier>
+      <offset unit="byte">69120</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #1 ("UDL_1"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #2 ("UDL_2")</name>
+      <local_identifier>fits_header_2</local_identifier>
+      <offset unit="byte">72000</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #2 ("UDL_2").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #2 ("UDL_2")</name>
+      <local_identifier>fits_data_object_2</local_identifier>
+      <offset unit="byte">118080</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #2 ("UDL_2"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #3 ("UDL_3")</name>
+      <local_identifier>fits_header_3</local_identifier>
+      <offset unit="byte">120960</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #3 ("UDL_3").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #3 ("UDL_3")</name>
+      <local_identifier>fits_data_object_3</local_identifier>
+      <offset unit="byte">167040</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #3 ("UDL_3"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #4 ("UDL_4")</name>
+      <local_identifier>fits_header_4</local_identifier>
+      <offset unit="byte">169920</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #4 ("UDL_4").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #4 ("UDL_4")</name>
+      <local_identifier>fits_data_object_4</local_identifier>
+      <offset unit="byte">216000</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #4 ("UDL_4"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #5 ("UDL_5")</name>
+      <local_identifier>fits_header_5</local_identifier>
+      <offset unit="byte">218880</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #5 ("UDL_5").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #5 ("UDL_5")</name>
+      <local_identifier>fits_data_object_5</local_identifier>
+      <offset unit="byte">264960</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #5 ("UDL_5"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #6 ("UDL_6")</name>
+      <local_identifier>fits_header_6</local_identifier>
+      <offset unit="byte">267840</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #6 ("UDL_6").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #6 ("UDL_6")</name>
+      <local_identifier>fits_data_object_6</local_identifier>
+      <offset unit="byte">313920</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #6 ("UDL_6"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #7 ("UDL_7")</name>
+      <local_identifier>fits_header_7</local_identifier>
+      <offset unit="byte">316800</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #7 ("UDL_7").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #7 ("UDL_7")</name>
+      <local_identifier>fits_data_object_7</local_identifier>
+      <offset unit="byte">362880</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #7 ("UDL_7"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #8 ("UDL_8")</name>
+      <local_identifier>fits_header_8</local_identifier>
+      <offset unit="byte">365760</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #8 ("UDL_8").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #8 ("UDL_8")</name>
+      <local_identifier>fits_data_object_8</local_identifier>
+      <offset unit="byte">411840</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #8 ("UDL_8"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #9 ("UDL_9")</name>
+      <local_identifier>fits_header_9</local_identifier>
+      <offset unit="byte">414720</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #9 ("UDL_9").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #9 ("UDL_9")</name>
+      <local_identifier>fits_data_object_9</local_identifier>
+      <offset unit="byte">460800</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #9 ("UDL_9"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+    <Header>
+      <name>FITS header #10 ("UDL_10")</name>
+      <local_identifier>fits_header_10</local_identifier>
+      <offset unit="byte">463680</offset>
+      <object_length unit="byte">46080</object_length>
+      <parsing_standard_id>FITS 3.0</parsing_standard_id>
+      <description>
+        FITS header #10 ("UDL_10").
+      </description>
+    </Header>
+
+    <Array_1D>
+      <name>FITS data object #10 ("UDL_10")</name>
+      <local_identifier>fits_data_object_10</local_identifier>
+      <offset unit="byte">509760</offset>
+      <axes>1</axes>
+      <axis_index_order>Last Index Fastest</axis_index_order>
+      <description>
+        FITS data object #10 ("UDL_10"): Support, planning, and telemetry data for this
+        NICMOS/NIC1 observation.
+      </description>
+      <Element_Array>
+        <data_type>SignedMSB2</data_type>
+      </Element_Array>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <elements>965</elements>
+        <sequence_number>1</sequence_number>
+      </Axis_Array>
+    </Array_1D>
+
+  </File_Area_Ancillary>
+</Product_Ancillary>

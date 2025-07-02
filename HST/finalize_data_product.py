@@ -30,8 +30,8 @@ def label_hst_data_directory(proposal_id, logger):
     """With a given proposal id, move data directory in the final bundle.
 
     1. Move data directory from staging to bundles directory.
-    2. Create data csv.
-    3. create data xml label.
+    2. Create data collection csv.
+    3. create data collection xml label.
 
     Inputs:
         proposal_id    a proposal id.
