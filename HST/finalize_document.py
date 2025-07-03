@@ -28,7 +28,7 @@ COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
 CSV_FILENAME = 'collection.csv'
 COL_DOC_LABEL = 'collection.xml'
 
-def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
+def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create document directory in the final bundle. These
     are the actions performed:
 

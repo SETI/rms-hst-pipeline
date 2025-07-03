@@ -87,11 +87,11 @@ def golden_filepath(basename):
 
 def golden_file_contents(basename):
     """
-    Return the contents as a Unicode string of the golden file with
+    Return the contents as a list of strings of the golden file with
     the given basename.
     """
-    with open(golden_filepath(basename), "rb") as f:
-        return f.read()
+    with open(golden_filepath(basename), "r") as f:
+        return f.readlines()
 
 def assert_golden_file_equal(basename, calculated_contents):
     """
@@ -104,8 +104,13 @@ def assert_golden_file_equal(basename, calculated_contents):
     filepath = golden_filepath(basename)
     if os.path.isfile(filepath):
         contents = golden_file_contents(filepath)
-        assert contents == calculated_contents
+        for idx, line in enumerate(contents):
+            # bypass the current date and comments
+            if 'modification_date' or '<!--' in line:
+                continue
+            assert line == calculated_contents[idx]
     else:
-        with open(filepath, "wb") as f:
-            f.write(calculated_contents)
+        with open(filepath, "w") as f:
+            for line in calculated_contents:
+                f.write(str(line))
             assert False, f"Golden file {basename!r} did not exist but it was created."

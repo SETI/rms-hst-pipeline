@@ -38,12 +38,13 @@ class TestLabelCreations:
         'paths,expected',
         [
             ([f'{TEST_COPIES_DIR}/hst_07885'],
-             {f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_spt.xml':
-              f'{TEST_COPIES_DIR}/test_n4wl01xdq_spt.golden.xml',
-              f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_raw.xml':
-              f'{TEST_COPIES_DIR}/test_n4wl01xdq_raw.golden.xml',
-              f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_trl.xml':
-              f'{TEST_COPIES_DIR}/test_n4wl01xdq_trl.golden.xml',
+             {
+                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_spt.xml':
+                f'{TEST_COPIES_DIR}/test_n4wl01xdq_spt.golden.xml',
+                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_raw.xml':
+                f'{TEST_COPIES_DIR}/test_n4wl01xdq_raw.golden.xml',
+                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_trl.xml':
+                f'{TEST_COPIES_DIR}/test_n4wl01xdq_trl.golden.xml',
              }),
         ]
     )
@@ -60,5 +61,6 @@ class TestLabelCreations:
         for created_lbl_path, golden_copy_path in expected_li:
             if os.path.isfile(created_lbl_path):
                 calculated_contents = golden_file_contents(created_lbl_path)
+
             assert_golden_file_equal(golden_copy_path,
                                      calculated_contents)
