@@ -22,7 +22,7 @@ from hst_helper.fs_utils import (create_col_dir_in_bundle,
 from hst_helper.general_utils import create_collection_label
 from label_bundle import label_hst_bundle
 
-class TestLabelCreations:
+class TestLabelCreationsWithDataDict:
     def setup_method(self):
         # data dictionary used to create the label
         self.data_dict = LBL_DATA_DICT

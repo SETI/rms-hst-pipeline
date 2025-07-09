@@ -66,7 +66,7 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
     # directories that might not exist.
     version_id = (1, 0)
     proposal_files_li = []
-    if not testing:
+    if not testing: # pragma: no cover
         # Search for proposal files & program info file stored at pipeline directory
         # Move them to bundles directory and collect neccessary data for the label
         pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')

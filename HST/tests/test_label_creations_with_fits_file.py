@@ -15,10 +15,7 @@ from .utils import (assert_golden_file_equal,
                     TEST_COPIES_DIR)
 
 
-class TestLabelCreations:
-    # def setup_method(self):
-
-
+class TestLabelCreationsWithFits:
     def teardown_method(self):
         # Remove the created xml
         created_lbl = [
