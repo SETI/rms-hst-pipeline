@@ -1,5 +1,6 @@
 from fs.path import dirname, join
 import os
+import shutil
 
 from citations import Citation_Information
 
@@ -114,3 +115,7 @@ def assert_golden_file_equal(basename, calculated_contents):
             for line in calculated_contents:
                 f.write(str(line))
             assert False, f"Golden file {basename!r} did not exist but it was created."
+
+def remove_dirs(directories):
+    for path in directories:
+         shutil.rmtree(path, ignore_errors=True)

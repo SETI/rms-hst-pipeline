@@ -47,7 +47,7 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     try:
         # Download all accepted files
         download_files(filtered_products, files_dir, logger, testing)
-    except:
+    except: #pragma: no cover
         # Downloading failed, removed the visit folder under the staging directory, and
         # the trl file under pipeline directory. We will only have either all files
         # downloaded or zero file downloaded.

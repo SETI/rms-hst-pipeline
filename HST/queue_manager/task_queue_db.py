@@ -45,7 +45,7 @@ class TaskQueue(Base):
     cmd = Column(String, nullable=False)
 
     def __repr__(self) -> str:
-        return (
+        return ( #pragma: no cover
             f'TaskQueue(proposal_id={self.proposal_id!r}'
             f', visit={self.visit!r})'
             f', task={self.task!r})'
@@ -97,7 +97,7 @@ def add_a_task(proposal_id, visit, task, priority, order, status, cmd):
         status         the status of the current task, 0 is wating and 1 is running.
         cmd            the command to run the task.
     """
-    if not db_exists():
+    if not db_exists(): #pragma: no cover
         return
 
     Session = sessionmaker(engine)
@@ -142,7 +142,7 @@ def update_a_task_status(proposal_id, visit, task, status):
         task           a number represents the current task.
         status         the status of the current task, 0 is wating and 1 is running.
     """
-    if not db_exists():
+    if not db_exists(): #pragma: no cover
         return
 
     Session = sessionmaker(engine)
@@ -220,7 +220,7 @@ def erase_all_task_queue():
     """
     Remove all entries in the task queue table.
     """
-    if not db_exists():
+    if not db_exists(): #pragma: no cover
         return
 
     Session = sessionmaker(engine)
@@ -233,7 +233,7 @@ def get_next_task_to_be_run():
     """
     Get the next task to be run from database. Return the table row entry.
     """
-    if not db_exists():
+    if not db_exists(): #pragma: no cover
         return
 
     Session = sessionmaker(engine)

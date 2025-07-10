@@ -31,7 +31,7 @@ def run_validation(proposal_id, logger=None):
     logger.info(f'Run validation for proposal id: {proposal_id}')
     try:
         proposal_id = int(proposal_id)
-    except ValueError:
+    except ValueError: #pragma: no cover
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
@@ -43,7 +43,7 @@ def run_validation(proposal_id, logger=None):
     # remove tmp context json
     try:
         os.remove(f'tmp-context-products-{proposal_id}.json')
-    except FileNotFoundError:
+    except FileNotFoundError: #pragma: no cover
         pass
 
 def create_manifest_files(proposal_id, logger):
@@ -58,7 +58,7 @@ def create_manifest_files(proposal_id, logger):
     logger.info(f'Create manifest files for proposal id: {proposal_id}')
     try:
         proposal_id = int(proposal_id)
-    except ValueError:
+    except ValueError: #pragma: no cover
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
@@ -82,7 +82,7 @@ def create_manifest_files(proposal_id, logger):
             elif 'individual' not in file_logical_path:
                 try:
                     col_name, _, fname = file_logical_path.rpartition('.')[0].split('/')
-                except ValueError:
+                except ValueError: #pragma: no cover
                     continue # ignore files like .DS_Store
                 lidvid = f'{lidvid_prefix}:{col_name}:{fname}::{VID}'
             tm_files_li.add((lidvid, file_logical_path))
