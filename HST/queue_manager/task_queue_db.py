@@ -14,8 +14,8 @@ from sqlalchemy import (create_engine,
                         Float,
                         Integer,
                         String)
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import (sessionmaker,
+                            declarative_base)
 
 # engine = create_engine(DB_URI, pool_size=20, max_overflow=0)
 engine = create_engine(DB_URI)

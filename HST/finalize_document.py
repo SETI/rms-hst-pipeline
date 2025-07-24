@@ -28,7 +28,7 @@ COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
 CSV_FILENAME = 'collection.csv'
 COL_DOC_LABEL = 'collection.xml'
 
-def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
+def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create document directory in the final bundle. These
     are the actions performed:
 
@@ -66,7 +66,7 @@ def label_hst_document_directory(proposal_id, data_dict, logger=None, testing=Fa
     # directories that might not exist.
     version_id = (1, 0)
     proposal_files_li = []
-    if not testing:
+    if not testing: # pragma: no cover
         # Search for proposal files & program info file stored at pipeline directory
         # Move them to bundles directory and collect neccessary data for the label
         pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')

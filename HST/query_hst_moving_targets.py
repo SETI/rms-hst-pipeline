@@ -9,8 +9,8 @@
 import pdslogger
 
 from hst_helper import (START_DATE,
-                         END_DATE,
-                         RETRY)
+                        END_DATE,
+                        RETRY)
 from hst_helper.query_utils import query_mast_slice
 
 def query_hst_moving_targets(proposal_ids=[],

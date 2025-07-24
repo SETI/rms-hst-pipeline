@@ -51,7 +51,8 @@ def prepare_browse_products(proposal_id, visit, logger=None):
             inst_id = get_instrument_id_from_fname(file)
 
             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-            INST_ID_DICT[formatted_proposal_id].add(inst_id)
+            if inst_id is not None:
+                INST_ID_DICT[formatted_proposal_id].add(inst_id)
 
             _, _, file_ext = file.rpartition('.')
             # Copy & save browse products under browse_{inst_id}_{suffix} and rest of

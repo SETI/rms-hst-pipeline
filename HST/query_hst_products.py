@@ -58,7 +58,7 @@ def query_hst_products(proposal_id, logger=None):
     logger.info('Query hst products for propsal id: ', str(proposal_id))
     try:
         proposal_id = int(proposal_id)
-    except ValueError:
+    except ValueError: #pragma: no cover
         logger.exception(ValueError)
         raise ValueError(f'Proposal id: {proposal_id} is not valid.')
 
@@ -96,7 +96,7 @@ def query_hst_products(proposal_id, logger=None):
 
     try:
         download_files(trl_products, trl_dir, logger)
-    except:
+    except: #pragma: no cover
         # Downloading failed, removed all the trl files to restore a clean directory.
         # We will only have either all files downloaded or zero file downloaded.
         for f in os.listdir(trl_dir):
@@ -131,7 +131,7 @@ def query_hst_products(proposal_id, logger=None):
             filepath = get_downloaded_file_path(proposal_id, f)
             try:
                 os.remove(filepath)
-            except FileNotFoundError:
+            except FileNotFoundError: #pragma: no cover
                 pass
 
     return (visit_diff, list(files_dict.keys()))

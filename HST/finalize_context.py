@@ -17,7 +17,7 @@ COL_CTXT_LABEL = 'collection_context.xml'
 COL_CTXT_LABEL_TEMPLATE = 'CONTEXT_COLLECTION_LABEL.xml'
 INV_LABEL_TEMPLATE = 'INVESTIGATION_LABEL.xml'
 
-def label_hst_context_directory(proposal_id, data_dict, logger=None, testing=False):
+def finalize_hst_context_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create context directory in the final bundle. These are
     the actions performed:
 

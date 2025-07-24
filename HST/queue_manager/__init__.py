@@ -43,7 +43,7 @@ def run_pipeline(proposal_ids, logger=None):
 
     try:
         init_task_queue_table()
-    except OperationalError as e:
+    except OperationalError as e: #pragma: no cover
         if 'already exists' in repr(e):
             erase_all_task_queue()
         elif 'no such table' in repr(e):
@@ -57,7 +57,7 @@ def run_pipeline(proposal_ids, logger=None):
     for prog_id in proposal_ids:
         try:
             proposal_id = int(prog_id)
-        except ValueError:
+        except ValueError: #pragma: no cover
             logger.warn(f'Proposal id: {prog_id} is not valid')
 
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
@@ -99,7 +99,7 @@ def queue_next_task(proposal_id, visit_info, task, logger):
     Returns:    the child process that executes the given task.
     """
     # if DB doesn't exist, log a warning message and return
-    if not db_exists():
+    if not db_exists(): #pragma: no cover
         logger.warn(f'Task queue db: {DB_PATH} does not exist')
         return
 

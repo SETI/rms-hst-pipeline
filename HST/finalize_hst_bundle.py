@@ -15,10 +15,10 @@ import os
 import pdslogger
 
 from create_target_label import create_target_label
-from finalize_document import label_hst_document_directory
-from finalize_schema import label_hst_schema_directory
-from finalize_context import label_hst_context_directory
-from finalize_data_product import label_hst_data_directory
+from finalize_document import finalize_hst_document_directory
+from finalize_schema import finalize_hst_schema_directory
+from finalize_context import finalize_hst_context_directory
+from finalize_data_product import finalize_hst_data_directory
 from hst_helper.fs_utils import get_program_dir_path
 from hst_helper.general_utils import (date_time_to_date,
                                       get_citation_info,
@@ -56,15 +56,15 @@ def finalize_hst_bundle(proposal_id, logger=None):
     # Get the general label data used in document/schema/context/bundle labels
     data_dict = get_general_label_data(proposal_id, logger)
     # Generate the final document directory
-    label_hst_document_directory(proposal_id, data_dict, logger)
+    finalize_hst_document_directory(proposal_id, data_dict, logger)
     # Generate the final schema directory
-    label_hst_schema_directory(proposal_id, data_dict, logger)
+    finalize_hst_schema_directory(proposal_id, data_dict, logger)
     # Generate the final context directory
-    label_hst_context_directory(proposal_id, data_dict, logger)
+    finalize_hst_context_directory(proposal_id, data_dict, logger)
     # Organize files, move from staging to bundles
     organize_files_from_staging_to_bundles(proposal_id, logger)
     # Create data collection files
-    label_hst_data_directory(proposal_id, logger)
+    finalize_hst_data_directory(proposal_id, logger)
     # Create bundle label
     label_hst_bundle(proposal_id, data_dict, logger)
     # Create target label if it doesn't exist in PDS page

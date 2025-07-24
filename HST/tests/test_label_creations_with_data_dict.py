@@ -1,7 +1,7 @@
 ##########################################################################################
-# tests/test_label_creations.py
+# tests/test_label_creations_with_data_dict.py
 #
-# Tests related to label creations in the final bundle directory.
+# Tests related to label creations using preprogrammed data dictionary.
 ##########################################################################################
 
 import os
@@ -10,18 +10,19 @@ import shutil
 
 from .utils import (assert_golden_file_equal,
                     golden_file_contents,
+                    TEST_COPIES_DIR,
                     LBL_DATA_DICT)
-from finalize_context import label_hst_context_directory
+from finalize_context import finalize_hst_context_directory
 from finalize_data_product import COL_DATA_LABEL_TEMPLATE
-from finalize_document import label_hst_document_directory
-from finalize_schema import label_hst_schema_directory
+from finalize_document import finalize_hst_document_directory
+from finalize_schema import finalize_hst_schema_directory
 from hst_helper.fs_utils import (create_col_dir_in_bundle,
                                  get_deliverable_path,
                                  get_program_dir_path)
 from hst_helper.general_utils import create_collection_label
 from label_bundle import label_hst_bundle
 
-class TestLabelCreations:
+class TestLabelCreationsWithDataDict:
     def setup_method(self):
         # data dictionary used to create the label
         self.data_dict = LBL_DATA_DICT
@@ -38,70 +39,72 @@ class TestLabelCreations:
 
     # Test schema colleciton label creation
     @pytest.mark.parametrize('p_id', [('7885')])
-    def test_label_hst_schema_directory(self, p_id):
-        sch_col_lbl = label_hst_schema_directory(p_id, self.data_dict, None, True)
+    def test_finalize_hst_schema_directory(self, p_id):
+        sch_col_lbl = finalize_hst_schema_directory(p_id, self.data_dict, None, True)
 
         if os.path.isfile(sch_col_lbl):
             calculated_contents = golden_file_contents(sch_col_lbl)
-        assert_golden_file_equal("test_schema_col_label.golden.xml", calculated_contents)
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_schema_col_label.golden.xml',
+                                 calculated_contents)
 
     # Test context colleciton label creation
     @pytest.mark.parametrize('p_id', [('7885')])
-    def test_label_hst_context_directory_ctxt_col_lbl(self, p_id):
+    def test_finalize_hst_context_directory_ctxt_col_lbl(self, p_id):
         data_dict = {
             'collection_name': 'context',
             'csv_filename': 'collection_context.csv',
         }
         data_dict = {**self.data_dict, **data_dict}
-        ctxt_col_lbl, _ = label_hst_context_directory(p_id, data_dict, None, True)
+        ctxt_col_lbl, _ = finalize_hst_context_directory(p_id, data_dict, None, True)
 
         if os.path.isfile(ctxt_col_lbl):
             calculated_contents = golden_file_contents(ctxt_col_lbl)
-        assert_golden_file_equal("test_context_col_label.golden.xml", calculated_contents)
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_context_col_label.golden.xml',
+                                 calculated_contents)
 
     # Test investigation label creation
     @pytest.mark.parametrize('p_id', [('7885')])
-    def test_label_hst_context_directory_inv_lbl(self, p_id):
+    def test_finalize_hst_context_directory_inv_lbl(self, p_id):
         data_dict = {
             'collection_name': 'context',
             'csv_filename': 'collection_context.csv',
         }
         data_dict = {**self.data_dict, **data_dict}
-        _, inv_lbl = label_hst_context_directory(p_id, data_dict, None, True)
+        _, inv_lbl = finalize_hst_context_directory(p_id, data_dict, None, True)
 
         if os.path.isfile(inv_lbl):
             calculated_contents = golden_file_contents(inv_lbl)
-        assert_golden_file_equal("test_investigation_label.golden.xml",
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_investigation_label.golden.xml',
                                  calculated_contents)
 
     # Test document colleciton label creation
     @pytest.mark.parametrize('p_id', [('7885')])
-    def test_label_hst_document_directory_doc_col_lbl(self, p_id):
+    def test_finalize_hst_document_directory_doc_col_lbl(self, p_id):
         data_dict = {
             'collection_name': 'document',
             'csv_filename': 'collection_document.csv',
         }
         data_dict = {**self.data_dict, **data_dict}
-        doc_col_lbl, _ = label_hst_document_directory(p_id, data_dict, None, True)
+        doc_col_lbl, _ = finalize_hst_document_directory(p_id, data_dict, None, True)
 
         if os.path.isfile(doc_col_lbl):
             calculated_contents = golden_file_contents(doc_col_lbl)
-        assert_golden_file_equal("test_document_col_label.golden.xml",
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_document_col_label.golden.xml',
                                  calculated_contents)
 
     # Test document label creation
     @pytest.mark.parametrize('p_id', [('7885')])
-    def test_label_hst_document_directory_doc_lbl(self, p_id):
+    def test_finalize_hst_document_directory_doc_lbl(self, p_id):
         data_dict = {
             'collection_name': 'document',
             'csv_filename': 'collection_document.csv',
         }
         data_dict = {**self.data_dict, **data_dict}
-        _, doc_lbl = label_hst_document_directory(p_id, data_dict, None, True)
+        _, doc_lbl = finalize_hst_document_directory(p_id, data_dict, None, True)
 
         if os.path.isfile(doc_lbl):
             calculated_contents = golden_file_contents(doc_lbl)
-        assert_golden_file_equal("test_document_label.golden.xml",
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_document_label.golden.xml',
                                  calculated_contents)
 
     # Test data product colleciton label creation
@@ -129,7 +132,7 @@ class TestLabelCreations:
 
         if os.path.isfile(data_prod_col_lbl):
             calculated_contents = golden_file_contents(data_prod_col_lbl)
-        assert_golden_file_equal("test_data_prod_col_label.golden.xml",
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_data_prod_col_label.golden.xml',
                                  calculated_contents)
 
     # Test bundle label creation
@@ -158,5 +161,5 @@ class TestLabelCreations:
 
         if os.path.isfile(bundle_lbl):
             calculated_contents = golden_file_contents(bundle_lbl)
-        assert_golden_file_equal("test_bundle_label.golden.xml",
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_bundle_label.golden.xml',
                                  calculated_contents)

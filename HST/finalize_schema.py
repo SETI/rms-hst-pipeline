@@ -19,7 +19,7 @@ CSV_FILENAME = 'collection_schema.csv'
 COL_SCH_LABEL = 'collection_schema.xml'
 COL_SCH_LABEL_TEMPLATE = 'SCHEMA_COLLECTION_LABEL.xml'
 
-def label_hst_schema_directory(proposal_id, data_dict, logger=None, testing=False):
+def finalize_hst_schema_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create schema directory in the final bundle. These are
     the actions performed:
 
