@@ -51,8 +51,7 @@ def label_hst_fits_directories(directories, root='', *,
                                old_root = '',
                                retrieval_date = '',
                                logger = None,
-                               reset_dates = True,
-                               replace_nans = False):
+                               reset_dates = True):
     """Process one or more directories of HST FITS files, returning the information needed
     for all of their PDS4 labels as a dictionary keyed by the basenames.
 
@@ -69,8 +68,9 @@ def label_hst_fits_directories(directories, root='', *,
         logger              pdslogger to use; None for default EasyLogger.
         reset_dates         True to reset the modification date of each file to the date
                             found in the FITS header.
-        replace_nans        True to rewrite each file without NaNs if NaNs are found.
     """
+
+    replace_nans = False    # disabled feature
 
     filepaths = get_filepaths(directories, root, match_pattern)
 

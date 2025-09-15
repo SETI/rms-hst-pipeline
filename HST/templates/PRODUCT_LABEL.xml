@@ -104,13 +104,6 @@ $IF(hst_dictionary["mast_pipeline_version_id"])
 $ELSE
       or around $modification_date[:10]$.
 $END_IF
-$IF(has_nans)
-
-      Note: This file has been modified from the original source. The source file contains
-      NaN ("not-a-number") values inside some data arrays, but NaN values are not allowed
-      in PDS4 data products. In this file, all NaN values have been replaced by a fixed
-      constant, as specified below in the Special_Constants class.
-$END_IF
 $IF(not ipppssoot_dict['reference_suffix'])
 
       Note that observation "$ipppssoot$" did not obtain science data. Only ancillary data
@@ -387,7 +380,7 @@ $FOR(hdu_dict,k=hdu_dictionaries)
     $END_FOR
     $IF(k in hdus_with_nans)
       <Special_Constants>
-        <invalid_constant>$nan_replacement$</invalid_constant>
+        <not_applicable_constant>NaN</not_applicable_constant>
       </Special_Constants>
     $END_IF
    $ELSE_IF(ddict["data_class"] == "Table_Binary")
