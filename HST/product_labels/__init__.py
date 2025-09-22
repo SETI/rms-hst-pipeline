@@ -23,7 +23,7 @@ from .hdu_data_descriptions   import fill_hdu_data_descriptions
 from .hdu_dictionary_support  import fill_hdu_dictionary, repair_hdu_dictionaries
 from .hst_dictionary_support  import fill_hst_dictionary
 from .get_time_coordinates    import get_time_coordinates
-from .nan_support             import cmp_ignoring_nans, has_nans, rewrite_wo_nans
+from .nan_support             import get_nan_hdus, cmp_ignoring_nans
 from .wavelength_ranges       import wavelength_ranges
 from .xml_support             import get_modification_history, get_target_identifications
 
@@ -70,8 +70,6 @@ def label_hst_fits_directories(directories, root='', *,
                             found in the FITS header.
     """
 
-    replace_nans = False    # disabled feature
-
     filepaths = get_filepaths(directories, root, match_pattern)
 
     if old_directories:
@@ -84,8 +82,7 @@ def label_hst_fits_directories(directories, root='', *,
                              old_root = old_root,
                              retrieval_date = '',
                              logger = logger,
-                             reset_dates = reset_dates,
-                             replace_nans = replace_nans)
+                             reset_dates = reset_dates)
 
 ############################################
 
@@ -94,8 +91,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                              old_root = '',
                              retrieval_date = '',
                              logger = None,
-                             reset_dates = True,
-                             replace_nans = False):
+                             reset_dates = True):
     """Process a list of filepaths, returning the information needed for all of their
     PDS4 labels as a dictionary keyed by the basenames.
 
@@ -107,10 +103,11 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         retrieval_date      date the file was retrieved from MAST, in yyyy-mm-dd format.
                             If blank, the date will be inferred from the file itself.
         logger              pdslogger to use; None for default EasyLogger.
-        replace_nans        True to rewrite each file without NaNs if NaNs are found.
         reset_dates         True to reset the modification date of each file to the date
                             found in the FITS header.
     """
+
+    replace_nans = False    # disabled feature
 
     logger = logger or pdslogger.EasyLogger()
 
@@ -123,6 +120,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             max_filepath = max(filepaths)
         except ValueError as e:
             logger.error(str(e) + ','.join(filepaths))
+            raise e
 
         for k, chars in enumerate(zip(min_filepath, max_filepath)):
             if chars[0] != chars[1]:
@@ -276,17 +274,13 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         # trl_timetags_by_ipppssoot[ipppssoot] = dictionary mapping dates to date-times.
         ##################################################################################
 
-        # Open the (original) FITS file
-        original_path = fullpath + '-original'
+        # Open the FITS file
         try:
-            if os.path.exists(original_path):
-                path = original_path
-                hdulist = pyfits.open(original_path)
-            else:
-                path = fullpath
-                hdulist = pyfits.open(fullpath)
+            hdulist = pyfits.open(fullpath)
         except OSError as e:
-            logger.error(str(e) + path)
+            logger.error(str(e) + fullpath)
+            continue
+
         # If this is an association file, read its contents for the IPPPSSOOT
         if suffix == 'asn':
             logger.info('Reading associations', filepath)
@@ -308,6 +302,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         # "hdu_dictionaries": a list of dictionaries describing the content of each HDU.
         # "internal_date"   : the internal date, if any, from the first FITS header.
         # "has_nans"        : True if any data array in the file contains NaN.
+        # "hdus_with_nans"  : List of HDU indices in which the data array contains NaN.
         ##################################################################################
 
         # Gather the HDU structure info
@@ -327,7 +322,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         # Update the dictionary
         basename_dict['hdu_dictionaries'] = hdu_dictionaries
         basename_dict['internal_date'   ] = get_header_date(hdulist)
-        basename_dict['has_nans'        ] = has_nans(hdulist)
+        basename_dict['hdus_with_nans'  ] = get_nan_hdus(hdulist)
+        basename_dict['has_nans'        ] = bool(basename_dict['hdus_with_nans'])
 
         hdulist.close()
 
@@ -984,36 +980,6 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         shortened = list(shortened)
         shortened.sort()
         logger.debug('Descriptions:\n    ' + '\n    '.join(shortened))
-
-    ######################################################################################
-    # Rewrite the file without NaNs if necessary
-    ######################################################################################
-
-    for basename, basename_dict in info_by_basename.items():
-        basename_dict['nan_replacement'] = 0.
-        basename_dict['hdus_with_nans'] = []
-
-        if not basename_dict['has_nans']:
-            continue
-
-        fullpath = basename_dict['fullpath']
-        if not replace_nans:
-            logger.warn('NaNs found but not replaced', fullpath)
-            continue
-
-        original_path = fullpath + '-original'
-        if os.path.exists(original_path):
-            (nan_replacement,
-             hdus_with_nans) = rewrite_wo_nans(original_path, rewrite=False)
-            logger.info(f'NaNs already replaced with {nan_replacement}', fullpath)
-        else:
-            shutil.copy(fullpath, original_path)
-            (nan_replacement,
-             hdus_with_nans) = rewrite_wo_nans(fullpath, rewrite=True)
-            logger.info(f'NaNs replaced with {nan_replacement}', fullpath)
-
-        basename_dict['nan_replacement'] = nan_replacement
-        basename_dict['hdus_with_nans'] = hdus_with_nans
 
     ######################################################################################
     # Write the new labels

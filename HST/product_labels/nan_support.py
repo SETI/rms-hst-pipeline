@@ -19,6 +19,28 @@ import numpy as np
 import os
 import astropy.io.fits as pyfits
 
+def get_nan_hdus(hdulist):
+    """The list of HDU indices in which the data array contains NaNs."""
+
+    # Check HDUs one by one...
+    nan_hdus = []
+    for k, hdu in enumerate(hdulist):
+
+        # If the data object isn't an array, continue
+        if not isinstance(hdu.data, np.ndarray):
+            continue
+
+        # Only floating-point arrays can have NaNs
+        if hdu.data.dtype.kind != 'f':
+            continue
+
+        # Check for NaNs; save info if found
+        mask = np.isnan(hdu.data)
+        if np.any(mask):
+            nan_hdus.append(k)
+
+    return nan_hdus
+
 def _get_nan_info(hdulist):
     """Return info about any of the data arrays in this FITS file that contain NaNs.
     If the returned list is empty, this file contains no NaNs.
