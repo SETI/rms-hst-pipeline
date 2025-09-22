@@ -5,7 +5,7 @@
 # Syntax:
 # pipeline_label_hst_products.py [-h] [--proposal-id PROPOSAL_ID] [--visit VISIT]
 #                                [--path PATH] [--old OLD][--select SELECT] [--date DATE]
-#                                [--replace-nans] [--reset-dates] [--log LOG] [--quiet]
+#                                [--reset-dates] [--log LOG] [--quiet]
 #
 # Enter the --help option to see more information.
 #
@@ -14,8 +14,6 @@
 # - Compare the staged FITS files to those in an existing bundle, if any.
 # - Create a new XML label for each file.
 # - Reset the modification dates of the FITS files to match their production date at MAST.
-# - If any file contains NaNs, rename the original file with “-original” appended,
-#   and then rewrite the file without NaNs.
 ##########################################################################################
 
 import argparse
@@ -62,9 +60,6 @@ parser.add_argument('--select', type=str, action='store', default='',
 parser.add_argument('--date', type=str, action='store', default='',
     help="""Optional retrieval date from MAST in yyyy-mm-dd format. This is used if the
          product creation date cannot be otherwise inferred from the file.""")
-
-parser.add_argument('--replace-nans', '-N', action='store_true',
-    help='Replace any floating-point NaNs with a special constant.')
 
 parser.add_argument('--reset-dates', '-D', action='store_true',
     help='Reset file modification dates to match the inferred product creation times.')
@@ -127,8 +122,7 @@ try:
                                old_directories = [args.old],
                                retrieval_date = args.date,
                                logger = logger,
-                               reset_dates = args.reset_dates,
-                               replace_nans = args.replace_nans)
+                               reset_dates = args.reset_dates)
 except:
     # Before raising the error, remove the task queue of the proposal id from database.
     remove_all_tasks_for_a_prog_id(formatted_proposal_id)
