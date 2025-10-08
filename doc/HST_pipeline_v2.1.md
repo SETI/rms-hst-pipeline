@@ -9,7 +9,7 @@ July 9, 2024
 # Terms
 
 - Program ID = the four or five-digit numeric HST proposal ID.
-- PPPSSOOT = the format of the first nine characters in the root name of a file. I indicates instrument, PPP indicates program, SS for visit, OO for observation, T for transmission/association.
+- IPPPSSOOT = the format of the first nine characters in the root name of a file. I indicates instrument, PPP indicates program, SS for visit, OO for observation, T for transmission/association.
 - IPPPSSOO = the first eight characters. On occasion, files have the same “IPPPSSOO” but the “T” character is different. Nevertheless, files with the same IPPPSSOO are always associated, regardless of the “T”.
 - VISIT = the two character designation for the HST visit, the “SS” in IPPPSSOOT.
 - TRL: File suffix that describes the processing history of all the files with the same IPPPSSOOT prefix.
