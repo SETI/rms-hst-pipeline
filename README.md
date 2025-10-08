@@ -1,42 +1,92 @@
 | PyPI Release | Test Status | Code Coverage |
-| ------------ | ----------- | ------------- |
+| ------------- | ------------ | -------------- |
 | [![PyPI version](https://badge.fury.io/py/rms-hst-pipeline.svg)](https://badge.fury.io/py/rms-hst-pipeline) | [![Build status](https://img.shields.io/github/actions/workflow/status/SETI/rms-hst-pipeline/run-app-tests.yml?branch=main)](https://github.com/SETI/rms-hst-pipeline/actions) | [![Code coverage](https://img.shields.io/codecov/c/github/SETI/rms-hst-pipeline/main?logo=codecov)](https://codecov.io/gh/SETI/rms-hst-pipeline) |
 
-# HST Pipeline
-# Required setup before running HST pipeline tasks
-- Go to `pds-hst-pipeline/HST`, setup an virtual environment and run `pip install -r requirements.txt`
-- Setup these environment variables:
-    - `HST_STAGING` (for downloaded files)
-    - `HST_PIPELINE` (for logs and program info)
-    - `HST_BUNDLES` (for final bundles)
-    - `PDS_HST_PIPELINE` (path of pds-hst-pipeline repo, this is where we execute the shell commands of each task)
-#
-# Example commands
-- Example Commands to run the full pipeline with all tasks:
-    - Run with the full ids (pre-fetch from MAST with True moving target flag):
-        - `python pipeline/pipeline_run.py`
-    - Query MAST with True moving target flag to get the latest ids, and then run pipeline with them:
-        - `python pipeline/pipeline_run.py --get-ids`
-    - Run with one proposal id:
-        - `python pipeline/pipeline_run.py --proposal-ids 07885`
-    - Run with multiple proposal ids:
-        - `python pipeline/pipeline_run.py --proposal-ids 13736 05167 10341 14930 06679`
-    - Run with specific number of subprocesses and max allowed running time for each task (in sec):
-        - `python pipeline/pipeline_run.py --proposal-ids 07885 13736 --max-subproc 30 --max-time 1860`
-- Example commands to run each specific task: (use `7885` as an example)
-    - These are the commands being run when executing `pipeline_run.py`
-        ```
-        python pipeline/pipeline_query_hst_moving_targets.py --proposal-ids 7885
-        python pipeline/pipeline_query_hst_products.py --proposal-id 7885
-        python pipeline/pipeline_get_program_info.py --proposal-id 7885
-        python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 01
-        python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 02
-        python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 03
-        python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 01
-        python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 02
-        python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 03
-        python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 01
-        python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 02
-        python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 03
-        python pipeline/pipeline_finalize_hst_bundle.py --proposal-id 7885
-        ```
+# 🚀 HST Pipeline
+
+## 🧭 Overview
+
+The **HST Pipeline** automates the end-to-end processing of Hubble Space Telescope (HST) data for the Planetary Data System (PDS).
+It supports querying data from MAST, retrieving and labeling products, preparing browse products, and generating final PDS-compliant bundles.
+This tool is designed for reproducible, efficient, and configurable data pipeline execution.
+
+---
+
+## ⚙️ Required Setup Before Running HST Pipeline Tasks
+
+1. Navigate to the HST directory and set up a virtual environment:
+   ```bash
+   cd pds-hst-pipeline/HST
+   python -m venv venv
+   source venv/bin/activate   # or `venv\Scripts\activate` on Windows
+   pip install -r requirements.txt
+   ```
+
+2. Set the following environment variables:
+
+   | Variable | Description |
+   | --------- | ------------ |
+   | `HST_STAGING` | Directory for downloaded files |
+   | `HST_PIPELINE` | Directory for logs and program info |
+   | `HST_BUNDLES` | Directory for final bundles |
+   | `PDS_HST_PIPELINE` | Path to the `pds-hst-pipeline` repository (where shell commands for each task are executed) |
+
+---
+
+## 🧩 Example Commands
+
+### ▶️ Run the Full Pipeline (All Tasks)
+
+- Run with all proposal IDs (pre-fetched from MAST with the *True moving target* flag):
+  ```bash
+  python pipeline/pipeline_run.py
+  ```
+
+- Query MAST with the *True moving target* flag to get the latest IDs, then run the pipeline:
+  ```bash
+  python pipeline/pipeline_run.py --get-ids
+  ```
+
+- Run with a single proposal ID:
+  ```bash
+  python pipeline/pipeline_run.py --proposal-ids 07885
+  ```
+
+- Run with multiple proposal IDs:
+  ```bash
+  python pipeline/pipeline_run.py --proposal-ids 13736 05167 10341 14930 06679
+  ```
+
+- Run with a specific number of subprocesses and a maximum allowed runtime for each task (in seconds):
+  ```bash
+  python pipeline/pipeline_run.py --proposal-ids 07885 13736 --max-subproc 30 --max-time 1860
+  ```
+
+---
+
+### 🧠 Run Individual Tasks (Example: Proposal ID `7885`)
+
+These are the commands executed internally when running `pipeline_run.py`:
+
+```bash
+python pipeline/pipeline_query_hst_moving_targets.py --proposal-ids 7885
+python pipeline/pipeline_query_hst_products.py --proposal-id 7885
+python pipeline/pipeline_get_program_info.py --proposal-id 7885
+python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 01
+python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 02
+python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 03
+python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 01
+python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 02
+python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 03
+python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 01
+python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 02
+python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 03
+python pipeline/pipeline_finalize_hst_bundle.py --proposal-id 7885
+```
+
+---
+
+✅ **Tip:**
+Use `--help` with any script (e.g., `python pipeline/pipeline_run.py --help`) to view all available options and arguments.
+
+---
