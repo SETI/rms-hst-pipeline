@@ -1,4 +1,8 @@
-#
+| PyPI Release | Test Status | Code Coverage |
+| ------------ | ----------- | ------------- |
+| [![PyPI version](https://badge.fury.io/py/rms-hst-pipeline.svg)](https://badge.fury.io/py/rms-hst-pipeline) | [![Build status](https://img.shields.io/github/actions/workflow/status/SETI/rms-hst-pipeline/run-app-tests.yml?branch=main)](https://github.com/SETI/rms-hst-pipeline/actions) | [![Code coverage](https://img.shields.io/codecov/c/github/SETI/rms-hst-pipeline/main?logo=codecov)](https://codecov.io/gh/SETI/rms-hst-pipeline) |
+
+# HST Pipeline
 # Required setup before running HST pipeline tasks
 - Go to `pds-hst-pipeline/HST`, setup an virtual environment and run `pip install -r requirements.txt`
 - Setup these environment variables:
