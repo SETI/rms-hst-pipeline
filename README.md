@@ -14,9 +14,8 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
 
 ## ⚙️ Required Setup Before Running HST Pipeline Tasks
 
-1. Navigate to the HST directory and set up a virtual environment:
+1. Set up a virtual environment at the root directory:
    ```bash
-   cd pds-hst-pipeline/HST
    python -m venv venv
    source venv/bin/activate   # or `venv\Scripts\activate` on Windows
    pip install -r requirements.txt
