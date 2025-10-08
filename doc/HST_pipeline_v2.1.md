@@ -9,7 +9,7 @@ July 9, 2024
 # Terms
 
 - Program ID = the four or five-digit numeric HST proposal ID.
-- PPPSSOOT = the format of the first nine characters in the root name of a file. I indicates instrument, PPP indicates program, SS for visit, OO for observation, T for transmission/association.
+- IPPPSSOOT = the format of the first nine characters in the root name of a file. I indicates instrument, PPP indicates program, SS for visit, OO for observation, T for transmission/association.
 - IPPPSSOO = the first eight characters. On occasion, files have the same “IPPPSSOO” but the “T” character is different. Nevertheless, files with the same IPPPSSOO are always associated, regardless of the “T”.
 - VISIT = the two character designation for the HST visit, the “SS” in IPPPSSOOT.
 - TRL: File suffix that describes the processing history of all the files with the same IPPPSSOOT prefix.
@@ -108,7 +108,7 @@ July 9, 2024
 - Actions:
   - Query MAST for any program IDs that meet the query constraints.
   - For each subdirectory of `<HST_PIPELINE>` that is missing, queue task **query-hst-products** for that program ID.
-  - Also re-queue task **query-hst-moving-targets** with a 30-day delay.  (To be implemented)
+  - Also re-queue task **query-hst-moving-targets** with a 30-day delay.  ([To be implemented](https://github.com/SETI/rms-hst-pipeline/issues/104))
 
 #
 # Task: **query-hst-products** (1)
@@ -138,8 +138,8 @@ July 9, 2024
     - Delete the TRL files.
   - Create a list of visits in which any files are new or changed.
   - If the list is not empty, queue task **update-hst-program** with the list of visits.
-  - If the list was empty, re-queue task **query-hst-products** with a 30-day delay. (To be implemented)
-  - Otherwise, re-queue task **query-hst-products** with a 90-day delay. (To be implemented)
+  - If the list was empty, re-queue task **query-hst-products** with a 30-day delay. ([To be implemented](https://github.com/SETI/rms-hst-pipeline/issues/104))
+  - Otherwise, re-queue task **query-hst-products** with a 90-day delay. ([To be implemented](https://github.com/SETI/rms-hst-pipeline/issues/104))
 
 #
 # Task: **update-hst-program**
@@ -241,7 +241,7 @@ July 9, 2024
   - All the files and labels inside `<HST_STAGING>/hst_<nnnnn>` and its visit subdirectories are up to date.
 - Actions:
   - Get the general label data used in document/schema/context/bundle labels
-  - Move existing, superseded files as described in PDS4-VERSIONING.txt (To be implemented)
+  - Move existing, superseded files as described in PDS4-VERSIONING.txt ([To be implemented](https://github.com/SETI/rms-hst-pipeline/issues/105))
   - Generate the final document directory under `<HST_BUNDLES>/hst_<nnnnn>/`
   - Generate the final schema directory under `<HST_BUNDLES>/hst_<nnnnn>/`
   - Generate the final context directory under `<HST_BUNDLES>/hst_<nnnnn>/`
@@ -250,4 +250,4 @@ July 9, 2024
   - Create bundle label under `<HST_BUNDLES>/hst_<nnnnn>/`
   - Create target label under `<HST_BUNDLES>/hst_<nnnnn>/context` if it doesn't exist in PDS page
   - Create manifest files & run validator
-  - Question: Will we need this process to generate a doi? How do we handle that? (To be implemented)
+  - Question: Will we need this process to generate a doi? How do we handle that? ([To be implemented](https://github.com/SETI/rms-hst-pipeline/issues/106))
