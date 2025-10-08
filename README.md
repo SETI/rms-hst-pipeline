@@ -38,27 +38,27 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
 
 - Run with all proposal IDs (pre-fetched from MAST with the *True moving target* flag):
   ```bash
-  python pipeline/pipeline_run.py
+  python HST/pipeline/pipeline_run.py
   ```
 
 - Query MAST with the *True moving target* flag to get the latest IDs, then run the pipeline:
   ```bash
-  python pipeline/pipeline_run.py --get-ids
+  python HST/pipeline/pipeline_run.py --get-ids
   ```
 
 - Run with a single proposal ID:
   ```bash
-  python pipeline/pipeline_run.py --proposal-ids 07885
+  python HST/pipeline/pipeline_run.py --proposal-ids 07885
   ```
 
 - Run with multiple proposal IDs:
   ```bash
-  python pipeline/pipeline_run.py --proposal-ids 13736 05167 10341 14930 06679
+  python HST/pipeline/pipeline_run.py --proposal-ids 13736 05167 10341 14930 06679
   ```
 
 - Run with a specific number of subprocesses and a maximum allowed runtime for each task (in seconds):
   ```bash
-  python pipeline/pipeline_run.py --proposal-ids 07885 13736 --max-subproc 30 --max-time 1860
+  python HST/pipeline/pipeline_run.py --proposal-ids 07885 13736 --max-subproc 30 --max-time 1860
   ```
 
 ---
@@ -68,24 +68,24 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
 These are the commands executed internally when running `pipeline_run.py`:
 
 ```bash
-python pipeline/pipeline_query_hst_moving_targets.py --proposal-ids 7885
-python pipeline/pipeline_query_hst_products.py --proposal-id 7885
-python pipeline/pipeline_get_program_info.py --proposal-id 7885
-python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 01
-python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 02
-python pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 03
-python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 01
-python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 02
-python pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 03
-python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 01
-python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 02
-python pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 03
-python pipeline/pipeline_finalize_hst_bundle.py --proposal-id 7885
+python HST/pipeline/pipeline_query_hst_moving_targets.py --proposal-ids 7885
+python HST/pipeline/pipeline_query_hst_products.py --proposal-id 7885
+python HST/pipeline/pipeline_get_program_info.py --proposal-id 7885
+python HST/pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 01
+python HST/pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 02
+python HST/pipeline/pipeline_retrieve_hst_visit.py --proposal-id 7885 --vi 03
+python HST/pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 01
+python HST/pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 02
+python HST/pipeline/pipeline_label_hst_products.py --proposal-id 7885 --vi 03
+python HST/pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 01
+python HST/pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 02
+python HST/pipeline/pipeline_prepare_browse_products.py --proposal-id 7885 --vi 03
+python HST/pipeline/pipeline_finalize_hst_bundle.py --proposal-id 7885
 ```
 
 ---
 
 ✅ **Tip:**
-Use `--help` with any script (e.g., `python pipeline/pipeline_run.py --help`) to view all available options and arguments.
+Use `--help` with any script (e.g., `python HST/pipeline/pipeline_run.py --help`) to view all available options and arguments.
 
 ---
