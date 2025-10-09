@@ -454,7 +454,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             if ipppssoot in associations_by_ipppssoot:
                 associates = associations_by_ipppssoot[ipppssoot]
                 if reference_ipppssoot in associations_by_ipppssoot:
-                    associations_by_ipppssoot[reference_ipppssoot].append(associates)
+                    associations_by_ipppssoot[reference_ipppssoot] += associates
                 else:
                     associations_by_ipppssoot[reference_ipppssoot] = associates
                 del associations_by_ipppssoot[ipppssoot]
@@ -536,7 +536,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
     # Insert the associations list from the ASN file
     for ipppssoot, associations in associations_by_ipppssoot.items():
-        ippsoot_dict = info_by_ipppssoot[ipppssoot]
+        ipppssoot_dict = info_by_ipppssoot[ipppssoot]
 
         validated_associates = []
         missing_associates = []
@@ -559,8 +559,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                 missing_associates.append((associate, memtype))
                 logger.warn('Missing associate for ' + ipppssoot, associate)
 
-        ippsoot_dict['associates'] = validated_associates
-        ippsoot_dict['missing_associates'] = missing_associates
+        ipppssoot_dict['associates'] = validated_associates
+        ipppssoot_dict['missing_associates'] = missing_associates
 
     # Fill in the merged suffixes
     for ipppssoot, ipppssoot_dict in info_by_ipppssoot.items():
@@ -598,7 +598,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     for ipppssoot, ipppssoot_dict in info_by_ipppssoot.items():
         if 'spt_suffix' in ipppssoot_dict:
             continue
-        for (associate, _) in ippsoot_dict['associates']:
+        for (associate, _) in ipppssoot_dict['associates']:
             if 'spt_suffix' in info_by_ipppssoot[associate]:
                 ipppssoot_dict['spt_suffix'] = info_by_ipppssoot[associate]['spt_suffix']
                 ipppssoot_dict['spt_fullpath'] = \
@@ -762,11 +762,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # Target identifications
         spt_fullpath = ipppssoot_dict['spt_fullpath']
-        if reference_suffix:
-            xml_content = reference_dict['previous_xml']
-        else:
-            xml_content = ''
-
+        xml_content = reference_dict['previous_xml']
         if xml_content:                 # use the old identification if available
             target_ids = get_target_identifications(xml_content)
         else:
@@ -1164,8 +1160,7 @@ def fill_modification_date(basename_dict, info_by_ipppssoot, logger):
     if latest_date in ipppssoot_dict['timetags']:
         latest_date = ipppssoot_dict['timetags'][latest_date]
     elif 'T' not in latest_date:
-        logger.debug(f'No time tags for {latest_date}', basename_dict['fullpath'])
-        print(ipppssoot_dict['timetags'].keys())
+        logger.debug(f'No hh:mm:ss for {latest_date}', basename_dict['fullpath'])
 
     basename_dict['modification_date'] = latest_date
     if latest_date == '0000':

@@ -165,7 +165,7 @@ def get_bintable_time_coordinates(filepath, logger):
     times = []
     for mjd in (mjds.min(), mjds.max()):
         day, sec = julian.day_sec_from_mjd(mjd)
-        iso = julian.format_day_sec(day, sec)
+        iso = julian.format_day_sec(day, sec, suffix='Z')
         times.append(iso)
 
     logger.debug('Times retrieved from bintable', filepath)
