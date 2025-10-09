@@ -814,10 +814,10 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # Override the time coordinates for EPC files
         if basename.endswith('_epc.fits'):
-            ipppssoot_dict['time_coordinates'] = get_bintable_time_coordinates(
+            basename_dict['time_coordinates'] = get_bintable_time_coordinates(
                                                             basename_dict['fullpath'],
                                                             logger)
-            ipppssoot_dict['time_is_actual'] = True
+            basename_dict['time_is_actual'] = True
 
         suffix = basename_dict['suffix']
         instrument_id = basename_dict['instrument_id']
