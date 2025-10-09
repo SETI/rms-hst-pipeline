@@ -4,6 +4,9 @@
 import julian
 import pdslogger
 
+from astropy.io import fits as pyfits
+
+
 def get_time_coordinates(ref_hdulist, spt_hdulist, filepath='', logger=None):
     """Return the tuple (start_time, stop_time, is_actual).
 
@@ -27,7 +30,6 @@ def get_time_coordinates(ref_hdulist, spt_hdulist, filepath='', logger=None):
                 pass
 
         return alt
-
 
     logger = logger or pdslogger.NullLogger()
 
@@ -149,5 +151,24 @@ def get_time_coordinates(ref_hdulist, spt_hdulist, filepath='', logger=None):
     stop_date_time = julian.ymdhms_format_from_day_sec(day, sec, suffix='Z')
 
     return (start_date_time, stop_date_time, True)
+
+
+def get_bintable_time_coordinates(filepath, logger):
+    """Get the tuple (start_time, stop_time) from MJD values embedded in a binary FITS
+    table.
+    """
+
+    hdulist = pyfits.open(filepath)
+    mjds = hdulist[1].data['TIME']
+    hdulist.close()
+
+    times = []
+    for mjd in (mjds.min(), mjds.max()):
+        day, sec = julian.day_sec_from_mjd(mjd)
+        iso = julian.format_day_sec(day, sec)
+        times.append(iso)
+
+    logger.debug('Times retrieved from bintable', filepath)
+    return times
 
 ##########################################################################################

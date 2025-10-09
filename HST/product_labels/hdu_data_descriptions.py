@@ -163,29 +163,31 @@ DATA_CLASS_TO_NOUN = {
     'UNKNOWN'          : ('UNKNOWN DATA CLASS', 'UNKNOWN DATA CLASSES'),
 }
 
-def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logger):
+def fill_hdu_data_descriptions(ipppssoot, suffix, info_by_ipppssoot, log_text, logger):
     """Fill in the description fields for all of the data objects in one file based on its
     suffix.
 
     Input:
-        ipppssoot       the file's IPPPSSOOT.
-        ipppssoot_dict  the dictionary describing every file having the same IPPPSSOOT.
-        suffix          the long suffix for one file.
-        log_text        True to write all description strings to the log.
-        logger          pdslogger to use; None to suppress logging.
+        ipppssoot           the file's IPPPSSOOT.
+        suffix              the long suffix for one file.
+        info_by_ipppssoot   the dictionary describing all IPPPSSOOTs.
+        log_text            True to write all description strings to the log.
+        logger              pdslogger to use; None to suppress logging.
 
-    Return:             the set of all descriptions generated. Useful to review the text
-                        being generated to confirm that it is correct.
+    Return:                 the set of all descriptions generated. Useful to review the
+                            text being generated to confirm that it is correct.
     """
 
     logger = logger or pdslogger.NullLogger()
+
+    ipppssoot_dict = info_by_ipppssoot[ipppssoot]
+    suffix_dict    = ipppssoot_dict[suffix]
 
     hst_dictionary  = ipppssoot_dict['hst_dictionary']
     instrument_id   = hst_dictionary['instrument_id']
     channel_id      = hst_dictionary['channel_id']
     hst_proposal_id = hst_dictionary['hst_proposal_id']
 
-    suffix_dict = ipppssoot_dict[suffix]
     filepath  = suffix_dict['fullpath']
     hdu_dicts = suffix_dict['hdu_dictionaries']
 
@@ -269,9 +271,8 @@ def fill_hdu_data_descriptions(ipppssoot, ipppssoot_dict, suffix, log_text, logg
             associated_sci_class = sci_class
         else:
             (associated_ipppssoot, associated_suffix) = selected_pairs[0]
-            associated_suffix_dict = (ipppssoot_dict['by_ipppssoot']
-                                                    [associated_ipppssoot]
-                                                    [associated_suffix])
+            associated_suffix_dict = (info_by_ipppssoot[associated_ipppssoot]
+                                                       [associated_suffix])
             associated_hdu_dicts = associated_suffix_dict['hdu_dictionaries']
             for k, hdu_dict in enumerate(associated_hdu_dicts):
                 extver = hdu_dict['extver']
