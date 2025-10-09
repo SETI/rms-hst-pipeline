@@ -180,7 +180,9 @@ $FOR(target=target_identifications)
       </description>
   $END_IF
       <Internal_Reference>
-        <lid_reference>$target[4]$</lid_reference>
+        <lid_reference>
+          $target[4]$
+        </lid_reference>
         <reference_type>data_to_target</reference_type>
       </Internal_Reference>
     </Target_Identification>
