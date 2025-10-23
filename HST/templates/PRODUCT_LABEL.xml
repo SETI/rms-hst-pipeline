@@ -23,9 +23,10 @@ $ONCE(FILE_AREA = "File_Area_Ancillary" if processing_level == "Ancillary" else 
 $ONCE(prop_id=hst_dictionary["hst_proposal_id"])
 $ONCE(formatted_prop_id=str(prop_id).zfill(5))
 $ONCE(inst_id=hst_dictionary["instrument_id"])
-$ONCE(ipppssoot=hst_dictionary["mast_observation_id"])
   <Identification_Area>
-    <logical_identifier>urn:nasa:pds:hst_$prop_id$:$collection_name$:$ipppssoot$$lid_suffix$</logical_identifier>
+    <logical_identifier>
+      $product_lid$
+    </logical_identifier>
     <version_id>$version_id[0]$.$version_id[1]$</version_id>
     <title>
       $WRAP(6, 90, basename + ": " + product_title)$
@@ -104,14 +105,7 @@ $IF(hst_dictionary["mast_pipeline_version_id"])
 $ELSE
       or around $modification_date[:10]$.
 $END_IF
-$IF(has_nans)
-
-      Note: This file has been modified from the original source. The source file contains
-      NaN ("not-a-number") values inside some data arrays, but NaN values are not allowed
-      in PDS4 data products. In this file, all NaN values have been replaced by a fixed
-      constant, as specified below in the Special_Constants class.
-$END_IF
-$IF(not ipppssoot_dict['reference_suffix'])
+$IF(not ipppssoot_dict['reference_suffixes'])
 
       Note that observation "$ipppssoot$" did not obtain science data. Only ancillary data
       files documenting this activity are available.
@@ -141,7 +135,9 @@ $END_FOR
       <name>HST observing program $prop_id$</name>
       <type>Individual Investigation</type>
       <Internal_Reference>
-        <lid_reference>urn:nasa:pds:context:investigation:individual.hst_$formatted_prop_id$</lid_reference>
+        <lid_reference>
+          urn:nasa:pds:context:investigation:individual.hst_$formatted_prop_id$
+        </lid_reference>
         <reference_type>data_to_investigation</reference_type>
       </Internal_Reference>
     </Investigation_Area>
@@ -151,7 +147,9 @@ $END_FOR
         <name>Hubble Space Telescope</name>
         <type>Host</type>
         <Internal_Reference>
-          <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
+          <lid_reference>
+            urn:nasa:pds:context:instrument_host:spacecraft.hst
+          </lid_reference>
           <reference_type>is_instrument_host</reference_type>
         </Internal_Reference>
       </Observing_System_Component>
@@ -159,7 +157,9 @@ $END_FOR
         <name>$instrument_name$</name>
         <type>Instrument</type>
         <Internal_Reference>
-          <lid_reference>urn:nasa:pds:context:instrument:hst.$inst_id.lower()$</lid_reference>
+          <lid_reference>
+            urn:nasa:pds:context:instrument:hst.$inst_id.lower()$
+          </lid_reference>
           <reference_type>is_instrument</reference_type>
         </Internal_Reference>
       </Observing_System_Component>
@@ -180,7 +180,9 @@ $FOR(target=target_identifications)
       </description>
   $END_IF
       <Internal_Reference>
-        <lid_reference>$target[4]$</lid_reference>
+        <lid_reference>
+          $target[4]$
+        </lid_reference>
         <reference_type>data_to_target</reference_type>
       </Internal_Reference>
     </Target_Identification>
@@ -307,7 +309,9 @@ $IF(processing_level != "Ancillary")
   $FOR(info=browse_info)
 
     <Internal_Reference>
-      <lidvid_reference>urn:nasa:pds:hst_$prop_id$:$info.collection_name$:$ipppssoot$$info.lid_suffix$::$version_id[0]$.0</lidvid_reference>
+      <lidvid_reference>
+        urn:nasa:pds:hst_$prop_id$:$info.collection_name$:$ipppssoot$_$info.suffix$::$version_id[0]$.0
+      </lidvid_reference>
       <reference_type>data_to_$"thumb" if "thumb" in info.suffix else "browse"$</reference_type>
     $IF("thumb" in info.suffix)
       <comment>Thumbnail browse product</comment>
@@ -323,7 +327,9 @@ $FOR(ref=reference_basenames)
 
   $ONCE(ref_dict=by_basename[ref])
     <Internal_Reference>
-      <lidvid_reference>urn:nasa:pds:hst_$prop_id$:$ref_dict["collection_name"]$:$ref_dict["ipppssoot"]$$ref_dict["lid_suffix"]$::$ref_dict["version_id"][0]$.$ref_dict["version_id"][1]$</lidvid_reference>
+      <lidvid_reference>
+        $ref_dict["product_lidvid"]$
+      </lidvid_reference>
       <reference_type>data_to_$ref_dict["processing_level"].lower()$_product</reference_type>
       <comment>
         $WRAP(8, 90, ref_dict["basename"] + ": " + ref_dict["product_title"])$
@@ -387,7 +393,7 @@ $FOR(hdu_dict,k=hdu_dictionaries)
     $END_FOR
     $IF(k in hdus_with_nans)
       <Special_Constants>
-        <invalid_constant>$nan_replacement$</invalid_constant>
+        <not_applicable_constant>NaN</not_applicable_constant>
       </Special_Constants>
     $END_IF
    $ELSE_IF(ddict["data_class"] == "Table_Binary")

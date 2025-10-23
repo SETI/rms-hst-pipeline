@@ -807,7 +807,8 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     try:
         mtflag = merged['MTFLAG']
     except KeyError:
-        logger.error('Missing FITS keyword MTFLAG', filepath)
+        logger.warn('Missing FITS keyword MTFLAG', filepath)
+        mtflag = False
 
     if mtflag in ('T', '1', True):
         moving_target_flag = True

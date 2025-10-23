@@ -214,20 +214,10 @@ EXTENDED_SUFFIXES = {
     'rawaccum_b': ('rawaccum', '_b'),
     'rawtag_a'  : ('rawtag', '_a'),
     'rawtag_b'  : ('rawtag', '_b'),
-    'x1dsum1'   : ('x1dsum', '_1'),
-    'x1dsum2'   : ('x1dsum', '_2'),
-    'x1dsum3'   : ('x1dsum', '_3'),
-    'x1dsum4'   : ('x1dsum', '_4'),
-}
-
-# When defining associated products, we exclude files with a conflicting suffix
-EXTENDED_SUFFIX_EXCLUSIONS = {
-    '_a':   {'_b'},
-    '_b':   {'_a'},
-    '_1':   {'_2','_3','_4'},
-    '_2':   {'_1','_3','_4'},
-    '_3':   {'_1','_2','_4'},
-    '_4':   {'_1','_2','_3'},
+    'x1dsum1'   : ('x1dsum', '1'),
+    'x1dsum2'   : ('x1dsum', '2'),
+    'x1dsum3'   : ('x1dsum', '3'),
+    'x1dsum4'   : ('x1dsum', '4'),
 }
 
 SuffixInfo = namedtuple('SuffixInfo', ['is_accepted',
@@ -1602,15 +1592,12 @@ LOCAL_BROWSE_SUFFIXES = {
 BrowseProductInfo = namedtuple('BrowseProductInfo', ['suffix',
                                                      'mast_suffix',
                                                      'collection_name',
-                                                     'lid_suffix',
                                                      'is_locally_generated'])
 # [0] suffix: the suffix on the browse product, following IPPPSSOOT. This is normally the
 #     the same as that for the FITS file, but might have "_thumb" appended.
 # [1] mast_suffix: the suffix used in MAST.
 # [2] collection_name: name of the collection, e.g., "browse_acs_flt".
-# [3] lid_suffix: any suffix to append to the IPPPSSOOT in the LID; mainly for the "_a",
-#     "_b", "_1", etc. suffixes used by COS.
-# [4] is_locally_generated: True if this product is generated locally; False if retrieved
+# [3] is_locally_generated: True if this product is generated locally; False if retrieved
 #     from MAST.
 
 # Create a dictionary that maps (instrument_id, FITS suffix) to a list of
@@ -1628,12 +1615,11 @@ for instrument_id, mast_suffixes in ACCEPTED_BROWSE_SUFFIXES.items():
         fits_suffix = local_suffix.replace('_thumb', '')
 
         # Translate fits_suffix to collection name and LID suffix
-        (short_suffix, lid_suffix) = EXTENDED_SUFFIXES.get(fits_suffix, (fits_suffix, ''))
+        (short_suffix, _) = EXTENDED_SUFFIXES.get(fits_suffix, (fits_suffix, ''))
         collection_name = 'browse_' + instrument_id.lower() + '_' + short_suffix
 
         # Create the BrowseProductInfo object and append
-        info = BrowseProductInfo(local_suffix, mast_suffix, collection_name, lid_suffix,
-                                 False)
+        info = BrowseProductInfo(local_suffix, mast_suffix, collection_name, False)
         BROWSE_SUFFIX_INFO[instrument_id, fits_suffix].append(info)
 
 # Update for the locally-generated browse products, which supersede MAST products.
@@ -1655,7 +1641,7 @@ for instrument_id in LOCAL_BROWSE_INSTRUMENTS:
         for k, info in enumerate(browse_info_list):
             if info.suffix == local_suffix:
                 new_info = BrowseProductInfo(local_suffix, '', info.collection_name,
-                                             info.lid_suffix, True)
+                                             True)
                 browse_info_list[k] = new_info
                 updated = True
                 break
@@ -1663,7 +1649,7 @@ for instrument_id in LOCAL_BROWSE_INSTRUMENTS:
         # Otherwise, append this product info
         if not updated:
             collection_name = 'browse_' + instrument_id.lower() + '_' + local_suffix
-            new_info = BrowseProductInfo(local_suffix, '', collection_name, '', True)
+            new_info = BrowseProductInfo(local_suffix, '', collection_name, True)
             browse_info_list.append(new_info)
 
 ##########################################################################################
@@ -1786,19 +1772,17 @@ def collection_name(suffix, instrument_id):
             + '_'
             + EXTENDED_SUFFIXES.get(suffix, (suffix, ''))[0])
 
-def lid_suffix(suffix):
-    """When a suffix has its own suffix, the latter suffix has to be appended to the
-    IPPPSSOOT in the LID because it is not part of the collection name.
+def short_suffix(suffix):
+    """When a suffix has its own suffix, this is the first part, e.g., "flt_a" -> "flt".
+    """
+
+    return EXTENDED_SUFFIXES.get(suffix, (suffix, ''))[0]
+
+def suffix_tail(suffix):
+    """When a suffix has its own suffix, this is the second part, e.g., "flt_a" -> "_a".
     """
 
     return EXTENDED_SUFFIXES.get(suffix, (suffix, ''))[1]
-
-def excluded_lid_suffixes(lid_suffix):
-    """When a suffix has its own suffix, the list of associated products should exclude
-    those with a conflicting suffix.
-    """
-
-    return EXTENDED_SUFFIX_EXCLUSIONS.get(lid_suffix, set())
 
 ##########################################################################################
 

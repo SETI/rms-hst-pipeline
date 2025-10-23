@@ -255,10 +255,12 @@ def download_files(table, dir, logger=None, testing=False):
     os.makedirs(dir, exist_ok=True)
 
     if len(table) > 0:
-        logger.info(f'Download files to {dir}')
+        logger.info(f'Downloading files to {dir}')
         if not testing: # pragma: no cover, no need to download files during the test
             try:
                 Observations.download_products(table, download_dir=dir)
+                logger.info(f'Downloading files to {dir} has completed!')
             except Exception as e: # errors when downloading files
+                logger.critical(f'Error happened during downloading files to {dir}')
                 logger.exception(e)
                 raise
