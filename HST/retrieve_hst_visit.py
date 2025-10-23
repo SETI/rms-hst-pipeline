@@ -46,6 +46,7 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
 
     try:
         # Download all accepted files
+        logger.info(f'Download accepted products to {files_dir}')
         download_files(filtered_products, files_dir, logger, testing)
     except: #pragma: no cover
         # Downloading failed, removed the visit folder under the staging directory, and
@@ -61,7 +62,7 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
         # database.
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         remove_all_tasks_for_a_prog_id(formatted_proposal_id)
-        logger.exception('MAST trl files downlaod failure')
+        logger.exception(f'MAST trl files downlaod failure for {proposal_id}')
         raise
 
     return len(filtered_products)

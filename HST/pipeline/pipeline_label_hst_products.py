@@ -94,7 +94,7 @@ if proposal_id and visit and not target_path:
     target_path = (HST_DIR['staging'] + '/hst_' + proposal_id.zfill(5) + '/visit_'
                    + visit.zfill(2))
 
-logger = pdslogger.PdsLogger('pds.hst.label-hst-products')
+logger = pdslogger.PdsLogger('pds.hst.label-hst-products-' + proposal_id)
 if not args.quiet:
     logger.add_handler(pdslogger.stdout_handler)
 

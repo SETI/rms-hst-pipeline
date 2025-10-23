@@ -95,6 +95,7 @@ def query_hst_products(proposal_id, logger=None):
     trl_products = get_trl_products(table)
 
     try:
+        logger.info(f'Download trl products to {trl_dir}')
         download_files(trl_products, trl_dir, logger)
     except: #pragma: no cover
         # Downloading failed, removed all the trl files to restore a clean directory.
