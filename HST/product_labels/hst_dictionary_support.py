@@ -533,7 +533,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     if scidata:
-        hst_dictionary['exposure_type'] = get_or_log(merged, 'EXPFLAG', 'INDETERMINATE')
+        hst_dictionary['exposure_type'] = get_or_log(merged, 'EXPFLAG')
 
     ##############################
     # filter_name
@@ -643,8 +643,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     if scidata:
-        hst_dictionary['fine_guidance_sensor_lock_type'] = get_or_log(merged, 'FGSLOCK',
-                                                                      'UNKNOWN')
+        hst_dictionary['fine_guidance_sensor_lock_type'] = get_or_log(merged, 'FGSLOCK')
 
     ##############################
     # gain_setting

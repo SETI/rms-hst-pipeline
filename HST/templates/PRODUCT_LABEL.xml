@@ -243,12 +243,12 @@ $FOR(detector,k,count=hst_dictionary["targeted_detector_ids"])
 $END_FOR
         </hst:Pointing_Parameters>
         <hst:Tracking_Parameters>
-          <hst:fine_guidance_sensor_lock_type>$hst_dictionary["fine_guidance_sensor_lock_type"]$</hst:fine_guidance_sensor_lock_type>
+          <hst:fine_guidance_sensor_lock_type>$REPLACE_UNK(hst_dictionary["fine_guidance_sensor_lock_type"], 'UNKNOWN')$</hst:fine_guidance_sensor_lock_type>
           <hst:gyroscope_mode>$hst_dictionary["gyroscope_mode"]$</hst:gyroscope_mode>
         </hst:Tracking_Parameters>
         <hst:Exposure_Parameters>
           <hst:exposure_duration unit="s">$hst_dictionary["exposure_duration"]$</hst:exposure_duration>
-          <hst:exposure_type>$hst_dictionary["exposure_type"]$</hst:exposure_type>
+          <hst:exposure_type>$REPLACE_UNK(hst_dictionary["exposure_type"], 'INDETERMINATE')$</hst:exposure_type>
         </hst:Exposure_Parameters>
         <hst:Wavelength_Filter_Grating_Parameters>
           <hst:filter_name>$hst_dictionary["filter_name"]$</hst:filter_name>
