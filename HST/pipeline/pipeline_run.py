@@ -52,6 +52,9 @@ parser.add_argument('--max-allowed-time', '--max-time',
 parser.add_argument('--get-ids', '-g', action='store_true',
     help='Fetch ids from MAST to update the id list before running pipeline.')
 
+parser.add_argument('--nocleanup', action='store_true',
+    help="Don't delete the MAST download files.")
+
 # Default list of program ids
 ids_li = ['15648', '13667', '10161', '11113', '08152', '15142', '11650', '04600',
           '10423', '15929', '09354', '11573', '10719', '08699', '07430', '07583',
@@ -194,8 +197,10 @@ proposal_ids = args.proposal_ids if args.proposal_ids else ids_li
 
 run_pipeline(proposal_ids, logger)
 # Clean up the staging directories
-for id in proposal_ids:
-    clean_up_staging_dir(id, logger)
+if not args.nocleanup:
+    for id_ in proposal_ids:
+        clean_up_staging_dir(id_, logger)
+
 logger.close()
 
 ##########################################################################################

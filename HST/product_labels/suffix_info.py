@@ -178,12 +178,17 @@ ALL_SUFFIXES = {
 # This might be a useful resource: https://archive.stsci.edu/hst/manifestkeywords.html
 ##########################################################################################
 
-REF_SUFFIXES = {'raw', 'd0m', 'd0f',
-                'a1f', 'a2f', 'a3f',                    # FGS
-                'rawtag',   'rawtag_a',   'rawtag_b',   # COS...
+# The reference suffix is the one file with a given IPPPSSOOT that defines the instrument
+# parameters and time coordinates. There are three sets of options in decreasing order of
+# preference.
+REF_SUFFIXES = [{'raw', 'd0m', 'd0f',
+                'a1f', 'a2f', 'a3f',                            # FGS
+                'rawtag',   'rawtag_a',   'rawtag_b',           # COS...
                 'rawaccum', 'rawaccum_a', 'rawaccum_b',
-                'rawacq',   'rawacq_a',   'rawacq_b'}
-ALT_REF_SUFFIXES = {'mos', 'drz', 'x1dsum', 'fltsum', 'd1f'}    # d1f needed for GHRS
+                'rawacq',   'rawacq_a',   'rawacq_b'},
+                {'mos', 'drz', 'x1dsum', 'fltsum', 'd1f'},      # d1f needed for GHRS
+                {'shf'}]     # shf needed for some GHRS that lack d1f
+REF_TAGS = ['Reference', 'Alternative reference', 'Second alternative reference']
 SPT_SUFFIXES = {'spt', 'shm', 'shf', 'dmf'}
 
 # These are used when we only want to download files for target identification testing

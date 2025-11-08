@@ -630,6 +630,9 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     ######################################################################################
 
     def find_suffix_dicts(ipppssoot_dict, suffixes):
+        """Return a list of reference IPPPSSOOT dicts for the given suffixes. These could
+        be from an associate.
+        """
         suffix_dicts = []
         for suffix in suffixes:
             if suffix in ipppssoot_dict['all_suffixes']:
@@ -639,8 +642,10 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                     suffix_dicts.append(info_by_ipppssoot[associate][suffix])
         return suffix_dicts
 
+    # suffix_options is a list of sets of suffix strings. The first is for the IPPPSSOOT;
+    # the second is for the parent if this IPPPSSOOT has a parent. We only use a parent
+    # as a reference if there are no reference suffixes found for the IPPPSSOOT itself.
     for ipppssoot, ipppssoot_dict in info_by_ipppssoot.items():
-
         ipppssoot_dict['shared'] = len(ipppssoot_dict['parents']) > 1
         if ipppssoot_dict['parent']:
             parent = ipppssoot_dict['parent']
@@ -651,32 +656,29 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             ipppssoot_dicts = [ipppssoot_dict]
             suffix_options = [ipppssoot_dict['merged_suffixes']]
 
-        # Check the REF_SUFFIXES list
-        tag = 'Reference'
-        for k, suffix_option in enumerate(suffix_options):
-            reference_suffixes = list(suffix_info.REF_SUFFIXES & suffix_option)
-            reference_dicts = find_suffix_dicts(ipppssoot_dicts[k], reference_suffixes)
-            if reference_suffixes:
-                break
-
-        # If that fails, check the ALT_REF_SUFFIXES list
-        if not reference_suffixes:
-            tag = 'Alternative reference'
+        # Search for a reference suffix among the available suffixes.
+        # There are three levels of suffix precedence defined in `suffix_info`; lower
+        # precedence suffixes are only used if all higher-precedence suffixes are absent.
+        # `tag` is one of "Reference", "Alternative Reference", or "Second Alt Reference".
+        for tag, suffixes in zip(suffix_info.REF_TAGS, suffix_info.REF_SUFFIXES):
             for k, suffix_option in enumerate(suffix_options):
-                reference_suffixes = list(suffix_info.ALT_REF_SUFFIXES & suffix_option)
+                reference_suffixes = list(suffixes & suffix_option)
                 reference_dicts = find_suffix_dicts(ipppssoot_dicts[k],
                                                     reference_suffixes)
                 if reference_suffixes:
                     break
+            if reference_suffixes:
+                break
 
         ipppssoot_dict['reference_suffixes'] = set(reference_suffixes)
         ipppssoot_dict['reference_dicts'] = reference_dicts
 
+        # Log the reference found
         count = len(reference_dicts)
-        if count > 1:
+        if count > 1:       # If there are multiple suitable references, just pick one
             for k, reference_dict in enumerate(reference_dicts):
                 logger.info(f'Multiple {tag.lower()} files found for {ipppssoot} ' +
-                             f'({k+1}/{count})', reference_dict['fullpath'])
+                            f'({k+1}/{count})', reference_dict['fullpath'])
             reference_suffix = reference_suffixes[0]
             reference_dict = reference_dicts[0]
         elif count == 1:
@@ -684,7 +686,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                         reference_dicts[0]['fullpath'])
             reference_suffix = reference_suffixes[0]
             reference_dict = reference_dicts[0]
-        else:
+        else:               # In the absence of a reference file, we're stuck.
             logger.critical('No reference file for ' + ipppssoot)
             raise ValueError('No reference file for ' + ipppssoot)
 
@@ -1032,7 +1034,7 @@ def get_filepaths(directories, root='', match_pattern='', extension='.fits'):
     """Generate a list of file paths for processing.
 
     Input:
-        directories     directory path of a list of directory paths.
+        directories     directory path or a list of directory paths.
         root            optional path to prepend to each directory path.
         match_pattern   optional fnmatch pattern to use to filter the returned list.
     """

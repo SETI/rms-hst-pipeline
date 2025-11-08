@@ -382,10 +382,17 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
             elif isinstance(ref_hdulist[1].data, pyfits.fitsrec.FITS_rec):
                 try:
                     detector_ids = list(ref_hdulist[1].data['SEGMENT'])
+                    detector_ids.sort()
                 except KeyError:
-                    logger.error('COS/FUV table does not have a column "SEGMENT"',
-                                 filepath)
-                    detector_ids = ['UNK']
+                    if 'SEGMENT' in ref_hdulist[0].header:
+                        detector_ids = [ref_hdulist[0].header['SEGMENT']]
+                        if detector_ids == ['BOTH']:
+                            detector_ids = ['FUVA', 'FUVB']
+                        dectector_ids = [ref_hdulist[0].header['SEGMENT']]
+                    else:
+                        logger.error('COS/FUV table does not have a column "SEGMENT"',
+                                     filepath)
+                        detector_ids = ['UNK']
 
             else:
                 logger.error('COS/FUV file does not contain "_a" or "_b"', filepath)
@@ -526,7 +533,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     if scidata:
-        hst_dictionary['exposure_type'] = get_or_log(merged, 'EXPFLAG', 0.)
+        hst_dictionary['exposure_type'] = get_or_log(merged, 'EXPFLAG')
 
     ##############################
     # filter_name
@@ -574,7 +581,10 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
         elif instrument_id == 'GHRS':
             if scidata:
-                filter_name = header0['GRATING']
+                if 'GRATING' in header0:
+                    filter_name = header0['GRATING']
+                else:
+                    filter_name = get_or_log(header0, 'SS_GRAT')
             else:
                 filter_name = spt_header['SPEC_1']
 
