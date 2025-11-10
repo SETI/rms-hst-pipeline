@@ -663,14 +663,15 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         for tag, suffixes in zip(suffix_info.REF_TAGS, suffix_info.REF_SUFFIXES):
             for k, suffix_option in enumerate(suffix_options):
                 reference_suffixes = list(suffixes & suffix_option)
-                reference_dicts = find_suffix_dicts(ipppssoot_dicts[k],
-                                                    reference_suffixes)
                 if reference_suffixes:
+                    reference_suffixes.sort()       # make order deterministic
+                    reference_dicts = find_suffix_dicts(ipppssoot_dicts[k],
+                                                        reference_suffixes)
                     break
             if reference_suffixes:
                 break
 
-        ipppssoot_dict['reference_suffixes'] = set(reference_suffixes)
+        ipppssoot_dict['reference_suffixes'] = reference_suffixes
         ipppssoot_dict['reference_dicts'] = reference_dicts
 
         # Log the reference found
