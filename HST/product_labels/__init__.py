@@ -6,7 +6,6 @@ import datetime
 import fnmatch
 import os
 import pathlib
-import shutil
 import sys
 from collections import defaultdict
 
@@ -660,6 +659,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         # There are three levels of suffix precedence defined in `suffix_info`; lower
         # precedence suffixes are only used if all higher-precedence suffixes are absent.
         # `tag` is one of "Reference", "Alternative Reference", or "Second Alt Reference".
+        reference_suffixes = []
         for tag, suffixes in zip(suffix_info.REF_TAGS, suffix_info.REF_SUFFIXES):
             for k, suffix_option in enumerate(suffix_options):
                 reference_suffixes = list(suffixes & suffix_option)
@@ -671,28 +671,27 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             if reference_suffixes:
                 break
 
-        ipppssoot_dict['reference_suffixes'] = reference_suffixes
-        ipppssoot_dict['reference_dicts'] = reference_dicts
-
-        # Log the reference found
-        count = len(reference_dicts)
-        if count > 1:       # If there are multiple suitable references, just pick one
-            for k, reference_dict in enumerate(reference_dicts):
-                logger.info(f'Multiple {tag.lower()} files found for {ipppssoot} ' +
-                            f'({k+1}/{count})', reference_dict['fullpath'])
-            reference_suffix = reference_suffixes[0]
-            reference_dict = reference_dicts[0]
-        elif count == 1:
-            logger.info(f'{tag} file found for ' + ipppssoot,
-                        reference_dicts[0]['fullpath'])
-            reference_suffix = reference_suffixes[0]
-            reference_dict = reference_dicts[0]
-        else:               # In the absence of a reference file, we're stuck.
+        # In the absence of a reference file, we're stuck
+        if not reference_suffixes:
             logger.critical('No reference file for ' + ipppssoot)
             raise ValueError('No reference file for ' + ipppssoot)
 
-        ipppssoot_dict['reference_suffix'] = reference_suffix
-        ipppssoot_dict['reference_dict'] = reference_dict
+        # Log the reference found
+        count = len(reference_dicts)
+        if count > 1:
+            for k, reference_dict in enumerate(reference_dicts):
+                logger.info(f'Multiple {tag.lower()} files found for {ipppssoot} ' +
+                            f'({k+1}/{count})', reference_dict['fullpath'])
+        else:
+            logger.info(f'{tag} file found for ' + ipppssoot,
+                        reference_dicts[0]['fullpath'])
+
+        ipppssoot_dict['reference_suffixes'] = reference_suffixes
+        ipppssoot_dict['reference_dicts'] = reference_dicts
+
+        # If there are multiple suitable references, just pick one
+        ipppssoot_dict['reference_suffix'] = reference_suffixes[0]
+        ipppssoot_dict['reference_dict'] = reference_dicts[0]
 
     ######################################################################################
     # Gather the metadata for each IPPPSSOOT:

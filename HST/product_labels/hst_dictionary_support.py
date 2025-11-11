@@ -388,7 +388,6 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
                         detector_ids = [ref_hdulist[0].header['SEGMENT']]
                         if detector_ids == ['BOTH']:
                             detector_ids = ['FUVA', 'FUVB']
-                        detector_ids = [ref_hdulist[0].header['SEGMENT']]
                     else:
                         logger.error('COS/FUV table does not have a column "SEGMENT"',
                                      filepath)
