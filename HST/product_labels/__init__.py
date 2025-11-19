@@ -121,8 +121,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             min_filepath = min(filepaths)
             max_filepath = max(filepaths)
         except ValueError as e:
-            logger.error(str(e) + ','.join(filepaths))
-            raise e
+            logger.exception(e)
+            raise
 
         for k, chars in enumerate(zip(min_filepath, max_filepath)):
             if chars[0] != chars[1]:
@@ -138,15 +138,13 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         logger.info('Root of file paths: ' + root)
         logger.replace_root(root)
 
-    PdsTemplate.set_logger(logger)
-
     # Make sure the retrieval date, if any, is valid
     if retrieval_date:
         try:
             _ = datetime.date.fromisoformat(retrieval_date)
-        except ValueError:
-            logger.exception(ValueError)
-            sys.exit(1)
+        except ValueError as e:
+            logger.exception(e)
+            raise
 
     # Create a mapping from basename to old filepath
     old_fullpath_vs_basename = {os.path.basename(f):os.path.join(old_root, f)
@@ -185,7 +183,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # If this suffix is not accepted, skip it
         if suffix not in accepted_suffixes:
-            logger.warn(f'Suffix {suffix} rejected', filepath)
+            logger.info(f'Suffix {suffix} rejected', filepath)
             continue
 
         ##################################################################################
@@ -236,7 +234,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             new_path = fullpath + '-duplicate'
             os.rename(fullpath, new_path)
             if content1 == content2:
-                logger.warn('Duplicated basename, renamed', new_path)
+                logger.info('Duplicated basename, renamed', new_path)
             else:
                 logger.error('Same basename, different content', new_path)
             continue
@@ -411,8 +409,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # Log an error if something happened that we don't understand
         if len(standard_tails) == 0:
-            logger.warn('No standard transmission characters found for ' +
-                        f'"{ipppssoo}": {nonstandard_tails}')
+            logger.error('No standard transmission characters found for ' +
+                         f'"{ipppssoo}": {nonstandard_tails}')
         elif len(standard_tails) > 1:
             logger.warn('Multiple standard transmission characters found for ' +
                         f'"{ipppssoo}": {standard_tails}')
@@ -500,7 +498,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         if matches_found > 0:
             solo_ipppssoots.append(ipppssoot)
         if matches_found > 1:
-            logger.warn('File used by multiple IPPPSSOOTs', ipppssoot + '_asn.fits')
+            logger.info('File used by multiple IPPPSSOOTs', ipppssoot + '_asn.fits')
 
     for ipppssoot in solo_ipppssoots:
         del info_by_ipppssoot[ipppssoot]
@@ -574,7 +572,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         if ipppssoot_dict['parent']:
             continue
         if not ipppssoot_dict['timetags']:
-            logger.warn(f'Missing trl timetags for {ipppssoot}')
+            logger.info(f'Missing trl timetags for {ipppssoot}')
 
     ######################################################################################
     # Identify the SPT/SHM/SHF file for each IPPPSSOOT.
