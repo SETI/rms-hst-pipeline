@@ -169,13 +169,16 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     associated with each EXTVER in a label.
     """
 
-    def get_or_log(header, key, alt='UNK'):
+    def get_or_log(header, key, alt='UNK', warn=False):
         """Internal function to look up in given FITS header; log error on failure.
         """
         try:
             return header[key]
         except KeyError:
-            logger.error('Missing FITS keyword ' + key, filepath)
+            if warn:
+                logger.warn(f'Missing FITS keyword {key} repaired', filepath)
+            else:
+                logger.error(f'Missing FITS keyword {key}', filepath)
             return alt
 
     logger = logger or pdslogger.NullLogger()
@@ -240,6 +243,13 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         'targeted_detector_ids'         : ['UNK'],
         'visit_id'                      : 'UNK',
     }
+
+    ##############################
+    # hst_proposal_id
+    ##############################
+
+    hst_proposal_id = get_or_log(merged, 'PROPOSID')
+    hst_dictionary['hst_proposal_id'] = hst_proposal_id
 
     ##############################
     # instrument_id
@@ -382,10 +392,16 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
             elif isinstance(ref_hdulist[1].data, pyfits.fitsrec.FITS_rec):
                 try:
                     detector_ids = list(ref_hdulist[1].data['SEGMENT'])
+                    detector_ids.sort()
                 except KeyError:
-                    logger.error('COS/FUV table does not have a column "SEGMENT"',
-                                 filepath)
-                    detector_ids = ['UNK']
+                    if 'SEGMENT' in ref_hdulist[0].header:
+                        detector_ids = [ref_hdulist[0].header['SEGMENT']]
+                        if detector_ids == ['BOTH']:
+                            detector_ids = ['FUVA', 'FUVB']
+                    else:
+                        logger.error('COS/FUV table does not have a column "SEGMENT"',
+                                     filepath)
+                        detector_ids = ['UNK']
 
             else:
                 logger.error('COS/FUV file does not contain "_a" or "_b"', filepath)
@@ -517,7 +533,8 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     if scidata:
-        exposure_duration = get_or_log(merged, 'EXPTIME', 0.)
+        warn_if_missing = hst_proposal_id in {5167, 5837, 6025, 6029}
+        exposure_duration = get_or_log(merged, 'EXPTIME', 0., warn=warn_if_missing)
         exposure_duration = round(exposure_duration, 3)     # strip extraneous precision
         hst_dictionary['exposure_duration'] = exposure_duration
 
@@ -526,7 +543,9 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     if scidata:
-        hst_dictionary['exposure_type'] = get_or_log(merged, 'EXPFLAG', 0.)
+        warn_if_missing = hst_proposal_id in {5167, 5837, 6025, 6029}
+        hst_dictionary['exposure_type'] = get_or_log(merged, 'EXPFLAG',
+                                                     warn=warn_if_missing)
 
     ##############################
     # filter_name
@@ -574,7 +593,10 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
         elif instrument_id == 'GHRS':
             if scidata:
-                filter_name = header0['GRATING']
+                if 'GRATING' in header0:
+                    filter_name = header0['GRATING']
+                else:
+                    filter_name = get_or_log(header0, 'SS_GRAT')
             else:
                 filter_name = spt_header['SPEC_1']
 
@@ -633,7 +655,9 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     ##############################
 
     if scidata:
-        hst_dictionary['fine_guidance_sensor_lock_type'] = get_or_log(merged, 'FGSLOCK')
+        warn_if_missing = hst_proposal_id in {5167, 5837, 6025, 6029}
+        lock_type = get_or_log(merged, 'FGSLOCK', warn=warn_if_missing)
+        hst_dictionary['fine_guidance_sensor_lock_type'] = lock_type
 
     ##############################
     # gain_setting
@@ -681,12 +705,6 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
         hst_pi_name = _join_hst_pi_name(pr_inv_l, pr_inv_f, pr_inv_m)
 
     hst_dictionary['hst_pi_name'] = hst_pi_name
-
-    ##############################
-    # hst_proposal_id
-    ##############################
-
-    hst_dictionary['hst_proposal_id'] = get_or_log(merged, 'PROPOSID')
 
     ##############################
     # hst_quality_comment

@@ -6,7 +6,6 @@ import datetime
 import fnmatch
 import os
 import pathlib
-import shutil
 import sys
 from collections import defaultdict
 
@@ -122,8 +121,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             min_filepath = min(filepaths)
             max_filepath = max(filepaths)
         except ValueError as e:
-            logger.error(str(e) + ','.join(filepaths))
-            raise e
+            logger.exception(e)
+            raise
 
         for k, chars in enumerate(zip(min_filepath, max_filepath)):
             if chars[0] != chars[1]:
@@ -139,15 +138,13 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         logger.info('Root of file paths: ' + root)
         logger.replace_root(root)
 
-    PdsTemplate.set_logger(logger)
-
     # Make sure the retrieval date, if any, is valid
     if retrieval_date:
         try:
             _ = datetime.date.fromisoformat(retrieval_date)
-        except ValueError:
-            logger.exception(ValueError)
-            sys.exit(1)
+        except ValueError as e:
+            logger.exception(e)
+            raise
 
     # Create a mapping from basename to old filepath
     old_fullpath_vs_basename = {os.path.basename(f):os.path.join(old_root, f)
@@ -186,7 +183,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # If this suffix is not accepted, skip it
         if suffix not in accepted_suffixes:
-            logger.warn(f'Suffix {suffix} rejected', filepath)
+            logger.info(f'Suffix {suffix} rejected', filepath)
             continue
 
         ##################################################################################
@@ -237,7 +234,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             new_path = fullpath + '-duplicate'
             os.rename(fullpath, new_path)
             if content1 == content2:
-                logger.warn('Duplicated basename, renamed', new_path)
+                logger.info('Duplicated basename, renamed', new_path)
             else:
                 logger.error('Same basename, different content', new_path)
             continue
@@ -412,8 +409,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # Log an error if something happened that we don't understand
         if len(standard_tails) == 0:
-            logger.warn('No standard transmission characters found for ' +
-                        f'"{ipppssoo}": {nonstandard_tails}')
+            logger.error('No standard transmission characters found for ' +
+                         f'"{ipppssoo}": {nonstandard_tails}')
         elif len(standard_tails) > 1:
             logger.warn('Multiple standard transmission characters found for ' +
                         f'"{ipppssoo}": {standard_tails}')
@@ -501,7 +498,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         if matches_found > 0:
             solo_ipppssoots.append(ipppssoot)
         if matches_found > 1:
-            logger.warn('File used by multiple IPPPSSOOTs', ipppssoot + '_asn.fits')
+            logger.info('File used by multiple IPPPSSOOTs', ipppssoot + '_asn.fits')
 
     for ipppssoot in solo_ipppssoots:
         del info_by_ipppssoot[ipppssoot]
@@ -575,7 +572,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         if ipppssoot_dict['parent']:
             continue
         if not ipppssoot_dict['timetags']:
-            logger.warn(f'Missing trl timetags for {ipppssoot}')
+            logger.info(f'Missing trl timetags for {ipppssoot}')
 
     ######################################################################################
     # Identify the SPT/SHM/SHF file for each IPPPSSOOT.
@@ -630,6 +627,9 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     ######################################################################################
 
     def find_suffix_dicts(ipppssoot_dict, suffixes):
+        """Return a list of reference IPPPSSOOT dicts for the given suffixes. These could
+        be from an associate.
+        """
         suffix_dicts = []
         for suffix in suffixes:
             if suffix in ipppssoot_dict['all_suffixes']:
@@ -639,8 +639,10 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                     suffix_dicts.append(info_by_ipppssoot[associate][suffix])
         return suffix_dicts
 
+    # suffix_options is a list of sets of suffix strings. The first is for the IPPPSSOOT;
+    # the second is for the parent if this IPPPSSOOT has a parent. We only use a parent
+    # as a reference if there are no reference suffixes found for the IPPPSSOOT itself.
     for ipppssoot, ipppssoot_dict in info_by_ipppssoot.items():
-
         ipppssoot_dict['shared'] = len(ipppssoot_dict['parents']) > 1
         if ipppssoot_dict['parent']:
             parent = ipppssoot_dict['parent']
@@ -651,45 +653,43 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             ipppssoot_dicts = [ipppssoot_dict]
             suffix_options = [ipppssoot_dict['merged_suffixes']]
 
-        # Check the REF_SUFFIXES list
-        tag = 'Reference'
-        for k, suffix_option in enumerate(suffix_options):
-            reference_suffixes = list(suffix_info.REF_SUFFIXES & suffix_option)
-            reference_dicts = find_suffix_dicts(ipppssoot_dicts[k], reference_suffixes)
+        # Search for a reference suffix among the available suffixes.
+        # There are three levels of suffix precedence defined in `suffix_info`; lower
+        # precedence suffixes are only used if all higher-precedence suffixes are absent.
+        # `tag` is one of "Reference", "Alternative Reference", or "Second Alt Reference".
+        reference_suffixes = []
+        for tag, suffixes in zip(suffix_info.REF_TAGS, suffix_info.REF_SUFFIXES):
+            for k, suffix_option in enumerate(suffix_options):
+                reference_suffixes = list(suffixes & suffix_option)
+                if reference_suffixes:
+                    reference_suffixes.sort()       # make order deterministic
+                    reference_dicts = find_suffix_dicts(ipppssoot_dicts[k],
+                                                        reference_suffixes)
+                    break
             if reference_suffixes:
                 break
 
-        # If that fails, check the ALT_REF_SUFFIXES list
+        # In the absence of a reference file, we're stuck
         if not reference_suffixes:
-            tag = 'Alternative reference'
-            for k, suffix_option in enumerate(suffix_options):
-                reference_suffixes = list(suffix_info.ALT_REF_SUFFIXES & suffix_option)
-                reference_dicts = find_suffix_dicts(ipppssoot_dicts[k],
-                                                    reference_suffixes)
-                if reference_suffixes:
-                    break
+            logger.critical('No reference file for ' + ipppssoot)
+            raise ValueError('No reference file for ' + ipppssoot)
 
-        ipppssoot_dict['reference_suffixes'] = set(reference_suffixes)
-        ipppssoot_dict['reference_dicts'] = reference_dicts
-
+        # Log the reference found
         count = len(reference_dicts)
         if count > 1:
             for k, reference_dict in enumerate(reference_dicts):
                 logger.info(f'Multiple {tag.lower()} files found for {ipppssoot} ' +
-                             f'({k+1}/{count})', reference_dict['fullpath'])
-            reference_suffix = reference_suffixes[0]
-            reference_dict = reference_dicts[0]
-        elif count == 1:
+                            f'({k+1}/{count})', reference_dict['fullpath'])
+        else:
             logger.info(f'{tag} file found for ' + ipppssoot,
                         reference_dicts[0]['fullpath'])
-            reference_suffix = reference_suffixes[0]
-            reference_dict = reference_dicts[0]
-        else:
-            logger.critical('No reference file for ' + ipppssoot)
-            raise ValueError('No reference file for ' + ipppssoot)
 
-        ipppssoot_dict['reference_suffix'] = reference_suffix
-        ipppssoot_dict['reference_dict'] = reference_dict
+        ipppssoot_dict['reference_suffixes'] = reference_suffixes
+        ipppssoot_dict['reference_dicts'] = reference_dicts
+
+        # If there are multiple suitable references, just pick one
+        ipppssoot_dict['reference_suffix'] = reference_suffixes[0]
+        ipppssoot_dict['reference_dict'] = reference_dicts[0]
 
     ######################################################################################
     # Gather the metadata for each IPPPSSOOT:
@@ -1032,7 +1032,7 @@ def get_filepaths(directories, root='', match_pattern='', extension='.fits'):
     """Generate a list of file paths for processing.
 
     Input:
-        directories     directory path of a list of directory paths.
+        directories     directory path or a list of directory paths.
         root            optional path to prepend to each directory path.
         match_pattern   optional fnmatch pattern to use to filter the returned list.
     """
