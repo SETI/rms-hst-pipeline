@@ -18,7 +18,7 @@ build==1.0.3
     # via pip-tools
 certifi==2023.7.22
     # via requests
-cffi==1.16.0
+cffi==2.0.0
     # via
     #   cryptography
     #   xattr
@@ -28,7 +28,7 @@ click==8.1.7
     # via pip-tools
 coverage==7.3.2
     # via -r requirements.in
-cryptography==46.0.0
+cryptography==46.0.5
     # via secretstorage
 fs==2.4.16
     # via -r requirements.in
