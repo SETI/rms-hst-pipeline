@@ -91,7 +91,7 @@ def add_a_task(proposal_id, visit, task, priority, order, status, cmd):
     Input:
         proposal_id    a proposal id of the task queue.
         visit          a two character visit or ''.
-        task           a number represents the current task.
+        task           a string represents the current task.
         priority       a number reporeents task priority.
         order          a number reporeents task executing order.
         status         the status of the current task, 0 is wating and 1 is running.
@@ -119,15 +119,16 @@ def add_a_task(proposal_id, visit, task, priority, order, status, cmd):
                               cmd=cmd)
         session.add(new_entry)
     else:
+        return False
         # If the current or a later task has been queued, we return False. This is a
         # flag to avoid spawning duplicated subprocess
-        if entry.order >= order:
-            return False
-        entry.task = task
-        entry.priority = priority
-        entry.order = order
-        entry.status = status
-        entry.cmd = cmd
+        # if entry.order >= order:
+        #     return False
+        # entry.task = task
+        # entry.priority = priority
+        # entry.order = order
+        # entry.status = status
+        # entry.cmd = cmd
     session.commit()
     session.close()
 
@@ -248,7 +249,7 @@ def get_next_task_to_be_run():
                                           TaskQueue.priority==subquery,
                                           TaskQueue.status==0
                                       )
-                                     .order_by(TaskQueue.task.desc())
+                                     .order_by(TaskQueue.order.desc())
                                      .first())
     session.close()
     return query
