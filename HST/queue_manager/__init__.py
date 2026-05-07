@@ -181,7 +181,16 @@ def wait_for_subprocess(logger, all=False):
                 remove_a_task(formatted_proposal_id, vi, task)
                 break
 
-        if len(SUBPROCESS_LIST) <= subprocess_count:
+        non_wrapper_subproc_cnt = 0
+        for sub in SUBPROCESS_LIST:
+            task = sub[5]
+            if TASK_INFO[task][3] is False:
+                non_wrapper_subproc_cnt += 1
+
+        # Count only non-wrapper tasks. This avoids deadlock-like idling when all slots are
+        # occupied by wrapper tasks while their spawned subtasks (non-wrapper tasks) cannot
+        # start running.
+        if non_wrapper_subproc_cnt <= subprocess_count:
             # A slot opened up! Or all processes finished. Depending on what we're
             # waiting for.
             break
