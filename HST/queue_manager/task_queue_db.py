@@ -235,13 +235,18 @@ def queue_cleanup_during_restart():
     """
     Reset the task queue after a restart: drop rows for tasks that must be re-queued from
     their program/visit entry points, and clear any 'running' (status 1) flags so every
-    remaining row is waiting (status 0).
+    remaining row is waiting (status 0). Does nothing if the database file is missing or
+    the queue table has no rows.
     """
     if not db_exists():
         return
 
     Session = sessionmaker(engine)
     session = Session()
+    if session.query(TaskQueue).count() == 0:
+        session.close()
+        return
+
     session.query(TaskQueue).filter(TaskQueue.task.in_(LOWER_LVL_TASKS)).delete(
         synchronize_session=False
     )

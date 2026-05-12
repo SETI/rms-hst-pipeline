@@ -23,8 +23,12 @@ from hst_helper import HST_DIR
 from organize_files import clean_up_staging_dir
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import run_pipeline
-from queue_manager.task_queue_db import init_task_queue_table
+from queue_manager.task_queue_db import (create_task_queue_table,
+                                         erase_all_task_queue,
+                                         init_task_queue_table)
 import queue_manager
+
+from sqlalchemy.exc import OperationalError
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -200,7 +204,16 @@ if get_ids and not args.proposal_ids:
 proposal_ids = args.proposal_ids if args.proposal_ids else ids_li
 
 if args.recreate_queue:
-    init_task_queue_table()
+    try:
+        init_task_queue_table()
+    except OperationalError as e: #pragma: no cover
+        if 'already exists' in repr(e):
+            erase_all_task_queue()
+        elif 'no such table' in repr(e):
+            create_task_queue_table()
+        else:
+            logger.error('Failed to create task queue table!')
+            raise Exception('Failed to create task queue table!') # fatal error
 
 run_pipeline(proposal_ids, logger)
 # Clean up the staging directories

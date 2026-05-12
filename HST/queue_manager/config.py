@@ -25,7 +25,7 @@ MAX_ALLOWED_TIME = 60 * 60 * 24
 MAX_SUBPROCESS_CNT = 20
 SUBPROCESS_LIST = []
 
-# Tasks dropped from the SQLite queue on restart (re-entered via higher-level steps).
+# Tasks dropped from the queue database on restart (re-entered via higher-level steps).
 LOWER_LVL_TASKS = (
     'get_prog_info',
     'update_visit',
