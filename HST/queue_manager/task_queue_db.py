@@ -7,7 +7,8 @@
 import os
 
 from queue_manager.config import (DB_PATH,
-                                  DB_URI)
+                                  DB_URI,
+                                  LOWER_LVL_TASKS)
 from sqlalchemy import (create_engine,
                         func,
                         Column,
@@ -227,6 +228,27 @@ def erase_all_task_queue():
     Session = sessionmaker(engine)
     session = Session()
     session.query(TaskQueue).delete()
+    session.commit()
+    session.close()
+
+def queue_cleanup_during_restart():
+    """
+    Reset the task queue after a restart: drop rows for tasks that must be re-queued from
+    their program/visit entry points, and clear any 'running' (status 1) flags so every
+    remaining row is waiting (status 0).
+    """
+    if not db_exists():
+        return
+
+    Session = sessionmaker(engine)
+    session = Session()
+    session.query(TaskQueue).filter(TaskQueue.task.in_(LOWER_LVL_TASKS)).delete(
+        synchronize_session=False
+    )
+    session.query(TaskQueue).filter(TaskQueue.status == 1).update(
+        {TaskQueue.status: 0},
+        synchronize_session=False,
+    )
     session.commit()
     session.close()
 

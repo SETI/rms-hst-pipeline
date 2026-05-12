@@ -25,6 +25,16 @@ MAX_ALLOWED_TIME = 60 * 60 * 24
 MAX_SUBPROCESS_CNT = 20
 SUBPROCESS_LIST = []
 
+# Tasks dropped from the SQLite queue on restart (re-entered via higher-level steps).
+LOWER_LVL_TASKS = (
+    'get_prog_info',
+    'update_visit',
+    'retrieve_visit',
+    'label_prod',
+    'prep_browse_prod',
+    'finalize_bundle',
+)
+
 # A dictionary keyed by task name, and its corresponding task tuple as the value. Each
 # tuple contains (task order, task priority, task command, and a wrapper-task flag).
 # task order: the executing order of a task when running pipeline with a proposal id.
