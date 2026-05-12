@@ -23,7 +23,7 @@ from hst_helper import HST_DIR
 from organize_files import clean_up_staging_dir
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import run_pipeline
-from queue_manager.task_queue_db import erase_all_task_queue
+from queue_manager.task_queue_db import init_task_queue_table
 import queue_manager
 
 # Set up parser
@@ -56,7 +56,7 @@ parser.add_argument('--get-ids', '-g', action='store_true',
 parser.add_argument('--nocleanup', action='store_true',
     help="Don't delete the MAST download files.")
 
-parser.add_argument('--drop-queue', action='store_true',
+parser.add_argument('--recreate-queue', action='store_true',
     help='Clear the task queue before starting the pipeline.')
 
 # Default list of program ids
@@ -199,8 +199,8 @@ if get_ids and not args.proposal_ids:
 # will run on the passed in list of ids
 proposal_ids = args.proposal_ids if args.proposal_ids else ids_li
 
-if args.drop_queue:
-    erase_all_task_queue()
+if args.recreate_queue:
+    init_task_queue_table()
 
 run_pipeline(proposal_ids, logger)
 # Clean up the staging directories
