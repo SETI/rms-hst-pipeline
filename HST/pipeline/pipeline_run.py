@@ -6,7 +6,7 @@
 # pipeline_run.py [-h] [--proposal-ids PROPOSAL_IDS [PROPOSAL_IDS ...]]
 #                 [--log LOG] [--quiet]
 #                 [--max-subproc-cnt MAX_SUBPROC_CNT]
-#                 [--max-allowed-time MAX_ALLOWED_TIME] [--get-ids]
+#                 [--max-allowed-time MAX_ALLOWED_TIME] [--get-ids] [--drop-queue]
 #
 # Enter the --help option to see more information.
 #
@@ -23,6 +23,7 @@ from hst_helper import HST_DIR
 from organize_files import clean_up_staging_dir
 from query_hst_moving_targets import query_hst_moving_targets
 from queue_manager import run_pipeline
+from queue_manager.task_queue_db import erase_all_task_queue
 import queue_manager
 
 # Set up parser
@@ -54,6 +55,9 @@ parser.add_argument('--get-ids', '-g', action='store_true',
 
 parser.add_argument('--nocleanup', action='store_true',
     help="Don't delete the MAST download files.")
+
+parser.add_argument('--drop-queue', action='store_true',
+    help='Clear the task queue before starting the pipeline.')
 
 # Default list of program ids
 ids_li = ['15648', '13667', '10161', '11113', '08152', '15142', '11650', '04600',
@@ -194,6 +198,9 @@ if get_ids and not args.proposal_ids:
 # If some proposal ids are passed in, we ignore the default list of full ids. Pipeline
 # will run on the passed in list of ids
 proposal_ids = args.proposal_ids if args.proposal_ids else ids_li
+
+if args.drop_queue:
+    erase_all_task_queue()
 
 run_pipeline(proposal_ids, logger)
 # Clean up the staging directories
