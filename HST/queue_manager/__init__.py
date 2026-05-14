@@ -10,16 +10,16 @@
 import os
 import pdslogger
 import subprocess
+import sys
 import time
 
 from hst_helper.fs_utils import get_formatted_proposal_id
 from queue_manager.task_queue_db import (add_a_task,
                                          create_task_queue_table,
                                          db_exists,
-                                         erase_all_task_queue,
                                          get_next_task_to_be_run,
                                          get_total_number_of_tasks,
-                                         init_task_queue_table,
+                                         queue_cleanup_during_restart,
                                          remove_a_task,
                                          update_a_task_status)
 from queue_manager.config import (DB_PATH,
@@ -29,42 +29,43 @@ from queue_manager.config import (DB_PATH,
                                   MAX_SUBPROCESS_CNT,
                                   SUBPROCESS_LIST,
                                   TASK_INFO)
-from sqlalchemy.exc import OperationalError
 
-def run_pipeline(proposal_ids, logger=None):
+def run_pipeline(proposal_ids=None, logger=None):
     """With a given list of proposal ids, run pipeline for each program id.
 
     Inputs:
-        proposal_ids    a list of proposal ids.
+        proposal_ids    a list of proposal ids, or None.
         logger          pdslogger to use; None for default EasyLogger.
     """
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Run pipeline with proposal ids: {proposal_ids}')
+    logger.info(f'Run pipeline')
 
-    try:
-        init_task_queue_table()
-    except OperationalError as e: #pragma: no cover
-        if 'already exists' in repr(e):
-            erase_all_task_queue()
-        elif 'no such table' in repr(e):
-            create_task_queue_table()
+    if not db_exists():
+        create_task_queue_table()
+    else:
+        queue_cleanup_during_restart()
+
+    # if there is no preserved task in the queue manager,
+    if get_total_number_of_tasks() == 0:
+        if proposal_ids is None:
+            logger.info('Start pipeline with all available proposal ids')
+            logger.info('Queue query_hst_moving_targets for all available proposal ids')
+            queue_next_task('', '', 'query_moving_targ', logger)
         else:
-            logger.error('Failed to create task queue table!')
-            raise Exception('Failed to create task queue table!') # fatal error
+            logger.info(f'Start pipeline with proposal ids: {proposal_ids}')
+            for prog_id in proposal_ids:
+                try:
+                    proposal_id = int(prog_id)
+                except ValueError: #pragma: no cover
+                    logger.warn(f'Proposal id: {prog_id} is not valid')
+                    continue
 
-    # Kick start the pipeline for each proposal id
-    # proc_li = []
-    for prog_id in proposal_ids:
-        try:
-            proposal_id = int(prog_id)
-        except ValueError: #pragma: no cover
-            logger.warn(f'Proposal id: {prog_id} is not valid')
-
-        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-        # Start hst pipeline for each proposal id
-        logger.info(f'Starting to run pipeline for {proposal_id}')
-        logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
-        queue_next_task(formatted_proposal_id, '', 'query_moving_targ', logger)
+                formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+                # Start hst pipeline for each proposal id
+                logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
+                queue_next_task(formatted_proposal_id, '', 'query_moving_targ', logger)
+    else:
+        logger.info(f'Resume pipeline with existing tasks')
 
     # spawning subprocesses
     while get_total_number_of_tasks() > 0:

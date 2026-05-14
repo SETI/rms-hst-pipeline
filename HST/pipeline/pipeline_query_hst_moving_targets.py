@@ -100,17 +100,18 @@ retry = args.retry if args.retry else RETRY
 taskqueue = args.taskqueue
 
 logger.info('MAST query constraints: ' + str(args))
-pid_li = query_hst_moving_targets(proposal_ids=proposal_ids,
-                                  instruments=instruments,
-                                  start_date=start_date,
-                                  end_date=end_date,
-                                  logger=logger,
-                                  max_retries=retry)
-logger.info('List of program ids: ' + str(pid_li))
+program_ids_list = query_hst_moving_targets(proposal_ids=proposal_ids,
+                                            instruments=instruments,
+                                            start_date=start_date,
+                                            end_date=end_date,
+                                            logger=logger,
+                                            max_retries=retry)
+logger.info('List of program ids: ' + str(program_ids_list))
 
 if taskqueue:
     # If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
-    for proposal_id in proposal_ids:
+    for proposal_id in program_ids_list:
+    # for proposal_id in proposal_ids:
         logger.info(f'Queue query_hst_products for {proposal_id}')
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         queue_next_task(formatted_proposal_id, '', 'query_prod', logger)
