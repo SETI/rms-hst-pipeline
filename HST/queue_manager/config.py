@@ -25,6 +25,13 @@ MAX_ALLOWED_TIME = 60 * 60 * 24
 MAX_SUBPROCESS_CNT = 20
 SUBPROCESS_LIST = []
 
+# Seconds to wait after pipeline start (or last re-queue) before re-queuing query_moving_targ
+# when run_forever is enabled and the task queue is empty.
+REQUEUE_TIME = 10 * 60
+
+# Seconds between idle heartbeat messages while waiting for the next re-queue.
+HEARTBEAT_INTERVAL = 60
+
 # Tasks dropped from the queue database on restart (re-entered via higher-level steps).
 LOWER_LVL_TASKS = (
     'get_prog_info',

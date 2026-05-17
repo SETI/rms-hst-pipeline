@@ -24,18 +24,22 @@ from queue_manager.task_queue_db import (add_a_task,
                                          update_a_task_status)
 from queue_manager.config import (DB_PATH,
                                   HST_SOURCE_ROOT,
+                                  HEARTBEAT_INTERVAL,
                                   PYTHON_EXE,
                                   MAX_ALLOWED_TIME,
                                   MAX_SUBPROCESS_CNT,
+                                  REQUEUE_TIME,
                                   SUBPROCESS_LIST,
                                   TASK_INFO)
 
-def run_pipeline(proposal_ids=None, logger=None):
+def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
     """With a given list of proposal ids, run pipeline for each program id.
 
     Inputs:
         proposal_ids    a list of proposal ids, or None.
         logger          pdslogger to use; None for default EasyLogger.
+        run_forever     if True, keep polling the task queue after it becomes empty; if
+                        False, exit when no tasks remain.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Run pipeline')
@@ -67,8 +71,12 @@ def run_pipeline(proposal_ids=None, logger=None):
     else:
         logger.info(f'Resume pipeline with existing tasks')
 
+    pipeline_start_time = time.time()
+    next_requeue_at = pipeline_start_time + REQUEUE_TIME
+    last_heartbeat_at = pipeline_start_time
+
     # spawning subprocesses
-    while get_total_number_of_tasks() > 0:
+    while True:
         task = get_next_task_to_be_run()
 
         if task is not None:
@@ -80,6 +88,35 @@ def run_pipeline(proposal_ids=None, logger=None):
                                task.visit, task.task, logger)
             # logger.debug("Spawning subprocess %s", str(sub_args))
         time.sleep(1)
+        if get_total_number_of_tasks() > 0 or run_forever:
+            if get_total_number_of_tasks() == 0 and run_forever:
+                now = time.time()
+                if now >= next_requeue_at:
+                    if proposal_ids is None:
+                        logger.info('Re-queue query_hst_moving_targets for all available '
+                                    'proposal ids')
+                        queue_next_task('', '', 'query_moving_targ', logger)
+                    else:
+                        for prog_id in proposal_ids:
+                            try:
+                                proposal_id = int(prog_id)
+                            except ValueError: #pragma: no cover
+                                logger.warn(f'Proposal id: {prog_id} is not valid')
+                                continue
+                            formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+                            logger.info(f'Re-queue query_hst_moving_targets for '
+                                        f'{proposal_id}')
+                            queue_next_task(formatted_proposal_id, '',
+                                            'query_moving_targ', logger)
+                    next_requeue_at = now + REQUEUE_TIME
+                elif now - last_heartbeat_at >= HEARTBEAT_INTERVAL:
+                    secs_until_requeue = max(0, int(next_requeue_at - now))
+                    print(f'Waiting for next queue (~{secs_until_requeue}s until '
+                          f're-queue)...', flush=True)
+                    last_heartbeat_at = now
+            continue
+        else:
+            break
 
     logger.info('Pipeline complete!')
 

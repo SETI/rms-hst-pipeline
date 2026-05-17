@@ -6,7 +6,7 @@
 # pipeline_run.py [-h] [--proposal-ids PROPOSAL_IDS [PROPOSAL_IDS ...]]
 #                 [--log LOG] [--quiet]
 #                 [--max-subproc-cnt MAX_SUBPROC_CNT]
-#                 [--max-allowed-time MAX_ALLOWED_TIME] [--recreate-queue]
+#                 [--max-allowed-time MAX_ALLOWED_TIME] [--recreate-queue] [--run-forever]
 #
 # Enter the --help option to see more information.
 #
@@ -59,6 +59,9 @@ parser.add_argument('--nocleanup', action='store_true',
 parser.add_argument('--recreate-queue', action='store_true',
     help='Clear the task queue before starting the pipeline.')
 
+parser.add_argument('--run-forever', action='store_true',
+    help='Keep running after the task queue is empty (poll for new tasks).')
+
 # Parse and validate the command line
 args = parser.parse_args()
 
@@ -101,9 +104,9 @@ if args.recreate_queue:
             logger.error('Failed to create task queue table!')
             raise Exception('Failed to create task queue table!') # fatal error
 
-run_pipeline(proposal_ids, logger)
+run_pipeline(proposal_ids, logger, run_forever=args.run_forever)
 # Clean up the staging directories
-if not args.nocleanup:
+if not args.nocleanup and proposal_ids is not None:
     for id_ in proposal_ids:
         clean_up_staging_dir(id_, logger)
 
