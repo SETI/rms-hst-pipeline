@@ -129,7 +129,7 @@ def queue_next_task(proposal_id, visit_info, task, logger):
     3. Run the task command (spawn the subprocess)
 
     Inputs:
-        proposal_id    the proposal if of the current task.
+        proposal_id    the proposal id of the current task.
         visit_info     a two character visit, a list of visits or ''.
         task           a string represents the current task.
         logger         pdslogger to use; None for default EasyLogger.
@@ -141,7 +141,7 @@ def queue_next_task(proposal_id, visit_info, task, logger):
         logger.warn(f'Task queue db: {DB_PATH} does not exist')
         return
 
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id) if proposal_id else ''
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Queue in the next task for: {formatted_proposal_id}'
                 f', task: {task}, visit: {visit_info}')

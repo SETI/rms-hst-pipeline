@@ -37,8 +37,8 @@ parser = argparse.ArgumentParser(
     description="""pipeline_query_hst_moving_targets: Perform MAST query with given query
                 constraints.""")
 
-parser.add_argument('--proposal-ids', nargs='+', type=str, default='',
-    help='The proposal ids for the MAST query')
+parser.add_argument('--proposal-ids', nargs='*', type=str, default=[],
+    help='The proposal ids for the MAST query (omit values to query all).')
 
 parser.add_argument('--instruments', '-i', nargs='+', type=str, default='',
     help='The instruments for the MAST query.')
@@ -92,7 +92,10 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('query-hst-moving-targets ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-proposal_ids = args.proposal_ids if args.proposal_ids else []
+# Empty list means query all proposal ids: flag omitted, --proposal-ids with no values,
+# or only empty/whitespace ids.
+proposal_ids = [p.strip() for p in args.proposal_ids if p.strip()]
+
 instruments = args.instruments if args.instruments else []
 start_date = args.start if args.start else START_DATE
 end_date = args.end if args.end else END_DATE
@@ -111,13 +114,14 @@ logger.info('List of program ids: ' + str(program_ids_list))
 if taskqueue:
     # If there is a missing HST_PIPELINE/hst_<nnnnn> directory, queue query-hst-products
     for proposal_id in program_ids_list:
-    # for proposal_id in proposal_ids:
         logger.info(f'Queue query_hst_products for {proposal_id}')
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         queue_next_task(formatted_proposal_id, '', 'query_prod', logger)
-        remove_a_task(formatted_proposal_id, '', 'query_moving_targ')
-    # TODO: TASK QUEUE
-    # - re-queue query-hst-moving-targets with a 30-day delay
+        if proposal_ids:
+            remove_a_task(formatted_proposal_id, '', 'query_moving_targ')
+    # remove the task of querying for all ids
+    if not proposal_ids:
+        remove_a_task('', '', 'query_moving_targ')
 
 logger.close()
 

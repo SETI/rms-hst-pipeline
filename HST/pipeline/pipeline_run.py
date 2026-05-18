@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(
                 proposal ids.""")
 
 parser.add_argument('--proposal-ids', nargs='*', type=str, default=None,
-    help='The specified proposal ids for the pipeline run.')
+    help='The specified proposal ids for the pipeline run (omit values to query all).')
 
 parser.add_argument('--log', '-l', type=str, default='',
     help="""Path and name for the log file. The name always has the current date and time
@@ -90,7 +90,14 @@ logger.add_handler(pdslogger.file_handler(logpath))
 LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
 logger.open('run-pipeline ' + ' '.join(sys.argv[1:]), limits=LIMITS)
 
-proposal_ids = args.proposal_ids
+# None means query all proposal ids: flag omitted, --proposal-ids with no values,
+# or only empty/whitespace ids.
+if args.proposal_ids is None:
+    proposal_ids = None
+else:
+    proposal_ids = [p.strip() for p in args.proposal_ids if p.strip()]
+    if not proposal_ids:
+        proposal_ids = None
 
 if args.recreate_queue:
     try:
