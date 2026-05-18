@@ -71,9 +71,9 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
     else:
         logger.info(f'Resume pipeline with existing tasks')
 
-    pipeline_start_time = time.time()
-    next_requeue_at = pipeline_start_time + REQUEUE_TIME
-    last_heartbeat_at = pipeline_start_time
+    queue_empty_at = None
+    next_requeue_at = None
+    last_heartbeat_at = None
 
     # spawning subprocesses
     while True:
@@ -89,8 +89,14 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
             # logger.debug("Spawning subprocess %s", str(sub_args))
         time.sleep(1)
         if get_total_number_of_tasks() > 0 or run_forever:
-            if get_total_number_of_tasks() == 0 and run_forever:
+            if get_total_number_of_tasks() > 0:
+                queue_empty_at = None
+            elif run_forever:
                 now = time.time()
+                if queue_empty_at is None:
+                    queue_empty_at = now
+                    next_requeue_at = queue_empty_at + REQUEUE_TIME
+                    last_heartbeat_at = queue_empty_at
                 if now >= next_requeue_at:
                     if proposal_ids is None:
                         logger.info('Re-queue query_hst_moving_targets for all available '
@@ -108,7 +114,6 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
                                         f'{proposal_id}')
                             queue_next_task(formatted_proposal_id, '',
                                             'query_moving_targ', logger)
-                    next_requeue_at = now + REQUEUE_TIME
                 elif now - last_heartbeat_at >= HEARTBEAT_INTERVAL:
                     secs_until_requeue = max(0, int(next_requeue_at - now))
                     print(f'Waiting for next queue (~{secs_until_requeue}s until '
