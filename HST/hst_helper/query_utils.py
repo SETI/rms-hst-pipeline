@@ -20,7 +20,6 @@ from .fs_utils import (get_formatted_proposal_id,
 from product_labels.suffix_info import (ACCEPTED_SUFFIXES,
                                         ACCEPTED_LETTER_CODES,
                                         INSTRUMENT_FROM_LETTER_CODE)
-from queue_manager.task_queue_db import remove_all_tasks_for_a_prog_id
 
 def ymd_tuple_to_mjd(ymd):
     """Return Modified Julian Date.
@@ -86,12 +85,6 @@ def query_mast_slice(proposal_id=None,
             cur_retry += 1
             logger.info(f'retry #{cur_retry}: {e}')
             time.sleep(1)
-
-    # Before raising the error, remove the task queue of the proposal id from database.
-    # TODO: Maybe just update the task status from running to waiting, so we can restart
-    # from current failed task when restarting the pipeline.
-    if proposal_id is not None:
-        remove_all_tasks_for_a_prog_id(formatted_proposal_id)
 
     logger.exception(RuntimeError)
     raise RuntimeError(f'Query MAST timed out. Number of retries: {max_retries}')

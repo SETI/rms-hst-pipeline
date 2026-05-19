@@ -86,8 +86,11 @@ def db_exists():
 
 def add_a_task(proposal_id, visit, task, priority, order, status, cmd):
     """
-    Add an entry of the given proposal id & visit with its task num and task status to
-    the task queue table. If the proposal id exists in the table, we update the entry.
+    Add an entry for the given proposal id, visit, and task to the task queue table.
+
+    Returns False if the task is already queued, or if another task for the same
+    proposal id and visit has a higher order (a later pipeline stage is already queued).
+    Otherwise adds the entry and returns None.
 
     Input:
         proposal_id    a proposal id of the task queue.
@@ -103,33 +106,33 @@ def add_a_task(proposal_id, visit, task, priority, order, status, cmd):
 
     Session = sessionmaker(engine)
     session = Session()
-    # Add a task for a given proposal id & visit if the proposal id & visit combo doesn't
-    # exist in the table
+    # Check if the task is queued
     entry = session.query(TaskQueue).filter(
-                                         TaskQueue.proposal_id==proposal_id,
-                                         TaskQueue.visit==visit,
-                                         TaskQueue.task==task,
-                                     ).first()
-    if entry is None:
-        new_entry = TaskQueue(proposal_id=proposal_id,
-                              visit=visit,
-                              task=task,
-                              priority=priority,
-                              order=order,
-                              status=status,
-                              cmd=cmd)
-        session.add(new_entry)
-    else:
+        TaskQueue.proposal_id == proposal_id,
+        TaskQueue.visit == visit,
+        TaskQueue.task == task,
+    ).first()
+    if entry is not None:
+        session.close()
         return False
-        # If the current or a later task has been queued, we return False. This is a
-        # flag to avoid spawning duplicated subprocess
-        # if entry.order >= order:
-        #     return False
-        # entry.task = task
-        # entry.priority = priority
-        # entry.order = order
-        # entry.status = status
-        # entry.cmd = cmd
+
+    # CHeck if a task with higher order is queued
+    later_entry = session.query(TaskQueue).filter(
+        TaskQueue.proposal_id == proposal_id,
+        TaskQueue.visit == visit,
+        TaskQueue.order > order,
+    ).first()
+    if later_entry is not None:
+        session.close()
+        return False
+
+    session.add(TaskQueue(proposal_id=proposal_id,
+                          visit=visit,
+                          task=task,
+                          priority=priority,
+                          order=order,
+                          status=status,
+                          cmd=cmd))
     session.commit()
     session.close()
 

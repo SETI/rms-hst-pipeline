@@ -49,27 +49,26 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
     else:
         queue_cleanup_during_restart()
 
-    # if there is no preserved task in the queue manager,
-    if get_total_number_of_tasks() == 0:
-        if proposal_ids is None:
+    if get_total_number_of_tasks() != 0:
+        logger.info(f'Resume pipeline with existing tasks')
+
+    if proposal_ids is None:
             logger.info('Start pipeline with all available proposal ids')
             logger.info('Queue query_hst_moving_targets for all available proposal ids')
             queue_next_task('', '', 'query_moving_targ', logger)
-        else:
-            logger.info(f'Start pipeline with proposal ids: {proposal_ids}')
-            for prog_id in proposal_ids:
-                try:
-                    proposal_id = int(prog_id)
-                except ValueError: #pragma: no cover
-                    logger.warn(f'Proposal id: {prog_id} is not valid')
-                    continue
-
-                formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-                # Start hst pipeline for each proposal id
-                logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
-                queue_next_task(formatted_proposal_id, '', 'query_moving_targ', logger)
     else:
-        logger.info(f'Resume pipeline with existing tasks')
+        logger.info(f'Start pipeline with proposal ids: {proposal_ids}')
+        for prog_id in proposal_ids:
+            try:
+                proposal_id = int(prog_id)
+            except ValueError: #pragma: no cover
+                logger.warn(f'Proposal id: {prog_id} is not valid')
+                continue
+
+            formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+            # Start hst pipeline for each proposal id
+            logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
+            queue_next_task(formatted_proposal_id, '', 'query_moving_targ', logger)
 
     queue_empty_at = None
     next_requeue_at = None
@@ -88,6 +87,7 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
                                task.visit, task.task, logger)
             # logger.debug("Spawning subprocess %s", str(sub_args))
         time.sleep(1)
+
         if get_total_number_of_tasks() > 0 or run_forever:
             if get_total_number_of_tasks() > 0:
                 queue_empty_at = None
@@ -97,6 +97,8 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
                     queue_empty_at = now
                     next_requeue_at = queue_empty_at + REQUEUE_TIME
                     last_heartbeat_at = queue_empty_at
+
+                # Re-queue query_hst_moving_targets at the period of REQUEUE_TIME
                 if now >= next_requeue_at:
                     if proposal_ids is None:
                         logger.info('Re-queue query_hst_moving_targets for all available '
@@ -114,6 +116,7 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
                                         f'{proposal_id}')
                             queue_next_task(formatted_proposal_id, '',
                                             'query_moving_targ', logger)
+                # Check the heartbeat to make sure the program is waiting for re-queue
                 elif now - last_heartbeat_at >= HEARTBEAT_INTERVAL:
                     secs_until_requeue = max(0, int(next_requeue_at - now))
                     print(f'Waiting for next queue (~{secs_until_requeue}s until '

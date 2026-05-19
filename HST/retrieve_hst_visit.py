@@ -11,12 +11,10 @@ import pdslogger
 import shutil
 
 from hst_helper import TRL_CHECKSUMS_FILE
-from hst_helper.fs_utils import (get_formatted_proposal_id,
-                                 get_program_dir_path)
+from hst_helper.fs_utils import (get_program_dir_path)
 from hst_helper.query_utils import (download_files,
                                     get_filtered_products,
                                     query_mast_slice)
-from queue_manager.task_queue_db import remove_all_tasks_for_a_prog_id
 
 def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     """Retrieve all accepted files for a given proposal id & visit.
@@ -58,10 +56,6 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
         except FileNotFoundError:
             pass
 
-        # Before raising the error, remove the task queue of the proposal id from
-        # database.
-        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-        remove_all_tasks_for_a_prog_id(formatted_proposal_id)
         logger.exception(f'MAST trl files downlaod failure for {proposal_id}')
         raise
 

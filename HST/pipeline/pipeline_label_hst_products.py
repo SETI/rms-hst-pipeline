@@ -25,8 +25,7 @@ import sys
 from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
 from product_labels import label_hst_fits_directories
-from queue_manager.task_queue_db import (remove_a_task,
-                                         remove_all_tasks_for_a_prog_id)
+from queue_manager.task_queue_db import remove_a_task
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -123,9 +122,8 @@ try:
                                retrieval_date = args.date,
                                logger = logger,
                                reset_dates = args.reset_dates)
-except:
-    # Before raising the error, remove the task queue of the proposal id from database.
-    remove_all_tasks_for_a_prog_id(formatted_proposal_id)
+except Exception as e:
+    logger.error(e)
     raise
 
 remove_a_task(formatted_proposal_id, visit, 'label_prod')

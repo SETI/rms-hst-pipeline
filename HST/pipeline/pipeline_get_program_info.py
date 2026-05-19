@@ -27,8 +27,7 @@ import sys
 from get_program_info import get_program_info
 from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
-from queue_manager.task_queue_db import (remove_a_task,
-                                         remove_all_tasks_for_a_prog_id)
+from queue_manager.task_queue_db import remove_a_task
 
 # Set up parser
 parser = argparse.ArgumentParser(
@@ -78,9 +77,8 @@ formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     get_program_info(proposal_id, None, logger)
-except:
-    # Before raising the error, remove the task queue of the proposal id from database.
-    remove_all_tasks_for_a_prog_id(formatted_proposal_id)
+except Exception as e:
+    logger.error(e)
     raise
 
 remove_a_task(formatted_proposal_id, '', 'get_prog_info')

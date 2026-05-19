@@ -119,21 +119,21 @@ def test_is_a_task_done():
 
 def test_add_duplicate_task_order():
     task_queue_db.init_task_queue_table()
-    # Add a task
     task_queue_db.add_a_task('123', 'A1', 'T1', 5, 1, 0, 'echo test')
-    # Try to add the same task with a lower order (should not update)
-    result = task_queue_db.add_a_task('123', 'A1', 'T1', 5, 0, 0, 'echo test')
-    assert result is False
-    # Try to add the same task with a higher order (should update)
-    result2 = task_queue_db.add_a_task('123', 'A1', 'T1', 6, 2, 1, 'echo test2')
-    assert result2 is None
+    # Duplicate task is not added
+    assert task_queue_db.add_a_task('123', 'A1', 'T1', 5, 0, 0, 'echo test') is False
+    # Earlier-stage task is not added when a later order exists for the same visit
+    assert task_queue_db.add_a_task('123', 'A1', 'T2', 5, 0, 0, 'echo test2') is False
+    # Later-stage task may be added when no higher order exists for the visit
+    assert task_queue_db.add_a_task('123', 'A1', 'T2', 5, 2, 0, 'echo test2') is None
     Session = sessionmaker(task_queue_db.engine)
     session = Session()
-    entry = session.query(task_queue_db.TaskQueue).filter_by(proposal_id='123', visit='A1', task='T1').first()
-    assert entry.priority == 6
-    assert entry.order == 2
-    assert entry.status == 1
-    assert entry.cmd == 'echo test2'
+    entries = session.query(task_queue_db.TaskQueue).filter_by(
+        proposal_id='123', visit='A1').all()
+    assert len(entries) == 2
+    tasks = {e.task: e for e in entries}
+    assert tasks['T1'].order == 1
+    assert tasks['T2'].order == 2
     session.close()
 
 def test_repr():
