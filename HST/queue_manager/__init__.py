@@ -14,6 +14,7 @@ import sys
 import time
 
 from hst_helper.fs_utils import get_formatted_proposal_id
+from organize_files import clean_up_staging_dir
 from queue_manager.task_queue_db import (add_a_task,
                                          create_task_queue_table,
                                          db_exists,
@@ -32,7 +33,7 @@ from queue_manager.config import (DB_PATH,
                                   SUBPROCESS_LIST,
                                   TASK_INFO)
 
-def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
+def run_pipeline(proposal_ids=None, logger=None, run_forever=False, no_cleanup=False):
     """With a given list of proposal ids, run pipeline for each program id.
 
     Inputs:
@@ -40,6 +41,8 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
         logger          pdslogger to use; None for default EasyLogger.
         run_forever     if True, keep polling the task queue after it becomes empty; if
                         False, exit when no tasks remain.
+        no_cleanup      if True, do not remove staging directories when the queue is idle
+                        or when the pipeline completes.
     """
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Run pipeline')
@@ -53,9 +56,9 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
         logger.info(f'Resume pipeline with existing tasks')
 
     if proposal_ids is None:
-            logger.info('Start pipeline with all available proposal ids')
-            logger.info('Queue query_hst_moving_targets for all available proposal ids')
-            queue_next_task('', '', 'query_moving_targ', logger)
+        logger.info('Start pipeline with all available proposal ids')
+        logger.info('Queue query_hst_moving_targets for all available proposal ids')
+        queue_next_task('', '', 'query_moving_targ', logger)
     else:
         logger.info(f'Start pipeline with proposal ids: {proposal_ids}')
         for prog_id in proposal_ids:
@@ -97,6 +100,8 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
                     queue_empty_at = now
                     next_requeue_at = queue_empty_at + REQUEUE_TIME
                     last_heartbeat_at = queue_empty_at
+                    if not no_cleanup:
+                        _clean_up_staging_dirs(proposal_ids, logger)
 
                 # Re-queue query_hst_moving_targets at the period of REQUEUE_TIME
                 if now >= next_requeue_at:
@@ -127,6 +132,27 @@ def run_pipeline(proposal_ids=None, logger=None, run_forever=False):
             break
 
     logger.info('Pipeline complete!')
+    if not no_cleanup:
+        _clean_up_staging_dirs(proposal_ids, logger)
+
+def _clean_up_staging_dirs(proposal_ids, logger):
+    """Clean up staging directories after pipeline work completes or the queue is idle.
+
+    Inputs:
+        proposal_ids    a list of proposal ids, or None to clean every hst_* directory
+                        under HST_STAGING.
+        logger          pdslogger to use; None for default EasyLogger.
+    """
+    if proposal_ids is None:
+        clean_up_staging_dir(None, logger)
+    else:
+        for prog_id in proposal_ids:
+            try:
+                proposal_id = int(prog_id)
+            except ValueError: #pragma: no cover
+                logger.warn(f'Proposal id: {prog_id} is not valid')
+                continue
+            clean_up_staging_dir(proposal_id, logger)
 
 def queue_next_task(proposal_id, visit_info, task, logger):
     """Queue in the next task for a given proposal id to database.

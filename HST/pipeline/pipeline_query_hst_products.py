@@ -86,7 +86,7 @@ formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     new_visit_li, all_visits = query_hst_products(proposal_id, logger)
-    logger.info('List of visits in which any files are new or changed: '
+    logger.info(f'List of visits for {proposal_id} in which any files are new or changed: '
                 + str(new_visit_li))
 except Exception as e:
     logger.error(e)
@@ -100,7 +100,7 @@ if taskqueue:
     else:
         staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
         logger.info(f'No new or changed files, {staging_dir} is fully populated.'
-                    +  ' Pipeline stops')
+                    +  f' Pipeline stops for {proposal_id}')
 
     remove_a_task(formatted_proposal_id, '', 'query_prod')
     # TODO: TASK QUEUE

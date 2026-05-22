@@ -20,7 +20,6 @@ import pdslogger
 import sys
 
 from hst_helper import HST_DIR
-from organize_files import clean_up_staging_dir
 from queue_manager import run_pipeline
 from queue_manager.task_queue_db import (create_task_queue_table,
                                          erase_all_task_queue,
@@ -111,11 +110,7 @@ if args.recreate_queue:
             logger.error('Failed to create task queue table!')
             raise Exception('Failed to create task queue table!') # fatal error
 
-run_pipeline(proposal_ids, logger, run_forever=args.run_forever)
-# Clean up the staging directories
-if not args.nocleanup and proposal_ids is not None:
-    for id_ in proposal_ids:
-        clean_up_staging_dir(id_, logger)
+run_pipeline(proposal_ids, logger, run_forever=args.run_forever, no_cleanup=args.nocleanup)
 
 logger.close()
 
