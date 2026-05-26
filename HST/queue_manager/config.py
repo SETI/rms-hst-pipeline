@@ -110,7 +110,7 @@ TASK_INFO = {
     ),
     # prepare the final deliverable bundle for a given proposal id after all visits processed
     'finalize_bundle': (
-        8, 5,
+        8, 6,
         'HST/pipeline/pipeline_finalize_hst_bundle.py --proposal-id {P}',
         False
     )
