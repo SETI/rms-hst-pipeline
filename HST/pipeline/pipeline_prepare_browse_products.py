@@ -78,7 +78,7 @@ formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 try:
     prepare_browse_products(proposal_id, visit, logger)
 except Exception as e:
-    logger.error(e)
+    logger.exception(e)
     raise
 
 remove_a_task(formatted_proposal_id, visit, 'prep_browse_prod')

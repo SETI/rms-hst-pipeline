@@ -89,7 +89,7 @@ try:
     logger.info(f'List of visits for {proposal_id} in which any files are new or changed: '
                 + str(new_visit_li))
 except Exception as e:
-    logger.error(e)
+    logger.exception(e)
     raise
 
 if taskqueue:

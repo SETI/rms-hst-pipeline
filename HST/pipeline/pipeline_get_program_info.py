@@ -78,7 +78,7 @@ formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 try:
     get_program_info(proposal_id, None, logger)
 except Exception as e:
-    logger.error(e)
+    logger.exception(e)
     raise
 
 remove_a_task(formatted_proposal_id, '', 'get_prog_info')

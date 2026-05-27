@@ -123,7 +123,7 @@ try:
                                logger = logger,
                                reset_dates = args.reset_dates)
 except Exception as e:
-    logger.error(e)
+    logger.exception(e)
     raise
 
 remove_a_task(formatted_proposal_id, visit, 'label_prod')
