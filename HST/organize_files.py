@@ -48,14 +48,14 @@ def _clean_up_staging_dir_at_path(staging_dir, logger):
     """
     if not os.path.isdir(staging_dir):
         return
-    for dir in os.listdir(staging_dir):
-        staging_prod_dir = os.path.join(staging_dir, dir)
-        if dir.startswith(MAST_DOWNLOAD_DIRNAME):
-            logger.info(f'Remove {dir} from staging directory')
+    for dirname in os.listdir(staging_dir):
+        staging_prod_dir = os.path.join(staging_dir, dirname)
+        if dirname.startswith(MAST_DOWNLOAD_DIRNAME):
+            logger.info(f'Remove {dirname} from staging directory')
             shutil.rmtree(staging_prod_dir)
         for col_prefix in COL_NAME_PREFIX:
-            if dir.startswith(col_prefix):
-                logger.info(f'Remove {dir} from staging directory')
+            if dirname.startswith(col_prefix):
+                logger.info(f'Remove {dirname} from staging directory')
                 shutil.rmtree(staging_prod_dir)
 
 def clean_up_staging_dir(proposal_id=None, logger=None):
