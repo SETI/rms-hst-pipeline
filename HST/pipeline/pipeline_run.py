@@ -101,14 +101,16 @@ else:
 if args.recreate_queue:
     try:
         init_task_queue_table()
-    except OperationalError as e: #pragma: no cover
-        if 'already exists' in repr(e):
+    except OperationalError as e:  # pragma: no cover
+        msg = str(e)
+        if 'already exists' in msg:
             erase_all_task_queue()
-        elif 'no such table' in repr(e):
+        elif 'no such table' in msg:
             create_task_queue_table()
         else:
-            logger.error('Failed to create task queue table!')
-            raise Exception('Failed to create task queue table!') # fatal error
+            logger.exception('Failed to create task queue table!')
+            raise
+
 
 run_pipeline(proposal_ids, logger, run_forever=args.run_forever, no_cleanup=args.nocleanup)
 
