@@ -117,10 +117,14 @@ if taskqueue:
         logger.info(f'Queue query_hst_products for {proposal_id}')
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         queue_next_task(formatted_proposal_id, '', 'query_prod', logger)
-        if proposal_ids:
-            remove_a_task(formatted_proposal_id, '', 'query_moving_targ')
-    # remove the task of querying for all ids
-    if not proposal_ids:
+
+    # remove per-proposal tasks for every user-requested id, including those
+    # that returned no moving targets.
+    if proposal_ids:
+        for proposal_id in proposal_ids:
+            remove_a_task(get_formatted_proposal_id(proposal_id), '', 'query_moving_targ')
+    else:
+        # remove the task of querying for all ids
         remove_a_task('', '', 'query_moving_targ')
 
 logger.close()
