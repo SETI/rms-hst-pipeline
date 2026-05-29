@@ -80,8 +80,10 @@ formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     update_hst_visit(formatted_proposal_id, visit, logger)
-except Exception as e:
-    logger.exception(e)
+except Exception:
+    logger.exception(
+        f'update_hst_visit failed for proposal id: {formatted_proposal_id}, '
+        f'visit: {visit}')
     raise
 
 remove_a_task(formatted_proposal_id, visit, 'update_visit')
