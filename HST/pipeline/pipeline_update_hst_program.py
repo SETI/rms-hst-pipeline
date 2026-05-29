@@ -79,8 +79,8 @@ formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
 try:
     update_hst_program(formatted_proposal_id, visits, logger)
-except Exception as e:
-    logger.exception(e)
+except Exception:
+    logger.exception(f'update_hst_program failed for proposal id: {formatted_proposal_id}')
     raise
 
 visit = '' if isinstance(visits, list) else visits
