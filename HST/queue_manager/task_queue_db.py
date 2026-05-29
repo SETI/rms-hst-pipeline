@@ -245,20 +245,17 @@ def queue_cleanup_during_restart():
         return
 
     Session = sessionmaker(engine)
-    session = Session()
-    if session.query(TaskQueue).count() == 0:
-        session.close()
-        return
+    with Session.begin() as session:
+        if session.query(TaskQueue).count() == 0:
+            return
 
-    session.query(TaskQueue).filter(TaskQueue.task.in_(LOWER_LVL_TASKS)).delete(
-        synchronize_session=False
-    )
-    session.query(TaskQueue).filter(TaskQueue.status == 1).update(
-        {TaskQueue.status: 0},
-        synchronize_session=False,
-    )
-    session.commit()
-    session.close()
+        session.query(TaskQueue).filter(TaskQueue.task.in_(LOWER_LVL_TASKS)).delete(
+            synchronize_session=False
+        )
+        session.query(TaskQueue).filter(TaskQueue.status == 1).update(
+            {TaskQueue.status: 0},
+            synchronize_session=False,
+        )
 
 def get_next_task_to_be_run():
     """
