@@ -671,7 +671,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # In the absence of a reference file, we're stuck
         if not reference_suffixes:
-            logger.critical('No reference file for ' + ipppssoot)
+            logger.error('No reference file for ' + ipppssoot)
             raise ValueError('No reference file for ' + ipppssoot)
 
         # Log the reference found

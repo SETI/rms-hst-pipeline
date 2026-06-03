@@ -18,7 +18,6 @@ def patch_obs_and_logger(monkeypatch):
         def download_products(table, download_dir=None):
             FakeObs.downloaded = (table, download_dir)
     monkeypatch.setattr(query_utils, 'Observations', FakeObs)
-    monkeypatch.setattr(query_utils, 'remove_all_tasks_for_a_prog_id', lambda pid: setattr(FakeObs, 'removed', pid))
     class FakeLogger:
         def __init__(self): self.messages = []
         def info(self, msg): self.messages.append(msg)
@@ -159,6 +158,11 @@ def test_get_trl_products(monkeypatch):
     assert result is table
 
 
+def test_tmp_download_filename():
+    row = {'productFilename': 'j8hp01a1q_trl.fits'}
+    assert query_utils.tmp_download_filename(row) == 'tmp_j8hp01a1q_trl.fits'
+
+
 def test_download_files(monkeypatch):
     class FakeLogger:
         def __init__(self): self.messages = []
@@ -173,4 +177,97 @@ def test_download_files(monkeypatch):
     assert 'Empty result from MAST query' in logger.messages
     # Non-empty table, not testing
     query_utils.download_files([1], '/tmp/dir', logger=logger, testing=True)
-    assert 'Download files to /tmp/dir' in logger.messages
+    assert 'Downloading files to /tmp/dir' in logger.messages
+
+
+def test_download_files_overwrites_existing_with_filename_fn(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_download_file(uri, *, local_path=None, cache=True, cloud_only=False):
+        calls.append((uri, local_path, cache))
+        with open(local_path, 'w') as f:
+            f.write('new')
+        return 'COMPLETE', None, None
+
+    class FakeObs:
+        download_file = staticmethod(fake_download_file)
+
+    monkeypatch.setattr(query_utils, 'Observations', FakeObs)
+
+    row = {
+        'obs_collection': 'HST',
+        'obs_id': 'obs1',
+        'productFilename': 'file.trl',
+        'dataURI': 'mast:HST/product/file.trl',
+    }
+    product_dir = tmp_path / 'mastDownload' / 'HST' / 'obs1'
+    product_dir.mkdir(parents=True)
+    existing = product_dir / 'tmp_file.trl'
+    existing.write_text('old')
+
+    query_utils.download_files(
+        [row], str(tmp_path), filename_fn=lambda r: f'tmp_{r["productFilename"]}'
+    )
+
+    assert existing.read_text() == 'new'
+    assert calls == [('mast:HST/product/file.trl', str(existing), False)]
+
+
+def test_download_files_skips_when_product_filename_exists(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_download_file(uri, *, local_path=None, cache=True, cloud_only=False):
+        calls.append((uri, local_path, cache))
+        return 'COMPLETE', None, None
+
+    class FakeObs:
+        download_file = staticmethod(fake_download_file)
+
+    monkeypatch.setattr(query_utils, 'Observations', FakeObs)
+
+    row = {
+        'obs_collection': 'HST',
+        'obs_id': 'obs1',
+        'productFilename': 'file.trl',
+        'dataURI': 'mast:HST/product/file.trl',
+    }
+    product_dir = tmp_path / 'mastDownload' / 'HST' / 'obs1'
+    product_dir.mkdir(parents=True)
+    (product_dir / 'file.trl').write_text('existing')
+
+    query_utils.download_files(
+        [row], str(tmp_path), filename_fn=lambda r: f'tmp_{r["productFilename"]}'
+    )
+
+    assert calls == []
+    assert not (product_dir / 'tmp_file.trl').exists()
+    assert (product_dir / 'file.trl').read_text() == 'existing'
+
+
+def test_rename_tmp_prefixed_downloads_overwrites_existing(tmp_path):
+    base = tmp_path / 'mastDownload' / 'HST' / 'obs1'
+    base.mkdir(parents=True)
+    (base / 'file.trl').write_text('old')
+    (base / 'tmp_file.trl').write_text('new')
+    query_utils.rename_tmp_prefixed_downloads(str(tmp_path))
+    assert not (base / 'tmp_file.trl').exists()
+    assert (base / 'file.trl').read_text() == 'new'
+
+
+def test_rename_tmp_prefixed_downloads(tmp_path):
+    base = tmp_path / 'mastDownload' / 'HST' / 'obs1'
+    base.mkdir(parents=True)
+    src = base / 'tmp_file.trl'
+    src.write_text('data')
+    query_utils.rename_tmp_prefixed_downloads(str(tmp_path))
+    assert not src.exists()
+    assert (base / 'file.trl').read_text() == 'data'
+
+
+def test_rename_tmp_prefixed_downloads_skips_non_prefixed(tmp_path):
+    base = tmp_path / 'mastDownload' / 'HST' / 'obs1'
+    base.mkdir(parents=True)
+    f = base / 'file.trl'
+    f.write_text('data')
+    query_utils.rename_tmp_prefixed_downloads(str(tmp_path))
+    assert f.read_text() == 'data'

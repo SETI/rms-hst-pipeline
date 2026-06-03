@@ -11,9 +11,10 @@ import pdslogger
 import time
 
 from astroquery.mast import Observations
-from . import (START_DATE,
+from . import (DOWNLOAD_TMP_PREFIX,
                END_DATE,
-               RETRY)
+               RETRY,
+               START_DATE)
 from .fs_utils import (get_formatted_proposal_id,
                        get_format_term,
                        get_visit)
@@ -231,14 +232,55 @@ def get_trl_products(table):
     result = filter_table(is_trl_suffix, result)
     return result
 
-def download_files(table, dir, logger=None, testing=False):
-    """Download files from MAST for a given product table and proposal id.
+# def download_files(table, dir, logger=None, testing=False):
+#     """Download files from MAST for a given product table and proposal id.
+
+#     Input:
+#         table          an observation table from MAST query.
+#         proposal_id    a proposal id.
+#         dir            the directory we want to store the downloaded files.
+#         logger         pdslogger to use; None for default EasyLogger.
+#     """
+#     logger = logger or pdslogger.EasyLogger()
+#     # When there is 0 product row from query result, we don't create the directory
+#     if len(table) == 0:
+#         logger.warn('Empty result from MAST query')
+#         return
+#     os.makedirs(dir, exist_ok=True)
+
+#     if len(table) > 0:
+#         logger.info(f'Downloading files to {dir}')
+#         if not testing: # pragma: no cover, no need to download files during the test
+#             try:
+#                 Observations.download_products(table, download_dir=dir)
+#                 logger.info(f'Downloading files to {dir} has completed!')
+#             except Exception as e: # errors when downloading files
+#                 logger.error(f'Error happened during downloading files to {dir}')
+#                 logger.exception(e)
+#                 raise
+
+
+def tmp_download_filename(row):
+    """Return a temporary download basename with DOWNLOAD_TMP_PREFIX prepended.
 
     Input:
-        table          an observation table from MAST query.
-        proposal_id    a proposal id.
-        dir            the directory we want to store the downloaded files.
+        row    a MAST product row with productFilename.
+
+    Returns:    temporary basename used during download.
+    """
+    return f'{DOWNLOAD_TMP_PREFIX}{row["productFilename"]}'
+
+def download_files(table, dir, logger=None, testing=False, filename_fn=None):
+    """Download files from MAST for a given product table.
+
+    Input:
+        table          product rows from MAST (e.g. get_product_list output).
+        dir            directory to store downloaded files.
         logger         pdslogger to use; None for default EasyLogger.
+        testing        skip actual downloads when True.
+        filename_fn    optional callable(row) -> str; basename for each file.
+                       When provided, downloads use cache=False so stale temp files
+                       are overwritten.
     """
     logger = logger or pdslogger.EasyLogger()
     # When there is 0 product row from query result, we don't create the directory
@@ -249,11 +291,69 @@ def download_files(table, dir, logger=None, testing=False):
 
     if len(table) > 0:
         logger.info(f'Downloading files to {dir}')
-        if not testing: # pragma: no cover, no need to download files during the test
+        if not testing:
             try:
-                Observations.download_products(table, download_dir=dir)
+                base_dir = os.path.join(dir.rstrip('/'), 'mastDownload')
+                cache = filename_fn is None
+                for row in table:
+                    product_dir = os.path.join(
+                        base_dir, row['obs_collection'], row['obs_id']
+                    )
+                    os.makedirs(product_dir, exist_ok=True)
+
+                    product_fname = os.path.basename(row['productFilename'])
+                    # final_path = os.path.join(product_dir, product_fname)
+                    # if filename_fn and os.path.isfile(final_path):
+                    #     logger.info(
+                    #         f'Skipping download for {product_fname}: file already exists'
+                    #     )
+                    #     continue
+
+                    fname = (filename_fn(row)
+                             if filename_fn
+                             else product_fname)
+                    local_path = os.path.join(product_dir, fname)
+
+                    status, msg, url = Observations.download_file(
+                        row['dataURI'], local_path=local_path, cache=cache
+                    )
+                    if status != 'COMPLETE':
+                        raise RuntimeError(
+                            f'Failed to download {row["productFilename"]} '
+                            f'to {local_path}: {status} {msg}'
+                        )
+                    # raise RuntimeError(
+                    #         f'Failed to download {row["productFilename"]} '
+                    #         f'to {local_path}: {status} {msg}'
+                    #     )
+
                 logger.info(f'Downloading files to {dir} has completed!')
-            except Exception as e: # errors when downloading files
-                logger.critical(f'Error happened during downloading files to {dir}')
+            except Exception as e:
+                logger.error(f'Error happened during downloading files to {dir}')
                 logger.exception(e)
                 raise
+
+def rename_tmp_prefixed_downloads(download_dir, tmp_prefix='tmp_', logger=None):
+    """Rename files under download_dir/mastDownload by removing tmp_prefix.
+
+    Used after downloads that use a temporary filename prefix so partial files
+    are not mistaken for final products until the download completes.
+
+    Input:
+        download_dir    directory passed to download_files.
+        tmp_prefix      prefix to strip from each downloaded basename.
+        logger          pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    base_dir = os.path.join(download_dir.rstrip('/'), 'mastDownload')
+    if not os.path.isdir(base_dir):
+        return
+
+    for root, _dirs, files in os.walk(base_dir):
+        for fname in files:
+            if not fname.startswith(tmp_prefix):
+                continue
+            src = os.path.join(root, fname)
+            dst = os.path.join(root, fname[len(tmp_prefix):])
+            os.replace(src, dst)
+            logger.info(f'Renamed downloaded file {fname} to {fname[len(tmp_prefix):]}')

@@ -13,13 +13,13 @@
 # - Delete all TRL files.
 # - Return the tuple of changed visits & all available visists.
 ##########################################################################################
-
 import os
 import pdslogger
 import shutil
 from collections import defaultdict
 
-from hst_helper import (PRODUCTS_FILE,
+from hst_helper import (DOWNLOAD_TMP_PREFIX,
+                        PRODUCTS_FILE,
                         TRL_CHECKSUMS_FILE)
 from hst_helper.fs_utils import (backup_file,
                                  create_program_dir,
@@ -29,7 +29,9 @@ from hst_helper.fs_utils import (backup_file,
 from hst_helper.query_utils import (download_files,
                                     get_filtered_products,
                                     get_trl_products,
-                                    query_mast_slice)
+                                    query_mast_slice,
+                                    rename_tmp_prefixed_downloads,
+                                    tmp_download_filename)
 
 # A dictionary keyed by IPPPSSOOT and stores observation id from MAST as the value.
 products_obs_dict = {}
@@ -94,7 +96,9 @@ def query_hst_products(proposal_id, logger=None):
 
     try:
         logger.info(f'Download trl products to {trl_dir}')
-        download_files(trl_products, trl_dir, logger)
+        download_files(trl_products, trl_dir, logger,
+                       filename_fn=tmp_download_filename)
+        rename_tmp_prefixed_downloads(trl_dir, DOWNLOAD_TMP_PREFIX, logger)
     except: #pragma: no cover
         # Downloading failed, removed all the trl files to restore a clean directory.
         # We will only have either all files downloaded or zero file downloaded.

@@ -10,11 +10,13 @@ import os
 import pdslogger
 import shutil
 
-from hst_helper import TRL_CHECKSUMS_FILE
+from hst_helper import DOWNLOAD_TMP_PREFIX, TRL_CHECKSUMS_FILE
 from hst_helper.fs_utils import (get_program_dir_path)
 from hst_helper.query_utils import (download_files,
                                     get_filtered_products,
-                                    query_mast_slice)
+                                    query_mast_slice,
+                                    rename_tmp_prefixed_downloads,
+                                    tmp_download_filename)
 
 def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     """Retrieve all accepted files for a given proposal id & visit.
@@ -45,7 +47,9 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
     try:
         # Download all accepted files
         logger.info(f'Download accepted products to {files_dir}')
-        download_files(filtered_products, files_dir, logger, testing)
+        download_files(filtered_products, files_dir, logger, testing,
+                       filename_fn=tmp_download_filename)
+        rename_tmp_prefixed_downloads(files_dir, DOWNLOAD_TMP_PREFIX, logger)
     except: #pragma: no cover
         # Downloading failed, removed the visit folder under the staging directory, and
         # the trl file under pipeline directory. We will only have either all files
@@ -56,7 +60,7 @@ def retrieve_hst_visit(proposal_id, visit, logger=None, testing=False):
         except FileNotFoundError:
             pass
 
-        logger.exception(f'MAST trl files downlaod failure for {proposal_id}')
+        logger.exception(f'MAST files downlaod failure for {proposal_id}')
         raise
 
     return len(filtered_products)
