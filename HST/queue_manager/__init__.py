@@ -2,7 +2,7 @@
 # queue_manager/__init__.py
 #
 # Queue manager module that will queue in the next task for the hst pipeline process.
-# - run_pipeline_process will start a hst pipeline process for the given proposal id list.
+# - run_full_process will start a hst pipeline process for the given proposal id list.
 # - queue_next_task will Queue in the next task for a given proposal id to database, and
 #   wait for the open subprocess slot to execute the corresponding command.
 ##########################################################################################
@@ -33,7 +33,7 @@ from queue_manager.config import (DB_PATH,
                                   SUBPROCESS_LIST,
                                   TASK_INFO)
 
-def run_pipeline_process(proposal_ids=None, logger=None, run_forever=False, no_cleanup=False):
+def run_full_process(proposal_ids=None, logger=None, run_forever=False, no_cleanup=False):
     """With a given list of proposal ids, run pipeline for each program id.
 
     Inputs:

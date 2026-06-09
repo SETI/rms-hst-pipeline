@@ -20,7 +20,7 @@ from prepare_browse_products import prepare_browse_products
 from product_labels import label_hst_fits_directories
 from query_hst_moving_targets import query_hst_moving_targets
 from query_hst_products import query_hst_products
-from queue_manager import run_pipeline_process
+from queue_manager import run_full_process
 from retrieve_hst_visit import retrieve_hst_visit
 from .utils import remove_dirs
 
@@ -36,12 +36,12 @@ class TestPipeline:
         remove_dirs(self.pipeline_dirs)
         remove_dirs(self.bundle_dirs)
 
-    # Test run pipeline by calling run_pipeline_process
+    # Test run pipeline by calling run_full_process
     @pytest.mark.parametrize('p_ids', [(['16167'])])
     def test_pipeline_run(self, p_ids):
         logger = pdslogger.PdsLogger('pds.hst.run-pipeline')
         try:
-            run_pipeline_process(p_ids, logger)
+            run_full_process(p_ids, logger)
         except Exception as e:
             assert False, f'Pipeline on {p_ids} has error: {e}'
 
