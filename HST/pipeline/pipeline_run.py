@@ -20,7 +20,7 @@ import pdslogger
 import sys
 
 from hst_helper import HST_DIR
-from queue_manager import run_pipeline
+from queue_manager import run_pipeline_process
 from queue_manager.task_queue_db import (create_task_queue_table,
                                          erase_all_task_queue,
                                          init_task_queue_table)
@@ -112,7 +112,7 @@ if args.recreate_queue:
             raise
 
 
-run_pipeline(proposal_ids, logger, run_forever=args.run_forever, no_cleanup=args.nocleanup)
+run_pipeline_process(proposal_ids, logger, run_forever=args.run_forever, no_cleanup=args.nocleanup)
 
 logger.close()
 
