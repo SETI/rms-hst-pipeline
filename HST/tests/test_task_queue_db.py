@@ -200,6 +200,45 @@ def test_add_duplicate_task_order():
     assert tasks['T2'].order == 2
     session.close()
 
+def test_add_a_task_allows_earlier_task_when_only_later_is_delayed_finalize_bundle():
+    task_queue_db.init_task_queue_table()
+    execution_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             execution_time)
+    result = task_queue_db.add_a_task('123', '', 'get_prog_info', 5, 3, 0, 'echo prog')
+    assert result is None
+    Session = sessionmaker(task_queue_db.engine)
+    session = Session()
+    entries = session.query(task_queue_db.TaskQueue).filter_by(proposal_id='123').all()
+    assert len(entries) == 2
+    tasks = {e.task: e for e in entries}
+    assert 'finalize_bundle' in tasks
+    assert 'get_prog_info' in tasks
+    session.close()
+
+def test_add_a_task_blocks_earlier_task_when_finalize_bundle_has_no_delay():
+    task_queue_db.init_task_queue_table()
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize')
+    result = task_queue_db.add_a_task('123', '', 'get_prog_info', 5, 3, 0, 'echo prog')
+    assert result is False
+
+def test_add_a_task_blocks_earlier_task_when_finalize_bundle_is_running():
+    task_queue_db.init_task_queue_table()
+    execution_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 1, 'echo finalize',
+                             execution_time)
+    result = task_queue_db.add_a_task('123', '', 'get_prog_info', 5, 3, 0, 'echo prog')
+    assert result is False
+
+def test_add_a_task_blocks_earlier_task_when_other_later_task_exists():
+    task_queue_db.init_task_queue_table()
+    execution_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             execution_time)
+    task_queue_db.add_a_task('123', '', 'update_prog', 2, 2, 0, 'echo update')
+    result = task_queue_db.add_a_task('123', '', 'query_prod', 1, 1, 0, 'echo query')
+    assert result is False
+
 def test_repr():
     t = task_queue_db.TaskQueue(proposal_id='p', visit='v', task='t', priority=1, order=1, status=0, cmd='c')
     assert 'TaskQueue' in repr(t)

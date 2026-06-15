@@ -88,13 +88,24 @@ def db_exists():
     """
     return os.path.exists(DB_PATH)
 
+def _can_ignore_later_finalize_bundle(later_entries):
+    """
+    Return True if the only higher-order queued task is a waiting finalize_bundle
+    with a scheduled execution_time.
+    """
+    return (len(later_entries) == 1
+            and later_entries[0].task == 'finalize_bundle'
+            and later_entries[0].execution_time is not None
+            and later_entries[0].status == 0)
+
 def add_a_task(proposal_id, visit, task, priority, order, status, cmd, execution_time=None):
     """
     Add an entry for the given proposal id, visit, and task to the task queue table.
 
     Returns False if the task is already queued, or if another task for the same
-    proposal id and visit has a higher order (a later pipeline stage is already queued).
-    Otherwise adds the entry and returns None.
+    proposal id and visit has a higher order (a later pipeline stage is already queued),
+    unless the only such task is a waiting finalize_bundle with a scheduled
+    execution_time. Otherwise adds the entry and returns None.
 
     If task is finalize_bundle and one already exists for the proposal id, the existing
     row is updated in place (including execution_time) instead of returning False.
@@ -140,13 +151,13 @@ def add_a_task(proposal_id, visit, task, priority, order, status, cmd, execution
         session.close()
         return False
 
-    # CHeck if a task with higher order is queued
-    later_entry = session.query(TaskQueue).filter(
+    # Check if a task with higher order is queued
+    later_entries = session.query(TaskQueue).filter(
         TaskQueue.proposal_id == proposal_id,
         TaskQueue.visit == visit,
         TaskQueue.order > order,
-    ).first()
-    if later_entry is not None:
+    ).all()
+    if later_entries and not _can_ignore_later_finalize_bundle(later_entries):
         session.close()
         return False
 

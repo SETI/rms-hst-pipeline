@@ -18,22 +18,27 @@ HST_SOURCE_ROOT = os.environ['PDS_HST_PIPELINE']
 DB_PATH = f'{HST_DIR["pipeline"]}/task_queue.db'
 DB_URI = f'sqlite:///{DB_PATH}'
 
-# max allowed subprocess time in seconds, downloading may take hours
+# max allowed subprocess time in seconds, downloading may take hours.
+# Default to 1 day
 MAX_ALLOWED_TIME = 60 * 60 * 24
-# max number of subprocesses allowed to run at the same time for the pipeline process for
-# all ids.
-MAX_SUBPROCESS_CNT = 20
+
+# max number of subprocesses allowed to run at the same time for the pipeline process for all ids.
+# Default to 100
+MAX_SUBPROCESS_CNT = 100
 SUBPROCESS_LIST = []
 
 # Seconds to wait after pipeline finish before re-queuing query_moving_targ
 # when run_forever is enabled and the task queue is empty.
-REQUEUE_TIME = 10 * 60
+# Default to 30 days
+REQUEUE_TIME = 60 * 60 * 24 * 30
 
 # Seconds between idle heartbeat messages while waiting for the next re-queue.
-HEARTBEAT_INTERVAL = 60
+# Default to 10 mins.
+HEARTBEAT_INTERVAL = 60 * 10
 
 # Seconds to wait after queuing finalize_bundle before it becomes eligible to run.
-FINALIZE_BUNDLE_DELAY_TIME = 10
+# Default to 1 days
+FINALIZE_BUNDLE_DELAY_TIME = 60 * 60 * 24
 
 # Tasks dropped from the queue database on restart (re-entered via higher-level steps).
 LOWER_LVL_TASKS = (
