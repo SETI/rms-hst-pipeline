@@ -1,4 +1,5 @@
 import os
+import datetime
 import tempfile
 import pytest
 from sqlalchemy import create_engine
@@ -101,6 +102,69 @@ def test_get_next_task_to_be_run():
     assert next_task is not None
     assert next_task.proposal_id == '456'
     assert next_task.priority == 10
+
+def test_get_next_task_to_be_run_skips_future_execution_time():
+    task_queue_db.init_task_queue_table()
+    future_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             future_time)
+    task_queue_db.add_a_task('456', 'B2', 'retrieve_visit', 4, 5, 0, 'echo retrieve')
+    next_task = task_queue_db.get_next_task_to_be_run()
+    assert next_task is not None
+    assert next_task.task == 'retrieve_visit'
+    assert next_task.proposal_id == '456'
+
+def test_get_next_task_to_be_run_returns_task_when_execution_time_passed():
+    task_queue_db.init_task_queue_table()
+    past_time = datetime.datetime.now() - datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             past_time)
+    task_queue_db.add_a_task('456', 'B2', 'retrieve_visit', 4, 5, 0, 'echo retrieve')
+    next_task = task_queue_db.get_next_task_to_be_run()
+    assert next_task is not None
+    assert next_task.task == 'finalize_bundle'
+    assert next_task.proposal_id == '123'
+
+def test_add_a_task_execution_time():
+    task_queue_db.init_task_queue_table()
+    execution_time = datetime.datetime(2026, 6, 12, 12, 0, 0)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             execution_time)
+    Session = sessionmaker(task_queue_db.engine)
+    session = Session()
+    entry = session.query(task_queue_db.TaskQueue).filter_by(
+        proposal_id='123', visit='', task='finalize_bundle').first()
+    assert entry is not None
+    assert entry.execution_time == execution_time
+    session.close()
+
+def test_add_a_task_execution_time_defaults_to_none():
+    task_queue_db.init_task_queue_table()
+    task_queue_db.add_a_task('123', 'A1', 'T1', 5, 1, 0, 'echo test')
+    Session = sessionmaker(task_queue_db.engine)
+    session = Session()
+    entry = session.query(task_queue_db.TaskQueue).filter_by(
+        proposal_id='123', visit='A1', task='T1').first()
+    assert entry is not None
+    assert entry.execution_time is None
+    session.close()
+
+def test_add_a_task_replaces_existing_finalize_bundle():
+    task_queue_db.init_task_queue_table()
+    old_time = datetime.datetime(2026, 1, 1, 12, 0, 0)
+    new_time = datetime.datetime(2026, 6, 12, 12, 0, 0)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo old', old_time)
+    result = task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo new',
+                                      new_time)
+    assert result is None
+    Session = sessionmaker(task_queue_db.engine)
+    session = Session()
+    entries = session.query(task_queue_db.TaskQueue).filter_by(
+        proposal_id='123', task='finalize_bundle').all()
+    assert len(entries) == 1
+    assert entries[0].cmd == 'echo new'
+    assert entries[0].execution_time == new_time
+    session.close()
 
 def test_get_total_number_of_tasks():
     task_queue_db.init_task_queue_table()

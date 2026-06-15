@@ -8,6 +8,7 @@
 ##########################################################################################
 
 import os
+import datetime
 import pdslogger
 import subprocess
 import sys
@@ -187,9 +188,14 @@ def queue_next_task(proposal_id, visit_info, task, logger):
     order = TASK_INFO[task][0]
     cmd = TASK_INFO[task][2].replace('{P}', formatted_proposal_id)
     cmd = cmd.replace('{V}', visit_arg)
+    execution_delay = TASK_INFO[task][4]
+    execution_time = None
+    if execution_delay:
+        execution_time = (datetime.datetime.now()
+                          + datetime.timedelta(seconds=execution_delay))
     # if the task has been queued, we don't spawn duplicated subprocess.
     spawn_subproc = add_a_task(formatted_proposal_id, visit,
-                               task, priority, order, 0, cmd)
+                               task, priority, order, 0, cmd, execution_time)
     if spawn_subproc is False:
         return
 
@@ -256,7 +262,7 @@ def wait_for_subprocess(logger, all=False):
         non_wrapper_subproc_cnt = 0
         for sub in SUBPROCESS_LIST:
             task = sub[5]
-            if TASK_INFO[task][3] is False:
+            if TASK_INFO[task][3] is False and not TASK_INFO[task][4]:
                 non_wrapper_subproc_cnt += 1
 
         # Count only non-wrapper tasks. This avoids deadlock-like idling when all slots are
