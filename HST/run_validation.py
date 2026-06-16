@@ -15,6 +15,9 @@ from hst_helper.fs_utils import (get_deliverable_path,
 CM_FNAME = 'checksum.manifest.txt'
 TM_FNAME = 'transfer.manifest.txt'
 
+HST_DIR = os.path.dirname(os.path.abspath(__file__))
+VALIDATE_PDART = os.path.join(HST_DIR, 'validate-pdart')
+
 VID = '1.0'
 
 def run_validation(proposal_id, logger=None):
@@ -38,11 +41,13 @@ def run_validation(proposal_id, logger=None):
     create_manifest_files(proposal_id, logger)
 
     bundle_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
-    run(["./validate-pdart", bundle_dir, bundle_dir, bundle_dir, str(proposal_id)])
+    logger.info(f'Run validation-pdart for proposal id: {proposal_id} on {bundle_dir}')
+    run([VALIDATE_PDART, bundle_dir, bundle_dir, bundle_dir, str(proposal_id)],
+        cwd=HST_DIR)
 
     # remove tmp context json
     try:
-        os.remove(f'tmp-context-products-{proposal_id}.json')
+        os.remove(os.path.join(HST_DIR, f'tmp-context-products-{proposal_id}.json'))
     except FileNotFoundError: #pragma: no cover
         pass
 

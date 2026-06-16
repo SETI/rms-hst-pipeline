@@ -29,9 +29,9 @@ def test_create_collection_label_creates_label(monkeypatch, fake_logger):
 
 def test_create_xml_label_calls_template(monkeypatch, fake_logger):
     class FakeTemplate:
-        ERROR_COUNT = 0
         def __init__(self, path):
             self.path = path
+            self.error_count = 0
         def write(self, data_dict, label_path):
             self.data_dict = data_dict
             self.label_path = label_path
@@ -44,8 +44,10 @@ def test_create_xml_label_calls_template(monkeypatch, fake_logger):
 
 def test_create_xml_label_error_count(monkeypatch, fake_logger):
     class FakeTemplate:
+        _error_count = 0
         def __init__(self, path):
             self.path = path
+            self.error_count = FakeTemplate._error_count
         def write(self, data_dict, label_path):
             pass
         @staticmethod
@@ -53,11 +55,11 @@ def test_create_xml_label_error_count(monkeypatch, fake_logger):
             pass
     monkeypatch.setattr(general_utils, 'PdsTemplate', FakeTemplate)
     # Test error count 1
-    FakeTemplate.ERROR_COUNT = 1
+    FakeTemplate._error_count = 1
     general_utils.create_xml_label('template', 'label', {'foo': 'bar'}, fake_logger)
     assert any('ERROR:' in m for m in fake_logger.messages)
     # Test error count > 1
-    FakeTemplate.ERROR_COUNT = 2
+    FakeTemplate._error_count = 2
     fake_logger.messages.clear()
     general_utils.create_xml_label('template', 'label', {'foo': 'bar'}, fake_logger)
     assert any('ERROR:' in m for m in fake_logger.messages)

@@ -85,10 +85,10 @@ def create_xml_label(template_path, label_path, data_dict, logger):
 
     logger.info('Insert data to the label template')
     TEMPLATE.write(data_dict, label_path)
-    if TEMPLATE.ERROR_COUNT == 1:
+    if TEMPLATE.error_count == 1:
         logger.error('1 error encountered', label_path)
-    elif TEMPLATE.ERROR_COUNT > 1:
-        logger.error(f'{TEMPLATE.ERROR_COUNT} errors encountered', label_path)
+    elif TEMPLATE.error_count > 1:
+        logger.error(f'{TEMPLATE.error_count} errors encountered', label_path)
 
 def create_csv(csv_path, data, logger):
     """Create csv with given csv file path and data to be written into the csv file.
