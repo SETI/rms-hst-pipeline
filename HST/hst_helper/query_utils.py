@@ -232,34 +232,6 @@ def get_trl_products(table):
     result = filter_table(is_trl_suffix, result)
     return result
 
-# def download_files(table, dir, logger=None, testing=False):
-#     """Download files from MAST for a given product table and proposal id.
-
-#     Input:
-#         table          an observation table from MAST query.
-#         proposal_id    a proposal id.
-#         dir            the directory we want to store the downloaded files.
-#         logger         pdslogger to use; None for default EasyLogger.
-#     """
-#     logger = logger or pdslogger.EasyLogger()
-#     # When there is 0 product row from query result, we don't create the directory
-#     if len(table) == 0:
-#         logger.warn('Empty result from MAST query')
-#         return
-#     os.makedirs(dir, exist_ok=True)
-
-#     if len(table) > 0:
-#         logger.info(f'Downloading files to {dir}')
-#         if not testing: # pragma: no cover, no need to download files during the test
-#             try:
-#                 Observations.download_products(table, download_dir=dir)
-#                 logger.info(f'Downloading files to {dir} has completed!')
-#             except Exception as e: # errors when downloading files
-#                 logger.error(f'Error happened during downloading files to {dir}')
-#                 logger.exception(e)
-#                 raise
-
-
 def tmp_download_filename(row):
     """Return a temporary download basename with DOWNLOAD_TMP_PREFIX prepended.
 
