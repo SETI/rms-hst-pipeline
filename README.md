@@ -43,10 +43,10 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
   python pipeline/pipeline_run_full_process.py
   ```
 
-- Query MAST with the *True moving target* flag to get the latest IDs, then run the pipeline:
+- Run a continuous process for a proposal ID that re-queues every 30 days::
 
   ```bash
-  python pipeline/pipeline_run_full_process.py --get-ids
+  python pipeline/pipeline_run_full_process.py 07885 --run-forever
   ```
 
 - Run with a single proposal ID:
@@ -67,11 +67,17 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
   python pipeline/pipeline_run_full_process.py --proposal-ids 07885 13736 --max-subproc 30 --max-time 1860
   ```
 
+- Run with a recreated task queue:
+
+  ```bash
+  python pipeline/pipeline_run_full_process.py --proposal-ids 07885 --recreate-queue
+  ```
+
 ---
 
 ### 🧠 Run Individual Tasks (Example: Proposal ID `7885`)
 
-These are the commands executed internally when running `pipeline_run_full_process.py` under `HST` directory:
+These are the commands executed internally when running `pipeline_run_full_process.py` in the `HST` directory:
 
 ```bash
 python pipeline/pipeline_query_hst_moving_targets.py --proposal-ids 7885
@@ -91,7 +97,6 @@ python pipeline/pipeline_finalize_hst_bundle.py --proposal-id 7885
 
 ---
 
-✅ **Tip:**
-Use `--help` with any script (e.g., `python HST/pipeline/pipeline_run_full_process.py --help`) to view all available options and arguments.
+✅ **Tip:** Use `--help` with any script (e.g., `python HST/pipeline/pipeline_run_full_process.py --help`) to view all available options and arguments.
 
 ---
