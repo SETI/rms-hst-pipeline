@@ -15,7 +15,8 @@ from sqlalchemy import (create_engine,
                         DateTime,
                         Float,
                         Integer,
-                        String)
+                        String,
+                        or_)
 from sqlalchemy.orm import (sessionmaker,
                             declarative_base)
 
@@ -294,18 +295,12 @@ def queue_cleanup_during_restart():
             synchronize_session=False,
         )
 
-def _task_is_ready_to_run(task, now):
-    """
-    Return True if the task has no execution_time or the current time has reached it.
-    """
-    return task.execution_time is None or now >= task.execution_time
-
 def get_next_task_to_be_run():
     """
     Get the next task to be run from database. Return the table row entry.
 
     Waiting tasks are considered in descending priority and order. Tasks with a future
-    execution_time are skipped until that time has passed.
+    execution_time are excluded until that time has passed.
     """
     if not db_exists():
         return
@@ -313,15 +308,14 @@ def get_next_task_to_be_run():
     Session = sessionmaker(engine)
     session = Session()
     now = datetime.datetime.now()
-    waiting_tasks = (session.query(TaskQueue).filter(TaskQueue.status == 0)
-                     .order_by(TaskQueue.priority.desc(), TaskQueue.order.desc())
-                     .all())
-    for task in waiting_tasks:
-        if _task_is_ready_to_run(task, now):
-            session.close()
-            return task
+    task = (session.query(TaskQueue)
+            .filter(TaskQueue.status == 0)
+            .filter(or_(TaskQueue.execution_time.is_(None),
+                        TaskQueue.execution_time <= now))
+            .order_by(TaskQueue.priority.desc(), TaskQueue.order.desc())
+            .first())
     session.close()
-    return None
+    return task
 
 def get_total_number_of_tasks():
     """
