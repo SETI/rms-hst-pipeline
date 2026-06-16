@@ -65,12 +65,12 @@ requests==2.33.0
     # via
     #   astroquery
     #   pyvo
-rms-julian==2.0.0
-rms-pdslogger==0.0.5
-rms-pdsparser==2.0.0
-rms-pdstemplate==0.0.3
-rms-textkernel==1.0.0
-rms-translator==0.0.1
+rms-julian==3.0.2
+rms-pdslogger==3.2.1
+rms-pdsparser==2.1.2
+rms-pdstemplate==2.4.0
+rms-textkernel==1.1.1
+rms-translator==1.0.0
 rsa==4.9.1
 s3transfer==0.14.0
 SecretStorage==3.5.0
