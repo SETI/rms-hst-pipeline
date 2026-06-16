@@ -290,9 +290,8 @@ def download_files(table, dir, logger=None, testing=False, filename_fn=None):
                         )
 
                 logger.info(f'Downloading files to {dir} has completed!')
-            except Exception as e:
-                logger.error(f'Error happened during downloading files to {dir}')
-                logger.exception(e)
+            except Exception:
+                logger.exception(f'Error happened during downloading files to {dir}')
                 raise
 
 def rename_tmp_prefixed_downloads(download_dir, tmp_prefix='tmp_', logger=None):
