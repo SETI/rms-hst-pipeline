@@ -280,7 +280,7 @@ def download_files(table, dir, logger=None, testing=False, filename_fn=None):
                              else product_fname)
                     local_path = os.path.join(product_dir, fname)
 
-                    status, msg, url = Observations.download_file(
+                    status, msg, _url = Observations.download_file(
                         row['dataURI'], local_path=local_path, cache=cache
                     )
                     if status != 'COMPLETE':
