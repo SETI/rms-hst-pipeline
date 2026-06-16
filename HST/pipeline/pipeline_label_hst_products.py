@@ -31,7 +31,7 @@ from queue_manager.task_queue_db import remove_a_task
 def parse_args(argv=None):
     """Parse and return command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="""pipeline_label_hst_products:productste and update PDS4 labels for HST
+        description="""pipeline_label_hst_products: products and update PDS4 labels for HST
                     data products.""")
 
     parser.add_argument('--proposal-id', type=str, default='',
