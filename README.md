@@ -15,6 +15,7 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
 ## ⚙️ Required Setup Before Running HST Pipeline Tasks
 
 1. Set up a virtual environment at the root directory:
+
    ```bash
    python -m venv venv
    source venv/bin/activate   # or `venv\Scripts\activate` on Windows
@@ -37,26 +38,31 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
 ### ▶️ Run the Full Pipeline (All Tasks)
 
 - Run with all proposal IDs (pre-fetched from MAST with the *True moving target* flag):
+
   ```bash
   python pipeline/pipeline_run_full_process.py
   ```
 
 - Query MAST with the *True moving target* flag to get the latest IDs, then run the pipeline:
+
   ```bash
   python pipeline/pipeline_run_full_process.py --get-ids
   ```
 
 - Run with a single proposal ID:
+
   ```bash
   python pipeline/pipeline_run_full_process.py --proposal-ids 07885
   ```
 
 - Run with multiple proposal IDs:
+
   ```bash
   python pipeline/pipeline_run_full_process.py --proposal-ids 13736 05167 10341 14930 06679 05837
   ```
 
 - Run with a specific number of subprocesses and a maximum allowed runtime for each task (in seconds):
+
   ```bash
   python pipeline/pipeline_run_full_process.py --proposal-ids 07885 13736 --max-subproc 30 --max-time 1860
   ```
