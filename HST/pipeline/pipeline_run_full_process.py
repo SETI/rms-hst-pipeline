@@ -21,7 +21,8 @@ import sys
 
 import queue_manager
 from hst_helper import HST_DIR
-from queue_manager import run_full_process
+from queue_manager import (MAX_SUBPROCESS_CNT,
+                           run_full_process)
 from queue_manager.task_queue_db import (create_task_queue_table,
                                          erase_all_task_queue,
                                          init_task_queue_table)
@@ -48,7 +49,7 @@ def parse_args(argv=None):
         help='Do not also log to the terminal.')
 
     parser.add_argument('--max-subproc-cnt', '--max-subproc',
-        type=int, action='store', default=20,
+        type=int, action='store', default=MAX_SUBPROCESS_CNT,
         help='Max number of subprocesses to run at a time for one pipeline process.')
 
     parser.add_argument('--max-allowed-time', '--max-time',
