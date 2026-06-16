@@ -53,7 +53,7 @@ def parse_args(argv=None):
     parser.add_argument('--end', type=str, action='store', default='',
         help='Optional end date from MAST in (yyyy, mm, dd) format.')
 
-    parser.add_argument('--retry', '-r', type=str, action='store', default='',
+    parser.add_argument('--retry', '-r', type=int, default=None,
         help='Optional max number of MAST connection retry.')
 
     parser.add_argument('--log', '-l', type=str, default='',
@@ -128,7 +128,7 @@ def main(argv=None):
         instruments = args.instruments if args.instruments else []
         start_date = args.start if args.start else START_DATE
         end_date = args.end if args.end else END_DATE
-        retry = args.retry if args.retry else RETRY
+        retry = args.retry if args.retry is not None else RETRY
 
         logger.info('MAST query constraints: ' + str(args))
         program_ids_list = query_hst_moving_targets(proposal_ids=proposal_ids,
