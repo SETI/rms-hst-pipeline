@@ -93,6 +93,10 @@ def get_target_path(args):
     if proposal_id and visit and not target_path:
         target_path = (HST_DIR['staging'] + '/hst_' + proposal_id.zfill(5) + '/visit_'
                        + visit.zfill(2))
+    if not target_path:
+        raise ValueError(
+            'Either --path or both --proposal-id and --visit must be provided.'
+        )
     return target_path
 
 
