@@ -213,37 +213,6 @@ def test_download_files_overwrites_existing_with_filename_fn(tmp_path, monkeypat
     assert calls == [('mast:HST/product/file.trl', str(existing), False)]
 
 
-def test_download_files_skips_when_product_filename_exists(tmp_path, monkeypatch):
-    calls = []
-
-    def fake_download_file(uri, *, local_path=None, cache=True, cloud_only=False):
-        calls.append((uri, local_path, cache))
-        return 'COMPLETE', None, None
-
-    class FakeObs:
-        download_file = staticmethod(fake_download_file)
-
-    monkeypatch.setattr(query_utils, 'Observations', FakeObs)
-
-    row = {
-        'obs_collection': 'HST',
-        'obs_id': 'obs1',
-        'productFilename': 'file.trl',
-        'dataURI': 'mast:HST/product/file.trl',
-    }
-    product_dir = tmp_path / 'mastDownload' / 'HST' / 'obs1'
-    product_dir.mkdir(parents=True)
-    (product_dir / 'file.trl').write_text('existing')
-
-    query_utils.download_files(
-        [row], str(tmp_path), filename_fn=lambda r: f'tmp_{r["productFilename"]}'
-    )
-
-    assert calls == []
-    assert not (product_dir / 'tmp_file.trl').exists()
-    assert (product_dir / 'file.trl').read_text() == 'existing'
-
-
 def test_rename_tmp_prefixed_downloads_overwrites_existing(tmp_path):
     base = tmp_path / 'mastDownload' / 'HST' / 'obs1'
     base.mkdir(parents=True)

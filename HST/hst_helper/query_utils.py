@@ -274,12 +274,6 @@ def download_files(table, dir, logger=None, testing=False, filename_fn=None):
                     os.makedirs(product_dir, exist_ok=True)
 
                     product_fname = os.path.basename(row['productFilename'])
-                    # final_path = os.path.join(product_dir, product_fname)
-                    # if filename_fn and os.path.isfile(final_path):
-                    #     logger.info(
-                    #         f'Skipping download for {product_fname}: file already exists'
-                    #     )
-                    #     continue
 
                     fname = (filename_fn(row)
                              if filename_fn
@@ -294,10 +288,6 @@ def download_files(table, dir, logger=None, testing=False, filename_fn=None):
                             f'Failed to download {row["productFilename"]} '
                             f'to {local_path}: {status} {msg}'
                         )
-                    # raise RuntimeError(
-                    #         f'Failed to download {row["productFilename"]} '
-                    #         f'to {local_path}: {status} {msg}'
-                    #     )
 
                 logger.info(f'Downloading files to {dir} has completed!')
             except Exception as e:
