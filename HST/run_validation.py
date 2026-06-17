@@ -42,8 +42,13 @@ def run_validation(proposal_id, logger=None):
 
     bundle_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     logger.info(f'Run validation-pdart for proposal id: {proposal_id} on {bundle_dir}')
-    run([VALIDATE_PDART, bundle_dir, bundle_dir, bundle_dir, str(proposal_id)],
-        cwd=HST_DIR)
+    try:
+        run([VALIDATE_PDART, bundle_dir, bundle_dir, bundle_dir, str(proposal_id)],
+            cwd=HST_DIR, check=True)
+    except:
+        logger.error(
+            f'Check validation-pdart failure report for proposal id: {proposal_id} '
+            f'at {bundle_dir}/validation-report.txt')
 
     # remove tmp context json
     try:
