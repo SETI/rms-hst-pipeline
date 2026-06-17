@@ -57,12 +57,12 @@ def test_create_xml_label_error_count(monkeypatch, fake_logger):
     # Test error count 1
     FakeTemplate._error_count = 1
     general_utils.create_xml_label('template', 'label', {'foo': 'bar'}, fake_logger)
-    assert any('ERROR:' in m for m in fake_logger.messages)
+    assert any('1 error encountered' in m for m in fake_logger.messages)
     # Test error count > 1
     FakeTemplate._error_count = 2
     fake_logger.messages.clear()
     general_utils.create_xml_label('template', 'label', {'foo': 'bar'}, fake_logger)
-    assert any('ERROR:' in m for m in fake_logger.messages)
+    assert any('2 errors encountered' in m for m in fake_logger.messages)
 
 def test_create_csv(tmp_path, fake_logger):
     csv_path = tmp_path / 'test.csv'

@@ -46,7 +46,7 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
 - Run a continuous process for a proposal ID that re-queues every 30 days::
 
   ```bash
-  python pipeline/pipeline_run_full_process.py 07885 --run-forever
+  python pipeline/pipeline_run_full_process.py --proposal-ids 07885 --run-forever
   ```
 
 - Run with a single proposal ID:
