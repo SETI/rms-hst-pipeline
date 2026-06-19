@@ -28,7 +28,7 @@ click==8.1.7
     # via pip-tools
 coverage==7.3.2
     # via -r requirements.in
-cryptography==46.0.7
+cryptography==48.0.1
     # via secretstorage
 fs==2.4.16
     # via -r requirements.in
