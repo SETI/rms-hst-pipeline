@@ -63,7 +63,7 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 col_name = collection_name(suffix, inst_id)
                 if (suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id] and
                     file_ext in BROWSE_PROD_EXT):
-                    prod_dir += f'/browse_{inst_id.lower()}_{suffix}/visit_{visit}/'
+                    prod_dir += f'/browse_mast_{inst_id.lower()}_{suffix}/visit_{visit}/'
                     logger.info(f'Move browse products to: {prod_dir + file}')
                 elif suffix in ACCEPTED_SUFFIXES[inst_id]:
                     prod_dir += f'/{col_name}/visit_{visit}/'
