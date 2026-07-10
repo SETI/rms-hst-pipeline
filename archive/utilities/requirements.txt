@@ -54,7 +54,7 @@ requests==2.33.0
 scipy==1.8.1
 six==1.14.0
 sortedcontainers==2.1.0
-soupsieve==2.0
+soupsieve==2.8.4
 SQLAlchemy==1.4.31
 sqlalchemy-stubs==0.4
 stack-data==0.3.0
