@@ -47,13 +47,13 @@ def finalize_hst_data_directory(proposal_id, logger):
 
     # Collect data to construct data dictionary used for the labels
     deliverable_path = get_deliverable_path(proposal_id)
-    for dir in os.listdir(deliverable_path):
+    for dir_name in os.listdir(deliverable_path):
         for col_prefix in COL_NAME_PREFIX:
-            if dir.startswith(col_prefix): # work on data_directory
-                collection_name = dir
+            if dir_name.startswith(col_prefix): # work on data_directory
+                collection_name = dir_name
 
                 # Get channel id
-                prod_dir = os.path.join(deliverable_path, dir)
+                prod_dir = os.path.join(deliverable_path, dir_name)
 
                 # Get label data
                 # TODO: might need to walk through bundles dir depending on if the files
@@ -81,7 +81,7 @@ def finalize_hst_data_directory(proposal_id, logger):
                     stop_date = date_time_to_date(max_stop) if max_stop else None
 
                     # Get collection title
-                    _, inst_id, suffix = dir.split('_')
+                    *_, inst_id, suffix = dir_name.split('_')
                     collection_title = get_collection_title_fmt(suffix, inst_id.upper())
                     collection_title = collection_title.replace('{I}', inst_id.upper())
                     collection_title = collection_title.replace(
@@ -140,11 +140,11 @@ def create_data_product_collection_csv(proposal_id, logger):
     """
     prod_ver = (1,0)
     deliverable_path = get_deliverable_path(proposal_id)
-    for dir in os.listdir(deliverable_path):
+    for dir_name in os.listdir(deliverable_path):
         for col_prefix in COL_NAME_PREFIX:
-            if dir.startswith(col_prefix):
+            if dir_name.startswith(col_prefix):
                 collection_data = []
-                bundles_prod_dir = os.path.join(deliverable_path, dir)
+                bundles_prod_dir = os.path.join(deliverable_path, dir_name)
                 for _, _, files in os.walk(bundles_prod_dir):
                     for file in files:
                         _, _, ext = file.rpartition('.')
@@ -154,9 +154,9 @@ def create_data_product_collection_csv(proposal_id, logger):
                             format_term = get_format_term(file)
                             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
                             prod_lidvid = (f'P,urn:nasa:pds:hst_{formatted_proposal_id}'
-                                           f':{dir}:{format_term}::'
+                                           f':{dir_name}:{format_term}::'
                                            f'{prod_ver[0]}.{prod_ver[1]}').split(',')
                             if prod_lidvid not in collection_data:
                                 collection_data.append(prod_lidvid)
-                prod_csv = f'{bundles_prod_dir}/collection_{dir}.csv'
+                prod_csv = f'{bundles_prod_dir}/collection_{dir_name}.csv'
                 create_csv(prod_csv, collection_data, logger)
