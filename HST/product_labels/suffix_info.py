@@ -1593,6 +1593,34 @@ LOCAL_BROWSE_SUFFIXES = {
     'c0f', 'c0m', 'cal', 'd0f', 'd0m', 'drc', 'drz', 'flt', 'flc', 'ima', 'mos', 'raw',
 }
 
+# FITS suffixes passed to picmaker for locally generated browse previews. Replaces
+# LOCAL_BROWSE_INSTRUMENTS / LOCAL_BROWSE_SUFFIXES as the picmaker gate.
+PICMAKER_BROWSE_SUFFIXES = {
+    'ACS'   : {'raw', 'drz', 'x2d'},
+    'COS'   : {'raw', 'drz', 'x2d'},
+    'FGS'   : {'raw', 'drz', 'x2d'},
+    'FOC'   : {'raw', 'drz', 'x2d'},
+    'FOS'   : {'raw', 'drz', 'x2d'},
+    'GHRS'  : {'raw', 'drz', 'x2d'},
+    'HSP'   : {'raw', 'drz', 'x2d'},
+    'NICMOS': {'raw', 'drz', 'x2d', 'mos'},
+    'STIS'  : {'raw', 'drz', 'x2d'},
+    'WFC3'  : {'raw', 'drz', 'x2d'},
+    'WFPC'  : {'raw', 'drz', 'x2d'},
+    'WFPC2' : {'raw', 'drz', 'x2d', 'c0f', 'd0f'},
+}
+
+# Suffixes where picmaker should be called with --mosaic (multi-chip / multi-detector).
+PICMAKER_MOSAIC_SUFFIXES = {'raw', 'c0f'}
+
+
+def use_mosaic(instrument_id, suffix):
+    """True if picmaker should be called with --mosaic for this instrument and suffix."""
+
+    if suffix not in PICMAKER_MOSAIC_SUFFIXES:
+        return False
+    return instrument_id in {'ACS', 'WFC3', 'FOC', 'WFPC', 'WFPC2'}
+
 # Class definition...
 BrowseProductInfo = namedtuple('BrowseProductInfo', ['suffix',
                                                      'mast_suffix',
