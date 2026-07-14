@@ -4,7 +4,8 @@
 # prepare_browse_products is the main function called in prepare_browse_products pipeline
 # task script. It will move data files from downloaded directories (under staging) to
 # newly structured directories (under staging):
-#   - browse_{inst_id}_{suffix}
+#   - browse_mast_{inst_id}_{suffix}
+#   - browse_generated_{inst_id}_{suffix}  (picmaker JPGs for allowlisted FITS)
 #   - data_{inst_id}_{suffix}
 ##########################################################################################
 
@@ -12,8 +13,11 @@ import os
 import pdslogger
 import shutil
 
+from generate_browse_previews import (generate_browse_previews,
+                                      picmaker_browse_collection_name)
 from product_labels.suffix_info import (ACCEPTED_BROWSE_SUFFIXES,
                                         ACCEPTED_SUFFIXES,
+                                        PICMAKER_BROWSE_SUFFIXES,
                                         collection_name)
 
 from hst_helper import (INST_ID_DICT,
@@ -24,7 +28,7 @@ from hst_helper.fs_utils import (get_formatted_proposal_id,
                                  get_file_suffix)
 
 def prepare_browse_products(proposal_id, visit, logger=None):
-    """With a given proposal id & visit, save browse products to browse_{inst_id}_{suffix}
+    """With a given proposal id & visit, save browse products to browse_* collections
     under staging dir.
 
     Inputs:
@@ -55,7 +59,7 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 INST_ID_DICT[formatted_proposal_id].add(inst_id)
 
             _, _, file_ext = file.rpartition('.')
-            # Copy & save browse products under browse_{inst_id}_{suffix} and rest of
+            # Copy & save browse products under browse_mast_{inst_id}_{suffix} and rest of
             # products under data_{inst_id}_{suffix}
             # TODO: maybe use move instead of copy and remove empty folder (?)
             if inst_id is not None:
@@ -73,3 +77,15 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 os.makedirs(prod_dir, exist_ok=True)
                 shutil.copy(file_path, prod_dir + file)
                 # shutil.move(file_path, prod_dir+file)
+
+                # Generate picmaker browse JPGs for allowlisted FITS science products
+                if (suffix in PICMAKER_BROWSE_SUFFIXES.get(inst_id, set())
+                        and file_ext == 'fits'):
+                    out_dir = (
+                        prod_dir
+                        + f'/{picmaker_browse_collection_name(inst_id, suffix)}'
+                        + f'/visit_{visit}/'
+                    )
+                    generate_browse_previews(
+                        prod_dir + file, out_dir, inst_id, suffix, logger,
+                    )
