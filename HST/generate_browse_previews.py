@@ -29,7 +29,12 @@ _SPECTRAL_INSTRUMENTS = frozenset({'STIS', 'COS', 'FGS', 'FOS', 'GHRS', 'HSP'})
 
 
 def picmaker_browse_collection_name(instrument_id, suffix):
-    """Return the staging collection name for picmaker-generated browse products."""
+    """Return the staging collection name for picmaker-generated browse products.
+
+    Inputs:
+        instrument_id   HST instrument id (e.g. ACS, WFC3).
+        suffix          FITS suffix (e.g. drz, raw).
+    """
 
     return f'browse_generated_{instrument_id.lower()}_{suffix}'
 
@@ -41,6 +46,10 @@ def _get_picmaker_recipe(instrument_id, suffix):
     file (sized tiers include ``--tint`` where appropriate; ``_full`` does not).
     ``extra_args`` carries only suffix-varying options (``--mosaic``, ``--trim``,
     ``--percentiles`` where they differ by suffix).
+
+    Inputs:
+        instrument_id   HST instrument id (e.g. ACS, WFC3).
+        suffix          FITS suffix (e.g. drz, raw).
     """
 
     if instrument_id in _IMAGING_INSTRUMENTS:
@@ -71,7 +80,12 @@ def _get_picmaker_recipe(instrument_id, suffix):
 
 
 def _versions_file_for_suffix(versions_path, suffix):
-    """Write a temporary versions file with ``--strip`` set for ``suffix``."""
+    """Write a temporary versions file with ``--strip`` set for ``suffix``.
+
+    Inputs:
+        versions_path   picmaker versions file defining thumb/small/med/full.
+        suffix          FITS suffix used to parameterize ``--strip`` in the versions file.
+    """
 
     content = versions_path.read_text(encoding='utf-8')
     content = re.sub(r'--strip\s+_\S+', f'--strip _{suffix}', content)
