@@ -312,9 +312,15 @@ $IF(processing_level != "Ancillary")
       <lidvid_reference>
         urn:nasa:pds:hst_$prop_id$:$info.collection_name$:$ipppssoot$_$info.suffix$::$version_id[0]$.0
       </lidvid_reference>
-      <reference_type>data_to_$"thumb" if "thumb" in info.suffix else "browse"$</reference_type>
+      <reference_type>data_to_$info.suffix if not info.mast_suffix else "browse"$</reference_type>
     $IF("thumb" in info.suffix)
       <comment>Thumbnail browse product</comment>
+    $ELSE_IF(info.suffix == "small" or info.suffix.endswith("_small"))
+      <comment>Small browse product</comment>
+    $ELSE_IF(info.suffix == "med" or info.suffix.endswith("_med"))
+      <comment>Medium browse product</comment>
+    $ELSE_IF(info.suffix == "full" or info.suffix.endswith("_full"))
+      <comment>Full-resolution browse product</comment>
     $ELSE_IF(hst_dictionary["observation_type"] == "IMAGING")
       <comment>Full-resolution browse product</comment>
     $ELSE

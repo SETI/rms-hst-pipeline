@@ -78,11 +78,13 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 shutil.copy(file_path, prod_dir + file)
                 # shutil.move(file_path, prod_dir+file)
 
-                # Generate picmaker browse JPGs for allowlisted FITS science products
+                # Generate picmaker browse JPGs for allowlisted FITS science products.
+                # Write as a sibling of data_*/browse_mast_* (not nested under data_*).
                 if (suffix in PICMAKER_BROWSE_SUFFIXES.get(inst_id, set())
                         and file_ext == 'fits'):
+                    staging_root = get_program_dir_path(proposal_id, None, 'staging')
                     out_dir = (
-                        prod_dir
+                        staging_root
                         + f'/{picmaker_browse_collection_name(inst_id, suffix)}'
                         + f'/visit_{visit}/'
                     )

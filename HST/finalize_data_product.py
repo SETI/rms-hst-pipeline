@@ -127,6 +127,7 @@ def finalize_hst_data_directory(proposal_id, logger):
                 create_collection_label(proposal_id, collection_name,
                                         data_dict, col_data_label_name,
                                         COL_DATA_LABEL_TEMPLATE, logger)
+                break
 
     # Create data product collection csv
     create_data_product_collection_csv(proposal_id, logger)
@@ -160,3 +161,4 @@ def create_data_product_collection_csv(proposal_id, logger):
                                 collection_data.append(prod_lidvid)
                 prod_csv = f'{bundles_prod_dir}/collection_{dir_name}.csv'
                 create_csv(prod_csv, collection_data, logger)
+                break

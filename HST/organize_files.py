@@ -30,14 +30,15 @@ def organize_files_from_staging_to_bundles(proposal_id, logger):
     # them over to the bundles folder
     staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
     deliverable_path = get_deliverable_path(proposal_id)
-    for dir in os.listdir(staging_dir):
+    for dir_name in os.listdir(staging_dir):
         for col_prefix in COL_NAME_PREFIX:
-            if dir.startswith(col_prefix):
-                staging_prod_dir = os.path.join(staging_dir, dir)
-                bundles_prod_dir = os.path.join(deliverable_path, dir)
+            if dir_name.startswith(col_prefix):
+                staging_prod_dir = os.path.join(staging_dir, dir_name)
+                bundles_prod_dir = os.path.join(deliverable_path, dir_name)
                 os.makedirs(bundles_prod_dir, exist_ok=True)
-                logger.info(f'Move {dir} from staging to bundles directory')
+                logger.info(f'Move {dir_name} from staging to bundles directory')
                 shutil.copytree(staging_prod_dir, bundles_prod_dir, dirs_exist_ok=True)
+                break
 
 def _clean_up_staging_dir_at_path(staging_dir, logger):
     """Remove mastDownload and collection-prefix directories under a staging program path.
@@ -48,15 +49,16 @@ def _clean_up_staging_dir_at_path(staging_dir, logger):
     """
     if not os.path.isdir(staging_dir):
         return
-    for dirname in os.listdir(staging_dir):
-        staging_prod_dir = os.path.join(staging_dir, dirname)
-        if dirname.startswith(MAST_DOWNLOAD_DIRNAME):
-            logger.info(f'Remove {dirname} from staging directory')
+    for dir_name in os.listdir(staging_dir):
+        staging_prod_dir = os.path.join(staging_dir, dir_name)
+        if dir_name.startswith(MAST_DOWNLOAD_DIRNAME):
+            logger.info(f'Remove {dir_name} from staging directory')
             shutil.rmtree(staging_prod_dir)
         for col_prefix in COL_NAME_PREFIX:
-            if dirname.startswith(col_prefix):
-                logger.info(f'Remove {dirname} from staging directory')
+            if dir_name.startswith(col_prefix):
+                logger.info(f'Remove {dir_name} from staging directory')
                 shutil.rmtree(staging_prod_dir)
+                break
 
 def clean_up_staging_dir(proposal_id=None, logger=None):
     """Remove organized directories (they are copied to the bundle directory) and empty
