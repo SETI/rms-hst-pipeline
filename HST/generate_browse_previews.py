@@ -35,15 +35,13 @@ def picmaker_browse_collection_name(instrument_id, suffix):
 
 
 def _get_picmaker_recipe(instrument_id, suffix):
-    """Return (versions_path, extra_args, tint_sized) for an instrument and suffix.
+    """Return (versions_path, extra_args) for an instrument and suffix.
 
-    Suffix-uniform stretch and layout flags live in the versions config file.
+    Suffix-uniform stretch, layout, and tint flags live in the versions config
+    file (sized tiers include ``--tint`` where appropriate; ``_full`` does not).
     ``extra_args`` carries only suffix-varying options (``--mosaic``, ``--trim``,
-    ``--percentiles`` where they differ by suffix). WFPC2 filter tint is injected
-    into sized version lines at runtime because ``d0f`` must not be tinted.
+    ``--percentiles`` where they differ by suffix).
     """
-
-    tint_sized = False
 
     if instrument_id in _IMAGING_INSTRUMENTS:
         config_path = _IMAGING_CONFIG
@@ -56,7 +54,6 @@ def _get_picmaker_recipe(instrument_id, suffix):
         extra_args = []
         if suffix in {'c0f', 'raw', 'd0f', 'drz'}:
             extra_args.extend(['--trim', '100'])
-        tint_sized = True
     elif instrument_id in _SPECTRAL_INSTRUMENTS:
         config_path = _SPECTRAL_CONFIG
         extra_args = []
@@ -70,25 +67,14 @@ def _get_picmaker_recipe(instrument_id, suffix):
     if use_mosaic(instrument_id, suffix):
         extra_args = ['--mosaic', *extra_args]
 
-    return config_path, extra_args, tint_sized
+    return config_path, extra_args
 
 
-def _versions_file_for_suffix(versions_path, suffix, *, tint_sized=False):
-    """Write a temporary versions file with ``--strip`` set for ``suffix``.
-
-    When ``tint_sized`` is True, add ``--tint`` to sized tiers only (lines with
-    ``--frame``), leaving the ``_full`` version untinted.
-    """
+def _versions_file_for_suffix(versions_path, suffix):
+    """Write a temporary versions file with ``--strip`` set for ``suffix``."""
 
     content = versions_path.read_text(encoding='utf-8')
     content = re.sub(r'--strip\s+_\S+', f'--strip _{suffix}', content)
-    if tint_sized:
-        lines = []
-        for line in content.splitlines():
-            if '--frame' in line and '--tint' not in line:
-                line = line.replace('--frame', '--tint --frame', 1)
-            lines.append(line)
-        content = '\n'.join(lines) + '\n'
     handle = tempfile.NamedTemporaryFile(
         mode='w', suffix='.txt', delete=False, encoding='utf-8',
     )
@@ -97,8 +83,7 @@ def _versions_file_for_suffix(versions_path, suffix, *, tint_sized=False):
     return handle.name
 
 
-def generate_hst_previews(fits_path, out_dir, versions_path, suffix, extra_args=(),
-                          *, tint_sized=False):
+def generate_hst_previews(fits_path, out_dir, versions_path, suffix, extra_args=()):
     """Run picmaker on one FITS file and write JPG previews to ``out_dir``.
 
     Inputs:
@@ -107,7 +92,6 @@ def generate_hst_previews(fits_path, out_dir, versions_path, suffix, extra_args=
         versions_path   picmaker versions file defining thumb/small/med/full.
         suffix          FITS suffix used to parameterize ``--strip`` in the versions file.
         extra_args      suffix-varying picmaker CLI tokens (e.g. --mosaic, --trim).
-        tint_sized      if True, add ``--tint`` to sized version lines only.
     """
 
     fits_path = Path(fits_path)
@@ -115,9 +99,7 @@ def generate_hst_previews(fits_path, out_dir, versions_path, suffix, extra_args=
     versions_path = Path(versions_path)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    versions_file = _versions_file_for_suffix(
-        versions_path, suffix, tint_sized=tint_sized,
-    )
+    versions_file = _versions_file_for_suffix(versions_path, suffix)
     try:
         args = [
             str(fits_path),
@@ -151,12 +133,11 @@ def generate_browse_previews(fits_path, out_dir, instrument_id, suffix, logger=N
             f'{instrument_id!r} suffix {suffix!r}'
         )
 
-    versions_path, extra_args, tint_sized = _get_picmaker_recipe(instrument_id, suffix)
+    versions_path, extra_args = _get_picmaker_recipe(instrument_id, suffix)
     logger.info(
         f'Generate picmaker browse previews for {fits_path} '
         f'({instrument_id}/{suffix}) -> {out_dir}'
     )
     generate_hst_previews(
         fits_path, out_dir, versions_path, suffix, extra_args=extra_args,
-        tint_sized=tint_sized,
     )

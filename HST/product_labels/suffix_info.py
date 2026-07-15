@@ -1581,20 +1581,18 @@ MAST_BROWSE_SUFFIX_TRANSLATOR = {
     'WFPC2' : {'c0f': 'c0m', 'd0f': 'd0m'},                 # convert to unwaivered
 }
 
+LOCAL_BROWSE_INSTRUMENTS = {
+    'ACS', 'COS', 'FGS', 'FOC', 'FOS', 'GHRS', 'HSP',
+    'NICMOS', 'STIS', 'WFC3', 'WFPC','WFPC2'
+}
+
+LOCAL_BROWSE_SUFFIXES = {
+    'c0f', 'c0m', 'cal', 'd0f', 'd0m', 'drc', 'drz', 'flt', 'flc', 'ima', 'mos', 'raw',
+}
+
 # FITS suffixes passed to picmaker for locally generated browse previews.
 PICMAKER_BROWSE_SUFFIXES = {
-    'ACS'   : {'raw', 'drz', 'x2d'},
-    'COS'   : {'raw', 'drz', 'x2d'},
-    'FGS'   : {'raw', 'drz', 'x2d'},
-    'FOC'   : {'raw', 'drz', 'x2d'},
-    'FOS'   : {'raw', 'drz', 'x2d'},
-    'GHRS'  : {'raw', 'drz', 'x2d'},
-    'HSP'   : {'raw', 'drz', 'x2d'},
-    'NICMOS': {'raw', 'drz', 'x2d', 'mos'},
-    'STIS'  : {'raw', 'drz', 'x2d'},
-    'WFC3'  : {'raw', 'drz', 'x2d'},
-    'WFPC'  : {'raw', 'drz', 'x2d'},
-    'WFPC2' : {'raw', 'drz', 'x2d', 'c0f', 'd0f'},
+    instrument: LOCAL_BROWSE_SUFFIXES for instrument in LOCAL_BROWSE_INSTRUMENTS
 }
 
 # OPUS-size suffixes appended by picmaker after --strip of the FITS suffix.
