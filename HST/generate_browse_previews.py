@@ -22,7 +22,7 @@ from product_labels.suffix_info import (PICMAKER_BROWSE_SUFFIXES,
                                         use_mosaic)
 
 _CONFIG_DIR = Path(__file__).resolve().parent / 'picmaker_configs'
-_IMAGING_CONFIG = _CONFIG_DIR / 'acs_foc_wfc_wfc3_previews.txt'
+_IMAGING_CONFIG = _CONFIG_DIR / 'acs_foc_wfpc_wfc3_previews.txt'
 _NICMOS_CONFIG = _CONFIG_DIR / 'nicmos_previews.txt'
 _WFPC2_CONFIG = _CONFIG_DIR / 'wfpc2_previews.txt'
 _SPECTRAL_CONFIG = _CONFIG_DIR / 'stis_cos_fgs_fos_ghrs_hsp_previews.txt'
@@ -52,9 +52,9 @@ def expected_opus_jpg_names(fits_path):
 def _get_picmaker_recipe(instrument_id, suffix):
     """Return (versions_path, extra_args) for an instrument and suffix.
 
-    Suffix-uniform stretch, layout, and tint flags live in the versions config
-    file (sized tiers include ``--tint`` where appropriate; ``_full`` does not).
-    ``extra_args`` carries only suffix-varying options (``--mosaic``, ``--trim``,
+    Suffix-uniform stretch, layout, tint, and trim flags live in the versions
+    config file (sized tiers include ``--tint`` where appropriate; ``_full``
+    does not). ``extra_args`` carries only suffix-varying options (``--mosaic``,
     ``--percentiles`` where they differ by suffix).
 
     Inputs:
@@ -71,13 +71,9 @@ def _get_picmaker_recipe(instrument_id, suffix):
     elif instrument_id == 'WFPC2':
         config_path = _WFPC2_CONFIG
         extra_args = []
-        if suffix in {'c0f', 'raw', 'd0f', 'drz'}:
-            extra_args.extend(['--trim', '100'])
     elif instrument_id in _SPECTRAL_INSTRUMENTS:
         config_path = _SPECTRAL_CONFIG
         extra_args = []
-        if suffix in {'raw', 'drz'}:
-            extra_args = ['--percentiles', '0.02', '99.98']
     else:
         raise ValueError(
             f'No picmaker recipe for instrument {instrument_id!r} and suffix {suffix!r}'
