@@ -80,6 +80,8 @@ def prepare_browse_products(proposal_id, visit, logger=None):
 
                 # Generate picmaker browse JPGs for allowlisted FITS science products.
                 # Write as a sibling of data_*/browse_mast_* (not nested under data_*).
+                # Failures are logged as warnings; browse_generated_* is only created
+                # when at least one FITS yields all four OPUS-size JPGs.
                 if (suffix in PICMAKER_BROWSE_SUFFIXES.get(inst_id, set())
                         and file_ext == 'fits'):
                     staging_root = get_program_dir_path(proposal_id, None, 'staging')

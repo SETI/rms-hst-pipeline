@@ -8,6 +8,7 @@
 
 import os
 import re
+import shutil
 import tempfile
 from pathlib import Path
 
@@ -15,7 +16,9 @@ import pdslogger
 from picmaker.options import get_parser
 from picmaker.picmaker import picmaker
 
+from hst_helper.fs_utils import get_format_term
 from product_labels.suffix_info import (PICMAKER_BROWSE_SUFFIXES,
+                                        PICMAKER_OPUS_SIZE_SUFFIXES,
                                         use_mosaic)
 
 _CONFIG_DIR = Path(__file__).resolve().parent / 'picmaker_configs'
@@ -37,6 +40,13 @@ def picmaker_browse_collection_name(instrument_id, suffix):
     """
 
     return f'browse_generated_{instrument_id.lower()}_{suffix}'
+
+
+def expected_opus_jpg_names(fits_path):
+    """Return the four OPUS-size JPG basenames expected for one FITS product."""
+
+    format_term = get_format_term(Path(fits_path).name)
+    return [f'{format_term}_{size}.jpg' for size in PICMAKER_OPUS_SIZE_SUFFIXES]
 
 
 def _get_picmaker_recipe(instrument_id, suffix):
@@ -118,7 +128,6 @@ def generate_hst_previews(fits_path, out_dir, versions_path, suffix, extra_args=
         args = [
             str(fits_path),
             '--directory', str(out_dir),
-            '--proceed',
             '--extension', 'jpg',
             *extra_args,
             '--versions', versions_file,
@@ -131,12 +140,21 @@ def generate_hst_previews(fits_path, out_dir, versions_path, suffix, extra_args=
 def generate_browse_previews(fits_path, out_dir, instrument_id, suffix, logger=None):
     """Generate picmaker browse previews for one FITS product.
 
+    Runs picmaker without ``--proceed``. On any picmaker failure, or if fewer than
+    all four OPUS-size JPGs are produced, logs a warning and returns False without
+    creating ``out_dir``. Only creates ``browse_generated_*`` paths when all four
+    JPGs are ready to install.
+
     Inputs:
         fits_path       path to the FITS file in a data_{inst}_{suffix} collection.
         out_dir         browse_generated_{inst}_{suffix}/visit_{visit}/ directory.
         instrument_id   HST instrument id (e.g. ACS, WFC3).
         suffix          FITS suffix (e.g. drz, raw).
         logger          pdslogger to use; None for default EasyLogger.
+
+    Returns:
+        True if all four JPGs were written under ``out_dir``; False if generation
+        was skipped after a warning.
     """
 
     logger = logger or pdslogger.EasyLogger()
@@ -152,6 +170,35 @@ def generate_browse_previews(fits_path, out_dir, instrument_id, suffix, logger=N
         f'Generate picmaker browse previews for {fits_path} '
         f'({instrument_id}/{suffix}) -> {out_dir}'
     )
-    generate_hst_previews(
-        fits_path, out_dir, versions_path, suffix, extra_args=extra_args,
-    )
+
+    expected = expected_opus_jpg_names(fits_path)
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_dir = Path(tmp)
+        try:
+            generate_hst_previews(
+                fits_path, tmp_dir, versions_path, suffix, extra_args=extra_args,
+            )
+        except Exception as exc:
+            logger.warning(
+                f'Cannot generate all picmaker browse JPGs for {fits_path} '
+                f'({instrument_id}/{suffix}): {exc}'
+            )
+            return False
+
+        # This code block is for the case when picmaker doesn't raise an error and generate
+        # any image.
+        missing = [name for name in expected if not (tmp_dir / name).is_file()]
+        if missing:
+            found = sorted(path.name for path in tmp_dir.glob('*.jpg'))
+            logger.warning(
+                f'Cannot generate all picmaker browse JPGs for {fits_path} '
+                f'({instrument_id}/{suffix}): missing {missing}; found {found}'
+            )
+            return False
+
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for name in expected:
+            shutil.move(str(tmp_dir / name), str(out_dir / name))
+
+    return True

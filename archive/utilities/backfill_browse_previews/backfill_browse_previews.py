@@ -180,10 +180,13 @@ def backfill_deliverable(deliverable_path, logger=None, *, dry_run=False, force=
             continue
 
         try:
-            generate_browse_previews(
+            ok = generate_browse_previews(
                 str(fits_path), str(out_dir), instrument_id, suffix, logger,
             )
-            counts['processed'] += 1
+            if ok:
+                counts['processed'] += 1
+            else:
+                counts['failed'] += 1
         except Exception as exc:
             logger.exception(exc)
             logger.error(f'Failed to generate previews for {fits_path}: {exc}')
