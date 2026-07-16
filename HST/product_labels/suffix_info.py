@@ -1601,14 +1601,20 @@ PICMAKER_OPUS_SIZE_SUFFIXES = ('thumb', 'small', 'med', 'full')
 
 # Suffixes where picmaker should be called with --mosaic (multi-chip / multi-detector).
 PICMAKER_MOSAIC_SUFFIXES = {'raw', 'c0f'}
+# WFPC2 archives unwaivered multi-detector science as c0m/d0m (c0f/d0f are suppressed).
+WFPC2_MOSAIC_SUFFIXES = PICMAKER_MOSAIC_SUFFIXES | {'c0m', 'd0m'}
 
 
 def use_mosaic(instrument_id, suffix):
     """True if picmaker should be called with --mosaic for this instrument and suffix."""
 
-    if suffix not in PICMAKER_MOSAIC_SUFFIXES:
+    mosaic_suffixes = (
+        WFPC2_MOSAIC_SUFFIXES if instrument_id == 'WFPC2' else PICMAKER_MOSAIC_SUFFIXES
+    )
+    if suffix not in mosaic_suffixes:
         return False
-    return instrument_id in {'ACS', 'WFC3', 'FOC', 'WFPC', 'WFPC2'}
+    # FOC is single-detector and has no picmaker apply_mosaic.
+    return instrument_id in {'ACS', 'WFC3', 'WFPC', 'WFPC2'}
 
 # Class definition...
 BrowseProductInfo = namedtuple('BrowseProductInfo', ['suffix',

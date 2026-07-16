@@ -22,13 +22,17 @@ from product_labels.suffix_info import (PICMAKER_BROWSE_SUFFIXES,
                                         use_mosaic)
 
 _CONFIG_DIR = Path(__file__).resolve().parent / 'picmaker_configs'
-_IMAGING_CONFIG = _CONFIG_DIR / 'acs_foc_wfpc_wfc3_previews.txt'
+_ACS_WFC3_CONFIG = _CONFIG_DIR / 'acs_wfc3_previews.txt'
+_WFPC_WFPC2_CONFIG = _CONFIG_DIR / 'wfpc_wfpc2_previews.txt'
+_FOC_CONFIG = _CONFIG_DIR / 'foc_previews.txt'
 _NICMOS_CONFIG = _CONFIG_DIR / 'nicmos_previews.txt'
-_WFPC2_CONFIG = _CONFIG_DIR / 'wfpc2_previews.txt'
-_SPECTRAL_CONFIG = _CONFIG_DIR / 'stis_cos_fgs_fos_ghrs_hsp_previews.txt'
+_STIS_CONFIG = _CONFIG_DIR / 'stis_previews.txt'
+_COS_FGS_FOS_GHRS_HSP_CONFIG = _CONFIG_DIR / 'cos_fgs_fos_ghrs_hsp_previews.txt'
 
-_IMAGING_INSTRUMENTS = frozenset({'ACS', 'WFC3', 'FOC', 'WFPC'})
-_SPECTRAL_INSTRUMENTS = frozenset({'STIS', 'COS', 'FGS', 'FOS', 'GHRS', 'HSP'})
+# Group instruments by shared preview behavior (stretch / tint / product era).
+_ACS_WFC3_INSTRUMENTS = frozenset({'ACS', 'WFC3'})
+_WFPC_WFPC2_INSTRUMENTS = frozenset({'WFPC', 'WFPC2'})
+_COS_FGS_FOS_GHRS_HSP_INSTRUMENTS = frozenset({'COS', 'FGS', 'FOS', 'GHRS', 'HSP'})
 
 
 def picmaker_browse_collection_name(instrument_id, suffix):
@@ -54,33 +58,33 @@ def _get_picmaker_recipe(instrument_id, suffix):
 
     Suffix-uniform stretch, layout, tint, and trim flags live in the versions
     config file (sized tiers include ``--tint`` where appropriate; ``_full``
-    does not). ``extra_args`` carries only suffix-varying options (``--mosaic``,
-    ``--percentiles`` where they differ by suffix).
+    does not). ``extra_args`` carries only suffix-varying options (``--mosaic``).
 
     Inputs:
         instrument_id   HST instrument id (e.g. ACS, WFC3).
         suffix          FITS suffix (e.g. drz, raw).
     """
 
-    if instrument_id in _IMAGING_INSTRUMENTS:
-        config_path = _IMAGING_CONFIG
-        extra_args = []
+    if instrument_id in _ACS_WFC3_INSTRUMENTS:
+        config_path = _ACS_WFC3_CONFIG
+    elif instrument_id in _WFPC_WFPC2_INSTRUMENTS:
+        config_path = _WFPC_WFPC2_CONFIG
+    elif instrument_id == 'FOC':
+        config_path = _FOC_CONFIG
     elif instrument_id == 'NICMOS':
         config_path = _NICMOS_CONFIG
-        extra_args = []
-    elif instrument_id == 'WFPC2':
-        config_path = _WFPC2_CONFIG
-        extra_args = []
-    elif instrument_id in _SPECTRAL_INSTRUMENTS:
-        config_path = _SPECTRAL_CONFIG
-        extra_args = []
+    elif instrument_id == 'STIS':
+        config_path = _STIS_CONFIG
+    elif instrument_id in _COS_FGS_FOS_GHRS_HSP_INSTRUMENTS:
+        config_path = _COS_FGS_FOS_GHRS_HSP_CONFIG
     else:
         raise ValueError(
             f'No picmaker recipe for instrument {instrument_id!r} and suffix {suffix!r}'
         )
 
+    extra_args = []
     if use_mosaic(instrument_id, suffix):
-        extra_args = ['--mosaic', *extra_args]
+        extra_args = ['--mosaic']
 
     return config_path, extra_args
 
