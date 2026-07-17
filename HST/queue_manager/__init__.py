@@ -2,72 +2,84 @@
 # queue_manager/__init__.py
 #
 # Queue manager module that will queue in the next task for the hst pipeline process.
-# - run_pipeline will start a hst pipeline process for the given proposal id list.
+# - run_full_process will start a hst pipeline process for the given proposal id list.
 # - queue_next_task will Queue in the next task for a given proposal id to database, and
 #   wait for the open subprocess slot to execute the corresponding command.
 ##########################################################################################
 
 import os
+import datetime
 import pdslogger
 import subprocess
+import sys
 import time
 
 from hst_helper.fs_utils import get_formatted_proposal_id
+from organize_files import clean_up_staging_dir
 from queue_manager.task_queue_db import (add_a_task,
                                          create_task_queue_table,
                                          db_exists,
-                                         erase_all_task_queue,
                                          get_next_task_to_be_run,
                                          get_total_number_of_tasks,
-                                         init_task_queue_table,
+                                         queue_cleanup_during_restart,
                                          remove_a_task,
                                          update_a_task_status)
 from queue_manager.config import (DB_PATH,
                                   HST_SOURCE_ROOT,
+                                  HEARTBEAT_INTERVAL,
                                   PYTHON_EXE,
                                   MAX_ALLOWED_TIME,
                                   MAX_SUBPROCESS_CNT,
+                                  REQUEUE_TIME,
                                   SUBPROCESS_LIST,
                                   TASK_INFO)
-from sqlalchemy.exc import OperationalError
 
-def run_pipeline(proposal_ids, logger=None):
+def run_full_process(proposal_ids=None, logger=None, run_forever=False, no_cleanup=False):
     """With a given list of proposal ids, run pipeline for each program id.
 
     Inputs:
-        proposal_ids    a list of proposal ids.
+        proposal_ids    a list of proposal ids, or None.
         logger          pdslogger to use; None for default EasyLogger.
+        run_forever     if True, keep polling the task queue after it becomes empty; if
+                        False, exit when no tasks remain.
+        no_cleanup      if True, do not remove staging directories when the queue is idle
+                        or when the pipeline completes.
     """
     logger = logger or pdslogger.EasyLogger()
-    logger.info(f'Run pipeline with proposal ids: {proposal_ids}')
+    logger.info(f'Run pipeline')
 
-    try:
-        init_task_queue_table()
-    except OperationalError as e: #pragma: no cover
-        if 'already exists' in repr(e):
-            erase_all_task_queue()
-        elif 'no such table' in repr(e):
-            create_task_queue_table()
-        else:
-            logger.error('Failed to create task queue table!')
-            raise Exception('Failed to create task queue table!') # fatal error
+    if not db_exists():
+        create_task_queue_table()
+    else:
+        queue_cleanup_during_restart()
 
-    # Kick start the pipeline for each proposal id
-    # proc_li = []
-    for prog_id in proposal_ids:
-        try:
-            proposal_id = int(prog_id)
-        except ValueError: #pragma: no cover
-            logger.warn(f'Proposal id: {prog_id} is not valid')
+    if get_total_number_of_tasks() != 0:
+        logger.info(f'Resume pipeline with existing tasks')
 
-        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-        # Start hst pipeline for each proposal id
-        logger.info(f'Starting to run pipeline for {proposal_id}')
-        logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
-        queue_next_task(formatted_proposal_id, '', 'query_moving_targ', logger)
+    if proposal_ids is None:
+        logger.info('Start pipeline with all available proposal ids')
+        logger.info('Queue query_hst_moving_targets for all available proposal ids')
+        queue_next_task('', '', 'query_moving_targ', logger)
+    else:
+        logger.info(f'Start pipeline with proposal ids: {proposal_ids}')
+        for prog_id in proposal_ids:
+            try:
+                proposal_id = int(prog_id)
+            except ValueError: #pragma: no cover
+                logger.warn(f'Proposal id: {prog_id} is not valid')
+                continue
+
+            formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+            # Start hst pipeline for each proposal id
+            logger.info(f'Queue query_hst_moving_targets for {proposal_id}')
+            queue_next_task(formatted_proposal_id, '', 'query_moving_targ', logger)
+
+    queue_empty_at = None
+    next_requeue_at = None
+    last_heartbeat_at = None
 
     # spawning subprocesses
-    while get_total_number_of_tasks() > 0:
+    while True:
         task = get_next_task_to_be_run()
 
         if task is not None:
@@ -80,7 +92,68 @@ def run_pipeline(proposal_ids, logger=None):
             # logger.debug("Spawning subprocess %s", str(sub_args))
         time.sleep(1)
 
+        if get_total_number_of_tasks() > 0 or run_forever:
+            if get_total_number_of_tasks() > 0:
+                queue_empty_at = None
+            elif run_forever:
+                now = time.time()
+                if queue_empty_at is None:
+                    queue_empty_at = now
+                    next_requeue_at = queue_empty_at + REQUEUE_TIME
+                    last_heartbeat_at = queue_empty_at
+                    if not no_cleanup:
+                        _clean_up_staging_dirs(proposal_ids, logger)
+
+                # Re-queue query_hst_moving_targets at the period of REQUEUE_TIME
+                if now >= next_requeue_at:
+                    if proposal_ids is None:
+                        logger.info('Re-queue query_hst_moving_targets for all available '
+                                    'proposal ids')
+                        queue_next_task('', '', 'query_moving_targ', logger)
+                    else:
+                        for prog_id in proposal_ids:
+                            try:
+                                proposal_id = int(prog_id)
+                            except ValueError: #pragma: no cover
+                                logger.warn(f'Proposal id: {prog_id} is not valid')
+                                continue
+                            formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+                            logger.info(f'Re-queue query_hst_moving_targets for '
+                                        f'{proposal_id}')
+                            queue_next_task(formatted_proposal_id, '',
+                                            'query_moving_targ', logger)
+                # Check the heartbeat to make sure the program is waiting for re-queue
+                elif now - last_heartbeat_at >= HEARTBEAT_INTERVAL:
+                    secs_until_requeue = max(0, int(next_requeue_at - now))
+                    print(f'Waiting for next queue (~{secs_until_requeue}s until '
+                          f're-queue)...', flush=True)
+                    last_heartbeat_at = now
+            continue
+        else:
+            break
+
     logger.info('Pipeline complete!')
+    if not no_cleanup:
+        _clean_up_staging_dirs(proposal_ids, logger)
+
+def _clean_up_staging_dirs(proposal_ids, logger):
+    """Clean up staging directories after pipeline work completes or the queue is idle.
+
+    Inputs:
+        proposal_ids    a list of proposal ids, or None to clean every hst_* directory
+                        under HST_STAGING.
+        logger          pdslogger to use; None for default EasyLogger.
+    """
+    if proposal_ids is None:
+        clean_up_staging_dir(None, logger)
+    else:
+        for prog_id in proposal_ids:
+            try:
+                proposal_id = int(prog_id)
+            except ValueError: #pragma: no cover
+                logger.warn(f'Proposal id: {prog_id} is not valid')
+                continue
+            clean_up_staging_dir(proposal_id, logger)
 
 def queue_next_task(proposal_id, visit_info, task, logger):
     """Queue in the next task for a given proposal id to database.
@@ -91,7 +164,7 @@ def queue_next_task(proposal_id, visit_info, task, logger):
     3. Run the task command (spawn the subprocess)
 
     Inputs:
-        proposal_id    the proposal if of the current task.
+        proposal_id    the proposal id of the current task.
         visit_info     a two character visit, a list of visits or ''.
         task           a string represents the current task.
         logger         pdslogger to use; None for default EasyLogger.
@@ -103,7 +176,7 @@ def queue_next_task(proposal_id, visit_info, task, logger):
         logger.warn(f'Task queue db: {DB_PATH} does not exist')
         return
 
-    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id) if proposal_id else ''
     logger = logger or pdslogger.EasyLogger()
     logger.info(f'Queue in the next task for: {formatted_proposal_id}'
                 f', task: {task}, visit: {visit_info}')
@@ -115,9 +188,14 @@ def queue_next_task(proposal_id, visit_info, task, logger):
     order = TASK_INFO[task][0]
     cmd = TASK_INFO[task][2].replace('{P}', formatted_proposal_id)
     cmd = cmd.replace('{V}', visit_arg)
+    execution_delay = TASK_INFO[task][4]
+    execution_time = None
+    if execution_delay:
+        execution_time = (datetime.datetime.now()
+                          + datetime.timedelta(seconds=execution_delay))
     # if the task has been queued, we don't spawn duplicated subprocess.
     spawn_subproc = add_a_task(formatted_proposal_id, visit,
-                               task, priority, order, 0, cmd)
+                               task, priority, order, 0, cmd, execution_time)
     if spawn_subproc is False:
         return
 
@@ -181,7 +259,16 @@ def wait_for_subprocess(logger, all=False):
                 remove_a_task(formatted_proposal_id, vi, task)
                 break
 
-        if len(SUBPROCESS_LIST) <= subprocess_count:
+        non_wrapper_subproc_cnt = 0
+        for sub in SUBPROCESS_LIST:
+            task = sub[5]
+            if TASK_INFO[task][3] is False and not TASK_INFO[task][4]:
+                non_wrapper_subproc_cnt += 1
+
+        # Count only non-wrapper tasks. This avoids deadlock-like idling when all slots are
+        # occupied by wrapper tasks while their spawned subtasks (non-wrapper tasks) cannot
+        # start running.
+        if non_wrapper_subproc_cnt <= subprocess_count:
             # A slot opened up! Or all processes finished. Depending on what we're
             # waiting for.
             break

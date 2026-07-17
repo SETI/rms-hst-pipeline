@@ -275,14 +275,15 @@ def get_collection_label_data(proposal_id, target_dir, logger):
 
     for root, _, files in os.walk(target_dir):
         for file in files:
-            format_term = get_format_term(file)
-            # For browse files
+            # For browse files: each jpg file is a member.
             if is_browse_prod(file):
-                if format_term not in files_li:
-                    files_li.append(format_term)
+                filename, _, _ = file.rpartition('.')
+                if filename not in files_li:
+                    files_li.append(filename)
                 continue
             if not file.startswith('collection_') and file.endswith('.xml'):
                 file_path = os.path.join(root, file)
+                format_term = get_format_term(file)
                 # Read the xml files
                 with open(file_path) as f:
                     xml_content = f.read()

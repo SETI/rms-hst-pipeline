@@ -1581,17 +1581,41 @@ MAST_BROWSE_SUFFIX_TRANSLATOR = {
     'WFPC2' : {'c0f': 'c0m', 'd0f': 'd0m'},                 # convert to unwaivered
 }
 
-# Our criterion for deciding if the pipeline should generate its own browse products is
-# that the instrument ID fall within the first set and the suffix fall within the second.
-# We don't have a mechanism in place for creating spectral plots, so we will always use
-# the MAST browse products for those.
 LOCAL_BROWSE_INSTRUMENTS = {
-    'ACS', 'FOC', 'NICMOS', 'WFC3', 'WFPC', 'WFPC2',
+    'ACS', 'COS', 'FGS', 'FOC', 'FOS', 'GHRS', 'HSP',
+    'NICMOS', 'STIS', 'WFC3', 'WFPC','WFPC2'
 }
 
 LOCAL_BROWSE_SUFFIXES = {
     'c0f', 'c0m', 'cal', 'd0f', 'd0m', 'drc', 'drz', 'flt', 'flc', 'ima', 'mos', 'raw',
 }
+
+# FITS suffixes passed to picmaker for locally generated browse previews.
+PICMAKER_BROWSE_SUFFIXES = {
+    instrument: LOCAL_BROWSE_SUFFIXES for instrument in LOCAL_BROWSE_INSTRUMENTS
+}
+
+# OPUS-size suffixes appended by picmaker after --strip of the FITS suffix.
+# One FITS input yields four JPGs: {ipppssoot}_thumb/small/med/full.jpg.
+PICMAKER_OPUS_SIZE_SUFFIXES = ('thumb', 'small', 'med', 'full')
+
+# Per-instrument FITS suffixes that still store separate chips/detectors and
+# should be passed to picmaker with --mosaic. Combined products (e.g. drz/drc)
+# are omitted; FOC has no apply_mosaic and is not listed.
+PICMAKER_MOSAIC_SUFFIXES_BY_INSTRUMENT = {
+    'ACS': {'raw', 'flt', 'flc'},
+    'WFC3': {'raw', 'flt', 'flc'},
+    'WFPC': {'c0f', 'd0f'},
+    # WFPC2 archives unwaivered multi-detector science as c0m/d0m; keep c0f/d0f
+    # in case waivered names appear.
+    'WFPC2': {'c0m', 'd0m', 'c0f', 'd0f'},
+}
+
+
+def use_mosaic(instrument_id, suffix):
+    """True if picmaker should be called with --mosaic for this instrument and suffix."""
+
+    return suffix in PICMAKER_MOSAIC_SUFFIXES_BY_INSTRUMENT.get(instrument_id, ())
 
 # Class definition...
 BrowseProductInfo = namedtuple('BrowseProductInfo', ['suffix',
@@ -1599,14 +1623,16 @@ BrowseProductInfo = namedtuple('BrowseProductInfo', ['suffix',
                                                      'collection_name',
                                                      'is_locally_generated'])
 # [0] suffix: the suffix on the browse product, following IPPPSSOOT. This is normally the
-#     the same as that for the FITS file, but might have "_thumb" appended.
+#     same as that for the FITS file, but might be an OPUS size
+#     tier ("thumb", "small", "med", "full") for browse_generated_* collections.
 # [1] mast_suffix: the suffix used in MAST.
-# [2] collection_name: name of the collection, e.g., "browse_acs_flt".
+# [2] collection_name: name of the collection, e.g., "browse_mast_acs_flt" or
+#     "browse_generated_acs_drz".
 # [3] is_locally_generated: True if this product is generated locally; False if retrieved
 #     from MAST.
 
 # Create a dictionary that maps (instrument_id, FITS suffix) to a list of
-# BrowseProductInfo objects for the MAST-generated products.
+# BrowseProductInfo objects for the MAST-retrieved products.
 BROWSE_SUFFIX_INFO = defaultdict(list)
 for instrument_id, mast_suffixes in ACCEPTED_BROWSE_SUFFIXES.items():
     translator = MAST_BROWSE_SUFFIX_TRANSLATOR.get(instrument_id, {}) # for "_large" and
@@ -1621,41 +1647,24 @@ for instrument_id, mast_suffixes in ACCEPTED_BROWSE_SUFFIXES.items():
 
         # Translate fits_suffix to collection name and LID suffix
         (short_suffix, _) = EXTENDED_SUFFIXES.get(fits_suffix, (fits_suffix, ''))
-        collection_name = 'browse_' + instrument_id.lower() + '_' + short_suffix
+        collection_name = 'browse_mast_' + instrument_id.lower() + '_' + short_suffix
 
         # Create the BrowseProductInfo object and append
         info = BrowseProductInfo(local_suffix, mast_suffix, collection_name, False)
         BROWSE_SUFFIX_INFO[instrument_id, fits_suffix].append(info)
 
-# Update for the locally-generated browse products, which supersede MAST products.
-# For these products, the FITS suffix and the local browse suffix are always the same
-for instrument_id in LOCAL_BROWSE_INSTRUMENTS:
-    accepted_suffixes = ACCEPTED_SUFFIXES[instrument_id]
-    for local_suffix in LOCAL_BROWSE_SUFFIXES:
-
-        # Skip suffixes that are not accepted for a given instrument, or unrecognized
-        try:
-            if local_suffix not in accepted_suffixes:
-                continue
-        except ValueError:
-            continue
-
-        # If there's a matching MAST product, replace it with the local version
-        updated = False
-        browse_info_list = BROWSE_SUFFIX_INFO[instrument_id, local_suffix]
-        for k, info in enumerate(browse_info_list):
-            if info.suffix == local_suffix:
-                new_info = BrowseProductInfo(local_suffix, '', info.collection_name,
-                                             True)
-                browse_info_list[k] = new_info
-                updated = True
-                break
-
-        # Otherwise, append this product info
-        if not updated:
-            collection_name = 'browse_' + instrument_id.lower() + '_' + local_suffix
-            new_info = BrowseProductInfo(local_suffix, '', collection_name, True)
-            browse_info_list.append(new_info)
+# Append picmaker OPUS-size browse products in browse_generated_* collections.
+# These coexist with MAST browse products; they do not replace them.
+for instrument_id, fits_suffixes in PICMAKER_BROWSE_SUFFIXES.items():
+    for fits_suffix in fits_suffixes:
+        (short_suffix, _) = EXTENDED_SUFFIXES.get(fits_suffix, (fits_suffix, ''))
+        collection_name = ('browse_generated_' + instrument_id.lower() + '_' +
+                           short_suffix)
+        browse_info_list = BROWSE_SUFFIX_INFO[instrument_id, fits_suffix]
+        for size_suffix in PICMAKER_OPUS_SIZE_SUFFIXES:
+            browse_info_list.append(
+                BrowseProductInfo(size_suffix, '', collection_name, True)
+            )
 
 ##########################################################################################
 # API supporting suffix identifications

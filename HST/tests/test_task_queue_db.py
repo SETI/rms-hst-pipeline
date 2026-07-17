@@ -1,4 +1,5 @@
 import os
+import datetime
 import tempfile
 import pytest
 from sqlalchemy import create_engine
@@ -102,6 +103,69 @@ def test_get_next_task_to_be_run():
     assert next_task.proposal_id == '456'
     assert next_task.priority == 10
 
+def test_get_next_task_to_be_run_skips_future_execution_time():
+    task_queue_db.init_task_queue_table()
+    future_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             future_time)
+    task_queue_db.add_a_task('456', 'B2', 'retrieve_visit', 4, 5, 0, 'echo retrieve')
+    next_task = task_queue_db.get_next_task_to_be_run()
+    assert next_task is not None
+    assert next_task.task == 'retrieve_visit'
+    assert next_task.proposal_id == '456'
+
+def test_get_next_task_to_be_run_returns_task_when_execution_time_passed():
+    task_queue_db.init_task_queue_table()
+    past_time = datetime.datetime.now() - datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             past_time)
+    task_queue_db.add_a_task('456', 'B2', 'retrieve_visit', 4, 5, 0, 'echo retrieve')
+    next_task = task_queue_db.get_next_task_to_be_run()
+    assert next_task is not None
+    assert next_task.task == 'finalize_bundle'
+    assert next_task.proposal_id == '123'
+
+def test_add_a_task_execution_time():
+    task_queue_db.init_task_queue_table()
+    execution_time = datetime.datetime(2026, 6, 12, 12, 0, 0)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             execution_time)
+    Session = sessionmaker(task_queue_db.engine)
+    session = Session()
+    entry = session.query(task_queue_db.TaskQueue).filter_by(
+        proposal_id='123', visit='', task='finalize_bundle').first()
+    assert entry is not None
+    assert entry.execution_time == execution_time
+    session.close()
+
+def test_add_a_task_execution_time_defaults_to_none():
+    task_queue_db.init_task_queue_table()
+    task_queue_db.add_a_task('123', 'A1', 'T1', 5, 1, 0, 'echo test')
+    Session = sessionmaker(task_queue_db.engine)
+    session = Session()
+    entry = session.query(task_queue_db.TaskQueue).filter_by(
+        proposal_id='123', visit='A1', task='T1').first()
+    assert entry is not None
+    assert entry.execution_time is None
+    session.close()
+
+def test_add_a_task_replaces_existing_finalize_bundle():
+    task_queue_db.init_task_queue_table()
+    old_time = datetime.datetime(2026, 1, 1, 12, 0, 0)
+    new_time = datetime.datetime(2026, 6, 12, 12, 0, 0)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo old', old_time)
+    result = task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo new',
+                                      new_time)
+    assert result is None
+    Session = sessionmaker(task_queue_db.engine)
+    session = Session()
+    entries = session.query(task_queue_db.TaskQueue).filter_by(
+        proposal_id='123', task='finalize_bundle').all()
+    assert len(entries) == 1
+    assert entries[0].cmd == 'echo new'
+    assert entries[0].execution_time == new_time
+    session.close()
+
 def test_get_total_number_of_tasks():
     task_queue_db.init_task_queue_table()
     assert task_queue_db.get_total_number_of_tasks() == 0
@@ -119,22 +183,61 @@ def test_is_a_task_done():
 
 def test_add_duplicate_task_order():
     task_queue_db.init_task_queue_table()
-    # Add a task
     task_queue_db.add_a_task('123', 'A1', 'T1', 5, 1, 0, 'echo test')
-    # Try to add the same task with a lower order (should not update)
-    result = task_queue_db.add_a_task('123', 'A1', 'T1', 5, 0, 0, 'echo test')
-    assert result is False
-    # Try to add the same task with a higher order (should update)
-    result2 = task_queue_db.add_a_task('123', 'A1', 'T1', 6, 2, 1, 'echo test2')
-    assert result2 is None
+    # Duplicate task is not added
+    assert task_queue_db.add_a_task('123', 'A1', 'T1', 5, 0, 0, 'echo test') is False
+    # Earlier-stage task is not added when a later order exists for the same visit
+    assert task_queue_db.add_a_task('123', 'A1', 'T2', 5, 0, 0, 'echo test2') is False
+    # Later-stage task may be added when no higher order exists for the visit
+    assert task_queue_db.add_a_task('123', 'A1', 'T2', 5, 2, 0, 'echo test2') is None
     Session = sessionmaker(task_queue_db.engine)
     session = Session()
-    entry = session.query(task_queue_db.TaskQueue).filter_by(proposal_id='123', visit='A1', task='T1').first()
-    assert entry.priority == 6
-    assert entry.order == 2
-    assert entry.status == 1
-    assert entry.cmd == 'echo test2'
+    entries = session.query(task_queue_db.TaskQueue).filter_by(
+        proposal_id='123', visit='A1').all()
+    assert len(entries) == 2
+    tasks = {e.task: e for e in entries}
+    assert tasks['T1'].order == 1
+    assert tasks['T2'].order == 2
     session.close()
+
+def test_add_a_task_allows_earlier_task_when_only_later_is_delayed_finalize_bundle():
+    task_queue_db.init_task_queue_table()
+    execution_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             execution_time)
+    result = task_queue_db.add_a_task('123', '', 'get_prog_info', 5, 3, 0, 'echo prog')
+    assert result is None
+    Session = sessionmaker(task_queue_db.engine)
+    session = Session()
+    entries = session.query(task_queue_db.TaskQueue).filter_by(proposal_id='123').all()
+    assert len(entries) == 2
+    tasks = {e.task: e for e in entries}
+    assert 'finalize_bundle' in tasks
+    assert 'get_prog_info' in tasks
+    session.close()
+
+def test_add_a_task_blocks_earlier_task_when_finalize_bundle_has_no_delay():
+    task_queue_db.init_task_queue_table()
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize')
+    result = task_queue_db.add_a_task('123', '', 'get_prog_info', 5, 3, 0, 'echo prog')
+    assert result is False
+
+def test_add_a_task_blocks_earlier_task_when_finalize_bundle_is_running():
+    task_queue_db.init_task_queue_table()
+    execution_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 1, 'echo finalize',
+                             execution_time)
+    result = task_queue_db.add_a_task('123', '', 'get_prog_info', 5, 3, 0, 'echo prog')
+    assert result is False
+
+def test_add_a_task_blocks_earlier_task_when_other_later_task_exists():
+    task_queue_db.init_task_queue_table()
+    execution_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    task_queue_db.add_a_task('123', '', 'finalize_bundle', 6, 8, 0, 'echo finalize',
+                             execution_time)
+    task_queue_db.add_a_task('123', '', 'update_prog', 2, 2, 0, 'echo update')
+    result = task_queue_db.add_a_task('123', '', 'query_prod', 1, 1, 0, 'echo query')
+    assert result is False
 
 def test_repr():
     t = task_queue_db.TaskQueue(proposal_id='p', visit='v', task='t', priority=1, order=1, status=0, cmd='c')
