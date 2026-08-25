@@ -1,0 +1,4 @@
+--strip _x2d --suffix _thumb --frame 100 100
+--strip _x2d --suffix _small --frame 256 256
+--strip _x2d --suffix _med   --frame 512 512
+--strip _x2d --suffix _full

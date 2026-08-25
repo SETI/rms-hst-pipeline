@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch"
+    schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<!-- RMS HST Browse-Product-Label pipeline version $label_version$ ($label_date$) -->
+<!-- RMS PdsTemplate module version $VERSION_ID()$ -->
+
+<Product_Browse
+  xmlns="http://pds.nasa.gov/pds4/pds/v1"
+  xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1
+                      https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.xsd">
+
+  <Identification_Area>
+    <logical_identifier>$product_lid$</logical_identifier>
+    <version_id>$version_id[0]$.$version_id[1]$</version_id>
+    <title>
+      $WRAP(6, 90, title)$
+    </title>
+    <information_model_version>1.15.0.0</information_model_version>
+    <product_class>Product_Browse</product_class>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>$modification_date$</modification_date>
+        <version_id>$version_id[0]$.$version_id[1]$</version_id>
+        <description>
+          This is the initial PDS4 version of this browse product.
+        </description>
+      </Modification_Detail>
+    </Modification_History>
+  </Identification_Area>
+
+  <Reference_List>
+    <Internal_Reference>
+      <lidvid_reference>$data_lidvid$</lidvid_reference>
+      <reference_type>browse_to_data</reference_type>
+    </Internal_Reference>
+  </Reference_List>
+$FOR(f=files)
+
+  <File_Area_Browse>
+    <File>
+      <file_name>$f["file_name"]$</file_name>
+      <creation_date_time>$f["creation_date_time"]$</creation_date_time>
+      <md5_checksum>$f["md5_checksum"]$</md5_checksum>
+    </File>
+    <Encoded_Image>
+      <offset unit="byte">0</offset>
+      <object_length unit="byte">$f["object_length"]$</object_length>
+      <encoding_standard_id>$f["encoding_standard_id"]$</encoding_standard_id>
+    </Encoded_Image>
+  </File_Area_Browse>
+$END_FOR
+</Product_Browse>

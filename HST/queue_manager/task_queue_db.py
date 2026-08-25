@@ -4,16 +4,19 @@
 # This file is related to SQLite task queue database created by sqlalchemy. All the
 # database related operations are included here.
 ##########################################################################################
+import datetime
 import os
 
 from queue_manager.config import (DB_PATH,
-                                  DB_URI)
+                                  DB_URI,
+                                  LOWER_LVL_TASKS)
 from sqlalchemy import (create_engine,
-                        func,
                         Column,
+                        DateTime,
                         Float,
                         Integer,
-                        String)
+                        String,
+                        or_)
 from sqlalchemy.orm import (sessionmaker,
                             declarative_base)
 
@@ -25,8 +28,9 @@ class TaskQueue(Base):
     """
     A database representation of the task queue. Each row represents the task queue of
     a proposal id & visit, and it will have columns of the proposal id, visit, task num
-    (current task), task priority, task executing order, status (current task status), and
-    task command. Each row will have an unique combination of proposal id & visit columns.
+    (current task), task priority, task executing order, status (current task status),
+    task command, and execution time. Each row will have an unique combination of proposal
+    id & visit columns.
     These will make sure tasks for these cases can be run in parallel:
 
     - tasks of different proposal ids
@@ -43,6 +47,7 @@ class TaskQueue(Base):
     order =  Column(Integer, nullable=False)
     status = Column(Integer, nullable=False)
     cmd = Column(String, nullable=False)
+    execution_time = Column(DateTime, nullable=True)
 
     def __repr__(self) -> str:
         return (
@@ -53,6 +58,7 @@ class TaskQueue(Base):
             f', order={self.order!r})'
             f', status={self.status!r})'
             f', cmd={self.cmd!r})'
+            f', execution_time={self.execution_time!r})'
         )
 
 def drop_task_queue_table():
@@ -83,53 +89,90 @@ def db_exists():
     """
     return os.path.exists(DB_PATH)
 
-def add_a_task(proposal_id, visit, task, priority, order, status, cmd):
+def _can_ignore_later_finalize_bundle(later_entries):
     """
-    Add an entry of the given proposal id & visit with its task num and task status to
-    the task queue table. If the proposal id exists in the table, we update the entry.
+    Return True if the only higher-order queued task is a waiting finalize_bundle
+    with a scheduled execution_time.
+    """
+    return (len(later_entries) == 1
+            and later_entries[0].task == 'finalize_bundle'
+            and later_entries[0].execution_time is not None
+            and later_entries[0].status == 0)
+
+def add_a_task(proposal_id, visit, task, priority, order, status, cmd, execution_time=None):
+    """
+    Add an entry for the given proposal id, visit, and task to the task queue table.
+
+    Returns False if the task is already queued, or if another task for the same
+    proposal id and visit has a higher order (a later pipeline stage is already queued),
+    unless the only such task is a waiting finalize_bundle with a scheduled
+    execution_time. Otherwise adds the entry and returns None.
+
+    If task is finalize_bundle and one already exists for the proposal id, the existing
+    row is updated in place (including execution_time) instead of returning False.
 
     Input:
-        proposal_id    a proposal id of the task queue.
-        visit          a two character visit or ''.
-        task           a number represents the current task.
-        priority       a number reporeents task priority.
-        order          a number reporeents task executing order.
-        status         the status of the current task, 0 is wating and 1 is running.
-        cmd            the command to run the task.
+        proposal_id      a proposal id of the task queue.
+        visit            a two character visit or ''.
+        task             a string represents the current task.
+        priority         a number reporeents task priority.
+        order            a number reporeents task executing order.
+        status           the status of the current task, 0 is wating and 1 is running.
+        cmd              the command to run the task.
+        execution_time   the date/time when the task becomes eligible to run, or None.
     """
     if not db_exists():
         return
 
     Session = sessionmaker(engine)
     session = Session()
-    # Add a task for a given proposal id & visit if the proposal id & visit combo doesn't
-    # exist in the table
+    if task == 'finalize_bundle':
+        entry = session.query(TaskQueue).filter(
+            TaskQueue.proposal_id == proposal_id,
+            TaskQueue.task == 'finalize_bundle',
+        ).first()
+        if entry is not None:
+            entry.visit = visit
+            entry.priority = priority
+            entry.order = order
+            entry.status = status
+            entry.cmd = cmd
+            entry.execution_time = execution_time
+            session.commit()
+            session.close()
+            return None
+
+    # Check if the task is queued
     entry = session.query(TaskQueue).filter(
-                                         TaskQueue.proposal_id==proposal_id,
-                                         TaskQueue.visit==visit,
-                                         TaskQueue.task==task,
-                                     ).first()
-    if entry is None:
-        new_entry = TaskQueue(proposal_id=proposal_id,
-                              visit=visit,
-                              task=task,
-                              priority=priority,
-                              order=order,
-                              status=status,
-                              cmd=cmd)
-        session.add(new_entry)
-    else:
-        # If the current or a later task has been queued, we return False. This is a
-        # flag to avoid spawning duplicated subprocess
-        if entry.order >= order:
-            return False
-        entry.task = task
-        entry.priority = priority
-        entry.order = order
-        entry.status = status
-        entry.cmd = cmd
+        TaskQueue.proposal_id == proposal_id,
+        TaskQueue.visit == visit,
+        TaskQueue.task == task,
+    ).first()
+    if entry is not None:
+        session.close()
+        return False
+
+    # Check if a task with higher order is queued
+    later_entries = session.query(TaskQueue).filter(
+        TaskQueue.proposal_id == proposal_id,
+        TaskQueue.visit == visit,
+        TaskQueue.order > order,
+    ).all()
+    if later_entries and not _can_ignore_later_finalize_bundle(later_entries):
+        session.close()
+        return False
+
+    session.add(TaskQueue(proposal_id=proposal_id,
+                          visit=visit,
+                          task=task,
+                          priority=priority,
+                          order=order,
+                          status=status,
+                          cmd=cmd,
+                          execution_time=execution_time))
     session.commit()
     session.close()
+    return None
 
 def update_a_task_status(proposal_id, visit, task, status):
     """
@@ -229,29 +272,50 @@ def erase_all_task_queue():
     session.commit()
     session.close()
 
+def queue_cleanup_during_restart():
+    """
+    Reset the task queue after a restart: drop rows for tasks that must be re-queued from
+    their program/visit entry points, and clear any 'running' (status 1) flags so every
+    remaining row is waiting (status 0). Does nothing if the database file is missing or
+    the queue table has no rows.
+    """
+    if not db_exists():
+        return
+
+    Session = sessionmaker(engine)
+    with Session.begin() as session:
+        if session.query(TaskQueue).count() == 0:
+            return
+
+        session.query(TaskQueue).filter(TaskQueue.task.in_(LOWER_LVL_TASKS)).delete(
+            synchronize_session=False
+        )
+        session.query(TaskQueue).filter(TaskQueue.status == 1).update(
+            {TaskQueue.status: 0},
+            synchronize_session=False,
+        )
+
 def get_next_task_to_be_run():
     """
     Get the next task to be run from database. Return the table row entry.
+
+    Waiting tasks are considered in descending priority and order. Tasks with a future
+    execution_time are excluded until that time has passed.
     """
     if not db_exists():
         return
 
     Session = sessionmaker(engine)
     session = Session()
-    # Get the tasks with the highest priority & waiting status
-    subquery = (session.query(func.max(TaskQueue.priority)).filter(TaskQueue.status==0)
-                                                           .scalar_subquery())
-    # Get the task with the highest priority & task num, this will prioritize finishing
-    # a pipeline process over running tasks at early pipeline stage or starting a new
-    # pipeline process.
-    query = (session.query(TaskQueue).filter(
-                                          TaskQueue.priority==subquery,
-                                          TaskQueue.status==0
-                                      )
-                                     .order_by(TaskQueue.task.desc())
-                                     .first())
+    now = datetime.datetime.now()
+    task = (session.query(TaskQueue)
+            .filter(TaskQueue.status == 0)
+            .filter(or_(TaskQueue.execution_time.is_(None),
+                        TaskQueue.execution_time <= now))
+            .order_by(TaskQueue.priority.desc(), TaskQueue.order.desc())
+            .first())
     session.close()
-    return query
+    return task
 
 def get_total_number_of_tasks():
     """

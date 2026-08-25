@@ -24,9 +24,7 @@ $ONCE(prop_id=hst_dictionary["hst_proposal_id"])
 $ONCE(formatted_prop_id=str(prop_id).zfill(5))
 $ONCE(inst_id=hst_dictionary["instrument_id"])
   <Identification_Area>
-    <logical_identifier>
-      $product_lid$
-    </logical_identifier>
+    <logical_identifier>$product_lid$</logical_identifier>
     <version_id>$version_id[0]$.$version_id[1]$</version_id>
     <title>
       $WRAP(6, 90, basename + ": " + product_title)$
@@ -135,9 +133,7 @@ $END_FOR
       <name>HST observing program $prop_id$</name>
       <type>Individual Investigation</type>
       <Internal_Reference>
-        <lid_reference>
-          urn:nasa:pds:context:investigation:individual.hst_$formatted_prop_id$
-        </lid_reference>
+        <lid_reference>urn:nasa:pds:context:investigation:individual.hst_$formatted_prop_id$</lid_reference>
         <reference_type>data_to_investigation</reference_type>
       </Internal_Reference>
     </Investigation_Area>
@@ -147,9 +143,7 @@ $END_FOR
         <name>Hubble Space Telescope</name>
         <type>Host</type>
         <Internal_Reference>
-          <lid_reference>
-            urn:nasa:pds:context:instrument_host:spacecraft.hst
-          </lid_reference>
+          <lid_reference>urn:nasa:pds:context:instrument_host:spacecraft.hst</lid_reference>
           <reference_type>is_instrument_host</reference_type>
         </Internal_Reference>
       </Observing_System_Component>
@@ -157,9 +151,7 @@ $END_FOR
         <name>$instrument_name$</name>
         <type>Instrument</type>
         <Internal_Reference>
-          <lid_reference>
-            urn:nasa:pds:context:instrument:hst.$inst_id.lower()$
-          </lid_reference>
+          <lid_reference>urn:nasa:pds:context:instrument:hst.$inst_id.lower()$</lid_reference>
           <reference_type>is_instrument</reference_type>
         </Internal_Reference>
       </Observing_System_Component>
@@ -180,9 +172,7 @@ $FOR(target=target_identifications)
       </description>
   $END_IF
       <Internal_Reference>
-        <lid_reference>
-          $target[4]$
-        </lid_reference>
+        <lid_reference>$target[4]$</lid_reference>
         <reference_type>data_to_target</reference_type>
       </Internal_Reference>
     </Target_Identification>
@@ -309,12 +299,16 @@ $IF(processing_level != "Ancillary")
   $FOR(info=browse_info)
 
     <Internal_Reference>
-      <lidvid_reference>
-        urn:nasa:pds:hst_$prop_id$:$info.collection_name$:$ipppssoot$_$info.suffix$::$version_id[0]$.0
-      </lidvid_reference>
-      <reference_type>data_to_$"thumb" if "thumb" in info.suffix else "browse"$</reference_type>
+      <lidvid_reference>urn:nasa:pds:hst_$formatted_prop_id$:$info.collection_name$:$ipppssoot$::$version_id[0]$.$version_id[1]$</lidvid_reference>
+      <reference_type>data_to_$info.suffix if not info.mast_suffix else "browse"$</reference_type>
     $IF("thumb" in info.suffix)
       <comment>Thumbnail browse product</comment>
+    $ELSE_IF(info.suffix == "small" or info.suffix.endswith("_small"))
+      <comment>Small browse product</comment>
+    $ELSE_IF(info.suffix == "med" or info.suffix.endswith("_med"))
+      <comment>Medium browse product</comment>
+    $ELSE_IF(info.suffix == "full" or info.suffix.endswith("_full"))
+      <comment>Full-resolution browse product</comment>
     $ELSE_IF(hst_dictionary["observation_type"] == "IMAGING")
       <comment>Full-resolution browse product</comment>
     $ELSE
@@ -327,9 +321,7 @@ $FOR(ref=reference_basenames)
 
   $ONCE(ref_dict=by_basename[ref])
     <Internal_Reference>
-      <lidvid_reference>
-        $ref_dict["product_lidvid"]$
-      </lidvid_reference>
+      <lidvid_reference>$ref_dict["product_lidvid"]$</lidvid_reference>
       <reference_type>data_to_$ref_dict["processing_level"].lower()$_product</reference_type>
       <comment>
         $WRAP(8, 90, ref_dict["basename"] + ": " + ref_dict["product_title"])$

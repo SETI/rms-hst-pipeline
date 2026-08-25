@@ -27,63 +27,80 @@ import sys
 from get_program_info import get_program_info
 from hst_helper import HST_DIR
 from hst_helper.fs_utils import get_formatted_proposal_id
-from queue_manager.task_queue_db import (remove_a_task,
-                                         remove_all_tasks_for_a_prog_id)
+from queue_manager.task_queue_db import remove_a_task
 
-# Set up parser
-parser = argparse.ArgumentParser(
-    description="""pipeline_get_program_info: Retrieve the proposal files via a web query
-                for a given proposal id.""")
 
-parser.add_argument('--proposal-id', type=str, default='', required=True,
-    help='The proposal id for the MAST query.')
+def parse_args(argv=None):
+    """Parse and return command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="""pipeline_get_program_info: Retrieve the proposal files via a web query
+                    for a given proposal id.""")
 
-parser.add_argument('--log', '-l', type=str, default='',
-    help="""Path and name for the log file. The name always has the current date and time
-         appended. If not specified, the file will be written to the current logs
-         directory and named "get-program-info-<date>.log".""")
+    parser.add_argument('--proposal-id', type=str, default='', required=True,
+        help='The proposal id for the MAST query.')
 
-parser.add_argument('--quiet', '-q', action='store_true',
-    help='Do not also log to the terminal.')
+    parser.add_argument('--log', '-l', type=str, default='',
+        help="""Path and name for the log file. The name always has the current date and time
+             appended. If not specified, the file will be written to the current logs
+             directory and named "get-program-info-<date>.log".""")
 
-# Make sure some params are passed in
-if len(sys.argv) == 1:
-    parser.print_help()
-    parser.exit()
+    parser.add_argument('--quiet', '-q', action='store_true',
+        help='Do not also log to the terminal.')
 
-args = parser.parse_args()
-proposal_id = args.proposal_id
-LOG_DIR = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
+    if argv is None and len(sys.argv) == 1:
+        parser.print_help()
+        parser.exit()
 
-logger = pdslogger.PdsLogger('pds.hst.get-program-info-' + proposal_id)
-if not args.quiet:
-    logger.add_handler(pdslogger.stdout_handler)
+    return parser.parse_args(argv)
 
-# Define the log file
-now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
-if args.log:
-    if os.path.isdir(args.log):
-        logpath = os.path.join(args.log, 'get-program-info-' + now + '.log')
+
+def setup_logger(args, argv=None):
+    """Configure and open the pipeline logger."""
+    proposal_id = args.proposal_id
+    log_dir = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
+
+    logger = pdslogger.PdsLogger('pds.hst.get-program-info-' + proposal_id)
+    if not args.quiet:
+        logger.add_handler(pdslogger.stdout_handler)
+
+    now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+    if args.log:
+        if os.path.isdir(args.log):
+            logpath = os.path.join(args.log, 'get-program-info-' + now + '.log')
+        else:
+            parts = os.path.splitext(args.log)
+            logpath = parts[0] + '-' + now + parts[1]
     else:
-        parts = os.path.splitext(args.log)
-        logpath = parts[0] + '-' + now + parts[1]
-else:
-    os.makedirs(LOG_DIR, exist_ok=True)
-    logpath = LOG_DIR + '/get-program-info-' + now + '.log'
+        os.makedirs(log_dir, exist_ok=True)
+        logpath = log_dir + '/get-program-info-' + now + '.log'
 
-logger.add_handler(pdslogger.file_handler(logpath))
-LIMITS = {'info': -1, 'debug': -1, 'normal': -1}
-logger.open('get-program-info ' + ' '.join(sys.argv[1:]), limits=LIMITS)
-formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    logger.add_handler(pdslogger.file_handler(logpath))
+    limits = {'info': -1, 'debug': -1, 'normal': -1}
+    cmd_args = sys.argv[1:] if argv is None else argv
+    logger.open('get-program-info ' + ' '.join(cmd_args), limits=limits)
+    return logger
 
-try:
-    get_program_info(proposal_id, None, logger)
-except:
-    # Before raising the error, remove the task queue of the proposal id from database.
-    remove_all_tasks_for_a_prog_id(formatted_proposal_id)
-    raise
 
-remove_a_task(formatted_proposal_id, '', 'get_prog_info')
-logger.close()
+def main(argv=None):
+    """Perform the get_program_info pipeline task."""
+    args = parse_args(argv)
+    logger = setup_logger(args, argv=argv)
+    try:
+        proposal_id = args.proposal_id
+        formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+
+        try:
+            get_program_info(proposal_id, None, logger)
+        except Exception as e:
+            logger.exception(e)
+            raise
+
+        remove_a_task(formatted_proposal_id, '', 'get_prog_info')
+    finally:
+        logger.close()
+
+
+if __name__ == '__main__':
+    main()
 
 ##########################################################################################
