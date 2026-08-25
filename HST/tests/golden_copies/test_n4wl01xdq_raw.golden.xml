@@ -18,7 +18,7 @@
                       https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.xsd">
 
   <Identification_Area>
-    <logical_identifier>urn:nasa:pds:hst_7885:data_nicmos_raw:n4wl01xdq</logical_identifier>
+    <logical_identifier>urn:nasa:pds:hst_07885:data_nicmos_raw:n4wl01xdq</logical_identifier>
     <version_id>1.0</version_id>
     <title>
       n4wl01xdq_raw.fits: Raw NICMOS data from HST Program 7885.
@@ -184,13 +184,13 @@
     </Internal_Reference>
 
     <Internal_Reference>
-      <lidvid_reference>urn:nasa:pds:hst_7885:browse_nicmos_raw:n4wl01xdq::1.0</lidvid_reference>
+      <lidvid_reference>urn:nasa:pds:hst_07885:browse_nicmos_raw:n4wl01xdq::1.0</lidvid_reference>
       <reference_type>data_to_browse</reference_type>
       <comment>Full-resolution browse product</comment>
     </Internal_Reference>
 
     <Internal_Reference>
-      <lidvid_reference>urn:nasa:pds:hst_7885:miscellaneous_nicmos_spt:n4wl01xdq::1.0</lidvid_reference>
+      <lidvid_reference>urn:nasa:pds:hst_07885:miscellaneous_nicmos_spt:n4wl01xdq::1.0</lidvid_reference>
       <reference_type>data_to_ancillary_product</reference_type>
       <comment>
         n4wl01xdq_spt.fits: Support, planning, and telemetry data for this NICMOS/NIC1
@@ -199,7 +199,7 @@
     </Internal_Reference>
 
     <Internal_Reference>
-      <lidvid_reference>urn:nasa:pds:hst_7885:miscellaneous_nicmos_trl:n4wl01xdq::1.0</lidvid_reference>
+      <lidvid_reference>urn:nasa:pds:hst_07885:miscellaneous_nicmos_trl:n4wl01xdq::1.0</lidvid_reference>
       <reference_type>data_to_ancillary_product</reference_type>
       <comment>
         n4wl01xdq_trl.fits: Trailer file with processing log for this NICMOS/NIC1

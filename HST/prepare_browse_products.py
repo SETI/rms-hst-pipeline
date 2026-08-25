@@ -15,6 +15,7 @@ import shutil
 
 from generate_browse_previews import (generate_browse_previews,
                                       picmaker_browse_collection_name)
+from label_browse_products import label_browse_collection_directory
 from product_labels.suffix_info import (ACCEPTED_BROWSE_SUFFIXES,
                                         ACCEPTED_SUFFIXES,
                                         PICMAKER_BROWSE_SUFFIXES,
@@ -93,3 +94,13 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                     generate_browse_previews(
                         prod_dir + file, out_dir, inst_id, suffix, logger,
                     )
+
+    # Write/update Product_Browse labels for any browse collections touched this visit.
+    staging_root = get_program_dir_path(proposal_id, None, 'staging')
+    for name in os.listdir(staging_root):
+        if not name.startswith('browse_'):
+            continue
+        browse_dir = os.path.join(staging_root, name)
+        visit_dir = os.path.join(browse_dir, f'visit_{visit}')
+        if os.path.isdir(visit_dir):
+            label_browse_collection_directory(browse_dir, proposal_id, logger)

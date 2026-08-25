@@ -21,6 +21,7 @@ from hst_helper.general_utils import (create_collection_label,
                                       get_citation_info,
                                       get_collection_label_data,
                                       get_mod_history_from_label)
+from label_browse_products import label_browse_products_for_proposal
 from product_labels.suffix_info import (INSTRUMENT_NAMES,
                                         get_collection_title_fmt)
 
@@ -47,6 +48,8 @@ def finalize_hst_data_directory(proposal_id, logger):
 
     # Collect data to construct data dictionary used for the labels
     deliverable_path = get_deliverable_path(proposal_id)
+    # Ensure browse product labels exist before collection inventory/labels are built.
+    label_browse_products_for_proposal(proposal_id, deliverable_path, logger)
     for dir_name in os.listdir(deliverable_path):
         for col_prefix in COL_NAME_PREFIX:
             if dir_name.startswith(col_prefix): # work on data_directory
