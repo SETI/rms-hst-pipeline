@@ -49,7 +49,7 @@ def update_hst_program(proposal_id, visit_li, logger=None):
     for vi in visit_li:
         while not is_a_task_done(proposal_id, vi, 'update_visit'):
             time.sleep(1)
-    logger.info(f'All visits for {proposal_id} have completed update_hst_visit')
+    logger.info(f'All visits ({visit_li}) for {proposal_id} have completed update_hst_visit')
 
     logger.info(f'Queue finalize_hst_bundle for {proposal_id}')
     queue_next_task(proposal_id, '', 'finalize_bundle', logger)
@@ -57,7 +57,7 @@ def update_hst_program(proposal_id, visit_li, logger=None):
     while not is_a_task_done(proposal_id, '', 'finalize_bundle'):
         time.sleep(1)
     # Remove all task queue & subprocess for the given proposal id from db
-    logger.info(f'Pipeline is done. Remove all tasks from db for {proposal_id}')
+    logger.info(f'Pipeline for {proposal_id} is done. Remove all tasks from db for {proposal_id}')
     remove_all_tasks_for_a_prog_id(proposal_id)
 
     logger.info(f'HST pipeline for {proposal_id} is done')

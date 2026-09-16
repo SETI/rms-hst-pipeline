@@ -82,7 +82,11 @@ def get_format_term(filename):
 
     Returns:    the IPPPSSOOT.
     """
-    format_term, _, _ = filename.partition('_')
+    # Strip extension first so labels like z2no0801t.xml still yield z2no0801t.
+    stem, _, _ = filename.rpartition('.')
+    if not stem:
+        stem = filename
+    format_term, _, _ = stem.partition('_')
     return format_term
 
 def get_instrument_id_from_fname(filename):

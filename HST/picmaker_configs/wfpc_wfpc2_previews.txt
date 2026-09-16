@@ -1,0 +1,4 @@
+--strip _c0f --suffix _thumb --frame 100 100 --tint --percentiles 0.02 99.95 --gamma 1.2 --trim 100
+--strip _c0f --suffix _small --frame 256 256 --tint --percentiles 0.02 99.95 --gamma 1.2 --trim 100
+--strip _c0f --suffix _med   --frame 512 512 --tint --percentiles 0.02 99.95 --gamma 1.2 --trim 100
+--strip _c0f --suffix _full --percentiles 0.02 99.95 --gamma 1.2 --trim 100

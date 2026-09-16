@@ -100,3 +100,23 @@ def test_clean_up_staging_dir_only_other(mock_rmtree, mock_listdir, mock_isdir, 
     organize_files.clean_up_staging_dir(proposal_id, fake_logger)
     # No rmtree calls for dirs not matching prefix or mastDownload
     assert mock_rmtree.call_count == 0
+
+@pytest.mark.usefixtures('patch_helpers')
+@mock.patch('HST.organize_files.HST_DIR', {'staging': '/fake/staging'})
+@mock.patch('os.path.isdir')
+@mock.patch('os.listdir')
+@mock.patch('shutil.rmtree')
+def test_clean_up_staging_dir_all_programs(mock_rmtree, mock_listdir, mock_isdir, fake_logger):
+    mock_isdir.return_value = True
+    mock_listdir.side_effect = [
+        ['hst_12345', 'hst_67890', 'other'],
+        ['mastDownload1', 'data_foo'],
+        ['browse_baz'],
+    ]
+    organize_files.clean_up_staging_dir(None, fake_logger)
+    assert mock_rmtree.call_args_list == [
+        mock.call('/fake/staging/hst_12345/mastDownload1'),
+        mock.call('/fake/staging/hst_12345/data_foo'),
+        mock.call('/fake/staging/hst_67890/browse_baz'),
+    ]
+    assert any('all hst_* programs' in m for m in fake_logger.messages)

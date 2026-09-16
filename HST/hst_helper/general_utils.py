@@ -275,17 +275,26 @@ def get_collection_label_data(proposal_id, target_dir, logger):
 
     for root, _, files in os.walk(target_dir):
         for file in files:
-            format_term = get_format_term(file)
-            # For browse files
+            # Browse inventory keys by IPPPSSOOT (format_term), same as CSV members.
+            # Multiple size variants (thumb/small/med/full) share one inventory row.
             if is_browse_prod(file):
+                format_term = get_format_term(file)
                 if format_term not in files_li:
                     files_li.append(format_term)
                 continue
             if not file.startswith('collection_') and file.endswith('.xml'):
                 file_path = os.path.join(root, file)
+                format_term = get_format_term(file)
                 # Read the xml files
                 with open(file_path) as f:
                     xml_content = f.read()
+                    # Product_Browse labels have no Time_Coordinates / HST mission area;
+                    # count them for inventory only.
+                    if ('<Product_Browse' in xml_content or
+                            '>Product_Browse</product_class>' in xml_content):
+                        if format_term not in files_li:
+                            files_li.append(format_term)
+                        continue
                     # target identifications
                     if 'target' not in res:
                         target_ids = get_target_identifications(xml_content)

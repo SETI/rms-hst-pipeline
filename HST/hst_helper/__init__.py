@@ -70,6 +70,9 @@ COL_NAME_PREFIX = ['data_', 'miscellaneous_', 'browse_']
 # MAST download directory name
 MAST_DOWNLOAD_DIRNAME = 'mastDownload'
 
+# Prefix for files while downloading; stripped after all downloads succeed.
+DOWNLOAD_TMP_PREFIX = 'tmp_'
+
 # Browse product files extension
 BROWSE_PROD_EXT = ['jpg', 'jpeg', 'png']
 

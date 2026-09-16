@@ -671,7 +671,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # In the absence of a reference file, we're stuck
         if not reference_suffixes:
-            logger.critical('No reference file for ' + ipppssoot)
+            logger.error('No reference file for ' + ipppssoot)
             raise ValueError('No reference file for ' + ipppssoot)
 
         # Log the reference found
@@ -836,16 +836,17 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         basename_dict['processing_level'] = processing_level
         basename_dict['collection_title'] = collection_title
 
-        collection_lid = ('urn:nasa:pds:hst_' + str(hst_dictionary['hst_proposal_id']) +
+        collection_lid = ('urn:nasa:pds:hst_' +
+                          str(hst_dictionary['hst_proposal_id']).zfill(5) +
                           ':' + basename_dict['collection_name'])
-        product_lid = (collection_lid + ':' + basename_dict['ipppssoot'] + '_' +
-                       basename_dict['suffix'])
+        # Product ID is IPPPSSOOT only (no suffix), matching collection inventory.
+        product_lid = collection_lid + ':' + basename_dict['ipppssoot']
         basename_dict['collection_lid'] = collection_lid
         basename_dict['product_lid'] = product_lid
 
         version_id = basename_dict['version_id']
         basename_dict['product_lidvid'] = (product_lid + '::' +
-                                           str(version_id[0]) + ':' + str(version_id[1]))
+                                           str(version_id[0]) + '.' + str(version_id[1]))
 
         browse_info = suffix_info.BROWSE_SUFFIX_INFO[instrument_id, suffix]
         basename_dict['browse_info'] = browse_info
