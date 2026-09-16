@@ -16,7 +16,7 @@ charset-normalizer==3.3.2
 click==8.1.7
 coverage==7.3.2
     # via -r requirements.in
-cryptography==48.0.1
+cryptography==50.0.0
     # via secretstorage
 fs==2.4.16
 google-api-core==2.28.1
