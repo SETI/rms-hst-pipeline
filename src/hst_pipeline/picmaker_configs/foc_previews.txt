@@ -1,2 +1,0 @@
---strip _c0f --suffix _thumb --frame 100 100 --percentiles 0.02 99.98
---strip _c0f --percentiles 0.02 99.98

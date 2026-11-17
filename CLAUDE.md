@@ -83,7 +83,7 @@ digits, visit 2 chars. IDs are accepted padded or unpadded (`7885` and `07885`) 
 normalized internally, so don't compare them as strings when building paths. Superseded
 files move to `backups/` with a `-<ymdhms>` suffix.
 
-`templates/`, `picmaker_configs/`, and `xml/` are package data resolved relative to
+`templates/` and `xml/` are package data resolved relative to
 `__file__`, and are declared in `[tool.setuptools.package-data]`. Anything added there
 needs a matching entry or it won't ship in the wheel.
 

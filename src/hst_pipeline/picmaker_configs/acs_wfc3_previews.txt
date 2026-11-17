@@ -1,2 +1,0 @@
---strip _drz --suffix _thumb --frame 100 100 --percentiles 0.02 99.98
---strip _drz --percentiles 0.02 99.98

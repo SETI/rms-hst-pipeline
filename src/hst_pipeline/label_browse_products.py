@@ -1,7 +1,7 @@
 ##########################################################################################
 # label_browse_products.py
 #
-# Create Product_Browse XML labels for browse_mast_* and browse_generated_* collections.
+# Create Product_Browse XML labels for browse_* collections of MAST previews.
 # One label per IPPPSSOOT (inventory member), with one File_Area_Browse per image file.
 ##########################################################################################
 
@@ -13,10 +13,12 @@ import pdslogger
 
 from hst_pipeline.hst_helper import BROWSE_PROD_EXT
 from hst_pipeline.hst_helper.fs_utils import (file_md5,
+                                              get_file_suffix,
                                               get_format_term,
-                                              get_formatted_proposal_id)
+                                              get_formatted_proposal_id,
+                                              get_instrument_id_from_fname)
 from hst_pipeline.hst_helper.general_utils import create_xml_label
-from hst_pipeline.product_labels.suffix_info import PICMAKER_BROWSE_TIERS
+from hst_pipeline.product_labels.suffix_info import browse_data_collection_name
 
 LABEL_VERSION = '1.0'
 LABEL_DATE = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -28,25 +30,6 @@ _ENCODING = {
     'jpeg': 'JPEG',
     'png': 'PNG',
 }
-
-
-def data_collection_from_browse_collection(browse_collection_name):
-    """Map browse_* collection name to the sibling data_* collection name."""
-    parts = browse_collection_name.split('_')
-    if len(parts) < 4 or parts[0] != 'browse' or parts[1] not in ('mast', 'generated'):
-        raise ValueError(f'Not a browse collection: {browse_collection_name}')
-    return 'data_' + '_'.join(parts[2:])
-
-
-def _browse_sort_key(filename):
-    """Order picmaker browse tiers (thumbnail, then full size); otherwise alphabetical."""
-    stem, _, _ = filename.rpartition('.')
-    _, sep, suffix = stem.partition('_')
-    tier_suffixes = list(PICMAKER_BROWSE_TIERS.values())
-    try:
-        return (0, tier_suffixes.index(sep + suffix))
-    except ValueError:
-        return (1, filename.lower())
 
 
 def _file_entry(filepath):
@@ -75,7 +58,7 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
     writes {ipppssoot}.xml next to those images.
 
     Inputs:
-        collection_dir    path to a browse_mast_* or browse_generated_* directory.
+        collection_dir    path to a browse_* directory.
         proposal_id       proposal id (int or str).
         logger            pdslogger to use; None for default EasyLogger.
         version_id        (major, minor) product version tuple.
@@ -85,7 +68,6 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
     logger = logger or pdslogger.EasyLogger()
     collection_name = os.path.basename(os.path.normpath(collection_dir))
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
-    data_collection = data_collection_from_browse_collection(collection_name)
 
     template_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                  'templates', TEMPLATE_NAME)
@@ -100,7 +82,12 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
             by_ipppssoot[get_format_term(name)].append(os.path.join(root, name))
 
         for ipppssoot, filepaths in sorted(by_ipppssoot.items()):
-            filepaths = sorted(filepaths, key=lambda p: _browse_sort_key(os.path.basename(p)))
+            filepaths = sorted(filepaths, key=lambda p: os.path.basename(p).lower())
+            # Every preview in one browse product is linked to the same FITS product.
+            first_name = os.path.basename(filepaths[0])
+            data_collection = browse_data_collection_name(
+                get_file_suffix(first_name), get_instrument_id_from_fname(first_name)
+            )
             product_lid = (f'urn:nasa:pds:hst_{formatted_proposal_id}'
                            f':{collection_name}:{ipppssoot}')
             data_lidvid = (f'urn:nasa:pds:hst_{formatted_proposal_id}'

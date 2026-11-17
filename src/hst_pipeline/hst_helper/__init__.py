@@ -8,6 +8,8 @@
 import os
 from collections import defaultdict
 
+from hst_pipeline.product_labels.suffix_info import BROWSE_EXTENSIONS
+
 # default start and end date of observation in query MAST constraints
 START_DATE = (1900, 1, 1)
 END_DATE = (2025, 1, 1)
@@ -119,7 +121,7 @@ MAST_DOWNLOAD_DIRNAME = 'mastDownload'
 DOWNLOAD_TMP_PREFIX = 'tmp_'
 
 # Browse product files extension
-BROWSE_PROD_EXT = ['jpg', 'jpeg', 'png']
+BROWSE_PROD_EXT = list(BROWSE_EXTENSIONS)
 
 # For citation info, need to fake it to something that will pass the XsdValidator.jar
 # for now. required pattern for dummy value: 10\\.\\S+/\\S+

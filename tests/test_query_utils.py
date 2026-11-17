@@ -93,7 +93,8 @@ def test_is_accepted_instrument_suffix(monkeypatch):
     monkeypatch.setitem(query_utils.__dict__, 'INSTRUMENT_FROM_LETTER_CODE', {'j': 'WFC3'})
     monkeypatch.setattr(query_utils, 'get_suffix', lambda row: 'flt')
     monkeypatch.setattr(query_utils, 'get_instrument_id_from_table_row', lambda row: 'WFC3')
-    row = {'obs_id': 'j123', 'productSubGroupDescription': 'flt'}
+    row = {'obs_id': 'j123', 'productSubGroupDescription': 'flt',
+           'productFilename': 'j123_flt.fits'}
     assert query_utils.is_accepted_instrument_suffix(row)
     monkeypatch.setattr(query_utils, 'get_instrument_id_from_table_row', lambda row: None)
     assert not query_utils.is_accepted_instrument_suffix(row)

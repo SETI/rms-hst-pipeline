@@ -1552,123 +1552,27 @@ for key, info in SUFFIX_INFO.items():
 # Support for browse products
 ##########################################################################################
 
-# Derived from numerous MAST queries. Given an instrument, this is the list of browse
-# suffixes that should be downloaded from MAST. For the most part, we ignore the thumbnail
-# browse products for purposes of PDS4 archiving. However, the thumbnail spectra are
-# well done and we will want to use them in OPUS/Viewmaster, so we're including them in
-# the bundles.
-ACCEPTED_BROWSE_SUFFIXES = {
-    'ACS'   : ['drc_large', 'drz_large', 'flc', 'flt', 'raw'],
-    'COS'   : ['x1dsum', 'x1dsum1', 'x1dsum2', 'x1dsum3', 'x1dsum4'],
-    'FGS'   : [],
-    'FOC'   : ['d0f', 'c0f'],
-    'FOS'   : ['c0f', 'c0f_thumb'],
-    'GHRS'  : ['c0f', 'c0f_thumb'],
-    'HSP'   : [],
-    'NICMOS': ['cal', 'mos', 'raw'],
-    'STIS'  : ['sx1', 'sx1_thumb', 'x1d', 'x1d_thumb'],
-    'WFC3'  : ['drc', 'drz', 'flc', 'flt', 'ima', 'raw'],
-    'WFPC'  : ['d0f', 'c0f'],
-    'WFPC2' : ['d0f', 'c0f'],   # Note: MAST browse products use the old, waivered names!
+# Browse products are the JPEG and PNG previews MAST serves alongside the FITS files. Each
+# is named <ipppssoot>_<suffix>.<ext>, where <suffix> is normally that of the FITS file it
+# previews. Previews are downloaded and archived under their MAST file names, unchanged.
+BROWSE_EXTENSIONS = ('jpg', 'jpeg', 'png')
+
+# Exceptions where MAST names a preview with a different suffix from the FITS product it
+# previews, given as {instrument_id: {MAST preview suffix: FITS suffix}}.
+#   - MAST names WFPC2 previews with the old, waivered suffixes, but the pipeline archives
+#     the unwaivered FITS files.
+#   - The WFPC2 "drw" preview shows the drizzled, four-chip mosaic of an exposure. The
+#     pipeline does not archive "drw" FITS files, so the preview is linked to the
+#     exposure's calibrated "c0m" image, from which the mosaic is made.
+MAST_BROWSE_TO_DATA_SUFFIX = {
+    'WFPC2': {'c0f': 'c0m', 'd0f': 'd0m', 'drw': 'c0m'},
 }
 
-# For each instrument that needs this, this is a dictionary that maps a MAST browse suffix
-# to the local browse suffix, i.e. the one that we will use in the bundle. Certain browse
-# products from MAST have to be renamed so that their suffixes match those of the
-# corresponding FITS file.
-MAST_BROWSE_SUFFIX_TRANSLATOR = {
-    'ACS'   : {'drc_large': 'drc', 'drz_large': 'drz'},     # strip "_large"
-    'WFPC2' : {'c0f': 'c0m', 'd0f': 'd0m'},                 # convert to unwaivered
+# Previews that get a browse collection of their own, named after the preview suffix
+# rather than after the FITS product they are linked to, e.g., "browse_wfpc2_drw".
+SEPARATE_BROWSE_COLLECTION_SUFFIXES = {
+    'WFPC2': {'drw'},
 }
-
-LOCAL_BROWSE_INSTRUMENTS = {
-    'ACS', 'COS', 'FGS', 'FOC', 'FOS', 'GHRS', 'HSP',
-    'NICMOS', 'STIS', 'WFC3', 'WFPC','WFPC2'
-}
-
-LOCAL_BROWSE_SUFFIXES = {
-    'c0f', 'c0m', 'cal', 'd0f', 'd0m', 'drc', 'drz', 'flt', 'flc', 'ima', 'mos', 'raw',
-}
-
-# FITS suffixes passed to picmaker for locally generated browse previews.
-PICMAKER_BROWSE_SUFFIXES = {
-    instrument: LOCAL_BROWSE_SUFFIXES for instrument in LOCAL_BROWSE_INSTRUMENTS
-}
-
-# Browse tiers picmaker generates for each FITS input, in label order, mapped to the
-# string picmaker appends to the IPPPSSOOT after --strip of the FITS suffix. One FITS
-# input yields two JPGs: {ipppssoot}_thumb.jpg and the full-size {ipppssoot}.jpg.
-PICMAKER_BROWSE_TIERS = {
-    'thumb': '_thumb',
-    'full' : '',
-}
-
-# Per-instrument FITS suffixes that still store separate chips/detectors and
-# should be passed to picmaker with --mosaic. Combined products (e.g. drz/drc)
-# are omitted; FOC has no apply_mosaic and is not listed.
-PICMAKER_MOSAIC_SUFFIXES_BY_INSTRUMENT = {
-    'ACS': {'raw', 'flt', 'flc'},
-    'WFC3': {'raw', 'flt', 'flc'},
-    'WFPC': {'c0f', 'd0f'},
-    # WFPC2 archives unwaivered multi-detector science as c0m/d0m; keep c0f/d0f
-    # in case waivered names appear.
-    'WFPC2': {'c0m', 'd0m', 'c0f', 'd0f'},
-}
-
-
-def use_mosaic(instrument_id, suffix):
-    """True if picmaker should be called with --mosaic for this instrument and suffix."""
-
-    return suffix in PICMAKER_MOSAIC_SUFFIXES_BY_INSTRUMENT.get(instrument_id, ())
-
-# Class definition...
-BrowseProductInfo = namedtuple('BrowseProductInfo', ['suffix',
-                                                     'mast_suffix',
-                                                     'collection_name',
-                                                     'is_locally_generated'])
-# [0] suffix: the suffix on the browse product, following IPPPSSOOT. This is normally the
-#     same as that for the FITS file, but is a picmaker browse tier ("thumb" or "full")
-#     for browse_generated_* collections.
-# [1] mast_suffix: the suffix used in MAST.
-# [2] collection_name: name of the collection, e.g., "browse_mast_acs_flt" or
-#     "browse_generated_acs_drz".
-# [3] is_locally_generated: True if this product is generated locally; False if retrieved
-#     from MAST.
-
-# Create a dictionary that maps (instrument_id, FITS suffix) to a list of
-# BrowseProductInfo objects for the MAST-retrieved products.
-BROWSE_SUFFIX_INFO = defaultdict(list)
-for instrument_id, mast_suffixes in ACCEPTED_BROWSE_SUFFIXES.items():
-    translator = MAST_BROWSE_SUFFIX_TRANSLATOR.get(instrument_id, {}) # for "_large" and
-                                                                      # WFPC2
-    for mast_suffix in mast_suffixes:
-
-        # Translate MAST suffix to local suffix, e.g., "drc_large" -> "drc"
-        local_suffix = translator.get(mast_suffix, mast_suffix)
-
-        # Translate local suffix to FITS suffix
-        fits_suffix = local_suffix.replace('_thumb', '')
-
-        # Translate fits_suffix to collection name and LID suffix
-        (short_suffix, _) = EXTENDED_SUFFIXES.get(fits_suffix, (fits_suffix, ''))
-        collection_name = 'browse_mast_' + instrument_id.lower() + '_' + short_suffix
-
-        # Create the BrowseProductInfo object and append
-        info = BrowseProductInfo(local_suffix, mast_suffix, collection_name, False)
-        BROWSE_SUFFIX_INFO[instrument_id, fits_suffix].append(info)
-
-# Append picmaker browse tiers in browse_generated_* collections.
-# These coexist with MAST browse products; they do not replace them.
-for instrument_id, fits_suffixes in PICMAKER_BROWSE_SUFFIXES.items():
-    for fits_suffix in fits_suffixes:
-        (short_suffix, _) = EXTENDED_SUFFIXES.get(fits_suffix, (fits_suffix, ''))
-        collection_name = ('browse_generated_' + instrument_id.lower() + '_' +
-                           short_suffix)
-        browse_info_list = BROWSE_SUFFIX_INFO[instrument_id, fits_suffix]
-        for tier in PICMAKER_BROWSE_TIERS:
-            browse_info_list.append(
-                BrowseProductInfo(tier, '', collection_name, True)
-            )
 
 ##########################################################################################
 # API supporting suffix identifications
@@ -1789,6 +1693,61 @@ def collection_name(suffix, instrument_id):
             + instrument_id.lower()
             + '_'
             + EXTENDED_SUFFIXES.get(suffix, (suffix, ''))[0])
+
+def browse_data_suffix(browse_suffix, instrument_id):
+    """The suffix of the FITS product that a MAST preview with this suffix depicts.
+
+    Input:
+        browse_suffix   suffix of the preview file, e.g., "drz" or "c0f".
+        instrument_id   instrument ID, e.g., "ACS".
+
+    Returns:    the FITS suffix, e.g., "drz", or "c0m" for a WFPC2 "c0f" preview.
+    """
+
+    return MAST_BROWSE_TO_DATA_SUFFIX.get(instrument_id, {}).get(browse_suffix,
+                                                                 browse_suffix)
+
+def is_accepted_browse_suffix(browse_suffix, instrument_id):
+    """True if a MAST preview with this suffix depicts a FITS product the pipeline archives.
+    """
+
+    return browse_data_suffix(browse_suffix, instrument_id) in ACCEPTED_SUFFIXES[instrument_id]
+
+def browse_collection_name(browse_suffix, instrument_id):
+    """The name of the browse collection for a MAST preview with this suffix. It normally
+    parallels the name of the data collection holding the FITS product the preview
+    depicts, e.g., "browse_wfpc2_c0m" for a WFPC2 "c0f" preview. Previews listed in
+    SEPARATE_BROWSE_COLLECTION_SUFFIXES are named after their own suffix instead, e.g.,
+    "browse_wfpc2_drw".
+    """
+
+    if browse_suffix in SEPARATE_BROWSE_COLLECTION_SUFFIXES.get(instrument_id, ()):
+        collection_suffix = browse_suffix
+    else:
+        collection_suffix = browse_data_suffix(browse_suffix, instrument_id)
+    return 'browse_' + instrument_id.lower() + '_' + short_suffix(collection_suffix)
+
+def browse_data_collection_name(browse_suffix, instrument_id):
+    """The name of the collection holding the FITS product that a MAST preview with this
+    suffix is linked to, e.g., "data_wfpc2_c0m" for a WFPC2 "c0f" or "drw" preview.
+    """
+
+    return collection_name(browse_data_suffix(browse_suffix, instrument_id), instrument_id)
+
+def data_to_browse_suffixes(data_suffix, instrument_id):
+    """The suffixes of MAST previews that could depict a FITS product with this suffix.
+
+    Input:
+        data_suffix     suffix of the FITS file, e.g., "drz" or "c0m".
+        instrument_id   instrument ID, e.g., "ACS".
+
+    Returns:    a list of preview suffixes, e.g., ["drz"], or ["c0f", "drw"] for WFPC2
+                "c0m".
+    """
+
+    translator = MAST_BROWSE_TO_DATA_SUFFIX.get(instrument_id, {})
+    suffixes = [b for (b, d) in translator.items() if d == data_suffix]
+    return suffixes or [data_suffix]
 
 def short_suffix(suffix):
     """When a suffix has its own suffix, this is the first part, e.g., "flt_a" -> "flt".

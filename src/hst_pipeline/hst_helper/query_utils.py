@@ -11,7 +11,8 @@ import pdslogger
 import time
 
 from astroquery.mast import Observations
-from . import (DOWNLOAD_TMP_PREFIX,
+from . import (BROWSE_PROD_EXT,
+               DOWNLOAD_TMP_PREFIX,
                END_DATE,
                RETRY,
                START_DATE)
@@ -20,7 +21,8 @@ from .fs_utils import (get_formatted_proposal_id,
                        get_visit)
 from hst_pipeline.product_labels.suffix_info import (ACCEPTED_SUFFIXES,
                                                      ACCEPTED_LETTER_CODES,
-                                                     INSTRUMENT_FROM_LETTER_CODE)
+                                                     INSTRUMENT_FROM_LETTER_CODE,
+                                                     is_accepted_browse_suffix)
 
 def ymd_tuple_to_mjd(ymd):
     """Return Modified Julian Date.
@@ -116,24 +118,35 @@ def is_accepted_instrument_letter_code(row):
     """
     return row['obs_id'][0].lower() in ACCEPTED_LETTER_CODES
 
-def is_accepted_instrument_suffix(row):
-    """Check if a product row has accepted suffex in the productSubGroupDescription field
-    of the table.
+def is_browse_row(row):
+    """Check if a product row is a JPEG or PNG preview (browse) file.
 
     Input:
         row    an observation table row.
 
-    Returns:    a boolean to indicate if a product row has accepted suffex in the
-                productSubGroupDescription field of the table.
+    Returns:    True if the product file name has a browse product extension.
+    """
+    _, _, ext = str(row['productFilename']).rpartition('.')
+    return ext.lower() in BROWSE_PROD_EXT
+
+def is_accepted_instrument_suffix(row):
+    """Check if a product row has an accepted suffix. A FITS or other data file is
+    accepted if its suffix is archived for its instrument; a JPEG or PNG preview is
+    accepted if the FITS product it depicts is archived.
+
+    Input:
+        row    an observation table row.
+
+    Returns:    a boolean to indicate if a product row has an accepted suffix.
     """
     suffix = get_suffix(row)
     instrument_id = get_instrument_id_from_table_row(row)
-    # return is_accepted(suffix, instrument_id)
-    if instrument_id is not None:
-        return suffix in ACCEPTED_SUFFIXES[instrument_id]
-    else:
+    if instrument_id is None:
         # skip files starting with "HST..."
         return False
+    if is_browse_row(row):
+        return is_accepted_browse_suffix(suffix, instrument_id)
+    return suffix in ACCEPTED_SUFFIXES[instrument_id]
 
 def is_trl_suffix(row):
     """Check if a product row has trl in the productSubGroupDescription field
@@ -182,12 +195,13 @@ def get_suffix(row):
     Returns:    the suffix of the product file.
     """
     suffix = str(row['productSubGroupDescription']).lower()
-    # For files like .jpg or .png, this will be '--', so we derive suffix from file names.
+    # For files like .jpg or .png, this will be '--', so we derive the suffix from the file
+    # name: everything after the IPPPSSOOT, e.g., "x1dsum1" from "ld8x01010_x1dsum1.png".
     if suffix == '--':
         filename = str(row['productFilename'])
         fname, _, _ = filename.rpartition('.')
-        _, _, suffix = fname.rpartition('_')
-        return suffix
+        _, _, suffix = fname.partition('_')
+        return suffix.lower()
     else:
         return suffix
 

@@ -13,8 +13,8 @@ dependencies = [
   # floor a dependency of ours already enforces. They are not a lockfile: the pinned
   # HST/requirements.txt that pip-compile used to generate was dropped in favor of this.
   #
-  # Imported directly by the package. astropy and numpy match the floors rms-picmaker
-  # already requires, so resolving to anything lower is impossible anyway.
+  # Imported directly by the package. The astropy and numpy floors are the ones
+  # rms-picmaker enforced while it was a dependency.
   "astropy>=7.2.0",
   "astroquery>=0.4.6",
   "beautifulsoup4>=4.12",
@@ -31,7 +31,6 @@ dependencies = [
   # URL dependencies, so this must become a normal version spec before publishing there.
   "rms-hst-targets @ git+https://github.com/SETI/rms-hst-targets",
   "rms-pdstemplate>=2.4.0",
-  "rms-picmaker>=2.0.0",
   "rms-translator>=1.0.0",
 ]
 license = "Apache-2.0"
@@ -102,12 +101,11 @@ docs = [
 where = ["src"]
 
 [tool.setuptools.package-data]
-# Label templates, browse-preview recipes, the PDS4 schemas that validate-pdart reads,
+# Label templates, the PDS4 schemas that validate-pdart reads,
 # the target-identification web cache, and the validate-pdart script itself must all ship
 # with the wheel; the code resolves every one of them relative to __file__.
 hst_pipeline = [
   "templates/*.xml",
-  "picmaker_configs/*",
   "xml/*",
   "validate-pdart",
 ]

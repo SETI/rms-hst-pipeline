@@ -799,7 +799,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     #
     # "processing_level": processing_level ("Raw", "Calibrated", etc.)
     # "collection_title": collection_title
-    # "browse_info"     : suffix-based browse_info.
+    # "browse_lids"     : LIDs of the MAST previews of this product that sit beside it.
     # "collection_lid"  : LID for this collection.
     # "product_lid"     : LID for this product.
     # "product_lidvid"  : LIDVID for this product.
@@ -848,8 +848,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         basename_dict['product_lidvid'] = (product_lid + '::' +
                                            str(version_id[0]) + '.' + str(version_id[1]))
 
-        browse_info = suffix_info.BROWSE_SUFFIX_INFO[instrument_id, suffix]
-        basename_dict['browse_info'] = browse_info
+        basename_dict['browse_lids'] = get_browse_lids(basename_dict, logger)
 
     ######################################################################################
     # Identify the associated Internal_Reference files for each basename.
@@ -1028,6 +1027,41 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         TEMPLATE.write(basename_dict, label_path)
 
 ##########################################################################################
+
+def get_browse_lids(basename_dict, logger=None):
+    """Return the LIDs of the browse products for one FITS file.
+
+    A browse product is a JPEG or PNG preview downloaded from MAST, which sits in the same
+    directory as the FITS file it depicts and shares its IPPPSSOOT. Only previews that are
+    present are returned, so a label never refers to a browse product that does not exist.
+
+    Input:
+        basename_dict   the info for one FITS file; must contain "fullpath", "ipppssoot",
+                        "suffix", "instrument_id", and "hst_dictionary".
+        logger          pdslogger to use; None to skip logging.
+
+    Returns:    a sorted list of unique browse product LIDs, e.g.,
+                ["urn:nasa:pds:hst_07885:browse_nicmos_raw:n4wl01xdq"].
+    """
+
+    directory = os.path.dirname(basename_dict['fullpath'])
+    ipppssoot = basename_dict['ipppssoot']
+    instrument_id = basename_dict['instrument_id']
+    proposal_id = str(basename_dict['hst_dictionary']['hst_proposal_id']).zfill(5)
+
+    lids = set()
+    for browse_suffix in suffix_info.data_to_browse_suffixes(basename_dict['suffix'],
+                                                             instrument_id):
+        for ext in suffix_info.BROWSE_EXTENSIONS:
+            browse_path = os.path.join(directory, f'{ipppssoot}_{browse_suffix}.{ext}')
+            if not os.path.isfile(browse_path):
+                continue
+            collection = suffix_info.browse_collection_name(browse_suffix, instrument_id)
+            lids.add(f'urn:nasa:pds:hst_{proposal_id}:{collection}:{ipppssoot}')
+            if logger:
+                logger.debug('Browse product found', browse_path)
+
+    return sorted(lids)
 
 def get_filepaths(directories, root='', match_pattern='', extension='.fits'):
     """Generate a list of file paths for processing.

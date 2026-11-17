@@ -4,8 +4,7 @@
 # prepare_browse_products is the main function called in prepare_browse_products pipeline
 # task script. It will move data files from downloaded directories (under staging) to
 # newly structured directories (under staging):
-#   - browse_mast_{inst_id}_{suffix}
-#   - browse_generated_{inst_id}_{suffix}  (picmaker JPGs for allowlisted FITS)
+#   - browse_{inst_id}_{suffix}  (JPEG/PNG previews from MAST, names unchanged)
 #   - data_{inst_id}_{suffix}
 ##########################################################################################
 
@@ -13,13 +12,11 @@ import os
 import pdslogger
 import shutil
 
-from hst_pipeline.generate_browse_previews import (generate_browse_previews,
-                                                   picmaker_browse_collection_name)
 from hst_pipeline.label_browse_products import label_browse_collection_directory
-from hst_pipeline.product_labels.suffix_info import (ACCEPTED_BROWSE_SUFFIXES,
-                                                     ACCEPTED_SUFFIXES,
-                                                     PICMAKER_BROWSE_SUFFIXES,
-                                                     collection_name)
+from hst_pipeline.product_labels.suffix_info import (ACCEPTED_SUFFIXES,
+                                                     browse_collection_name,
+                                                     collection_name,
+                                                     is_accepted_browse_suffix)
 
 from hst_pipeline.hst_helper import (INST_ID_DICT,
                                      BROWSE_PROD_EXT)
@@ -60,17 +57,21 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 INST_ID_DICT[formatted_proposal_id].add(inst_id)
 
             _, _, file_ext = file.rpartition('.')
-            # Copy & save browse products under browse_mast_{inst_id}_{suffix} and rest of
-            # products under data_{inst_id}_{suffix}
+            # Copy & save MAST previews, under their MAST file names, in
+            # browse_{inst_id}_{suffix} and the rest of the products in
+            # data_{inst_id}_{suffix}
             # TODO: maybe use move instead of copy and remove empty folder (?)
             if inst_id is not None:
                 prod_dir = get_program_dir_path(proposal_id, None, 'staging')
-                col_name = collection_name(suffix, inst_id)
-                if (suffix in ACCEPTED_BROWSE_SUFFIXES[inst_id] and
-                    file_ext in BROWSE_PROD_EXT):
-                    prod_dir += f'/browse_mast_{inst_id.lower()}_{suffix}/visit_{visit}/'
+                if file_ext.lower() in BROWSE_PROD_EXT:
+                    if not is_accepted_browse_suffix(suffix, inst_id):
+                        logger.info(f'Skip preview of an unarchived product: {file}')
+                        continue
+                    browse_col_name = browse_collection_name(suffix, inst_id)
+                    prod_dir += f'/{browse_col_name}/visit_{visit}/'
                     logger.info(f'Move browse products to: {prod_dir + file}')
                 elif suffix in ACCEPTED_SUFFIXES[inst_id]:
+                    col_name = collection_name(suffix, inst_id)
                     prod_dir += f'/{col_name}/visit_{visit}/'
                     logger.info(f'Move data products to: {prod_dir + file}')
 
@@ -78,22 +79,6 @@ def prepare_browse_products(proposal_id, visit, logger=None):
                 os.makedirs(prod_dir, exist_ok=True)
                 shutil.copy(file_path, prod_dir + file)
                 # shutil.move(file_path, prod_dir+file)
-
-                # Generate picmaker browse JPGs for allowlisted FITS science products.
-                # Write as a sibling of data_*/browse_mast_* (not nested under data_*).
-                # Failures are logged as warnings; browse_generated_* is only created
-                # when at least one FITS yields both the thumbnail and full-size JPGs.
-                if (suffix in PICMAKER_BROWSE_SUFFIXES.get(inst_id, set())
-                        and file_ext == 'fits'):
-                    staging_root = get_program_dir_path(proposal_id, None, 'staging')
-                    out_dir = (
-                        staging_root
-                        + f'/{picmaker_browse_collection_name(inst_id, suffix)}'
-                        + f'/visit_{visit}/'
-                    )
-                    generate_browse_previews(
-                        prod_dir + file, out_dir, inst_id, suffix, logger,
-                    )
 
     # Write/update Product_Browse labels for any browse collections touched this visit.
     staging_root = get_program_dir_path(proposal_id, None, 'staging')

@@ -1,2 +1,0 @@
---strip _mos --suffix _thumb --frame 100 100 --percentiles 0.02 99.98 --gamma 0.5
---strip _mos --scale 200 --percentiles 0.02 99.98 --gamma 0.5
