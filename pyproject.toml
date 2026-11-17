@@ -27,7 +27,9 @@ dependencies = [
   # RMS packages, floored at the versions the pipeline has been run against.
   "rms-julian>=3.0.2",
   "rms-pdslogger>=3.2.1",
-  "rms-hst-targets",
+  # Not published on PyPI, so it is installed straight from GitHub. PyPI rejects direct
+  # URL dependencies, so this must become a normal version spec before publishing there.
+  "rms-hst-targets @ git+https://github.com/SETI/rms-hst-targets",
   "rms-pdstemplate>=2.4.0",
   "rms-picmaker>=2.0.0",
   "rms-translator>=1.0.0",
@@ -50,6 +52,8 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Operating System :: MacOS :: MacOS X",
   "Operating System :: POSIX :: Linux",
 ]

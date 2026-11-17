@@ -148,7 +148,7 @@ from the pull request gate and run weekly by `.github/workflows/network-tests.ym
 
 | Workflow | Trigger | What it does |
 | -------- | ------- | ------------ |
-| `run-tests.yml` | Push, PR, weekly | Non-network tests on Linux and macOS across Python 3.11–3.13, plus coverage, docs, and packaging checks |
+| `run-tests.yml` | Push, PR, weekly | Non-network tests on Linux and macOS across Python 3.11–3.15, plus coverage, docs, and packaging checks |
 | `network-tests.yml` | Weekly, manual | The MAST-dependent tests |
 | `audit.yml` | Weekly, manual | `pip-audit` against the dependency set |
 | `publish_to_pypi.yml` | GitHub release | Builds and publishes to PyPI |
