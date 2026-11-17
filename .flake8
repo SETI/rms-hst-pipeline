@@ -1,2 +1,31 @@
+# Linting is not yet enforced for this project. The ruff configuration in pyproject.toml
+# describes the intended house style; this file exists for the same reason it does in
+# rms-polymath, namely that ruff implements no rule in the E121-E133 range, so
+# continuation-line indentation is the one pycodestyle family only flake8 can check.
+#
+# The commented-out "Flake8 continuation-line indent" step in
+# .github/workflows/run-tests.yml runs `flake8 --select=E12,E13 src tests` and reads this
+# file. Until that step is enabled, the ignore list below reflects the code as it stands
+# so that anyone running flake8 by hand gets a signal rather than thousands of hits.
 [flake8]
-ignore = E111, E114, E115, E116, E117, E121, E122, E124, E126, E127, E128, E129, E131, E201, E202, E203, E211, E221, E222, E225, E226, E227, E228, E231, E241, E251, E261, E262, E265, E266, E272, E302, E303, E305, E501, E741, W291, W391, W503, W504
+max-line-length = 90
+extend-exclude = archive,venv,.venv,docs/_build
+
+ignore =
+    # Whitespace and alignment. This codebase aligns assignments, dict values, and
+    # keyword arguments into columns throughout; these rules all fight that.
+    E201, E202, E203, E211, E221, E222, E241, E251, E272,
+    # Indentation and continuation lines.
+    E111, E114, E115, E116, E117, E121, E122, E124, E126, E127, E128, E129, E131,
+    # Operator spacing.
+    E225, E226, E227, E228, E231,
+    # Comment formatting.
+    E261, E262, E265, E266,
+    # Blank lines.
+    E302, E303, E305,
+    # Line length, ambiguous names, trailing whitespace, line breaks near operators.
+    E501, E741, W291, W391, W503, W504
+
+per-file-ignores =
+    # F401 module imported but unused; E402 module level import not at top of file.
+    __init__.py: F401, E402

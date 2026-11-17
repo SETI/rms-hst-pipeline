@@ -1,0 +1,85 @@
+##########################################################################################
+# organize_files.py
+#
+# Move all data product files for a given proposal id from the staging folder to the
+# bundle folder.
+##########################################################################################
+
+import os
+import pdslogger
+import shutil
+
+from hst_pipeline.hst_helper import (COL_NAME_PREFIX,
+                                     HST_DIR,
+                                     MAST_DOWNLOAD_DIRNAME)
+from hst_pipeline.hst_helper.fs_utils import (get_program_dir_path,
+                                              get_deliverable_path)
+
+def organize_files_from_staging_to_bundles(proposal_id, logger):
+    """Move files from staging folder to bundles folder
+
+    Inputs:
+        proposal_id    a proposal id.
+        logger         pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    logger.info(f'Organize files for proposal id: {proposal_id}')
+    # TODO: change copying files to moving files?
+    # 1. Move existing files based on PDS4-VERSIONING.txt (need to get this file)
+    # 2. Walk through all the downloaded files from MAST in the staging folder and move
+    # them over to the bundles folder
+    staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+    deliverable_path = get_deliverable_path(proposal_id)
+    for dir_name in os.listdir(staging_dir):
+        for col_prefix in COL_NAME_PREFIX:
+            if dir_name.startswith(col_prefix):
+                staging_prod_dir = os.path.join(staging_dir, dir_name)
+                bundles_prod_dir = os.path.join(deliverable_path, dir_name)
+                os.makedirs(bundles_prod_dir, exist_ok=True)
+                logger.info(f'Move {dir_name} from staging to bundles directory')
+                shutil.copytree(staging_prod_dir, bundles_prod_dir, dirs_exist_ok=True)
+                break
+
+def _clean_up_staging_dir_at_path(staging_dir, logger):
+    """Remove mastDownload and collection-prefix directories under a staging program path.
+
+    Inputs:
+        staging_dir    path to an hst_<nnnnn> staging directory.
+        logger         pdslogger to use; None for default EasyLogger.
+    """
+    if not os.path.isdir(staging_dir):
+        return
+    for dir_name in os.listdir(staging_dir):
+        staging_prod_dir = os.path.join(staging_dir, dir_name)
+        if dir_name.startswith(MAST_DOWNLOAD_DIRNAME):
+            logger.info(f'Remove {dir_name} from staging directory')
+            shutil.rmtree(staging_prod_dir)
+        for col_prefix in COL_NAME_PREFIX:
+            if dir_name.startswith(col_prefix):
+                logger.info(f'Remove {dir_name} from staging directory')
+                shutil.rmtree(staging_prod_dir)
+                break
+
+def clean_up_staging_dir(proposal_id=None, logger=None):
+    """Remove organized directories (they are copied to the bundle directory) and empty
+    mastDownload directories (empty after moving trl to pipeline directory) from the staging folder.
+    This step should be run at the end of the pipeline process.
+
+    Inputs:
+        proposal_id    a proposal id, or None to clean every hst_* directory under
+                       HST_STAGING.
+        logger         pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    if proposal_id is None:
+        logger.info('Clean up staging directories for all hst_* programs')
+        staging_root = HST_DIR['staging']
+        if not os.path.isdir(staging_root):
+            return
+        for dir_name in sorted(os.listdir(staging_root)):
+            if dir_name.startswith('hst_'):
+                _clean_up_staging_dir_at_path(os.path.join(staging_root, dir_name), logger)
+    else:
+        logger.info(f'Clean up staging directory for proposal id: {proposal_id}')
+        staging_dir = get_program_dir_path(proposal_id, None, root_dir='staging')
+        _clean_up_staging_dir_at_path(staging_dir, logger)

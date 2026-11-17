@@ -1,0 +1,176 @@
+[build-system]
+requires = ["setuptools>=77", "setuptools_scm[toml]"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rms-hst-pipeline"
+dynamic = ["version"]
+description = "Automated pipeline that turns HST observations into PDS4-compliant bundles"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  # Version floors are set where a lower version is known not to work, or to match the
+  # floor a dependency of ours already enforces. They are not a lockfile: the pinned
+  # HST/requirements.txt that pip-compile used to generate was dropped in favor of this.
+  #
+  # Imported directly by the package. astropy and numpy match the floors rms-picmaker
+  # already requires, so resolving to anything lower is impossible anyway.
+  "astropy>=7.2.0",
+  "astroquery>=0.4.6",
+  "beautifulsoup4>=4.12",
+  "numpy>=2.4.4",
+  "requests>=2.31",
+  "unidecode>=1.3",
+  # queue_manager imports declarative_base from sqlalchemy.orm, which is 1.4+, and the
+  # queue has only ever been run against 2.x.
+  "SQLAlchemy>=2.0",
+  # RMS packages, floored at the versions the pipeline has been run against.
+  "rms-julian>=3.0.2",
+  "rms-pdslogger>=3.2.1",
+  "rms-hst-targets",
+  "rms-pdstemplate>=2.4.0",
+  "rms-picmaker>=2.0.0",
+  "rms-translator>=1.0.0",
+]
+license = "Apache-2.0"
+license-files = ["LICENSE.md"]
+authors = [
+  {name = "Mark Showalter", email = "mshowalter@seti.org"}
+]
+maintainers = [
+  {name = "Mark Showalter", email = "mshowalter@seti.org"}
+]
+keywords = ["hst", "hubble", "pds", "pds4", "mast", "planetary"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Natural Language :: English",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Astronomy",
+  "Topic :: Utilities",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: POSIX :: Linux",
+]
+
+[project.urls]
+Homepage = "https://github.com/SETI/rms-hst-pipeline"
+Repository = "https://github.com/SETI/rms-hst-pipeline"
+Source = "https://github.com/SETI/rms-hst-pipeline"
+Issues = "https://github.com/SETI/rms-hst-pipeline/issues"
+
+# Each task in queue_manager.config.TASK_INFO dispatches one of these. Keeping them as
+# console scripts means the queue no longer has to locate .py files inside the checkout.
+[project.scripts]
+hst-pipeline              = "hst_pipeline.pipeline.pipeline_run_full_process:main"
+hst-query-moving-targets  = "hst_pipeline.pipeline.pipeline_query_hst_moving_targets:main"
+hst-query-products        = "hst_pipeline.pipeline.pipeline_query_hst_products:main"
+hst-update-program        = "hst_pipeline.pipeline.pipeline_update_hst_program:main"
+hst-get-program-info      = "hst_pipeline.pipeline.pipeline_get_program_info:main"
+hst-update-visit          = "hst_pipeline.pipeline.pipeline_update_hst_visit:main"
+hst-retrieve-visit        = "hst_pipeline.pipeline.pipeline_retrieve_hst_visit:main"
+hst-label-products        = "hst_pipeline.pipeline.pipeline_label_hst_products:main"
+hst-prepare-browse        = "hst_pipeline.pipeline.pipeline_prepare_browse_products:main"
+hst-finalize-bundle       = "hst_pipeline.pipeline.pipeline_finalize_hst_bundle:main"
+
+[project.optional-dependencies]
+dev = [
+  "coverage>=7.0",
+  "flake8",
+  "pip-audit>=2.7",
+  "pymarkdownlnt>=0.9.35",
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+  "pytest-xdist>=3.8.0",
+  "pyroma>=4.2",
+  "ruff>=0.8",
+  "rms-hst-pipeline[docs]",
+]
+docs = [
+  "myst-parser",
+  "sphinx>=7",
+  "sphinx-rtd-theme",
+]
+
+[tool.setuptools]
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+# Label templates, browse-preview recipes, the PDS4 schemas that validate-pdart reads,
+# the target-identification web cache, and the validate-pdart script itself must all ship
+# with the wheel; the code resolves every one of them relative to __file__.
+hst_pipeline = [
+  "templates/*.xml",
+  "picmaker_configs/*",
+  "xml/*",
+  "validate-pdart",
+]
+
+[tool.setuptools_scm]
+local_scheme = "no-local-version"
+write_to = "src/hst_pipeline/_version.py"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+# --dist loadfile, not the default --dist load: the queue_manager tests all share the
+# single SQLite database at $HST_PIPELINE/task_queue.db, so splitting one module
+# across workers makes them fail with "database is locked". Keeping a module on one
+# worker still parallelizes across modules.
+addopts = ["--strict-markers", "--strict-config", "-n", "auto", "--dist", "loadfile"]
+markers = [
+  # These tests reach out to MAST. They download real products, assert result counts
+  # that drift as the archive grows, and in the case of test_pipeline_run they delete
+  # and rebuild the program directories under HST_PIPELINE and HST_BUNDLES. CI runs
+  # `-m "not network"`; run the full suite locally when touching the query or retrieve
+  # paths.
+  "network: test requires live access to the MAST archive (deselect with -m 'not network')",
+  # rms-hst-targets keeps its 70 MB of committed caches outside its package directory, so
+  # they are absent from a pip-installed copy. Tests that exercise real identification
+  # need a source checkout of that package and are deselected everywhere else.
+  "targets_data: test requires the rms-hst-targets committed caches",
+]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["src/hst_pipeline"]
+omit = ["tests/*", "*/_version.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise NotImplementedError",
+]
+
+# Linting is not yet enforced on this codebase; see .github/workflows/run-tests.yml.
+# This configuration describes the house style so that anyone running ruff by hand gets
+# results consistent with it, but no CI step reads it yet.
+[tool.ruff]
+target-version = "py311"
+line-length = 90
+extend-exclude = ["archive"]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+# F401/E402: __init__.py re-exports and interleaves imports with the assignments.
+"__init__.py" = ["F401", "E402"]
+# E501: expected-value tables in the tests stay aligned rather than wrapped.
+"tests/*" = ["E501"]
+
+[tool.pymarkdown.plugins.md013]
+enabled = false
+
+[tool.pymarkdown.plugins.md033]
+enabled = false
+
+[tool.pymarkdown.plugins.md041]
+enabled = false

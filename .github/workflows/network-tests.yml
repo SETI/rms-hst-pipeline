@@ -1,0 +1,46 @@
+name: Run Network Tests
+run-name: Run Network Tests triggered by ${{ github.event_name }}
+
+# The tests marked `network` are deliberately kept out of the pull request gate in
+# run-tests.yml. They query MAST live, download real products, and assert exact result
+# counts, so they can fail because the archive changed rather than because this
+# repository did. Running them on a schedule surfaces that drift without blocking merges.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "43 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  network-test:
+    name: Network tests against MAST
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.13
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          python -m pip install -e ".[dev]"
+
+      - name: Create pipeline directories
+        run: |
+          mkdir -p "${RUNNER_TEMP}/staging" "${RUNNER_TEMP}/pipeline" "${RUNNER_TEMP}/bundles"
+          echo "HST_STAGING=${RUNNER_TEMP}/staging"   >> "$GITHUB_ENV"
+          echo "HST_PIPELINE=${RUNNER_TEMP}/pipeline" >> "$GITHUB_ENV"
+          echo "HST_BUNDLES=${RUNNER_TEMP}/bundles"   >> "$GITHUB_ENV"
+
+      # Not parallelized: test_pipeline_run rebuilds the program directories under
+      # HST_PIPELINE and HST_BUNDLES in setup_method, so concurrent workers collide.
+      - name: Run network tests
+        run: |
+          python -m pytest -m network -v -n 0 tests

@@ -1,0 +1,60 @@
+#!/bin/bash
+# Use the tmp-context-products.json written next to this script by run_validation.py
+CONTEXT_PRODUCTS=./tmp-context-products
+# The PDS4 schemas ship inside the package, alongside this script. Resolve them from the
+# script's own location so the path holds whether the package is installed or run from a
+# checkout.
+XMLDIR="$(cd "$(dirname "$0")" && pwd)/xml"
+SCHEMAS="${XMLDIR}/PDS4_HST_1M00_1100.xsd, ${XMLDIR}/PDS4_DISP_1L00_1510.xsd.xml"
+SCHEMATRONS="${XMLDIR}/PDS4_HST_1M00_1100.sch, ${XMLDIR}/PDS4_DISP_1L00_1510.sch.xml"
+
+die(){
+    echo $@ >&2
+}
+
+usage(){
+    die Usage: "$(basename $0)" "<bundle-dir>" "<manifest-dir>" "<report-dir>"
+}
+
+if [ $# -ne 4 ]; then
+    usage
+    exit 1
+fi
+
+BUNDLE_DIR=$1
+MANIFEST_DIR=$2
+REPORT_DIR=$3
+PROPOSAL_ID=$4
+REPORT_FILEPATH="${REPORT_DIR}"/validation-report.txt
+
+# NOTE: the -D is temporary until we have a tool to remove NaNs from
+# data.
+
+# NOTE: the --add-context line is also temporary until we have context
+# products ready.
+
+validate "${BUNDLE_DIR}" -M "${MANIFEST_DIR}"/checksum.manifest.txt -R pds4.bundle \
+    -D \
+    --add-context-products "${CONTEXT_PRODUCTS}-${PROPOSAL_ID}.json" \
+    -S ${SCHEMATRONS} -x ${SCHEMAS} \
+    -r "${REPORT_FILEPATH}"
+
+echo validate "${BUNDLE_DIR}" -M "${MANIFEST_DIR}"/checksum.manifest.txt -R pds4.bundle \
+    -D \
+    --add-context-products "${CONTEXT_PRODUCTS}-${PROPOSAL_ID}.json" \
+    -S ${SCHEMATRONS} -x ${SCHEMAS} \
+    -r "${REPORT_FILEPATH}"
+validate --version
+if [ ! -f "${REPORT_FILEPATH}" ]; then
+    die A PDS4 validation report was not generated.
+    exit 1
+fi
+
+# The validation tool returns a success error code even if the
+# validation fails, so we have to kludge around that.
+if grep -q FAIL "${REPORT_FILEPATH}"; then
+    die Validation contains failures.
+    exit 1
+fi
+
+exit 0

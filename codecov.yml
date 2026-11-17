@@ -1,0 +1,13 @@
+# No target is set yet: this project has no coverage baseline, because CI has never run
+# its tests. Once run-tests.yml has reported a few times, set a target that reflects the
+# measured number rather than an aspirational one.
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+        threshold: 1%
