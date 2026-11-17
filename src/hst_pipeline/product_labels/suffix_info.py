@@ -1595,9 +1595,13 @@ PICMAKER_BROWSE_SUFFIXES = {
     instrument: LOCAL_BROWSE_SUFFIXES for instrument in LOCAL_BROWSE_INSTRUMENTS
 }
 
-# OPUS-size suffixes appended by picmaker after --strip of the FITS suffix.
-# One FITS input yields four JPGs: {ipppssoot}_thumb/small/med/full.jpg.
-PICMAKER_OPUS_SIZE_SUFFIXES = ('thumb', 'small', 'med', 'full')
+# Browse tiers picmaker generates for each FITS input, in label order, mapped to the
+# string picmaker appends to the IPPPSSOOT after --strip of the FITS suffix. One FITS
+# input yields two JPGs: {ipppssoot}_thumb.jpg and the full-size {ipppssoot}.jpg.
+PICMAKER_BROWSE_TIERS = {
+    'thumb': '_thumb',
+    'full' : '',
+}
 
 # Per-instrument FITS suffixes that still store separate chips/detectors and
 # should be passed to picmaker with --mosaic. Combined products (e.g. drz/drc)
@@ -1623,8 +1627,8 @@ BrowseProductInfo = namedtuple('BrowseProductInfo', ['suffix',
                                                      'collection_name',
                                                      'is_locally_generated'])
 # [0] suffix: the suffix on the browse product, following IPPPSSOOT. This is normally the
-#     same as that for the FITS file, but might be an OPUS size
-#     tier ("thumb", "small", "med", "full") for browse_generated_* collections.
+#     same as that for the FITS file, but is a picmaker browse tier ("thumb" or "full")
+#     for browse_generated_* collections.
 # [1] mast_suffix: the suffix used in MAST.
 # [2] collection_name: name of the collection, e.g., "browse_mast_acs_flt" or
 #     "browse_generated_acs_drz".
@@ -1653,7 +1657,7 @@ for instrument_id, mast_suffixes in ACCEPTED_BROWSE_SUFFIXES.items():
         info = BrowseProductInfo(local_suffix, mast_suffix, collection_name, False)
         BROWSE_SUFFIX_INFO[instrument_id, fits_suffix].append(info)
 
-# Append picmaker OPUS-size browse products in browse_generated_* collections.
+# Append picmaker browse tiers in browse_generated_* collections.
 # These coexist with MAST browse products; they do not replace them.
 for instrument_id, fits_suffixes in PICMAKER_BROWSE_SUFFIXES.items():
     for fits_suffix in fits_suffixes:
@@ -1661,9 +1665,9 @@ for instrument_id, fits_suffixes in PICMAKER_BROWSE_SUFFIXES.items():
         collection_name = ('browse_generated_' + instrument_id.lower() + '_' +
                            short_suffix)
         browse_info_list = BROWSE_SUFFIX_INFO[instrument_id, fits_suffix]
-        for size_suffix in PICMAKER_OPUS_SIZE_SUFFIXES:
+        for tier in PICMAKER_BROWSE_TIERS:
             browse_info_list.append(
-                BrowseProductInfo(size_suffix, '', collection_name, True)
+                BrowseProductInfo(tier, '', collection_name, True)
             )
 
 ##########################################################################################

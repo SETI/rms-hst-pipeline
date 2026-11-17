@@ -276,7 +276,7 @@ def get_collection_label_data(proposal_id, target_dir, logger):
     for root, _, files in os.walk(target_dir):
         for file in files:
             # Browse inventory keys by IPPPSSOOT (format_term), same as CSV members.
-            # Multiple size variants (thumb/small/med/full) share one inventory row.
+            # Multiple size variants (e.g. thumb and full size) share one inventory row.
             if is_browse_prod(file):
                 format_term = get_format_term(file)
                 if format_term not in files_li:

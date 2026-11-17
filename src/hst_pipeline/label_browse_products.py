@@ -16,7 +16,7 @@ from hst_pipeline.hst_helper.fs_utils import (file_md5,
                                               get_format_term,
                                               get_formatted_proposal_id)
 from hst_pipeline.hst_helper.general_utils import create_xml_label
-from hst_pipeline.product_labels.suffix_info import PICMAKER_OPUS_SIZE_SUFFIXES
+from hst_pipeline.product_labels.suffix_info import PICMAKER_BROWSE_TIERS
 
 LABEL_VERSION = '1.0'
 LABEL_DATE = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -39,11 +39,12 @@ def data_collection_from_browse_collection(browse_collection_name):
 
 
 def _browse_sort_key(filename):
-    """Order OPUS size tiers thumb/small/med/full; otherwise alphabetical."""
+    """Order picmaker browse tiers (thumbnail, then full size); otherwise alphabetical."""
     stem, _, _ = filename.rpartition('.')
-    _, _, suffix = stem.partition('_')
+    _, sep, suffix = stem.partition('_')
+    tier_suffixes = list(PICMAKER_BROWSE_TIERS.values())
     try:
-        return (0, PICMAKER_OPUS_SIZE_SUFFIXES.index(suffix))
+        return (0, tier_suffixes.index(sep + suffix))
     except ValueError:
         return (1, filename.lower())
 

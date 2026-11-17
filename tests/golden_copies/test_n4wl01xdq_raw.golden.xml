@@ -194,18 +194,6 @@
 
     <Internal_Reference>
       <lid_reference>urn:nasa:pds:hst_07885:browse_generated_nicmos_raw:n4wl01xdq</lid_reference>
-      <reference_type>data_to_small</reference_type>
-      <comment>Small browse product</comment>
-    </Internal_Reference>
-
-    <Internal_Reference>
-      <lid_reference>urn:nasa:pds:hst_07885:browse_generated_nicmos_raw:n4wl01xdq</lid_reference>
-      <reference_type>data_to_med</reference_type>
-      <comment>Medium browse product</comment>
-    </Internal_Reference>
-
-    <Internal_Reference>
-      <lid_reference>urn:nasa:pds:hst_07885:browse_generated_nicmos_raw:n4wl01xdq</lid_reference>
       <reference_type>data_to_full</reference_type>
       <comment>Full-resolution browse product</comment>
     </Internal_Reference>

@@ -1,9 +1,9 @@
 ##########################################################################################
 # generate_browse_previews.py
 #
-# Generate OPUS-size browse JPG previews with picmaker for FITS products whose
-# (instrument, suffix) pair is listed in PICMAKER_BROWSE_SUFFIXES. Output is
-# written to browse_generated_{inst}_{suffix}/ collections.
+# Generate browse JPG previews (a thumbnail and a full-size image) with picmaker for FITS
+# products whose (instrument, suffix) pair is listed in PICMAKER_BROWSE_SUFFIXES. Output
+# is written to browse_generated_{inst}_{suffix}/ collections.
 ##########################################################################################
 
 import os
@@ -18,7 +18,7 @@ from picmaker.picmaker import picmaker
 
 from hst_pipeline.hst_helper.fs_utils import get_format_term
 from hst_pipeline.product_labels.suffix_info import (PICMAKER_BROWSE_SUFFIXES,
-                                                     PICMAKER_OPUS_SIZE_SUFFIXES,
+                                                     PICMAKER_BROWSE_TIERS,
                                                      use_mosaic)
 
 _CONFIG_DIR = Path(__file__).resolve().parent / 'picmaker_configs'
@@ -29,7 +29,7 @@ _NICMOS_CONFIG = _CONFIG_DIR / 'nicmos_previews.txt'
 _STIS_CONFIG = _CONFIG_DIR / 'stis_previews.txt'
 _COS_FGS_FOS_GHRS_HSP_CONFIG = _CONFIG_DIR / 'cos_fgs_fos_ghrs_hsp_previews.txt'
 
-# Group instruments by shared preview behavior (stretch / tint / product era).
+# Group instruments by shared preview behavior (stretch / product era).
 _ACS_WFC3_INSTRUMENTS = frozenset({'ACS', 'WFC3'})
 _WFPC_WFPC2_INSTRUMENTS = frozenset({'WFPC', 'WFPC2'})
 _COS_FGS_FOS_GHRS_HSP_INSTRUMENTS = frozenset({'COS', 'FGS', 'FOS', 'GHRS', 'HSP'})
@@ -46,19 +46,25 @@ def picmaker_browse_collection_name(instrument_id, suffix):
     return f'browse_generated_{instrument_id.lower()}_{suffix}'
 
 
-def expected_opus_jpg_names(fits_path):
-    """Return the four OPUS-size JPG basenames expected for one FITS product."""
+def expected_browse_jpg_names(fits_path):
+    """Return the JPG basenames expected for one FITS product, one per browse tier.
+
+    Inputs:
+        fits_path       path to the input FITS file.
+
+    Returns:    a list of basenames in tier order, e.g. ['n4wl01xdq_thumb.jpg',
+                'n4wl01xdq.jpg'].
+    """
 
     format_term = get_format_term(Path(fits_path).name)
-    return [f'{format_term}_{size}.jpg' for size in PICMAKER_OPUS_SIZE_SUFFIXES]
+    return [f'{format_term}{suffix}.jpg' for suffix in PICMAKER_BROWSE_TIERS.values()]
 
 
 def _get_picmaker_recipe(instrument_id, suffix):
     """Return (versions_path, extra_args) for an instrument and suffix.
 
-    Suffix-uniform stretch, layout, tint, and trim flags live in the versions
-    config file (sized tiers include ``--tint`` where appropriate; ``_full``
-    does not). ``extra_args`` carries only suffix-varying options (``--mosaic``).
+    Suffix-uniform stretch, layout, and trim flags live in the versions config file.
+    ``extra_args`` carries only suffix-varying options (``--mosaic``).
 
     Inputs:
         instrument_id   HST instrument id (e.g. ACS, WFC3).
@@ -93,7 +99,7 @@ def _versions_file_for_suffix(versions_path, suffix):
     """Write a temporary versions file with ``--strip`` set for ``suffix``.
 
     Inputs:
-        versions_path   picmaker versions file defining thumb/small/med/full.
+        versions_path   picmaker versions file defining the thumb and full-size tiers.
         suffix          FITS suffix used to parameterize ``--strip`` in the versions file.
     """
 
@@ -113,7 +119,7 @@ def generate_hst_previews(fits_path, out_dir, versions_path, suffix, extra_args=
     Inputs:
         fits_path       path to the input FITS file.
         out_dir         output directory for the generated JPGs.
-        versions_path   picmaker versions file defining thumb/small/med/full.
+        versions_path   picmaker versions file defining the thumb and full-size tiers.
         suffix          FITS suffix used to parameterize ``--strip`` in the versions file.
         extra_args      suffix-varying picmaker CLI tokens (e.g. --mosaic, --trim).
     """
@@ -140,10 +146,10 @@ def generate_hst_previews(fits_path, out_dir, versions_path, suffix, extra_args=
 def generate_browse_previews(fits_path, out_dir, instrument_id, suffix, logger=None):
     """Generate picmaker browse previews for one FITS product.
 
-    Runs picmaker without ``--proceed``. On any picmaker failure, or if fewer than
-    all four OPUS-size JPGs are produced, logs a warning and returns False without
-    creating ``out_dir``. Only creates ``browse_generated_*`` paths when all four
-    JPGs are ready to install.
+    Runs picmaker without ``--proceed``. On any picmaker failure, or if either the
+    thumbnail or the full-size JPG is missing, logs a warning and returns False without
+    creating ``out_dir``. Only creates ``browse_generated_*`` paths when both JPGs are
+    ready to install.
 
     Inputs:
         fits_path       path to the FITS file in a data_{inst}_{suffix} collection.
@@ -153,7 +159,7 @@ def generate_browse_previews(fits_path, out_dir, instrument_id, suffix, logger=N
         logger          pdslogger to use; None for default EasyLogger.
 
     Returns:
-        True if all four JPGs were written under ``out_dir``; False if generation
+        True if both JPGs were written under ``out_dir``; False if generation
         was skipped after a warning.
     """
 
@@ -171,7 +177,7 @@ def generate_browse_previews(fits_path, out_dir, instrument_id, suffix, logger=N
         f'({instrument_id}/{suffix}) -> {out_dir}'
     )
 
-    expected = expected_opus_jpg_names(fits_path)
+    expected = expected_browse_jpg_names(fits_path)
     with tempfile.TemporaryDirectory() as tmp:
         tmp_dir = Path(tmp)
         try:
