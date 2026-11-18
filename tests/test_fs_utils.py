@@ -120,3 +120,11 @@ def test_create_col_dir_in_bundle(monkeypatch):
     assert result[0] == '/tmp/bundles/hst_12345-deliverable/hst_12345'
     assert result[1] == '/tmp/bundles/hst_12345-deliverable/hst_12345/data_collection'
     assert called['path'].endswith('data_collection')
+
+
+def test_get_context_products_path():
+    # Beside the bundle, in the program directory under the bundles root
+    assert (fs_utils.get_context_products_path(14609)
+            == '/tmp/bundles/hst_14609-deliverable/tmp-context-products-14609.json')
+    assert (fs_utils.get_context_products_path('5167')
+            == '/tmp/bundles/hst_05167-deliverable/tmp-context-products-05167.json')

@@ -8,11 +8,12 @@
 import bs4
 from collections import defaultdict
 import json
+import os
 import pdslogger
 import urllib
 
+from hst_pipeline.hst_helper.fs_utils import get_context_products_path
 from hst_pipeline.hst_helper.general_utils import create_collection_label
-# from hst_helper.fs_utils import get_deliverable_path
 
 PDS_URL = 'https://pds.nasa.gov/data/pds4/context-pds4/target/'
 
@@ -82,8 +83,9 @@ def create_target_label(proposal_id, data_dict, logger=None):
     create_tmp_context_json(proposal_id, data_dict, missing_target_list)
 
 def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
-    """Create tmp-context-products.json to store additional context product information
-    used for validation. It will be passed to --add-context-products parameter in the
+    """Create tmp-context-products-<nnnnn>.json to store additional context product
+    information used for validation. It is written beside the bundle (see
+    get_context_products_path) and passed to the --add-context-products parameter in the
     validation, for development purpose only.
 
     Inputs:
@@ -120,5 +122,7 @@ def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
             'lidvid': targ_lidvid,
         }
         json_data['Product_Context'].append(new_context)
-    with open(f'tmp-context-products-{proposal_id}.json', 'w') as tmp_json:
+    json_path = get_context_products_path(proposal_id)
+    os.makedirs(os.path.dirname(json_path), exist_ok=True)
+    with open(json_path, 'w') as tmp_json:
         json.dump(json_data, tmp_json)

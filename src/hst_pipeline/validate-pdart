@@ -1,6 +1,4 @@
 #!/bin/bash
-# Use the tmp-context-products.json written next to this script by run_validation.py
-CONTEXT_PRODUCTS=./tmp-context-products
 # The PDS4 schemas ship inside the package, alongside this script. Resolve them from the
 # script's own location so the path holds whether the package is installed or run from a
 # checkout.
@@ -13,7 +11,8 @@ die(){
 }
 
 usage(){
-    die Usage: "$(basename $0)" "<bundle-dir>" "<manifest-dir>" "<report-dir>"
+    die Usage: "$(basename $0)" "<bundle-dir>" "<manifest-dir>" "<report-dir>" \
+        "<context-products-json>"
 }
 
 if [ $# -ne 4 ]; then
@@ -24,7 +23,8 @@ fi
 BUNDLE_DIR=$1
 MANIFEST_DIR=$2
 REPORT_DIR=$3
-PROPOSAL_ID=$4
+# Extra, not-yet-registered context products (written by create_target_label.py)
+CONTEXT_PRODUCTS_JSON=$4
 REPORT_FILEPATH="${REPORT_DIR}"/validation-report.txt
 
 # NOTE: the -D is temporary until we have a tool to remove NaNs from
@@ -35,13 +35,13 @@ REPORT_FILEPATH="${REPORT_DIR}"/validation-report.txt
 
 validate "${BUNDLE_DIR}" -M "${MANIFEST_DIR}"/checksum.manifest.txt -R pds4.bundle \
     -D \
-    --add-context-products "${CONTEXT_PRODUCTS}-${PROPOSAL_ID}.json" \
+    --add-context-products "${CONTEXT_PRODUCTS_JSON}" \
     -S ${SCHEMATRONS} -x ${SCHEMAS} \
     -r "${REPORT_FILEPATH}"
 
 echo validate "${BUNDLE_DIR}" -M "${MANIFEST_DIR}"/checksum.manifest.txt -R pds4.bundle \
     -D \
-    --add-context-products "${CONTEXT_PRODUCTS}-${PROPOSAL_ID}.json" \
+    --add-context-products "${CONTEXT_PRODUCTS_JSON}" \
     -S ${SCHEMATRONS} -x ${SCHEMAS} \
     -r "${REPORT_FILEPATH}"
 validate --version

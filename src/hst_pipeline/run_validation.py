@@ -7,7 +7,8 @@ import pdslogger
 import shutil
 from subprocess import run
 
-from hst_pipeline.hst_helper.fs_utils import (get_deliverable_path,
+from hst_pipeline.hst_helper.fs_utils import (get_context_products_path,
+                                              get_deliverable_path,
                                               get_program_dir_path,
                                               get_formatted_proposal_id,
                                               file_md5)
@@ -46,7 +47,8 @@ def run_validation(proposal_id, logger=None):
     program_dir = get_program_dir_path(proposal_id, None, root_dir='bundles')
     logger.info(f'Run validation-pdart for proposal id: {proposal_id} on {bundle_dir}')
     try:
-        run([VALIDATE_PDART, bundle_dir, program_dir, program_dir, str(proposal_id)],
+        run([VALIDATE_PDART, bundle_dir, program_dir, program_dir,
+             get_context_products_path(proposal_id)],
             cwd=HST_DIR, check=True)
     except:
         logger.error(
@@ -55,7 +57,7 @@ def run_validation(proposal_id, logger=None):
 
     # remove tmp context json
     try:
-        os.remove(os.path.join(HST_DIR, f'tmp-context-products-{proposal_id}.json'))
+        os.remove(get_context_products_path(proposal_id))
     except FileNotFoundError: #pragma: no cover
         pass
 

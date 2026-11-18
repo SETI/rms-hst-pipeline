@@ -80,6 +80,22 @@ def get_deliverable_path(proposal_id, testing=False):
     return (f'{get_program_dir_path(proposal_id, None, "bundles", testing)}'
             f'/hst_{formatted_proposal_id}')
 
+def get_context_products_path(proposal_id, testing=False):
+    """Return the path of the temporary context-products JSON file that is passed to the
+    validator for a given proposal id. It sits beside the bundle, in the program
+    directory under the bundles root.
+
+    Input:
+        proposal_id    a proposal id.
+        testing        the flag used to determine if we are calling the function for
+                       testing purpose with the test directory.
+
+    Returns:    <HST_BUNDLES>/hst_<nnnnn>-deliverable/tmp-context-products-<nnnnn>.json
+    """
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    return (f'{get_program_dir_path(proposal_id, None, "bundles", testing)}'
+            f'/tmp-context-products-{formatted_proposal_id}.json')
+
 def get_format_term(filename):
     """Return IPPPSSOOT for a given file name.
 
