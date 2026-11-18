@@ -122,6 +122,18 @@ def test_prepare_leaves_unfiled_file_in_inbox(staging):
     ]
 
 
+def test_prepare_leaves_duplicate_named_file_in_inbox(staging):
+    inbox = _inbox(staging)
+    _write(inbox / 'odtf01010' / 'odtf01e5j_epc.fits')
+    _write(inbox / 'odtf01020' / 'odtf01e5j_epc.fits-duplicate')
+
+    assert prepare_module.prepare_browse_products(PROPOSAL_ID, VISIT) == 1
+    assert _all_files(staging) == [
+        'miscellaneous_stis_epc/visit_01/odtf01e5j_epc.fits',
+        'visit_01/mastDownload/HST/odtf01020/odtf01e5j_epc.fits-duplicate',
+    ]
+
+
 @pytest.mark.parametrize('filename,expected', [
     ('ld8x01010_x1dsum3.fits', 'data_cos_x1dsum'),
     ('ld8x01010_x1dsum3.xml', 'data_cos_x1dsum'),
@@ -131,6 +143,8 @@ def test_prepare_leaves_unfiled_file_in_inbox(staging):
     ('u2no0401t_drw.jpg', 'browse_wfpc2_drw'),
     ('j9xx01abq_drz_large.jpg', None),
     ('hst_05167_readme.txt', None),
+    ('odtf01e5j_epc.fits-duplicate', None),     # renamed repeat from an old download
+    ('ld8x01010_x1dsum.fits.gz', None),
 ])
 def test_get_collection_dirname(filename, expected):
     assert prepare_module.get_collection_dirname(filename) == expected
@@ -250,3 +264,16 @@ def test_dedupe_handles_each_visit_separately(staging):
     assert [(r.visit, r.deleted) for r in results] == [('01', True), ('02', False)]
     assert not (staging / 'visit_01' / 'mastDownload').exists()
     assert (staging / 'visit_02' / 'mastDownload').is_dir()
+
+
+@pytest.mark.parametrize('content,deleted', [(b'data', True), (b'other', False)])
+def test_dedupe_checks_duplicate_named_file_against_original(staging, content, deleted):
+    _write(staging / 'miscellaneous_stis_epc' / 'visit_01' / 'odtf01e5j_epc.fits')
+    _write(_inbox(staging) / 'odtf01020' / 'odtf01e5j_epc.fits-duplicate', content)
+
+    results = dedupe_module.dedupe_staging(PROPOSAL_ID, delete=True)
+
+    assert [(r.redundant, r.unfiled, r.deleted) for r in results] == [
+        (1 if deleted else 0, [], deleted)
+    ]
+    assert (staging / 'visit_01' / 'mastDownload').exists() != deleted

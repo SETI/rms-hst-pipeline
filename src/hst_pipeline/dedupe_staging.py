@@ -19,6 +19,9 @@ from hst_pipeline.hst_helper import MAST_DOWNLOAD_DIRNAME
 from hst_pipeline.hst_helper.fs_utils import get_program_dir_path
 from hst_pipeline.prepare_browse_products import get_filed_path
 
+# Suffix that older download steps appended to a repeated file instead of dropping it.
+DUPLICATE_SUFFIX = '-duplicate'
+
 # Outcome for one visit.
 #   visit       two character visit.
 #   redundant   number of files with a byte-identical filed copy.
@@ -30,7 +33,8 @@ VisitResult = namedtuple('VisitResult',
 
 
 def check_visit_inbox(proposal_id, visit):
-    """Check every file in one visit's mastDownload tree against its filed copy.
+    """Check every file in one visit's mastDownload tree against its filed copy. A file
+    named "<name>-duplicate" is checked against the filed copy of <name>.
 
     Inputs:
         proposal_id    a proposal id.
@@ -47,6 +51,10 @@ def check_visit_inbox(proposal_id, visit):
         for file in sorted(files):
             path = os.path.join(root, file)
             dest = get_filed_path(proposal_id, visit, file)
+            if dest is None and file.endswith(DUPLICATE_SUFFIX):
+                # A renamed repeat is redundant only if it matches the filed original.
+                dest = (get_filed_path(proposal_id, visit,
+                                       file[:-len(DUPLICATE_SUFFIX)]) or '')
             if dest is None:
                 unfiled.append(path)
             elif os.path.isfile(dest) and filecmp.cmp(path, dest, shallow=False):

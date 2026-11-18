@@ -28,6 +28,10 @@ from hst_pipeline.hst_helper.fs_utils import (get_formatted_proposal_id,
                                               get_instrument_id_from_fname,
                                               get_file_suffix)
 
+# Extensions of the downloaded data files and their labels. Any other file, e.g., a
+# "*.fits-duplicate" left by an older download step, belongs in no collection.
+DATA_EXTENSIONS = ('fits', 'xml')
+
 
 def get_collection_dirname(filename):
     """Return the name of the collection that a downloaded file belongs in.
@@ -37,7 +41,8 @@ def get_collection_dirname(filename):
                     its label "ld8x01010_x1dsum1.xml", or a preview "u2no0401t_c0f.jpg".
 
     Returns:    the collection name, e.g., "data_cos_x1dsum" or "browse_wfpc2_c0m"; None if
-                the file belongs in no collection.
+                the file belongs in no collection, including any file whose extension is
+                not one of DATA_EXTENSIONS or BROWSE_PROD_EXT.
     """
     inst_id = get_instrument_id_from_fname(filename)
     if inst_id is None:
@@ -48,6 +53,8 @@ def get_collection_dirname(filename):
     if ext.lower() in BROWSE_PROD_EXT:
         if is_accepted_browse_suffix(suffix, inst_id):
             return browse_collection_name(suffix, inst_id)
+        return None
+    if ext.lower() not in DATA_EXTENSIONS:
         return None
     if suffix in ACCEPTED_SUFFIXES[inst_id]:
         return collection_name(suffix, inst_id)

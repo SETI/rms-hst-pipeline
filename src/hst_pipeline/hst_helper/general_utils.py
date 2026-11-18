@@ -120,6 +120,9 @@ def get_citation_info(proposal_id, logger):
         logger         pdslogger to use; None for default EasyLogger.
 
     Returns:    the Citation_Information object of the given proposal id.
+
+    Raises:     FileNotFoundError if the pipeline directory holds no proposal file to read
+                it from, i.e., hst-get-program-info has not been run for the proposal.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     if formatted_proposal_id in CITATION_INFO_DICT:
@@ -128,8 +131,9 @@ def get_citation_info(proposal_id, logger):
     logger.info(f'Get citation info for: {proposal_id}')
 
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
+    files = os.listdir(pipeline_dir) if os.path.isdir(pipeline_dir) else []
 
-    for file in os.listdir(pipeline_dir):
+    for file in files:
         _, _, ext = file.rpartition('.')
         # We don't have an implementation to create citation info from pdf.
         if ext in DOCUMENT_EXT_FOR_CITATION_INFO:
@@ -139,6 +143,13 @@ def get_citation_info(proposal_id, logger):
                     Citation_Information.create_from_file(file_path)
                 )
             return CITATION_INFO_DICT[formatted_proposal_id]
+
+    exts = ', '.join('.' + ext for ext in DOCUMENT_EXT_FOR_CITATION_INFO)
+    message = (f'No proposal file ({exts}) for proposal id {proposal_id} in '
+               f'{pipeline_dir}; run "hst-get-program-info --proposal-id {proposal_id}" '
+               'first')
+    logger.error(message)
+    raise FileNotFoundError(message)
 
 def get_instrument_id_set(proposal_id, logger):
     """Walk through all downloaded files, store data in the INST_ID_DICT, and return

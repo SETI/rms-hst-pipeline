@@ -91,6 +91,21 @@ def test_get_citation_info_from_file(monkeypatch, tmp_path, fake_logger):
     result = general_utils.get_citation_info('54321', fake_logger)
     assert result == 'created'
 
+@pytest.mark.parametrize('make_dir', [True, False])
+def test_get_citation_info_missing_says_what_to_run(monkeypatch, tmp_path, fake_logger,
+                                                    make_dir):
+    # A pipeline directory without proposal files, or no pipeline directory at all
+    general_utils.CITATION_INFO_DICT.pop('15490', None)
+    pipeline_dir = tmp_path / 'hst_15490'
+    if make_dir:
+        pipeline_dir.mkdir()
+        (pipeline_dir / '15490.pdf').write_text('not readable for citations')
+    monkeypatch.setattr(general_utils, 'get_program_dir_path',
+                        lambda pid, v, root_dir: str(pipeline_dir))
+    with pytest.raises(FileNotFoundError, match='hst-get-program-info --proposal-id 15490'):
+        general_utils.get_citation_info(15490, fake_logger)
+    assert any(m.startswith('ERROR: No proposal file') for m in fake_logger.messages)
+
 def test_get_instrument_id_set(monkeypatch, fake_logger):
     monkeypatch.setitem(general_utils.INST_ID_DICT, '12345', set(['WFC']))
     monkeypatch.setattr(general_utils, 'get_formatted_proposal_id', lambda pid: '12345')
