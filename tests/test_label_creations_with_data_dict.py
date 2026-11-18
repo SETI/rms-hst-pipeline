@@ -117,7 +117,7 @@ class TestLabelCreationsWithDataDict:
             'inst_id': 'nicmos',
             'collection_title': 'Calibrated NICMOS "_cal" image files from HST ' +
                                 'Program 7885.',
-            'instrument_name': 'Near-Infrared Camera and Multi-Object Spectrometer',
+            'instrument_name': 'HST Near Infrared Camera and Multi-Object Spectrometer',
             'stop_date_time': '1998-08-05T03:02:11Z',
         }
         data_dict = {**self.data_dict, **data_dict}

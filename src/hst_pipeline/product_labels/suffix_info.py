@@ -92,19 +92,24 @@ INSTRUMENT_FROM_LETTER_CODE = {
 # Inverse mapping...
 LETTER_CODE_FROM_INSTRUMENT = {v:k for k,v in INSTRUMENT_FROM_LETTER_CODE.items()}
 
+# Instrument names as registered in the PDS instrument context products
+# (urn:nasa:pds:context:instrument:hst.<inst>), using the form that names HST. Validate
+# checks each label's instrument name against these. WFPC2 is registered only as
+# "... for HST", not "HST ...".
+# GHRS and WFPC are not registered yet; their names follow the same pattern.
 INSTRUMENT_NAMES = {
-    'ACS'   : 'Advanced Camera for Surveys',
-    'COS'   : 'Cosmic Origins Spectrograph',
-    'FGS'   : 'Fine Guidance Sensors',
-    'FOC'   : 'Faint Object Camera',
-    'FOS'   : 'Faint Object Spectrograph',
-    'GHRS'  : 'Goddard High Resolution Spectrograph',
-    'HSP'   : 'High Speed Photometer',
-    'NICMOS': 'Near-Infrared Camera and Multi-Object Spectrometer',
-    'STIS'  : 'Space Telescope Imaging Spectrograph',
-    'WFC3'  : 'Wide Field Camera 3',
-    'WFPC'  : 'Wide Field/Planetary Camera',
-    'WFPC2' : 'Wide Field and Planetary Camera 2',
+    'ACS'   : 'HST Advanced Camera for Surveys',
+    'COS'   : 'HST Cosmic Origins Spectrograph',
+    'FGS'   : 'HST Fine Guidance Sensor',
+    'FOC'   : 'HST Faint Object Camera',
+    'FOS'   : 'HST Faint Object Spectrograph',
+    'GHRS'  : 'HST Goddard High Resolution Spectrograph',
+    'HSP'   : 'HST High Speed Photometer',
+    'NICMOS': 'HST Near Infrared Camera and Multi-Object Spectrometer',
+    'STIS'  : 'HST Space Telescope Imaging Spectrograph',
+    'WFC3'  : 'HST Wide Field Camera 3',
+    'WFPC'  : 'HST Wide Field/Planetary Camera',
+    'WFPC2' : 'Wide Field Planetary Camera 2 for HST',
 }
 
 ##########################################################################################

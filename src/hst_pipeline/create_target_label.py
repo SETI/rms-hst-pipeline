@@ -14,10 +14,20 @@ import urllib
 
 from hst_pipeline.hst_helper.fs_utils import get_context_products_path
 from hst_pipeline.hst_helper.general_utils import create_collection_label
+from hst_pipeline.product_labels.suffix_info import INSTRUMENT_NAMES
 
 PDS_URL = 'https://pds.nasa.gov/data/pds4/context-pds4/target/'
 
 TARGET_LABEL_TEMPLATE = 'TARGET_LABEL.xml'
+
+# Names and types of the context products, exactly as the label templates write them
+# (PRODUCT_LABEL.xml, PRODUCT_COLLECTION_LABEL.xml, BUNDLE_LABEL.xml), so that validate
+# can match each context reference against the temporary context-products JSON.
+INVESTIGATION_NAME_FMT = 'HST observing program {}'
+INVESTIGATION_TYPE = 'Individual Investigation'
+HOST_NAME = 'Hubble Space Telescope'
+HOST_TYPE = 'Host'
+INSTRUMENT_TYPE = 'Instrument'
 
 def create_target_label(proposal_id, data_dict, logger=None):
     """Create target label under context collection if it doesn't exist in PDS page.
@@ -95,19 +105,23 @@ def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
     # TODO: figure out the version id for all context data
     vid = '1.0'
     context_data = [
-        f'urn:nasa:pds:context:investigation:individual.hst_{proposal_id:05}::{vid}',
-        f'urn:nasa:pds:context:instrument_host:spacecraft.hst::{vid}'
+        (f'urn:nasa:pds:context:investigation:individual.hst_{proposal_id:05}::{vid}',
+         INVESTIGATION_NAME_FMT.format(proposal_id), INVESTIGATION_TYPE),
+        (f'urn:nasa:pds:context:instrument_host:spacecraft.hst::{vid}',
+         HOST_NAME, HOST_TYPE),
     ]
 
     for inst in data_dict['inst_id_li']:
-        context_data.append(f'urn:nasa:pds:context:instrument:hst.{inst.lower()}::{vid}')
+        context_data.append(
+            (f'urn:nasa:pds:context:instrument:hst.{inst.lower()}::{vid}',
+             INSTRUMENT_NAMES[inst], INSTRUMENT_TYPE))
 
     json_data = defaultdict(list)
-    for data in context_data:
+    for (lidvid, name, type_) in context_data:
         new_context = {
-            'name': [],
-            'type': [],
-            'lidvid': data,
+            'name': [name],
+            'type': [type_],
+            'lidvid': lidvid,
         }
         json_data['Product_Context'].append(new_context)
 

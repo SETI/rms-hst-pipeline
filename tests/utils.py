@@ -2,6 +2,7 @@ import os
 import shutil
 
 from hst_pipeline.citations import Citation_Information
+from hst_pipeline.product_labels.suffix_info import INSTRUMENT_NAMES
 
 TEST_COPIES_DIR = 'golden_copies'
 
@@ -47,19 +48,7 @@ LBL_DATA_DICT = {
                         '1999.',
     'processing_level': 'Raw',
     'wavelength_ranges': ['Near Infrared', 'Infrared'],
-    'instrument_name_dict': {'ACS': 'Advanced Camera for Surveys',
-                                'COS': 'Cosmic Origins Spectrograph',
-                                'FGS': 'Fine Guidance Sensors',
-                                'FOC': 'Faint Object Camera',
-                                'FOS': 'Faint Object Spectrograph',
-                                'GHRS': 'Goddard High Resolution Spectrograph',
-                                'HSP': 'High Speed Photometer',
-                                'NICMOS': 'Near-Infrared Camera and' +
-                                        ' Multi-Object Spectrometer',
-                                'STIS': 'Space Telescope Imaging Spectrograph',
-                                'WFC3': 'Wide Field Camera 3',
-                                'WFPC': 'Wide Field/Planetary Camera',
-                                'WFPC2': 'Wide Field and Planetary Camera 2'},
+    'instrument_name_dict': INSTRUMENT_NAMES,
     'target_identifications': [
         {'name': 'Uranus',
             'alternate_designations': [],
