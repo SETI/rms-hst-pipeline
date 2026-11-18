@@ -156,7 +156,7 @@
           <hst:repeat_exposure_count>1</hst:repeat_exposure_count>
           <hst:subarray_flag>false</hst:subarray_flag>
           <hst:binning_mode>1</hst:binning_mode>
-          <hst:plate_scale unit="mrad/pixel">4.2e-05</hst:plate_scale>
+          <hst:plate_scale unit="arcsec/pixel">0.042</hst:plate_scale>
         </hst:Operational_Parameters>
         <hst:Processing_Parameters>
           <hst:mast_pipeline_version_id>OPUS 2008_5c</hst:mast_pipeline_version_id>

@@ -570,6 +570,15 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
                 filters.sort()
                 filter_name = '+'.join(filters)
 
+        elif instrument_id == 'COS':
+            # COS has no filter wheel; its optical element is the grating or, for NUV
+            # imaging, the mirror (MIRRORA/MIRRORB). Science files record it as OPT_ELEM;
+            # otherwise use the spt file's SPEC_1.
+            if 'OPT_ELEM' in header0:
+                filter_name = header0['OPT_ELEM']
+            else:
+                filter_name = get_or_log(spt_header, 'SPEC_1')
+
         elif instrument_id == 'FGS':
             filter_name = header0['CAST_FLT']
 

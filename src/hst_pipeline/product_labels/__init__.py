@@ -828,6 +828,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                                                                     channel_id)
 
         hst_dictionary = basename_dict['hst_dictionary']
+        basename_dict['plate_scale_nil_reason'] = suffix_info.plate_scale_nil_reason(
+                                                                        instrument_id)
 
         ic = instrument_id + ('/' + channel_id if channel_id != instrument_id else '')
         icp_dict = {'I': instrument_id, 'IC': ic, 'P': hst_dictionary['hst_proposal_id']}

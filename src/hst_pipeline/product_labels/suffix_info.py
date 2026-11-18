@@ -58,6 +58,20 @@ UNWAIVERED_INSTRUMENTS = {'ACS', 'COS', 'NICMOS', 'STIS', 'WFC3'}
 ALL_INSTRUMENTS = WAIVERED_INSTRUMENTS | UNWAIVERED_INSTRUMENTS | {'FGS', 'WFPC2'}
 # For our purposes, FGS and WFPC2 are always special cases.
 
+# Instruments that do not form images, so a plate scale is inapplicable.
+NON_IMAGING_INSTRUMENTS = {'COS', 'FGS', 'FOS', 'GHRS', 'HSP'}
+
+
+def plate_scale_nil_reason(instrument_id):
+    """Return the nilReason for a missing plate scale.
+
+    Input:
+        instrument_id    instrument ID, e.g., "COS".
+
+    Returns:    "inapplicable" for a non-imaging instrument; otherwise "missing".
+    """
+    return 'inapplicable' if instrument_id in NON_IMAGING_INSTRUMENTS else 'missing'
+
 # First letter of filenames and the corresponding instrument IDs
 # From https://archive.stsci.edu/hlsp/ipppssoot.html
 INSTRUMENT_FROM_LETTER_CODE = {
