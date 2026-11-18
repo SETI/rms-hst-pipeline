@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <?xml-model href="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1F00.sch"
     schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="https://pds.nasa.gov/pds4/mission/hst/v1/PDS4_HST_1D00_1000.sch"
-    schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Document xmlns="http://pds.nasa.gov/pds4/pds/v1"
               xmlns:pds="http://pds.nasa.gov/pds4/pds/v1"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
