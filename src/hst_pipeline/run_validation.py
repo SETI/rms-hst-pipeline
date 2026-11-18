@@ -82,7 +82,7 @@ def create_manifest_files(proposal_id, logger):
     for root, dirs, files in os.walk(deliverable_path, topdown=True):
         for name in files:
             file_path = os.path.join(root, name)
-            _, _, file_logical_path = file_path.partition('deliverable/')
+            file_logical_path = os.path.relpath(file_path, deliverable_path)
             cm_files_li.add((file_path, file_logical_path))
             if 'bundle' in file_logical_path:
                 lidvid = f'{lidvid_prefix}::{VID}'

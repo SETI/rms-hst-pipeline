@@ -30,7 +30,7 @@ def patch_helpers(monkeypatch):
 def test_organize_files_from_staging_to_bundles_basic(mock_copytree, mock_makedirs, mock_get_program_dir_path, mock_get_deliverable_path, fake_logger, patch_helpers, monkeypatch):
     proposal_id = '12345'
     staging_dir = '/fake/staging/hst_12345'
-    deliverable_path = '/fake/bundles/hst_12345-deliverable'
+    deliverable_path = '/fake/bundles/hst_12345-deliverable/hst_12345'
     dirs = ['data_foo', 'miscellaneous_bar', 'browse_baz', 'other']
     mock_get_program_dir_path.return_value = staging_dir
     mock_get_deliverable_path.return_value = deliverable_path

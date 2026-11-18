@@ -221,7 +221,7 @@ July 9, 2024
 - Priority: 5 (Highest)
 - State:
   - New files have been filed by **prepare-browse-products** into `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`.
-  - Existing bundle, if any, is at `<HST_BUNDLES>/hst_<nnnnn>/`.
+  - Existing bundle, if any, is at `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`.
 - Actions:
   - Compare the staged FITS files to those in an existing bundle, if any.
   - Create a new XML label for each file, labeling all of the visit's collections together so that labels can refer to the visit's other files.
@@ -244,12 +244,12 @@ July 9, 2024
 - Actions:
   - Get the general label data used in document/schema/context/bundle labels
   - Move existing, superseded files as described in PDS4-VERSIONING.txt ([To be implemented](https://github.com/SETI/rms-hst-pipeline/issues/105))
-  - Generate the final document directory under `<HST_BUNDLES>/hst_<nnnnn>/`
-  - Generate the final schema directory under `<HST_BUNDLES>/hst_<nnnnn>/`
-  - Generate the final context directory under `<HST_BUNDLES>/hst_<nnnnn>/`
-  - Organize data files from MAST, move them from staging `<HST_STAGING>/hst_<nnnnn>/` to bundles `<HST_BUNDLES>/hst_<nnnnn>/` (keep files from MAST at staging directory, we could consider removing them since they are not used)
-  - Create data collection files for each collection directory under `<HST_BUNDLES>/hst_<nnnnn>/`
-  - Create bundle label under `<HST_BUNDLES>/hst_<nnnnn>/`
-  - Create target label under `<HST_BUNDLES>/hst_<nnnnn>/context` if it doesn't exist in PDS page
-  - Create manifest files & run validator
+  - Generate the final document directory under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
+  - Generate the final schema directory under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
+  - Generate the final context directory under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
+  - Organize data files from MAST, move them from staging `<HST_STAGING>/hst_<nnnnn>/` to bundles `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/` (keep files from MAST at staging directory, we could consider removing them since they are not used)
+  - Create data collection files for each collection directory under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
+  - Create bundle label under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
+  - Create target label under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/context` if it doesn't exist in PDS page
+  - Create manifest files in `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` & run validator, which writes `validation-report.txt` there
   - Question: Will we need this process to generate a doi? How do we handle that? ([To be implemented](https://github.com/SETI/rms-hst-pipeline/issues/106))

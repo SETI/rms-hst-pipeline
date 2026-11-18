@@ -10,7 +10,7 @@ from hashlib import md5
 import os
 import shutil
 
-from . import HST_DIR
+from . import DELIVERABLE_SUFFIX, HST_DIR
 from hst_pipeline.product_labels.suffix_info import (INSTRUMENT_FROM_LETTER_CODE,
                                                      product_id)
 
@@ -35,6 +35,10 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline', testing=F
     """Return the program directory for IPPPSSOOT from a proposal id. If visit is
     specified, return the visit directory.
 
+    Under the bundles root, the program directory is named hst_<nnnnn>-deliverable; it
+    holds the bundle directory hst_<nnnnn> (see get_deliverable_path) together with the
+    manifest files and the validation report.
+
     Input:
         proposal_id    a proposal id.
         visit          the two character designation for the HST visit
@@ -53,27 +57,28 @@ def get_program_dir_path(proposal_id, visit=None, root_dir='pipeline', testing=F
     else:
         formatted_proposal_id = f'{get_formatted_proposal_id(proposal_id)}_testing'
 
-    if visit is None:
-        program_dir = f'{root}/hst_{formatted_proposal_id}'
-    else:
-        program_dir = f'{root}/hst_{formatted_proposal_id}/visit_{visit}'
+    program_dir = f'{root}/hst_{formatted_proposal_id}'
+    if root_dir == 'bundles':
+        program_dir += DELIVERABLE_SUFFIX
+    if visit is not None:
+        program_dir += f'/visit_{visit}'
 
     return program_dir
 
 def get_deliverable_path(proposal_id, testing=False):
-    """Return the final deliverable path in the bundles directory for a given proposal
-    id.
+    """Return the path of the bundle itself for a given proposal id.
 
     Input:
         proposal_id    a proposal id.
         testing        the flag used to determine if we are calling the function for
                        testing purpose with the test directory.
 
-    Returns:    the final deliverable path in the bundles directory.
+    Returns:    <HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>, the directory holding
+                bundle.xml and the collection directories.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     return (f'{get_program_dir_path(proposal_id, None, "bundles", testing)}'
-            f'/hst_{formatted_proposal_id}-deliverable')
+            f'/hst_{formatted_proposal_id}')
 
 def get_format_term(filename):
     """Return IPPPSSOOT for a given file name.

@@ -5,7 +5,8 @@
 # script. It will do these actions:
 #
 # - Create documents/schema/context/kernel directories.
-# - Move new files into the proper directories under <HST_BUNDLES>/hst_<nnnnn>/.
+# - Move new files into the proper directories under
+#   <HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/.
 # - Create the new collection csv & xml and the bundle xml files
 # - Run the validator.
 ##########################################################################################
@@ -36,7 +37,8 @@ def finalize_hst_bundle(proposal_id, logger=None):
 
     1. Create documents/schema/context/kernel directories.
     2. TODO: Move existing/superseded files based on PDS4-VERSIONING.txt.
-    3. Move new files into the proper directories under <HST_BUNDLES>/hst_<nnnnn>/.
+    3. Move new files into the proper directories under
+       <HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/.
     4. Create the new collection.csv and bundle.xml files
     5. Run the validator.
 

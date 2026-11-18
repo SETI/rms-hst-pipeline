@@ -117,6 +117,9 @@ COL_NAME_PREFIX = ['data_', 'miscellaneous_', 'browse_']
 # MAST download directory name
 MAST_DOWNLOAD_DIRNAME = 'mastDownload'
 
+# Suffix of each program directory under HST_BUNDLES: <HST_BUNDLES>/hst_<nnnnn>-deliverable/
+DELIVERABLE_SUFFIX = '-deliverable'
+
 # Prefix for files while downloading; stripped after all downloads succeed.
 DOWNLOAD_TMP_PREFIX = 'tmp_'
 

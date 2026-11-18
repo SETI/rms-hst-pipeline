@@ -90,6 +90,11 @@ Each file is stored once in staging. `hst-retrieve-visit` downloads into
 `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, and `hst-label-products` labels
 the files there. Run them in that order.
 
+Under `HST_BUNDLES` only the program directory has a suffix:
+`<HST_BUNDLES>/hst_<nnnnn>-deliverable/` holds the manifests and `validation-report.txt`,
+and the bundle itself is `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
+(`get_program_dir_path(..., 'bundles')` and `get_deliverable_path()` respectively).
+
 `templates/` and `xml/` are package data resolved relative to
 `__file__`, and are declared in `[tool.setuptools.package-data]`. Anything added there
 needs a matching entry or it won't ship in the wheel.

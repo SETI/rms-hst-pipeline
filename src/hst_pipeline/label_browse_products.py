@@ -120,7 +120,7 @@ def label_browse_products_for_proposal(proposal_id, bundles_or_staging_root, log
     Inputs:
         proposal_id                 proposal id.
         bundles_or_staging_root     path containing browse_* collection directories
-                                    (e.g. .../hst_05167-deliverable or staging program
+                                    (e.g. .../hst_05167-deliverable/hst_05167 or staging program
                                     dir after prepare_browse_products).
         logger                      pdslogger to use; None for default EasyLogger.
 

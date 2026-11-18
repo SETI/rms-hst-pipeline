@@ -34,13 +34,19 @@ def test_get_program_dir_path_formats(monkeypatch):
     assert fs_utils.get_program_dir_path('123', '01', 'pipeline') == '/tmp/pipeline/hst_00123/visit_01'
     # Testing flag
     assert fs_utils.get_program_dir_path('123', None, 'pipeline', testing=True) == '/tmp/pipeline/hst_00123_testing'
+    # Bundles: the program directory has the -deliverable suffix
+    assert fs_utils.get_program_dir_path('123', None, 'bundles') == '/tmp/bundles/hst_00123-deliverable'
+    assert fs_utils.get_program_dir_path('123', None, 'bundles', testing=True) == '/tmp/bundles/hst_00123_testing-deliverable'
+    # Staging: no suffix
+    assert fs_utils.get_program_dir_path('123', '01', 'staging') == '/tmp/staging/hst_00123/visit_01'
 
 
-def test_get_deliverable_path(monkeypatch):
-    monkeypatch.setattr(fs_utils, 'get_formatted_proposal_id', lambda pid: str(pid).zfill(5))
-    monkeypatch.setattr(fs_utils, 'get_program_dir_path', lambda pid, v, r, testing=False: f'/tmp/bundles/hst_{str(pid).zfill(5)}')
-    result = fs_utils.get_deliverable_path('12345')
-    assert result == '/tmp/bundles/hst_12345/hst_12345-deliverable'
+def test_get_deliverable_path():
+    # The bundle directory has no suffix; its parent, the program directory, does.
+    assert fs_utils.get_deliverable_path('12345') == '/tmp/bundles/hst_12345-deliverable/hst_12345'
+    assert fs_utils.get_deliverable_path(7885) == '/tmp/bundles/hst_07885-deliverable/hst_07885'
+    assert (fs_utils.get_deliverable_path(7885, testing=True)
+            == '/tmp/bundles/hst_07885_testing-deliverable/hst_07885')
 
 
 def test_get_format_term():
@@ -109,8 +115,8 @@ def test_create_col_dir_in_bundle(monkeypatch):
     def fake_makedirs(path, exist_ok):
         called['path'] = path
     monkeypatch.setattr(os, 'makedirs', fake_makedirs)
-    monkeypatch.setattr(fs_utils, 'get_deliverable_path', lambda pid, testing=False: '/tmp/bundles/hst_12345/hst_12345-deliverable')
+    monkeypatch.setattr(fs_utils, 'get_deliverable_path', lambda pid, testing=False: '/tmp/bundles/hst_12345-deliverable/hst_12345')
     result = fs_utils.create_col_dir_in_bundle('12345', 'data_collection')
-    assert result[0] == '/tmp/bundles/hst_12345/hst_12345-deliverable'
-    assert result[1] == '/tmp/bundles/hst_12345/hst_12345-deliverable/data_collection'
+    assert result[0] == '/tmp/bundles/hst_12345-deliverable/hst_12345'
+    assert result[1] == '/tmp/bundles/hst_12345-deliverable/hst_12345/data_collection'
     assert called['path'].endswith('data_collection')
