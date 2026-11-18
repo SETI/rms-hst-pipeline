@@ -98,14 +98,21 @@ hst-get-program-info --proposal-id 7885
 hst-retrieve-visit --proposal-id 7885 --vi 01
 hst-retrieve-visit --proposal-id 7885 --vi 02
 hst-retrieve-visit --proposal-id 7885 --vi 03
-hst-label-products --proposal-id 7885 --vi 01
-hst-label-products --proposal-id 7885 --vi 02
-hst-label-products --proposal-id 7885 --vi 03
 hst-prepare-browse --proposal-id 7885 --vi 01
 hst-prepare-browse --proposal-id 7885 --vi 02
 hst-prepare-browse --proposal-id 7885 --vi 03
+hst-label-products --proposal-id 7885 --vi 01
+hst-label-products --proposal-id 7885 --vi 02
+hst-label-products --proposal-id 7885 --vi 03
 hst-finalize-bundle --proposal-id 7885
 ```
+
+`hst-prepare-browse` moves each visit's downloads out of `visit_<ss>/mastDownload/` into
+their collection directories, so it must run before `hst-label-products`, which labels
+the files there. Staging directories built by older versions of the pipeline hold a
+second copy of every file under `mastDownload/`; `hst-dedupe-staging --proposal-id 7885`
+reports those copies, and `--delete` removes each visit's copy once every file in it is
+verified to be identical to its filed copy.
 
 ---
 

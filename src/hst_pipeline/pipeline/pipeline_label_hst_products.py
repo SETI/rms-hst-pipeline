@@ -14,6 +14,11 @@
 # - Compare the staged FITS files to those in an existing bundle, if any.
 # - Create a new XML label for each file.
 # - Reset the modification dates of the FITS files to match their production date at MAST.
+# - Create a Product_Browse label for each MAST preview.
+#
+# With --proposal-id and --visit, it labels the visit's files after the
+# prepare_browse_products task has filed them into collection directories under staging.
+# With --path, it labels the FITS files under that directory instead.
 ##########################################################################################
 
 import argparse
@@ -24,6 +29,7 @@ import sys
 
 from hst_pipeline.hst_helper import HST_DIR
 from hst_pipeline.hst_helper.fs_utils import get_formatted_proposal_id
+from hst_pipeline.label_hst_products import label_hst_visit
 from hst_pipeline.product_labels import label_hst_fits_directories
 from hst_pipeline.queue_manager.task_queue_db import remove_a_task
 
@@ -45,7 +51,8 @@ def parse_args(argv=None):
              files downloaded from MAST. "Logically complete" means that every file that
              a given file might  need to refer to is also in the same directory. A
              directory containing all the files from a single HST visit is always
-             logically complete.""")
+             logically complete. If omitted, the files of --visit that have been filed
+             into collection directories under the staging directory are labeled.""")
 
     parser.add_argument('--old', type=str, action='store', default='',
         help="""Path to another directory tree that might contain older versions of the same
@@ -80,24 +87,12 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
-def get_target_path(args):
-    """Return the directory containing FITS files to label."""
-    target_path = args.path
-    proposal_id = args.proposal_id
-    visit = args.visit
-
-    # If proposal id and visit are both passed in, it will look for fits files under the
-    # staging directory for that specific proposal id and visit. Otherwise it will look for
-    # passed in path.
-    # TBD: Do we want to set both proposal id and visit as the required params?
-    if proposal_id and visit and not target_path:
-        target_path = (HST_DIR['staging'] + '/hst_' + proposal_id.zfill(5) + '/visit_'
-                       + visit.zfill(2))
-    if not target_path:
+def check_target(args):
+    """Raise a ValueError unless --path or both --proposal-id and --visit are given."""
+    if not args.path and not (args.proposal_id and args.visit):
         raise ValueError(
             'Either --path or both --proposal-id and --visit must be provided.'
         )
-    return target_path
 
 
 def setup_logger(args, argv=None):
@@ -135,17 +130,25 @@ def main(argv=None):
     logger = setup_logger(args, argv=argv)
     try:
         proposal_id = args.proposal_id
-        visit = args.visit
-        target_path = get_target_path(args)
+        visit = args.visit.zfill(2) if args.visit else ''
+        check_target(args)
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
 
         try:
-            label_hst_fits_directories(target_path,
-                                       match_pattern=args.select,
-                                       old_directories=[args.old],
-                                       retrieval_date=args.date,
-                                       logger=logger,
-                                       reset_dates=args.reset_dates)
+            if args.path:
+                label_hst_fits_directories(args.path,
+                                           match_pattern=args.select,
+                                           old_directories=[args.old],
+                                           retrieval_date=args.date,
+                                           logger=logger,
+                                           reset_dates=args.reset_dates)
+            else:
+                label_hst_visit(proposal_id, visit,
+                                match_pattern=args.select,
+                                old_directories=[args.old],
+                                retrieval_date=args.date,
+                                logger=logger,
+                                reset_dates=args.reset_dates)
         except Exception as e:
             logger.exception(e)
             raise

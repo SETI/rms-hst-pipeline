@@ -2,12 +2,11 @@
 # label_browse_products.py
 #
 # Create Product_Browse XML labels for browse_* collections of MAST previews.
-# One label per IPPPSSOOT (inventory member), with one File_Area_Browse per image file.
+# One label per image file, named after it, e.g. u2no0401t_c0f.xml for u2no0401t_c0f.jpg.
 ##########################################################################################
 
 import datetime
 import os
-from collections import defaultdict
 
 import pdslogger
 
@@ -16,9 +15,12 @@ from hst_pipeline.hst_helper.fs_utils import (file_md5,
                                               get_file_suffix,
                                               get_format_term,
                                               get_formatted_proposal_id,
-                                              get_instrument_id_from_fname)
+                                              get_instrument_id_from_fname,
+                                              get_product_id)
 from hst_pipeline.hst_helper.general_utils import create_xml_label
-from hst_pipeline.product_labels.suffix_info import browse_data_collection_name
+from hst_pipeline.product_labels.suffix_info import (browse_data_collection_name,
+                                                     browse_data_suffix,
+                                                     product_id)
 
 LABEL_VERSION = '1.0'
 LABEL_DATE = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -54,8 +56,11 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
                                       version_id=VID):
     """Write Product_Browse labels for all browse images under one collection directory.
 
-    Groups image files by IPPPSSOOT (format_term) within each visit_* subdirectory and
-    writes {ipppssoot}.xml next to those images.
+    Writes one label per image, next to it, named after the image file up to its
+    extension, e.g., u2no0401t_c0f.xml for u2no0401t_c0f.jpg. The product's LID ends in the
+    product ID: the IPPPSSOOT plus the tail of an extended suffix, so the x1dsum1 preview
+    of ld8x01010 gets "ld8x010101". This matches the collection inventory and the data
+    product it previews.
 
     Inputs:
         collection_dir    path to a browse_* directory.
@@ -74,37 +79,34 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
 
     labels_written = 0
     for root, _, files in os.walk(collection_dir):
-        by_ipppssoot = defaultdict(list)
-        for name in files:
-            _, _, ext = name.rpartition('.')
+        for name in sorted(files, key=str.lower):
+            stem, _, ext = name.rpartition('.')
             if ext.lower() not in BROWSE_PROD_EXT:
                 continue
-            by_ipppssoot[get_format_term(name)].append(os.path.join(root, name))
 
-        for ipppssoot, filepaths in sorted(by_ipppssoot.items()):
-            filepaths = sorted(filepaths, key=lambda p: os.path.basename(p).lower())
-            # Every preview in one browse product is linked to the same FITS product.
-            first_name = os.path.basename(filepaths[0])
-            data_collection = browse_data_collection_name(
-                get_file_suffix(first_name), get_instrument_id_from_fname(first_name)
-            )
+            ipppssoot = get_format_term(name)
+            browse_suffix = get_file_suffix(name)
+            instrument_id = get_instrument_id_from_fname(name)
+            data_collection = browse_data_collection_name(browse_suffix, instrument_id)
+            data_id = product_id(ipppssoot,
+                                 browse_data_suffix(browse_suffix, instrument_id))
             product_lid = (f'urn:nasa:pds:hst_{formatted_proposal_id}'
-                           f':{collection_name}:{ipppssoot}')
+                           f':{collection_name}:{get_product_id(name)}')
             data_lidvid = (f'urn:nasa:pds:hst_{formatted_proposal_id}'
-                           f':{data_collection}:{ipppssoot}'
+                           f':{data_collection}:{data_id}'
                            f'::{version_id[0]}.{version_id[1]}')
             data_dict = {
                 'label_version': LABEL_VERSION,
                 'label_date': LABEL_DATE,
                 'product_lid': product_lid,
                 'version_id': version_id,
-                'title': (f'Browse image(s) for observation {ipppssoot} from HST '
+                'title': (f'Browse image for observation {ipppssoot} from HST '
                           f'Program {int(proposal_id)}.'),
                 'modification_date': datetime.datetime.utcnow().strftime('%Y-%m-%d'),
                 'data_lidvid': data_lidvid,
-                'files': [_file_entry(p) for p in filepaths],
+                'files': [_file_entry(os.path.join(root, name))],
             }
-            label_path = os.path.join(root, f'{ipppssoot}.xml')
+            label_path = os.path.join(root, f'{stem}.xml')
             create_xml_label(template_path, label_path, data_dict, logger)
             labels_written += 1
 

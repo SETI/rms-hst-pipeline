@@ -95,8 +95,8 @@ TASK_INFO = {
     ),
     # a wrapper to perform these tasks for a given proposal id & a visit
     # - retrieve files from MAST for a given proposal id & a visit
-    # - label each product files
-    # - prepare browse products by organizing the downloaded files from MAST
+    # - move the downloaded files into their collection directories
+    # - label each product file
     'update_visit': (
         4, 3,
         'hst-update-visit --proposal-id {P} --vi {V}',
@@ -110,17 +110,18 @@ TASK_INFO = {
         False,
         0,
     ),
-    # generate the labels for downloaded files from MAST
-    'label_prod': (
+    # move the files downloaded from MAST into their collection directories, so each
+    # file is stored once in staging
+    'prep_browse_prod': (
         6, 5,
-        'hst-label-products --proposal-id {P} --vi {V}',
+        'hst-prepare-browse --proposal-id {P} --vi {V}',
         False,
         0,
     ),
-    # organize downloaded files from MAST, move browse/data products to corresponding directories
-    'prep_browse_prod': (
+    # generate the labels for the filed files, in their collection directories
+    'label_prod': (
         7, 5,
-        'hst-prepare-browse --proposal-id {P} --vi {V}',
+        'hst-label-products --proposal-id {P} --vi {V}',
         False,
         0,
     ),

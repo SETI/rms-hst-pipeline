@@ -13,7 +13,7 @@ import pdslogger
 from hst_pipeline.hst_helper import (COL_NAME_PREFIX,
                                      BROWSE_PROD_EXT)
 from hst_pipeline.hst_helper.fs_utils import (get_formatted_proposal_id,
-                                              get_format_term,
+                                              get_product_id,
                                               get_deliverable_path)
 from hst_pipeline.hst_helper.general_utils import (create_collection_label,
                                                    create_csv,
@@ -155,10 +155,10 @@ def create_data_product_collection_csv(proposal_id, logger):
                         # if not file.startswith('collection_') and file.endswith('.xml'):
                         if (not file.startswith('collection_') and
                             ext in ['xml'] + BROWSE_PROD_EXT):
-                            format_term = get_format_term(file)
+                            prod_id = get_product_id(file)
                             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
                             prod_lidvid = (f'P,urn:nasa:pds:hst_{formatted_proposal_id}'
-                                           f':{dir_name}:{format_term}::'
+                                           f':{dir_name}:{prod_id}::'
                                            f'{prod_ver[0]}.{prod_ver[1]}').split(',')
                             if prod_lidvid not in collection_data:
                                 collection_data.append(prod_lidvid)

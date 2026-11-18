@@ -8,8 +8,10 @@
 #
 # Enter the --help option to see more information.
 #
-# Perform prepare_browse_products task to prepare the browse products and their labels,
-# and save them in Files and labels are in <HST_STAGING>/hst_<nnnnn>/visit_<ss>/.
+# Perform prepare_browse_products task: move the files downloaded for a visit from
+# <HST_STAGING>/hst_<nnnnn>/visit_<ss>/mastDownload/ into their collection directories,
+# <HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/, so each file is stored once. The
+# label_hst_products task labels them afterward.
 ##########################################################################################
 
 import argparse
@@ -27,8 +29,8 @@ from hst_pipeline.queue_manager.task_queue_db import remove_a_task
 def parse_args(argv=None):
     """Parse and return command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="""pipeline_prepare_browse_products: Prepare the browse products and their
-                    labels and save them in the corresponding staging folders.""")
+        description="""pipeline_prepare_browse_products: Move the files downloaded for a
+                    visit into their collection directories under the staging folder.""")
 
     parser.add_argument('--proposal-id', type=str, default='', required=True,
         help='The proposal id for the MAST query.')

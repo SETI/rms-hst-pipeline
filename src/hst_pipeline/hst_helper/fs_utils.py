@@ -11,7 +11,8 @@ import os
 import shutil
 
 from . import HST_DIR
-from hst_pipeline.product_labels.suffix_info import INSTRUMENT_FROM_LETTER_CODE
+from hst_pipeline.product_labels.suffix_info import (INSTRUMENT_FROM_LETTER_CODE,
+                                                     product_id)
 
 def create_program_dir(proposal_id, visit=None, root_dir='pipeline'):
     """Create the program directory for IPPPSSOOT from a proposal id, return the path of
@@ -88,6 +89,17 @@ def get_format_term(filename):
         stem = filename
     format_term, _, _ = stem.partition('_')
     return format_term
+
+def get_product_id(filename):
+    """Return the product ID (the last field of the LID) for a given file name.
+
+    Input:
+        filename   a product file name, e.g., a FITS file, label, or browse image.
+
+    Returns:    the IPPPSSOOT plus the tail of an extended suffix, e.g., "ld8x010101" for
+                "ld8x01010_x1dsum1.fits" and "ld8x01010" for "ld8x01010_x1dsum.png".
+    """
+    return product_id(get_format_term(filename), get_file_suffix(filename))
 
 def get_instrument_id_from_fname(filename):
     """Return instrument id for a given file name.

@@ -18,8 +18,10 @@ from hst_pipeline.queue_manager.task_queue_db import (is_a_task_done,
 
 def update_hst_visit(proposal_id, visit, logger=None):
     """Queue retrieve_hst_visit for the given visit and wait for it to complete.
-    Queue label_hst_products for the given visit and wait for it to complete.
-    Queue task prepare_browse_products for the given visit and wait for it to complete.
+    Queue task prepare_browse_products for the given visit, which moves the downloaded
+    files into their collection directories, and wait for it to complete.
+    Queue label_hst_products for the given visit, which labels the filed files, and wait
+    for it to complete.
 
     Inputs:
         proposal_id    a proposal id.
@@ -42,17 +44,17 @@ def update_hst_visit(proposal_id, visit, logger=None):
         time.sleep(60)
     logger.info(f'Retrieve hst visit for {proposal_id} visit {visit} has completed!')
 
-    logger.info(f'Queue label_hst_products for {proposal_id} visit {visit}')
-    queue_next_task(proposal_id, visit, 'label_prod', logger)
-    while not is_a_task_done(proposal_id, visit, 'label_prod'):
-        time.sleep(1)
-    logger.info(f'Label hst products for {proposal_id} visit {visit} has completed!')
-
     logger.info(f'Queue prepare_browse_products for {proposal_id} visit {visit}')
     queue_next_task(proposal_id, visit, 'prep_browse_prod', logger)
     while not is_a_task_done(proposal_id, visit, 'prep_browse_prod'):
         time.sleep(1)
     logger.info(f'Prepare browse products for {proposal_id} visit {visit} has completed!')
+
+    logger.info(f'Queue label_hst_products for {proposal_id} visit {visit}')
+    queue_next_task(proposal_id, visit, 'label_prod', logger)
+    while not is_a_task_done(proposal_id, visit, 'label_prod'):
+        time.sleep(1)
+    logger.info(f'Label hst products for {proposal_id} visit {visit} has completed!')
 
     # Remove the task queue for the given proposal id & visit from db
     remove_all_tasks_for_a_prog_id_and_visit(proposal_id, visit)

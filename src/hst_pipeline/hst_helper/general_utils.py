@@ -20,10 +20,10 @@ from . import (BROWSE_PROD_EXT,
                TARG_ID_DICT,
                TIME_DICT)
 from .fs_utils import (get_deliverable_path,
-                       get_format_term,
                        get_formatted_proposal_id,
                        get_program_dir_path,
-                       get_instrument_id_from_fname)
+                       get_instrument_id_from_fname,
+                       get_product_id)
 from hst_pipeline.citations import Citation_Information
 from hst_pipeline.product_labels.xml_support import (get_instrument_params,
                                                      get_modification_history,
@@ -275,16 +275,16 @@ def get_collection_label_data(proposal_id, target_dir, logger):
 
     for root, _, files in os.walk(target_dir):
         for file in files:
-            # Browse inventory keys by IPPPSSOOT (format_term), same as CSV members.
-            # Multiple size variants (e.g. thumb and full size) share one inventory row.
+            # Records are counted by product ID (the IPPPSSOOT plus the tail of an
+            # extended suffix), the same key as the collection inventory members.
             if is_browse_prod(file):
-                format_term = get_format_term(file)
-                if format_term not in files_li:
-                    files_li.append(format_term)
+                prod_id = get_product_id(file)
+                if prod_id not in files_li:
+                    files_li.append(prod_id)
                 continue
             if not file.startswith('collection_') and file.endswith('.xml'):
                 file_path = os.path.join(root, file)
-                format_term = get_format_term(file)
+                prod_id = get_product_id(file)
                 # Read the xml files
                 with open(file_path) as f:
                     xml_content = f.read()
@@ -292,8 +292,8 @@ def get_collection_label_data(proposal_id, target_dir, logger):
                     # count them for inventory only.
                     if ('<Product_Browse' in xml_content or
                             '>Product_Browse</product_class>' in xml_content):
-                        if format_term not in files_li:
-                            files_li.append(format_term)
+                        if prod_id not in files_li:
+                            files_li.append(prod_id)
                         continue
                     # target identifications
                     if 'target' not in res:
@@ -322,8 +322,8 @@ def get_collection_label_data(proposal_id, target_dir, logger):
                         res['primary_res'] = (PRIMARY_RES_DICT[formatted_proposal_id]
                                                                 [collection_name])
                     # records
-                    if format_term not in files_li:
-                        files_li.append(format_term)
+                    if prod_id not in files_li:
+                        files_li.append(prod_id)
 
     if 'target' not in res:
         res['target'] = TARG_ID_DICT[formatted_proposal_id]

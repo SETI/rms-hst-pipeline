@@ -82,10 +82,10 @@ July 9, 2024
   - retrieve the online files that describe a program (such as .apt or .pro) and assemble other program-level information.
 - **retrieve-hst-visit** \<program-ID\> \<visit\>
   - retrieve the accepted FITS files and browse products from MAST.
-- **label-hst-products** \<program-ID\> \<visit\>
-  - create labels for the FITS data files.
 - **prepare-browse-products** \<program-ID\> \<visit\>
-  - create and label the browse products.
+  - move the retrieved files into their collection directories, so each is stored once.
+- **label-hst-products** \<program-ID\> \<visit\>
+  - create labels for the FITS data files and the browse products.
 - **finalize-hst-bundle** \<program-ID\>
   - package a complete set of files in the staging directories as a new bundle or as updates to an existing bundle
 
@@ -183,8 +183,8 @@ July 9, 2024
 - Priority: 3 (Medium)
 - Actions:
   - Queue **retrieve-hst-visit** for this visit and wait for it to complete.
-  - Queue **label-hst-products** for this visit and wait for it to complete.
   - Queue task **prepare-browse-products** for this visit and wait for it to complete.
+  - Queue **label-hst-products** for this visit and wait for it to complete.
 
 #
 # Task: **retrieve-hst-visit**
@@ -199,23 +199,6 @@ July 9, 2024
   - Retrieve all the identified files and put them in `<HST*STAGING>/hst*<nnnnn>/visit\_<ss>/`.
 
 #
-# Task: **label-hst-products**
-
-- Initiated by: **update-hst-visit**
-- Input: program ID and visit
-- Log: `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/logs/label-hst-products-<ymdhms>.log`
-- Priority: 5 (Highest)
-- State:
-  - New files are in `<HST_STAGING>/hst_<nnnnn>/visit_<ss>/`.
-  - Existing bundle, if any, is at `<HST_BUNDLES>/hst_<nnnnn>/`.
-- Actions:
-  - Compare the staged FITS files to those in an existing bundle, if any.
-  - Create a new XML label for each file.
-  - Reset the modification dates of the FITS files to match their production date at MAST.
-  - If any file contains NaNs, rename the original file with “`-original`” appended, and then rewrite the file without NaNs.
-  - TBD: What to do if the file in the existing bundle is identical.
-
-#
 # Task: **prepare-browse-products**
 
 - Initiated by: **update-hst-visit**
@@ -223,10 +206,29 @@ July 9, 2024
 - Log: `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/logs/prepare-browse-products-<ymdhms>.log`
 - Priority: 5 (Highest)
 - State:
-  - Files and labels are in `<HST_STAGING>/hst_<nnnnn>/visit_<ss>/`.
+  - Downloaded files are in `<HST_STAGING>/hst_<nnnnn>/visit_<ss>/mastDownload/`.
 - Actions:
-  - Prepare the browse products and their labels, and save them in Files and labels are in `<HST_STAGING>/hst_<nnnnn>/visit_<ss>/`.
-  - Details TBD.
+  - Move each downloaded file into its collection directory, `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, so that each file is stored only once in staging. MAST previews (`.jpg`, `.png`) go into `browse_*` collections under their MAST file names.
+  - Leave in place, with a warning, any file that belongs in no collection.
+  - Remove the directories left empty under `mastDownload/`.
+
+#
+# Task: **label-hst-products**
+
+- Initiated by: **update-hst-visit**
+- Input: program ID and visit
+- Log: `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/logs/label-hst-products-<ymdhms>.log`
+- Priority: 5 (Highest)
+- State:
+  - New files have been filed by **prepare-browse-products** into `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`.
+  - Existing bundle, if any, is at `<HST_BUNDLES>/hst_<nnnnn>/`.
+- Actions:
+  - Compare the staged FITS files to those in an existing bundle, if any.
+  - Create a new XML label for each file, labeling all of the visit's collections together so that labels can refer to the visit's other files.
+  - Create a `Product_Browse` label for each MAST preview in the visit's `browse_*` collections.
+  - Reset the modification dates of the FITS files to match their production date at MAST.
+  - If any file contains NaNs, rename the original file with “`-original`” appended, and then rewrite the file without NaNs.
+  - TBD: What to do if the file in the existing bundle is identical.
 
 #
 

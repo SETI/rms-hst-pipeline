@@ -76,6 +76,8 @@ hst-retrieve-visit        = "hst_pipeline.pipeline.pipeline_retrieve_hst_visit:m
 hst-label-products        = "hst_pipeline.pipeline.pipeline_label_hst_products:main"
 hst-prepare-browse        = "hst_pipeline.pipeline.pipeline_prepare_browse_products:main"
 hst-finalize-bundle       = "hst_pipeline.pipeline.pipeline_finalize_hst_bundle:main"
+# A one-time maintenance command, not a queued task.
+hst-dedupe-staging        = "hst_pipeline.pipeline.pipeline_dedupe_staging:main"
 
 [project.optional-dependencies]
 dev = [

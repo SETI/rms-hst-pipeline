@@ -26,7 +26,8 @@ rather than locating `.py` files inside the checkout.)
 Or `pip install -e ".[dev]"`. Dependencies live in `pyproject.toml`; there is no
 requirements lockfile. Installing puts the ten task commands (`hst-pipeline`,
 `hst-query-products`, …) on `PATH`; they are declared in `[project.scripts]` and are what
-`queue_manager/config.py`'s `TASK_INFO` dispatches.
+`queue_manager/config.py`'s `TASK_INFO` dispatches. `hst-dedupe-staging` is also declared
+there but is a one-time maintenance command, not a task.
 
 ## Tests
 
@@ -82,6 +83,12 @@ Data directories follow `<root>/hst_<nnnnn>/visit_<ss>/` — proposal ID zero-pa
 digits, visit 2 chars. IDs are accepted padded or unpadded (`7885` and `07885`) and
 normalized internally, so don't compare them as strings when building paths. Superseded
 files move to `backups/` with a `-<ymdhms>` suffix.
+
+Each file is stored once in staging. `hst-retrieve-visit` downloads into
+`<HST_STAGING>/hst_<nnnnn>/visit_<ss>/mastDownload/`, which is only an inbox;
+`hst-prepare-browse` then moves every file into its collection directory,
+`<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, and `hst-label-products` labels
+the files there. Run them in that order.
 
 `templates/` and `xml/` are package data resolved relative to
 `__file__`, and are declared in `[tool.setuptools.package-data]`. Anything added there

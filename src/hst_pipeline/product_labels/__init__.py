@@ -839,8 +839,11 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         collection_lid = ('urn:nasa:pds:hst_' +
                           str(hst_dictionary['hst_proposal_id']).zfill(5) +
                           ':' + basename_dict['collection_name'])
-        # Product ID is IPPPSSOOT only (no suffix), matching collection inventory.
-        product_lid = collection_lid + ':' + basename_dict['ipppssoot']
+        # Product ID is the IPPPSSOOT plus the tail of an extended suffix (e.g., "1" for
+        # "x1dsum1"), matching the collection inventory.
+        product_lid = (collection_lid + ':' +
+                       suffix_info.product_id(basename_dict['ipppssoot'],
+                                              basename_dict['suffix']))
         basename_dict['collection_lid'] = collection_lid
         basename_dict['product_lid'] = product_lid
 
@@ -1031,9 +1034,13 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 def get_browse_lids(basename_dict, logger=None):
     """Return the LIDs of the browse products for one FITS file.
 
-    A browse product is a JPEG or PNG preview downloaded from MAST, which sits in the same
-    directory as the FITS file it depicts and shares its IPPPSSOOT. Only previews that are
-    present are returned, so a label never refers to a browse product that does not exist.
+    A browse product is a JPEG or PNG preview downloaded from MAST that shares the
+    IPPPSSOOT of the FITS file it depicts. It is found either in the same directory as the
+    FITS file (the layout of a MAST download) or in the sibling browse collection, at
+    <program>/<browse collection>/visit_<ss>/ when the FITS file is at
+    <program>/<data collection>/visit_<ss>/ (the layout of staging and of a bundle). Only
+    previews that are present are returned, so a label never refers to a browse product
+    that does not exist.
 
     Input:
         basename_dict   the info for one FITS file; must contain "fullpath", "ipppssoot",
@@ -1045,6 +1052,8 @@ def get_browse_lids(basename_dict, logger=None):
     """
 
     directory = os.path.dirname(basename_dict['fullpath'])
+    visit_dirname = os.path.basename(directory)
+    program_dir = os.path.dirname(os.path.dirname(directory))
     ipppssoot = basename_dict['ipppssoot']
     instrument_id = basename_dict['instrument_id']
     proposal_id = str(basename_dict['hst_dictionary']['hst_proposal_id']).zfill(5)
@@ -1052,12 +1061,17 @@ def get_browse_lids(basename_dict, logger=None):
     lids = set()
     for browse_suffix in suffix_info.data_to_browse_suffixes(basename_dict['suffix'],
                                                              instrument_id):
+        collection = suffix_info.browse_collection_name(browse_suffix, instrument_id)
+        sibling_dir = os.path.join(program_dir, collection, visit_dirname)
         for ext in suffix_info.BROWSE_EXTENSIONS:
-            browse_path = os.path.join(directory, f'{ipppssoot}_{browse_suffix}.{ext}')
+            browse_name = f'{ipppssoot}_{browse_suffix}.{ext}'
+            browse_path = os.path.join(directory, browse_name)
+            if not os.path.isfile(browse_path):
+                browse_path = os.path.join(sibling_dir, browse_name)
             if not os.path.isfile(browse_path):
                 continue
-            collection = suffix_info.browse_collection_name(browse_suffix, instrument_id)
-            lids.add(f'urn:nasa:pds:hst_{proposal_id}:{collection}:{ipppssoot}')
+            browse_id = suffix_info.product_id(ipppssoot, browse_suffix)
+            lids.add(f'urn:nasa:pds:hst_{proposal_id}:{collection}:{browse_id}')
             if logger:
                 logger.debug('Browse product found', browse_path)
 

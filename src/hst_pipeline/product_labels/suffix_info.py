@@ -1755,6 +1755,14 @@ def short_suffix(suffix):
 
     return EXTENDED_SUFFIXES.get(suffix, (suffix, ''))[0]
 
+def product_id(ipppssoot, suffix):
+    """The product ID, the last field of a product's LID: the IPPPSSOOT plus the tail of
+    an extended suffix, so that files sharing a collection keep distinct LIDs, e.g.,
+    "lb6a03s1q" for "x1dsum", "lb6a03s1q1" for "x1dsum1", "lb6a03s1q_a" for "rawtag_a".
+    """
+
+    return ipppssoot + suffix_tail(suffix)
+
 def suffix_tail(suffix):
     """When a suffix has its own suffix, this is the second part, e.g., "flt_a" -> "_a".
     """

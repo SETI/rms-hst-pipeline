@@ -152,7 +152,7 @@ def test_get_collection_label_data(monkeypatch, tmp_path, fake_logger):
     xml_file = tmp_path / 'file.xml'
     xml_file.write_text(xml_content)
     monkeypatch.setattr(general_utils, 'get_formatted_proposal_id', lambda pid: formatted_id)
-    monkeypatch.setattr(general_utils, 'get_format_term', lambda fname: 'file')
+    monkeypatch.setattr(general_utils, 'get_product_id', lambda fname: 'file')
     monkeypatch.setattr(general_utils, 'is_browse_prod', lambda fname: False)
     monkeypatch.setattr(general_utils, 'get_target_identifications', lambda xml: [('n', [], '', [], '')])
     monkeypatch.setattr(general_utils, 'get_time_coordinates', lambda xml: ('start', 'stop'))
@@ -164,3 +164,18 @@ def test_get_collection_label_data(monkeypatch, tmp_path, fake_logger):
     assert res['inst_params'] == 'params'
     assert res['primary_res'] == 'summary'
     assert res['records'] == 1
+
+
+def test_get_collection_label_data_counts_x1dsum_products_separately(tmp_path,
+                                                                     fake_logger):
+    formatted_id = '77778'
+    for d in (general_utils.TIME_DICT, general_utils.INST_PARAMS_DICT,
+              general_utils.PRIMARY_RES_DICT, general_utils.RECORDS_DICT):
+        d[formatted_id] = {}
+    general_utils.TARG_ID_DICT[formatted_id] = []
+    for name in ('ld8x01010_x1dsum.png', 'ld8x01010_x1dsum1.png',
+                 'ld8x01010_x1dsum2.png'):
+        (tmp_path / name).write_bytes(b'')
+    res = general_utils.get_collection_label_data(formatted_id, str(tmp_path),
+                                                  fake_logger)
+    assert res['records'] == 3
