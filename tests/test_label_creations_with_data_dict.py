@@ -17,6 +17,7 @@ from hst_pipeline.finalize_data_product import COL_DATA_LABEL_TEMPLATE
 from hst_pipeline.finalize_document import (copy_mast_proposal_page,
                                             finalize_hst_document_directory,
                                             get_document_files,
+                                            get_document_sources,
                                             strip_mast_proposal_page)
 from hst_pipeline.finalize_schema import finalize_hst_schema_directory
 from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
@@ -225,3 +226,19 @@ def test_copy_mast_proposal_page(tmp_path):
     src.write_text('<html>No proposal found</html>', encoding='latin-1')
     copy_mast_proposal_page(str(src), str(dst))
     assert dst.read_text(encoding='latin-1') == '<html>No proposal found</html>'
+
+
+def test_get_document_sources(tmp_path):
+    # Only the MAST page has a source URL; its date is the saved page's modification date
+    page = tmp_path / '01086.html'
+    page.write_text('x')
+    os.utime(page, (0, 1_000_000_000))      # 2001-09-09 UTC
+    (tmp_path / '01086.pro').write_text('x')
+    doc_files = [('01086', '01086.html', 'HTML'), ('01086', '01086.pro', '7-Bit ASCII Text')]
+    sources = get_document_sources(1086, str(tmp_path), doc_files)
+    assert len(sources) == 1
+    (file, url, date) = sources[0]
+    assert file == '01086.html'
+    assert url == 'https://archive.stsci.edu/proposal_search.php?id=1086&mission=hst'
+    assert date in ('2001-09-08', '2001-09-09')     # depends on the local time zone
+    assert get_document_sources(5825, str(tmp_path), doc_files[1:]) == []

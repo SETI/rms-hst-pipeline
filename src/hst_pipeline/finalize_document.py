@@ -8,6 +8,7 @@
 # - Create document collection csv & xml.
 ##########################################################################################
 
+import datetime
 import os
 import pdslogger
 import re
@@ -16,7 +17,8 @@ import shutil
 from hst_pipeline.hst_helper import (DOCUMENT_EXT,
                                      DOCUMENT_EXT_FOR_CITATION_INFO,
                                      DOCUMENT_STANDARD_IDS,
-                                     MAST_PROPOSAL_SUFFIX)
+                                     MAST_PROPOSAL_SUFFIX,
+                                     MAST_PROPOSAL_URL)
 from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
                                               get_deliverable_path,
                                               get_formatted_proposal_id,
@@ -76,6 +78,7 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
     # directories that might not exist.
     version_id = (1, 0)
     proposal_files_li = []
+    source_li = []
     if not testing: # pragma: no cover
         # Search for proposal files stored at pipeline directory
         # Move them to bundles directory and collect neccessary data for the label
@@ -91,6 +94,8 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
                                         f'{document_dir}/{file}', logger)
             else:
                 shutil.copy(f'{pipeline_dir}/{file}', f'{document_dir}/{file}')
+
+        source_li = get_document_sources(proposal_id, pipeline_dir, proposal_files_li)
 
         # Collect data to construct data dictionary used for the document label
         # Get version id
@@ -117,6 +122,7 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
         'collection_name': 'document',
         'version_id': version_id,
         'proposal_files_li': proposal_files_li,
+        'source_li': source_li,
         'csv_filename': CSV_FILENAME,
         'records_num': records_num,
         'mod_history': mod_history,
@@ -172,6 +178,29 @@ def get_document_files(proposal_id, pipeline_dir):
         doc_files.append((basename, mast_page, DOCUMENT_STANDARD_IDS[ext]))
 
     return doc_files
+
+def get_document_sources(proposal_id, pipeline_dir, doc_files):
+    """Return the source of each document file that is not a proposal file, i.e., the
+    MAST proposal search page, for an External_Reference in the document label.
+
+    Input:
+        proposal_id     a proposal id.
+        pipeline_dir    the program's pipeline directory.
+        doc_files       the list returned by get_document_files().
+
+    Returns:    a list of tuples (file name, URL, retrieval date as yyyy-mm-dd); the date
+                is the modification date of the page saved in the pipeline directory.
+    """
+    sources = []
+    for (_, file, _) in doc_files:
+        if not file.endswith(MAST_PROPOSAL_SUFFIX):
+            continue
+        url = MAST_PROPOSAL_URL.format(int(proposal_id))
+        mtime = os.path.getmtime(f'{pipeline_dir}/{file}')
+        date = datetime.datetime.fromtimestamp(mtime).strftime('%Y-%m-%d')
+        sources.append((file, url, date))
+
+    return sources
 
 def strip_mast_proposal_page(page):
     """Return the proposal content of a MAST proposal search page: a horizontal rule,

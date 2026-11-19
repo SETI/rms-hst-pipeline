@@ -27,6 +27,14 @@ $ONCE(formatted_prop_id=str(prop_id).zfill(5))
             <lidvid_reference>urn:nasa:pds:context:investigation:individual.hst_$formatted_prop_id$::$version_id[0]$.$version_id[1]$</lidvid_reference>
             <reference_type>$collection_name$_to_investigation</reference_type>
         </Internal_Reference>
+        $FOR(source_li)
+        <External_Reference>
+            <reference_text>$VALUE[1]$</reference_text>
+            <description>
+                $WRAP(16, 90, f'Source of {VALUE[0]}: the MAST proposal search page for HST proposal {prop_id}, retrieved {VALUE[2]}. The MAST site header and footer have been removed.')$
+            </description>
+        </External_Reference>
+        $END_FOR
     </Reference_List>
 $ONCE(file_num=len(proposal_files_li))
     <Document>

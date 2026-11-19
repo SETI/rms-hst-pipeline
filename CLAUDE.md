@@ -113,7 +113,8 @@ saved as `<nnnnn>.html` in the pipeline directory and parsed by
 year, so the citation has one author and the publication year is the end of the cycle.
 `finalize_document.get_document_files` puts the proposal files, or failing those the
 `<nnnnn>.html` page, in the bundle's `document/` collection; the page is copied
-without the MAST site's header and footer, so it begins with `<hr>` and the title. `program-info.txt` (the
+without the MAST site's header and footer, so it begins with `<hr>` and the title. Its
+URL and retrieval date go in an `External_Reference` in the document label. `program-info.txt` (the
 cleaned-up citation) stays in the pipeline directory and is not delivered.
 
 Under `HST_BUNDLES` only the program directory has a suffix:
