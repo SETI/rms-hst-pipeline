@@ -15,8 +15,13 @@ from hst_pipeline.hst_helper import (COL_NAME_PREFIX,
 from hst_pipeline.hst_helper.fs_utils import (get_program_dir_path,
                                               get_deliverable_path)
 
+# Hidden files, e.g., the ".DS_Store" files macOS Finder leaves in any directory it shows,
+# are never copied into a bundle; PDS4 validation rejects their names.
+IGNORE_HIDDEN_FILES = shutil.ignore_patterns('.*')
+
 def organize_files_from_staging_to_bundles(proposal_id, logger):
-    """Move files from staging folder to bundles folder
+    """Copy the collection directories of a proposal from the staging folder to the
+    bundles folder, skipping hidden files.
 
     Inputs:
         proposal_id    a proposal id.
@@ -37,7 +42,8 @@ def organize_files_from_staging_to_bundles(proposal_id, logger):
                 bundles_prod_dir = os.path.join(deliverable_path, dir_name)
                 os.makedirs(bundles_prod_dir, exist_ok=True)
                 logger.info(f'Move {dir_name} from staging to bundles directory')
-                shutil.copytree(staging_prod_dir, bundles_prod_dir, dirs_exist_ok=True)
+                shutil.copytree(staging_prod_dir, bundles_prod_dir, dirs_exist_ok=True,
+                                ignore=IGNORE_HIDDEN_FILES)
                 break
 
 def _clean_up_staging_dir_at_path(staging_dir, logger):

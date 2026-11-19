@@ -40,7 +40,8 @@ def test_organize_files_from_staging_to_bundles_basic(mock_copytree, mock_makedi
 
     # Only dirs starting with COL_NAME_PREFIX are copied
     expected = [
-        mock.call(os.path.join(staging_dir, d), os.path.join(deliverable_path, d), dirs_exist_ok=True)
+        mock.call(os.path.join(staging_dir, d), os.path.join(deliverable_path, d), dirs_exist_ok=True,
+                  ignore=organize_files.IGNORE_HIDDEN_FILES)
         for d in dirs if any(d.startswith(prefix) for prefix in COL_NAME_PREFIX)
     ]
     assert mock_copytree.call_args_list == expected
@@ -49,6 +50,23 @@ def test_organize_files_from_staging_to_bundles_basic(mock_copytree, mock_makedi
     # Logger messages
     assert any('Organize files for proposal id' in m for m in fake_logger.messages)
     assert any('Move data_foo' in m for m in fake_logger.messages)
+
+def test_organize_files_skips_hidden_files(tmp_path, monkeypatch):
+    # Finder's .DS_Store files in staging must not reach the bundle.
+    staging = tmp_path / 'staging' / 'hst_14903'
+    bundle = tmp_path / 'bundles' / 'hst_14903-deliverable' / 'hst_14903'
+    visit = staging / 'data_stis_raw' / 'visit_02'
+    visit.mkdir(parents=True)
+    (visit / 'od8x02hsq_raw.fits').write_bytes(b'data')
+    (visit / '.DS_Store').write_bytes(b'finder')
+    (staging / 'data_stis_raw' / '.DS_Store').write_bytes(b'finder')
+    monkeypatch.setattr(organize_files, 'get_program_dir_path', lambda *a, **k: str(staging))
+    monkeypatch.setattr(organize_files, 'get_deliverable_path', lambda *a, **k: str(bundle))
+
+    organize_files.organize_files_from_staging_to_bundles(14903, None)
+
+    copied = sorted(str(p.relative_to(bundle)) for p in bundle.rglob('*') if p.is_file())
+    assert copied == ['data_stis_raw/visit_02/od8x02hsq_raw.fits']
 
 # clean_up_staging_dir
 @mock.patch('hst_pipeline.organize_files.get_program_dir_path')
