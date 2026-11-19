@@ -79,7 +79,7 @@ July 9, 2024
 - **update-hst-program** \<program-ID\> \<visit\> [\<visit\> …]
   - overall task to create a new bundle or to manage the update of an existing bundle.
 - **get-program-info** \<program-ID\>
-  - retrieve the online files that describe a program (such as .apt or .pro) and assemble other program-level information. Early programs (roughly Cycles 1–3) have no .apt or .pro file; for them the citation information (title, PI, cycle, abstract) is read from the MAST proposal search page, saved as `<nnnnn>-mast.html`.
+  - retrieve the online files that describe a program (such as .apt or .pro) and assemble other program-level information. Early programs (roughly Cycles 1–3) have no .apt or .pro file; for them the citation information (title, PI, cycle, abstract) is read from the MAST proposal search page, saved as `<nnnnn>.html` and delivered in the bundle's document collection in place of the proposal files, stripped of the MAST site's header and footer.
 - **retrieve-hst-visit** \<program-ID\> \<visit\>
   - retrieve the accepted FITS files and browse products from MAST.
 - **prepare-browse-products** \<program-ID\> \<visit\>
@@ -165,7 +165,7 @@ July 9, 2024
 - Priority: 5 (Highest)
 - State:
   - Directory `<HST_PIPELINE>/hst_<nnnnn>/` contains the proposal files `<nnnnn>.apt`, `.pro`, and/or `.prop` files, plus the `.pdf` version. Absent on first run.
-  - File `<HST_PIPELINE>/hst_<nnnnn>/program-info.txt` contains citation info and maybe other info about the program overall. Absent on first run.
+  - File `<HST_PIPELINE>/hst_<nnnnn>/program-info.txt` contains citation info and maybe other info about the program overall. Absent on first run. It stays in the pipeline directory and is not delivered in the bundle.
 - Actions:
   - Retrieve the proposal files via a web query.
   - If these files are the same as the existing ones, stop.

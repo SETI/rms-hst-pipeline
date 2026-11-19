@@ -38,7 +38,7 @@ $ONCE(file_num=len(proposal_files_li))
             $FOR(proposal_files_li)
                 <Document_File>
                     <file_name>$VALUE[1]$</file_name>
-                    <document_standard_id>7-Bit ASCII Text</document_standard_id>
+                    <document_standard_id>$VALUE[2]$</document_standard_id>
                 </Document_File>
             $END_FOR
         </Document_Edition>

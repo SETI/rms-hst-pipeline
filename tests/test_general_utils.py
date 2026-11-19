@@ -92,9 +92,9 @@ def test_get_citation_info_from_file(monkeypatch, tmp_path, fake_logger):
     assert result == 'created'
 
 @pytest.mark.parametrize('files,expected', [
-    (['01086.pro', '01086-mast.html', '01086.apt'], '01086.apt'),
-    (['01086-mast.html', '01086.pro'], '01086.pro'),
-    (['01086-mast.html', '01086.pdf'], '01086-mast.html'),
+    (['01086.pro', '01086.html', '01086.apt'], '01086.apt'),
+    (['01086.html', '01086.pro'], '01086.pro'),
+    (['01086.html', '01086.pdf'], '01086.html'),
 ])
 def test_get_citation_info_preference(monkeypatch, tmp_path, fake_logger, files,
                                       expected):

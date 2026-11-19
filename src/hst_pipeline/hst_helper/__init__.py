@@ -72,10 +72,19 @@ DOCUMENT_EXT = ('apt', 'pdf', 'pro', 'prop')
 DOCUMENT_EXT_FOR_CITATION_INFO = ('apt', 'pro')
 
 # Fallback source of citation info for early programs with no .apt or .pro file: the MAST
-# proposal search page, saved in the pipeline directory as <nnnnn>-mast.html. It is not a
-# proposal file, so it is not copied into the bundle's document collection.
+# proposal search page, saved in the pipeline directory as <nnnnn>.html. Like the proposal
+# files, it is copied into the bundle's document collection.
 MAST_PROPOSAL_URL = 'https://archive.stsci.edu/proposal_search.php?id={}&mission=hst'
-MAST_PROPOSAL_SUFFIX = '-mast.html'
+MAST_PROPOSAL_SUFFIX = '.html'
+
+# PDS4 document_standard_id of each kind of file in the document collection
+DOCUMENT_STANDARD_IDS = {
+    'apt' : 'UTF-8 Text',       # APT XML
+    'html': 'HTML',             # MAST proposal search page
+    'pdf' : 'PDF',
+    'pro' : '7-Bit ASCII Text',
+    'prop': '7-Bit ASCII Text',
+}
 
 # File names
 PROGRAM_INFO_FILE = 'program-info.txt'

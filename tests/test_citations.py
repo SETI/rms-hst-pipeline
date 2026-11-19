@@ -1006,7 +1006,7 @@ MAST_PAGE_1086 = """<html><body>
 
 
 def write_mast_page(tmp_path, text=MAST_PAGE_1086):
-    path = tmp_path / '01086-mast.html'
+    path = tmp_path / '01086.html'
     path.write_text(text)
     return str(path)
 

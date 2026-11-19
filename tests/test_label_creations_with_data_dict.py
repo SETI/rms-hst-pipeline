@@ -14,7 +14,10 @@ from .utils import (assert_golden_file_equal,
                     LBL_DATA_DICT)
 from hst_pipeline.finalize_context import finalize_hst_context_directory
 from hst_pipeline.finalize_data_product import COL_DATA_LABEL_TEMPLATE
-from hst_pipeline.finalize_document import finalize_hst_document_directory
+from hst_pipeline.finalize_document import (copy_mast_proposal_page,
+                                            finalize_hst_document_directory,
+                                            get_document_files,
+                                            strip_mast_proposal_page)
 from hst_pipeline.finalize_schema import finalize_hst_schema_directory
 from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
                                               get_deliverable_path,
@@ -163,3 +166,62 @@ class TestLabelCreationsWithDataDict:
             calculated_contents = golden_file_contents(bundle_lbl)
         assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_bundle_label.golden.xml',
                                  calculated_contents)
+
+
+@pytest.mark.parametrize('files,expected', [
+    # Proposal files are delivered; program-info.txt and unrelated files are not
+    (['07885.pro', '07885.prop', '07885.pdf', 'program-info.txt', 'products.txt'],
+     [('07885', '07885.pdf', 'PDF'),
+      ('07885', '07885.pro', '7-Bit ASCII Text'),
+      ('07885', '07885.prop', '7-Bit ASCII Text')]),
+    # With an .apt file, a stale MAST page is not delivered
+    (['07885.apt', '07885.html'], [('07885', '07885.apt', 'UTF-8 Text')]),
+    # Without an .apt or .pro file, the MAST proposal page is delivered
+    (['07885.html', 'program-info.txt'], [('07885', '07885.html', 'HTML')]),
+])
+def test_get_document_files(tmp_path, files, expected):
+    for name in files:
+        (tmp_path / name).write_text('x')
+    assert get_document_files(7885, str(tmp_path)) == expected
+
+
+MAST_PAGE = """<html lang="en"><head><title>HST Proposal Search</title></head><body>
+<div id="nav"><a href="/">MAST</a></div>
+<div id="indt">
+<h2 align='center'>DO NEPTUNE AND PLUTO HAVE RINGS?<br> HST Proposal 1086</h2>
+<center><H3>Robert Bless<br>University of Wisconsin - Madison</H3></center>
+   <HR><H2>Proposal Abstract</H2>
+   <p> The origin of planetary ring systems remains unknown. Caf\xe9.</p><hr/>
+<h2>Publications referencing this proposal</h2>
+<br><ul><li>No papers listed in database for this Proposal ID</ul><br><hr>
+</div>
+<h2> Data for Program ID: 1086 (as of now)</h2>
+<div id="footernav">Top of Page</div>
+</body></html>
+"""
+
+
+def test_strip_mast_proposal_page():
+    stripped = strip_mast_proposal_page(MAST_PAGE)
+    # Begins with a rule, then the title; ends after the publications
+    assert stripped.startswith("<hr>\n<h2 align='center'>DO NEPTUNE AND PLUTO")
+    assert stripped.endswith('No papers listed in database for this Proposal ID</ul>'
+                             '<br><hr>\n')
+    for dropped in ('<html', '<head>', 'id="nav"', 'Data for Program ID', 'footernav'):
+        assert dropped not in stripped
+    assert strip_mast_proposal_page('<html>No proposal found</html>') is None
+
+
+def test_copy_mast_proposal_page(tmp_path):
+    src = tmp_path / 'src.html'
+    src.write_text(MAST_PAGE, encoding='latin-1')
+    dst = tmp_path / 'dst.html'
+    copy_mast_proposal_page(str(src), str(dst))
+    text = dst.read_text(encoding='latin-1')
+    assert text.startswith('<hr>\n<h2')
+    assert 'Caf\xe9.' in text          # Latin-1 characters survive
+
+    # A page without a proposal title is copied unchanged
+    src.write_text('<html>No proposal found</html>', encoding='latin-1')
+    copy_mast_proposal_page(str(src), str(dst))
+    assert dst.read_text(encoding='latin-1') == '<html>No proposal found</html>'

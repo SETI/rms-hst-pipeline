@@ -119,10 +119,10 @@ class TestGetProgramInfo:
         called = []
         monkeypatch.setattr('hst_pipeline.get_program_info.download_mast_proposal_page',
                             lambda pid, d, logger=None: called.append(pid) or
-                            '01086-mast.html')
+                            '01086.html')
         res = download_proposal_files(1086, str(tmp_path), logger=mock.Mock())
         assert called == [1086]
-        assert res == {'01086-mast.html'}
+        assert res == {'01086.html'}
 
     def test_download_proposal_files_no_fallback_with_pro(self, monkeypatch, tmp_path):
         # An existing, unchanged .pro file means the MAST page is not needed
@@ -146,9 +146,9 @@ class TestGetProgramInfo:
         monkeypatch.setattr('hst_pipeline.get_program_info.create_program_info_file',
                             created.append)
         res = download_mast_proposal_page('01086', str(tmp_path), logger=mock.Mock())
-        assert res == '01086-mast.html'
+        assert res == '01086.html'
         assert urls == ['https://archive.stsci.edu/proposal_search.php?id=1086&mission=hst']
-        assert created == [str(tmp_path / '01086-mast.html')]
+        assert created == [str(tmp_path / '01086.html')]
 
     def test_download_mast_proposal_page_unreadable(self, monkeypatch, tmp_path):
         # A page without proposal info is logged as an error and not kept
@@ -164,5 +164,5 @@ class TestGetProgramInfo:
                             fake_create)
         logger = mock.Mock()
         assert download_mast_proposal_page(99999, str(tmp_path), logger=logger) is None
-        assert not (tmp_path / '99999-mast.html').exists()
+        assert not (tmp_path / '99999.html').exists()
         assert 'missing title' in logger.error.call_args[0][0]

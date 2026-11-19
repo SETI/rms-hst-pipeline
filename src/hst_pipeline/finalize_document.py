@@ -2,17 +2,21 @@
 # finalize_document.py
 #
 # - Create document directory.
-# - Move/copy proposal files over from pipeline directory.
+# - Copy the proposal files (or, for early programs without them, the MAST proposal
+#   search page) over from the pipeline directory.
 # - Create document xml.
 # - Create document collection csv & xml.
 ##########################################################################################
 
 import os
 import pdslogger
+import re
 import shutil
 
 from hst_pipeline.hst_helper import (DOCUMENT_EXT,
-                                     PROGRAM_INFO_FILE)
+                                     DOCUMENT_EXT_FOR_CITATION_INFO,
+                                     DOCUMENT_STANDARD_IDS,
+                                     MAST_PROPOSAL_SUFFIX)
 from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
                                               get_deliverable_path,
                                               get_formatted_proposal_id,
@@ -28,12 +32,18 @@ COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
 CSV_FILENAME = 'collection.csv'
 COL_DOC_LABEL = 'collection.xml'
 
+# In a MAST proposal search page, the proposal content starts at the centered title and
+# ends at the close of the content <div>, after the list of publications; before it are
+# the site header and menus, after it the data-search links and the site footer.
+MAST_PAGE_START_REGEX = re.compile(r"<h2 align='center'>", re.I)
+MAST_PAGE_END_REGEX = re.compile(r'</div>', re.I)
+
 def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create document directory in the final bundle. These
     are the actions performed:
 
     1. Create document directory.
-    2. Move/copy proposal files over from pipeline directory.
+    2. Copy proposal files (or the MAST proposal page) from pipeline directory.
     3. Create document label.
     4. Create document collection csv.
     5. Create document collection label.
@@ -67,20 +77,20 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
     version_id = (1, 0)
     proposal_files_li = []
     if not testing: # pragma: no cover
-        # Search for proposal files & program info file stored at pipeline directory
+        # Search for proposal files stored at pipeline directory
         # Move them to bundles directory and collect neccessary data for the label
         pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
         logger.info('Move over proposal files')
 
-        for file in os.listdir(pipeline_dir):
-            basename, _, ext = file.rpartition('.')
-            if ext in DOCUMENT_EXT or file == PROGRAM_INFO_FILE:
-                proposal_files_li.append((basename, file))
-                file_path = f'{pipeline_dir}/{file}'
-
-                # Move the proposal files and program info file to the document directory
-                shutil.copy(file_path, f'{document_dir}/{file}')
-                # shutil.move(file_path, f'{document_dir}/{file}')
+        proposal_files_li = get_document_files(proposal_id, pipeline_dir)
+        for (_, file, _) in proposal_files_li:
+            # Copy the proposal files to the document directory; the MAST page loses
+            # the site's header and footer
+            if file.endswith(MAST_PROPOSAL_SUFFIX):
+                copy_mast_proposal_page(f'{pipeline_dir}/{file}',
+                                        f'{document_dir}/{file}', logger)
+            else:
+                shutil.copy(f'{pipeline_dir}/{file}', f'{document_dir}/{file}')
 
         # Collect data to construct data dictionary used for the document label
         # Get version id
@@ -131,6 +141,78 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
                                           logger, testing)
 
     return (doc_col_lbl, doc_lbl)
+
+def get_document_files(proposal_id, pipeline_dir):
+    """Return the files in a program's pipeline directory that belong in the bundle's
+    document collection: the proposal files (.apt, .pdf, .pro, .prop) and, for early
+    programs that have none, the MAST proposal search page <nnnnn>.html.
+
+    Input:
+        proposal_id     a proposal id.
+        pipeline_dir    the program's pipeline directory.
+
+    Returns:    a list of tuples (basename without extension, file name, PDS4
+                document_standard_id), sorted by file name.
+    """
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    mast_page = f'{formatted_proposal_id}{MAST_PROPOSAL_SUFFIX}'
+    doc_files = []
+    for file in sorted(os.listdir(pipeline_dir)):
+        basename, _, ext = file.rpartition('.')
+        if basename != formatted_proposal_id:
+            continue
+        if ext in DOCUMENT_EXT:
+            doc_files.append((basename, file, DOCUMENT_STANDARD_IDS[ext]))
+
+    # The MAST page is only the fallback, used when there is no .apt or .pro file
+    has_citation_file = any(file.rpartition('.')[2] in DOCUMENT_EXT_FOR_CITATION_INFO
+                            for (_, file, _) in doc_files)
+    if not has_citation_file and os.path.isfile(f'{pipeline_dir}/{mast_page}'):
+        basename, _, ext = mast_page.rpartition('.')
+        doc_files.append((basename, mast_page, DOCUMENT_STANDARD_IDS[ext]))
+
+    return doc_files
+
+def strip_mast_proposal_page(page):
+    """Return the proposal content of a MAST proposal search page: a horizontal rule,
+    then everything from the title through the list of publications.
+
+    Input:
+        page    the text of the page.
+
+    Returns:    the stripped text, or None if the title cannot be found.
+    """
+    start = MAST_PAGE_START_REGEX.search(page)
+    if not start:
+        return None
+    end = MAST_PAGE_END_REGEX.search(page, start.end())
+    content = page[start.start():end.start() if end else len(page)]
+    return '<hr>\n' + content.rstrip() + '\n'
+
+def copy_mast_proposal_page(src, dst, logger=None):
+    """Copy a MAST proposal search page into the document collection, without the
+    site's header and footer. If the proposal content cannot be found, copy the page
+    unchanged.
+
+    Input:
+        src       path to the page saved in the pipeline directory.
+        dst       path of the copy in the document collection.
+        logger    pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+
+    # The pages are ISO-8859-1; Latin-1 also passes any other byte through unchanged
+    with open(src, encoding='latin-1') as f:
+        page = f.read()
+
+    stripped = strip_mast_proposal_page(page)
+    if stripped is None:
+        logger.warn(f'No proposal title found in {src}; copied unchanged')
+        shutil.copy(src, dst)
+        return
+
+    with open(dst, 'w', encoding='latin-1') as f:
+        f.write(stripped)
 
 def create_document_collection_csv(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create document collection csv in the final bundle.

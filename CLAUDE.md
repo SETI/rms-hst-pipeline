@@ -108,9 +108,13 @@ Broad queries without a proposal ID still ask MAST for moving targets only.
 `hst-get-program-info` downloads the Phase 2 files (.apt, .pdf, .pro, .prop) from
 STScI, and the citation info comes from the .apt or else the .pro file. Early programs
 (roughly Cycles 1–3) have neither, so it falls back to the MAST proposal search page,
-saved as `<nnnnn>-mast.html` in the pipeline directory and parsed by
+saved as `<nnnnn>.html` in the pipeline directory and parsed by
 `citations/citation_information_from_mast.py`. That page names only the PI and gives no
 year, so the citation has one author and the publication year is the end of the cycle.
+`finalize_document.get_document_files` puts the proposal files, or failing those the
+`<nnnnn>.html` page, in the bundle's `document/` collection; the page is copied
+without the MAST site's header and footer, so it begins with `<hr>` and the title. `program-info.txt` (the
+cleaned-up citation) stays in the pipeline directory and is not delivered.
 
 Under `HST_BUNDLES` only the program directory has a suffix:
 `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` holds the manifests and `validation-report.txt`,
