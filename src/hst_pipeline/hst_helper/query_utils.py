@@ -36,6 +36,28 @@ def ymd_tuple_to_mjd(ymd):
     days = julian.day_from_ymd(y, m, d)
     return julian.mjd_from_day(days)
 
+# Instruments whose observations are retrieved for a given proposal even when MAST does
+# not flag the target as moving. MAST never sets mtFlag for FGS, and rarely for HSP.
+NON_MOVING_INSTRUMENTS = ('FGS', 'HSP')
+
+def is_retrievable_row(row):
+    """Check if an observation row of a proposal should be retrieved: its target is
+    flagged as moving, or its instrument is one of NON_MOVING_INSTRUMENTS.
+
+    Input:
+        row    an observation table row.
+
+    Returns:    True if the observation should be retrieved.
+    """
+    try:
+        if bool(row['mtFlag']):
+            return True
+    except (TypeError, ValueError, KeyError):   # masked or missing value
+        pass
+
+    instrument = str(row['instrument_name']).partition('/')[0].upper()
+    return instrument in NON_MOVING_INSTRUMENTS
+
 def query_mast_slice(proposal_id=None,
                      instrument=None,
                      start_date=START_DATE,
@@ -45,6 +67,10 @@ def query_mast_slice(proposal_id=None,
                      testing=False):
     """Return a slice of MAST database as a table object with a given proposal id,
     instrument, start_date, and end_date.
+
+    Only moving-target observations are returned, except that when a proposal id is
+    given, the observations of NON_MOVING_INSTRUMENTS (FGS, HSP) are returned as well,
+    whatever their target.
 
     Input:
         proposal_id    a proposal id.
@@ -69,9 +95,13 @@ def query_mast_slice(proposal_id=None,
         'mtFlag': True
     }
 
+    # For a single proposal, query every observation and filter locally, so that the
+    # unflagged FGS and HSP observations are kept.
+    filter_locally = proposal_id is not None
     if proposal_id is not None:
         formatted_proposal_id = get_formatted_proposal_id(proposal_id)
         query_params['proposal_id'] = formatted_proposal_id
+        del query_params['mtFlag']
     if instrument is not None:
         query_params['instrument_name'] = str(instrument)
     if start_date is not None and end_date is not None:
@@ -83,6 +113,8 @@ def query_mast_slice(proposal_id=None,
             if testing and max_retries > 1:
                 raise ConnectionError
             table = Observations.query_criteria(**query_params)
+            if filter_locally and len(table):
+                table = filter_table(is_retrievable_row, table)
             return table
         except (ConnectionError, TimeoutError) as e:
             cur_retry += 1

@@ -2,7 +2,16 @@ import pytest
 from unittest import mock
 import types
 import sys
+from astropy.table import Table
 from hst_pipeline.hst_helper import query_utils
+
+
+def make_obs_table():
+    """An observation table mixing moving and fixed targets of several instruments."""
+    return Table({'obs_id': ['w1', 'w2', 'f1', 'h1', 's1'],
+                  'instrument_name': ['WFC3/UVIS', 'WFC3/IR', 'FGS', 'HSP/UNK/VIS',
+                                      'STIS/CCD'],
+                  'mtFlag': [True, False, False, False, False]})
 
 # Patch Observations and logger globally
 @pytest.fixture(autouse=True)
@@ -10,7 +19,8 @@ def patch_obs_and_logger(monkeypatch):
     class FakeObs:
         @staticmethod
         def query_criteria(**kwargs):
-            return 'table'
+            FakeObs.kwargs = kwargs
+            return make_obs_table()
         @staticmethod
         def get_product_list(table):
             return table
@@ -35,8 +45,36 @@ def test_ymd_tuple_to_mjd(monkeypatch):
 def test_query_mast_slice_success(monkeypatch):
     logger = query_utils.pdslogger.EasyLogger()
     result = query_utils.query_mast_slice(proposal_id='12345', instrument='WFC3', logger=logger, max_retries=1)
-    assert result == 'table'
+    assert list(result['obs_id']) == ['w1', 'f1', 'h1']
     assert 'Query MAST: run query_mast_slice' in logger.messages
+
+
+def test_query_mast_slice_proposal_keeps_fgs_and_hsp():
+    # For a proposal, MAST is queried without mtFlag; moving targets plus every FGS
+    # and HSP observation are kept.
+    result = query_utils.query_mast_slice(proposal_id='8105', max_retries=1)
+    assert 'mtFlag' not in query_utils.Observations.kwargs
+    assert query_utils.Observations.kwargs['proposal_id'] == '08105'
+    assert list(result['obs_id']) == ['w1', 'f1', 'h1']
+
+
+def test_query_mast_slice_without_proposal_requires_moving_target():
+    # A broad query still asks MAST for moving targets only, and is not filtered here.
+    result = query_utils.query_mast_slice(instrument='FGS', max_retries=1)
+    assert query_utils.Observations.kwargs['mtFlag'] is True
+    assert len(result) == 5
+
+
+def test_is_retrievable_row():
+    rows = {row['obs_id']: row for row in make_obs_table()}
+    assert query_utils.is_retrievable_row(rows['w1'])
+    assert not query_utils.is_retrievable_row(rows['w2'])
+    assert query_utils.is_retrievable_row(rows['f1'])
+    assert query_utils.is_retrievable_row(rows['h1'])
+    assert not query_utils.is_retrievable_row(rows['s1'])
+    masked = Table({'instrument_name': ['FOS/BL'], 'mtFlag': [True]}, masked=True)
+    masked['mtFlag'].mask = [True]
+    assert not query_utils.is_retrievable_row(masked[0])
 
 
 def test_query_mast_slice_retry(monkeypatch):
@@ -47,11 +85,11 @@ def test_query_mast_slice_retry(monkeypatch):
             FailingObs.tries += 1
             if FailingObs.tries < 2:
                 raise ConnectionError('fail')
-            return 'table'
+            return make_obs_table()
     monkeypatch.setattr(query_utils, 'Observations', FailingObs)
     logger = query_utils.pdslogger.EasyLogger()
     result = query_utils.query_mast_slice(proposal_id='12345', instrument='WFC3', logger=logger, max_retries=2)
-    assert result == 'table'
+    assert len(result) == 3
     assert any('retry' in m for m in logger.messages)
 
 

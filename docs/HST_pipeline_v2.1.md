@@ -75,7 +75,7 @@ July 9, 2024
 - **query-hst-moving-targets** \<query constraints\>
   - runs periodically (or can be run manually) to get a list of programs with moving targets.
 - **query-hst-products** \<program-ID\>
-  - get a complete list of the accepted files for a specified program.
+  - get a complete list of the accepted files for a specified program. Only observations of moving targets are included, except that every FGS and HSP observation is included, because MAST does not flag their targets as moving.
 - **update-hst-program** \<program-ID\> \<visit\> [\<visit\> …]
   - overall task to create a new bundle or to manage the update of an existing bundle.
 - **get-program-info** \<program-ID\>

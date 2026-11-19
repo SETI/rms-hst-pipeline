@@ -100,6 +100,11 @@ MAST names; no other MAST preview is downloaded. This needs the `rms-picmaker` f
 SETI/rms-picmaker PR #33 (or a local checkout, installed with `pip install --no-deps -e
 ../rms-picmaker`); the released version can't read WFPC2 files or take `mask_ranges`.
 
+Only moving-target observations (MAST's `mtFlag`) are retrieved, except that for a given
+proposal `query_mast_slice` also keeps every FGS and HSP observation
+(`query_utils.NON_MOVING_INSTRUMENTS`), since MAST never flags those targets as moving.
+Broad queries without a proposal ID still ask MAST for moving targets only.
+
 Under `HST_BUNDLES` only the program directory has a suffix:
 `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` holds the manifests and `validation-report.txt`,
 and the bundle itself is `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
