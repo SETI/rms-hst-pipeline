@@ -46,7 +46,7 @@ EASY_TRANSLATIONS = {
     "COS"   : ["UV"],
     "GHRS"  : ["UV"],
     "FGS"   : ["VIS"],
-    ("ACS", "SBN"): ["UV"],
+    ("ACS", "SBC"): ["UV"],
     ("HSP", "UV1"): ["UV"],
     ("HSP", "UV2"): ["UV"],
     ("HSP", "VIS"): ["UV", "VIS", "NIR"],

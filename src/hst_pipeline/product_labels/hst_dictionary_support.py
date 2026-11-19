@@ -263,7 +263,7 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
 
     ##############################
     # channel_id
-    # ACS: HRC, SBN, WFC
+    # ACS: HRC, SBC, WFC
     # COS: FUV, NUV
     # FOS: AMBER, BLUE
     # GHRS: D1, D2
