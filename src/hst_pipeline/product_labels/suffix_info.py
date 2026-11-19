@@ -1613,7 +1613,13 @@ PICMAKER_BROWSE_REQUIREMENTS = {
 #     detectors or ACS/WFC's two; no effect on single-detector images.
 #   - footprint: median-filter with a circular footprint this many pixels across before
 #     computing the stretch, so cosmic rays and hot pixels do not set its limits.
-PICMAKER_BROWSE_OPTIONS = {'mosaic': True, 'footprint': 7}
+#   - percentiles: stretch between these percentiles of the (filtered) pixel values,
+#     rather than the minimum and maximum, so clumps of bad pixels and a bright target do
+#     not set the limits either. With mosaic, each detector is stretched on its own.
+#   - mask_ranges: treat pixels in this range of values as invalid, here exactly zero,
+#     e.g., the zero-filled border of an FOC image, so they do not affect the stretch.
+PICMAKER_BROWSE_OPTIONS = {'mosaic': True, 'footprint': 7, 'percentiles': (0.01, 99.99),
+                           'mask_ranges': (0, 0)}
 
 # The products of imaging instruments that are spectra, whose MAST previews (plots) are
 # used, given as {instrument_id: tuple of FITS suffixes}.

@@ -138,7 +138,9 @@ def test_picmaker_browse_tables():
     assert set(PICMAKER_BROWSE_SUFFIXES) == {'ACS', 'FOC', 'NICMOS', 'STIS', 'WFC3',
                                              'WFPC', 'WFPC2'}
     assert not set(PICMAKER_BROWSE_SUFFIXES) & NON_IMAGING_INSTRUMENTS
-    assert PICMAKER_BROWSE_OPTIONS == {'mosaic': True, 'footprint': 7}
+    assert PICMAKER_BROWSE_OPTIONS == {'mosaic': True, 'footprint': 7,
+                                       'percentiles': (0.01, 99.99),
+                                       'mask_ranges': (0, 0)}
     for (instrument_id, suffixes) in PICMAKER_BROWSE_SUFFIXES.items():
         assert set(suffixes) <= ACCEPTED_SUFFIXES[instrument_id]
 
@@ -326,6 +328,8 @@ def test_generate_picmaker_browse_products_options_and_reruns(tmp_path, monkeypa
     for options in calls:
         assert options['mosaic'] is True
         assert options['footprint'] == 7
+        assert options['percentiles'] == (0.01, 99.99)
+        assert options['mask_ranges'] == (0, 0)
         assert options['extension'] == 'jpg'
         assert options['directory'] == str(staging / 'browse_wfpc2_c0m' / 'visit_01')
     assert sorted(os.listdir(staging / 'browse_wfpc2_c0m' / 'visit_01')) == [

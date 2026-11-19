@@ -209,7 +209,7 @@ July 9, 2024
   - Downloaded files are in `<HST_STAGING>/hst_<nnnnn>/visit_<ss>/mastDownload/`.
 - Actions:
   - Move each downloaded file into its collection directory, `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, so that each file is stored only once in staging. MAST previews (`.jpg`, `.png`) of non-image products (spectra, and all products of COS, FGS, FOS, GHRS, and HSP) go into `browse_*` collections under their MAST file names. MAST previews of images are not downloaded.
-  - Generate a picmaker preview (`mosaic=True`, `footprint=7`) of each image product that lacks one: the raw, calibrated, and combined images of ACS, FOC, NICMOS, STIS (imaging mode only), WFC3, WFPC, and WFPC2, e.g., `browse_wfpc2_c0m/visit_<ss>/<ipppssoot>_c0m.jpg`.
+  - Generate a picmaker preview (`mosaic=True`, `footprint=7`, `percentiles=(0.01, 99.99)`, `mask_ranges=(0, 0)`) of each image product that lacks one: the raw, calibrated, and combined images of ACS, FOC, NICMOS, STIS (imaging mode only), WFC3, WFPC, and WFPC2, e.g., `browse_wfpc2_c0m/visit_<ss>/<ipppssoot>_c0m.jpg`.
   - Leave in place, with a warning, any file that belongs in no collection.
   - Remove the directories left empty under `mastDownload/`.
 
