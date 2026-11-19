@@ -208,7 +208,8 @@ July 9, 2024
 - State:
   - Downloaded files are in `<HST_STAGING>/hst_<nnnnn>/visit_<ss>/mastDownload/`.
 - Actions:
-  - Move each downloaded file into its collection directory, `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, so that each file is stored only once in staging. MAST previews (`.jpg`, `.png`) go into `browse_*` collections under their MAST file names.
+  - Move each downloaded file into its collection directory, `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, so that each file is stored only once in staging. MAST previews (`.jpg`, `.png`) of non-image products (spectra, and all products of COS, FGS, FOS, GHRS, and HSP) go into `browse_*` collections under their MAST file names. MAST previews of images are not downloaded.
+  - Generate a picmaker preview (`mosaic=True`, `footprint=7`) of each image product that lacks one: the raw, calibrated, and combined images of ACS, FOC, NICMOS, STIS (imaging mode only), WFC3, WFPC, and WFPC2, e.g., `browse_wfpc2_c0m/visit_<ss>/<ipppssoot>_c0m.jpg`.
   - Leave in place, with a warning, any file that belongs in no collection.
   - Remove the directories left empty under `mastDownload/`.
 
@@ -225,7 +226,7 @@ July 9, 2024
 - Actions:
   - Compare the staged FITS files to those in an existing bundle, if any.
   - Create a new XML label for each file, labeling all of the visit's collections together so that labels can refer to the visit's other files.
-  - Create a `Product_Browse` label for each MAST preview in the visit's `browse_*` collections.
+  - Create a `Product_Browse` label for each preview, from MAST or picmaker, in the visit's `browse_*` collections.
   - Reset the modification dates of the FITS files to match their production date at MAST.
   - If any file contains NaNs, rename the original file with “`-original`” appended, and then rewrite the file without NaNs.
   - TBD: What to do if the file in the existing bundle is identical.

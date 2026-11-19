@@ -5,17 +5,26 @@
 # task script. It files the downloads of one visit: every file under the visit's
 # mastDownload inbox (under staging) is MOVED into its collection directory (under
 # staging), so each file exists only once in staging:
-#   - browse_{inst_id}_{suffix}  (JPEG/PNG previews from MAST, names unchanged)
+#   - browse_{inst_id}_{suffix}  (MAST previews of non-image products, names unchanged)
 #   - data_{inst_id}_{suffix} or miscellaneous_{inst_id}_{suffix}
-# Files that belong in no collection stay in the inbox, and a warning is logged. Labels
-# are written afterward by the label_hst_products task, from the collection directories.
+# Files that belong in no collection stay in the inbox, and a warning is logged. Then,
+# picmaker generates a preview of each of the visit's image products (as listed in
+# PICMAKER_BROWSE_SUFFIXES) that lacks one, in browse_{inst_id}_{suffix}. Labels are
+# written afterward by the label_hst_products task, from the collection directories.
 ##########################################################################################
 
 import filecmp
 import os
 import pdslogger
 
+from astropy.io import fits
+from picmaker.options import get_parser as get_picmaker_parser
+from picmaker.picmaker import picmaker
+
 from hst_pipeline.product_labels.suffix_info import (ACCEPTED_SUFFIXES,
+                                                     PICMAKER_BROWSE_OPTIONS,
+                                                     PICMAKER_BROWSE_REQUIREMENTS,
+                                                     PICMAKER_BROWSE_SUFFIXES,
                                                      browse_collection_name,
                                                      collection_name,
                                                      is_accepted_browse_suffix)
@@ -32,15 +41,18 @@ from hst_pipeline.hst_helper.fs_utils import (get_formatted_proposal_id,
 # "*.fits-duplicate" left by an older download step, belongs in no collection.
 DATA_EXTENSIONS = ('fits', 'xml')
 
+# Format of the browse products that picmaker generates.
+PICMAKER_EXTENSION = 'jpg'
+
 
 def get_collection_dirname(filename):
     """Return the name of the collection that a downloaded file belongs in.
 
     Input:
         filename    the basename of a downloaded file, e.g., "ld8x01010_x1dsum1.fits",
-                    its label "ld8x01010_x1dsum1.xml", or a preview "u2no0401t_c0f.jpg".
+                    its label "ld8x01010_x1dsum1.xml", or a preview "j9xx01abq_drz.jpg".
 
-    Returns:    the collection name, e.g., "data_cos_x1dsum" or "browse_wfpc2_c0m"; None if
+    Returns:    the collection name, e.g., "data_cos_x1dsum" or "browse_acs_drz"; None if
                 the file belongs in no collection, including any file whose extension is
                 not one of DATA_EXTENSIONS or BROWSE_PROD_EXT.
     """
@@ -81,7 +93,8 @@ def get_filed_path(proposal_id, visit, filename):
 
 def prepare_browse_products(proposal_id, visit, logger=None):
     """With a given proposal id & visit, move the downloaded files of the visit from the
-    mastDownload inbox into their collection directories under the staging directory.
+    mastDownload inbox into their collection directories under the staging directory, then
+    generate the visit's missing picmaker browse products.
 
     A file that replaces one already filed (e.g., after a re-download) overwrites it. If
     two downloaded files share a basename, an identical repeat is dropped; a repeat with
@@ -141,7 +154,104 @@ def prepare_browse_products(proposal_id, visit, logger=None):
 
     _remove_empty_dirs(inbox, logger)
     logger.info(f'Moved {moved} file(s) from {inbox}')
+
+    generate_picmaker_browse_products(proposal_id, visit, logger)
     return moved
+
+
+def generate_picmaker_browse_products(proposal_id, visit, logger=None):
+    """Generate the picmaker browse products of one visit.
+
+    For each instrument and suffix in PICMAKER_BROWSE_SUFFIXES, every FITS file of the
+    visit in data_{inst_id}_{suffix} that has no preview yet, and whose primary header
+    meets PICMAKER_BROWSE_REQUIREMENTS, gets one, made with PICMAKER_BROWSE_OPTIONS and
+    named after it, in
+    the visit directory of browse_{inst_id}_{suffix}, e.g.,
+    browse_wfpc2_c0m/visit_04/u2no0401t_c0m.jpg for
+    data_wfpc2_c0m/visit_04/u2no0401t_c0m.fits.
+    An existing preview is kept. A FITS file picmaker cannot convert is logged as an error
+    and skipped.
+
+    Inputs:
+        proposal_id    a proposal id.
+        visit          two character visit.
+        logger         pdslogger to use; None for default EasyLogger.
+
+    Returns:    the number of browse products generated.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    staging_root = get_program_dir_path(proposal_id, None, 'staging')
+
+    generated = 0
+    for (inst_id, suffixes) in PICMAKER_BROWSE_SUFFIXES.items():
+        for suffix in suffixes:
+            data_dir = os.path.join(staging_root, collection_name(suffix, inst_id),
+                                    f'visit_{visit}')
+            if not os.path.isdir(data_dir):
+                continue
+            browse_dir = os.path.join(staging_root,
+                                      browse_collection_name(suffix, inst_id),
+                                      f'visit_{visit}')
+            for file in sorted(os.listdir(data_dir)):
+                stem, _, ext = file.rpartition('.')
+                if ext.lower() != 'fits' or get_instrument_id_from_fname(file) != inst_id:
+                    continue
+                browse_path = os.path.join(browse_dir, f'{stem}.{PICMAKER_EXTENSION}')
+                if os.path.exists(browse_path):
+                    continue
+                fits_path = os.path.join(data_dir, file)
+                if not _meets_picmaker_requirements(fits_path, inst_id):
+                    continue
+                try:
+                    make_picmaker_browse_product(fits_path, browse_dir,
+                                                 PICMAKER_BROWSE_OPTIONS)
+                except Exception as e:
+                    logger.error(f'picmaker failed on {fits_path}: {e}')
+                    continue
+                if not os.path.exists(browse_path):
+                    logger.error(f'picmaker wrote no browse product for {fits_path}')
+                    continue
+                generated += 1
+                logger.info(f'Generated browse product: {browse_path}')
+
+    if generated:
+        logger.info(f'Generated {generated} picmaker browse product(s) for visit {visit}')
+    return generated
+
+
+def _meets_picmaker_requirements(fits_path, inst_id):
+    """True if the primary header of a FITS file has the values that
+    PICMAKER_BROWSE_REQUIREMENTS lists for its instrument, e.g., OBSTYPE = "IMAGING" for
+    STIS.
+
+    Inputs:
+        fits_path    path to the FITS file.
+        inst_id      its instrument ID.
+
+    Returns:    True if picmaker should generate the file's preview.
+    """
+    requirements = PICMAKER_BROWSE_REQUIREMENTS.get(inst_id)
+    if not requirements:
+        return True
+    header = fits.getheader(fits_path)
+    return all(header.get(key) == value for (key, value) in requirements.items())
+
+
+def make_picmaker_browse_product(fits_path, browse_dir, options):
+    """Run picmaker on one FITS file, writing its preview to browse_dir under the FITS
+    file's name with the extension PICMAKER_EXTENSION.
+
+    Inputs:
+        fits_path     path to the FITS file.
+        browse_dir    the directory to write the preview to; created if necessary.
+        options       dict of picmaker options, e.g., {"mosaic": True, "footprint": 7}.
+    """
+    # Start from picmaker's own defaults, which picmaker() requires to be complete.
+    picmaker_options = vars(get_picmaker_parser().parse_args([fits_path]))
+    picmaker_options.update(options)
+    picmaker_options.update(directory=browse_dir, extension=PICMAKER_EXTENSION,
+                            replace='all')
+    picmaker(**picmaker_options)
 
 
 def _remove_empty_dirs(top, logger):

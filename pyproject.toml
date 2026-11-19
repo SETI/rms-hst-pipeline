@@ -7,14 +7,14 @@ name = "rms-hst-pipeline"
 dynamic = ["version"]
 description = "Automated pipeline that turns HST observations into PDS4-compliant bundles"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"   # rms-picmaker requires 3.12
 dependencies = [
   # Version floors are set where a lower version is known not to work, or to match the
   # floor a dependency of ours already enforces. They are not a lockfile: the pinned
   # HST/requirements.txt that pip-compile used to generate was dropped in favor of this.
   #
   # Imported directly by the package. The astropy and numpy floors are the ones
-  # rms-picmaker enforced while it was a dependency.
+  # rms-picmaker enforces.
   "astropy>=7.2.0",
   "astroquery>=0.4.6",
   "beautifulsoup4>=4.12",
@@ -30,6 +30,10 @@ dependencies = [
   # Not published on PyPI, so it is installed straight from GitHub. PyPI rejects direct
   # URL dependencies, so this must become a normal version spec before publishing there.
   "rms-hst-targets @ git+https://github.com/SETI/rms-hst-targets",
+  # WFPC2 browse products need the multi-extension FITS reader and the per-detector
+  # mosaic fix of SETI/rms-picmaker PR #33, which no release has yet. Replace this with a
+  # version floor once a release includes it.
+  "rms-picmaker @ git+https://github.com/SETI/rms-picmaker@bugfix/wfpc2-multi-extension-fits",
   "rms-pdstemplate>=2.4.0",
   "rms-translator>=1.0.0",
 ]
@@ -48,7 +52,6 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Astronomy",
   "Topic :: Utilities",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",

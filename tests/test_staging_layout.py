@@ -112,13 +112,13 @@ def test_prepare_drops_identical_repeat_and_keeps_conflicting_one(staging):
 
 
 def test_prepare_leaves_unfiled_file_in_inbox(staging):
-    _write(_inbox(staging) / 'j9xx01abq' / 'j9xx01abq_drz_large.jpg')
-    _write(_inbox(staging) / 'j9xx01abq' / 'j9xx01abq_drz.jpg')
+    _write(_inbox(staging) / 'ld8x01010' / 'ld8x01010_x1dsum_large.png')
+    _write(_inbox(staging) / 'ld8x01010' / 'ld8x01010_x1dsum.png')
 
     assert prepare_module.prepare_browse_products(PROPOSAL_ID, VISIT) == 1
     assert _all_files(staging) == [
-        'browse_acs_drz/visit_01/j9xx01abq_drz.jpg',
-        'visit_01/mastDownload/HST/j9xx01abq/j9xx01abq_drz_large.jpg',
+        'browse_cos_x1dsum/visit_01/ld8x01010_x1dsum.png',
+        'visit_01/mastDownload/HST/ld8x01010/ld8x01010_x1dsum_large.png',
     ]
 
 
@@ -139,8 +139,11 @@ def test_prepare_leaves_duplicate_named_file_in_inbox(staging):
     ('ld8x01010_x1dsum3.xml', 'data_cos_x1dsum'),
     ('ld8x01010_x1dsum3.png', 'browse_cos_x1dsum'),
     ('ld8x01010_asn.fits', 'miscellaneous_cos_asn'),
-    ('u2no0401t_c0f.jpg', 'browse_wfpc2_c0m'),
-    ('u2no0401t_drw.jpg', 'browse_wfpc2_drw'),
+    ('o4xx01abq_x1d.png', 'browse_stis_x1d'),   # a STIS spectrum: MAST preview
+    ('o4xx01abq_flt.jpg', None),                # image previews come from picmaker
+    ('j9xx01abq_drz.jpg', None),
+    ('u2no0401t_c0f.jpg', None),
+    ('u2no0401t_drw.jpg', None),
     ('j9xx01abq_drz_large.jpg', None),
     ('hst_05167_readme.txt', None),
     ('odtf01e5j_epc.fits-duplicate', None),     # renamed repeat from an old download

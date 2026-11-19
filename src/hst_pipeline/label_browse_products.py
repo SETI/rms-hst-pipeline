@@ -1,8 +1,9 @@
 ##########################################################################################
 # label_browse_products.py
 #
-# Create Product_Browse XML labels for browse_* collections of MAST previews.
-# One label per image file, named after it, e.g. u2no0401t_c0f.xml for u2no0401t_c0f.jpg.
+# Create Product_Browse XML labels for browse_* collections of previews, from MAST or
+# picmaker. One label per image file, named after it, e.g. u2no0401t_c0m.xml for
+# u2no0401t_c0m.jpg.
 ##########################################################################################
 
 import datetime
@@ -57,7 +58,7 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
     """Write Product_Browse labels for all browse images under one collection directory.
 
     Writes one label per image, next to it, named after the image file up to its
-    extension, e.g., u2no0401t_c0f.xml for u2no0401t_c0f.jpg. The product's LID ends in the
+    extension, e.g., u2no0401t_c0m.xml for u2no0401t_c0m.jpg. The product's LID ends in the
     product ID: the IPPPSSOOT plus the tail of an extended suffix, so the x1dsum1 preview
     of ld8x01010 gets "ld8x010101". This matches the collection inventory and the data
     product it previews.

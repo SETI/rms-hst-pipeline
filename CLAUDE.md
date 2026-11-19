@@ -90,6 +90,15 @@ Each file is stored once in staging. `hst-retrieve-visit` downloads into
 `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, and `hst-label-products` labels
 the files there. Run them in that order.
 
+Every image product gets a picmaker preview: `hst-prepare-browse` runs picmaker, always
+with `PICMAKER_BROWSE_OPTIONS` (`mosaic=True, footprint=7`), on each FITS file lacking a
+preview whose suffix is listed for its instrument in `suffix_info.PICMAKER_BROWSE_SUFFIXES`
+(ACS, FOC, NICMOS, STIS imaging, WFC3, WFPC, WFPC2). Non-image products, those of the
+non-imaging instruments (COS, FGS, FOS, GHRS, HSP) and the STIS spectra, keep MAST's
+JPEG/PNG previews, filed under their MAST names; no other MAST preview is downloaded. WFPC2 needs the
+`rms-picmaker` from SETI/rms-picmaker PR #33 (or a local checkout, installed with
+`pip install --no-deps -e ../rms-picmaker`); the released version can't read WFPC2 files.
+
 Under `HST_BUNDLES` only the program directory has a suffix:
 `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` holds the manifests and `validation-report.txt`,
 and the bundle itself is `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
