@@ -5,6 +5,8 @@ from unittest import mock
 import xml.dom.minidom as md
 
 from hst_pipeline.citations.citation_information_from_apt import citation_information_from_apt
+from hst_pipeline.citations import Citation_Information
+from hst_pipeline.citations.citation_information_from_mast import citation_information_from_mast
 from hst_pipeline.citations.citation_information_from_pro import citation_information_from_pro
 from hst_pipeline.citations.fix_abstract import fix_abstract
 from hst_pipeline.citations.fix_authors import fix_authors
@@ -986,3 +988,66 @@ def test_fix_title_article_before_comma():
 
     # The function doesn't process this as expected in mixed case
     assert 'a,' in result
+
+
+# Test citation_information_from_mast.py
+
+# Trimmed from https://archive.stsci.edu/proposal_search.php?id=1086&mission=hst
+MAST_PAGE_1086 = """<html><body>
+<h2 align='center'>DO NEPTUNE AND PLUTO HAVE RINGS?<br> HST Proposal 1086</h2>
+<center><H3>Robert Bless <span style="font-weight:normal">(<a href="x">publications @ ADS</a>)</span><br>University of Wisconsin - Madison</H3></center><b>Cycle: </b>1<br>  <B>Category:</B>         <br>
+  <B>Proposal type:</B>   GTO/HSP<br>
+  <B>Status:</B>          completed<br>
+   <HR><H2>Proposal Abstract</H2>
+   <p> The origin of planetary ring systems remains unknown. Neptune&#39;s rings
+   &amp; arcs. Revision History: Received on RPS 9/1/89; Added to SCCS 9/5/89 </p><hr/>
+</body></html>
+"""
+
+
+def write_mast_page(tmp_path, text=MAST_PAGE_1086):
+    path = tmp_path / '01086-mast.html'
+    path.write_text(text)
+    return str(path)
+
+
+def test_citation_information_from_mast(tmp_path):
+    info = citation_information_from_mast(write_mast_page(tmp_path))
+    (propno, category, cycle, authors, title,
+     submission_year, timing_year, abstract) = info
+    assert propno == 1086
+    assert category == 'GTO/HSP'
+    assert cycle == 1
+    assert authors == ['Robert Bless']
+    assert title == 'DO NEPTUNE AND PLUTO HAVE RINGS?'
+    assert (submission_year, timing_year) == (0, 0)
+    # Entities decoded, whitespace collapsed, revision history dropped
+    assert abstract == ("The origin of planetary ring systems remains unknown. "
+                        "Neptune's rings & arcs.")
+
+
+def test_citation_information_from_mast_no_proposal(tmp_path):
+    path = write_mast_page(tmp_path, '<html><body>No proposal found</body></html>')
+    with pytest.raises(ValueError, match='missing title'):
+        citation_information_from_mast(path)
+
+
+def test_citation_information_from_mast_missing_cycle(tmp_path):
+    path = write_mast_page(tmp_path, MAST_PAGE_1086.replace('<b>Cycle: </b>1', ''))
+    with pytest.raises(ValueError, match='missing cycle'):
+        citation_information_from_mast(path)
+
+
+def test_create_from_file_reads_mast_page(tmp_path):
+    info = Citation_Information.create_from_file(write_mast_page(tmp_path))
+    assert info.propno == 1086
+    assert info.author_list == 'Robert Bless'
+    assert info.publication_year == '1992'   # end of Cycle 1; the page gives no year
+    assert 'HST Cycle 1 Program 1086, 1992.' in info.description
+
+
+def test_fix_title_common_two_letter_words():
+    # Common two-letter words in all-caps titles are not taken for acronyms
+    assert fix_title('DO NEPTUNE AND PLUTO HAVE RINGS?') == 'Do Neptune and Pluto Have Rings?'
+    assert fix_title('WHAT DO WE SEE ON IO') == 'What Do We See on Io'
+    assert fix_title('UV IMAGING OF MARS') == 'UV Imaging of Mars'

@@ -11,6 +11,8 @@
 #     it to a backups/ subdirectory.
 #   - Save the newly downloaded files.
 # - Generate the new program-info.txt with a possibly modified citation.
+# - If there is no .apt or .pro file (as for early programs), fall back to the MAST
+#   proposal search page for the citation info.
 ##########################################################################################
 
 import os
@@ -23,6 +25,8 @@ import urllib.request
 from hst_pipeline.citations import Citation_Information
 from hst_pipeline.hst_helper import (DOCUMENT_EXT,
                                      DOCUMENT_EXT_FOR_CITATION_INFO,
+                                     MAST_PROPOSAL_SUFFIX,
+                                     MAST_PROPOSAL_URL,
                                      PROGRAM_INFO_FILE)
 from hst_pipeline.hst_helper.fs_utils import (backup_file,
                                               get_formatted_proposal_id,
@@ -151,4 +155,49 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
                 create_program_info_file(filepath)
                 is_program_info_file_created = True
 
+    # Early programs have no .apt or .pro file; use the MAST proposal search page instead
+    has_citation_file = (is_program_info_file_created or
+                         any(os.path.exists(os.path.join(download_dir, basename))
+                             for (_, basename) in table
+                             if basename.rpartition('.')[2]
+                             in DOCUMENT_EXT_FOR_CITATION_INFO))
+    if not has_citation_file:
+        basename = download_mast_proposal_page(proposal_id, download_dir, logger)
+        if basename:
+            res.add(basename)
+
     return res
+
+def download_mast_proposal_page(proposal_id, download_dir, logger=None):
+    """Download the MAST proposal search page of a program and create PROGRAM_INFO_FILE
+    from it; the fallback for programs with no .apt or .pro file.
+
+    Input:
+        proposal_id     a proposal id.
+        download_dir    the directory to store the page.
+        logger          pdslogger to use; None for default EasyLogger.
+
+    Returns:    the basename of the page if it was newly downloaded or changed and
+                its citation info could be read; otherwise None.
+    """
+    logger = logger or pdslogger.EasyLogger()
+    formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+    url = MAST_PROPOSAL_URL.format(int(proposal_id))
+    basename = f'{formatted_proposal_id}{MAST_PROPOSAL_SUFFIX}'
+    filepath = os.path.join(download_dir, basename)
+
+    logger.info(f'No .apt or .pro file for {proposal_id}; using {url}')
+    try:
+        retrieved = is_proposal_file_retrieved(proposal_id, url, filepath, logger=logger)
+        if not retrieved:
+            return None
+        logger.info(f'Create program info file from {basename}')
+        create_program_info_file(filepath)
+    except ValueError as e:
+        # The page has no proposal information, e.g., MAST has no such proposal
+        logger.error(f'No citation info for {proposal_id} in {url}: {e}')
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        return None
+
+    return basename

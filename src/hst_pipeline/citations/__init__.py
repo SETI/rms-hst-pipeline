@@ -9,6 +9,7 @@ from collections.abc import Iterable
 
 from .citation_information_from_apt import citation_information_from_apt
 from .citation_information_from_pro import citation_information_from_pro
+from .citation_information_from_mast import citation_information_from_mast
 from .fix_title import fix_title
 from .fix_authors import fix_authors
 from .fix_abstract import fix_abstract
@@ -98,10 +99,11 @@ PUBLICATION_YEARS = {
 
 class Citation_Information:
     """This class encapsulates the information needed for the PDS4 Citation_Information
-    object, as extracted from either an APT file or a .PRO file.
+    object, as extracted from an APT file, a .PRO file, or a MAST proposal search page.
 
     The function create_from_file takes two inputs:
-        - name of the file (which must end in .apt or .pro)
+        - name of the file (which must end in .apt or .pro, or be a saved MAST proposal
+          search page ending in .html)
         - version ID of the HST pipeline, which is included in the returned information
 
     The returned Citation_Information object has the following properties, which return
@@ -205,6 +207,8 @@ class Citation_Information:
             info = citation_information_from_apt(filename)
         elif filename_lc.endswith('.pro'):
             info = citation_information_from_pro(filename)
+        elif filename_lc.endswith('.html'):
+            info = citation_information_from_mast(filename)
         else:
             raise ValueError('unrecognized file format: ' + filename)
 

@@ -105,6 +105,13 @@ proposal `query_mast_slice` also keeps every FGS and HSP observation
 (`query_utils.NON_MOVING_INSTRUMENTS`), since MAST never flags those targets as moving.
 Broad queries without a proposal ID still ask MAST for moving targets only.
 
+`hst-get-program-info` downloads the Phase 2 files (.apt, .pdf, .pro, .prop) from
+STScI, and the citation info comes from the .apt or else the .pro file. Early programs
+(roughly Cycles 1–3) have neither, so it falls back to the MAST proposal search page,
+saved as `<nnnnn>-mast.html` in the pipeline directory and parsed by
+`citations/citation_information_from_mast.py`. That page names only the PI and gives no
+year, so the citation has one author and the publication year is the end of the cycle.
+
 Under `HST_BUNDLES` only the program directory has a suffix:
 `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` holds the manifests and `validation-report.txt`,
 and the bundle itself is `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`

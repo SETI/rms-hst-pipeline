@@ -86,10 +86,31 @@ def test_get_citation_info_from_file(monkeypatch, tmp_path, fake_logger):
         def create_from_file(path):
             return 'created'
     monkeypatch.setattr(general_utils, 'Citation_Information', FakeCitation)
-    file_path = tmp_path / 'file.txt'
+    file_path = tmp_path / '54321.txt'
     file_path.write_text('dummy')
     result = general_utils.get_citation_info('54321', fake_logger)
     assert result == 'created'
+
+@pytest.mark.parametrize('files,expected', [
+    (['01086.pro', '01086-mast.html', '01086.apt'], '01086.apt'),
+    (['01086-mast.html', '01086.pro'], '01086.pro'),
+    (['01086-mast.html', '01086.pdf'], '01086-mast.html'),
+])
+def test_get_citation_info_preference(monkeypatch, tmp_path, fake_logger, files,
+                                      expected):
+    # .apt is preferred over .pro, and either over the MAST proposal page
+    general_utils.CITATION_INFO_DICT.pop('01086', None)
+    for name in files:
+        (tmp_path / name).write_text('x')
+    monkeypatch.setattr(general_utils, 'get_program_dir_path',
+                        lambda pid, v, root_dir: str(tmp_path))
+    class FakeCitation:
+        @staticmethod
+        def create_from_file(path):
+            return os.path.basename(path)
+    monkeypatch.setattr(general_utils, 'Citation_Information', FakeCitation)
+    assert general_utils.get_citation_info(1086, fake_logger) == expected
+    general_utils.CITATION_INFO_DICT.pop('01086', None)
 
 @pytest.mark.parametrize('make_dir', [True, False])
 def test_get_citation_info_missing_says_what_to_run(monkeypatch, tmp_path, fake_logger,

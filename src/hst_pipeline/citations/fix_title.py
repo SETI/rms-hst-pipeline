@@ -158,7 +158,8 @@ ALLCAPS_WORDS = [
 # Ly = Lyman
 # Zw = Zwicky
 # Ia, Ib are "subparts" of Roman Numeral I
-TWO_LETTER_NOT_ALL_CAPS = ['ia', 'ib', 'io', 'is', 'ly', 'no', 'up', 'vs', 'zw']
+TWO_LETTER_NOT_ALL_CAPS = ['do', 'ia', 'ib', 'io', 'is', 'ly', 'my', 'no', 'so', 'up',
+                           'vs', 'we', 'zw']
 
 # These are words that are not capitalized unless at the beginning of the title
 # or after a colon, semicolon, dash or period.

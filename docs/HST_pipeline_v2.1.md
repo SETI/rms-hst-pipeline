@@ -79,7 +79,7 @@ July 9, 2024
 - **update-hst-program** \<program-ID\> \<visit\> [\<visit\> …]
   - overall task to create a new bundle or to manage the update of an existing bundle.
 - **get-program-info** \<program-ID\>
-  - retrieve the online files that describe a program (such as .apt or .pro) and assemble other program-level information.
+  - retrieve the online files that describe a program (such as .apt or .pro) and assemble other program-level information. Early programs (roughly Cycles 1–3) have no .apt or .pro file; for them the citation information (title, PI, cycle, abstract) is read from the MAST proposal search page, saved as `<nnnnn>-mast.html`.
 - **retrieve-hst-visit** \<program-ID\> \<visit\>
   - retrieve the accepted FITS files and browse products from MAST.
 - **prepare-browse-products** \<program-ID\> \<visit\>

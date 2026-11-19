@@ -14,6 +14,7 @@ from . import (BROWSE_PROD_EXT,
                CITATION_INFO_DICT,
                DOCUMENT_EXT_FOR_CITATION_INFO,
                INST_ID_DICT,
+               MAST_PROPOSAL_SUFFIX,
                INST_PARAMS_DICT,
                PRIMARY_RES_DICT,
                RECORDS_DICT,
@@ -131,23 +132,24 @@ def get_citation_info(proposal_id, logger):
     logger.info(f'Get citation info for: {proposal_id}')
 
     pipeline_dir = get_program_dir_path(proposal_id, None, root_dir='pipeline')
-    files = os.listdir(pipeline_dir) if os.path.isdir(pipeline_dir) else []
 
-    for file in files:
-        _, _, ext = file.rpartition('.')
-        # We don't have an implementation to create citation info from pdf.
-        if ext in DOCUMENT_EXT_FOR_CITATION_INFO:
-            file_path = f'{pipeline_dir}/{file}'
-            if formatted_proposal_id not in CITATION_INFO_DICT:
-                CITATION_INFO_DICT[formatted_proposal_id] = (
-                    Citation_Information.create_from_file(file_path)
-                )
+    # In order of preference: the proposal files (.apt, then .pro; we can't read a pdf),
+    # then the MAST proposal search page saved for early programs that have neither.
+    basenames = [f'{formatted_proposal_id}.{ext}'
+                 for ext in DOCUMENT_EXT_FOR_CITATION_INFO]
+    basenames.append(f'{formatted_proposal_id}{MAST_PROPOSAL_SUFFIX}')
+    for basename in basenames:
+        file_path = f'{pipeline_dir}/{basename}'
+        if os.path.isfile(file_path):
+            CITATION_INFO_DICT[formatted_proposal_id] = (
+                Citation_Information.create_from_file(file_path)
+            )
             return CITATION_INFO_DICT[formatted_proposal_id]
 
     exts = ', '.join('.' + ext for ext in DOCUMENT_EXT_FOR_CITATION_INFO)
-    message = (f'No proposal file ({exts}) for proposal id {proposal_id} in '
-               f'{pipeline_dir}; run "hst-get-program-info --proposal-id {proposal_id}" '
-               'first')
+    message = (f'No proposal file ({exts}) or MAST proposal page for proposal id '
+               f'{proposal_id} in {pipeline_dir}; run "hst-get-program-info '
+               f'--proposal-id {proposal_id}" first')
     logger.error(message)
     raise FileNotFoundError(message)
 

@@ -71,6 +71,12 @@ HST_DIR = _read_hst_dir()
 DOCUMENT_EXT = ('apt', 'pdf', 'pro', 'prop')
 DOCUMENT_EXT_FOR_CITATION_INFO = ('apt', 'pro')
 
+# Fallback source of citation info for early programs with no .apt or .pro file: the MAST
+# proposal search page, saved in the pipeline directory as <nnnnn>-mast.html. It is not a
+# proposal file, so it is not copied into the bundle's document collection.
+MAST_PROPOSAL_URL = 'https://archive.stsci.edu/proposal_search.php?id={}&mission=hst'
+MAST_PROPOSAL_SUFFIX = '-mast.html'
+
 # File names
 PROGRAM_INFO_FILE = 'program-info.txt'
 PRODUCTS_FILE = 'products.txt'
