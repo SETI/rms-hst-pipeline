@@ -19,9 +19,9 @@ class TestLabelCreationsWithFits:
     def teardown_method(self):
         # Remove the created xml
         created_lbl = [
-            f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_spt.xml',
-            f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_raw.xml',
-            f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_trl.xml',
+            f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_spt.lblx',
+            f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_raw.lblx',
+            f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_trl.lblx',
         ]
         created_lbl_paths = [golden_filepath(lbl_path) for lbl_path in created_lbl]
         for lbl in created_lbl_paths:
@@ -36,12 +36,12 @@ class TestLabelCreationsWithFits:
         [
             ([f'{TEST_COPIES_DIR}/hst_07885'],
              {
-                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_spt.xml':
-                f'{TEST_COPIES_DIR}/test_n4wl01xdq_spt.golden.xml',
-                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_raw.xml':
-                f'{TEST_COPIES_DIR}/test_n4wl01xdq_raw.golden.xml',
-                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_trl.xml':
-                f'{TEST_COPIES_DIR}/test_n4wl01xdq_trl.golden.xml',
+                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_spt.lblx':
+                f'{TEST_COPIES_DIR}/test_n4wl01xdq_spt.golden.lblx',
+                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_raw.lblx':
+                f'{TEST_COPIES_DIR}/test_n4wl01xdq_raw.golden.lblx',
+                f'{TEST_COPIES_DIR}/hst_07885/visit_01/mastDownload/HST/n4wl01xdq/n4wl01xdq_trl.lblx':
+                f'{TEST_COPIES_DIR}/test_n4wl01xdq_trl.golden.lblx',
              }),
         ]
     )

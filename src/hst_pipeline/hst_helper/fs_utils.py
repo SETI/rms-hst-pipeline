@@ -74,7 +74,7 @@ def get_deliverable_path(proposal_id, testing=False):
                        testing purpose with the test directory.
 
     Returns:    <HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>, the directory holding
-                bundle.xml and the collection directories.
+                bundle.lblx and the collection directories.
     """
     formatted_proposal_id = get_formatted_proposal_id(proposal_id)
     return (f'{get_program_dir_path(proposal_id, None, "bundles", testing)}'
@@ -104,7 +104,7 @@ def get_format_term(filename):
 
     Returns:    the IPPPSSOOT.
     """
-    # Strip extension first so labels like z2no0801t.xml still yield z2no0801t.
+    # Strip extension first so labels like z2no0801t.lblx still yield z2no0801t.
     stem, _, _ = filename.rpartition('.')
     if not stem:
         stem = filename

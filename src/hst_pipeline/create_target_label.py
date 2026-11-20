@@ -14,14 +14,14 @@ import urllib
 
 from hst_pipeline.hst_helper.fs_utils import get_context_products_path
 from hst_pipeline.hst_helper.general_utils import create_collection_label
-from hst_pipeline.product_labels.suffix_info import INSTRUMENT_NAMES
+from hst_pipeline.product_labels.suffix_info import INSTRUMENT_NAMES, LABEL_SUFFIX
 
 PDS_URL = 'https://pds.nasa.gov/data/pds4/context-pds4/target/'
 
-TARGET_LABEL_TEMPLATE = 'TARGET_LABEL.xml'
+TARGET_LABEL_TEMPLATE = 'TARGET_LABEL' + LABEL_SUFFIX
 
 # Names and types of the context products, exactly as the label templates write them
-# (PRODUCT_LABEL.xml, PRODUCT_COLLECTION_LABEL.xml, BUNDLE_LABEL.xml), so that validate
+# (PRODUCT_LABEL.lblx, PRODUCT_COLLECTION_LABEL.lblx, BUNDLE_LABEL.lblx), so that validate
 # can match each context reference against the temporary context-products JSON.
 INVESTIGATION_NAME_FMT = 'HST observing program {}'
 INVESTIGATION_TYPE = 'Individual Investigation'
@@ -79,7 +79,7 @@ def create_target_label(proposal_id, data_dict, logger=None):
                 break
         # Create target label under context folder if it doesn't exist in PDS page.
         if not is_target_label_exists:
-            label_filename = f'{target}_1.0.xml'
+            label_filename = f'{target}_1.0{LABEL_SUFFIX}'
             target_data_dict = {
                 'target': target_info,
                 'label_date': data_dict['label_date']

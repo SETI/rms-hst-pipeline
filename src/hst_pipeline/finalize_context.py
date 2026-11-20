@@ -1,11 +1,12 @@
 ##########################################################################################
 # finalize_context.py
 #
-# Create context directory, collection csv & xml, and investigation xml.
+# Create context directory, collection csv & label, and investigation label.
 ##########################################################################################
 
 import pdslogger
 
+from hst_pipeline.hst_helper import LABEL_SUFFIX
 from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
                                               get_formatted_proposal_id)
 from hst_pipeline.hst_helper.general_utils import (create_collection_label,
@@ -13,9 +14,9 @@ from hst_pipeline.hst_helper.general_utils import (create_collection_label,
                                                    get_mod_history_from_label)
 
 CSV_FILENAME = 'collection_context.csv'
-COL_CTXT_LABEL = 'collection_context.xml'
-COL_CTXT_LABEL_TEMPLATE = 'CONTEXT_COLLECTION_LABEL.xml'
-INV_LABEL_TEMPLATE = 'INVESTIGATION_LABEL.xml'
+COL_CTXT_LABEL = 'collection_context' + LABEL_SUFFIX
+COL_CTXT_LABEL_TEMPLATE = 'CONTEXT_COLLECTION_LABEL' + LABEL_SUFFIX
+INV_LABEL_TEMPLATE = 'INVESTIGATION_LABEL' + LABEL_SUFFIX
 
 def finalize_hst_context_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create context directory in the final bundle. These are
@@ -78,7 +79,7 @@ def finalize_hst_context_directory(proposal_id, data_dict, logger=None, testing=
                                            logger, testing)
 
     # Create investigation label
-    inv_label = f'individual.hst_{formatted_proposal_id}.xml'
+    inv_label = f'individual.hst_{formatted_proposal_id}{LABEL_SUFFIX}'
     inv_lbl = create_collection_label(proposal_id, 'context', ctx_data_dict,
                                       inv_label, INV_LABEL_TEMPLATE,
                                       logger, testing)

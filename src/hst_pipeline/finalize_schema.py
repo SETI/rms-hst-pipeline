@@ -1,14 +1,15 @@
 ##########################################################################################
 # finalize_schema.py
 #
-# Create schema directory, and schema csv & xml.
+# Create schema directory, and schema csv & label.
 ##########################################################################################
 
 import pdslogger
 
 from hst_pipeline.hst_helper import (PDS4_LIDVID,
                                      HST_LIDVID,
-                                     DISP_LIDVID)
+                                     DISP_LIDVID,
+                                     LABEL_SUFFIX)
 from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
                                               get_formatted_proposal_id)
 from hst_pipeline.hst_helper.general_utils import (create_collection_label,
@@ -16,8 +17,8 @@ from hst_pipeline.hst_helper.general_utils import (create_collection_label,
                                                    get_mod_history_from_label)
 
 CSV_FILENAME = 'collection_schema.csv'
-COL_SCH_LABEL = 'collection_schema.xml'
-COL_SCH_LABEL_TEMPLATE = 'SCHEMA_COLLECTION_LABEL.xml'
+COL_SCH_LABEL = 'collection_schema' + LABEL_SUFFIX
+COL_SCH_LABEL_TEMPLATE = 'SCHEMA_COLLECTION_LABEL' + LABEL_SUFFIX
 
 def finalize_hst_schema_directory(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create schema directory in the final bundle. These are

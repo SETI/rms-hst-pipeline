@@ -1582,6 +1582,9 @@ for key, info in SUFFIX_INFO.items():
 #     name, unchanged. No other MAST preview of an imaging instrument is downloaded.
 BROWSE_EXTENSIONS = ('jpg', 'jpeg', 'png')
 
+# The file extension of every PDS4 label the pipeline writes, and of its label templates
+LABEL_SUFFIX = '.lblx'
+
 # Exceptions where MAST names a preview with a different suffix from the FITS product it
 # previews, given as {instrument_id: {MAST preview suffix: FITS suffix}}. There are none
 # at present; WFPC2, whose MAST previews have the old, waivered suffixes, uses picmaker.
@@ -1620,6 +1623,16 @@ PICMAKER_BROWSE_REQUIREMENTS = {
 #     e.g., the zero-filled border of an FOC image, so they do not affect the stretch.
 PICMAKER_BROWSE_OPTIONS = {'mosaic': True, 'footprint': 7, 'percentiles': (0.01, 99.99),
                            'mask_ranges': (0, 0)}
+
+# The data quality files of WFPC and WFPC2 images, given as
+# {instrument_id: {image suffix: data quality suffix}}. picmaker excludes every pixel
+# flagged in the data quality file from a preview's stretch and draws it as invalid; it is
+# told where to find that file with its hst_dq option, the visit directory of the data
+# quality collection.
+HST_DQ_SUFFIXES = {
+    'WFPC' : {'c0f': 'c1f', 'd0f': 'q0f'},
+    'WFPC2': {'c0m': 'c1m', 'd0m': 'q0m'},
+}
 
 # The products of imaging instruments that are spectra, whose MAST previews (plots) are
 # used, given as {instrument_id: tuple of FITS suffixes}.

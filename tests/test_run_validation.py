@@ -20,28 +20,28 @@ def _write(path, content=b'x'):
 def test_manifests_list_paths_relative_to_bundle(tmp_path, monkeypatch):
     monkeypatch.setitem(fs_utils.__dict__, 'HST_DIR', {'bundles': str(tmp_path)})
     bundle = tmp_path / 'hst_07885-deliverable' / 'hst_07885'
-    _write(bundle / 'bundle.xml')
-    _write(bundle / 'data_nicmos_raw' / 'collection_data_nicmos_raw.xml')
-    _write(bundle / 'data_nicmos_raw' / 'visit_01' / 'n4wl01xdq_raw.xml')
+    _write(bundle / 'bundle.lblx')
+    _write(bundle / 'data_nicmos_raw' / 'collection_data_nicmos_raw.lblx')
+    _write(bundle / 'data_nicmos_raw' / 'visit_01' / 'n4wl01xdq_raw.lblx')
 
     run_validation.create_manifest_files(7885, None)
 
     program_dir = tmp_path / 'hst_07885-deliverable'
     checksums = (program_dir / run_validation.CM_FNAME).read_text().splitlines()
     assert [line.split('  ')[1] for line in checksums] == [
-        'bundle.xml',
-        'data_nicmos_raw/collection_data_nicmos_raw.xml',
-        'data_nicmos_raw/visit_01/n4wl01xdq_raw.xml',
+        'bundle.lblx',
+        'data_nicmos_raw/collection_data_nicmos_raw.lblx',
+        'data_nicmos_raw/visit_01/n4wl01xdq_raw.lblx',
     ]
 
     transfers = [line.split() for line in
                  (program_dir / run_validation.TM_FNAME).read_text().splitlines()]
     assert transfers == [
-        ['urn:nasa:pds:hst_07885::1.0', 'bundle.xml'],
+        ['urn:nasa:pds:hst_07885::1.0', 'bundle.lblx'],
         ['urn:nasa:pds:hst_07885:data_nicmos_raw::1.0',
-         'data_nicmos_raw/collection_data_nicmos_raw.xml'],
+         'data_nicmos_raw/collection_data_nicmos_raw.lblx'],
         ['urn:nasa:pds:hst_07885:data_nicmos_raw:n4wl01xdq_raw::1.0',
-         'data_nicmos_raw/visit_01/n4wl01xdq_raw.xml'],
+         'data_nicmos_raw/visit_01/n4wl01xdq_raw.lblx'],
     ]
 
 

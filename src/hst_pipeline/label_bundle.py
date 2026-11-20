@@ -7,12 +7,13 @@
 import os
 import pdslogger
 
+from hst_pipeline.hst_helper import LABEL_SUFFIX
 from hst_pipeline.hst_helper.fs_utils import get_deliverable_path
 from hst_pipeline.hst_helper.general_utils import (create_collection_label,
                                                    get_mod_history_from_label)
 
-BUNDLE_LABEL = 'bundle.xml'
-BUNDLE_LABEL_TEMPLATE = 'BUNDLE_LABEL.xml'
+BUNDLE_LABEL = 'bundle' + LABEL_SUFFIX
+BUNDLE_LABEL_TEMPLATE = 'BUNDLE_LABEL' + LABEL_SUFFIX
 
 def label_hst_bundle(proposal_id, data_dict, logger=None, testing=False):
     """With a given proposal id, create the bundle label. Return the path of the bundle

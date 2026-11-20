@@ -48,7 +48,7 @@ class TestLabelCreationsWithDataDict:
 
         if os.path.isfile(sch_col_lbl):
             calculated_contents = golden_file_contents(sch_col_lbl)
-        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_schema_col_label.golden.xml',
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_schema_col_label.golden.lblx',
                                  calculated_contents)
 
     # Test context colleciton label creation
@@ -63,7 +63,7 @@ class TestLabelCreationsWithDataDict:
 
         if os.path.isfile(ctxt_col_lbl):
             calculated_contents = golden_file_contents(ctxt_col_lbl)
-        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_context_col_label.golden.xml',
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_context_col_label.golden.lblx',
                                  calculated_contents)
 
     # Test investigation label creation
@@ -78,7 +78,7 @@ class TestLabelCreationsWithDataDict:
 
         if os.path.isfile(inv_lbl):
             calculated_contents = golden_file_contents(inv_lbl)
-        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_investigation_label.golden.xml',
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_investigation_label.golden.lblx',
                                  calculated_contents)
 
     # Test document colleciton label creation
@@ -93,7 +93,7 @@ class TestLabelCreationsWithDataDict:
 
         if os.path.isfile(doc_col_lbl):
             calculated_contents = golden_file_contents(doc_col_lbl)
-        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_document_col_label.golden.xml',
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_document_col_label.golden.lblx',
                                  calculated_contents)
 
     # Test document label creation
@@ -108,7 +108,7 @@ class TestLabelCreationsWithDataDict:
 
         if os.path.isfile(doc_lbl):
             calculated_contents = golden_file_contents(doc_lbl)
-        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_document_label.golden.xml',
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_document_label.golden.lblx',
                                  calculated_contents)
 
     # Test data product colleciton label creation
@@ -129,14 +129,14 @@ class TestLabelCreationsWithDataDict:
         col_name = data_dict['collection_name']
         # Create data product collection directory
         create_col_dir_in_bundle(p_id, col_name, True)
-        col_data_label_name = f'collection_{col_name}.xml'
+        col_data_label_name = f'collection_{col_name}.lblx'
         data_prod_col_lbl = create_collection_label(p_id, col_name,
                                                     data_dict, col_data_label_name,
                                                     COL_DATA_LABEL_TEMPLATE, None, True)
 
         if os.path.isfile(data_prod_col_lbl):
             calculated_contents = golden_file_contents(data_prod_col_lbl)
-        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_data_prod_col_label.golden.xml',
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_data_prod_col_label.golden.lblx',
                                  calculated_contents)
 
     # Test bundle label creation
@@ -165,7 +165,7 @@ class TestLabelCreationsWithDataDict:
 
         if os.path.isfile(bundle_lbl):
             calculated_contents = golden_file_contents(bundle_lbl)
-        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_bundle_label.golden.xml',
+        assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_bundle_label.golden.lblx',
                                  calculated_contents)
 
 

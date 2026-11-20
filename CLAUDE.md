@@ -47,7 +47,7 @@ directories for proposal 16167 in `setup_method`. A network-dependent count asse
 failing is usually MAST drifting, not a regression.
 
 Tests write into a parallel `_testing` tree (`get_program_dir_path(..., testing=True)` →
-`hst_07885_testing`) so real data is untouched. Label tests write `.xml` into
+`hst_07885_testing`) so real data is untouched. Label tests write `.lblx` into
 `tests/golden_copies/` and clean up in teardown.
 
 `src/hst_pipeline/citation_tests/` holds standalone scripts, not pytest, and depends on
@@ -94,11 +94,14 @@ Every image product gets a picmaker preview: `hst-prepare-browse` runs picmaker,
 with `PICMAKER_BROWSE_OPTIONS` (`mosaic=True, footprint=7, percentiles=(0.01, 99.99),
 mask_ranges=(0, 0)`), on each FITS file lacking a preview whose suffix is listed for its
 instrument in `suffix_info.PICMAKER_BROWSE_SUFFIXES` (ACS, FOC, NICMOS, STIS imaging,
-WFC3, WFPC, WFPC2). Non-image products, those of the non-imaging instruments (COS, FGS,
+WFC3, WFPC, WFPC2). WFPC and WFPC2 images (`c0f`/`d0f`, `c0m`/`d0m`) are also passed
+`hst_dq`, the visit directory of their data quality collection (`suffix_info.HST_DQ_SUFFIXES`),
+since picmaker otherwise looks for the DQ file beside the image; flagged pixels are left
+out of the stretch and drawn black. Non-image products, those of the non-imaging instruments (COS, FGS,
 FOS, GHRS, HSP) and the STIS spectra, keep MAST's JPEG/PNG previews, filed under their
 MAST names; no other MAST preview is downloaded. This needs the `rms-picmaker` from
 SETI/rms-picmaker PR #33 (or a local checkout, installed with `pip install --no-deps -e
-../rms-picmaker`); the released version can't read WFPC2 files or take `mask_ranges`.
+../rms-picmaker`); the released version can't read WFPC2 files or take `mask_ranges` or `hst_dq`.
 
 Only moving-target observations (MAST's `mtFlag`) are retrieved, except that for a given
 proposal `query_mast_slice` also keeps every FGS and HSP observation
@@ -121,6 +124,11 @@ Under `HST_BUNDLES` only the program directory has a suffix:
 `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` holds the manifests and `validation-report.txt`,
 and the bundle itself is `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
 (`get_program_dir_path(..., 'bundles')` and `get_deliverable_path()` respectively).
+
+Every label the pipeline writes, and every template in `templates/`, ends in `.lblx`,
+not `.xml` (`suffix_info.LABEL_SUFFIX`, re-exported by `hst_helper`); `validate-pdart`
+passes `-e lblx` so that validate looks for them. `xml/` keeps its `.xml`, `.xsd`, and
+`.sch` schema files.
 
 `templates/` and `xml/` are package data resolved relative to
 `__file__`, and are declared in `[tool.setuptools.package-data]`. Anything added there

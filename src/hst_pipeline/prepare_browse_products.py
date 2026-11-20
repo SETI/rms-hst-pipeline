@@ -25,12 +25,14 @@ from hst_pipeline.product_labels.suffix_info import (ACCEPTED_SUFFIXES,
                                                      PICMAKER_BROWSE_OPTIONS,
                                                      PICMAKER_BROWSE_REQUIREMENTS,
                                                      PICMAKER_BROWSE_SUFFIXES,
+                                                     HST_DQ_SUFFIXES,
                                                      browse_collection_name,
                                                      collection_name,
                                                      is_accepted_browse_suffix)
 
 from hst_pipeline.hst_helper import (INST_ID_DICT,
                                      BROWSE_PROD_EXT,
+                                     LABEL_SUFFIX,
                                      MAST_DOWNLOAD_DIRNAME)
 from hst_pipeline.hst_helper.fs_utils import (get_formatted_proposal_id,
                                               get_program_dir_path,
@@ -39,7 +41,7 @@ from hst_pipeline.hst_helper.fs_utils import (get_formatted_proposal_id,
 
 # Extensions of the downloaded data files and their labels. Any other file, e.g., a
 # "*.fits-duplicate" left by an older download step, belongs in no collection.
-DATA_EXTENSIONS = ('fits', 'xml')
+DATA_EXTENSIONS = ('fits', LABEL_SUFFIX.lstrip('.'))
 
 # Format of the browse products that picmaker generates.
 PICMAKER_EXTENSION = 'jpg'
@@ -50,7 +52,7 @@ def get_collection_dirname(filename):
 
     Input:
         filename    the basename of a downloaded file, e.g., "ld8x01010_x1dsum1.fits",
-                    its label "ld8x01010_x1dsum1.xml", or a preview "j9xx01abq_drz.jpg".
+                    its label "ld8x01010_x1dsum1.lblx", or a preview "j9xx01abq_drz.jpg".
 
     Returns:    the collection name, e.g., "data_cos_x1dsum" or "browse_acs_drz"; None if
                 the file belongs in no collection, including any file whose extension is
@@ -165,7 +167,9 @@ def generate_picmaker_browse_products(proposal_id, visit, logger=None):
     For each instrument and suffix in PICMAKER_BROWSE_SUFFIXES, every FITS file of the
     visit in data_{inst_id}_{suffix} that has no preview yet, and whose primary header
     meets PICMAKER_BROWSE_REQUIREMENTS, gets one, made with PICMAKER_BROWSE_OPTIONS and
-    named after it, in
+    named after it. A WFPC or WFPC2 image listed in HST_DQ_SUFFIXES is masked by the
+    data quality file of the same visit's data quality collection, e.g.,
+    data_wfpc2_c1m/visit_04/u2no0401t_c1m.fits. The preview is written in
     the visit directory of browse_{inst_id}_{suffix}, e.g.,
     browse_wfpc2_c0m/visit_04/u2no0401t_c0m.jpg for
     data_wfpc2_c0m/visit_04/u2no0401t_c0m.fits.
@@ -192,6 +196,12 @@ def generate_picmaker_browse_products(proposal_id, visit, logger=None):
             browse_dir = os.path.join(staging_root,
                                       browse_collection_name(suffix, inst_id),
                                       f'visit_{visit}')
+            options = PICMAKER_BROWSE_OPTIONS
+            dq_suffix = HST_DQ_SUFFIXES.get(inst_id, {}).get(suffix)
+            if dq_suffix:
+                dq_dir = os.path.join(staging_root, collection_name(dq_suffix, inst_id),
+                                      f'visit_{visit}')
+                options = {**options, 'hst_dq': dq_dir}
             for file in sorted(os.listdir(data_dir)):
                 stem, _, ext = file.rpartition('.')
                 if ext.lower() != 'fits' or get_instrument_id_from_fname(file) != inst_id:
@@ -203,8 +213,7 @@ def generate_picmaker_browse_products(proposal_id, visit, logger=None):
                 if not _meets_picmaker_requirements(fits_path, inst_id):
                     continue
                 try:
-                    make_picmaker_browse_product(fits_path, browse_dir,
-                                                 PICMAKER_BROWSE_OPTIONS)
+                    make_picmaker_browse_product(fits_path, browse_dir, options)
                 except Exception as e:
                     logger.error(f'picmaker failed on {fits_path}: {e}')
                     continue

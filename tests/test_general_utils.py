@@ -185,7 +185,7 @@ def test_get_collection_label_data(monkeypatch, tmp_path, fake_logger):
     general_utils.PRIMARY_RES_DICT[formatted_id] = {}
     general_utils.RECORDS_DICT[formatted_id] = {}
     xml_content = '<xml></xml>'
-    xml_file = tmp_path / 'file.xml'
+    xml_file = tmp_path / 'file.lblx'
     xml_file.write_text(xml_content)
     monkeypatch.setattr(general_utils, 'get_formatted_proposal_id', lambda pid: formatted_id)
     monkeypatch.setattr(general_utils, 'get_product_id', lambda fname: 'file')

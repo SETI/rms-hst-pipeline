@@ -136,7 +136,8 @@ def test_prepare_leaves_duplicate_named_file_in_inbox(staging):
 
 @pytest.mark.parametrize('filename,expected', [
     ('ld8x01010_x1dsum3.fits', 'data_cos_x1dsum'),
-    ('ld8x01010_x1dsum3.xml', 'data_cos_x1dsum'),
+    ('ld8x01010_x1dsum3.lblx', 'data_cos_x1dsum'),
+    ('ld8x01010_x1dsum3.xml', None),            # labels are .lblx, not .xml
     ('ld8x01010_x1dsum3.png', 'browse_cos_x1dsum'),
     ('ld8x01010_asn.fits', 'miscellaneous_cos_asn'),
     ('o4xx01abq_x1d.png', 'browse_stis_x1d'),   # a STIS spectrum: MAST preview
@@ -174,7 +175,7 @@ def test_label_hst_visit_labels_all_visit_collections_in_one_call(staging, monke
     assert calls == [[str(staging / 'data_cos_x1d' / 'visit_01'),
                       str(staging / 'data_cos_x1dsum' / 'visit_01'),
                       str(staging / 'miscellaneous_cos_spt' / 'visit_01')]]
-    assert (staging / 'browse_cos_x1dsum' / 'visit_01' / 'ld8x01010_x1dsum.xml').exists()
+    assert (staging / 'browse_cos_x1dsum' / 'visit_01' / 'ld8x01010_x1dsum.lblx').exists()
 
 
 def test_label_hst_visit_without_fits_files(staging, monkeypatch):
@@ -215,7 +216,7 @@ def _old_layout(staging, visit='01', content=b'data'):
     """Lay out one visit as older pipelines left it: each file both in the inbox and in
     its collection."""
     for name, collection in (('ld8x01010_x1dsum.fits', 'data_cos_x1dsum'),
-                             ('ld8x01010_x1dsum.xml', 'data_cos_x1dsum'),
+                             ('ld8x01010_x1dsum.lblx', 'data_cos_x1dsum'),
                              ('ld8x01010_x1dsum.png', 'browse_cos_x1dsum')):
         _write(_inbox(staging, visit) / 'ld8x01010' / name, content)
         _write(staging / collection / f'visit_{visit}' / name, content)

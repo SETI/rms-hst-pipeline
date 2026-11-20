@@ -2,7 +2,7 @@
 # label_browse_products.py
 #
 # Create Product_Browse XML labels for browse_* collections of previews, from MAST or
-# picmaker. One label per image file, named after it, e.g. u2no0401t_c0m.xml for
+# picmaker. One label per image file, named after it, e.g. u2no0401t_c0m.lblx for
 # u2no0401t_c0m.jpg.
 ##########################################################################################
 
@@ -11,7 +11,7 @@ import os
 
 import pdslogger
 
-from hst_pipeline.hst_helper import BROWSE_PROD_EXT
+from hst_pipeline.hst_helper import BROWSE_PROD_EXT, LABEL_SUFFIX
 from hst_pipeline.hst_helper.fs_utils import (file_md5,
                                               get_file_suffix,
                                               get_format_term,
@@ -25,7 +25,7 @@ from hst_pipeline.product_labels.suffix_info import (browse_data_collection_name
 
 LABEL_VERSION = '1.0'
 LABEL_DATE = datetime.datetime.now().strftime('%Y-%m-%d')
-TEMPLATE_NAME = 'BROWSE_PRODUCT_LABEL.xml'
+TEMPLATE_NAME = 'BROWSE_PRODUCT_LABEL' + LABEL_SUFFIX
 VID = (1, 0)
 
 _ENCODING = {
@@ -58,7 +58,7 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
     """Write Product_Browse labels for all browse images under one collection directory.
 
     Writes one label per image, next to it, named after the image file up to its
-    extension, e.g., u2no0401t_c0m.xml for u2no0401t_c0m.jpg. The product's LID ends in the
+    extension, e.g., u2no0401t_c0m.lblx for u2no0401t_c0m.jpg. The product's LID ends in the
     product ID: the IPPPSSOOT plus the tail of an extended suffix, so the x1dsum1 preview
     of ld8x01010 gets "ld8x010101". This matches the collection inventory and the data
     product it previews.
@@ -107,7 +107,7 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
                 'data_lidvid': data_lidvid,
                 'files': [_file_entry(os.path.join(root, name))],
             }
-            label_path = os.path.join(root, f'{stem}.xml')
+            label_path = os.path.join(root, stem + LABEL_SUFFIX)
             create_xml_label(template_path, label_path, data_dict, logger)
             labels_written += 1
 

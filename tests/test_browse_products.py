@@ -21,6 +21,7 @@ from hst_pipeline.hst_helper import query_utils
 from hst_pipeline.label_browse_products import label_browse_collection_directory
 from hst_pipeline.product_labels import get_browse_lids
 from hst_pipeline.product_labels.suffix_info import (ACCEPTED_SUFFIXES,
+                                                     HST_DQ_SUFFIXES,
                                                      NON_IMAGING_INSTRUMENTS,
                                                      PICMAKER_BROWSE_OPTIONS,
                                                      PICMAKER_BROWSE_SUFFIXES,
@@ -144,6 +145,13 @@ def test_picmaker_browse_tables():
     for (instrument_id, suffixes) in PICMAKER_BROWSE_SUFFIXES.items():
         assert set(suffixes) <= ACCEPTED_SUFFIXES[instrument_id]
 
+    # Each data quality file belongs to an image that gets a picmaker preview, and is
+    # itself downloaded.
+    assert set(HST_DQ_SUFFIXES) == {'WFPC', 'WFPC2'}
+    for (instrument_id, dq_suffixes) in HST_DQ_SUFFIXES.items():
+        assert set(dq_suffixes) <= set(PICMAKER_BROWSE_SUFFIXES[instrument_id])
+        assert set(dq_suffixes.values()) <= ACCEPTED_SUFFIXES[instrument_id]
+
 
 def _touch(path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -233,10 +241,10 @@ def test_prepare_browse_products_files_previews_under_mast_names(tmp_path, monke
 
     staging = tmp_path / 'hst_05167'
     assert sorted(os.listdir(staging / 'browse_stis_x1d' / 'visit_01')) == [
-        'o4xx01abq_x1d.png', 'o4xx01abq_x1d.xml'
+        'o4xx01abq_x1d.lblx', 'o4xx01abq_x1d.png'
     ]
     assert sorted(os.listdir(staging / 'browse_cos_x1dsum' / 'visit_01')) == [
-        'ld8x01010_x1dsum1.png', 'ld8x01010_x1dsum1.xml'
+        'ld8x01010_x1dsum1.lblx', 'ld8x01010_x1dsum1.png'
     ]
 
     # No collection name carries the old "mast" prefix.
@@ -253,9 +261,10 @@ def test_prepare_browse_products_files_previews_under_mast_names(tmp_path, monke
                                    'u2xx0101t_c0f.jpg', 'u2xx0101t_drw.jpg']
 
 
-def _write_wfpc2_fits(path):
+def _write_wfpc2_fits(path, arrays=None):
     """Write a small WFPC2 file in the multi-extension layout of a c0m or d0m file: an
-    empty PRIMARY HDU and one 32x32 SCI extension per detector."""
+    empty PRIMARY HDU and one 32x32 SCI extension per detector, holding random values or
+    else the given four arrays."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     primary = pyfits.PrimaryHDU()
     primary.header['TELESCOP'] = 'HST'
@@ -264,8 +273,9 @@ def _write_wfpc2_fits(path):
     hdus = [primary]
     rng = np.random.default_rng(1)
     for detector in range(1, 5):
-        sci = pyfits.ImageHDU((rng.random((32, 32)) * 100 * detector).astype('float32'),
-                              name='SCI')
+        array = (rng.random((32, 32)) * 100 * detector if arrays is None
+                 else arrays[detector - 1])
+        sci = pyfits.ImageHDU(np.asarray(array).astype('float32'), name='SCI')
         sci.header['DETECTOR'] = detector
         hdus.append(sci)
     pyfits.HDUList(hdus).writeto(path)
@@ -275,8 +285,12 @@ def test_prepare_browse_products_generates_wfpc2_mosaics(tmp_path, monkeypatch):
     _use_tmp_staging(tmp_path, monkeypatch)
     staging = tmp_path / 'hst_05167'
     download_dir = staging / 'visit_01' / 'mastDownload' / 'HST' / 'u2xx0101t'
-    for suffix in ('c0m', 'd0m', 'c1m'):
+    for suffix in ('c0m', 'd0m'):
         _write_wfpc2_fits(str(download_dir / f'u2xx0101t_{suffix}.fits'))
+    # The c0m data quality file flags the first 8 rows of the first detector
+    dq = [np.zeros((32, 32)) for _ in range(4)]
+    dq[0][:8] = 1
+    _write_wfpc2_fits(str(download_dir / 'u2xx0101t_c1m.fits'), dq)
 
     prepare_module.prepare_browse_products(5167, '01')
 
@@ -288,9 +302,17 @@ def test_prepare_browse_products_generates_wfpc2_mosaics(tmp_path, monkeypatch):
             assert image.size == (64, 64)
     assert not (staging / 'browse_wfpc2_c1m').exists()
 
+    # The flagged pixels are drawn black, picmaker's invalid color. The d0m file holds
+    # the same data but has no q0m file, so only its darkest data pixels are black.
+    def _black_pixels(suffix):
+        path = staging / f'browse_wfpc2_{suffix}' / 'visit_01' / f'u2xx0101t_{suffix}.jpg'
+        with Image.open(path) as image:
+            return int(np.sum(np.asarray(image.convert('L')) < 8))
+    assert _black_pixels('c0m') - _black_pixels('d0m') >= 0.8 * 8 * 32
+
     # Labeling links each mosaic to its data product, and the data product to it.
     label_browse_collection_directory(str(staging / 'browse_wfpc2_c0m'), 5167)
-    root = ET.parse(staging / 'browse_wfpc2_c0m' / 'visit_01' / 'u2xx0101t_c0m.xml')
+    root = ET.parse(staging / 'browse_wfpc2_c0m' / 'visit_01' / 'u2xx0101t_c0m.lblx')
     lids = [e.text for e in root.iterfind('.//pds:logical_identifier', PDS4_NS)]
     assert lids == ['urn:nasa:pds:hst_05167:browse_wfpc2_c0m:u2xx0101t']
     refs = [e.text for e in root.iterfind('.//pds:lidvid_reference', PDS4_NS)]
@@ -306,7 +328,7 @@ def test_generate_picmaker_browse_products_options_and_reruns(tmp_path, monkeypa
     staging = tmp_path / 'hst_05167'
     for name in ('u2xx0101t_c0m.fits', 'u2xx0102t_c0m.fits', 'u2xx0103t_c0m.fits'):
         _touch(str(staging / 'data_wfpc2_c0m' / 'visit_01' / name))
-    _touch(str(staging / 'data_wfpc2_c0m' / 'visit_01' / 'u2xx0101t_c0m.xml'))
+    _touch(str(staging / 'data_wfpc2_c0m' / 'visit_01' / 'u2xx0101t_c0m.lblx'))
     # An existing preview is kept
     _touch(str(staging / 'browse_wfpc2_c0m' / 'visit_01' / 'u2xx0102t_c0m.jpg'))
 
@@ -326,6 +348,7 @@ def test_generate_picmaker_browse_products_options_and_reruns(tmp_path, monkeypa
     assert [os.path.basename(c['files'][0]) for c in calls] == ['u2xx0101t_c0m.fits',
                                                                  'u2xx0103t_c0m.fits']
     for options in calls:
+        assert options['hst_dq'] == str(staging / 'data_wfpc2_c1m' / 'visit_01')
         assert options['mosaic'] is True
         assert options['footprint'] == 7
         assert options['percentiles'] == (0.01, 99.99)
@@ -350,14 +373,14 @@ def test_browse_labels_are_named_after_each_image(tmp_path):
 
     assert label_browse_collection_directory(str(collection_dir), 5167) == 2
     assert sorted(os.listdir(visit_dir)) == [
-        'ld8x01010_x1dsum.png', 'ld8x01010_x1dsum.xml',
-        'ld8x01010_x1dsum1.png', 'ld8x01010_x1dsum1.xml',
+        'ld8x01010_x1dsum.lblx', 'ld8x01010_x1dsum.png',
+        'ld8x01010_x1dsum1.lblx', 'ld8x01010_x1dsum1.png',
     ]
     # The previews share a collection but get distinct LIDs, each linked to the matching
     # x1dsum data product.
     for stem, prod_id in (('ld8x01010_x1dsum', 'ld8x01010'),
                           ('ld8x01010_x1dsum1', 'ld8x010101')):
-        root = ET.parse(visit_dir / f'{stem}.xml').getroot()
+        root = ET.parse(visit_dir / f'{stem}.lblx').getroot()
         file_names = [e.text
                       for e in root.iterfind('.//pds:File/pds:file_name', PDS4_NS)]
         assert file_names == [f'{stem}.png']
@@ -400,6 +423,40 @@ def test_get_filtered_products_never_downloads_image_previews(monkeypatch):
                                                  'x34u0101t_c0f.fits',
                                                  'y3xx0101t_c0f.fits',
                                                  'y3xx0101t_c0f.jpg']
+
+
+def test_generate_picmaker_browse_products_hst_dq(tmp_path, monkeypatch):
+    # WFPC and WFPC2 images are given the visit directory of their data quality
+    # collection; other images, including FOC's c0f files, are given none.
+    _use_tmp_staging(tmp_path, monkeypatch)
+    staging = tmp_path / 'hst_05167'
+    for (collection, name) in (('data_wfpc_c0f', 'w0xx0101t_c0f.fits'),
+                               ('data_wfpc_d0f', 'w0xx0101t_d0f.fits'),
+                               ('data_wfpc2_c0m', 'u2xx0101t_c0m.fits'),
+                               ('data_wfpc2_d0m', 'u2xx0101t_d0m.fits'),
+                               ('data_wfpc2_drz', 'u2xx0101t_drz.fits'),
+                               ('data_foc_c0f', 'x3xx0101t_c0f.fits'),
+                               ('data_acs_flt', 'j9xx01abq_flt.fits')):
+        _touch(str(staging / collection / 'visit_01' / name))
+
+    calls = {}
+    def fake_picmaker(**options):
+        name = os.path.basename(options['files'][0])
+        calls[name] = options.get('hst_dq')
+        _touch(os.path.join(options['directory'], name.replace('.fits', '.jpg')))
+
+    monkeypatch.setattr(prepare_module, 'picmaker', fake_picmaker)
+    assert prepare_module.generate_picmaker_browse_products(5167, '01') == 7
+
+    def dq_dir(collection):
+        return str(staging / collection / 'visit_01')
+    assert calls == {'w0xx0101t_c0f.fits': dq_dir('data_wfpc_c1f'),
+                     'w0xx0101t_d0f.fits': dq_dir('data_wfpc_q0f'),
+                     'u2xx0101t_c0m.fits': dq_dir('data_wfpc2_c1m'),
+                     'u2xx0101t_d0m.fits': dq_dir('data_wfpc2_q0m'),
+                     'u2xx0101t_drz.fits': None,
+                     'x3xx0101t_c0f.fits': None,
+                     'j9xx01abq_flt.fits': None}
 
 
 def test_generate_picmaker_browse_products_skips_stis_spectra(tmp_path, monkeypatch):

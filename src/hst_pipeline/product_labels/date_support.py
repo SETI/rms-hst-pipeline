@@ -409,7 +409,7 @@ def merge_trl_timetags(date_dict, new_dict):
 
 ##########################################################################################
 
-def get_label_retrieval_date(filepath, label_suffix='.xml'):
+def get_label_retrieval_date(filepath, label_suffix='.lblx'):
     """If the given data file already has a label, return the retrieval date from that
     label. Otherwise, return an empty string.
 

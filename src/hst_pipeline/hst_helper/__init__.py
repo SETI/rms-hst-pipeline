@@ -8,7 +8,7 @@
 import os
 from collections import defaultdict
 
-from hst_pipeline.product_labels.suffix_info import BROWSE_EXTENSIONS
+from hst_pipeline.product_labels.suffix_info import BROWSE_EXTENSIONS, LABEL_SUFFIX
 
 # default start and end date of observation in query MAST constraints
 START_DATE = (1900, 1, 1)

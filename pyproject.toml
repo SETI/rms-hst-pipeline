@@ -110,7 +110,7 @@ where = ["src"]
 # the target-identification web cache, and the validate-pdart script itself must all ship
 # with the wheel; the code resolves every one of them relative to __file__.
 hst_pipeline = [
-  "templates/*.xml",
+  "templates/*.lblx",
   "xml/*",
   "validate-pdart",
 ]

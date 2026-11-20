@@ -3,7 +3,7 @@
 #
 # - Move data directory from staging to bundles directory.
 # - Create data csv.
-# - Create data xml label.
+# - Create data collection label.
 ##########################################################################################
 
 import datetime
@@ -11,7 +11,8 @@ import os
 import pdslogger
 
 from hst_pipeline.hst_helper import (COL_NAME_PREFIX,
-                                     BROWSE_PROD_EXT)
+                                     BROWSE_PROD_EXT,
+                                     LABEL_SUFFIX)
 from hst_pipeline.hst_helper.fs_utils import (get_formatted_proposal_id,
                                               get_product_id,
                                               get_deliverable_path)
@@ -25,14 +26,14 @@ from hst_pipeline.label_browse_products import label_browse_products_for_proposa
 from hst_pipeline.product_labels.suffix_info import (INSTRUMENT_NAMES,
                                                      get_collection_title_fmt)
 
-COL_DATA_LABEL_TEMPLATE = 'PRODUCT_COLLECTION_LABEL.xml'
+COL_DATA_LABEL_TEMPLATE = 'PRODUCT_COLLECTION_LABEL' + LABEL_SUFFIX
 
 def finalize_hst_data_directory(proposal_id, logger):
     """With a given proposal id, move data directory in the final bundle.
 
     1. Move data directory from staging to bundles directory.
     2. Create data collection csv.
-    3. create data collection xml label.
+    3. create data collection label.
 
     Inputs:
         proposal_id    a proposal id.
@@ -66,7 +67,7 @@ def finalize_hst_data_directory(proposal_id, logger):
                     target_info = label_data['target']
 
                     # For browse products, we don't have primary_res & inst_params since
-                    # those products don't have data .xml label
+                    # those products don't have a data product label
                     try:
                         _, proc_lvl, wavelength_ranges, _ = label_data['primary_res']
                         processing_lvl = proc_lvl[0]
@@ -95,7 +96,7 @@ def finalize_hst_data_directory(proposal_id, logger):
                     citation_info = get_citation_info(proposal_id, logger)
 
                     version_id = (1, 0)
-                    col_data_label_name = f'collection_{collection_name}.xml'
+                    col_data_label_name = f'collection_{collection_name}{LABEL_SUFFIX}'
                     mod_history = get_mod_history_from_label(col_data_label_name,
                                                              version_id)
 
@@ -152,9 +153,8 @@ def create_data_product_collection_csv(proposal_id, logger):
                 for _, _, files in os.walk(bundles_prod_dir):
                     for file in files:
                         _, _, ext = file.rpartition('.')
-                        # if not file.startswith('collection_') and file.endswith('.xml'):
                         if (not file.startswith('collection_') and
-                            ext in ['xml'] + BROWSE_PROD_EXT):
+                            ext in [LABEL_SUFFIX.lstrip('.')] + BROWSE_PROD_EXT):
                             prod_id = get_product_id(file)
                             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
                             prod_lidvid = (f'P,urn:nasa:pds:hst_{formatted_proposal_id}'

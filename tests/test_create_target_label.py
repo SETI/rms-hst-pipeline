@@ -44,9 +44,9 @@ def test_context_json_names_and_types(tmp_path, monkeypatch):
     }
 
 
-@pytest.mark.parametrize('template', ['PRODUCT_LABEL.xml',
-                                      'PRODUCT_COLLECTION_LABEL.xml',
-                                      'BUNDLE_LABEL.xml'])
+@pytest.mark.parametrize('template', ['PRODUCT_LABEL.lblx',
+                                      'PRODUCT_COLLECTION_LABEL.lblx',
+                                      'BUNDLE_LABEL.lblx'])
 def test_templates_use_the_investigation_name_and_type(template):
     # If a template's wording changes, the JSON must change with it.
     with open(os.path.join(TEMPLATE_DIR, template)) as f:
@@ -56,7 +56,7 @@ def test_templates_use_the_investigation_name_and_type(template):
 
 
 def test_product_template_uses_the_host_and_instrument_types():
-    with open(os.path.join(TEMPLATE_DIR, 'PRODUCT_LABEL.xml')) as f:
+    with open(os.path.join(TEMPLATE_DIR, 'PRODUCT_LABEL.lblx')) as f:
         text = f.read()
     assert f'<name>{ctl.HOST_NAME}</name>' in text
     assert f'<type>{ctl.HOST_TYPE}</type>' in text

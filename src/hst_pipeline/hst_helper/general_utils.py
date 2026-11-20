@@ -14,6 +14,7 @@ from . import (BROWSE_PROD_EXT,
                CITATION_INFO_DICT,
                DOCUMENT_EXT_FOR_CITATION_INFO,
                INST_ID_DICT,
+               LABEL_SUFFIX,
                MAST_PROPOSAL_SUFFIX,
                INST_PARAMS_DICT,
                PRIMARY_RES_DICT,
@@ -295,7 +296,7 @@ def get_collection_label_data(proposal_id, target_dir, logger):
                 if prod_id not in files_li:
                     files_li.append(prod_id)
                 continue
-            if not file.startswith('collection_') and file.endswith('.xml'):
+            if not file.startswith('collection_') and file.endswith(LABEL_SUFFIX):
                 file_path = os.path.join(root, file)
                 prod_id = get_product_id(file)
                 # Read the xml files

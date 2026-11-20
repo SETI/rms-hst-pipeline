@@ -52,7 +52,7 @@ def test_get_deliverable_path():
 def test_get_format_term():
     assert fs_utils.get_format_term('ipppssoot_suffix.fits') == 'ipppssoot'
     assert fs_utils.get_format_term('abc_def_ghi.txt') == 'abc'
-    assert fs_utils.get_format_term('z2no0801t.xml') == 'z2no0801t'
+    assert fs_utils.get_format_term('z2no0801t.lblx') == 'z2no0801t'
     assert fs_utils.get_format_term('z2no0801t_thumb.jpg') == 'z2no0801t'
 
 

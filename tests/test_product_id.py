@@ -27,7 +27,7 @@ def test_product_id(ipppssoot, suffix, expected):
 @pytest.mark.parametrize('filename,expected', [
     ('ld8x01010_x1dsum.fits', 'ld8x01010'),
     ('ld8x01010_x1dsum2.fits', 'ld8x010102'),
-    ('ld8x01010_x1dsum2.xml', 'ld8x010102'),
+    ('ld8x01010_x1dsum2.lblx', 'ld8x010102'),
     ('ld8x01010_x1dsum2.png', 'ld8x010102'),
     ('lb6a03s1q_flt_a.fits', 'lb6a03s1q_a'),
     ('u2no0401t_d0f.jpg', 'u2no0401t'),

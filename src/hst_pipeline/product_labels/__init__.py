@@ -13,6 +13,7 @@ import astropy.io.fits as pyfits
 import pdslogger
 
 from . import suffix_info
+from .suffix_info             import LABEL_SUFFIX
 from .date_support            import (get_header_date,
                                       get_trl_timetags,
                                       merge_trl_timetags,
@@ -30,11 +31,10 @@ from .xml_support             import get_modification_history, get_target_identi
 from hst_pipeline.target_support        import hst_target_identifications
 from pdstemplate import PdsTemplate
 
-LABEL_SUFFIX = '.xml'
 DEBUG_DESCRIPTIONS = False
 
 this_dir = os.path.split(suffix_info.__file__)[0]
-TEMPLATE_PATH = this_dir + '/../templates/PRODUCT_LABEL.xml'
+TEMPLATE_PATH = this_dir + '/../templates/PRODUCT_LABEL' + LABEL_SUFFIX
 
 # From https://archive.stsci.edu/hlsp/ipppssoot.html, valid last chars of the IPPPSSOOT
 STANDARD_TRANSMISSION_TAILS = {'b', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'}

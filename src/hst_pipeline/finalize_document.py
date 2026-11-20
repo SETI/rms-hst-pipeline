@@ -17,6 +17,7 @@ import shutil
 from hst_pipeline.hst_helper import (DOCUMENT_EXT,
                                      DOCUMENT_EXT_FOR_CITATION_INFO,
                                      DOCUMENT_STANDARD_IDS,
+                                     LABEL_SUFFIX,
                                      MAST_PROPOSAL_SUFFIX,
                                      MAST_PROPOSAL_URL)
 from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
@@ -29,10 +30,10 @@ from hst_pipeline.hst_helper.general_utils import (create_xml_label,
                                                    get_instrument_id_set,
                                                    get_mod_history_from_label)
 
-DOC_LABEL_TEMPLATE = 'DOCUMENT_LABEL.xml'
-COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL.xml'
+DOC_LABEL_TEMPLATE = 'DOCUMENT_LABEL' + LABEL_SUFFIX
+COL_DOC_LABEL_TEMPLATE = 'DOCUMENT_COLLECTION_LABEL' + LABEL_SUFFIX
 CSV_FILENAME = 'collection.csv'
-COL_DOC_LABEL = 'collection.xml'
+COL_DOC_LABEL = 'collection' + LABEL_SUFFIX
 
 # In a MAST proposal search page, the proposal content starts at the centered title and
 # ends at the close of the content <div>, after the list of publications; before it are
@@ -136,7 +137,7 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
     this_dir = os.path.dirname(os.path.abspath(__file__))
     doc_template = f'{this_dir}/templates/{DOC_LABEL_TEMPLATE}'
     # Document label path
-    doc_lbl = f'{document_dir}/{formatted_proposal_id}.xml'
+    doc_lbl = f'{document_dir}/{formatted_proposal_id}{LABEL_SUFFIX}'
     create_xml_label(doc_template, doc_lbl, doc_data_dict, logger)
 
     # Create document collection csv

@@ -225,7 +225,7 @@ July 9, 2024
   - Existing bundle, if any, is at `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`.
 - Actions:
   - Compare the staged FITS files to those in an existing bundle, if any.
-  - Create a new XML label for each file, labeling all of the visit's collections together so that labels can refer to the visit's other files.
+  - Create a new XML label (`<name>.lblx`) for each file, labeling all of the visit's collections together so that labels can refer to the visit's other files.
   - Create a `Product_Browse` label for each preview, from MAST or picmaker, in the visit's `browse_*` collections.
   - Reset the modification dates of the FITS files to match their production date at MAST.
   - If any file contains NaNs, rename the original file with “`-original`” appended, and then rewrite the file without NaNs.
