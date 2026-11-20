@@ -6,7 +6,9 @@
 
 import pytest
 
-from hst_pipeline.hst_helper import (MissingEnvironmentError,
+from hst_pipeline.hst_helper import (DEFAULT_END_DATE,
+                                     MissingEnvironmentError,
+                                     _read_end_date,
                                      _read_hst_dir,
                                      _REQUIRED_ENV)
 
@@ -72,3 +74,23 @@ def test_error_is_a_runtime_error():
     assert issubclass(MissingEnvironmentError, RuntimeError)
 
 ##########################################################################################
+
+
+def test_end_date_defaults_to_far_future(monkeypatch):
+    # Without HST_END_DATE, no released data is excluded.
+    monkeypatch.delenv('HST_END_DATE', raising=False)
+    assert _read_end_date() == DEFAULT_END_DATE == (2100, 1, 1)
+    monkeypatch.setenv('HST_END_DATE', '  ')
+    assert _read_end_date() == DEFAULT_END_DATE
+
+
+def test_end_date_from_environment(monkeypatch):
+    monkeypatch.setenv('HST_END_DATE', '2025-01-01')
+    assert _read_end_date() == (2025, 1, 1)
+
+
+@pytest.mark.parametrize('value', ['2025', '2025/01/01', '2025-13-01', 'soon'])
+def test_end_date_rejects_bad_values(monkeypatch, value):
+    monkeypatch.setenv('HST_END_DATE', value)
+    with pytest.raises(ValueError, match='HST_END_DATE'):
+        _read_end_date()

@@ -285,9 +285,13 @@ def test_prepare_browse_products_generates_wfpc2_mosaics(tmp_path, monkeypatch):
     _use_tmp_staging(tmp_path, monkeypatch)
     staging = tmp_path / 'hst_05167'
     download_dir = staging / 'visit_01' / 'mastDownload' / 'HST' / 'u2xx0101t'
+    # Random data, except for a very bright band in the first 8 rows of the first
+    # detector, which the c0m data quality file flags.
+    rng = np.random.default_rng(1)
+    data = [rng.random((32, 32)) * 100 * detector for detector in range(1, 5)]
+    data[0][:8] = 1.e6
     for suffix in ('c0m', 'd0m'):
-        _write_wfpc2_fits(str(download_dir / f'u2xx0101t_{suffix}.fits'))
-    # The c0m data quality file flags the first 8 rows of the first detector
+        _write_wfpc2_fits(str(download_dir / f'u2xx0101t_{suffix}.fits'), data)
     dq = [np.zeros((32, 32)) for _ in range(4)]
     dq[0][:8] = 1
     _write_wfpc2_fits(str(download_dir / 'u2xx0101t_c1m.fits'), dq)
@@ -302,13 +306,22 @@ def test_prepare_browse_products_generates_wfpc2_mosaics(tmp_path, monkeypatch):
             assert image.size == (64, 64)
     assert not (staging / 'browse_wfpc2_c1m').exists()
 
-    # The flagged pixels are drawn black, picmaker's invalid color. The d0m file holds
-    # the same data but has no q0m file, so only its darkest data pixels are black.
-    def _black_pixels(suffix):
+    # The flagged pixels are left out of the stretch but still drawn, not blacked out
+    # (picmaker draws them in its invalid color only with desnow, which isn't passed).
+    # Each detector is stretched separately; the first is the mosaic's upper right
+    # quadrant, where the flagged band is drawn as the bottom 8 rows. In c0m the stretch
+    # spans the unflagged data, while in d0m, which holds the same data but has no q0m
+    # file, the bright band sets the stretch and darkens the rest of the detector. The
+    # band is white in both.
+    def _detector1(suffix):
         path = staging / f'browse_wfpc2_{suffix}' / 'visit_01' / f'u2xx0101t_{suffix}.jpg'
         with Image.open(path) as image:
-            return int(np.sum(np.asarray(image.convert('L')) < 8))
-    assert _black_pixels('c0m') - _black_pixels('d0m') >= 0.8 * 8 * 32
+            return np.asarray(image.convert('L')).astype(int)[:32, 32:]
+    c0m, d0m = _detector1('c0m'), _detector1('d0m')
+    for pixels in (c0m, d0m):
+        assert np.all(pixels[24:] > 240)
+    assert np.all(d0m[:24] < 16)
+    assert np.sum(c0m[:24] < 16) <= 0.5 * 24 * 32
 
     # Labeling links each mosaic to its data product, and the data product to it.
     label_browse_collection_directory(str(staging / 'browse_wfpc2_c0m'), 5167)

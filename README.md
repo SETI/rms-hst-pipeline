@@ -41,6 +41,9 @@ This tool is designed for reproducible, efficient, and configurable data pipelin
    | `HST_PIPELINE` | Directory for logs and program info |
    | `HST_BUNDLES` | Directory for final bundles |
 
+   One more is optional: `HST_END_DATE` (`YYYY-MM-DD`) limits MAST queries to data
+   released before that date. Unset, no released data is excluded.
+
 ---
 
 ## 🧩 Example Commands
@@ -148,8 +151,10 @@ pytest                               # everything, including the MAST tests
 
 Tests marked `network` query MAST live: they download real products, assert result counts
 that drift as the archive grows, and in the case of `test_pipeline_run.py` delete and
-rebuild the program directories under `HST_PIPELINE` and `HST_BUNDLES`. They are excluded
-from the pull request gate and run weekly by `.github/workflows/network-tests.yml`.
+rebuild the program directories under `HST_PIPELINE` and `HST_BUNDLES`. To keep those
+counts stable, `tests/conftest.py` sets `HST_END_DATE=2025-01-01` unless it is already
+set, so the tests see only data released before 2025. They are excluded from the pull
+request gate and run weekly by `.github/workflows/network-tests.yml`.
 
 ### Continuous Integration
 

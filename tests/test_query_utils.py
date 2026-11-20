@@ -49,6 +49,16 @@ def test_query_mast_slice_success(monkeypatch):
     assert 'Query MAST: run query_mast_slice' in logger.messages
 
 
+def test_release_range_comes_from_end_date():
+    # tests/conftest.py limits the tests to data released before 2025.
+    from hst_pipeline.hst_helper import END_DATE, START_DATE
+    assert END_DATE == (2025, 1, 1)
+    query_utils.query_mast_slice(proposal_id='17739', max_retries=1)
+    start, end = query_utils.Observations.kwargs['t_obs_release']
+    assert start == query_utils.ymd_tuple_to_mjd(START_DATE)
+    assert end == query_utils.ymd_tuple_to_mjd((2025, 1, 1))
+
+
 def test_query_mast_slice_proposal_keeps_fgs_and_hsp():
     # For a proposal, MAST is queried without mtFlag; moving targets plus every FGS
     # and HSP observation are kept.

@@ -97,9 +97,10 @@ instrument in `suffix_info.PICMAKER_BROWSE_SUFFIXES` (ACS, FOC, NICMOS, STIS ima
 WFC3, WFPC, WFPC2). WFPC and WFPC2 images (`c0f`/`d0f`, `c0m`/`d0m`) are also passed
 `hst_dq`, the visit directory of their data quality collection (`suffix_info.HST_DQ_SUFFIXES`),
 since picmaker otherwise looks for the DQ file beside the image; flagged pixels are left
-out of the stretch and drawn black. Non-image products, those of the non-imaging instruments (COS, FGS,
-FOS, GHRS, HSP) and the STIS spectra, keep MAST's JPEG/PNG previews, filed under their
-MAST names; no other MAST preview is downloaded. This needs the `rms-picmaker` from
+out of the stretch but drawn normally (picmaker blacks them out only with `desnow`, which
+isn't passed). Non-image products, those of the non-imaging instruments (COS, FGS, FOS,
+GHRS, HSP) and the STIS spectra, keep MAST's JPEG/PNG previews, filed under their MAST
+names; no other MAST preview is downloaded. This needs the `rms-picmaker` from
 SETI/rms-picmaker PR #33 (or a local checkout, installed with `pip install --no-deps -e
 ../rms-picmaker`); the released version can't read WFPC2 files or take `mask_ranges` or `hst_dq`.
 
@@ -144,8 +145,12 @@ unchanged. That adapter is the only place allowed to touch `targets` internals.
 on failure, hence the `FAIL` grep in the wrapper.
 
 `hst_helper/__init__.py` has several hardcoded placeholders marked `TODO` —
-`END_DATE = (2025, 1, 1)`, `DOI = '10.1/2'`, a `VID_DICT` that always returns 1.0. Treat
-them as known gaps, not as values to trust.
+`DOI = '10.1/2'`, a `VID_DICT` that always returns 1.0. Treat them as known gaps, not as
+values to trust. MAST queries are limited to data released between `START_DATE` and
+`END_DATE`. `END_DATE` is `(2100, 1, 1)`, excluding no released data, unless the optional
+`HST_END_DATE` environment variable (`YYYY-MM-DD`) overrides it. `tests/conftest.py`
+sets `HST_END_DATE=2025-01-01` (unless it's already set) so the MAST counts the network
+tests assert stay fixed; the pipeline subprocesses those tests start inherit it.
 
 ## archive/
 

@@ -5,14 +5,40 @@
 # The module contains different helper functions used in multiple tasks.
 ##########################################################################################
 
+import datetime
 import os
 from collections import defaultdict
 
 from hst_pipeline.product_labels.suffix_info import BROWSE_EXTENSIONS, LABEL_SUFFIX
 
-# default start and end date of observation in query MAST constraints
+# default range of MAST release dates (t_obs_release) in query MAST constraints. The end
+# date is far enough in the future that it doesn't exclude any released data, unless the
+# HST_END_DATE environment variable (YYYY-MM-DD) overrides it; the tests set it, so that
+# the archive's contents, and the MAST query counts they assert, stay fixed.
 START_DATE = (1900, 1, 1)
-END_DATE = (2025, 1, 1)
+DEFAULT_END_DATE = (2100, 1, 1)
+
+
+def _read_end_date():
+    """Return the latest MAST release date to include in queries.
+
+    Returns:    a (year, month, day) tuple, from HST_END_DATE if it is set and not empty,
+                otherwise DEFAULT_END_DATE.
+
+    Raises:
+        ValueError    if HST_END_DATE is not a valid YYYY-MM-DD date.
+    """
+    value = os.environ.get('HST_END_DATE', '').strip()
+    if not value:
+        return DEFAULT_END_DATE
+    try:
+        date = datetime.date.fromisoformat(value)
+    except ValueError:
+        raise ValueError(f'HST_END_DATE must be a YYYY-MM-DD date, not {value!r}') from None
+    return (date.year, date.month, date.day)
+
+
+END_DATE = _read_end_date()
 
 # default number of connection retry when connecting to MAST failed.
 RETRY = 1
