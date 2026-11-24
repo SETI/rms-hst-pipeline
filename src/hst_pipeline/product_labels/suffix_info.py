@@ -1753,7 +1753,8 @@ def get_collection_title_fmt(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).collection_title_fmt
 
 def get_prior_suffixes(suffix, instrument_id, channel_id=None):
-    return _suffix_info(suffix, instrument_id, channel_id).prior_suffixes
+    # A copy, so that a caller can't alter SUFFIX_INFO
+    return set(_suffix_info(suffix, instrument_id, channel_id).prior_suffixes)
 
 def is_ancillary(suffix, instrument_id, channel_id=None):
     return _suffix_info(suffix, instrument_id, channel_id).processing_level == 'Ancillary'

@@ -912,8 +912,10 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         # Insert the prior suffixes from SUFFIX_INFO
         for suffix in ipppssoot_suffixes:
-            prior_suffixes = suffix_info.get_prior_suffixes(suffix, instrument_id)
-            prior_suffixes &= all_suffixes      # limit to suffixes that actually exist
+            # Limit to suffixes that actually exist. Don't use "&=", which would alter
+            # the set in SUFFIX_INFO for every later IPPPSSOOT.
+            prior_suffixes = (suffix_info.get_prior_suffixes(suffix, instrument_id)
+                              & all_suffixes)
             prior_pairs = {p for p in pairs if p[1] in prior_suffixes}
             ipppssoot_dict[suffix]['reference_list'] |= prior_pairs
             ipppssoot_dict[suffix]['prior_pairs'] |= prior_pairs
@@ -1130,6 +1132,11 @@ def read_associations(hdulist, basename):
     a dictionary keyed by each combined IPPPSSnnn. Each item in the list is a tuple
     (IPPPSSOOT value, memtype), where memtype has been truncated if it contains a suffix
     (following the dash).
+
+    With several products, each "PROD-<key>" gets the exposures "EXP-<key>", except that
+    the dither-combined product "PROD-DTH" gets every exposure of the association; e.g.,
+    in a dithered CR-SPLIT association, "PROD-CR1" and "PROD-CR2" each get their own
+    exposures and "PROD-DTH" gets all of them.
     """
 
     table = hdulist[1].data
@@ -1164,6 +1171,12 @@ def read_associations(hdulist, basename):
                               rec[MEMTYPE])
 
             associations_by_key[key].append((rec[MEMNAME].lower(), memtype))
+
+        # The dither-combined product combines every exposure
+        if 'DTH' in associations_by_key and not associations_by_key['DTH']:
+            associations_by_key['DTH'] = [pair for (key, pairs)
+                                          in associations_by_key.items()
+                                          for pair in pairs]
 
         associations = {}
         for key, product in product_by_key.items():
