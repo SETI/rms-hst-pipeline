@@ -300,9 +300,9 @@ SUFFIX_INFO = {
     ),
     'epc': (
         True, 'Ancillary',
-        'CCD temperature table for this {IC} observation.', '',
-        'CCD temperature table for this {IC} observation in HST Program {P}.',
-        '{I} "_epc" CCD temperature tables for HST Program {P}.',
+        'CCD temperature telemetry table for this {IC} observation.', '',
+        'CCD temperature telemetry table for this {IC} observation in HST Program {P}.',
+        '{I} "_epc" CCD temperature telemetry tables for HST Program {P}.',
         set(),
         {'NICMOS', 'STIS'},
     ),
