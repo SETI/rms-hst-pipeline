@@ -4,7 +4,7 @@
 # Tests for reading ASN tables, for the prior suffixes that link each product to the
 # files it was made from, for the combined products that give an association's
 # metadata, for the chips of its ACS/WFC images, which come from its exposures, and for
-# the associated files that a STIS association can lack.
+# the associated files and the exposures that a STIS association can lack.
 ##########################################################################################
 
 from astropy.io import fits
@@ -13,6 +13,8 @@ from hst_pipeline.product_labels import association_observation_id
 from hst_pipeline.product_labels import fill_hst_dictionary
 from hst_pipeline.product_labels import association_product_dicts
 from hst_pipeline.product_labels import read_associations
+from hst_pipeline.product_labels import remove_empty_ipppssoots
+from hst_pipeline.product_labels import stored_exposures
 from hst_pipeline.product_labels import use_source_detector_ids
 from hst_pipeline.product_labels import suffix_info
 from hst_pipeline.product_labels.hdu_data_descriptions import \
@@ -145,3 +147,30 @@ def test_stis_association_lacks_x1d_and_x2d():
     # Not an association: still a warning
     exposure = {'associates': [], 'all_suffixes': {'raw', 'flt', 'sx1'}}
     assert not associated_suffix_is_optional(exposure, 'sx1', 'STIS')
+
+
+def _files(ipppssoot, expnames_by_suffix):
+    ipppssoot_dict = {suffix: {'suffix': suffix, 'expnames': set(expnames)}
+                      for (suffix, expnames) in expnames_by_suffix.items()}
+    ipppssoot_dict['ipppssoot'] = ipppssoot
+    ipppssoot_dict['all_suffixes'] = set(expnames_by_suffix)
+    return ipppssoot_dict
+
+
+def test_stis_exposures_stored_in_association_files():
+    # o8m301010 (09296): the science exposure is in its raw and tag files, the wavecals
+    # in its wav file; none of them has a file of its own
+    association = _files('o8m301010', {'raw': ['o8m301azq'], 'tag': ['o8m301azq'],
+                                       'wav': ['o8m301axq', 'o8m301bcq'],
+                                       'asn': [], 'trl': []})
+    assert stored_exposures(association) == {'o8m301azq', 'o8m301axq', 'o8m301bcq'}
+
+    # Not STIS: an ACS association's missing exposures still warn
+    assert stored_exposures(_files('j9mm03010', {'drz': ['j9mm03nwq']})) == set()
+
+
+def test_remove_empty_ipppssoots():
+    # o8m301axq, a wavecal shared by several associations, once got an empty entry
+    info_by_ipppssoot = {'o8m301010': {'raw': {}}, 'o8m301axq': {}}
+    remove_empty_ipppssoots(info_by_ipppssoot)
+    assert list(info_by_ipppssoot) == ['o8m301010']

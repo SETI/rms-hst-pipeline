@@ -315,6 +315,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         # "internal_date"   : the internal date, if any, from the first FITS header.
         # "has_nans"        : True if any data array in the file contains NaN.
         # "hdus_with_nans"  : List of HDU indices in which the data array contains NaN.
+        # "expnames"        : set of the exposures (EXPNAMEs) whose data are in this file.
         ##################################################################################
 
         # Gather the HDU structure info
@@ -337,6 +338,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         basename_dict['internal_date'   ] = get_header_date(hdulist)
         basename_dict['hdus_with_nans'  ] = get_nan_hdus(hdulist)
         basename_dict['has_nans'        ] = bool(basename_dict['hdus_with_nans'])
+        basename_dict['expnames'        ] = {str(hdu.header.get('EXPNAME', '')).strip()
+                                             .lower() for hdu in hdulist} - {''}
 
         hdulist.close()
 
@@ -504,6 +507,10 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     for ipppssoot in solo_ipppssoots:
         del info_by_ipppssoot[ipppssoot]
 
+    # Moving files above can create an empty entry for an associate that has no files
+    # of its own; remove it, so that the associate is missing like any other.
+    remove_empty_ipppssoots(info_by_ipppssoot)
+
     ######################################################################################
     # Insert IPPPSSOOT-wide information into `info_by_ipppssoot`:
     # "ipppssoot"         : IPPPSSOOT.
@@ -555,7 +562,11 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             else:
                 # Warn if an associated file is missing
                 missing_associates.append((associate, memtype))
-                logger.warn('Missing associate for ' + ipppssoot, associate)
+                if associate in stored_exposures(ipppssoot_dict):
+                    logger.info(f'Associate stored in the files of {ipppssoot}',
+                                associate)
+                else:
+                    logger.warn('Missing associate for ' + ipppssoot, associate)
 
         ipppssoot_dict['associates'] = validated_associates
         ipppssoot_dict['missing_associates'] = missing_associates
@@ -1067,6 +1078,39 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
 # The channels whose combined images (e.g., drz) don't identify their chips
 CCDCHIP_CHANNELS = {('ACS', 'WFC'), ('WFC3', 'UVIS')}
+
+def remove_empty_ipppssoots(info_by_ipppssoot):
+    """Remove the IPPPSSOOTs that have no files.
+
+    Input:
+        info_by_ipppssoot   the labeler's dictionary of IPPPSSOOTs, each mapping
+                            suffixes to basename dicts; altered in place.
+    """
+    for ipppssoot in [ipppssoot for (ipppssoot, ipppssoot_dict)
+                      in info_by_ipppssoot.items() if not ipppssoot_dict]:
+        del info_by_ipppssoot[ipppssoot]
+
+def stored_exposures(ipppssoot_dict):
+    """Return the exposures stored inside a STIS association's own files.
+
+    STIS keeps the exposures of an association as extensions of its files, e.g., the
+    science exposure in its _raw and _tag files and the wavecals in its _wav file, each
+    extension naming its exposure with EXPNAME. These exposures have no files of their
+    own.
+
+    Input:
+        ipppssoot_dict  the dictionary of the association's IPPPSSOOT, containing
+                        "ipppssoot", "all_suffixes", and a basename dict per suffix.
+
+    Returns:    the set of lower-case EXPNAMEs; empty for other instruments.
+    """
+    ipppssoot = ipppssoot_dict['ipppssoot']
+    if suffix_info.INSTRUMENT_FROM_LETTER_CODE[ipppssoot[0]] != 'STIS':
+        return set()
+    expnames = set()
+    for suffix in ipppssoot_dict['all_suffixes']:
+        expnames |= ipppssoot_dict[suffix].get('expnames', set())
+    return expnames
 
 def association_observation_id(rootname, asn_id, associates):
     """Return the mast_observation_id of an association's combined product.
