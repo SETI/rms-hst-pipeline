@@ -18,21 +18,17 @@
 ##########################################################################################
 
 import argparse
-import datetime
-import os
-import pdslogger
 import sys
 
 from hst_pipeline.hst_helper import (END_DATE,
-                                     HST_DIR,
                                      RETRY,
                                      START_DATE)
 from hst_pipeline.hst_helper.fs_utils import get_formatted_proposal_id
+from hst_pipeline.hst_helper.log_support import (close_task_logger,
+                                                 setup_task_logger)
 from hst_pipeline.query_hst_moving_targets import query_hst_moving_targets
 from hst_pipeline.queue_manager import queue_next_task
 from hst_pipeline.queue_manager.task_queue_db import remove_a_task
-
-LOG_DIR = HST_DIR['pipeline'] + '/logs'
 
 
 def parse_args(argv=None):
@@ -80,27 +76,8 @@ def normalize_proposal_ids(proposal_ids):
 
 
 def setup_logger(args, argv=None):
-    """Configure and open the pipeline logger."""
-    logger = pdslogger.PdsLogger('pds.hst.query-hst-moving-targets')
-    if not args.quiet:
-        logger.add_handler(pdslogger.stdout_handler)
-
-    now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
-    if args.log:
-        if os.path.isdir(args.log):
-            logpath = os.path.join(args.log, 'query-hst-moving-targets-' + now + '.log')
-        else:
-            parts = os.path.splitext(args.log)
-            logpath = parts[0] + '-' + now + parts[1]
-    else:
-        os.makedirs(LOG_DIR, exist_ok=True)
-        logpath = LOG_DIR + '/query-hst-moving-targets-' + now + '.log'
-
-    logger.add_handler(pdslogger.file_handler(logpath))
-    limits = {'info': -1, 'debug': -1, 'normal': -1}
-    cmd_args = sys.argv[1:] if argv is None else argv
-    logger.open('query-hst-moving-targets ' + ' '.join(cmd_args), limits=limits)
-    return logger
+    """Configure and open the pipeline logger; see setup_task_logger()."""
+    return setup_task_logger('query-hst-moving-targets', args, argv)
 
 
 def queue_follow_up_tasks(proposal_ids, program_ids_list, logger):
@@ -142,7 +119,7 @@ def main(argv=None):
         if args.taskqueue:
             queue_follow_up_tasks(proposal_ids, program_ids_list, logger)
     finally:
-        logger.close()
+        close_task_logger(logger)
 
 
 if __name__ == '__main__':

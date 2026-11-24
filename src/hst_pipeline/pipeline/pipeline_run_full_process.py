@@ -14,21 +14,16 @@
 ##########################################################################################
 
 import argparse
-import datetime
-import os
-import pdslogger
-import sys
 
 from hst_pipeline import queue_manager
-from hst_pipeline.hst_helper import HST_DIR
+from hst_pipeline.hst_helper.log_support import (close_task_logger,
+                                                 setup_task_logger)
 from hst_pipeline.queue_manager import (MAX_SUBPROCESS_CNT,
                                         run_full_process)
 from hst_pipeline.queue_manager.task_queue_db import (create_task_queue_table,
                                                       erase_all_task_queue,
                                                       init_task_queue_table)
 from sqlalchemy.exc import OperationalError
-
-LOG_DIR = HST_DIR['pipeline'] + '/logs'
 
 
 def parse_args(argv=None):
@@ -76,27 +71,9 @@ def normalize_proposal_ids(proposal_ids):
     return proposal_ids or None
 
 
-def setup_logger(args):
-    """Configure and open the pipeline logger."""
-    logger = pdslogger.PdsLogger('pds.hst.run-pipeline')
-    if not args.quiet:
-        logger.add_handler(pdslogger.stdout_handler)
-
-    now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
-    if args.log:
-        if os.path.isdir(args.log):
-            logpath = os.path.join(args.log, 'run-pipeline-' + now + '.log')
-        else:
-            parts = os.path.splitext(args.log)
-            logpath = parts[0] + '-' + now + parts[1]
-    else:
-        os.makedirs(LOG_DIR, exist_ok=True)
-        logpath = LOG_DIR + '/run-pipeline-' + now + '.log'
-
-    logger.add_handler(pdslogger.file_handler(logpath))
-    limits = {'info': -1, 'debug': -1, 'normal': -1}
-    logger.open('run-pipeline ' + ' '.join(sys.argv[1:]), limits=limits)
-    return logger
+def setup_logger(args, argv=None):
+    """Configure and open the pipeline logger; see setup_task_logger()."""
+    return setup_task_logger('run-pipeline', args, argv)
 
 
 def recreate_task_queue(logger):
@@ -121,7 +98,7 @@ def main(argv=None):
     queue_manager.MAX_ALLOWED_TIME = args.max_allowed_time
     queue_manager.MAX_SUBPROCESS_CNT = args.max_subproc_cnt
 
-    logger = setup_logger(args)
+    logger = setup_logger(args, argv=argv)
     try:
         proposal_ids = normalize_proposal_ids(args.proposal_ids)
 
@@ -132,7 +109,7 @@ def main(argv=None):
                          run_forever=args.run_forever,
                          no_cleanup=args.nocleanup)
     finally:
-        logger.close()
+        close_task_logger(logger)
 
 
 if __name__ == '__main__':

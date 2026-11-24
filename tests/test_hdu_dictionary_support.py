@@ -10,6 +10,7 @@ from astropy.io import fits
 
 from hst_pipeline.product_labels.hdu_dictionary_support import (
     fill_hdu_dictionary,
+    UNIT_TRANSLATOR,
     science_array_class_suffix,
 )
 
@@ -74,3 +75,9 @@ def test_fill_hdu_dictionary_reads_obstype_from_primary_hdu(tmp_path):
     with fits.open(path) as hdulist:
         hdu_dict = fill_hdu_dictionary(hdulist[0], 0, 'STIS', str(path))
     assert hdu_dict['data']['data_class'] == 'Array_2D_Image'
+
+
+@pytest.mark.parametrize('unit, expected', [('Counts', 'count'), ('K', 'K')])
+def test_unit_translator(unit, expected):
+    # Units of WFPC/WFPC2 SI_Specific columns and NICMOS epc values
+    assert UNIT_TRANSLATOR[unit] == expected

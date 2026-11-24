@@ -54,6 +54,8 @@ July 9, 2024
 - Every time a task runs, it creates a unique log file describing what it has done.
 - Tasks are designed to be relatively independent of one another, so that multiple tasks can run in parallel, using multiple threads, without interfering with one another.
 - Log files are given the name of the task, followed by “`-yyyy-mm-ddThh-mm-ss.log`” containing the local time at which the task started in the format year-month-day-hour-minute-second. They are saved in “`logs/`” subdirectories at various levels in the file system hierarchy.
+- Every warning and error a task logs is also appended to its program's `<HST_PIPELINE>/hst_<nnnnn>/WARNINGS.log`; a task for no one program uses `<HST_PIPELINE>/logs/WARNINGS.log`.
+- Each task run that logged a warning or worse, and each task the queue saw fail or killed, adds a line to `<HST_PIPELINE>/NEEDS_REVIEW.log`: the time, the command, the message counts or problem, and the task's log. Delete either file to acknowledge it.
 - The pipeline is “queue-based”, meaning that it maintains a queue of available tasks.
 - Just before completion, tasks typically generate one or more new tasks and add them to the task queue.
 

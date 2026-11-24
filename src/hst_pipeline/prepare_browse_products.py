@@ -101,7 +101,7 @@ def prepare_browse_products(proposal_id, visit, logger=None):
     A file that replaces one already filed (e.g., after a re-download) overwrites it. If
     two downloaded files share a basename, an identical repeat is dropped; a repeat with
     different content stays in the inbox and an error is logged. Directories left empty
-    in the inbox are removed.
+    in the inbox are removed. Hidden files, such as Finder's .DS_Store, are ignored.
 
     Inputs:
         proposal_id    a proposal id.
@@ -130,6 +130,9 @@ def prepare_browse_products(proposal_id, visit, logger=None):
         dirs.sort()     # visit observation directories in a reproducible order
         for file in sorted(files):
             file_path = os.path.join(root, file)
+            if file.startswith('.'):    # e.g., Finder's .DS_Store
+                logger.debug(f'Hidden file ignored: {file_path}')
+                continue
             inst_id = get_instrument_id_from_fname(file)
             if inst_id is not None:
                 INST_ID_DICT[formatted_proposal_id].add(inst_id)

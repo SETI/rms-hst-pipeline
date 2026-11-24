@@ -19,14 +19,12 @@
 ##########################################################################################
 
 import argparse
-import datetime
-import os
-import pdslogger
 import sys
 
 from hst_pipeline.get_program_info import get_program_info
-from hst_pipeline.hst_helper import HST_DIR
 from hst_pipeline.hst_helper.fs_utils import get_formatted_proposal_id
+from hst_pipeline.hst_helper.log_support import (close_task_logger,
+                                                 setup_task_logger)
 from hst_pipeline.queue_manager.task_queue_db import remove_a_task
 
 
@@ -55,30 +53,8 @@ def parse_args(argv=None):
 
 
 def setup_logger(args, argv=None):
-    """Configure and open the pipeline logger."""
-    proposal_id = args.proposal_id
-    log_dir = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
-
-    logger = pdslogger.PdsLogger('pds.hst.get-program-info-' + proposal_id)
-    if not args.quiet:
-        logger.add_handler(pdslogger.stdout_handler)
-
-    now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
-    if args.log:
-        if os.path.isdir(args.log):
-            logpath = os.path.join(args.log, 'get-program-info-' + now + '.log')
-        else:
-            parts = os.path.splitext(args.log)
-            logpath = parts[0] + '-' + now + parts[1]
-    else:
-        os.makedirs(log_dir, exist_ok=True)
-        logpath = log_dir + '/get-program-info-' + now + '.log'
-
-    logger.add_handler(pdslogger.file_handler(logpath))
-    limits = {'info': -1, 'debug': -1, 'normal': -1}
-    cmd_args = sys.argv[1:] if argv is None else argv
-    logger.open('get-program-info ' + ' '.join(cmd_args), limits=limits)
-    return logger
+    """Configure and open the pipeline logger; see setup_task_logger()."""
+    return setup_task_logger('get-program-info', args, argv, proposal_id=args.proposal_id)
 
 
 def main(argv=None):
@@ -97,7 +73,7 @@ def main(argv=None):
 
         remove_a_task(formatted_proposal_id, '', 'get_prog_info')
     finally:
-        logger.close()
+        close_task_logger(logger)
 
 
 if __name__ == '__main__':

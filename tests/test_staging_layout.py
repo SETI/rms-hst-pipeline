@@ -72,6 +72,19 @@ def test_prepare_moves_each_file_into_its_collection(staging):
     assert not (staging / 'visit_01' / 'mastDownload').exists()
 
 
+
+def test_prepare_ignores_hidden_files_quietly(staging):
+    import pdslogger
+    inbox = _inbox(staging)
+    _write(inbox / '.DS_Store', b'finder')
+    _write(inbox / 'ld8x01010' / 'ld8x01010_asn.fits')
+    logger = pdslogger.PdsLogger('test.prepare-hidden-files')
+    logger.open('test')
+
+    assert prepare_module.prepare_browse_products(PROPOSAL_ID, VISIT, logger) == 1
+    assert logger.close()[:3] == (0, 0, 0)       # no warning
+    assert (inbox / '.DS_Store').exists()
+
 def test_prepare_rerun_is_a_no_op(staging):
     _write(_inbox(staging) / 'ld8x01010' / 'ld8x01010_x1dsum.fits')
     prepare_module.prepare_browse_products(PROPOSAL_ID, VISIT)

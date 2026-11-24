@@ -16,6 +16,7 @@ import sys
 import time
 
 from hst_pipeline.hst_helper.fs_utils import get_formatted_proposal_id
+from hst_pipeline.hst_helper.log_support import record_needs_review
 from hst_pipeline.organize_files import clean_up_staging_dir
 from hst_pipeline.queue_manager.task_queue_db import (add_a_task,
                                                       create_task_queue_table,
@@ -238,6 +239,15 @@ def run_and_maybe_wait(args, max_allowed_time, proposal_id, visit, task, logger)
     SUBPROCESS_LIST.append((pid, time.time(), time.time()+max_allowed_time,
                             proposal_id, visit, task, args))
 
+def task_title(args):
+    """Return a task's command line with only the base name of the command, e.g.,
+    "hst-finalize-bundle --proposal-id 10992", for NEEDS_REVIEW.log.
+
+    Input:
+        args    the command of a subprocess, as a list of strings.
+    """
+    return ' '.join([os.path.basename(str(args[0]))] + [str(a) for a in args[1:]])
+
 def wait_for_subprocess(logger, all=False):
     """Wait for one (or all) subprocess slots to open up.
 
@@ -257,8 +267,14 @@ def wait_for_subprocess(logger, all=False):
             if pid.poll() is not None:
                 # The subprocess completed, make the slot available for next subprocess
                 del SUBPROCESS_LIST[i]
-                logger.info(f'Remove completed subprocess for: {proposal_id}'
-                            f', args: {args}')
+                if pid.returncode:
+                    problem = f'exit status {pid.returncode}'
+                    logger.error(f'Subprocess failed with {problem} for: {proposal_id}'
+                                 f', args: {args}')
+                    record_needs_review(task_title(args), problem)
+                else:
+                    logger.info(f'Remove completed subprocess for: {proposal_id}'
+                                f', args: {args}')
                 break
 
             if cur_time > proc_max_time and pid:
@@ -266,9 +282,10 @@ def wait_for_subprocess(logger, all=False):
                 # Note no offset file will be written in this case
                 pid.kill()
                 del SUBPROCESS_LIST[i]
-                logger.info('Remove subprocess running too long '
-                            f'(over {MAX_ALLOWED_TIME} seconds, possible hang) '
-                            f'for: {proposal_id}, args: {args}')
+                problem = (f'killed after running over {MAX_ALLOWED_TIME} seconds '
+                           '(possible hang)')
+                logger.error(f'Subprocess {problem} for: {proposal_id}, args: {args}')
+                record_needs_review(task_title(args), problem)
                 # Remove hung task in the queue
                 formatted_proposal_id = get_formatted_proposal_id(proposal_id)
                 remove_a_task(formatted_proposal_id, vi, task)

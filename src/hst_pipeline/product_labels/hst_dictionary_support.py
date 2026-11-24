@@ -170,13 +170,15 @@ def fill_hst_dictionary(ref_hdulist, spt_hdulist, filepath='', logger=None):
     """
 
     def get_or_log(header, key, alt='UNK', warn=False):
-        """Internal function to look up in given FITS header; log error on failure.
+        """Internal function to look up in given FITS header; log error on failure,
+        or, if warn is True, log the repair at INFO, since warn is True only for the
+        programs known to lack the keyword.
         """
         try:
             return header[key]
         except KeyError:
             if warn:
-                logger.warn(f'Missing FITS keyword {key} repaired', filepath)
+                logger.info(f'Missing FITS keyword {key} repaired', filepath)
             else:
                 logger.error(f'Missing FITS keyword {key}', filepath)
             return alt

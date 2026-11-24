@@ -16,13 +16,11 @@
 ##########################################################################################
 
 import argparse
-import datetime
-import os
-import pdslogger
 import sys
 
-from hst_pipeline.hst_helper import HST_DIR
 from hst_pipeline.hst_helper.fs_utils import get_formatted_proposal_id
+from hst_pipeline.hst_helper.log_support import (close_task_logger,
+                                                 setup_task_logger)
 from hst_pipeline.queue_manager.task_queue_db import remove_a_task
 from hst_pipeline.update_hst_visit import update_hst_visit
 
@@ -55,33 +53,9 @@ def parse_args(argv=None):
 
 
 def setup_logger(args, argv=None):
-    """Configure and open the pipeline logger."""
-    proposal_id = args.proposal_id
-    visit = args.visit.zfill(2)
-    log_dir = f'{HST_DIR["pipeline"]}/hst_{proposal_id.zfill(5)}/logs'
-
-    logger = pdslogger.PdsLogger(
-        f'pds.hst.update-hst-visit-{proposal_id}-visit_{visit}'
-    )
-    if not args.quiet:
-        logger.add_handler(pdslogger.stdout_handler)
-
-    now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
-    if args.log:
-        if os.path.isdir(args.log):
-            logpath = os.path.join(args.log, 'update-hst-visit-' + now + '.log')
-        else:
-            parts = os.path.splitext(args.log)
-            logpath = parts[0] + '-' + now + parts[1]
-    else:
-        os.makedirs(log_dir, exist_ok=True)
-        logpath = log_dir + '/update-hst-visit-' + now + '.log'
-
-    logger.add_handler(pdslogger.file_handler(logpath))
-    limits = {'info': -1, 'debug': -1, 'normal': -1}
-    cmd_args = sys.argv[1:] if argv is None else argv
-    logger.open('update-hst-visit ' + ' '.join(cmd_args), limits=limits)
-    return logger
+    """Configure and open the pipeline logger; see setup_task_logger()."""
+    return setup_task_logger('update-hst-visit', args, argv,
+                             proposal_id=args.proposal_id, visit=args.visit)
 
 
 def main(argv=None):
@@ -104,7 +78,7 @@ def main(argv=None):
 
         remove_a_task(formatted_proposal_id, visit, 'update_visit')
     finally:
-        logger.close()
+        close_task_logger(logger)
 
 
 if __name__ == '__main__':

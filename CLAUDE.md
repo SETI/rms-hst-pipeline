@@ -186,6 +186,15 @@ Target identification lives in the separate `rms-hst-targets` package (imported 
 `hst_target_identifications()` contract over it, so the label-building code above it is
 unchanged. That adapter is the only place allowed to touch `targets` internals.
 
+Every task's entry point opens its logger with `hst_helper.log_support.setup_task_logger`
+and closes it with `close_task_logger`. Besides the timestamped log, the logger appends
+WARNING and worse to `<HST_PIPELINE>/hst_<nnnnn>/WARNINGS.log` (or
+`<HST_PIPELINE>/logs/WARNINGS.log` for tasks that belong to no program). Closing a run
+with any warning adds a line to `<HST_PIPELINE>/NEEDS_REVIEW.log`. The queue manager adds
+lines there too, for tasks that exit nonzero or that it kills. So reserve WARNING for
+what someone should look at, and log routine repairs at INFO. `run_validation` logs each
+message in validate's report, except that `warning.product_not_registered` goes to INFO.
+
 `run_validation.py` shells out to `validate-pdart`, which needs the PDS4 `validate` tool on
 `PATH` and reads schemas from the package's own `xml/` directory. That tool exits 0 even
 on failure, hence the `FAIL` grep in the wrapper.

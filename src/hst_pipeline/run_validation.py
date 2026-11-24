@@ -4,6 +4,7 @@
 
 import os
 import pdslogger
+import re
 import shutil
 from subprocess import run
 
@@ -20,6 +21,17 @@ HST_DIR = os.path.dirname(os.path.abspath(__file__))
 VALIDATE_PDART = os.path.join(HST_DIR, 'validate-pdart')
 
 VID = '1.0'
+
+REPORT_FNAME = 'validation-report.txt'
+
+# Validate's messages that are expected of every bundle during development, and are
+# logged at INFO rather than WARNING: the pipeline's context products aren't registered.
+EXPECTED_VALIDATE_MESSAGES = {'warning.product_not_registered'}
+
+# A product line ("  FAIL: file:/path/x.lblx (urn:...)") and a message line
+# ("      ERROR  [error.label.context_ref_not_found]   line 97: ...") of the report
+_PRODUCT_LINE = re.compile(r'\s*(?:PASS|FAIL|SKIP): (\S+)')
+_MESSAGE_LINE = re.compile(r'\s*(FATAL_ERROR|ERROR|WARNING|INFO)\s+\[([^\]]+)\]\s*(.*)')
 
 def run_validation(proposal_id, logger=None):
     """Run validator and generate report.
@@ -53,13 +65,58 @@ def run_validation(proposal_id, logger=None):
     except:
         logger.error(
             f'Check validation-pdart failure report for proposal id: {proposal_id} '
-            f'at {program_dir}/validation-report.txt')
+            f'at {program_dir}/{REPORT_FNAME}')
+
+    log_validation_report(f'{program_dir}/{REPORT_FNAME}', logger)
 
     # remove tmp context json
     try:
         os.remove(get_context_products_path(proposal_id))
     except FileNotFoundError: #pragma: no cover
         pass
+
+def log_validation_report(report_path, logger):
+    """Log each message of a validation report at its own level, with the product it
+    concerns: FATAL_ERROR and ERROR as errors, WARNING as warnings, except that the
+    messages in EXPECTED_VALIDATE_MESSAGES are logged as info.
+
+    Inputs:
+        report_path    path to the validation report.
+        logger         pdslogger to use.
+
+    Returns:    a tuple (errors, warnings), the numbers of messages logged as errors and
+                as warnings.
+    """
+    try:
+        with open(report_path) as f:
+            lines = f.read().splitlines()
+    except FileNotFoundError:
+        logger.error('Validation report not found', report_path)
+        return (1, 0)
+
+    errors = 0
+    warnings = 0
+    product = ''
+    for line in lines:
+        if match := _PRODUCT_LINE.match(line):
+            product = match.group(1).removeprefix('file:')
+            continue
+        if not (match := _MESSAGE_LINE.match(line)):
+            continue
+        (level, msg_type, text) = match.groups()
+        message = f'validate [{msg_type}] {text}'.rstrip()
+        if msg_type in EXPECTED_VALIDATE_MESSAGES or level == 'INFO':
+            logger.info(message, product)
+        elif level == 'WARNING':
+            logger.warn(message, product)
+            warnings += 1
+        else:
+            logger.error(message, product)
+            errors += 1
+
+    logger.info(f'Validation report has {errors} error(s) and {warnings} warning(s) '
+                'needing review', report_path)
+    return (errors, warnings)
 
 def create_manifest_files(proposal_id, logger):
     """With a given proposal id, create checksum manifest and transfer manifest files.

@@ -22,13 +22,11 @@
 ##########################################################################################
 
 import argparse
-import datetime
-import os
-import pdslogger
 import sys
 
-from hst_pipeline.hst_helper import HST_DIR
 from hst_pipeline.hst_helper.fs_utils import get_formatted_proposal_id
+from hst_pipeline.hst_helper.log_support import (close_task_logger,
+                                                 setup_task_logger)
 from hst_pipeline.label_hst_products import label_hst_visit
 from hst_pipeline.product_labels import label_hst_fits_directories
 from hst_pipeline.queue_manager.task_queue_db import remove_a_task
@@ -96,32 +94,9 @@ def check_target(args):
 
 
 def setup_logger(args, argv=None):
-    """Configure and open the pipeline logger."""
-    proposal_id = args.proposal_id
-    visit = args.visit
-    log_dir = (HST_DIR['pipeline'] + '/hst_' + proposal_id.zfill(5) + '/visit_'
-               + visit.zfill(2) + '/logs')
-
-    logger = pdslogger.PdsLogger('pds.hst.label-hst-products-' + proposal_id)
-    if not args.quiet:
-        logger.add_handler(pdslogger.stdout_handler)
-
-    now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
-    if args.log:
-        if os.path.isdir(args.log):
-            logpath = os.path.join(args.log, 'label-hst-products-' + now + '.log')
-        else:
-            parts = os.path.splitext(args.log)
-            logpath = parts[0] + '-' + now + parts[1]
-    else:
-        os.makedirs(log_dir, exist_ok=True)
-        logpath = log_dir + '/label-hst-products-' + now + '.log'
-
-    logger.add_handler(pdslogger.file_handler(logpath))
-    limits = {'info': -1, 'debug': -1, 'normal': -1}
-    cmd_args = sys.argv[1:] if argv is None else argv
-    logger.open('label-hst-products ' + ' '.join(cmd_args), limits=limits)
-    return logger
+    """Configure and open the pipeline logger; see setup_task_logger()."""
+    return setup_task_logger('label-hst-products', args, argv,
+                             proposal_id=args.proposal_id, visit=args.visit, visit_logs=True)
 
 
 def main(argv=None):
@@ -155,7 +130,7 @@ def main(argv=None):
 
         remove_a_task(formatted_proposal_id, visit, 'label_prod')
     finally:
-        logger.close()
+        close_task_logger(logger)
 
 
 if __name__ == '__main__':

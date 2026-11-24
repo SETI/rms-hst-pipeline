@@ -259,6 +259,38 @@ identical to its filed copy.
 | Manifests and `validation-report.txt` | `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` |
 | Program-level logs | `<HST_PIPELINE>/hst_<nnnnn>/logs/<task>-<yyyy-mm-ddThh-mm-ss>.log` |
 | Visit-level logs | `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/logs/` |
+| Logs of tasks for no one program | `<HST_PIPELINE>/logs/` |
+| Each program's warnings and errors | `<HST_PIPELINE>/hst_<nnnnn>/WARNINGS.log` |
+| Runs that need review | `<HST_PIPELINE>/NEEDS_REVIEW.log` |
+
+### Finding problems
+
+Look first at `<HST_PIPELINE>/NEEDS_REVIEW.log`. It doesn't exist until something needs
+review. Then it gets one line for each of these runs:
+
+- each task run that logged a warning, an error, or a fatal error;
+- each task that the task queue saw exit with a nonzero status;
+- each task that the task queue killed for running longer than `--max-time`.
+
+Each line has the time, the command, the counts or the problem, and the task's log:
+
+```text
+2026-11-24T05:20:20 | finalize-hst-bundle --proposal-id 10992 | 1 ERROR | <HST_PIPELINE>/hst_10992/logs/finalize-hst-bundle-2026-11-24T05-15-02.log
+```
+
+Every task for a program also appends its warnings and errors to that program's
+`WARNINGS.log`. Each line names the task. Tasks that belong to no program use
+`<HST_PIPELINE>/logs/WARNINGS.log` instead.
+
+To acknowledge either file, delete it. The next problem creates it again.
+
+`hst-finalize-bundle` also logs each message in `validate`'s report, with the product it
+concerns. Errors are logged as errors, and warnings as warnings. One exception:
+`warning.product_not_registered` is logged at INFO, since every bundle gets it while its
+context products are unregistered.
+
+Routine repairs, such as filling in a FITS keyword that a known program lacks, are
+logged at INFO, not WARNING.
 
 `validate` exits successfully even when products fail, so check the summary at the end
 of `validation-report.txt`, or the log of `hst-finalize-bundle`, which reports
