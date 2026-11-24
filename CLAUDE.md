@@ -166,6 +166,12 @@ Labels use PDS4 Information Model 1.26.0.0 (`PDS4_PDS_1Q00`), the HST dictionary
 `Product_Ancillary` labels use `ancillary_to_*`, and observational products refer to
 ancillary ones with `data_to_ancillary_data` and to partially processed ones with
 `data_to_partially_processed_product` (`DATA_REF_TYPES` in `PRODUCT_LABEL.lblx`).
+An association with a combined product of its own (drz, mos, x1dsum, ...; see
+`product_labels.association_product_dicts`) takes its metadata and time range from that
+product's header, not from its exposures, and the product refers to the association's
+own asn, jif, jit, spt, and trl files. Two exceptions: when `ROOTNAME` names an exposure
+(COS x1dsum), `mast_observation_id` is `ASN_ID`; and an ACS/WFC or WFC3/UVIS drz, whose
+`CCDCHIP` is -999, takes its chips from the exposures.
 
 Under `HST_BUNDLES` only the program directory has a suffix:
 `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` holds the manifests and `validation-report.txt`,

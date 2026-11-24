@@ -709,8 +709,15 @@ def label_hst_fits_filepaths(filepaths, root='', *,
     for ipppssoot, ipppssoot_dict in info_by_ipppssoot.items():
         reference_dict = ipppssoot_dict['reference_dict']
 
+        # The reference file of an association is one of its exposures. If the
+        # association has a combined product of its own (e.g., a drz), its metadata
+        # come from that product's header instead; see association_product_dicts.
+        product_dicts = association_product_dicts(ipppssoot_dict)
+        metadata_dicts = product_dicts or ipppssoot_dict['reference_dicts']
+        metadata_dict = metadata_dicts[0]
+
         # Fill the HST dictionary
-        fullpath = reference_dict['fullpath']
+        fullpath = metadata_dict['fullpath']
         ref_hdulist = pyfits.open(fullpath)
         spt_fullpath = ipppssoot_dict['spt_fullpath']
         if spt_fullpath:
@@ -718,6 +725,21 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         else:
             spt_hdulist = ref_hdulist
         hst_dictionary = fill_hst_dictionary(ref_hdulist, spt_hdulist, fullpath, logger)
+
+        if product_dicts:
+            logger.info(f'Metadata for association {ipppssoot} from', fullpath)
+            hst_dictionary['mast_observation_id'] = association_observation_id(
+                                    hst_dictionary['mast_observation_id'],
+                                    ref_hdulist[0].header.get('ASN_ID', ''),
+                                    ipppssoot_dict['associates'])
+
+            # A combined ACS/WFC or WFC3/UVIS image has CCDCHIP = -999, so take its
+            # chips from the exposures it combines
+            if (hst_dictionary['instrument_id'],
+                    hst_dictionary['channel_id']) in CCDCHIP_CHANNELS:
+                fullpaths = [d['fullpath'] for d in ipppssoot_dict['reference_dicts']]
+                use_source_detector_ids(hst_dictionary, fullpaths, spt_hdulist)
+
         instrument_id = hst_dictionary['instrument_id']
         channel_id = hst_dictionary['channel_id']
 
@@ -733,11 +755,11 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         ipppssoot_dict['time_coordinates'] = time_coordinates[:2]
         ipppssoot_dict['time_is_actual'] = time_coordinates[2]
 
-        if len(ipppssoot_dict['reference_dicts']) > 1:
+        if len(metadata_dicts) > 1:
             min_time = time_coordinates[0]
             max_time = time_coordinates[1]
-            for alt_reference_dict in ipppssoot_dict['reference_dicts']:
-                if alt_reference_dict is reference_dict:
+            for alt_reference_dict in metadata_dicts:
+                if alt_reference_dict is metadata_dict:
                     continue
                 alt_ref_fullpath = alt_reference_dict['fullpath']
                 alt_ref_hdulist = pyfits.open(alt_ref_fullpath)
@@ -929,6 +951,13 @@ def label_hst_fits_filepaths(filepaths, root='', *,
                 if parent and suffix in info_by_ipppssoot[parent]:
                     info_by_ipppssoot[parent][suffix]['reference_list'] |= pairs
 
+        # An association's own combined products refer to all of its own files (asn,
+        # jif, jit, spt, trl, ...); their prior suffixes already link them to the
+        # exposures they combine.
+        own_pairs = {(ipppssoot, suffix) for suffix in ipppssoot_suffixes}
+        for product_dict in association_product_dicts(ipppssoot_dict):
+            product_dict['reference_list'] |= own_pairs
+
     # Finalize the reference list
     for basename, basename_dict in info_by_basename.items():
 
@@ -1033,6 +1062,79 @@ def label_hst_fits_filepaths(filepaths, root='', *,
 
         label_path = basename_dict['fullpath'].replace('.fits', LABEL_SUFFIX)
         TEMPLATE.write(basename_dict, label_path)
+
+##########################################################################################
+
+# The channels whose combined images (e.g., drz) don't identify their chips
+CCDCHIP_CHANNELS = {('ACS', 'WFC'), ('WFC3', 'UVIS')}
+
+def association_observation_id(rootname, asn_id, associates):
+    """Return the mast_observation_id of an association's combined product.
+
+    This is the product's ROOTNAME, except that COS writes the ROOTNAME of one of the
+    exposures into its x1dsum files (e.g., "lbg501eaq" in lbg501010_x1dsum.fits); then
+    it is the ASN_ID.
+
+    Inputs:
+        rootname    the lower-case ROOTNAME of the product.
+        asn_id      the product's ASN_ID; '' if it has none.
+        associates  list of tuples (associated ipppssoot, memtype) of the association.
+
+    Returns:    the lower-case observation ID.
+    """
+    if asn_id and rootname in {associate for (associate, _) in associates}:
+        return asn_id.lower()
+    return rootname
+
+def use_source_detector_ids(hst_dictionary, fullpaths, spt_hdulist):
+    """Replace the detector IDs of a combined ACS/WFC or WFC3/UVIS image with those of
+    the exposures it combines.
+
+    The combined image's HDUs have CCDCHIP = -999, which fill_hst_dictionary takes to
+    mean both chips, and which maps each such HDU to no detector. Those HDUs are removed
+    from "detector_id_vs_extver", so that they take the exposures' detector IDs.
+
+    Inputs:
+        hst_dictionary  the HST dictionary of the combined image, updated in place.
+        fullpaths       paths to the exposures' reference files, e.g., raw files.
+        spt_hdulist     HDU list of the association's SPT file.
+    """
+    detector_ids = set()
+    for fullpath in fullpaths:
+        with pyfits.open(fullpath) as hdulist:
+            source_dictionary = fill_hst_dictionary(hdulist, spt_hdulist, fullpath,
+                                                    pdslogger.NullLogger())
+        detector_ids |= set(source_dictionary['detector_ids'])
+
+    detector_ids = sorted(detector_ids - {'UNK'})
+    if detector_ids:
+        hst_dictionary['detector_ids'] = detector_ids
+        hst_dictionary['detector_id_vs_extver'] = {
+            extver: detector_id for (extver, detector_id)
+            in hst_dictionary.get('detector_id_vs_extver', {}).items() if detector_id}
+
+def association_product_dicts(ipppssoot_dict):
+    """Return the basename dicts of an association's own combined products, whose
+    headers give the association's metadata. The exceptions are the chips of ACS/WFC and
+    WFC3/UVIS images, which come from the exposures (see CCDCHIP_CHANNELS).
+
+    These are the IPPPSSOOT's own files having the highest-precedence suffixes of
+    suffix_info.REF_SUFFIXES, e.g., the drz and drc of an ACS association.
+
+    Input:
+        ipppssoot_dict  the dictionary of one IPPPSSOOT within the labeler, containing
+                        "associates", "all_suffixes", and a basename dict per suffix.
+
+    Returns:    a list of basename dicts, sorted by suffix; empty if the IPPPSSOOT has
+                no associates or none of these suffixes.
+    """
+    if not ipppssoot_dict['associates']:
+        return []
+    for suffixes in suffix_info.REF_SUFFIXES:
+        own_suffixes = sorted(suffixes & ipppssoot_dict['all_suffixes'])
+        if own_suffixes:
+            return [ipppssoot_dict[suffix] for suffix in own_suffixes]
+    return []
 
 ##########################################################################################
 
