@@ -47,6 +47,45 @@ def test_context_json_names_and_types(tmp_path, monkeypatch):
     }
 
 
+
+def _write_label(path, lids):
+    refs = ''.join(f'<Internal_Reference><lid_reference>{lid}</lid_reference>'
+                   '</Internal_Reference>' for lid in lids)
+    path.write_text('<Product_Document xmlns="http://pds.nasa.gov/pds4/pds/v1">'
+                    f'<Context_Area>{refs}</Context_Area></Product_Document>')
+
+
+def test_context_json_adds_handbook_instruments(tmp_path, monkeypatch):
+    # A handbook covering several instruments refers to each of them, and validate
+    # needs every one of them in the JSON, even if the program didn't use it.
+    monkeypatch.setitem(fs_utils.__dict__, 'HST_DIR', {'bundles': str(tmp_path)})
+    document_dir = tmp_path / 'hst_05167-deliverable' / 'hst_05167' / 'document'
+    document_dir.mkdir(parents=True)
+    prefix = 'urn:nasa:pds:context:instrument:hst.'
+    _write_label(document_dir / 'hst-data-handbook-volume-2.lblx',
+                 ['urn:nasa:pds:context:instrument_host:spacecraft.hst',
+                  prefix + 'fos', prefix + 'ghrs', prefix + 'hsp', prefix + 'wfpc'])
+    _write_label(document_dir / 'wfpc2-data-handbook.lblx',
+                 [prefix + 'wfpc2', prefix + 'unknown'])
+    # Not a handbook label (no dash), so its references are ignored
+    _write_label(document_dir / 'document.lblx', [prefix + 'acs'])
+
+    assert ctl.handbook_instruments(str(document_dir)) == \
+        ['FOS', 'GHRS', 'HSP', 'WFPC', 'WFPC2']
+    assert ctl.handbook_instruments(str(tmp_path / 'missing')) == []
+
+    ctl.create_tmp_context_json(5167, {'inst_id_li': ['WFPC2']})
+    json_data = _read_json(tmp_path, 5167)
+    insts = {lidvid: names for (lidvid, (names, types)) in json_data.items()
+             if lidvid.startswith(prefix)}
+    assert insts == {
+        prefix + 'wfpc2::1.0': ['Wide Field Planetary Camera 2 for HST'],
+        prefix + 'fos::1.0': ['HST Faint Object Spectrograph'],
+        prefix + 'ghrs::1.0': ['HST Goddard High Resolution Spectrograph'],
+        prefix + 'hsp::1.0': ['HST High Speed Photometer'],
+        prefix + 'wfpc::1.0': ['HST Wide Field/Planetary Camera'],
+    }
+
 def test_target_template_version_and_names():
     # The JSON gives the version, name, and type that TARGET_LABEL.lblx writes.
     with open(os.path.join(TEMPLATE_DIR, 'TARGET_LABEL.lblx')) as f:

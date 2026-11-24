@@ -11,8 +11,10 @@ import json
 import os
 import pdslogger
 import urllib.request
+from xml.etree import ElementTree
 
-from hst_pipeline.hst_helper.fs_utils import get_context_products_path
+from hst_pipeline.hst_helper.fs_utils import (get_context_products_path,
+                                              get_deliverable_path)
 from hst_pipeline.hst_helper.general_utils import create_collection_label
 from hst_pipeline.product_labels.suffix_info import INSTRUMENT_NAMES, LABEL_SUFFIX
 
@@ -29,6 +31,7 @@ INVESTIGATION_TYPE = 'Individual Investigation'
 HOST_NAME = 'Hubble Space Telescope'
 HOST_TYPE = 'Host'
 INSTRUMENT_TYPE = 'Instrument'
+INSTRUMENT_LID_PREFIX = 'urn:nasa:pds:context:instrument:hst.'
 
 def create_target_label(proposal_id, data_dict, logger=None):
     """Create target label under context collection if it doesn't exist in PDS page.
@@ -99,9 +102,14 @@ def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
     get_context_products_path) and passed to the --add-context-products parameter in the
     validation, for development purpose only.
 
+    Besides the program's own instruments, it lists every HST instrument that a handbook
+    label in the bundle's document collection refers to, since a handbook covering
+    several instruments (e.g., Volume II of the HST Data Handbook) refers to all of them.
+
     Inputs:
         proposal_id    a proposal id.
         data_dict      a data dictionary used to create the label.
+        targ_list      the target dictionaries of newly created target labels.
     """
     # TODO: figure out the version id for all context data
     vid = '1.0'
@@ -112,7 +120,13 @@ def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
          HOST_NAME, HOST_TYPE),
     ]
 
-    for inst in data_dict['inst_id_li']:
+    inst_ids = list(data_dict['inst_id_li'])
+    document_dir = os.path.join(get_deliverable_path(proposal_id), 'document')
+    for inst in handbook_instruments(document_dir):
+        if inst not in inst_ids:
+            inst_ids.append(inst)
+
+    for inst in inst_ids:
         context_data.append(
             (f'urn:nasa:pds:context:instrument:hst.{inst.lower()}::{vid}',
              INSTRUMENT_NAMES[inst], INSTRUMENT_TYPE))
@@ -144,3 +158,33 @@ def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
     os.makedirs(os.path.dirname(json_path), exist_ok=True)
     with open(json_path, 'w') as tmp_json:
         json.dump(json_data, tmp_json)
+
+def handbook_instruments(document_dir):
+    """Return the HST instruments that the handbook labels in a document collection
+    refer to. A handbook label is a label whose name contains a dash (see
+    finalize_document); the instruments are those of its references to
+    urn:nasa:pds:context:instrument:hst.<inst> that have an entry in INSTRUMENT_NAMES.
+
+    Input:
+        document_dir    the bundle's document collection directory; it need not exist.
+
+    Returns:    a sorted list of instrument ids, e.g., ['FOS', 'GHRS'].
+    """
+    if not os.path.isdir(document_dir):
+        return []
+
+    names = {inst.lower(): inst for inst in INSTRUMENT_NAMES}
+    insts = set()
+    for label in os.listdir(document_dir):
+        if '-' not in label or not label.endswith(LABEL_SUFFIX):
+            continue
+        root = ElementTree.parse(os.path.join(document_dir, label)).getroot()
+        for elem in root.iter():
+            if elem.tag.rpartition('}')[2] != 'lid_reference':
+                continue
+            lid = (elem.text or '').strip()
+            if lid.startswith(INSTRUMENT_LID_PREFIX):
+                inst = names.get(lid[len(INSTRUMENT_LID_PREFIX):])
+                if inst:
+                    insts.add(inst)
+    return sorted(insts)
