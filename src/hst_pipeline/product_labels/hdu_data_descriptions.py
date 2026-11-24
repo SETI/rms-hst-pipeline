@@ -163,6 +163,26 @@ DATA_CLASS_TO_NOUN = {
     'UNKNOWN'          : ('UNKNOWN DATA CLASS', 'UNKNOWN DATA CLASSES'),
 }
 
+# Suffixes whose associated files a STIS association often lacks: MAST delivers its
+# _sx1 and _sx2 files without the _x1d and _x2d files that their descriptions refer to.
+STIS_ASSOCIATION_OPTIONAL = {'sx1', 'sx2'}
+
+def associated_suffix_is_optional(ipppssoot_dict, suffix, instrument_id):
+    """True if a file of this suffix can lack its associated file, so that its absence
+    is routine rather than a warning.
+
+    Input:
+        ipppssoot_dict      the dictionary describing the file's IPPPSSOOT.
+        suffix              the file's suffix.
+        instrument_id       the instrument ID.
+
+    Return:                 True for the _sx1 and _sx2 files of a STIS association.
+    """
+    is_association = bool(ipppssoot_dict.get('associates')
+                          or 'asn' in ipppssoot_dict.get('all_suffixes', ()))
+    return (instrument_id == 'STIS' and suffix in STIS_ASSOCIATION_OPTIONAL
+            and is_association)
+
 def fill_hdu_data_descriptions(ipppssoot, suffix, info_by_ipppssoot, log_text, logger):
     """Fill in the description fields for all of the data objects in one file based on its
     suffix.
@@ -265,8 +285,11 @@ def fill_hdu_data_descriptions(ipppssoot, suffix, info_by_ipppssoot, log_text, l
                               if pair[1] in associated_suffix]
 
         if not selected_pairs:
-            logger.warn(f'Missing associated suffix _{associated_suffix} for file',
-                        filepath)
+            message = f'Missing associated suffix _{associated_suffix} for file'
+            if associated_suffix_is_optional(ipppssoot_dict, suffix, instrument_id):
+                logger.info(message, filepath)
+            else:
+                logger.warn(message, filepath)
             associated_hdu_index = science_hdu_index
             associated_sci_class = sci_class
         else:

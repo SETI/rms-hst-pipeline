@@ -3,7 +3,8 @@
 #
 # Tests for reading ASN tables, for the prior suffixes that link each product to the
 # files it was made from, for the combined products that give an association's
-# metadata, and for the chips of its ACS/WFC images, which come from its exposures.
+# metadata, for the chips of its ACS/WFC images, which come from its exposures, and for
+# the associated files that a STIS association can lack.
 ##########################################################################################
 
 from astropy.io import fits
@@ -14,6 +15,8 @@ from hst_pipeline.product_labels import association_product_dicts
 from hst_pipeline.product_labels import read_associations
 from hst_pipeline.product_labels import use_source_detector_ids
 from hst_pipeline.product_labels import suffix_info
+from hst_pipeline.product_labels.hdu_data_descriptions import \
+    associated_suffix_is_optional
 
 
 def _asn(rows):
@@ -129,3 +132,16 @@ def test_use_source_detector_ids(tmp_path):
         hst_dictionary = fill_hst_dictionary(spt, spt, drz)
         use_source_detector_ids(hst_dictionary, [full], spt)
         assert hst_dictionary['detector_ids'] == ['WFC1', 'WFC2']
+
+
+def test_stis_association_lacks_x1d_and_x2d():
+    # odefa2010 (14903): its _sx1 and _sx2 files have no _x1d or _x2d files
+    association = {'associates': [], 'all_suffixes': {'asn', 'raw', 'flt', 'sx1', 'sx2'}}
+    assert associated_suffix_is_optional(association, 'sx1', 'STIS')
+    assert associated_suffix_is_optional(association, 'sx2', 'STIS')
+    assert not associated_suffix_is_optional(association, 'x2d', 'STIS')
+    assert not associated_suffix_is_optional(association, 'sx1', 'COS')
+
+    # Not an association: still a warning
+    exposure = {'associates': [], 'all_suffixes': {'raw', 'flt', 'sx1'}}
+    assert not associated_suffix_is_optional(exposure, 'sx1', 'STIS')
