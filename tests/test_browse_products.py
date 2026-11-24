@@ -22,8 +22,10 @@ from hst_pipeline.label_browse_products import label_browse_collection_directory
 from hst_pipeline.product_labels import get_browse_lids
 from hst_pipeline.product_labels.suffix_info import (ACCEPTED_SUFFIXES,
                                                      HST_DQ_SUFFIXES,
+                                                     MAST_SPECTRUM_BROWSE_SUFFIXES,
                                                      NON_IMAGING_INSTRUMENTS,
                                                      PICMAKER_BROWSE_OPTIONS,
+                                                     PICMAKER_BROWSE_REQUIREMENTS,
                                                      PICMAKER_BROWSE_SUFFIXES,
                                                      browse_collection_name,
                                                      browse_data_collection_name,
@@ -134,11 +136,17 @@ def test_is_accepted_browse_suffix():
 
 
 def test_picmaker_browse_tables():
-    # Every imaging instrument, and no non-imaging one, gets picmaker previews, all made
-    # with the same options.
-    assert set(PICMAKER_BROWSE_SUFFIXES) == {'ACS', 'FOC', 'NICMOS', 'STIS', 'WFC3',
-                                             'WFPC', 'WFPC2'}
-    assert not set(PICMAKER_BROWSE_SUFFIXES) & NON_IMAGING_INSTRUMENTS
+    # Every imaging instrument gets picmaker previews, all made with the same options, and
+    # so does COS for its NUV images; no other non-imaging instrument does.
+    assert set(PICMAKER_BROWSE_SUFFIXES) == {'ACS', 'COS', 'FOC', 'NICMOS', 'STIS',
+                                             'WFC3', 'WFPC', 'WFPC2'}
+    assert set(PICMAKER_BROWSE_SUFFIXES) & NON_IMAGING_INSTRUMENTS == {'COS'}
+    assert PICMAKER_BROWSE_REQUIREMENTS == {'COS' : {'OBSTYPE': 'IMAGING'},
+                                            'STIS': {'OBSTYPE': 'IMAGING'}}
+    # The spectrographs' spectra keep MAST's plots
+    for (instrument_id, suffixes) in MAST_SPECTRUM_BROWSE_SUFFIXES.items():
+        assert not set(suffixes) & set(PICMAKER_BROWSE_SUFFIXES[instrument_id])
+        assert set(suffixes) <= ACCEPTED_SUFFIXES[instrument_id]
     assert PICMAKER_BROWSE_OPTIONS == {'mosaic': True, 'footprint': 7,
                                        'percentiles': (0.01, 99.99),
                                        'mask_ranges': (0, 0)}
@@ -147,7 +155,8 @@ def test_picmaker_browse_tables():
 
     # Each data quality file belongs to an image that gets a picmaker preview, and is
     # itself downloaded.
-    assert set(HST_DQ_SUFFIXES) == {'WFPC', 'WFPC2'}
+    assert set(HST_DQ_SUFFIXES) == {'FOC', 'WFPC', 'WFPC2'}
+    assert HST_DQ_SUFFIXES['FOC'] == {'d0f': 'q0f'}
     for (instrument_id, dq_suffixes) in HST_DQ_SUFFIXES.items():
         assert set(dq_suffixes) <= set(PICMAKER_BROWSE_SUFFIXES[instrument_id])
         assert set(dq_suffixes.values()) <= ACCEPTED_SUFFIXES[instrument_id]
@@ -157,6 +166,16 @@ def _touch(path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'wb') as f:
         f.write(b'\xff\xd8\xff\xd9')    # bytes need not form a valid image here
+
+
+def _write_image_fits(path, **keywords):
+    """Write a small FITS file whose primary HDU is a 4x4 image, with these primary header
+    keywords, e.g., INSTRUME='STIS'."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    primary = pyfits.PrimaryHDU(np.zeros((4, 4), dtype='float32'))
+    for (key, value) in keywords.items():
+        primary.header[key] = value
+    pyfits.HDUList([primary]).writeto(path)
 
 
 def _basename_dict(fullpath, instrument_id):
@@ -340,7 +359,7 @@ def test_generate_picmaker_browse_products_options_and_reruns(tmp_path, monkeypa
     _use_tmp_staging(tmp_path, monkeypatch)
     staging = tmp_path / 'hst_05167'
     for name in ('u2xx0101t_c0m.fits', 'u2xx0102t_c0m.fits', 'u2xx0103t_c0m.fits'):
-        _touch(str(staging / 'data_wfpc2_c0m' / 'visit_01' / name))
+        _write_image_fits(str(staging / 'data_wfpc2_c0m' / 'visit_01' / name))
     _touch(str(staging / 'data_wfpc2_c0m' / 'visit_01' / 'u2xx0101t_c0m.lblx'))
     # An existing preview is kept
     _touch(str(staging / 'browse_wfpc2_c0m' / 'visit_01' / 'u2xx0102t_c0m.jpg'))
@@ -439,8 +458,9 @@ def test_get_filtered_products_never_downloads_image_previews(monkeypatch):
 
 
 def test_generate_picmaker_browse_products_hst_dq(tmp_path, monkeypatch):
-    # WFPC and WFPC2 images are given the visit directory of their data quality
-    # collection; other images, including FOC's c0f files, are given none.
+    # FOC d0f, WFPC, and WFPC2 images are given the visit directory of their data
+    # quality collection; other images, including FOC's calibrated c0f files, are given
+    # none.
     _use_tmp_staging(tmp_path, monkeypatch)
     staging = tmp_path / 'hst_05167'
     for (collection, name) in (('data_wfpc_c0f', 'w0xx0101t_c0f.fits'),
@@ -449,8 +469,9 @@ def test_generate_picmaker_browse_products_hst_dq(tmp_path, monkeypatch):
                                ('data_wfpc2_d0m', 'u2xx0101t_d0m.fits'),
                                ('data_wfpc2_drz', 'u2xx0101t_drz.fits'),
                                ('data_foc_c0f', 'x3xx0101t_c0f.fits'),
+                               ('data_foc_d0f', 'x3xx0101t_d0f.fits'),
                                ('data_acs_flt', 'j9xx01abq_flt.fits')):
-        _touch(str(staging / collection / 'visit_01' / name))
+        _write_image_fits(str(staging / collection / 'visit_01' / name))
 
     calls = {}
     def fake_picmaker(**options):
@@ -459,7 +480,7 @@ def test_generate_picmaker_browse_products_hst_dq(tmp_path, monkeypatch):
         _touch(os.path.join(options['directory'], name.replace('.fits', '.jpg')))
 
     monkeypatch.setattr(prepare_module, 'picmaker', fake_picmaker)
-    assert prepare_module.generate_picmaker_browse_products(5167, '01') == 7
+    assert prepare_module.generate_picmaker_browse_products(5167, '01') == 8
 
     def dq_dir(collection):
         return str(staging / collection / 'visit_01')
@@ -469,6 +490,7 @@ def test_generate_picmaker_browse_products_hst_dq(tmp_path, monkeypatch):
                      'u2xx0101t_d0m.fits': dq_dir('data_wfpc2_q0m'),
                      'u2xx0101t_drz.fits': None,
                      'x3xx0101t_c0f.fits': None,
+                     'x3xx0101t_d0f.fits': dq_dir('data_foc_q0f'),
                      'j9xx01abq_flt.fits': None}
 
 
@@ -477,13 +499,9 @@ def test_generate_picmaker_browse_products_skips_stis_spectra(tmp_path, monkeypa
     # spectroscopic raw file gets no picmaker preview (its x1d gets MAST's plot instead).
     _use_tmp_staging(tmp_path, monkeypatch)
     data_dir = tmp_path / 'hst_05167' / 'data_stis_raw' / 'visit_01'
-    os.makedirs(data_dir)
     for (name, obstype) in (('o4xx01aaq_raw.fits', 'IMAGING'),
                             ('o4xx01abq_raw.fits', 'SPECTROSCOPIC')):
-        primary = pyfits.PrimaryHDU()
-        primary.header['INSTRUME'] = 'STIS'
-        primary.header['OBSTYPE'] = obstype
-        pyfits.HDUList([primary]).writeto(data_dir / name)
+        _write_image_fits(str(data_dir / name), INSTRUME='STIS', OBSTYPE=obstype)
 
     calls = []
     def fake_picmaker(**options):
@@ -497,3 +515,53 @@ def test_generate_picmaker_browse_products_skips_stis_spectra(tmp_path, monkeypa
     assert os.listdir(tmp_path / 'hst_05167' / 'browse_stis_raw' / 'visit_01') == [
         'o4xx01aaq_raw.jpg'
     ]
+
+
+def test_generate_picmaker_browse_products_cos_images(tmp_path, monkeypatch):
+    # COS NUV images, e.g., the ACQ/IMAGE target acquisitions, get picmaker previews. An
+    # ACQ/SEARCH rawacq file is in imaging mode too but holds only a table, and the files
+    # of a spectroscopic exposure are spectra; neither gets one. An unreadable file is
+    # logged and skipped.
+    _use_tmp_staging(tmp_path, monkeypatch)
+    staging = tmp_path / 'hst_12042'
+    def data_path(suffix, name):
+        return str(staging / f'data_cos_{suffix}' / 'visit_01' / f'{name}_{suffix}.fits')
+
+    for suffix in ('rawacq', 'flt', 'counts'):
+        _write_image_fits(data_path(suffix, 'lbg501e8q'), INSTRUME='COS',
+                          OBSTYPE='IMAGING')
+    for suffix in ('flt', 'counts'):
+        _write_image_fits(data_path(suffix, 'lbg501eaq'), INSTRUME='COS',
+                          OBSTYPE='SPECTROSCOPIC')
+    primary = pyfits.PrimaryHDU()
+    primary.header['INSTRUME'] = 'COS'
+    primary.header['OBSTYPE'] = 'IMAGING'
+    table = pyfits.BinTableHDU.from_columns([pyfits.Column(name='X', format='E',
+                                                           array=np.zeros(4))])
+    pyfits.HDUList([primary, table]).writeto(data_path('rawacq', 'lbg501e7q'))
+    with open(data_path('flt', 'lbg501ecq'), 'wb') as f:
+        f.write(b'not a FITS file')
+
+    calls = []
+    def fake_picmaker(**options):
+        calls.append(os.path.basename(options['files'][0]))
+        _touch(os.path.join(options['directory'], calls[-1].replace('.fits', '.jpg')))
+
+    monkeypatch.setattr(prepare_module, 'picmaker', fake_picmaker)
+    errors = []
+    class FakeLogger:
+        def error(self, message):
+            errors.append(message)
+        def info(self, message):
+            pass
+    assert prepare_module.generate_picmaker_browse_products(12042, '01',
+                                                            FakeLogger()) == 3
+    assert sorted(calls) == ['lbg501e8q_counts.fits', 'lbg501e8q_flt.fits',
+                             'lbg501e8q_rawacq.fits']
+    for suffix in ('rawacq', 'flt', 'counts'):
+        assert os.listdir(staging / f'browse_cos_{suffix}' / 'visit_01') == [
+            f'lbg501e8q_{suffix}.jpg'
+        ]
+    assert len(errors) == 1
+    assert errors[0].startswith('Cannot read') and 'lbg501ecq_flt.fits' in errors[0]
+

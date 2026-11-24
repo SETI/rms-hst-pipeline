@@ -3,8 +3,8 @@
 # script's own location so the path holds whether the package is installed or run from a
 # checkout.
 XMLDIR="$(cd "$(dirname "$0")" && pwd)/xml"
-SCHEMAS="${XMLDIR}/PDS4_HST_1M00_1100.xsd, ${XMLDIR}/PDS4_DISP_1L00_1510.xsd.xml"
-SCHEMATRONS="${XMLDIR}/PDS4_HST_1M00_1100.sch, ${XMLDIR}/PDS4_DISP_1L00_1510.sch.xml"
+SCHEMAS="${XMLDIR}/PDS4_HST_1M00_1100.xsd, ${XMLDIR}/PDS4_DISP_1Q00_1510.xsd"
+SCHEMATRONS="${XMLDIR}/PDS4_HST_1M00_1100.sch, ${XMLDIR}/PDS4_DISP_1Q00_1510.sch"
 
 die(){
     echo $@ >&2

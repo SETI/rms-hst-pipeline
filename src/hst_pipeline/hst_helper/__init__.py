@@ -112,6 +112,20 @@ DOCUMENT_STANDARD_IDS = {
     'prop': '7-Bit ASCII Text',
 }
 
+# The HST handbooks bundle, whose document collection holds the data and instrument
+# handbooks. Each program's document collection includes those for its instruments as
+# secondary members. Its path comes from the HST_HANDBOOKS environment variable, read when
+# the document collection is built; see finalize_document.get_handbooks_dir().
+HANDBOOKS_ENV = 'HST_HANDBOOKS'
+HANDBOOKS_COLLECTION = 'document'
+
+# A handbook is selected for each instrument named by a keyword in its label's
+# Citation_Information (see finalize_document.get_handbook_files()). Every instrument has
+# a data handbook and an instrument handbook, whose labels have these LIDs; the bundle,
+# collection, and product labels refer to them.
+HANDBOOK_LID = 'urn:nasa:pds:hst_handbooks:document:{inst}-{kind}-handbook'
+HANDBOOK_KINDS = ('data', 'instrument')
+
 # File names
 PROGRAM_INFO_FILE = 'program-info.txt'
 PRODUCTS_FILE = 'products.txt'
@@ -141,16 +155,19 @@ INST_PARAMS_DICT = defaultdict(dict)
 PRIMARY_RES_DICT = defaultdict(dict)
 RECORDS_DICT = defaultdict(dict)
 
-# TODO: These are for schema csv & label, need to figure how to determine the schema
-# inventories and version
-PDS4_LIDVID = 'S,urn:nasa:pds:system_bundle:xml_schema:pds-xml_schema::1.19'
-HST_LIDVID = 'S,urn:nasa:pds:system_bundle:xml_schema:hst-xml_schema::1.0'
-DISP_LIDVID = 'S,urn:nasa:pds:system_bundle:xml_schema:disp-xml_schema::1.17'
-
-# General version of xml label
-INFORMATION_MODEL_VERSION = '1.15.0.0'
-HST_SHORT_VERSION = '1D00_1000'
-DISP_SHORT_VERSION = '1B00'
+# The schemas the labels use: PDS4 Information Model 1.26.0.0 (1Q00), the HST dictionary
+# 1.1.0.0 (1M00_1100, the latest, built on IM 1.22), and the Display dictionary 1.5.1.0
+# (1Q00_1510). They are the schema collection's secondary members, by the LIDVIDs of
+# their labels in the PDS system bundle. The HST and Display schemas also ship in xml/,
+# for validate-pdart, and the templates name them; change all of these together.
+INFORMATION_MODEL_VERSION = '1.26.0.0'
+PDS4_SHORT_VERSION = '1Q00'
+HST_SHORT_VERSION = '1M00_1100'
+DISP_SHORT_VERSION = '1Q00_1510'
+PDS4_LIDVID = 'S,urn:nasa:pds:system_bundle:xml_schema:pds-xml_schema_1.26.0.0::1.0'
+HST_LIDVID = 'S,urn:nasa:pds:system_bundle:xml_schema:hst-xml_schema_1.22.0.0_1.1.0::1.0'
+DISP_LIDVID = ('S,urn:nasa:pds:system_bundle:xml_schema:'
+               'disp-xml_schema_1.26.0.0_1.5.1.0::1.0')
 
 # Collection names in the bundles
 COL_NAME_PREFIX = ['data_', 'miscellaneous_', 'browse_']

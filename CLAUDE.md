@@ -21,13 +21,22 @@ rather than locating `.py` files inside the checkout.)
 
 ```bash
 ./scripts/setup-venv.sh && source venv/bin/activate
+pip install --no-deps -e ../rms-psiops -e ../rms-picmaker -e ../rms-hst-targets
 ```
 
-Or `pip install -e ".[dev]"`. Dependencies live in `pyproject.toml`; there is no
+Or `pip install -e ".[dev]"` for the first line. Three dependencies aren't on PyPI in the
+form needed, so `pyproject.toml` names them by GitHub URL: `rms-psiops` (not on PyPI;
+`rms-picmaker` needs it), `rms-picmaker` on branch `bugfix/wfpc2-multi-extension-fits`
+(the PyPI release lacks SETI/rms-picmaker PR #33), and `rms-hst-targets` (not on PyPI; its
+committed caches need a source checkout). The second line swaps those GitHub copies for
+editable clones beside this checkout. It must be `--no-deps`, since pip otherwise reports
+a conflict with the URLs, and it must be repeated after any rerun of the first line,
+which reinstalls the GitHub copies. Dependencies live in `pyproject.toml`; there is no
 requirements lockfile. Installing puts the ten task commands (`hst-pipeline`,
 `hst-query-products`, …) on `PATH`; they are declared in `[project.scripts]` and are what
 `queue_manager/config.py`'s `TASK_INFO` dispatches. `hst-dedupe-staging` is also declared
-there but is a one-time maintenance command, not a task.
+there but is a one-time maintenance command, not a task. Finalizing also needs the PDS4
+`validate` tool on `PATH` and `JAVA_HOME` set.
 
 ## Tests
 
@@ -93,16 +102,26 @@ the files there. Run them in that order.
 Every image product gets a picmaker preview: `hst-prepare-browse` runs picmaker, always
 with `PICMAKER_BROWSE_OPTIONS` (`mosaic=True, footprint=7, percentiles=(0.01, 99.99),
 mask_ranges=(0, 0)`), on each FITS file lacking a preview whose suffix is listed for its
-instrument in `suffix_info.PICMAKER_BROWSE_SUFFIXES` (ACS, FOC, NICMOS, STIS imaging,
-WFC3, WFPC, WFPC2). WFPC and WFPC2 images (`c0f`/`d0f`, `c0m`/`d0m`) are also passed
-`hst_dq`, the visit directory of their data quality collection (`suffix_info.HST_DQ_SUFFIXES`),
-since picmaker otherwise looks for the DQ file beside the image; flagged pixels are left
-out of the stretch but drawn normally (picmaker blacks them out only with `desnow`, which
-isn't passed). Non-image products, those of the non-imaging instruments (COS, FGS, FOS,
-GHRS, HSP) and the STIS spectra, keep MAST's JPEG/PNG previews, filed under their MAST
-names; no other MAST preview is downloaded. This needs the `rms-picmaker` from
-SETI/rms-picmaker PR #33 (or a local checkout, installed with `pip install --no-deps -e
-../rms-picmaker`); the released version can't read WFPC2 files or take `mask_ranges` or `hst_dq`.
+instrument in `suffix_info.PICMAKER_BROWSE_SUFFIXES` (ACS, COS imaging, FOC, NICMOS, STIS
+imaging, WFC3, WFPC, WFPC2) and that holds an image array. COS and STIS files qualify only
+with `OBSTYPE = IMAGING` (`PICMAKER_BROWSE_REQUIREMENTS`), e.g., target acquisitions;
+their labels likewise call those arrays `Array_2D_Image`, and all other COS/STIS arrays
+`Array_2D_Spectrum` (`hdu_dictionary_support.science_array_class_suffix`). FOC raw images
+(`d0f`) and WFPC and WFPC2 images (`c0f`/`d0f`, `c0m`/`d0m`) are also passed `hst_dq`, the
+visit directory of their data quality collection (`suffix_info.HST_DQ_SUFFIXES`), since
+picmaker otherwise looks for the DQ file beside the image; flagged pixels are left out of
+the stretch but drawn normally (picmaker blacks them out only with `desnow`, which isn't
+passed). Non-image products, those of the non-imaging instruments (FGS, FOS, GHRS, HSP)
+and the COS and STIS spectra (`MAST_SPECTRUM_BROWSE_SUFFIXES`), keep MAST's JPEG/PNG
+previews, filed under their MAST names; no other MAST preview is downloaded. This needs
+the `rms-picmaker` from SETI/rms-picmaker PR #33, installed from a local checkout (see
+Setup); the released version can't read WFPC2 files or take `mask_ranges` or `hst_dq`.
+picmaker masks ACS, COS, NICMOS, STIS, and WFC3 images with the `DQ` extension of the same
+file, and FOC `d0f`, WFPC, and WFPC2 images with their separate DQ files. FOC's calibrated
+`c0f` images have no DQ file and aren't masked (FOC's `c1f` is an image, not a DQ file).
+The `footprint` median filter, from `rms-psiops`, leaves masked pixels out of each median.
+For NICMOS, picmaker leaves unmasked the pixels whose only DQ flags are 16 (grot), 64
+(saturated), 1024 (source), or 2048 (signal in the 0th read), in every NICMOS file type.
 
 Only moving-target observations (MAST's `mtFlag`) are retrieved, except that for a given
 proposal `query_mast_slice` also keeps every FGS and HSP observation
@@ -120,6 +139,33 @@ year, so the citation has one author and the publication year is the end of the 
 without the MAST site's header and footer, so it begins with `<hr>` and the title. Its
 URL and retrieval date go in an `External_Reference` in the document label. `program-info.txt` (the
 cleaned-up citation) stays in the pipeline directory and is not delivered.
+
+`HST_HANDBOOKS` names the HST handbooks bundle (e.g., `/Volumes/Data-SSD/HST_HANDBOOKS`;
+veraPDF in `validate` can't open paths with spaces).
+It is read only when the document collection is built, not at import, and
+`finalize_document.get_handbooks_dir()` raises `HandbooksError` if it is missing. A
+handbook in that bundle's `document/` directory goes with every instrument named by a
+`<keyword>` in its label's `Citation_Information` (case is ignored; `WFPC` is WF/PC and
+`WFPC2` is WFPC2), so a volume of the HST Data Handbook that covers several instruments
+lists each of them. For each of the program's instruments, every such `Product_Document`
+label and the documents its `file_name`s name are copied into the program's `document/`
+collection; file names don't matter, except that every handbook file's name has a dash,
+which is how stale copies are recognized. The LIDs of the copied labels are listed in
+`collection.csv` as secondary members (`S,<lid>`, no VID). Handbooks no longer selected
+are removed on the next finalize. The tests pass `handbooks_dir` explicitly, using
+`tests/utils.make_handbooks_dir()`. The bundle, data collection, and product labels refer
+to each instrument's two handbooks by LID (`hst_helper.HANDBOOK_LID`, e.g.,
+`urn:nasa:pds:hst_handbooks:document:wfpc-data-handbook`); the templates spell that
+pattern out, and finalizing warns if a handbook it names is missing from `HST_HANDBOOKS`.
+
+Labels use PDS4 Information Model 1.26.0.0 (`PDS4_PDS_1Q00`), the HST dictionary
+`PDS4_HST_1M00_1100` (its latest release), and the Display dictionary
+`PDS4_DISP_1Q00_1510`. The version appears in every template, in `hst_helper`
+(`INFORMATION_MODEL_VERSION` and the schema collection's `*_LIDVID`s), in `xml/`, and in
+`validate-pdart`; change them together. Reference types follow the product class:
+`Product_Ancillary` labels use `ancillary_to_*`, and observational products refer to
+ancillary ones with `data_to_ancillary_data` and to partially processed ones with
+`data_to_partially_processed_product` (`DATA_REF_TYPES` in `PRODUCT_LABEL.lblx`).
 
 Under `HST_BUNDLES` only the program directory has a suffix:
 `<HST_BUNDLES>/hst_<nnnnn>-deliverable/` holds the manifests and `validation-report.txt`,

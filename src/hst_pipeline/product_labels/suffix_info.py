@@ -1572,14 +1572,17 @@ for key, info in SUFFIX_INFO.items():
 ##########################################################################################
 
 # Browse products are JPEG and PNG previews of the FITS products.
-#   - Image products of the imaging instruments, those listed in PICMAKER_BROWSE_SUFFIXES,
-#     get previews that picmaker generates with PICMAKER_BROWSE_OPTIONS. Each is named
-#     after its FITS file, e.g., "u2no0401t_c0m.jpg" for "u2no0401t_c0m.fits".
-#   - All other products, i.e., those of the non-imaging instruments (COS, FGS, FOS, GHRS,
-#     HSP) and the spectra in MAST_SPECTRUM_BROWSE_SUFFIXES, use the previews MAST serves
+#   - Image products, those listed in PICMAKER_BROWSE_SUFFIXES that meet
+#     PICMAKER_BROWSE_REQUIREMENTS, get previews that picmaker generates with
+#     PICMAKER_BROWSE_OPTIONS. Each is named after its FITS file, e.g., "u2no0401t_c0m.jpg"
+#     for "u2no0401t_c0m.fits". These include the images of the imaging instruments and
+#     the NUV images of COS, e.g., its target acquisitions.
+#   - All other products, i.e., those of the non-imaging instruments (FGS, FOS, GHRS, HSP)
+#     and the spectra in MAST_SPECTRUM_BROWSE_SUFFIXES, use the previews MAST serves
 #     alongside the FITS files. Each is named <ipppssoot>_<suffix>.<ext>, where <suffix> is
 #     normally that of the FITS file it previews, and is archived under its MAST file
-#     name, unchanged. No other MAST preview of an imaging instrument is downloaded.
+#     name, unchanged. No other MAST preview of an instrument in PICMAKER_BROWSE_SUFFIXES
+#     is downloaded.
 BROWSE_EXTENSIONS = ('jpg', 'jpeg', 'png')
 
 # The file extension of every PDS4 label the pipeline writes, and of its label templates
@@ -1590,11 +1593,12 @@ LABEL_SUFFIX = '.lblx'
 # at present; WFPC2, whose MAST previews have the old, waivered suffixes, uses picmaker.
 MAST_BROWSE_TO_DATA_SUFFIX = {}
 
-# The image products of each imaging instrument, given as {instrument_id: tuple of FITS
+# The image products of each instrument, given as {instrument_id: tuple of FITS
 # suffixes}: the raw, calibrated, and combined science images. picmaker generates a
-# preview of each.
+# preview of each that meets PICMAKER_BROWSE_REQUIREMENTS and holds an image array.
 PICMAKER_BROWSE_SUFFIXES = {
     'ACS'   : ('raw', 'flt', 'flc', 'sfl', 'drz', 'drc'),
+    'COS'   : ('rawacq', 'rawaccum', 'flt', 'fltsum', 'counts'),
     'FOC'   : ('c0f', 'd0f'),
     'NICMOS': ('raw', 'ima', 'cal', 'mos'),
     'STIS'  : ('raw', 'flt', 'sfl', 'x2d', 'sx2'),
@@ -1604,9 +1608,13 @@ PICMAKER_BROWSE_SUFFIXES = {
 }
 
 # Primary header values a FITS file must have for picmaker to generate its preview, given
-# as {instrument_id: {keyword: value}}. STIS files with these suffixes are images only in
-# imaging mode, e.g., target acquisitions; otherwise they are two-dimensional spectra.
+# as {instrument_id: {keyword: value}}. COS and STIS files with these suffixes are images
+# only in imaging mode, e.g., target acquisitions; otherwise they are two-dimensional
+# spectra. Even in imaging mode, some COS target acquisitions (ACQ/SEARCH, ACQ/PEAKXD,
+# ACQ/PEAKD) hold only a table in their rawacq file; picmaker skips any file without an
+# image array.
 PICMAKER_BROWSE_REQUIREMENTS = {
+    'COS' : {'OBSTYPE': 'IMAGING'},
     'STIS': {'OBSTYPE': 'IMAGING'},
 }
 
@@ -1624,19 +1632,23 @@ PICMAKER_BROWSE_REQUIREMENTS = {
 PICMAKER_BROWSE_OPTIONS = {'mosaic': True, 'footprint': 7, 'percentiles': (0.01, 99.99),
                            'mask_ranges': (0, 0)}
 
-# The data quality files of WFPC and WFPC2 images, given as
-# {instrument_id: {image suffix: data quality suffix}}. picmaker excludes every pixel
-# flagged in the data quality file from a preview's stretch and draws it as invalid; it is
-# told where to find that file with its hst_dq option, the visit directory of the data
-# quality collection.
+# The data quality files of FOC, WFPC, and WFPC2 images, which are separate files in
+# their own collections, given as {instrument_id: {image suffix: data quality suffix}}.
+# picmaker excludes every pixel flagged in the data quality file from a preview's stretch;
+# it is told where to find that file with its hst_dq option, the visit directory of the
+# data quality collection. FOC has a data quality file only for its raw d0f image; its
+# calibrated c0f image is dezoomed and geometrically corrected, so picmaker gives it no
+# mask (and FOC's c1f is a calibrated image, not a data quality file).
 HST_DQ_SUFFIXES = {
+    'FOC'  : {'d0f': 'q0f'},
     'WFPC' : {'c0f': 'c1f', 'd0f': 'q0f'},
     'WFPC2': {'c0m': 'c1m', 'd0m': 'q0m'},
 }
 
-# The products of imaging instruments that are spectra, whose MAST previews (plots) are
-# used, given as {instrument_id: tuple of FITS suffixes}.
+# The products of the instruments in PICMAKER_BROWSE_SUFFIXES that are spectra, whose
+# MAST previews (plots) are used, given as {instrument_id: tuple of FITS suffixes}.
 MAST_SPECTRUM_BROWSE_SUFFIXES = {
+    'COS' : ('x1d', 'x1dsum', 'x1dsum1', 'x1dsum2', 'x1dsum3', 'x1dsum4'),
     'STIS': ('x1d', 'sx1'),
 }
 
@@ -1775,8 +1787,9 @@ def browse_data_suffix(browse_suffix, instrument_id):
 
 def is_accepted_browse_suffix(browse_suffix, instrument_id):
     """True if a MAST preview with this suffix is archived: it depicts a FITS product the
-    pipeline archives, and that product is not an image. For an imaging instrument, only
-    the previews of the spectra in MAST_SPECTRUM_BROWSE_SUFFIXES are archived.
+    pipeline archives, and that product is not an image. For an instrument with picmaker
+    previews, i.e., one in PICMAKER_BROWSE_SUFFIXES, only the previews of the spectra in
+    MAST_SPECTRUM_BROWSE_SUFFIXES are archived.
     """
 
     data_suffix = browse_data_suffix(browse_suffix, instrument_id)

@@ -208,8 +208,9 @@ July 9, 2024
 - State:
   - Downloaded files are in `<HST_STAGING>/hst_<nnnnn>/visit_<ss>/mastDownload/`.
 - Actions:
-  - Move each downloaded file into its collection directory, `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, so that each file is stored only once in staging. MAST previews (`.jpg`, `.png`) of non-image products (spectra, and all products of COS, FGS, FOS, GHRS, and HSP) go into `browse_*` collections under their MAST file names. MAST previews of images are not downloaded.
-  - Generate a picmaker preview (`mosaic=True`, `footprint=7`, `percentiles=(0.01, 99.99)`, `mask_ranges=(0, 0)`) of each image product that lacks one: the raw, calibrated, and combined images of ACS, FOC, NICMOS, STIS (imaging mode only), WFC3, WFPC, and WFPC2, e.g., `browse_wfpc2_c0m/visit_<ss>/<ipppssoot>_c0m.jpg`.
+  - Move each downloaded file into its collection directory, `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, so that each file is stored only once in staging. MAST previews (`.jpg`, `.png`) of non-image products (spectra, and all products of FGS, FOS, GHRS, and HSP) go into `browse_*` collections under their MAST file names. MAST previews of images are not downloaded.
+  - Generate a picmaker preview (`mosaic=True`, `footprint=7`, `percentiles=(0.01, 99.99)`, `mask_ranges=(0, 0)`) of each image product that lacks one: the raw, calibrated, and combined images of ACS, FOC, NICMOS, WFC3, WFPC, and WFPC2, and of COS and STIS in imaging mode only (`OBSTYPE = IMAGING`, e.g., target acquisitions), e.g., `browse_wfpc2_c0m/visit_<ss>/<ipppssoot>_c0m.jpg`. Files without an image array, such as a COS ACQ/SEARCH `rawacq` table, are skipped.
+  - Mask pixels flagged in the data quality array, which are left out of the stretch but drawn normally: the `DQ` extension of the same file for ACS, COS, NICMOS, STIS, and WFC3, and the separate DQ file (`q0f` for FOC `d0f`; `c1f`/`q0f` for WFPC; `c1m`/`q0m` for WFPC2) from its data quality collection. The `footprint` median filter leaves masked pixels out of each median. NICMOS pixels whose only flags are 16 (grot), 64 (saturated), 1024 (astrophysical source), or 2048 (signal in the 0th read) are not masked, since their values are sound. FOC's calibrated `c0f` images are dezoomed and geometrically corrected, so they have no data quality file and are not masked.
   - Leave in place, with a warning, any file that belongs in no collection.
   - Remove the directories left empty under `mastDownload/`.
 
@@ -245,7 +246,7 @@ July 9, 2024
 - Actions:
   - Get the general label data used in document/schema/context/bundle labels
   - Move existing, superseded files as described in PDS4-VERSIONING.txt ([To be implemented](https://github.com/SETI/rms-hst-pipeline/issues/105))
-  - Generate the final document directory under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
+  - Generate the final document directory under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`. Besides the proposal files, it holds copies of the data and instrument handbooks of the program's instruments, with their labels, taken from the document collection of the HST handbooks bundle named by `$HST_HANDBOOKS`. A handbook belongs to every instrument whose id is a `<keyword>` in its label's `Citation_Information` (e.g., Volume I of the HST Data Handbook has the keyword `FOC`; Volume II has `FOS`, `GHRS`, `HSP`, and `WFPC`); the label is copied with the documents it names. Handbook LIDs use the lower-case instrument id, e.g., `urn:nasa:pds:hst_handbooks:document:wfpc-data-handbook` for WF/PC. The collection inventory lists the handbooks as secondary members, by LID.
   - Generate the final schema directory under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
   - Generate the final context directory under `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`
   - Organize data files from MAST, move them from staging `<HST_STAGING>/hst_<nnnnn>/` to bundles `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/` (keep files from MAST at staging directory, we could consider removing them since they are not used)

@@ -134,3 +134,60 @@ def assert_golden_file_equal(basename, calculated_contents):
 def remove_dirs(directories):
     for path in directories:
          shutil.rmtree(path, ignore_errors=True)
+
+# A miniature HST handbooks collection: each label's name, LID (None for a collection
+# label), Citation_Information keywords, and the documents it describes
+_LID = 'urn:nasa:pds:hst_handbooks:document:'
+HANDBOOK_LABELS = [
+    ('acs-data-handbook.lblx', _LID + 'acs-data-handbook', ['HST', 'ACS'],
+     ['ACS-Data-Handbook-2024-v13.pdf']),
+    ('fos-data-handbook.lblx', _LID + 'fos-data-handbook', ['HST', 'FOS'],
+     ['FOS-Data-Handbook-1998-v3.1-final.pdf', 'FOS-Data-Handbook-correction-2001.pdf']),
+    ('hst-data-handbook-volume-1.lblx', _LID + 'hst-data-handbook-volume-1',
+     ['HST', 'FOC'], ['HST-Data-Handbook-Volume-1-1997-v3-OCR.pdf']),
+    ('hst-data-handbook-volume-2.lblx', _LID + 'hst-data-handbook-volume-2',
+     ['HST', 'FOS', 'GHRS', 'HSP', 'WFPC2'], ['HST-Data-Handbook-Volume-2-1997-v3-OCR.pdf']),
+    ('nicmos-data-handbook.lblx', _LID + 'nicmos-data-handbook', ['HST', 'NICMOS'],
+     ['NICMOS-Data-Handbook-2009-v8.pdf']),
+    ('nicmos-instrument-handbook.lblx', _LID + 'nicmos-instrument-handbook',
+     ['HST', 'NICMOS'], ['NICMOS-Instrument-Handbook-2009-v11-final.pdf']),
+    ('wfpc-data-handbook.lblx', _LID + 'wfpc-data-handbook', ['HST', 'wfpc'],
+     ['WFPC-Data-Handbook-final.pdf']),
+    ('wfpc2-data-handbook.lblx', _LID + 'wfpc2-data-handbook', ['HST', 'WFPC2'],
+     ['WFPC2-Data-Handbook-2010-v5-final.pdf']),
+    ('collection_document.lblx', None, ['HST', 'ACS', 'NICMOS'],
+     ['collection_document.csv']),
+]
+
+def handbook_label_text(lid, keywords, files):
+    """The text of a minimal handbook label, in the PDS4 namespace; a collection label
+    if lid is None."""
+    root = 'Product_Collection' if lid is None else 'Product_Document'
+    lid = _LID.rstrip(':') if lid is None else lid
+    keywords = ''.join(f'            <keyword>{k}</keyword>\n' for k in keywords)
+    files = ''.join(f'            <Document_File><file_name>{f}</file_name>'
+                    '</Document_File>\n' for f in files)
+    return (f'<?xml version="1.0" encoding="UTF-8"?>\n'
+            f'<{root} xmlns="http://pds.nasa.gov/pds4/pds/v1">\n'
+            '    <Identification_Area>\n'
+            f'        <logical_identifier>{lid}</logical_identifier> <!--TBD-->\n'
+            '        <Citation_Information>\n'
+            f'{keywords}'
+            '        </Citation_Information>\n'
+            '    </Identification_Area>\n'
+            '    <Document>\n'
+            f'{files}'
+            '    </Document>\n'
+            f'</{root}>\n')
+
+def make_handbooks_dir(path):
+    """Write a miniature handbooks collection (HANDBOOK_LABELS and the documents they
+    describe) into the directory at path, creating it if necessary. Return the path."""
+    os.makedirs(path, exist_ok=True)
+    for (name, lid, keywords, files) in HANDBOOK_LABELS:
+        with open(os.path.join(path, name), 'w') as f:
+            f.write(handbook_label_text(lid, keywords, files))
+        for file in files:
+            with open(os.path.join(path, file), 'w') as f:
+                f.write(f'contents of {file}\n')
+    return str(path)

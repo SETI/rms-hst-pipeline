@@ -165,10 +165,11 @@ def generate_picmaker_browse_products(proposal_id, visit, logger=None):
     """Generate the picmaker browse products of one visit.
 
     For each instrument and suffix in PICMAKER_BROWSE_SUFFIXES, every FITS file of the
-    visit in data_{inst_id}_{suffix} that has no preview yet, and whose primary header
-    meets PICMAKER_BROWSE_REQUIREMENTS, gets one, made with PICMAKER_BROWSE_OPTIONS and
-    named after it. A WFPC or WFPC2 image listed in HST_DQ_SUFFIXES is masked by the
-    data quality file of the same visit's data quality collection, e.g.,
+    visit in data_{inst_id}_{suffix} that has no preview yet, holds an image array, and
+    whose primary header meets PICMAKER_BROWSE_REQUIREMENTS, gets one, made with
+    PICMAKER_BROWSE_OPTIONS and named after it. An FOC, WFPC, or WFPC2 image listed in
+    HST_DQ_SUFFIXES is masked by the data quality file of the same visit's data quality
+    collection, e.g.,
     data_wfpc2_c1m/visit_04/u2no0401t_c1m.fits. The preview is written in
     the visit directory of browse_{inst_id}_{suffix}, e.g.,
     browse_wfpc2_c0m/visit_04/u2no0401t_c0m.jpg for
@@ -210,7 +211,11 @@ def generate_picmaker_browse_products(proposal_id, visit, logger=None):
                 if os.path.exists(browse_path):
                     continue
                 fits_path = os.path.join(data_dir, file)
-                if not _meets_picmaker_requirements(fits_path, inst_id):
+                try:
+                    if not _meets_picmaker_requirements(fits_path, inst_id):
+                        continue
+                except Exception as e:
+                    logger.error(f'Cannot read {fits_path}: {e}')
                     continue
                 try:
                     make_picmaker_browse_product(fits_path, browse_dir, options)
@@ -229,9 +234,10 @@ def generate_picmaker_browse_products(proposal_id, visit, logger=None):
 
 
 def _meets_picmaker_requirements(fits_path, inst_id):
-    """True if the primary header of a FITS file has the values that
+    """True if a FITS file holds an image array and its primary header has the values that
     PICMAKER_BROWSE_REQUIREMENTS lists for its instrument, e.g., OBSTYPE = "IMAGING" for
-    STIS.
+    COS and STIS. A COS target acquisition such as ACQ/SEARCH meets the requirements, but
+    its rawacq file holds only a table.
 
     Inputs:
         fits_path    path to the FITS file.
@@ -239,11 +245,26 @@ def _meets_picmaker_requirements(fits_path, inst_id):
 
     Returns:    True if picmaker should generate the file's preview.
     """
-    requirements = PICMAKER_BROWSE_REQUIREMENTS.get(inst_id)
-    if not requirements:
-        return True
-    header = fits.getheader(fits_path)
-    return all(header.get(key) == value for (key, value) in requirements.items())
+    requirements = PICMAKER_BROWSE_REQUIREMENTS.get(inst_id, {})
+    with fits.open(fits_path) as hdulist:
+        header = hdulist[0].header
+        if not all(header.get(key) == value for (key, value) in requirements.items()):
+            return False
+        return any(_is_image_hdu(hdu) for hdu in hdulist)
+
+
+def _is_image_hdu(hdu):
+    """True if an HDU holds an image: an array with at least two axes longer than one.
+
+    Inputs:
+        hdu    one HDU of an open FITS file.
+
+    Returns:    True if the HDU is an image.
+    """
+    if not isinstance(hdu, (fits.PrimaryHDU, fits.ImageHDU)):
+        return False
+    shape = hdu.shape
+    return sum(1 for n in shape if n > 1) >= 2
 
 
 def make_picmaker_browse_product(fits_path, browse_dir, options):

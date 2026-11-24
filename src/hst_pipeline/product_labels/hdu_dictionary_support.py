@@ -36,6 +36,9 @@ BITPIX_INFO = {     # (bytes per element, PDS4 Field_Binary type)
     -64: (8, 'IEEE754MSBDouble'),
 }
 
+# The suffix of the science array classes of each instrument, e.g., "Array_2D_Image". COS
+# and STIS are spectrographs, but in imaging mode (see IMAGING_MODE_INSTRUMENTS), e.g.,
+# their target acquisitions, their arrays are images.
 SCIENCE_ARRAY_CLASS_SUFFIX = {
     'ACS'   : '_Image',
     'COS'   : '_Spectrum',
@@ -50,6 +53,26 @@ SCIENCE_ARRAY_CLASS_SUFFIX = {
     'WFPC'  : '_Image',
     'WFPC2' : '_Image',
 }
+
+# Instruments whose files hold images rather than spectra when the primary header has
+# OBSTYPE = "IMAGING"
+IMAGING_MODE_INSTRUMENTS = {'COS', 'STIS'}
+
+def science_array_class_suffix(instrument_id, primary_header=None):
+    """The suffix of the class of a science array, "_Image", "_Spectrum", or "".
+
+    Input:
+        instrument_id   instrument ID.
+        primary_header  the primary FITS header of the file; None if unknown.
+
+    Return:             the suffix from SCIENCE_ARRAY_CLASS_SUFFIX, except "_Image" for a
+                        COS or STIS file in imaging mode.
+    """
+
+    if (instrument_id in IMAGING_MODE_INSTRUMENTS and primary_header is not None
+            and primary_header.get('OBSTYPE', '').strip() == 'IMAGING'):
+        return '_Image'
+    return SCIENCE_ARRAY_CLASS_SUFFIX[instrument_id]
 
 # Used to normalize units and to recognized them when embedded inside column descriptions
 UNIT_TRANSLATOR = {
@@ -111,7 +134,8 @@ NOT_UNITS = {"0", "1", "1 or 0", "T/F", "diodes", "defl.units"}
 # These will be called Array_*D_Image or Array_*D_Spectrum rather than Array_*D
 SCIENCE_EXTNAMES = {'SCI', 'ERR', 'DQ', 'SAMP', 'TIME', 'WHT', 'CTX'}
 
-def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None):
+def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None,
+                        primary_header=None):
     """Return a dictionary containing the file structure info needed to describe one
     header object and one data object in an HST FITS file.
 
@@ -121,6 +145,9 @@ def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None):
         instrument_id   instrument ID.
         filepath        directory path to this file.
         logger          pdslogger to use; None to suppress logging.
+        primary_header  the file's primary FITS header, which decides whether a COS or
+                        STIS array is an image or a spectrum; None to use this HDU's
+                        header if it is the primary one.
 
     Return:             hdu_dict
         hdu_dict        a dictionary containing all the structural info needed to describe
@@ -307,7 +334,9 @@ def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None):
             is_empty = (naxis1 * naxis2 * naxis3 == 0)
 
         if extname in SCIENCE_EXTNAMES or index == 0:
-            data_class += SCIENCE_ARRAY_CLASS_SUFFIX[instrument_id]
+            if primary_header is None and index == 0:
+                primary_header = header
+            data_class += science_array_class_suffix(instrument_id, primary_header)
 
         # Clean up the units
         unit = header.get('BUNIT', '').replace(' ','')

@@ -34,6 +34,9 @@ dependencies = [
   # and the mask_ranges option of SETI/rms-picmaker PR #33, which no release has yet. Replace this with a
   # version floor once a release includes it.
   "rms-picmaker @ git+https://github.com/SETI/rms-picmaker@bugfix/wfpc2-multi-extension-fits",
+  # Needed by rms-picmaker (its footprint median filter) but not published on PyPI, so it
+  # is installed straight from GitHub too; without this, pip cannot resolve rms-picmaker.
+  "rms-psiops @ git+https://github.com/SETI/rms-psiops",
   "rms-pdstemplate>=2.4.0",
   "rms-translator>=1.0.0",
 ]

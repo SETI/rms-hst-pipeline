@@ -6,6 +6,10 @@
 # in editable mode with its development and documentation extras. Safe to re-run: an
 # existing environment is reused and its packages upgraded.
 #
+# rms-psiops, rms-picmaker, and rms-hst-targets are installed from GitHub. To work from
+# local clones instead, reinstall them afterward with --no-deps; see "Installation" in
+# README.md.
+#
 # Usage:
 #   ./scripts/setup-venv.sh [options]
 #
@@ -39,7 +43,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         -r|--recreate) RECREATE=1; shift ;;
         -p|--python)   PYTHON_CMD="$2"; shift 2 ;;
-        -h|--help)     sed -n '2,25p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help)     sed -n '2,26p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo -e "${RED}Unknown option: $1${NC}" >&2; exit 1 ;;
     esac
 done
@@ -81,5 +85,11 @@ before running the tests or any task:
     export HST_STAGING=/path/to/staging
     export HST_PIPELINE=/path/to/pipeline
     export HST_BUNDLES=/path/to/bundles
+
+Finalizing a bundle also needs HST_HANDBOOKS (the HST handbooks bundle), JAVA_HOME, and
+the PDS4 validate tool on PATH. To use local clones of rms-psiops, rms-picmaker, and
+rms-hst-targets, reinstall them (see "Installation" in README.md):
+
+    pip install --no-deps -e ../rms-psiops -e ../rms-picmaker -e ../rms-hst-targets
 
 MSG

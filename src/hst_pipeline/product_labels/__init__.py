@@ -322,7 +322,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         for k, hdu in enumerate(hdulist):
             try:
                 hdu_dictionaries.append(fill_hdu_dictionary(hdu, k, instrument_id,
-                                                            filepath, logger))
+                                                            filepath, logger,
+                                                            hdulist[0].header))
             except (ValueError, TypeError) as e:
                 logger.error('Irrecoverable error reading FITS file', filepath)
                 logger.exception(e)

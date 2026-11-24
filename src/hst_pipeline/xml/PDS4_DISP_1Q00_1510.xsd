@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!-- PDS4 XML/Schema for Name Space Id:disp  Version:1.5.1.0 - Thu Nov 02 23:29:05 UTC 2023 -->
-  <!-- Generated from the PDS4 Information Model Version 1.21.0.0 - System Build 14.0 -->
+  <!-- PDS4 XML/Schema for Name Space Id:disp  Version:1.5.1.0 - Fri Apr 24 16:47:12 UTC 2026 -->
+  <!-- Generated from the PDS4 Information Model Version 1.26.0.0 - System Build 16.1	 -->
   <!-- *** This PDS4 product schema is an operational deliverable. *** -->
   <!--                                                                           -->
   <!--               Dictionary Stack                                            -->
-  <!-- 1.21.0.0 - pds: - Common Dictionary                                       -->
+  <!-- 1.26.0.0 - pds: - Common Dictionary                                       -->
   <!-- 1.5.1.0 - disp: - Display                                                 -->
   <!--                                                                           -->
   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -15,7 +15,7 @@
     attributeFormDefault="unqualified"
     version="1.5.1.0">
  
-    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1L00.xsd"/>
+    <xs:import namespace="http://pds.nasa.gov/pds4/pds/v1" schemaLocation="https://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1Q00.xsd"/>
  
   <xs:annotation>
     <xs:documentation>
@@ -58,12 +58,21 @@ This dictionary describes how to display Array data on a display device.
 
   <xs:complexType name="Display_Direction">
     <xs:annotation>
-      <xs:documentation>The Display_Direction class specifies how two of
-        the dimensions of an Array object should be displayed in the
-        vertical (line) and horizontal (sample) dimensions of a display
-        device.</xs:documentation>
+      <xs:documentation>The Display_Direction class specifies which two
+        of the dimensions of an Array object should be displayed and how
+        they should be displayed in the vertical (line) and horizontal
+        (sample) dimensions of a display device. This class is a
+        modification of the corresponding class in the Display
+        Dictionary, and is redefined here for convenience. The
+        local_identifier_reference is used to identify the array or
+        arrays to which this iteration of the class applies. Multiple
+        entries are permitted the settings in the iteration of
+        Display_Direction apply to all of the referenced arrays.
+        </xs:documentation>
     </xs:annotation>
     <xs:sequence>
+      <xs:element ref="pds:local_identifier" minOccurs="0" maxOccurs="1"> </xs:element>
+      <xs:element name="local_identifier_reference" type="pds:local_identifier_reference" minOccurs="0" maxOccurs="unbounded"> </xs:element>
       <xs:element name="comment" type="pds:comment" minOccurs="0" maxOccurs="1"> </xs:element>
       <xs:element name="horizontal_display_axis" type="disp:horizontal_display_axis" minOccurs="1" maxOccurs="1"> </xs:element>
       <xs:element name="horizontal_display_direction" type="disp:horizontal_display_direction" minOccurs="1" maxOccurs="1"> </xs:element>

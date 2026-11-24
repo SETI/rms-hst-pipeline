@@ -4,8 +4,10 @@
 # - Create document directory.
 # - Copy the proposal files (or, for early programs without them, the MAST proposal
 #   search page) over from the pipeline directory.
+# - Copy the handbooks whose labels name one of the program's instruments as a keyword,
+#   with their labels, from the HST handbooks bundle ($HST_HANDBOOKS).
 # - Create document xml.
-# - Create document collection csv & xml.
+# - Create document collection csv & xml; the handbooks are secondary members.
 ##########################################################################################
 
 import datetime
@@ -13,10 +15,15 @@ import os
 import pdslogger
 import re
 import shutil
+from xml.etree import ElementTree
 
 from hst_pipeline.hst_helper import (DOCUMENT_EXT,
                                      DOCUMENT_EXT_FOR_CITATION_INFO,
                                      DOCUMENT_STANDARD_IDS,
+                                     HANDBOOK_KINDS,
+                                     HANDBOOK_LID,
+                                     HANDBOOKS_COLLECTION,
+                                     HANDBOOKS_ENV,
                                      LABEL_SUFFIX,
                                      MAST_PROPOSAL_SUFFIX,
                                      MAST_PROPOSAL_URL)
@@ -27,7 +34,6 @@ from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
 from hst_pipeline.hst_helper.general_utils import (create_xml_label,
                                                    create_collection_label,
                                                    create_csv,
-                                                   get_instrument_id_set,
                                                    get_mod_history_from_label)
 
 DOC_LABEL_TEMPLATE = 'DOCUMENT_LABEL' + LABEL_SUFFIX
@@ -41,22 +47,32 @@ COL_DOC_LABEL = 'collection' + LABEL_SUFFIX
 MAST_PAGE_START_REGEX = re.compile(r"<h2 align='center'>", re.I)
 MAST_PAGE_END_REGEX = re.compile(r'</div>', re.I)
 
-def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing=False):
+class HandbooksError(RuntimeError):
+    """Raised when the HST handbooks bundle cannot be found or read."""
+
+
+def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing=False,
+                                    handbooks_dir=None):
     """With a given proposal id, create document directory in the final bundle. These
     are the actions performed:
 
     1. Create document directory.
     2. Copy proposal files (or the MAST proposal page) from pipeline directory.
-    3. Create document label.
-    4. Create document collection csv.
-    5. Create document collection label.
+    3. Copy the handbooks whose labels name one of the program's instruments as a
+       keyword, and their labels, from the handbooks collection.
+    4. Create document label.
+    5. Create document collection csv, with the handbooks as secondary members.
+    6. Create document collection label.
 
     Inputs:
-        proposal_id    a proposal id.
-        data_dict      a data dictionary used to create the label.
-        logger         pdslogger to use; None for default EasyLogger.
-        testing        the flag used to determine if we are calling the function for
-                       testing purpose with the test directory.
+        proposal_id      a proposal id.
+        data_dict        a data dictionary used to create the label; its 'inst_id_li'
+                         lists the program's instruments.
+        logger           pdslogger to use; None for default EasyLogger.
+        testing          the flag used to determine if we are calling the function for
+                         testing purpose with the test directory.
+        handbooks_dir    the handbooks collection directory; None for the one in the
+                         bundle named by $HST_HANDBOOKS (see get_handbooks_dir()).
 
     Returns:    a tupel of the path of document collection label and the path of
                 document label.
@@ -111,9 +127,18 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
         except FileNotFoundError:
             pass
 
-    # Number of document inventory:
-    # 2 handbooks per instrument + the proposal file directory
-    records_num = len(data_dict['inst_id_li']) * 2 + 1
+    # Copy the handbooks of the program's instruments, which are secondary members
+    handbooks_dir = handbooks_dir or get_handbooks_dir()
+    (handbook_lids, handbook_files) = get_handbook_files(data_dict['inst_id_li'],
+                                                         handbooks_dir)
+    logger.info(f'Copy {len(handbook_files)} handbook files from {handbooks_dir}')
+    for lid in sorted(set(expected_handbook_lids(data_dict['inst_id_li']))
+                      - set(handbook_lids)):
+        logger.warn(f'Handbook {lid} is referenced but not in {handbooks_dir}')
+    copy_handbook_files(handbook_files, handbooks_dir, document_dir, logger)
+
+    # Number of document inventory: the proposal files + the handbooks
+    records_num = len(handbook_lids) + 1
 
     # Get the mod history for document collection label if it's already existed.
     col_doc_label_path = f'{document_dir}/{COL_DOC_LABEL}'
@@ -124,6 +149,7 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
         'version_id': version_id,
         'proposal_files_li': proposal_files_li,
         'source_li': source_li,
+        'handbook_lids': handbook_lids,
         'csv_filename': CSV_FILENAME,
         'records_num': records_num,
         'mod_history': mod_history,
@@ -179,6 +205,169 @@ def get_document_files(proposal_id, pipeline_dir):
         doc_files.append((basename, mast_page, DOCUMENT_STANDARD_IDS[ext]))
 
     return doc_files
+
+def get_handbooks_dir():
+    """Return the handbooks collection directory: the document/ directory of the HST
+    handbooks bundle named by the HST_HANDBOOKS environment variable, or that directory
+    itself if it has no document/ subdirectory.
+
+    Returns:    the path to the directory holding the handbooks and their labels.
+
+    Raises:
+        HandbooksError    if HST_HANDBOOKS is unset or names no directory.
+    """
+    bundle_dir = os.environ.get(HANDBOOKS_ENV, '').strip()
+    if not bundle_dir:
+        raise HandbooksError(f'{HANDBOOKS_ENV} must name the HST handbooks bundle, '
+                             'whose handbooks go in every document collection')
+
+    collection_dir = os.path.join(bundle_dir, HANDBOOKS_COLLECTION)
+    if os.path.isdir(collection_dir):
+        return collection_dir
+    if os.path.isdir(bundle_dir):
+        return bundle_dir
+    raise HandbooksError(f'{HANDBOOKS_ENV} directory not found: {bundle_dir}')
+
+def get_handbook_instrument(filename):
+    """Return the part of a handbook file's name before the first dash, in upper case;
+    e.g., 'WFPC2' for WFPC2-Data-Handbook-2010-v5-final.pdf and 'HST' for
+    hst-data-handbook-volume-1.lblx. Every handbook file's name has a dash; the proposal
+    files' and collection files' names don't.
+
+    Input:
+        filename    a file name in the handbooks or a document collection.
+
+    Returns:    the part before the dash, or None if the name has no dash.
+    """
+    (name, dash, _) = filename.partition('-')
+    return name.upper() if dash else None
+
+def expected_handbook_lids(inst_ids):
+    """Return the LIDs of the handbooks that the bundle, collection, and product
+    labels refer to for a set of instruments: a data handbook and an instrument handbook
+    for each.
+
+    Input:
+        inst_ids    an iterable of instrument ids, e.g., ['NICMOS', 'WFPC'].
+
+    Returns:    a list of LIDs.
+    """
+    return [HANDBOOK_LID.format(inst=inst.lower(), kind=kind)
+            for inst in inst_ids for kind in HANDBOOK_KINDS]
+
+def read_handbook_label(path):
+    """Read a label in the handbooks collection.
+
+    Input:
+        path    path to the label.
+
+    Returns:    None if the label is not a Product_Document (e.g., the collection
+                label); otherwise a tuple (lid, keywords, files): the LID, the set of
+                Citation_Information keywords in upper case, and the names of the
+                document files the label describes.
+
+    Raises:
+        HandbooksError    if the label cannot be parsed or has no logical_identifier.
+    """
+    try:
+        root = ElementTree.parse(path).getroot()
+    except ElementTree.ParseError as e:
+        raise HandbooksError(f'Cannot parse {path}: {e}')
+
+    def local(tag):
+        return tag.rpartition('}')[2]
+
+    if local(root.tag) != 'Product_Document':
+        return None
+
+    lid = None
+    keywords = set()
+    files = []
+    for elem in root.iter():
+        tag = local(elem.tag)
+        text = (elem.text or '').strip()
+        if tag == 'logical_identifier' and lid is None:
+            lid = text
+        elif tag == 'Citation_Information':
+            keywords |= {(k.text or '').strip().upper() for k in elem
+                         if local(k.tag) == 'keyword'}
+        elif tag == 'file_name' and text:
+            files.append(text)
+
+    if not lid:
+        raise HandbooksError(f'No logical_identifier in {path}')
+    return (lid, keywords, files)
+
+def get_handbook_files(inst_ids, handbooks_dir):
+    """Return the handbook files for a set of instruments, and the LIDs of their
+    labels. A handbook belongs to an instrument if one of the keywords in its label's
+    Citation_Information is that instrument's id, ignoring case; a handbook covering
+    several instruments, such as a volume of the HST Data Handbook, names each of them.
+    Its files are the label and the documents the label names.
+
+    Input:
+        inst_ids         an iterable of instrument ids, e.g., ['NICMOS', 'WFPC'].
+        handbooks_dir    the handbooks collection directory.
+
+    Returns:    a tuple (lids, files): the sorted LIDs of the handbook labels, and the
+                sorted names of all the handbook files (documents and labels).
+
+    Raises:
+        HandbooksError    if a handbook label cannot be read, has no
+                          logical_identifier, or names a document that is missing.
+    """
+    names = {inst.upper() for inst in inst_ids}
+
+    lids = []
+    files = []
+    for label in sorted(os.listdir(handbooks_dir)):
+        path = os.path.join(handbooks_dir, label)
+        if not label.endswith(LABEL_SUFFIX) or not os.path.isfile(path):
+            continue
+        info = read_handbook_label(path)
+        if info is None:
+            continue
+        (lid, keywords, documents) = info
+        if not keywords & names:
+            continue
+        for document in documents:
+            if not os.path.isfile(os.path.join(handbooks_dir, document)):
+                raise HandbooksError(f'{path} names a missing file: {document}')
+        lids.append(lid)
+        files += [label] + documents
+
+    return (sorted(lids), sorted(set(files)))
+
+def copy_handbook_files(files, handbooks_dir, document_dir, logger=None):
+    """Copy handbook files into a document collection, skipping those already there
+    with the same size and modification time. Handbook files left in the collection from
+    an earlier run that are no longer wanted, because an instrument has been dropped or a
+    handbook renamed, are removed: every file whose name has a dash, as handbook names
+    do and the proposal files' and collection files' names don't.
+
+    Input:
+        files            names of the handbook files to copy.
+        handbooks_dir    the handbooks collection directory.
+        document_dir     the program's document collection directory.
+        logger           pdslogger to use; None for default EasyLogger.
+    """
+    logger = logger or pdslogger.EasyLogger()
+
+    for file in files:
+        src = os.path.join(handbooks_dir, file)
+        dst = os.path.join(document_dir, file)
+        if os.path.isfile(dst):
+            (src_stat, dst_stat) = (os.stat(src), os.stat(dst))
+            if (src_stat.st_size == dst_stat.st_size
+                and int(src_stat.st_mtime) == int(dst_stat.st_mtime)):
+                continue
+        shutil.copy2(src, dst)
+
+    wanted = set(files)
+    for file in os.listdir(document_dir):
+        if file not in wanted and get_handbook_instrument(file):
+            logger.info(f'Remove handbook file no longer needed: {file}')
+            os.remove(os.path.join(document_dir, file))
 
 def get_document_sources(proposal_id, pipeline_dir, doc_files):
     """Return the source of each document file that is not a proposal file, i.e., the
@@ -249,7 +438,8 @@ def create_document_collection_csv(proposal_id, data_dict, logger=None, testing=
 
     Inputs:
         proposal_id    a proposal id.
-        data_dict      data dictonary to fill in the label template.
+        data_dict      data dictonary to fill in the label template; its
+                       'handbook_lids' lists the LIDs of the secondary members.
         logger         pdslogger to use; None for default EasyLogger.
         testing        the flag used to determine if we are calling the function for
                        testing purpose with the test directory.
@@ -268,12 +458,9 @@ def create_document_collection_csv(proposal_id, data_dict, logger=None, testing=
                        f':document:{formatted_proposal_id}'
                        f'::{version_id[0]}.{version_id[1]}').split(',')
     collection_data = [document_lidvid]
-    inst_ids = get_instrument_id_set(proposal_id, logger)
-    for inst in inst_ids:
-        inst = inst.lower()
-        data_hb_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-dhb'.split(',')
-        collection_data.append(data_hb_lid)
-        inst_hb_lid = f'S,urn:nasa:pds:hst-support:document:{inst}-ihb'.split(',')
-        collection_data.append(inst_hb_lid)
+
+    # The handbooks are secondary members, referenced by LID
+    for lid in data_dict['handbook_lids']:
+        collection_data.append(['S', lid])
 
     create_csv(document_collection_dir, collection_data, logger)
