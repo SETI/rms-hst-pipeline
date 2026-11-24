@@ -5,6 +5,7 @@
 ##########################################################################################
 
 import numpy as np
+import pdslogger
 import pytest
 from astropy.io import fits
 
@@ -81,3 +82,30 @@ def test_fill_hdu_dictionary_reads_obstype_from_primary_hdu(tmp_path):
 def test_unit_translator(unit, expected):
     # Units of WFPC/WFPC2 SI_Specific columns and NICMOS epc values
     assert UNIT_TRANSLATOR[unit] == expected
+
+
+def _epc_table(path, unit):
+    """Write a NICMOS-epc-like file whose one table has a VALUE column in the given unit;
+    return the logger's warning count and the column's unit in the label."""
+    table = fits.BinTableHDU.from_columns([
+        fits.Column(name='TIME', format='D', unit='MJD', array=[54309.18]),
+        fits.Column(name='VALUE', format='D', unit=unit, array=[1207.6]),
+    ], name='MNCORSPD')
+    path.parent.mkdir()
+    fits.HDUList([fits.PrimaryHDU(), table]).writeto(path)
+    logger = pdslogger.PdsLogger(f'test.epc-units-{path.parent.name}-{path.stem}')
+    logger.open('test')
+    with fits.open(path) as hdulist:
+        hdu_dict = fill_hdu_dictionary(hdulist[1], 1, 'NICMOS', str(path), logger)
+    return (logger.close()[2], hdu_dict['data']['units'][1])
+
+
+@pytest.mark.parametrize('unit, expected', [('rps', 'Hz'), ('A', 'A')])
+def test_epc_units(tmp_path, unit, expected):
+    # n9z702d2j_epc.fits (11118): cooling-system rotation speeds and a current
+    assert _epc_table(tmp_path / unit / 'n9z702d2j_epc.fits', unit) == (0, expected)
+
+
+def test_ampere_is_recognized_only_in_epc_files(tmp_path):
+    # Elsewhere, "A" may mean Angstroms, so it still warns
+    assert _epc_table(tmp_path / 'spt' / 'n9z702d2q_spt.fits', 'A') == (1, 'A')

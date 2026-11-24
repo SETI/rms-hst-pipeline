@@ -130,6 +130,15 @@ UNIT_TRANSLATOR = {
     'Volts'                 : 'V',
 }
 
+# Units of the NICMOS "_epc" telemetry tables, used before UNIT_TRANSLATOR. "rps"
+# (revolutions per second, the NICMOS Cooling System's rotation speeds) has no PDS4
+# unit, so it becomes the numerically equal "Hz". "A" is amperes here, but means
+# Angstroms in some other HST files, so it is recognized only in these tables.
+EPC_UNIT_TRANSLATOR = {
+    'A'  : 'A',
+    'rps': 'Hz',
+}
+
 # Don't issue warnings when these appear at the end of a description
 NOT_UNITS = {"0", "1", "1 or 0", "T/F", "diodes", "defl.units"}
 
@@ -218,6 +227,7 @@ def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None,
     basename = os.path.basename(filepath)
     suffix = basename.partition('.')[0]     # before '.fits'
     suffix = suffix.partition('_')[2]       # after the underscore
+    is_epc = (suffix == 'epc')
 
     #### Construct the names and descriptions
 
@@ -472,7 +482,9 @@ def fill_hdu_dictionary(hdu, index, instrument_id, filepath, logger=None,
                 unit = ''
 
             # Standardize the units
-            if unit in UNIT_TRANSLATOR:
+            if is_epc and unit in EPC_UNIT_TRANSLATOR:
+                unit = EPC_UNIT_TRANSLATOR[unit]
+            elif unit in UNIT_TRANSLATOR:
                 unit = UNIT_TRANSLATOR[unit]
             else:
                 logger.warn(f'Unrecognized unit "{unit}" for HDU[{index}], ' +
