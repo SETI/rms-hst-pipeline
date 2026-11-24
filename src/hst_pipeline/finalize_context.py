@@ -56,8 +56,8 @@ def finalize_hst_context_directory(proposal_id, data_dict, logger=None, testing=
     mod_history = get_mod_history_from_label(col_ctxt_label_path, version_id)
 
     # Number of document inventory:
-    # num of target ids + inst ids + inst_host + investigation
-    records_num = (len(data_dict['target_identifications']) +
+    # num of target LIDs + inst ids + inst_host + investigation
+    records_num = (len(get_target_lids(data_dict['target_identifications'])) +
                    len(data_dict['inst_id_li']) + 2)
 
     ctx_data_dict = {
@@ -119,10 +119,29 @@ def create_context_collection_csv(proposal_id, context_dir, data_dict, logger=No
          f'hst_{formatted_proposal_id}::1.0').split(',')
     ]
 
-    for targ in target_ids:
-        target = f'{targ["type"].lower()}.{targ["name"].lower()}'
-        targ_ctxt_livid = f'S,urn:nasa:pds:context:target:{target}::1.0'.split(',')
-        csv_entries.append(targ_ctxt_livid)
+    for lid in get_target_lids(target_ids):
+        csv_entries.append(['S', f'{lid}::1.0'])
     collection_context_data += csv_entries
 
     create_csv(collection_context_csv, collection_context_data, logger)
+
+
+def get_target_lids(target_ids):
+    """The distinct LIDs of the given target identifications, in order of appearance.
+
+    A target identified in several observations appears once per variant of its
+    identification, e.g., with different alternate designations, but it is one member of
+    the context collection.
+
+    Inputs:
+        target_ids    a list of target identification dictionaries, each with a 'lid'
+                      that is a full LID, beginning with "urn:nasa:pds:context:target:".
+
+    Returns:    a list of LID strings.
+    """
+    lids = []
+    for targ in target_ids:
+        if targ['lid'] not in lids:
+            lids.append(targ['lid'])
+
+    return lids

@@ -10,7 +10,7 @@ from collections import defaultdict
 import json
 import os
 import pdslogger
-import urllib
+import urllib.request
 
 from hst_pipeline.hst_helper.fs_utils import get_context_products_path
 from hst_pipeline.hst_helper.general_utils import create_collection_label
@@ -19,6 +19,7 @@ from hst_pipeline.product_labels.suffix_info import INSTRUMENT_NAMES, LABEL_SUFF
 PDS_URL = 'https://pds.nasa.gov/data/pds4/context-pds4/target/'
 
 TARGET_LABEL_TEMPLATE = 'TARGET_LABEL' + LABEL_SUFFIX
+TARGET_LABEL_VID = '1.0'     # the version_id in TARGET_LABEL.lblx
 
 # Names and types of the context products, exactly as the label templates write them
 # (PRODUCT_LABEL.lblx, PRODUCT_COLLECTION_LABEL.lblx, BUNDLE_LABEL.lblx), so that validate
@@ -55,16 +56,16 @@ def create_target_label(proposal_id, data_dict, logger=None):
 
     # Get the target info (name & type) from the passed in data dict, and check to see
     # if it exists in the pds_targ_list (from PDS page).
+    # A target can appear more than once, identified with different alternate
+    # designations; it needs only one label.
     target_records = data_dict['target_identifications']
     found_target_list = []
+    found_lids = set()
     for targ in target_records:
-        # TODO: handle the case for a target body with multiple names or types. Might
-        # need a new task for this.
-        # name = targ['formatted_name']
-        # type = targ['formatted_type']
         lid = targ['lid']
         _, _, target = lid.partition('target:')
-        if target not in found_target_list:
+        if lid not in found_lids:
+            found_lids.add(lid)
             found_target_list.append((targ, target))
 
     # Compare target info from data dict to the ones from PDS page.
@@ -79,7 +80,7 @@ def create_target_label(proposal_id, data_dict, logger=None):
                 break
         # Create target label under context folder if it doesn't exist in PDS page.
         if not is_target_label_exists:
-            label_filename = f'{target}_1.0{LABEL_SUFFIX}'
+            label_filename = f'{target}_{TARGET_LABEL_VID}{LABEL_SUFFIX}'
             target_data_dict = {
                 'target': target_info,
                 'label_date': data_dict['label_date']
@@ -125,15 +126,18 @@ def create_tmp_context_json(proposal_id, data_dict, targ_list=[]):
         }
         json_data['Product_Context'].append(new_context)
 
-    # Include newly added target labels
+    # Include newly added target labels, with the name, alternate designations, type,
+    # and version that TARGET_LABEL.lblx writes, since the product labels refer to the
+    # target by its name and type.
     for targ in targ_list:
-        targ_name = targ['formatted_name']
-        targ_type = targ['formatted_type']
-        targ_lidvid = f"{targ['lid']}::{1.1}"
+        names = [targ['name']]
+        for alt in targ.get('alternate_designations', []):
+            if alt not in names:
+                names.append(alt)
         new_context = {
-            'name': [targ_name],
-            'type': [targ_type],
-            'lidvid': targ_lidvid,
+            'name': names,
+            'type': [targ['type']],
+            'lidvid': f"{targ['lid']}::{TARGET_LABEL_VID}",
         }
         json_data['Product_Context'].append(new_context)
     json_path = get_context_products_path(proposal_id)

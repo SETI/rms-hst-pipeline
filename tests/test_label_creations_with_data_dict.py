@@ -79,6 +79,29 @@ class TestLabelCreationsWithDataDict:
         assert_golden_file_equal(f'{TEST_COPIES_DIR}/test_context_col_label.golden.lblx',
                                  calculated_contents)
 
+    # Test that the context collection lists each target once, by its LID
+    @pytest.mark.parametrize('p_id', [('7885')])
+    def test_finalize_hst_context_directory_target_lids(self, p_id):
+        prefix = 'urn:nasa:pds:context:target:'
+        fragment = {'name': '73P/Schwassmann-Wachmann 3 B', 'type': 'Comet',
+                    'alternate_designations': ['73P/Schwassmann-Wachmann 3-B'],
+                    'lid': prefix + 'comet.73p_schwassmann-wachmann_3-b'}
+        variant = {**fragment, 'alternate_designations': []}
+        moon = {'name': 'Io', 'type': 'Satellite', 'alternate_designations': [],
+                'lid': prefix + 'satellite.jupiter.io'}
+        data_dict = {**self.data_dict,
+                     'target_identifications': [fragment, moon, variant]}
+        finalize_hst_context_directory(p_id, data_dict, None, True)
+
+        _, context_dir = create_col_dir_in_bundle(p_id, 'context', True)
+        with open(f'{context_dir}/collection_context.csv') as f:
+            targets = [line.strip() for line in f if ':target:' in line]
+        assert targets == [f'S,{prefix}comet.73p_schwassmann-wachmann_3-b::1.0',
+                           f'S,{prefix}satellite.jupiter.io::1.0']
+
+        with open(f'{context_dir}/collection_context.lblx') as f:
+            assert '<records>5</records>' in f.read()
+
     # Test investigation label creation
     @pytest.mark.parametrize('p_id', [('7885')])
     def test_finalize_hst_context_directory_inv_lbl(self, p_id):
