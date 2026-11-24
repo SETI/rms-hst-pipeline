@@ -186,25 +186,38 @@ def get_header_date(hdulist):
 # Each of the following patterns have been seen somewhere in a TRL file, based on
 # extensive trial and error.
 
+# Before a day that might be one or two digits: anything not ending in a digit. A bare
+# ".*" would swallow the first digit of a two-digit day, reading "19-May" as "9-May".
+NOT_DIGIT = '(?:.*[^0-9])?'
+
+# Lines that contain a date-time unrelated to the processing, e.g., the build date in
+# "[INFO    ] Python Version 3.12.13 | packaged by conda-forge | (main, Mar  5 2026,
+# 16:50:00) [GCC 14.3.0]"
+IGNORED_TRL_TEXT = ('Python Version',)
+
 YYYYDOYHHMMSS           = re.compile(f'{YYYY}{DOY}{HHMMSS}.*')
 D_MON_YY_HH_MM_SS       = re.compile(f'.*[^0-9]{D}-{MON}-{YY} {HH_MM_SS}.*', re.I)
 MON_D_HH_MM_SS_TZ_YYYY  = re.compile(f'.*{MON} {D} {HH_MM_SS} ([A-Z]+) {YYYY}.*', re.I)
-D_MON_YYYY_HH_MM_SS     = re.compile(f'.*{D}-{MON}-{YYYY} {HH_MM_SS}.*', re.I)
-D_MON_YY_HH_MM_SS       = re.compile(f'.*{D}-{MON}-{YY},? {HH_MM_SS}.*', re.I)
+MON_D_HH_MM_SS_YYYY     = re.compile(f'.*{MON} {D} {HH_MM_SS} {YYYY}.*', re.I)
+D_MON_YYYY_HH_MM_SS     = re.compile(f'{NOT_DIGIT}{D}-{MON}-{YYYY} {HH_MM_SS}.*', re.I)
+D_MON_YY_HH_MM_SS       = re.compile(f'{NOT_DIGIT}{D}-{MON}-{YY},? {HH_MM_SS}.*', re.I)
 HH_MM_SS_DD_MON_YYYY    = re.compile(f'.*{HH_MM_SS} {DD}-{MON}-{YYYY}.*', re.I)
 HH_MM_SS_DD_MON_YY      = re.compile(f'.*{HH_MM_SS} {DD}-{MON}-{YY}[^0-9].*', re.I)
 HH_MM_SS_FFF_DD_MM_YYYY = re.compile(f'.*{HH_MM_SS_FFF}.? .?{DD}/{MM}/{YYYY}.*')
 YYYY_MM_DD_HH_MM_SS_FFF = re.compile(f'.*{YYYY}-{MM}-{DD}.{HH_MM_SS_FFF}.*')
 HH_MM_SS_TZ_DD_MON_YYYY = re.compile(f'.*{HH_MM_SS} ([A-Z]+) {DD}-{MON}-{YYYY}.*', re.I)
 MON_D_YYYY_HH_MM_SS     = re.compile(f'.*{MON} {D} {YYYY},? {HH_MM_SS}.*', re.I)
-D_MM_YY_HH_MM_SS        = re.compile(f'.*{D}/{MM}/{YY} +{HH_MM_SS}.*')
-D_MON_YYYY_HH_MM        = re.compile(f'.*{D}-{MON}-{YYYY} {HH_MM}.*', re.I)
+D_MM_YY_HH_MM_SS        = re.compile(f'{NOT_DIGIT}{D}/{MM}/{YY} +{HH_MM_SS}.*')
+D_MON_YYYY_HH_MM        = re.compile(f'{NOT_DIGIT}{D}-{MON}-{YYYY} {HH_MM}.*', re.I)
+# astrodrizzle: "[INFO    ] 21:42:47 (19-May-2026): Processing j9mm06ecq_flt.fits ..."
+HH_MM_SS_PAREN_D_MON_YYYY = re.compile(f'.*{HH_MM_SS_FFF} \\({D}-{MON}-{YYYY}\\).*',
+                                       re.I)
 
 # If some other weird format is encountered, it will _probably_ be interpreted correctly,
 # using the patterns below, but a warning message will also be logged.
 
 TIME_TEST   = re.compile(r'(.*[^0-9])' + HH_MM_SS_FFF + r'(.*)')
-MONTH_TEST  = re.compile(r'(.* )' + MON + r'(.*)', re.I)
+MONTH_TEST  = re.compile(r'(.*[^A-Z])' + MON + r'([^A-Z].*|)', re.I)
 YYYY_D_TEST = re.compile(f'.*[^0-9]{YYYY}[^0-9]+{D}[^0-9].*')
 YY_D_TEST   = re.compile(f'.*[^0-9]{YY}[^0-9]+{D}[^0-9].*')
 D_YYYY_TEST = re.compile(f'.*[^0-9]{D}[^0-9]+{YYYY}[^0-9].*')
@@ -254,6 +267,8 @@ def get_trl_timetags(hdu_1, filepath, logger=None):
     date_dict = {}
     for rec in hdu_1.data:
         text = rec[column_name]
+        if any(ignored in text for ignored in IGNORED_TRL_TEXT):
+            continue
         tz = 'UTC'  # unless otherwise specified
         match = YYYYDOYHHMMSS.fullmatch(text)
         if match:
@@ -275,6 +290,11 @@ def get_trl_timetags(hdu_1, filepath, logger=None):
 
         elif match := MON_D_HH_MM_SS_TZ_YYYY.fullmatch(text):
             (mon, d, hh_mm_ss, tz, yyyy) = match.groups()
+            dd = ('0' + d if len(d) == 1 else d.replace(' ', '0'))
+            mm = MONTHS[mon.upper()]
+
+        elif match := MON_D_HH_MM_SS_YYYY.fullmatch(text):
+            (mon, d, hh_mm_ss, yyyy) = match.groups()
             dd = ('0' + d if len(d) == 1 else d.replace(' ', '0'))
             mm = MONTHS[mon.upper()]
 
@@ -324,6 +344,11 @@ def get_trl_timetags(hdu_1, filepath, logger=None):
             mm = MONTHS[mon.upper()]
             hh_mm_ss = hh_mm + ':00'
 
+        elif match := HH_MM_SS_PAREN_D_MON_YYYY.fullmatch(text):
+            (hh_mm_ss, d, mon, yyyy) = match.groups()
+            dd = ('0' + d if len(d) == 1 else d.replace(' ', '0'))
+            mm = MONTHS[mon.upper()]
+
         # last resort, some other random time string
         else:
             match = TIME_TEST.fullmatch(text)
@@ -331,7 +356,8 @@ def get_trl_timetags(hdu_1, filepath, logger=None):
                 continue
 
             (before, hh_mm_ss, after) = match.groups()
-            remainder = before[-14:] + ' ' + after[14:]
+            # The 14 characters on each side of the time, delimited for the tests below
+            remainder = ' ' + before[-14:] + ' ' + after[:14] + ' '
 
             match = MONTH_TEST.fullmatch(remainder)
             if match:
