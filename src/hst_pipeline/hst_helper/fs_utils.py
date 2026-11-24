@@ -10,7 +10,7 @@ from hashlib import md5
 import os
 import shutil
 
-from . import DELIVERABLE_SUFFIX, HST_DIR
+from . import DELIVERABLE_SUFFIX, HST_DIR, PENDING_SUFFIX, VISIT_LISTS
 from hst_pipeline.product_labels.suffix_info import (INSTRUMENT_FROM_LETTER_CODE,
                                                      product_id)
 
@@ -185,16 +185,26 @@ def get_formatted_proposal_id(proposal_id):
     """
     return str(proposal_id).zfill(5)
 
-def backup_file(proposal_id, visit, filepath):
+# Format of the "-<ymdhms>" that backup_file appends to a file's basename
+BACKUP_TIME_FORMAT = '%Y-%m-%dT%H-%M-%S'
+BACKUP_TIME_PATTERN = r'\d{4}-\d\d-\d\dT\d\d-\d\d-\d\d'
+
+def backup_time():
+    """Return the current time in BACKUP_TIME_FORMAT."""
+    return datetime.datetime.now().strftime(BACKUP_TIME_FORMAT)
+
+def backup_file(proposal_id, visit, filepath, now=None):
     """Rename and move a file to the /backups.
 
     Input:
         proposal_id    the proposal id.
         visit          the two character visit.
         filepath       the current filepath to be renamed & moved.
+        now            the time to append, as from backup_time(); None for the current
+                       time. Files replaced together share one time.
     """
     backups_dir = f'{get_program_dir_path(proposal_id, visit)}/backups'
-    now = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+    now = now or backup_time()
     _, _, fname = filepath.rpartition('/')
     basename, _, ext = fname.partition('.')
     new_path = f'{backups_dir}/{basename}-{now}.{ext}'
@@ -202,6 +212,45 @@ def backup_file(proposal_id, visit, filepath):
     os.makedirs(backups_dir, exist_ok=True)
     # move file to the back up dir
     shutil.move(filepath, new_path)
+
+def commit_visit_lists(proposal_id, visit):
+    """Replace a visit's PRODUCTS_FILE and TRL_CHECKSUMS_FILE with the pending versions
+    written by hst-query-products, backing up the old ones. Call it once the visit has
+    been labeled.
+
+    Input:
+        proposal_id    the proposal id.
+        visit          the two character visit.
+
+    Returns:    the list of the paths that were replaced or created.
+    """
+    visit_dir = get_program_dir_path(proposal_id, visit)
+    committed = []
+    now = backup_time()
+    for fname in VISIT_LISTS:
+        path = f'{visit_dir}/{fname}'
+        if not os.path.exists(path + PENDING_SUFFIX):
+            continue
+        if os.path.exists(path):
+            backup_file(proposal_id, visit, path, now=now)
+        os.replace(path + PENDING_SUFFIX, path)
+        committed.append(path)
+    return committed
+
+def discard_pending_visit_lists(proposal_id, visit):
+    """Remove a visit's pending PRODUCTS_FILE and TRL_CHECKSUMS_FILE, e.g., after a
+    failed retrieval, so that the next query finds the visit changed again.
+
+    Input:
+        proposal_id    the proposal id.
+        visit          the two character visit.
+    """
+    visit_dir = get_program_dir_path(proposal_id, visit)
+    for fname in VISIT_LISTS:
+        try:
+            os.remove(f'{visit_dir}/{fname}{PENDING_SUFFIX}')
+        except FileNotFoundError:
+            pass
 
 def create_col_dir_in_bundle(proposal_id, collection_name, testing=False):
     """Create the collection directory in the final bundle directory for a given propsal

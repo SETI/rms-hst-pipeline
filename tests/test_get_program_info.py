@@ -104,7 +104,7 @@ class TestGetProgramInfo:
         monkeypatch.setattr('hst_pipeline.get_program_info.get_formatted_proposal_id', lambda pid: '12345')
         monkeypatch.setattr('hst_pipeline.get_program_info.DOCUMENT_EXT', ('pro', 'apt'))
         monkeypatch.setattr('hst_pipeline.get_program_info.DOCUMENT_EXT_FOR_CITATION_INFO', ('pro',))
-        monkeypatch.setattr('hst_pipeline.get_program_info.is_proposal_file_retrieved', lambda pid, url, fp, logger=None: True)
+        monkeypatch.setattr('hst_pipeline.get_program_info.is_proposal_file_retrieved', lambda pid, url, fp, logger=None, now=None: True)
         monkeypatch.setattr('hst_pipeline.get_program_info.create_program_info_file', lambda fp: None)
         logger = mock.Mock()
         logger.open = mock.Mock()
@@ -115,10 +115,10 @@ class TestGetProgramInfo:
     def test_download_proposal_files_falls_back_to_mast(self, monkeypatch, tmp_path):
         # No .apt or .pro file at STScI: the MAST proposal page is fetched instead
         monkeypatch.setattr('hst_pipeline.get_program_info.is_proposal_file_retrieved',
-                            lambda pid, url, fp, logger=None: False)
+                            lambda pid, url, fp, logger=None, now=None: False)
         called = []
         monkeypatch.setattr('hst_pipeline.get_program_info.download_mast_proposal_page',
-                            lambda pid, d, logger=None: called.append(pid) or
+                            lambda pid, d, logger=None, now=None: called.append(pid) or
                             '01086.html')
         res = download_proposal_files(1086, str(tmp_path), logger=mock.Mock())
         assert called == [1086]
@@ -128,14 +128,14 @@ class TestGetProgramInfo:
         # An existing, unchanged .pro file means the MAST page is not needed
         (tmp_path / '05825.pro').write_text('pro')
         monkeypatch.setattr('hst_pipeline.get_program_info.is_proposal_file_retrieved',
-                            lambda pid, url, fp, logger=None: False)
+                            lambda pid, url, fp, logger=None, now=None: False)
         monkeypatch.setattr('hst_pipeline.get_program_info.download_mast_proposal_page',
                             mock.Mock(side_effect=AssertionError('not expected')))
         assert download_proposal_files(5825, str(tmp_path), logger=mock.Mock()) == set()
 
     def test_download_mast_proposal_page(self, monkeypatch, tmp_path):
         urls = []
-        def fake_retrieved(pid, url, fp, logger=None):
+        def fake_retrieved(pid, url, fp, logger=None, now=None):
             urls.append(url)
             with open(fp, 'w') as f:
                 f.write('page')
@@ -152,7 +152,7 @@ class TestGetProgramInfo:
 
     def test_download_mast_proposal_page_unreadable(self, monkeypatch, tmp_path):
         # A page without proposal info is logged as an error and not kept
-        def fake_retrieved(pid, url, fp, logger=None):
+        def fake_retrieved(pid, url, fp, logger=None, now=None):
             with open(fp, 'w') as f:
                 f.write('No proposal found')
             return True

@@ -99,6 +99,15 @@ Each file is stored once in staging. `hst-retrieve-visit` downloads into
 `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`, and `hst-label-products` labels
 the files there. Run them in that order.
 
+A rerun redoes only the visits that `hst-query-products` finds changed: those whose
+MAST file list or TRL checksums differ from the visit's `products.txt` and
+`trl_checksums.txt` in `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/`. It writes the new lists
+as `*.pending`; `hst-label-products` commits them once it has labeled the visit
+(`fs_utils.commit_visit_lists`), and a failed `hst-retrieve-visit` discards them, so an
+unfinished visit is found changed again. `hst-get-program-info` gives every proposal file
+one download replaces the same `-<ymdhms>` in `backups/`; the document's minor version
+is the number of such times (`finalize_document.count_document_revisions`).
+
 Every image product gets a picmaker preview: `hst-prepare-browse` runs picmaker, always
 with `PICMAKER_BROWSE_OPTIONS` (`mosaic=True, footprint=7, percentiles=(0.01, 99.99),
 mask_ranges=(0, 0)`), on each FITS file lacking a preview whose suffix is listed for its

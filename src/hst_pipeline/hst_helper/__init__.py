@@ -131,6 +131,14 @@ PROGRAM_INFO_FILE = 'program-info.txt'
 PRODUCTS_FILE = 'products.txt'
 TRL_CHECKSUMS_FILE = 'trl_checksums.txt'
 
+# A visit's PRODUCTS_FILE and TRL_CHECKSUMS_FILE describe the files as of its last
+# labeling. hst-query-products writes newer lists with this suffix appended; they replace
+# the old ones only when hst-label-products has labeled the visit (see
+# fs_utils.commit_visit_lists), so a visit whose retrieval or labeling never finished is
+# found changed again on the next query.
+VISIT_LISTS = (PRODUCTS_FILE, TRL_CHECKSUMS_FILE)
+PENDING_SUFFIX = '.pending'
+
 # Instrument ids dictionary, keyed by propoposal id and store the list of instrument ids
 INST_ID_DICT = defaultdict(set)
 

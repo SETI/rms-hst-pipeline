@@ -27,7 +27,8 @@ from hst_pipeline.hst_helper import (DOCUMENT_EXT,
                                      LABEL_SUFFIX,
                                      MAST_PROPOSAL_SUFFIX,
                                      MAST_PROPOSAL_URL)
-from hst_pipeline.hst_helper.fs_utils import (create_col_dir_in_bundle,
+from hst_pipeline.hst_helper.fs_utils import (BACKUP_TIME_PATTERN,
+                                              create_col_dir_in_bundle,
                                               get_deliverable_path,
                                               get_formatted_proposal_id,
                                               get_program_dir_path)
@@ -116,16 +117,10 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
 
         # Collect data to construct data dictionary used for the document label
         # Get version id
-        # Increase the minor version number if a proposal file exists in backups. Note: a
-        # propsal file is in backups if it's different than the latest file via web query.
+        # The minor version counts the downloads that replaced a proposal file; see
+        # count_document_revisions.
         backups_dir = get_program_dir_path(proposal_id, None) + '/backups'
-        try:
-            for file in os.listdir(backups_dir):
-                for name_info in proposal_files_li:
-                    if name_info[0] in file:
-                        version_id = (version_id[0], version_id[1]+1)
-        except FileNotFoundError:
-            pass
+        version_id = (1, count_document_revisions(backups_dir, proposal_files_li))
 
     # Copy the handbooks of the program's instruments, which are secondary members
     handbooks_dir = handbooks_dir or get_handbooks_dir()
@@ -174,6 +169,35 @@ def finalize_hst_document_directory(proposal_id, data_dict, logger=None, testing
                                           logger, testing)
 
     return (doc_col_lbl, doc_lbl)
+
+def count_document_revisions(backups_dir, proposal_files_li):
+    """Return the number of downloads that replaced any of the proposal files.
+
+    hst-get-program-info moves each replaced file to backups/ as
+    "<basename>-<ymdhms>.<ext>", with one time for all the files of one download, so
+    each distinct time is one revision of the document.
+
+    Input:
+        backups_dir         the program's backups directory, which may not exist.
+        proposal_files_li   the tuples (basename, file name, standard id) of the proposal
+                            files, as returned by get_document_files().
+
+    Returns:    the number of distinct backup times among those files' backups.
+    """
+    if not os.path.isdir(backups_dir):
+        return 0
+    patterns = []
+    for (_, file, _) in proposal_files_li:
+        (basename, _, ext) = file.partition('.')
+        patterns.append(re.compile(re.escape(basename) + f'-({BACKUP_TIME_PATTERN})\\.'
+                                   + re.escape(ext) + '$'))
+    times = set()
+    for name in os.listdir(backups_dir):
+        for pattern in patterns:
+            match = pattern.match(name)
+            if match:
+                times.add(match.group(1))
+    return len(times)
 
 def get_document_files(proposal_id, pipeline_dir):
     """Return the files in a program's pipeline directory that belong in the bundle's

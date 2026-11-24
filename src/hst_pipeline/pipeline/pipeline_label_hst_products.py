@@ -15,6 +15,8 @@
 # - Create a new XML label for each file.
 # - Reset the modification dates of the FITS files to match their production date at MAST.
 # - Create a Product_Browse label for each MAST preview.
+# - For a visit, replace its products.txt and trl_checksums.txt with the pending lists
+#   from query_hst_products, if any (see fs_utils.commit_visit_lists).
 #
 # With --proposal-id and --visit, it labels the visit's files after the
 # prepare_browse_products task has filed them into collection directories under staging.
@@ -24,7 +26,8 @@
 import argparse
 import sys
 
-from hst_pipeline.hst_helper.fs_utils import get_formatted_proposal_id
+from hst_pipeline.hst_helper.fs_utils import (commit_visit_lists,
+                                              get_formatted_proposal_id)
 from hst_pipeline.hst_helper.log_support import (close_task_logger,
                                                  setup_task_logger)
 from hst_pipeline.label_hst_products import label_hst_visit
@@ -124,6 +127,9 @@ def main(argv=None):
                                 retrieval_date=args.date,
                                 logger=logger,
                                 reset_dates=args.reset_dates)
+                # The visit is now up to date with the query that found it changed
+                for path in commit_visit_lists(proposal_id, visit):
+                    logger.info('Visit list updated', path)
         except Exception as e:
             logger.exception(e)
             raise

@@ -8,8 +8,10 @@
 # - Create directories <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/ if they don't exist.
 # - Download all TRL files to <HST_STAGING>/hst_<nnnnn>/.
 # - For each visit:
-#   - Update or create products.txt in <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/.
-#   - Update or create trl_checksums.txt in <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/.
+#   - Compare the files with products.txt and trl_checksums.txt in
+#     <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/; if they changed, write the new lists as
+#     products.txt.pending and trl_checksums.txt.pending, which replace them once the
+#     visit has been labeled.
 # - Delete all TRL files.
 # - Return the tuple of changed visits & all available visists.
 ##########################################################################################
@@ -19,10 +21,10 @@ import shutil
 from collections import defaultdict
 
 from hst_pipeline.hst_helper import (DOWNLOAD_TMP_PREFIX,
+                                     PENDING_SUFFIX,
                                      PRODUCTS_FILE,
                                      TRL_CHECKSUMS_FILE)
-from hst_pipeline.hst_helper.fs_utils import (backup_file,
-                                              create_program_dir,
+from hst_pipeline.hst_helper.fs_utils import (create_program_dir,
                                               file_md5,
                                               get_program_dir_path,
                                               get_visit)
@@ -42,7 +44,8 @@ def query_hst_products(proposal_id, logger=None):
         - Query MAST for all available visits and files in this program.
         - Create directories <HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/ if they don't exist.
         - Download all TRL files to <HST_STAGING>/hst_<nnnnn>/.
-        - Compare and create PRODUCTS_FILE & TRL_CHECKSUMS_FILE.
+        - Compare with PRODUCTS_FILE & TRL_CHECKSUMS_FILE; write pending versions of
+          those that changed.
         - Delete all TRL files.
         - Return the tuple of changed visits & all available visists.
 
@@ -134,40 +137,15 @@ def query_hst_products(proposal_id, logger=None):
 
     return (visit_diff, list(files_dict.keys()))
 
-def generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included=False):
-    """Create {fname}.txt in the pipeline visit directory of a proposal id. The file
-    will contain a list of file names of the visit in alphabetical order.
-    if checksum_included is True, the file will contain a dictionary keyed by file names
-    and the corresponding checksums as the values.
-
-    Input:
-        proposal_id          a proposal id.
-        files_dict           a dictionary keyed by two character visit and store a list
-                             of files for the corresponding visit.
-        visit                two character visit.
-        fname                the file name.
-        checksum_included    a flag used to deteremine if we want to include checksum
-                             of each file in the generated file.
-
-    """
-    file_path = f'{get_program_dir_path(proposal_id, visit)}/{fname}'
-    files_li = files_dict[visit]
-
-    with open(file_path, 'w') as f:
-        for file in files_li:
-            if not checksum_included:
-                f.write('%s\n' % file)
-            else:
-                filepath = get_downloaded_file_path(proposal_id, file)
-                checksum = file_md5(filepath)
-                f.write('%s:%s\n' % (file, checksum))
-
 def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=False):
-    """Return a flag to indicate if any files are new or changed in the visit.
-    Compare the contents of current txt file with the results from MAST. If they are
-    the same, keep the current txt file. If they are different, move the current txt
-    file to the backups directory, and generate the new txt file based on the new results
-    from MAST.
+    """Return a flag to indicate if any files are new or changed in the visit since it
+    was last labeled.
+
+    Compare the visit's txt file, which describes its files as of its last labeling,
+    with the results from MAST. If they differ, or there is no txt file, write the new
+    list to "<fname>.pending"; fs_utils.commit_visit_lists() moves it into place once
+    the visit has been labeled. If they match, remove any pending file left by an
+    earlier run.
 
     Input:
         proposal_id          a proposal id.
@@ -180,38 +158,25 @@ def compare_files_txt(proposal_id, files_dict, visit, fname, checksum_included=F
 
     Returns:    a boolean that indicates if any files are new or changed in the visit.
     """
-    is_visit_diff = False
     txt_file_path = f'{get_program_dir_path(proposal_id, visit)}/{fname}'
-    files_li = files_dict[visit]
-    files_li.sort()
+    pending_path = txt_file_path + PENDING_SUFFIX
+    files_li = sorted(files_dict[visit])
     if checksum_included:
-        files_li_with_checksum = []
-        for file in files_li:
-            filepath = get_downloaded_file_path(proposal_id, file)
-            checksum = file_md5(filepath)
-            files_li_with_checksum.append(f'{file}:{checksum}')
-        files_li = files_li_with_checksum
+        files_li = [f'{file}:{file_md5(get_downloaded_file_path(proposal_id, file))}'
+                    for file in files_li]
 
     if os.path.exists(txt_file_path):
-        # get info from the old txt file
-        text_file = open(txt_file_path, 'r')
-        files_from_txt = [line.rstrip() for line in text_file]
-        text_file.close()
+        with open(txt_file_path) as f:
+            files_from_txt = [line.rstrip() for line in f]
+        if files_from_txt == files_li:
+            if os.path.exists(pending_path):
+                os.remove(pending_path)
+            return False
 
-        # compare the list from MAST with the contents of the old txt file
-        if files_from_txt != files_li:
-            is_visit_diff = True
-            # move the old txt file to backups
-            backup_file(proposal_id, visit, txt_file_path)
-            # generate the new txt file
-            generate_files_txt(proposal_id, files_dict, visit,
-                               fname, checksum_included)
-    else:
-        # Generate txt file if it doesn't exist
-        generate_files_txt(proposal_id, files_dict, visit, fname, checksum_included)
-        is_visit_diff = True
-
-    return is_visit_diff
+    with open(pending_path, 'w') as f:
+        for line in files_li:
+            f.write(line + '\n')
+    return True
 
 def get_downloaded_file_path(proposal_id, fname, visit=None, root_dir='staging'):
     """Return the file path of a downloaded file.

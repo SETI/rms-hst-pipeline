@@ -29,6 +29,7 @@ from hst_pipeline.hst_helper import (DOCUMENT_EXT,
                                      MAST_PROPOSAL_URL,
                                      PROGRAM_INFO_FILE)
 from hst_pipeline.hst_helper.fs_utils import (backup_file,
+                                              backup_time,
                                               get_formatted_proposal_id,
                                               get_program_dir_path)
 
@@ -50,7 +51,7 @@ def get_program_info(proposal_id, download_dir=None, logger=None):
     res = download_proposal_files(proposal_id, download_dir, logger)
     return res
 
-def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
+def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None, now=None):
     """Return a boolean flag to determine if a proposal file is retrieved.
 
     Input:
@@ -58,6 +59,9 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
         url            the url to retrieve the text of a proposal file
         filepath       the file path of the existing proposal file or the file path used
                        to store the newly retrieved proposal file.
+        now            the time to append to a replaced file in backups/, shared by the
+                       files of one download (see finalize_document's document version);
+                       None for the current time.
 
     Returns:    a boolean that indicates if a proposal file is retrieved.
     """
@@ -77,7 +81,7 @@ def is_proposal_file_retrieved(proposal_id, url, filepath, logger=None):
     if is_proposal_file_different(new_contents, filepath):
         # Back up the current proposal file if there is a different one
         if os.path.exists(filepath):
-            backup_file(proposal_id, None, filepath)
+            backup_file(proposal_id, None, filepath, now=now)
         # Save the new proposal file
         with open(filepath, 'wb') as f:
             f.write(new_contents)
@@ -139,12 +143,14 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
     ]
 
     res = set()
+    now = backup_time()     # one time for every file this download replaces
     logger.open('Download proposal files')
     is_program_info_file_created = False
     for (url, basename) in table:
         filepath = os.path.join(download_dir, basename)
         # Download the new proposal files if necessary
-        if is_proposal_file_retrieved(proposal_id, url, filepath, logger=logger):
+        if is_proposal_file_retrieved(proposal_id, url, filepath, logger=logger,
+                                      now=now):
             logger.info(f'Retrieve {basename} from {url}')
             res.add(basename)
             # Create or update program info file
@@ -162,13 +168,14 @@ def download_proposal_files(proposal_id, download_dir, logger=None):
                              if basename.rpartition('.')[2]
                              in DOCUMENT_EXT_FOR_CITATION_INFO))
     if not has_citation_file:
-        basename = download_mast_proposal_page(proposal_id, download_dir, logger)
+        basename = download_mast_proposal_page(proposal_id, download_dir, logger,
+                                               now=now)
         if basename:
             res.add(basename)
 
     return res
 
-def download_mast_proposal_page(proposal_id, download_dir, logger=None):
+def download_mast_proposal_page(proposal_id, download_dir, logger=None, now=None):
     """Download the MAST proposal search page of a program and create PROGRAM_INFO_FILE
     from it; the fallback for programs with no .apt or .pro file.
 
@@ -176,6 +183,8 @@ def download_mast_proposal_page(proposal_id, download_dir, logger=None):
         proposal_id     a proposal id.
         download_dir    the directory to store the page.
         logger          pdslogger to use; None for default EasyLogger.
+        now             the time to append to a replaced page in backups/; None for the
+                        current time.
 
     Returns:    the basename of the page if it was newly downloaded or changed and
                 its citation info could be read; otherwise None.
@@ -188,7 +197,8 @@ def download_mast_proposal_page(proposal_id, download_dir, logger=None):
 
     logger.info(f'No .apt or .pro file for {proposal_id}; using {url}')
     try:
-        retrieved = is_proposal_file_retrieved(proposal_id, url, filepath, logger=logger)
+        retrieved = is_proposal_file_retrieved(proposal_id, url, filepath, logger=logger,
+                                               now=now)
         if not retrieved:
             return None
         logger.info(f'Create program info file from {basename}')

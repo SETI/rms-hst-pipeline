@@ -120,8 +120,8 @@ July 9, 2024
 - Log: `<HST_PIPELINE>/hst_<nnnnn>/logs/query-hst-products-<ymdhms>.log`
 - Priority: 1 (Lowest)
 - State:
-  - File `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/products.txt` contains the list of available products with accepted suffixes, sorted alphabetically, for each visit. Missing on first run.
-  - File `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/trl_checksums.txt` contains the current list of all TRL files and their checksums. Missing on first run.
+  - File `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/products.txt` contains the list of products with accepted suffixes, sorted alphabetically, as of the visit's last labeling. Missing until the visit has been labeled.
+  - File `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/trl_checksums.txt` contains the TRL files and their checksums as of the visit's last labeling. Missing until the visit has been labeled.
 - Actions:
 
   - Query MAST for all available visits and files in this program.
@@ -133,10 +133,9 @@ July 9, 2024
 
 - Actions (continued):
   - For each visit…
-    - If `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/products.txt` already exists, check its contents against the list from MAST and identify any changes.
-    - If changes are identified, move products.txt to `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/backups/products-<ymdhms>.txt` and replace the content of products.txt.
-    - If `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/trl_checksums.txt` does not already exist, create it with the checksums of the staged TRL files.
-    - Otherwise, compare the checksums. If there are any changes, rename `trl_checksums.txt` to `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/backups/trl_checksums-<ymdhms>.txt` and save the new content.
+    - Compare the list from MAST with `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/products.txt`, and the checksums of the staged TRL files with `trl_checksums.txt`. The visit has changed if either file is missing or differs.
+    - For a changed visit, write the new list as `products.txt.pending` and/or `trl_checksums.txt.pending`. **label-hst-products** moves them into place once it has labeled the visit, and a failed **retrieve-hst-visit** deletes them. A visit whose retrieval or labeling never finished therefore keeps its old lists and is found changed again by the next query.
+    - For an unchanged visit, delete any pending list left by an earlier run.
     - Delete the TRL files.
   - Create a list of visits in which any files are new or changed.
   - If the list is not empty, queue task **update-hst-program** with the list of visits.
@@ -151,7 +150,7 @@ July 9, 2024
 - Log: `<HST_PIPELINE>/hst_<nnnnn>/logs/update-hst-program-<ymdhms>.log`
 - Priority: 2 (Low)
 - State:
-  - File `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/products.txt` is up to date for each visit.
+  - Each changed visit has `products.txt.pending` and/or `trl_checksums.txt.pending` in `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/`.
 - Actions:
   - Queue task **get-program-info** and wait for it to complete.
   - For each visit, queue task **update-hst-visit** and wait until all the visits have completed.
@@ -172,7 +171,7 @@ July 9, 2024
   - Retrieve the proposal files via a web query.
   - If these files are the same as the existing ones, stop.
   - Otherwise,
-    - Rename each existing file by appending “`-<ymdhms>`” before its extension and moving it to a `backups/` subdirectory.
+    - Rename each existing file by appending “`-<ymdhms>`” before its extension and moving it to a `backups/` subdirectory. All the files replaced by one download share one time; **finalize-hst-bundle** sets the document's minor version to the number of these times.
     - Then save the newly downloaded files.
     - Regenerate `program-info.txt` with a possibly modified citation.
 
@@ -196,9 +195,10 @@ July 9, 2024
 - Log: `<HST*PIPELINE>/hst*<nnnnn>/visit\_<ss>/logs/retrieve-hst-visit-<ymdhms>.log`
 - Priority: 4 (High)
 - State:
-  - The file `<HST*PIPELINE>/hst*<nnnnn>/visit\_<ss>/products.txt` always contains the list of available products (FITS files or browse products) with approved suffixes.
+  - The file `<HST*PIPELINE>/hst*<nnnnn>/visit\_<ss>/products.txt.pending` contains the list of available products (FITS files or browse products) with approved suffixes.
 - Actions:
   - Retrieve all the identified files and put them in `<HST*STAGING>/hst*<nnnnn>/visit\_<ss>/`.
+  - If the download fails, delete the visit's pending lists, so that the next **query-hst-products** finds the visit changed again.
 
 #
 # Task: **prepare-browse-products**
@@ -232,6 +232,7 @@ July 9, 2024
   - Create a `Product_Browse` label for each preview, from MAST or picmaker, in the visit's `browse_*` collections.
   - Reset the modification dates of the FITS files to match their production date at MAST.
   - If any file contains NaNs, rename the original file with “`-original`” appended, and then rewrite the file without NaNs.
+  - Replace the visit's `products.txt` and `trl_checksums.txt` with the pending lists from **query-hst-products**, if any, moving the old ones to `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/backups/`.
   - TBD: What to do if the file in the existing bundle is identical.
 
 #
