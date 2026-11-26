@@ -24,9 +24,11 @@
 ##########################################################################################
 
 import argparse
+import os
 import sys
 
 from hst_pipeline.hst_helper.fs_utils import (commit_visit_lists,
+                                              get_deliverable_path,
                                               get_formatted_proposal_id)
 from hst_pipeline.hst_helper.log_support import (close_task_logger,
                                                  setup_task_logger)
@@ -60,7 +62,9 @@ def parse_args(argv=None):
              products and their labels. If specified, the new labels will increment the
              version number relative to the old labels, with a new fractional number if
              the label has changed but the data file is the same, or with a new whole
-             number if the data file has changed.""")
+             number if the data file has changed; a label whose data file and content
+             are unchanged keeps its version. With --visit, the default is the
+             program's bundle, if it exists.""")
 
     parser.add_argument('--select', type=str, action='store', default='',
         help="""Optional wildcard pattern. Files that do not match this pattern will be
@@ -116,20 +120,26 @@ def main(argv=None):
             if args.path:
                 label_hst_fits_directories(args.path,
                                            match_pattern=args.select,
-                                           old_directories=[args.old],
+                                           old_directories=[args.old] if args.old else [],
                                            retrieval_date=args.date,
                                            logger=logger,
                                            reset_dates=args.reset_dates)
             else:
-                label_hst_visit(proposal_id, visit,
-                                match_pattern=args.select,
-                                old_directories=[args.old],
-                                retrieval_date=args.date,
-                                logger=logger,
-                                reset_dates=args.reset_dates)
-                # The visit is now up to date with the query that found it changed
-                for path in commit_visit_lists(proposal_id, visit):
-                    logger.info('Visit list updated', path)
+                # The previous versions are those in the bundle, if any
+                old = args.old or get_deliverable_path(proposal_id)
+                old_directories = [old] if os.path.isdir(old) else []
+                logger.info('Previous versions: ' + (old if old_directories else 'none'))
+                (data_dirs, _) = label_hst_visit(proposal_id, visit,
+                                                 match_pattern=args.select,
+                                                 old_directories=old_directories,
+                                                 retrieval_date=args.date,
+                                                 logger=logger,
+                                                 reset_dates=args.reset_dates)
+                # The visit is now up to date with the query that found it changed, if
+                # it had files to label
+                if data_dirs:
+                    for path in commit_visit_lists(proposal_id, visit):
+                        logger.info('Visit list updated', path)
         except Exception as e:
             logger.exception(e)
             raise

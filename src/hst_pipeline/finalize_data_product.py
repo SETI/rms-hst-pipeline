@@ -21,6 +21,7 @@ from hst_pipeline.hst_helper.general_utils import (create_collection_label,
                                                    date_time_to_date,
                                                    get_citation_info,
                                                    get_collection_label_data,
+                                                   get_label_version_id,
                                                    get_mod_history_from_label)
 from hst_pipeline.label_browse_products import label_browse_products_for_proposal
 from hst_pipeline.product_labels.suffix_info import (INSTRUMENT_NAMES,
@@ -143,20 +144,22 @@ def create_data_product_collection_csv(proposal_id, logger):
         proposal_id    a proposal id.
         logger         pdslogger to use; None for default EasyLogger.
     """
-    prod_ver = (1,0)
     deliverable_path = get_deliverable_path(proposal_id)
     for dir_name in os.listdir(deliverable_path):
         for col_prefix in COL_NAME_PREFIX:
             if dir_name.startswith(col_prefix):
                 collection_data = []
                 bundles_prod_dir = os.path.join(deliverable_path, dir_name)
-                for _, _, files in os.walk(bundles_prod_dir):
+                for root, _, files in os.walk(bundles_prod_dir):
                     for file in files:
-                        _, _, ext = file.rpartition('.')
+                        stem, _, ext = file.rpartition('.')
                         if (not file.startswith('collection_') and
                             ext in [LABEL_SUFFIX.lstrip('.')] + BROWSE_PROD_EXT):
                             prod_id = get_product_id(file)
                             formatted_proposal_id = get_formatted_proposal_id(proposal_id)
+                            # The product's version, from its label
+                            prod_ver = get_label_version_id(
+                                                os.path.join(root, stem + LABEL_SUFFIX))
                             prod_lidvid = (f'P,urn:nasa:pds:hst_{formatted_proposal_id}'
                                            f':{dir_name}:{prod_id}::'
                                            f'{prod_ver[0]}.{prod_ver[1]}').split(',')

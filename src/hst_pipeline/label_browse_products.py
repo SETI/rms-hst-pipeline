@@ -18,7 +18,8 @@ from hst_pipeline.hst_helper.fs_utils import (file_md5,
                                               get_formatted_proposal_id,
                                               get_instrument_id_from_fname,
                                               get_product_id)
-from hst_pipeline.hst_helper.general_utils import create_xml_label
+from hst_pipeline.hst_helper.general_utils import (create_xml_label,
+                                                   get_label_version_id)
 from hst_pipeline.product_labels.suffix_info import (browse_data_collection_name,
                                                      browse_data_suffix,
                                                      product_id)
@@ -67,7 +68,9 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
         collection_dir    path to a browse_* directory.
         proposal_id       proposal id (int or str).
         logger            pdslogger to use; None for default EasyLogger.
-        version_id        (major, minor) product version tuple.
+        version_id        (major, minor) version of the browse products; the data
+                          product each one previews is cited at the version in its label,
+                          or this one if that label is missing.
 
     Returns:    number of browse product labels written.
     """
@@ -89,13 +92,18 @@ def label_browse_collection_directory(collection_dir, proposal_id, logger=None,
             browse_suffix = get_file_suffix(name)
             instrument_id = get_instrument_id_from_fname(name)
             data_collection = browse_data_collection_name(browse_suffix, instrument_id)
-            data_id = product_id(ipppssoot,
-                                 browse_data_suffix(browse_suffix, instrument_id))
+            data_suffix = browse_data_suffix(browse_suffix, instrument_id)
+            data_id = product_id(ipppssoot, data_suffix)
+            data_label = os.path.join(os.path.dirname(os.path.normpath(collection_dir)),
+                                      data_collection,
+                                      os.path.relpath(root, collection_dir),
+                                      f'{ipppssoot}_{data_suffix}{LABEL_SUFFIX}')
+            data_version = get_label_version_id(data_label, version_id)
             product_lid = (f'urn:nasa:pds:hst_{formatted_proposal_id}'
                            f':{collection_name}:{get_product_id(name)}')
             data_lidvid = (f'urn:nasa:pds:hst_{formatted_proposal_id}'
                            f':{data_collection}:{data_id}'
-                           f'::{version_id[0]}.{version_id[1]}')
+                           f'::{data_version[0]}.{data_version[1]}')
             data_dict = {
                 'label_version': LABEL_VERSION,
                 'label_date': LABEL_DATE,

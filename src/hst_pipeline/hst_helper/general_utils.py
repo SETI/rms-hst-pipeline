@@ -203,6 +203,27 @@ def get_mod_history_from_label(prev_label_path, current_version_id):
 
     return mod_history
 
+def get_label_version_id(label_path, default=(1, 0)):
+    """Return the version of the product a label describes, from the first <version_id>
+    in the label, which is in its Identification_Area.
+
+    Inputs:
+        label_path    the path of the label.
+        default       the version to return if the label or its version is missing.
+
+    Returns:    the version as a tuple of two ints, e.g., (1, 1).
+    """
+    try:
+        with open(label_path) as f:
+            for line in f:
+                if '<version_id>' in line:
+                    text = line.partition('<version_id>')[2].partition('<')[0]
+                    (major, _, minor) = text.strip().partition('.')
+                    return (int(major), int(minor))
+    except (FileNotFoundError, ValueError):
+        pass
+    return default
+
 def get_target_id_from_label(proposal_id, prev_label_path):
     """Get the target identification info from the exisitng label.
 

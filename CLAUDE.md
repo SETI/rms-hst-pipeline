@@ -108,6 +108,14 @@ unfinished visit is found changed again. `hst-get-program-info` gives every prop
 one download replaces the same `-<ymdhms>` in `backups/`; the document's minor version
 is the number of such times (`finalize_document.count_document_revisions`).
 
+`hst-label-products --visit` compares each product with its previous version in the
+program's bundle (`--old` overrides). A label whose FITS file is identical and whose
+content is unchanged, apart from version numbers and `Modification_History`
+(`product_labels.label_bodies_match`), is kept as it was; otherwise the version becomes
+x.(n+1) for a changed label or (x+1).0 for a changed FITS file. Finalize lists each
+product in its collection inventory at the version in its label, and browse labels cite
+their data product's version. Collection and bundle versions are still always 1.0.
+
 Every image product gets a picmaker preview: `hst-prepare-browse` runs picmaker, always
 with `PICMAKER_BROWSE_OPTIONS` (`mosaic=True, footprint=7, percentiles=(0.01, 99.99),
 mask_ranges=(0, 0)`), on each FITS file lacking a preview whose suffix is listed for its

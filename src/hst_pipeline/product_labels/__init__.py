@@ -6,6 +6,7 @@ import datetime
 import fnmatch
 import os
 import pathlib
+import re
 import sys
 from collections import defaultdict
 
@@ -79,7 +80,7 @@ def label_hst_fits_directories(directories, root='', *,
     label_hst_fits_filepaths(filepaths, root,
                              old_filepaths = old_filepaths,
                              old_root = old_root,
-                             retrieval_date = '',
+                             retrieval_date = retrieval_date,
                              logger = logger,
                              reset_dates = reset_dates)
 
@@ -197,21 +198,8 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         # "suffix"         : suffix following first underscore, excluding ".fits".
         # "short_suffix"   : suffix with out its "tail", e.g., "flt_a" -> "flt".
         # "suffix_tail"    : tail of the suffix, e.g., "flt_a", "_a".
-        # "retrieval_date" : the creation date on the file.
+        # "retrieval_date" : the date the file was retrieved from MAST; filled in below.
         ##################################################################################
-
-        # Identify the retrieval date
-        if retrieval_date:
-            file_retrieval_date = retrieval_date
-        else:
-            # Take it from a pre-existing label, if any
-            file_retrieval_date = get_label_retrieval_date(fullpath, LABEL_SUFFIX)
-
-        if not file_retrieval_date:
-            # Otherwise, use the file creation date. This is a bit dangerous because the
-            # pipeline can modify the creation dates of files, meaning this date might be
-            # wrong if you run the pipeline on the same directory a second time.
-            file_retrieval_date = get_file_creation_date(fullpath)[:10]
 
         basename_dict = {
             'basename' : basename,
@@ -223,7 +211,7 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             'short_suffix'   : suffix_info.short_suffix(suffix),
             'suffix_tail'    : suffix_info.suffix_tail(suffix),
             'collection_name': suffix_info.collection_name(suffix, instrument_id),
-            'retrieval_date' : file_retrieval_date,
+            'retrieval_date' : '',
             'label_version'  : LABEL_VERSION,
             'label_date'     : LABEL_DATE,
         }
@@ -256,7 +244,11 @@ def label_hst_fits_filepaths(filepaths, root='', *,
             with open(previous_fullpath[:-5] + LABEL_SUFFIX) as f:
                 xml_content = f.read()
 
-            modification_history = get_modification_history(xml_content)
+            modification_history = [{'modification_date': date,
+                                     'version_id': version,
+                                     'description': unwrap_description(description)}
+                                    for (date, version, description)
+                                    in get_modification_history(xml_content)]
             old_version = modification_history[-1]['version_id']
 
             fits_is_identical = cmp_ignoring_nans(fullpath, previous_fullpath)
@@ -278,6 +270,28 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         basename_dict['previous_xml'        ] = xml_content
         basename_dict['modification_history'] = modification_history
         basename_dict['fits_is_identical'   ] = fits_is_identical
+        basename_dict['previous_version_id' ] = old_version if previous_fullpath else None
+
+        # Identify the retrieval date
+        if retrieval_date:
+            file_retrieval_date = retrieval_date
+        elif fits_is_identical:
+            # The same file as the previous version, retrieved when that was
+            file_retrieval_date = get_label_retrieval_date(previous_fullpath, LABEL_SUFFIX)
+        elif previous_fullpath:
+            # A new version, retrieved when it was downloaded
+            file_retrieval_date = ''
+        else:
+            # Take it from a pre-existing label beside the file, if any
+            file_retrieval_date = get_label_retrieval_date(fullpath, LABEL_SUFFIX)
+
+        if not file_retrieval_date:
+            # Otherwise, use the file creation date. This is a bit dangerous because the
+            # pipeline can modify the creation dates of files, meaning this date might be
+            # wrong if you run the pipeline on the same directory a second time.
+            file_retrieval_date = get_file_creation_date(fullpath)[:10]
+
+        basename_dict['retrieval_date'] = file_retrieval_date
 
         ##################################################################################
         # Read fundamental info from a few specific files
@@ -798,7 +812,11 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         spt_fullpath = ipppssoot_dict['spt_fullpath']
         xml_content = reference_dict['previous_xml']
         if xml_content:                 # use the old identification if available
-            target_ids = get_target_identifications(xml_content)
+            target_ids = [(info['name'], info['alternate_designations'], info['type'],
+                           [line.strip() for line in info['description'].splitlines()
+                            if line.strip()],
+                           'urn:nasa:pds:context:target:' + info['lid'])
+                          for info in get_target_identifications(xml_content)]
         else:
             try:
                 target_ids = hst_target_identifications(spt_hdulist[0].header,
@@ -1063,21 +1081,91 @@ def label_hst_fits_filepaths(filepaths, root='', *,
         logger.debug('Descriptions:\n    ' + '\n    '.join(shortened))
 
     ######################################################################################
-    # Write the new labels
+    # Keep the previous version of each label whose FITS file is identical and whose
+    # content, apart from its version numbers and Modification_History, is unchanged.
+    #
+    # "label_is_unchanged": True to write the previous label again, unaltered.
     ######################################################################################
 
     for basename, basename_dict in info_by_basename.items():
         ref_ipppssoot = basename_dict['ref_ipppssoot']
         basename_dict['ipppssoot_dict'] = info_by_ipppssoot[ref_ipppssoot]
         basename_dict['by_basename'] = info_by_basename
+        basename_dict['label_path'] = basename_dict['fullpath'].replace('.fits',
+                                                                        LABEL_SUFFIX)
+        basename_dict['label_is_unchanged'] = False
+        if basename_dict['fits_is_identical']:
+            content = TEMPLATE.generate(basename_dict, basename_dict['label_path'])
+            if label_bodies_match(content, basename_dict['previous_xml']):
+                basename_dict['label_is_unchanged'] = True
 
-        label_path = basename_dict['fullpath'].replace('.fits', LABEL_SUFFIX)
-        TEMPLATE.write(basename_dict, label_path)
+    # Restore the versions of the unchanged products, and redo the descriptions, which
+    # cite other products by LIDVID
+    unchanged = [d for d in info_by_basename.values() if d['label_is_unchanged']]
+    for basename_dict in unchanged:
+        version_id = basename_dict['previous_version_id']
+        basename_dict['version_id'] = version_id
+        basename_dict['product_lidvid'] = (basename_dict['product_lid'] + '::' +
+                                           str(version_id[0]) + '.' + str(version_id[1]))
+    if unchanged:
+        logger.info(f'{len(unchanged)} labels unchanged from their previous versions')
+        for ipppssoot, ipppssoot_dict in info_by_ipppssoot.items():
+            for suffix in ipppssoot_dict['all_suffixes']:
+                fill_hdu_data_descriptions(ipppssoot, suffix, info_by_ipppssoot, False,
+                                           pdslogger.NullLogger())
+
+    ######################################################################################
+    # Write the new labels
+    ######################################################################################
+
+    for basename, basename_dict in info_by_basename.items():
+        label_path = basename_dict['label_path']
+        if basename_dict['label_is_unchanged']:
+            with open(label_path, 'w') as f:
+                f.write(basename_dict['previous_xml'])
+        else:
+            if basename_dict['previous_version_id']:
+                logger.info('New version ' + '.'.join(str(v) for v in
+                                                      basename_dict['version_id']),
+                            label_path)
+            TEMPLATE.write(basename_dict, label_path)
 
 ##########################################################################################
 
 # The channels whose combined images (e.g., drz) don't identify their chips
 CCDCHIP_CHANNELS = {('ACS', 'WFC'), ('WFC3', 'UVIS')}
+
+# Parts of a label that differ between versions without any change to its content
+_MODIFICATION_HISTORY = re.compile(r'<Modification_History>.*</Modification_History>',
+                                   re.S)
+_VERSION_ID = re.compile(r'<version_id>[^<]*</version_id>')
+_LIDVID_VERSION = re.compile(r'::\d+\.\d+')
+_XML_COMMENT = re.compile(r'<!--.*?-->', re.S)
+
+def label_bodies_match(label1, label2):
+    """True if two versions of a product label have the same content, apart from their
+    XML comments (e.g., the labeling software's version), version numbers (their own and
+    those of the LIDVIDs they cite), and Modification_History.
+
+    Input:
+        label1, label2  the text of the labels.
+    """
+    def body(label):
+        for pattern in (_MODIFICATION_HISTORY, _XML_COMMENT, _VERSION_ID):
+            label = pattern.sub('', label)
+        return _LIDVID_VERSION.sub('::', label)
+    return body(label1) == body(label2)
+
+def unwrap_description(text):
+    """Return the text of a Modification_Detail description from a label, with each
+    paragraph on one line and paragraphs separated by blank lines, ready for $WRAP.
+
+    Input:
+        text    the description, as written in the label.
+    """
+    paragraphs = re.split(r'\n\s*\n', text.strip())
+    return '\n\n'.join(' '.join(line.strip() for line in paragraph.splitlines())
+                         for paragraph in paragraphs)
 
 def remove_empty_ipppssoots(info_by_ipppssoot):
     """Remove the IPPPSSOOTs that have no files.

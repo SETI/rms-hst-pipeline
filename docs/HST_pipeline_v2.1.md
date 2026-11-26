@@ -227,13 +227,15 @@ July 9, 2024
   - New files have been filed by **prepare-browse-products** into `<HST_STAGING>/hst_<nnnnn>/<collection>/visit_<ss>/`.
   - Existing bundle, if any, is at `<HST_BUNDLES>/hst_<nnnnn>-deliverable/hst_<nnnnn>/`.
 - Actions:
-  - Compare the staged FITS files to those in an existing bundle, if any.
+  - Compare the staged FITS files and their new labels with the previous versions in the program's bundle, if any (or the directory given by `--old`):
+    - A label whose FITS file is identical and whose content, apart from version numbers and `Modification_History`, is unchanged is kept as it was, with its version.
+    - A changed label whose FITS file is identical becomes version x.(n+1); a changed FITS file makes version (x+1).0. Either way the old `Modification_History` is kept, and the new entry describes the update.
+    - The retrieval date of an identical FITS file comes from its previous label.
   - Create a new XML label (`<name>.lblx`) for each file, labeling all of the visit's collections together so that labels can refer to the visit's other files.
   - Create a `Product_Browse` label for each preview, from MAST or picmaker, in the visit's `browse_*` collections.
   - Reset the modification dates of the FITS files to match their production date at MAST.
   - If any file contains NaNs, rename the original file with “`-original`” appended, and then rewrite the file without NaNs.
   - Replace the visit's `products.txt` and `trl_checksums.txt` with the pending lists from **query-hst-products**, if any, moving the old ones to `<HST_PIPELINE>/hst_<nnnnn>/visit_<ss>/backups/`.
-  - TBD: What to do if the file in the existing bundle is identical.
 
 #
 
